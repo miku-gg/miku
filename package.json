@@ -1,0 +1,10 @@
+{
+  "name": "mikugg",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^6.4.1"
+  }
+}

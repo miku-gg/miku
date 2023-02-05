@@ -1,0 +1,30 @@
+{
+  "name": "@mikugg/core",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+ "files": ["dist/**/*"],
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --ext .ts",
+    "prepare" : "npm run build"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "eslint": "^8.32.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/node": "^18.11.18",
+    "@types/better-queue": "^3.8.3",
+    "@keenondrums/singleton": "^1.0.0",
+    "axios": "^1.2.4",
+    "better-queue": "^3.8.12"
+  }
+}
