@@ -1,0 +1,33 @@
+{
+  "input": "./src",
+  "output": ".retype",
+  "favicon": "assets/favicon.ico",
+  "branding":
+  {
+    "title": "miku.gg",
+    "label": "Docs",
+    "logo": "assets/logo.png",
+    "logoDark": "assets/logo.png"
+  },
+  "meta": {
+    "title": " | miku.gg documentation"
+  },
+  "links": [
+    {
+      "text": "GitHub",
+      "link": "https://github.com/miku-gg/mikug"
+    },
+    {
+      "text": "Discord",
+      "link": "https://discord.gg/"
+    }
+  ],
+  "footer": {
+    "copyright": "&copy; Copyright {{ year }}. [miku.gg](https://miku.gg) All rights reserved."
+  },
+  "integrations": {
+    "googleAnalytics": {
+      "id": "G-93FSYGX2ES"
+    }
+  }
+}

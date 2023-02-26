@@ -1,10 +1,21 @@
 {
   "name": "mikugg",
   "private": true,
+  "scripts": {
+    "bootstrap": "npx lerna bootstrap --include-dependencies",
+    "docs": "lerna run start --scope=@mikugg/docs",
+    "start": "(cp .env apps/browser-chat || true) && lerna run start --parallel --ignore @mikugg/docs",
+    "build": "(cp .env apps/browser-chat || true) && npx lerna run build"
+  },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*",
+    "docs"
   ],
   "devDependencies": {
     "lerna": "^6.4.1"
+  },
+  "dependencies": {
+    "react-json-view": "latest"
   }
 }

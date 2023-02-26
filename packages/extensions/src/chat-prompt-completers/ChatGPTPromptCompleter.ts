@@ -1,74 +1,13 @@
-import { Configuration, OpenAIApi } from "openai";
 import * as Core from '@mikugg/core';
+import { InferProps } from "prop-types";
+import { ChatGPTServicePropTypes } from '../services/openai/ChatGPTService';
 
-interface OpenAIManagerConfig {
+type ChatGPTPropTypes = InferProps<typeof ChatGPTServicePropTypes>;
 
-  /**
-   * The API key for the OpenAI API.
-   */
-  apiKey: string;
-
-  /**
-   * The stop words for the OpenAI API.
-   */
-  stop: string[]
-}
-
-/**
- * OpenAIManager is a class that interacts with the OpenAI API.
- * 
- * @method createCompletion - A function that creates a completion.
- * 
- * @property {OpenAIManagerConfig} config - The configuration for the OpenAIManager.
- * @property {OpenAIApi} openai - The OpenAI API.
- * 
- * @see https://beta.openai.com/docs/api-reference/completions/create
- */
-class OpenAIManager {
-  private config: OpenAIManagerConfig;
-  private openai: OpenAIApi;
-
-  /**
-   * 
-   * @param config - The configuration for the OpenAIManager.
-   */
-  constructor(config: OpenAIManagerConfig) {
-    this.config = config;
-    const configuration = new Configuration({
-      apiKey: this.config.apiKey,
-    });
-    this.openai = new OpenAIApi(configuration);
-  }
-
-  /**
-   * 
-   * @param prompt - The prompt for the completion.
-   * 
-   * @returns The completion.
-   */
-  async createCompletion(prompt: string, useStop = true): Promise<string> {
-    const completion = await this.openai.createCompletion({
-      model: "text-davinci-003",
-      prompt,
-      temperature: 0.9,
-      max_tokens: 150,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0.6,
-      stop: useStop ? this.config.stop : [],
-      
-    });
-    const choices = completion?.data?.choices || [];
-
-    return choices.length ? (choices[0].text || '') : '';
-  }
-}
-
-export interface ChatGPTParams extends Core.ChatPromptCompleters.ChatPromptCompleterParams {
-  /**
-   * The OpenAI API key.
-   */
-  openAIKey: string
+export interface ChatGPTParams extends Core.ChatPromptCompleters.ChatPromptCompleterConfig {
+  serviceEndpoint: string;
+  props: ChatGPTPropTypes;
+  signer: Core.Services.ServiceQuerySigner
 }
 
 /**
@@ -79,17 +18,20 @@ export interface ChatGPTParams extends Core.ChatPromptCompleters.ChatPromptCompl
  * @property {OpenAIManager} openaiManger - The OpenAIManager.
  */
 export class ChatGPTPromptCompleter extends Core.ChatPromptCompleters.ChatPromptCompleter {
-  private openaiManger: OpenAIManager;
+  private props: ChatGPTPropTypes;
+  private service: Core.Services.ServiceClient<ChatGPTPropTypes, string>;
 
   constructor(params: ChatGPTParams) {
     super(params);
-    this.openaiManger = new OpenAIManager({
-      apiKey: params.openAIKey,
-      stop: [
-        `${params.botSubject}: `,
-        ...params.subjects.map(subject => `${subject}: `),
-      ]
-    })
+    this.props = params.props;
+    this.service = new Core.Services.ServiceClient<ChatGPTPropTypes, string>(params.serviceEndpoint, params.signer);
+  }
+  
+  public override async getCost(prompt: string): Promise<number> {
+    return this.service.getQueryCost({
+      ...this.getProps(),
+      prompt
+    });
   }
 
   /**
@@ -98,28 +40,29 @@ export class ChatGPTPromptCompleter extends Core.ChatPromptCompleters.ChatPrompt
    * 
    * @returns The completed prompt.
    */
-  protected async completePrompt(prompt: Core.ChatPromptCompleters.ChatPrompt): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
-    const result = await this.openaiManger.createCompletion(prompt.text);
+  protected async completePrompt(prompt: string): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
+    const result = await this.service.query({
+      ...this.getProps(),
+      prompt
+    }, await this.getCost(prompt));
     return {text: result};
   }
 
-  /**
-   * 
-   * @returns The prompt templates.
-   */
-  getPromptTemplates(): Core.ChatPromptCompleters.PromptTemplates {
+
+  protected async handleCompletionOutput(output: Core.ChatPromptCompleters.ChatPromptResponse): Promise<Core.OutputListeners.DialogOutputEnvironment> {
+    let promptResponse = output.text.replace(`\n${this.memory.getBotSubject()}: `, '')
     return {
-      describeContext: () => 'Please describe the current place and scene, using keywords sepparated by commas:',
-      options: {
-        context: () => 'List of possible events after this conversation:',
-        action: (subject: string) => `List of possible actions for ${subject} to do:`,
-        dialog: (subject: string) => `List of possible responses for ${subject} to say:`,
-      },
-      describeMoods: (botSubject: string) => `Sentences from ${botSubject} contain the mood at the end.\n
-      The possible moods are: ${Core.OutputListeners.moods.join(', ')}.\n
-      Examples:\n
-      ${botSubject}: Hello! Nice to see you! *happy*\n
-      ${botSubject}: Oh, I'm so sorry.*sad*\n`,
-    }
+      text: promptResponse
+    };
+  }
+
+  private getProps(): ChatGPTPropTypes {
+    return {
+      ...this.props,
+      stop: [
+        `${this.memory.getBotSubject()}: `,
+        ...this.memory.getSubjects().map(subject => `${subject}: `),
+      ]
+    };
   }
 }

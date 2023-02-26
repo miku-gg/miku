@@ -1,1 +1,2 @@
-export * from './ChatGPTPromptCompleter'
+export * from './ChatGPTPromptCompleter';
+export * from './PygmalionPromptCompleter';

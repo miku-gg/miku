@@ -6,7 +6,7 @@ import { Command } from "../commands";
  * @typeparam GeneratorInputType - The type of the input used to generate a command.
  */
 export abstract class CommandGenerator<GeneratorInputType> {
-  private subscriptions: Set<(command: Command) => void> = new Set();
+  private subscriptions: Set<(command: Command) => any> = new Set();
 
   /**
    * Generate a command from an input.
@@ -35,7 +35,9 @@ export abstract class CommandGenerator<GeneratorInputType> {
    */
   public async emit(input: GeneratorInputType): Promise<void> {
     const command = await this.generate(input);
-    this.subscriptions.forEach(fn => fn(command));
+    const pendings: Promise<any>[] = [];
+    this.subscriptions.forEach(fn => pendings.push(fn(command)));
+    await Promise.all(pendings);
   }
 }
 

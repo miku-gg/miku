@@ -36,8 +36,6 @@ export class WhisperGardioAPI extends Core.APIs.GradioAPI<SpeechToTextInput, Spe
 
 /*
  * WhisperGradioCommandGenerator is a command generator that generates commands from a base64 encoded audio file.
- * It based on the following repository:
- * https://github.com/ivandiazwm/whisper-gradio
  */
 export class WhisperGradioCommandGenerator extends Core.CommandGenerators.APICommandGenerator<{
   base64Input: string,

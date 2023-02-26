@@ -2,12 +2,15 @@ import * as ChatPromptCompleters from './chat-prompt-completers';
 import * as CommandGenerators from './command-generators';
 import * as Commands from './commands';
 import * as OutputListeners from './output-listeners';
+import * as Memory from './memory';
 
 export * as ChatPromptCompleters from './chat-prompt-completers';
 export * as APIs from './apis';
 export * as CommandGenerators from './command-generators';
 export * as Commands from './commands';
 export * as OutputListeners from './output-listeners';
+export * as Memory from './memory';
+export * as Services from './services';
 
 /**
  * ChatBotParams type
@@ -23,10 +26,10 @@ export interface ChatBotParams {
   promptCompleter: ChatPromptCompleters.ChatPromptCompleter;
   commandGenerators: CommandGenerators.CommandGenerator<any>[];
   outputListeners: {
-    dialogOutputListeners?: OutputListeners.OutputListener<OutputListeners.DialogOutputEnvironment>[];
-    actionOutputListeners?: OutputListeners.OutputListener<OutputListeners.ActionOutputEnvironment>[];
-    contextOutputListeners?: OutputListeners.OutputListener<OutputListeners.ContextOutputEnvironment>[];
-    optionsOutputListeners?: OutputListeners.OutputListener<OutputListeners.OptionsOutputEnvironment>[];
+    dialogOutputListeners?: OutputListeners.OutputListener<OutputListeners.DialogOutputEnvironment, any>[];
+    actionOutputListeners?: OutputListeners.OutputListener<OutputListeners.ActionOutputEnvironment, any>[];
+    contextOutputListeners?: OutputListeners.OutputListener<OutputListeners.ContextOutputEnvironment, any>[];
+    optionsOutputListeners?: OutputListeners.OutputListener<OutputListeners.OptionsOutputEnvironment, any>[];
   };
 }
 
@@ -45,10 +48,10 @@ export class ChatBot {
   private promptCompleter: ChatPromptCompleters.ChatPromptCompleter;
   private commandGenerators: CommandGenerators.CommandGenerator<unknown>[];
   private outputListeners: {
-    dialogOutputListeners?: OutputListeners.OutputListener<OutputListeners.DialogOutputEnvironment>[];
-    actionOutputListeners?: OutputListeners.OutputListener<OutputListeners.ActionOutputEnvironment>[];
-    contextOutputListeners?: OutputListeners.OutputListener<OutputListeners.ContextOutputEnvironment>[];
-    optionsOutputListeners?: OutputListeners.OutputListener<OutputListeners.OptionsOutputEnvironment>[];
+    dialogOutputListeners?: OutputListeners.OutputListener<OutputListeners.DialogOutputEnvironment, any>[];
+    actionOutputListeners?: OutputListeners.OutputListener<OutputListeners.ActionOutputEnvironment, any>[];
+    contextOutputListeners?: OutputListeners.OutputListener<OutputListeners.ContextOutputEnvironment, any>[];
+    optionsOutputListeners?: OutputListeners.OutputListener<OutputListeners.OptionsOutputEnvironment, any>[];
   };
 
   constructor(params: ChatBotParams) {
@@ -60,23 +63,23 @@ export class ChatBot {
       (commandGenerator) => commandGenerator.subscribe(
         async (command) => {
           const output = await this.promptCompleter.processCommand(command);
-          
+        
           switch (command.type) {
             case Commands.CommandType.DIALOG:
               this.outputListeners.dialogOutputListeners?.map((e) => {
-                e.handleOutput(output as OutputListeners.DialogOutputEnvironment)
+                e.sendOutput(output as OutputListeners.DialogOutputEnvironment)
               });
             case Commands.CommandType.CONTEXT:
               this.outputListeners.contextOutputListeners?.map((e) => {
-                e.handleOutput(output as OutputListeners.ContextOutputEnvironment)
+                e.sendOutput(output as OutputListeners.ContextOutputEnvironment)
               });
             case Commands.CommandType.ACTION:
               this.outputListeners.actionOutputListeners?.map((e) => {
-                e.handleOutput(output as OutputListeners.ActionOutputEnvironment)
+                e.sendOutput(output as OutputListeners.ActionOutputEnvironment)
               });
             case Commands.CommandType.OPTIONS:
               this.outputListeners.optionsOutputListeners?.map((e) => {
-                e.handleOutput(output as OutputListeners.OptionsOutputEnvironment)
+                e.sendOutput(output as OutputListeners.OptionsOutputEnvironment)
               });
           }
         }

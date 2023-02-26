@@ -1,0 +1,40 @@
+.scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  border-radius: 100vh;
+  background: skyblue;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: white;
+  border-radius: 100vh;
+  border: 3px solid skyblue;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #c0a0b9;
+}
+
+.button-transparent {
+  transition: all 0.3s ease;
+  border-radius: 0.375rem;
+  border: 2px solid #a696e7;
+  color: white;
+  background: transparent;
+}
+.button-transparent:hover {
+  box-shadow: 0 0 16px 0 #6f4cffe0;
+}
+
+.button-purple {
+  transition: all 0.3s ease;
+  border-radius: 0.375rem;
+  color: white;
+  background-color: #7957D2 !important;
+}
+
+.button-purple:hover {
+  background-color: #6f4cffe0 !important;
+}

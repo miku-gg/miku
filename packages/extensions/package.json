@@ -1,7 +1,12 @@
 {
   "name": "@mikugg/extensions",
-  "version": "0.0.1",
+  "version": "0.0.18-alpha.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miku-gg/miku.git",
+    "directory": "packages/extensions"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -9,8 +14,9 @@
   ],
   "scripts": {
     "build": "tsc",
+    "start": "tsc --watch",
     "lint": "eslint . --ext .ts",
-    "prepare" : "npm run build"
+    "prepare": "npm run build"
   },
   "author": "",
   "license": "MIT",
@@ -24,8 +30,16 @@
   "dependencies": {
     "@mikugg/core": "*",
     "@types/axios": "^0.14.0",
+    "@types/lodash.trim": "^4.5.7",
     "@types/node": "^18.11.18",
+    "@types/prop-types": "^15.7.5",
     "axios": "^1.2.4",
-    "openai": "^3.1.0"
-  }
+    "compute-cosine-similarity": "^1.0.0",
+    "gpt3-tokenizer": "^1.1.5",
+    "ipfs-only-hash": "^4.0.0",
+    "lodash.trim": "^4.5.1",
+    "openai": "^3.1.0",
+    "prop-types": "^15.8.1"
+  },
+  "gitHead": "fdedec3c8725dfd89c7062c0115ca23c1645f863"
 }

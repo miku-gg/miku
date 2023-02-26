@@ -1,0 +1,17 @@
+{
+  "name": "@mikugg/docs",
+  "version": "0.0.18-alpha.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "./node_modules/.bin/retype watch",
+    "build": "./node_modules/.bin/retype build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "retypeapp": "^2.4.0"
+  }
+}

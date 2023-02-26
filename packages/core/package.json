@@ -1,14 +1,22 @@
 {
   "name": "@mikugg/core",
-  "version": "0.0.1",
+  "version": "0.0.18-alpha.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miku-gg/miku.git",
+    "directory": "packages/core"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
- "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "build": "tsc",
+    "start": "tsc --watch",
     "lint": "eslint . --ext .ts",
-    "prepare" : "npm run build"
+    "prepare": "npm run build"
   },
   "author": "",
   "license": "MIT",
@@ -20,11 +28,17 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@types/axios": "^0.14.0",
-    "@types/node": "^18.11.18",
-    "@types/better-queue": "^3.8.3",
+    "@ethersproject/wallet": "^5.7.0",
     "@keenondrums/singleton": "^1.0.0",
+    "@types/axios": "^0.14.0",
+    "@types/base-64": "^1.0.0",
+    "@types/node": "^18.11.18",
+    "@types/prop-types": "^15.7.5",
     "axios": "^1.2.4",
-    "better-queue": "^3.8.12"
-  }
+    "base-64": "^1.0.0",
+    "events": "^3.3.0",
+    "prop-types": "^15.8.1",
+    "queue": "^6.0.2"
+  },
+  "gitHead": "fdedec3c8725dfd89c7062c0115ca23c1645f863"
 }

@@ -1,1 +1,2 @@
-export * from './ElevenLabsOutputListener';
+export * from './TTSOutputListener';
+export * from './EmotionRenderer';

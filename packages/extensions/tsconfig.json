@@ -3,12 +3,16 @@
   "experimentalDecorators": true,
   "esModuleInterop": true,
   "stripInternal": true,
-  "target": "es5",
-  "module": "commonjs",
+  "target": "es6",
+  "module": "CommonJS",
+  "moduleResolution": "node16",
+  "resolveJsonModule": true,
+  "noImplicitOverride": true,
+  "declarationMap": true,
   "declaration": true,
   "outDir": "./dist",
   "strict": true
 },
 "include": ["src"],
-"exclude": ["node_modules", "**/__tests__/*"]
+"exclude": ["node_modules", "dist", "**/__tests__/*"]
 }

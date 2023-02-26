@@ -1,0 +1,39 @@
+{
+  "name": "@mikugg/bot-builder",
+  "version": "0.0.18-alpha.0",
+  "private": true,
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miku-gg/miku.git",
+    "directory": "packages/bot-builder"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc --watch",
+    "lint": "eslint . --ext .ts",
+    "prepare": "npm run build"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "eslint": "^8.32.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@mikugg/core": "*",
+    "@mikugg/extensions": "*",
+    "@types/prop-types": "^15.7.5",
+    "prop-types": "^15.8.1"
+  },
+  "gitHead": "fdedec3c8725dfd89c7062c0115ca23c1645f863"
+}
