@@ -3,8 +3,8 @@ import { FormEvent, useEffect, useReducer, useState } from 'react';
 import { Disclosure } from '@headlessui/react'
 import { getBotHashFromUrl, useBot } from '../../libs/botLoader';
 
-const MIKU_BOT = 'Qmbg9NDjXSAx9vpfuDbNpeVMwNLjytd3Sh1gtbdknsfWqi';
-const ELAINA_BOT = 'QmT1YQvV38SNhwef7BnkjqEeYWSsQYePuMi76MkUXCyyhC';
+const MIKU_BOT = 'QmdDSTD9QV1rTkHRYFtyAJWkYandNXnJeVmrr1xZ8effkS';
+const ELAINA_BOT = 'QmXThSy6BjidXAeTr3nez9ikXsWh5xZgJZxLbbmcCimdAP';
 export const IS_ALPHA_LIVE = window.location.hostname === 'alpha.miku.gg';
 
 export default function BotLoadingModal(): JSX.Element {

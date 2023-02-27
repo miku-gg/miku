@@ -16,7 +16,7 @@ app.get('/', (req, res) => res.send('miku bot server'))
 app.post('/bot', bodyParser.json(), addBot);
 app.get('/bot/:hash', getItem.bind(null, 'json', 'bots'));
 
-app.post('/image', multer().single('file'), addImage);
+app.post('/image', multer().array('files'), addImage);
 app.get('/image/:hash', getItem.bind(null, 'image', 'imgs'));
 
 app.post('/emotion', multer().single('file'), addEmotion);

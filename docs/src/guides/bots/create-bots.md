@@ -80,5 +80,5 @@ To create a bot you need to create a JSON file with a valid structure.
 
 Here you have two examples of bot configs:
 
-* [Miku: OpenAI + Azure](https://github.com/miku-gg/miku/blob/master/apps/bot-directory/db/bots/Qmbg9NDjXSAx9vpfuDbNpeVMwNLjytd3Sh1gtbdknsfWqi)
-* [Elaina: Pygmalion + 11Labs](https://github.com/miku-gg/miku/blob/master/apps/bot-directory/db/bots/QmT1YQvV38SNhwef7BnkjqEeYWSsQYePuMi76MkUXCyyhC)
+* [Miku: OpenAI + Azure](https://github.com/miku-gg/miku/blob/master/apps/bot-directory/db/bots/QmdDSTD9QV1rTkHRYFtyAJWkYandNXnJeVmrr1xZ8effkS)
+* [Elaina: Pygmalion + 11Labs](https://github.com/miku-gg/miku/blob/master/apps/bot-directory/db/bots/QmXThSy6BjidXAeTr3nez9ikXsWh5xZgJZxLbbmcCimdAP)
