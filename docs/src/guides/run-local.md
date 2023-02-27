@@ -6,7 +6,14 @@ order: 1900
 
 The preferred way to run the project is to download the source code and run it locally. This way, you can customize the bot to your liking and you don't have to worry about the servers going offline.
 
+!!!
+The following guide is linux-only. I still haven't run it on Windows or Mac, but I'm sure it's possible. If you manage to do it, please let me know and I'll add the instructions here.
+!!!
+
+
 ## Instructions
+
+[!embed](https://www.youtube.com/watch?v=zEiH9TqZjF8)
 
 ### Requirements
 You need to have `node v16+` and `git` installed on your machine. You can download them from the following links:
@@ -27,9 +34,9 @@ git clone https://github.com/miku-gg/miku.git
 Next, you need to create an `.env` file. You can do this by running the following commands:
 
 ```bash
-cd mikugg
+cd miku
 cp .env.example .env
-code .env
+gedit .env
 ```
 
 The `.env` file should look like this. Please replace the api key values with your own.
