@@ -10,7 +10,7 @@ export const IS_ALPHA_LIVE = window.location.hostname === 'alpha.miku.gg';
 export default function BotLoadingModal(): JSX.Element {
   const { botHash, loading, setBotHash } = useBot();
   const searchParams = queryString.parse(location.search);
-  const [apiKeyForm, setApiKeyForm] = useState<{[key: string]: string}>({openai: '', elevenLabs: '', azure: ''});
+  const [apiKeyForm, setApiKeyForm] = useState<{[key: string]: string}>({openai: '', elevenLabs: '', azure: '', novelai: ''});
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
 
   const submitAPIKey = (e: FormEvent) => {
@@ -72,6 +72,14 @@ export default function BotLoadingModal(): JSX.Element {
                       placeholder="11Labs API key..."
                       value={apiKeyForm.elevenLabs}
                       onChange={(e) => setApiKeyForm(current => ({...current, elevenLabs: e.target.value}))}
+                    />
+                    <input
+                      type="text"
+                      className="w-full border-2 border-gray-300 p-2 rounded-md m-1 bg-gray-100 text-black"
+                      name="novelai"
+                      placeholder="NovelAI API key..."
+                      value={apiKeyForm.novelai}
+                      onChange={(e) => setApiKeyForm(current => ({...current, novelai: e.target.value}))}
                     />
                   </Disclosure.Panel>
                 </Disclosure>

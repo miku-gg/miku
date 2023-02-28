@@ -95,7 +95,7 @@ class BotFactory {
 
     // for alpha demo
     const searchParams = queryString.parse(location.search);
-
+    
     switch (service) {
       case MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter:
         outputListener = new MikuExtensions.OutputListeners.EmotionRenderer({
@@ -120,6 +120,16 @@ class BotFactory {
           props: {
             ...props,
             apiKey
+          }
+        });
+        break;
+      case MikuExtensions.Services.ServicesNames.NovelAITTS:
+        outputListener = new MikuExtensions.OutputListeners.TTSOutputListener({
+          serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+          signer: signer,
+          props: {
+            ...props,
+            apiKey: String(searchParams['novelai'] || '') || ''
           }
         });
         break;
@@ -163,6 +173,14 @@ class BotFactory {
         ) {
           return false;
         }
+
+        if (
+          listener.service === MikuExtensions.Services.ServicesNames.NovelAITTS &&
+          !queryString.parse(location.search)['novelai']
+        ) {
+          return false;
+        }
+        
         
         return true;
       })

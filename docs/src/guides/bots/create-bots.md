@@ -33,7 +33,7 @@ To create a bot you need to create a JSON file with a valid structure.
     },
     "outputListeners": [ // list of services that will do stuff when the chat response arrives
         {
-            "service": 'azure_tts' | 'elevenlabs_tts', // The voice that will be used to generate the bot responses
+            "service": 'azure_tts' | 'elevenlabs_tts' | 'novelai_tts', // The voice that will be used to generate the bot responses
             "props": { // depends on the service used
                 "voiceId": "en-US-AriaNeural" // The voice that will be used for the bot responses
             }
