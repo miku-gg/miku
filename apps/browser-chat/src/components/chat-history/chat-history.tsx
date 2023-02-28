@@ -1,8 +1,11 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { toast } from "react-toastify";
 import * as MikuCore from '@mikugg/core';
 import botFactory from "../../libs/botFactory";
 import { useBot } from "../../libs/botLoader";
+import { CheckIcon, PencilIcon } from '@primer/octicons-react'
+import "./chat-history.css";
+import trim from 'lodash.trim';
 
 export const HistoryManagementButtons = ({ onLoad }: {onLoad: () => void}) => {
   const history = botFactory.getInstance()?.getMemory();
@@ -34,7 +37,13 @@ export const HistoryManagementButtons = ({ onLoad }: {onLoad: () => void}) => {
           toast.warn('Please, load a bot before uploading a history');
           return;
         }
-        const json = reader.result as string;
+        let json = reader.result as string;
+
+        // fix for old format, remove in the future
+        json = json.replace(/"type":"dialog"/g, `"type":1`);
+        json = json.replace(/"type":"action"/g, `"type":1`);
+        json = json.replace(/"type":"context"/g, '"type":0');
+
         const newData = JSON.parse(json) as {
           memory: MikuCore.Memory.MemoryLine[],
           botHash: string,
@@ -80,10 +89,132 @@ export const HistoryManagementButtons = ({ onLoad }: {onLoad: () => void}) => {
   )
 }
 
+const HistoryMemoryLine = ({
+  botSubject,
+  text,
+  subject,
+  editing,
+  editingText,
+  setEditingText,
+  onEditedSelected,
+  onEditedSubmit,
+  onCancelEdit,
+}: {
+  botSubject: string
+  text: string
+  subject: string
+  editing: boolean
+  editingText: string
+  setEditingText: (text: string) => void
+  onEditedSelected: () => void
+  onEditedSubmit: () => void
+  onCancelEdit: () => void
+}): JSX.Element => {
+
+
+  const subjectDisplay = (
+    <p
+      className={`${
+        (subject === botSubject)
+          ? "text-yellow-300"
+          : "text-green-600"
+      }`}
+    >
+      {subject}:
+    </p>
+  );
+
+  return (
+    <div className="w-full">
+      {editing ? (
+        <div className="flex gap-2 items-center w-full">
+          <button className="text-gray-400 hover:text-gray-100" onClick={onEditedSubmit}>
+            <CheckIcon size={16} />
+          </button>
+          {subjectDisplay}
+          <input
+            className="w-full bg-transparent text-white border-2 border-transparent border-b-gray-500 focus:border-b-solid focus:border-x-trasparent focus:border-b-2 focus:border-b-blue-700 outline-0 transition-all"
+            value={editingText}
+            onChange={(e) => setEditingText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                onCancelEdit();
+              } else if (e.key === 'Enter') {
+                onEditedSubmit();
+              }
+            }}
+          />
+        </div>
+      ) : (
+        <div className="memory-line-display flex gap-2 items-center">
+          <button className="memory-edit-button text-gray-400 hover:text-gray-100" onClick={onEditedSelected}>
+            <PencilIcon size={16} />
+          </button>
+          {subjectDisplay}
+          <p className={`${
+            (subject === botSubject)
+              ? "text-white"
+              : "text-gray-400"
+            } text-left`}
+          >
+            {text}
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+const HistoryMemoryLines = ({
+  botSubject,
+  memoryLines,
+  editedIndex,
+  setEditedIndex,
+  editedText,
+  setEditedText,
+  onEditedSubmit
+}: {
+  botSubject: string,
+  memoryLines: MikuCore.Memory.MemoryLine[],
+  editedIndex: number,
+  setEditedIndex: (index: number) => void,
+  editedText: string,
+  setEditedText: (text: string) => void,
+  onEditedSubmit: () => void,
+}) => {
+  return (
+    <div className="flex flex-col justify-start items-start w-full h-fit">
+      {memoryLines.map((line, i) => {
+        return (
+          <HistoryMemoryLine
+            key={`chat_${botSubject}_${line.text}_${line.subject}_${i}`}
+            botSubject={botSubject}
+            text={line.text}
+            subject={line.subject}
+            editing={editedIndex === i}
+            editingText={editedText}
+            setEditingText={setEditedText}
+            onEditedSelected={() => {
+              setEditedIndex(i);
+              setEditedText(line.text);
+            }}
+            onCancelEdit={() => setEditedIndex(-1)}
+            onEditedSubmit={onEditedSubmit}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 export const HistoryConsole = () => {
   const { botConfig } = useBot();
   const history = botFactory.getInstance()?.getMemory();
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
+
+  const [editedIndex, setEditedIndex] = useState<number>(-1);
+  const [editedText, setEditedText] = useState<string>('');
 
   useEffect(() => {
     botFactory.getInstance()?.subscribeDialog(() => {
@@ -91,8 +222,32 @@ export const HistoryConsole = () => {
     });
   }, [botConfig]);
 
+
+  const updateMemoryLine = () => {
+    const memory = botFactory.getInstance()?.getMemory();
+    const lines = memory?.getMemory() || [];
+    if (editedText === lines[editedIndex].text) {
+      setEditedIndex(-1);
+      return;
+    }
+    if (!trim(editedText)) {
+      lines.splice(editedIndex, 1);
+    } else {
+      lines[editedIndex] = {
+        ...lines[editedIndex],
+        text: editedText
+      };
+    }
+    memory?.clearMemories();
+    lines.forEach((line) => {
+      memory?.pushMemory(line);
+    });
+    setEditedIndex(-1);
+    forceUpdate();
+  };
+
   return (
-    <div className="flex flex-col h-full p-2.5 overflow-auto gap-3 w-full font-mono text-sm text-white bg-[#323232] rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-{#323232} dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+    <div className="flex flex-col h-full p-2.5 overflow-auto gap-3 w-full font-mono text-sm text-white bg-[#323232] rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-{#323232} border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500">
       {/* HISTORY CONTEXT */}
       <div className="text-left w-full h-fi text-slate-400">
         {history
@@ -109,26 +264,15 @@ export const HistoryConsole = () => {
           ))}
       </div>
       {/* HISTORY CURRENT CHAT */}
-      <div className="flex flex-col justify-start items-start w-full h-fit">
-        {history?.getMemory().map(({ text, subject }, i) => (
-          <div key={`chat_${i}`} className="flex gap-2">
-            <p
-              className={`${
-                (subject === ((botConfig?.short_term_memory?.props as {botSubject: string})?.botSubject || ''))
-                  ? "text-yellow-300"
-                  : "text-green-600"
-              }`}
-            >
-              {subject}:
-            </p>
-            <p className={`${
-                (subject === ((botConfig?.short_term_memory?.props as {botSubject: string})?.botSubject || ''))
-                  ? "text-white"
-                  : "text-gray-400"
-              } text-left`}>{text}</p>
-          </div>
-        ))}
-      </div>
+      <HistoryMemoryLines
+        editedIndex={editedIndex}
+        setEditedIndex={(i: number) => setEditedIndex(i)}
+        editedText={editedText}
+        setEditedText={(t: string) => setEditedText(t)}
+        botSubject={(botConfig?.short_term_memory?.props as {botSubject: string})?.botSubject || ''}
+        memoryLines={history?.getMemory() || []}
+        onEditedSubmit={updateMemoryLine}
+      />
     </div>
   );
 }

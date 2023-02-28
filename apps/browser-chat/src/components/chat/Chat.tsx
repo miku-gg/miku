@@ -11,7 +11,7 @@ function SmallSpinner(): JSX.Element {
     <div role="status">
       <svg
         aria-hidden="true"
-        className="ml-2 w-4 h-4 mr-2 text-gray-200 animate-spin dark:text-gray-400 fill-gr@types/dom-mediacapture-recorday-600"
+        className="ml-2 w-4 h-4 mr-2 text-gray-200 animate-spin fill-gr@types/dom-mediacapture-recorday-600"
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

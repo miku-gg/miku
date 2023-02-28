@@ -92,7 +92,7 @@ export abstract class ChatPromptCompleter {
     const promptResult = await this.completePrompt(prompt);
     const output = await this.handleCompletionOutput(promptResult);
     this.memory.pushMemory({
-      type: 'dialog',
+      type: Commands.CommandType.DIALOG,
       text: output.text,
       subject: this.memory.getBotSubject()
     });

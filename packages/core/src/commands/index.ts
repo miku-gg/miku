@@ -39,23 +39,9 @@ export interface Command {
 
 
 export const commandToMemoryLine = (command: Command): MemoryLine => {
-  let memoryType: 'dialog' | 'context' | 'action' = 'dialog';
-
-  switch (command.type) {
-    case CommandType.CONTEXT:
-      memoryType = 'context';
-      break;
-    case CommandType.ACTION:
-      memoryType = 'action';
-      break;
-    case CommandType.DIALOG:
-      memoryType = 'dialog';
-      break;
-  }
-
   return {
     subject: command.input.subject,
     text: command.input.text,
-    type: memoryType,
+    type: command.type,
   };
 }

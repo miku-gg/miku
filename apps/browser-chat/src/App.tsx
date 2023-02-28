@@ -15,7 +15,7 @@ export const App = () => {
   const { loading: loadingBot, botHash, botConfig } = useBot();
 
   const sendPrompt = (
-    event: React.FormEvent,
+    event: React.UIEvent,
     value: string,
     type: number
   ): void => {
@@ -46,7 +46,7 @@ export const App = () => {
       }}
     >
       <div className="w-5/12 h-full max-lg:w-full">
-        <Conversation loading={loading} />
+        <Conversation loading={loading} sendPrompt={sendPrompt}/>
         <Chat sendPrompt={sendPrompt} />
       </div>
       <Aside />

@@ -1,0 +1,8 @@
+.memory-edit-button {
+  opacity: 0;
+  transition: all .2s ease-in;
+}
+
+.memory-line-display:hover .memory-edit-button {
+  opacity: 1;
+}

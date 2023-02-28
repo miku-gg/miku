@@ -7,7 +7,7 @@ order: 1900
 The preferred way to run the project is to download the source code and run it locally. This way, you can customize the bot to your liking and you don't have to worry about the servers going offline.
 
 !!!
-The following guide is linux-only. I still haven't run it on Windows or Mac, but I'm sure it's possible. If you manage to do it, please let me know and I'll add the instructions here.
+The following guide is linux-only. For Windows 10, [check this guide](https://rentry.org/ukim) (credits to some anon).
 !!!
 
 

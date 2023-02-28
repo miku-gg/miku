@@ -37,13 +37,16 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<Core.
     for (let x = 0; x < text.length; x++)
     {
         const ch = text.charAt(x);
+        const spaceBefore = x > 0 && text.charAt(x - 1) == ' ';
 
         if (lastOpen == '(' && ch == ')') {lastOpen = undefined; continue;}
         if (lastOpen == '[' && ch == ']') {lastOpen = undefined; continue;}
         if (lastOpen == '-' && ch == '-') {lastOpen = undefined; continue;}
         if (lastOpen == '*' && ch == '*') {lastOpen = undefined; continue;}
 
-        if (ch == '(' || ch == '[' || ch == '-' || ch == "*") {
+        // We require a space before these characters to avoid cases like "Oh-oh"
+        // Where the character is part of the word.
+        if (spaceBefore && (ch == '(' || ch == '[' || ch == '-' || ch == "*")) {
           lastOpen = ch;
           continue;
         }

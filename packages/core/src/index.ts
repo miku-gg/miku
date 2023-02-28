@@ -63,7 +63,7 @@ export class ChatBot {
       (commandGenerator) => commandGenerator.subscribe(
         async (command) => {
           const output = await this.promptCompleter.processCommand(command);
-        
+
           switch (command.type) {
             case Commands.CommandType.DIALOG:
               this.outputListeners.dialogOutputListeners?.map((e) => {
