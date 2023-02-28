@@ -46,6 +46,11 @@ servicesValidator.addService(
 );
 
 servicesValidator.addService(
+  MikuExtensions.Services.ServicesNames.NovelAITTS,
+  MikuExtensions.Services.TTS.TTSServicePropTypes
+);
+
+servicesValidator.addService(
   MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter,
   MikuExtensions.Services.EmotionInterpreterPropTypes
 );

@@ -9,6 +9,7 @@ export enum ServicesNames {
   Pygmalion = "pygmalion_completer",
   AzureTTS = "azure_tts",
   ElevenLabsTTS = "elevenlabs_tts",
+  NovelAITTS = "novelai_tts",
   GPTShortTermMemory = "gpt_short-memory",
   OpenAIEmotionInterpreter = "openai_emotion-interpreter",
 }

@@ -10,6 +10,7 @@ require('dotenv').config({ path: path.join(__dirname, '../../.env')});
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const AZURE_API_KEY = process.env.AZURE_API_KEY || '';
+const NOVELAI_API_KEY = process.env.NOVELAI_API_KEY || '';
 const PYGMALION_ENDPOINT = process.env.PYGMALION_ENDPOINT || '';
 const EMOTIONS_ENDPOINT = process.env.EMOTIONS_ENDPOINT || '';
 
@@ -49,6 +50,16 @@ if (AZURE_API_KEY) {
     billingEndpoint: '',
     addRoute
   });  
+}
+
+if (NOVELAI_API_KEY) {
+  new MikuExtensions.Services.TTS.NovelAITTSService({
+    apiKey: NOVELAI_API_KEY,
+    costPerRequest: 10, 
+    billingEndpoint: '',
+    serviceId: MikuExtensions.Services.ServicesNames.NovelAITTS,
+    addRoute
+  });
 }
 
 if (PYGMALION_ENDPOINT) {
