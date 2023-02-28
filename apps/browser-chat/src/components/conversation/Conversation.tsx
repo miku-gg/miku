@@ -1,11 +1,11 @@
 import * as MikuExtensions from "@mikugg/extensions";
-import { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import "./conversation.css";
 
 import historyIcon from "../../assets/icons/chat-history.png";
-import settingsIcon from "../../assets/icons/settings.png";
+// import settingsIcon from "../../assets/icons/settings.png";
 import infoIcon from "../../assets/icons/information.png";
-import backgroundIcon from "../../assets/icons/background.png";
+// import backgroundIcon from "../../assets/icons/background.png";
 
 import { Loader } from "../loading/Loader";
 import botFactory from "../../libs/botFactory";
@@ -14,10 +14,17 @@ import { PopUp } from "../pup-up/pup-up";
 import { ChatHistory, HistoryManagementButtons } from "../chat-history/chat-history";
 import { BotDetails } from "../bot-details/BotDetails";
 import "./conversation.css";
+import { Reload } from "../../assets/icons/svg";
+import { UnmuteIcon } from "@primer/octicons-react";
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT || 'http://localhost:8585/images';
 
-export const Conversation = ({ loading }: any) => {
+const playAudio = (base64: string): void => {
+  const snd = new Audio(base64);
+  snd.play();
+}
+
+export const Conversation = ({ loading, sendPrompt }: any) => {
   const [message, setMessage] = useState<string>();
   const [backgroundImage, setBackgroundImage] = useState<string>();
   const [emotionImage, setEmotionImage] = useState<string>();
@@ -25,6 +32,7 @@ export const Conversation = ({ loading }: any) => {
   const [ showHistory, setShowHistory ] = useState<Boolean>(false)
   const [ handleBotDetailsInfo, setHandleBotDetailsInfo ] = useState<boolean>(false);
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
+  const [lastAudio, setLastAudio] = useState<string>('');
 
   useEffect(() => {
     if (botConfig) {
@@ -43,8 +51,10 @@ export const Conversation = ({ loading }: any) => {
 
   useEffect(() => {
     botFactory.getInstance()?.subscribeAudio((base64: string) => {
-      const snd = new Audio(base64);
-      snd.play();
+      if (base64) {
+        playAudio(base64);
+        setLastAudio(base64);  
+      }
     });
   }, [botConfig]);
 
@@ -54,6 +64,24 @@ export const Conversation = ({ loading }: any) => {
   
   const displayBotDetails = () =>{
     setHandleBotDetailsInfo(true)
+  }
+
+  const onRegenerateClick = (event: React.UIEvent) => {
+    const bot = botFactory.getInstance();
+    const shortTermMemory = bot?.getMemory();
+    const memoryLines = shortTermMemory?.getMemory();
+    if (shortTermMemory && memoryLines && memoryLines.length >= 2) {
+      shortTermMemory.clearMemories();
+      memoryLines.forEach((line, index) => {
+        if (index < memoryLines.length - 2) {
+          shortTermMemory.pushMemory(line);
+        }
+      })
+
+      const lastMemoryLine = memoryLines[memoryLines.length - 2];
+
+      sendPrompt(event, lastMemoryLine.text, lastMemoryLine.type);
+    }
   }
 
   return (
@@ -90,7 +118,7 @@ export const Conversation = ({ loading }: any) => {
             }}
           />
         </div>
-        {/* CONVERSATION CONTAINER */}
+        {/* RESPONSE CONTAINER */}
         <div
           className={
             (!message && !loading)
@@ -98,12 +126,35 @@ export const Conversation = ({ loading }: any) => {
               : "absolute bottom-10 z-10 flex justify-center items-center w-full h-1/4"
           }
         >
-          <div className="flex justify-left px-8 py-4 items-start scrollbar w-10/12 h-3/4 bg-gradient-to-b from-slate-900/[.7] to-gray-500/50 rounded-md overflow-auto border-[4px] drop-shadow-2xl shadow-black">
-            {loading ? (
-              <Loader />
-            ) : (
-              <p className="text-xl font-bold text-white ">{message}</p>
-            )}
+          <div className="response-container h-3/4 w-10/12 relative">
+            <div className="flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b from-slate-900/[.7] to-gray-500/50 rounded-md overflow-auto border-[4px] drop-shadow-2xl shadow-black">
+              {loading ? (
+                <Loader />
+              ) : (
+                <p className="text-lg font-bold text-white ">{message}</p>
+              )}
+            </div>
+            {
+              !loading ? (
+                <button
+                  className="reload-button absolute top-[-2.5em] right-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
+                  onClick={onRegenerateClick}
+                >
+                  <Reload />
+                  Regenerate
+                </button>
+              ) : null
+            }
+            {
+              (!loading && lastAudio) ? (
+                <button
+                  className="audio-button absolute bottom-3 left-3 inline-flex items-center gap-2 text-gray-400 rounded-md hover:text-white"
+                  onClick={() => playAudio(lastAudio)}
+                >
+                  <UnmuteIcon size={24} />
+                </button>
+              ) : null
+            }
           </div>
         </div>
       </div>

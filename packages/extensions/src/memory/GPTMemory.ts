@@ -5,6 +5,8 @@ export interface GPTShortTermMemoryConfig extends MikuCore.Memory.MemoryPromptCo
   language: MikuCore.ChatPromptCompleters.Language;
 }
 
+
+
 export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
 
   constructor({prompt_context, prompt_initiator, subjects, botSubject}: GPTShortTermMemoryConfig, memorySize = 15) {
@@ -34,13 +36,10 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
 
     for (let i = Math.max(this.memory.length - this.memorySize, 0); i < this.memory.length; i++) {
       switch (this.memory[i].type) {
-        case 'dialog':
+        case MikuCore.Commands.CommandType.DIALOG:
           prompt += '\n' + this.memory[i].subject + ': ' + this.memory[i].text;
           break;
-        case 'action':
-          prompt += '\n' + this.memory[i].subject + ': *' + this.memory[i].text + '*';
-          break;
-        case 'context':
+        case MikuCore.Commands.CommandType.CONTEXT:
           prompt += '\n' + this.memory[i].text;
           break;
       }

@@ -1,7 +1,9 @@
+import { Commands } from "..";
+
 export interface MemoryLine {
   text: string;
   subject: string;
-  type: 'dialog' | 'context' | 'action';
+  type: Commands.CommandType;
 }
 
 /**

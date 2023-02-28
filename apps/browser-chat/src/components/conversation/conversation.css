@@ -37,3 +37,23 @@
   -o-user-select: none;
   user-select: none;
 }
+
+.audio-button,
+.reload-button {
+  opacity: 0;
+  transition: all .2s ease-in;
+}
+
+.reload-button:hover,
+.response-container:hover .reload-button {
+  opacity: 1;
+}
+
+.reload-button:hover,
+.response-container:hover .audio-button {
+  opacity: 1;
+}
+
+.reload-button:hover {
+  box-shadow: 0 0 6px 0 white;
+}
