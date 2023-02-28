@@ -41,7 +41,7 @@ To create a bot you need to create a JSON file with a valid structure.
         {
             "service": "openai_emotion-interpreter",  // For mapping the bot responses to emotion images
             "props": {
-                "images": { // Hashesh of the emotion images
+                "images": { // Hashes of the emotion images
                     "angry": string;
                     "sad": string;
                     "happy": string;
