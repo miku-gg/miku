@@ -1,0 +1,16 @@
+<div class="ui stackable menu">
+  <div class="item header">
+    <img src="/public/logo.png" />
+  </div>
+  <a class="item <%= active === '/' ? 'active' : '' %> " href="/">Bot List</a>
+  <a class="item <%= active === '/build' ? 'active' : '' %>" href="/build">Build Bot</a>
+  <a class="item disabled">Download Bot <span class="bg-red-700 rounded-lg px-2 py-1 ml-2 text-white">soon</span></a>
+  <a class="item disabled">Share Bot <span class="bg-red-700 rounded-lg px-2 py-1 ml-2 text-white">soon</span></a>
+  <div class="item right" style="display: flex; justify-content: right;">
+    <i class="sun icon"></i>
+    <div class="ui toggle checkbox" style="margin-left: 5px;">
+      <input type="checkbox" tabindex="0" class="dark_mode_toggle hidden">
+    </div>
+    <i class="moon icon"></i>
+  </div>
+</div>

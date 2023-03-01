@@ -5,6 +5,8 @@ import servicesValidator from "./lib/ServicesValidator"
 export const BotConfigPropTypes = {
   "bot_name": PropTypes.string.isRequired,
   "version": PropTypes.string.isRequired,
+  "description": PropTypes.string,
+  "configVersion": PropTypes.number,
   "subject": PropTypes.string.isRequired,
   "profile_pic": PropTypes.string.isRequired,
   "background_pic": PropTypes.string.isRequired,

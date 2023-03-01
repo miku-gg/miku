@@ -1,0 +1,116 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="/public/semantic.min.css">
+    <link rel="stylesheet" href="/public/form.min.css">
+    <link rel="icon" href="/public/favicon.ico" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Bot directory | Miku</title>
+    <style>
+      .ui.inverted.form  .field textarea,
+      .ui.inverted.form  .dropdown,
+      .ui.inverted.form  .dropdown .item,
+      .ui.inverted.form  .field input {
+        background-color: #484848;
+        color: #fff;
+      }
+      .ui.menu.inverted .item.disabled {
+        color: #fff !important;
+      }
+      .ui.card.inverted {
+        background-color: #484848;
+      }
+      .ui.card.inverted .content .header,
+      .ui.card.inverted .content .meta,
+      .ui.card.inverted .content .description,
+      .ui.card.inverted .extra.content a {
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ui basic segment">
+     <%- include('header', {active: '/'}); %>
+      <div class="flex gap-6">
+        <% bots.forEach(function(bot){ %>
+          <div class="w-60">
+            <div class="ui card">
+              <div class="image">
+                <img src="/image/<%= bot.profile_pic %>">
+              </div>
+              <div class="content">
+                <a class="header" href="http://localhost:5173/?bot=<%= bot.hash%>" target="_blank"><%= bot.bot_name %></a>
+                <div class="meta">
+                  <% switch (bot.prompt_completer.service) {
+                    case 'pygmalion_completer':  %>
+                  <div class="bg-blue-700 rounded-md px-2 py-1 mt-1 inline-block">Pygmalion</div>
+                  <% break;
+                    case 'chatgpt_completer':  %>
+                    <div class="bg-green-700 rounded-md px-2 py-1 mt-1 inline-block">Davinci</div>
+                  <% break; }  %>
+                </div>
+                <div class="description">
+                  <%= bot.description || 'No description' %>
+                </div>
+              </div>
+              <div class="extra content">
+                <a>
+                  Version <%= bot.version %>
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+      <div class="mt-10 w-5/12">
+        <form action="/bot" method="post" enctype="multipart/form-data" class="ui form">
+          <label>
+            <h3 class="ui header">Upload a bot</h3>
+            <input type="file" value="file" required accept=".miku" name="file" id="file"/>
+          </label>
+          <div class="mt-5">
+            <button class="ui button" type="submit">Upload</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- LIBS -->
+    <script
+    src="/public/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+    <script src="/public/semantic.min.js"></script>
+    <script src="/public/form.min.js"></script>
+    <script>
+      
+      $(document).ready(function() {
+        $('.dropdown').dropdown();
+
+        // toggle button formatting
+        $(".ui.checkbox").checkbox();
+
+        // listen for changes to dark mode toggle buttons
+        $(".dark_mode_toggle:checkbox").on("change", function() {
+          change_theme($(this).is(":checked"));
+        });
+      });
+
+      function change_theme(dark_mode) {
+        if (dark_mode) {
+          // for contrast with child segments
+          $("body").css("background-color", "#121212");
+          // most Semantic UI elements have the "ui" class
+          // useful to skip over elements with some class, such as "ignore_dark_mode"
+          $(".ui").not(".ignore_dark_mode").addClass("inverted");
+          // change the state of all dark mode toggle buttons
+          $(".dark_mode_toggle:checkbox").prop("checked", true);
+        } else {
+          $("body").css("background-color", "");
+          $(".inverted").not(".ignore_dark_mode").removeClass("inverted");
+          $(".dark_mode_toggle:checkbox").prop("checked", false);
+        }
+      }
+      change_theme(true);
+    </script>
+  </body>
+</html>

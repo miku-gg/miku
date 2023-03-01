@@ -1,4 +1,4 @@
-import ReactJson from "react-json-view"
+import ReactJson from "react-json-view-2"
 import { useBot } from "../../libs/botLoader";
 
 export const BotDetails = () =>{
