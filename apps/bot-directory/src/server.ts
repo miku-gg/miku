@@ -10,8 +10,7 @@ import multer from 'multer';
 import addEmotion from './paths/addEmotion';
 import fs from 'fs';
 import config from './config';
-const Hash = require('ipfs-only-hash');
-const ejs = require('ejs');
+import open from 'open';
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env')});
 
@@ -57,4 +56,5 @@ app.get('/emotion/:hash', getItem.bind(null, 'json', 'emotions'));
 
 app.listen(process.env.PORT || 8585, () => {
   console.log(`Bots server running on http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`);
+  open(`http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`)
 })

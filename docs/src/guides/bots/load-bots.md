@@ -6,6 +6,26 @@ order: 1790
 
 Once you have a bot config created by you or someone else, you can load it to the bot database.
 
+## Using the bot directory
+
+To load a bot, go to your local `https://localhost:8585/` where the bot directory is.
+
+![](/assets/bot_directory.png)
+
+To load a bot, select the `.miku` file of you download or created. and then click on **"Upload"**
+
+And that's it! You can now click on the bot name to start using it.
+
+!!!danger Be Aware!
+Be careful when you install bots from external sources. Make sure it's from a trusted bot developer and that the bot is not malicious. I only recomend downloading bots from discord that have been reviewed by the community.
+
+There will be a Share/Download bot server where you will be able to download all the trusted bots, but it's not ready yet.
+!!!
+
+## Doing it manually
+
+If you want to understand how the bot loading works under the hood, you can do it manually.
+
 ### Instruction to load a bot
 
 1. Make sure that your local bot-directory server is running at `http://localhost:8585`
