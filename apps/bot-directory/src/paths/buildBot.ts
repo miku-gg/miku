@@ -52,9 +52,10 @@ export default async function buildBot(req: Request, res: Response) {
     const files = Array(req.files) || [];
     const zip = new AdmZip();
 
-    await Promise.all(files.map(async (_file) => {
+    // @ts-ignore
+    await Promise.all(files[0].map(async (_file) => {
       // @ts-ignore
-      const file = _file[0] as Express.Multer.File;
+      const file = _file as Express.Multer.File;
       const f = fs.readFileSync(file.path, 'base64');
       const hash = await Hash.of(f) as string;
       fs.renameSync(file.path, `_temp/${hash}`);
