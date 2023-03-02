@@ -69,8 +69,6 @@ export class OpenAIPromptCompleterService extends Miku.Services.Service {
       }));
     }
 
-    console.log('input', input);
-
     const completion = OpenAIChatModels.includes(input.model) ?
       await this.chatCompletion(openai, input) :
       await this.simpleCompletion(openai, input);
@@ -95,36 +93,19 @@ export class OpenAIPromptCompleterService extends Miku.Services.Service {
   }
 
   protected async chatCompletion(openai: OpenAIApi, input: InferProps<typeof this.propTypesRequired>): Promise<string> {
-    console.log('completion!');
-    try {
-      console.log('sending',{
-        model: input.model,
-        temperature: input.temperature,
-        max_tokens: input.max_tokens,
-        top_p: input.top_p,
-        frequency_penalty: 0,
-        presence_penalty: 0.6,
-        messages: input.messages,
-        stop: input.stop.length ? input.stop : undefined,
-      });
-      const response = await openai.createChatCompletion({
-        model: input.model,
-        temperature: input.temperature,
-        max_tokens: input.max_tokens,
-        top_p: input.top_p,
-        frequency_penalty: 0,
-        presence_penalty: 0.6,
-        messages: input.messages,
-        stop: input.stop.length ? input.stop : undefined,
-      })
-      console.log('response', response?.data?.choices);
-      const choices = response?.data?.choices || [];
+    const response = await openai.createChatCompletion({
+      model: input.model,
+      temperature: input.temperature,
+      max_tokens: input.max_tokens,
+      top_p: input.top_p,
+      frequency_penalty: 0,
+      presence_penalty: 0.6,
+      messages: input.messages,
+      stop: input.stop.length ? input.stop : undefined,
+    })
+    const choices = response?.data?.choices || [];
 
-      return choices.length ? (choices[0].message?.content || '') : '';
-    } catch (error) {
-      console.error('error', error);
-      throw error;
-    }
+    return choices.length ? (choices[0].message?.content || '') : '';
   }
 
   protected async calculatePrice(input: InferProps<typeof this.propTypesRequired>): Promise<number> {
