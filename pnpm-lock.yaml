@@ -236,7 +236,7 @@ importers:
       gpt3-tokenizer: ^1.1.5
       ipfs-only-hash: ^4.0.0
       lodash.trim: ^4.5.1
-      openai: ^3.1.0
+      openai: ^3.2.1
       prop-types: ^15.8.1
       ts-node: ^10.9.1
       typescript: ^4.9.4
@@ -251,7 +251,7 @@ importers:
       gpt3-tokenizer: 1.1.5
       ipfs-only-hash: 4.0.0
       lodash.trim: 4.5.1
-      openai: 3.1.0
+      openai: 3.2.1
       prop-types: 15.8.1
     devDependencies:
       '@typescript-eslint/eslint-plugin': 5.53.0_ny4s7qc6yg74faf3d6xty2ofzy
@@ -5991,8 +5991,8 @@ packages:
       is-wsl: 2.2.0
     dev: true
 
-  /openai/3.1.0:
-    resolution: {integrity: sha512-v5kKFH5o+8ld+t0arudj833Mgm3GcgBnbyN9946bj6u7bvel4Yg6YFz2A4HLIYDzmMjIo0s6vSG9x73kOwvdCg==}
+  /openai/3.2.1:
+    resolution: {integrity: sha512-762C9BNlJPbjjlWZi4WYK9iM2tAVAv0uUp1UmI34vb0CN5T2mjB/qM6RYBmNKMh/dN9fC+bxqPwWJZUTWW052A==}
     dependencies:
       axios: 0.26.1
       form-data: 4.0.0
