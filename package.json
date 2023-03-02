@@ -15,8 +15,5 @@
   ],
   "devDependencies": {
     "lerna": "^6.4.1"
-  },
-  "dependencies": {
-    "react-json-view": "latest"
   }
 }

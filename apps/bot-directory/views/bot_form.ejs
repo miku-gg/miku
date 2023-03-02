@@ -1,0 +1,192 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="/public/semantic.min.css">
+    <link rel="stylesheet" href="/public/form.min.css">
+    <link rel="icon" href="/public/favicon.ico" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Bot directory | Miku</title>
+    <style>
+      .ui.inverted.form  .field textarea,
+      .ui.inverted.form  .dropdown,
+      .ui.inverted.form  .dropdown .item,
+      .ui.inverted.form  .field input {
+        background-color: #484848;
+        color: #fff;
+      }
+      .ui.menu.inverted .item.disabled {
+        color: #fff !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ui basic segment">
+      <%- include('header', {active: '/build'}); %>
+      <div>
+        <form class="ui form" action="/build" method="POST" enctype="multipart/form-data" >
+          <div class="max-w-5xl m-auto">
+            <h1 class="ui dividing header">Build a new bot</h1>
+            <div class="fields">
+              <div class="field twelve wide">
+                <label>Bot name</label>
+                <input type="text" placeholder="Miku" required name="bot_name">
+              </div>
+              <div class="field four wide">
+                <label>Bot version</label>
+                <input type="text" placeholder="1" required name="version">
+              </div>
+            </div>
+            <div class="field">
+              <label>Description</label>
+              <textarea required rows="2" name="description"></textarea>
+            </div>
+            <div class="field four wide">
+              <label>Name that interacts with the bot</label>
+              <input type="text" placeholder="You" required name="subject">
+            </div>
+            <div class="field">
+              <label>Context Prompt</label>
+              <textarea required rows="2" name="context"></textarea>
+            </div>
+            <div class="field">
+              <label>Initiator Prompt</label>
+              <textarea required rows="2" name="initiator"></textarea>
+            </div>
+            <div>
+              <div class="ui selection dropdown">
+                <input type="hidden" name="chat_completer" required>
+                <i class="dropdown icon"></i>
+                <div class="default text">Chat Completer</div>
+                <div class="menu">
+                  <div class="item" data-value="pygmalion_completer">Pygmalion 6B</div>
+                  <div class="item" data-value="chatgpt_completer">Open AI (davinci)</div>
+                </div>
+              </div>
+            </div>
+            <div class="ui selection dropdown" style="margin: 20px 0">
+              <input type="hidden" name="tts" required>
+              <i class="dropdown icon"></i>
+              <div class="default text">Default TTS service</div>
+              <div class="menu">
+                <div class="item" data-value="elevenlabs_tts">ElevenLabs</div>
+                <div class="item" data-value="azure_tts">AzureTTS</div>
+                <div class="item" data-value="novelai_tts">NovelAI</div>
+              </div>
+            </div>
+            <div class="field four wide" aria-colspan="display">
+              <label>Default TTS VoiceId</label>
+              <input type="text" name="voiceId" required/>
+            </div>  
+          </div>
+          <div class="px-40 mt-10">
+            <% 
+            imageConfigs = [
+            ['Bot Profile Pic', '256x256', 'profile_pic'],
+            ['Background Pic', '1024x1024', 'background_pic'],
+            ['Emotion:happy', '1024x1024', 'happy'],
+            ['Emotion:sad', '1024x1024', 'sad'],
+            ['Emotion:angry', '1024x1024', 'angry'],
+            ['Emotion:disgusted', '1024x1024', 'disgusted'],
+            ['Emotion:scared', '1024x1024', 'scared'],
+            ['Emotion:embarrassed', '1024x1024', 'embarrassed'],
+            ['Emotion:shy', '1024x1024', 'shy'],
+            ['Emotion:pleasure', '1024x1024', 'pleasure'],
+            ['Emotion:confused', '1024x1024', 'confused'],
+            ['Emotion:neutral', '1024x1024', 'neutral'],
+            ['Emotion:excited', '1024x1024', 'excited'],
+            ['Emotion:begging', '1024x1024', 'begging'],
+            ['Emotion:hopeful', '1024x1024', 'hopeful'],
+            ['Emotion:longing', '1024x1024', 'longing'],
+            ['Emotion:proud', '1024x1024', 'proud'],
+            ['Emotion:rage', '1024x1024', 'rage'],
+            ['Emotion:scorn', '1024x1024', 'scorn'],
+            ['Emotion:blushed', '1024x1024', 'blushed'],
+            ['Emotion:lustful', '1024x1024', 'lustful'],
+            ['Emotion:shocked', '1024x1024', 'shocked'],
+            ['Emotion:disappointed', '1024x1024', 'disappointed'],
+            ['Emotion:guilt', '1024x1024', 'guilt'],
+            ['Emotion:frustrated', '1024x1024', 'frustrated'],
+            ['Emotion:annoyed', '1024x1024', 'annoyed'],
+            ['Emotion:exhausted', '1024x1024', 'exhausted'],
+            ['Emotion:tired', '1024x1024', 'tired'],
+            ['Emotion:curious', '1024x1024', 'curious'],
+            ['Emotion:intrigued', '1024x1024', 'intrigued'],
+            ['Emotion:amused', '1024x1024', 'amused']
+          ];
+            imageConfigs.forEach(function(config){ %>
+              <div class="inline-block p-2">
+                <h4><%= config[0] %></h4>
+                <div>
+                  <label class="inline-block">
+                    <input type="file" style="display: none;" id="<%= config[2] %>" name="<%= config[2] %>">
+                    <img
+                      id="<%= config[2] %>-preview"
+                      class="ui small image transition-all hover:opacity-60 cursor-pointer"
+                      width="128"
+                      height="128"
+                      src="/public/placeholder.png">
+                  </label>
+                </div>
+                <small><%= config[1] %></small>
+              </div>
+            <% }); %>
+          </div>
+          <div class="field flex justify-center pt-10">
+            <input type="submit" class="ui primary button big" value="Build Bot" />
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- LIBS -->
+    <script
+    src="/public/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+    <script src="/public/semantic.min.js"></script>
+    <script src="/public/form.min.js"></script>
+    <script>
+      
+      $(document).ready(function() {
+        $('.dropdown').dropdown();
+
+        // toggle button formatting
+        $(".ui.checkbox").checkbox();
+
+        // listen for changes to dark mode toggle buttons
+        $(".dark_mode_toggle:checkbox").on("change", function() {
+          change_theme($(this).is(":checked"));
+        });
+
+        <% imageConfigs.forEach(function(config){ %>
+          $('#<%= config[2] %>').change(function(){
+            const file = this.files[0];
+            if (file){
+              let reader = new FileReader();
+              reader.onload = function(event){
+                $('#<%= config[2] %>-preview').attr('src', event.target.result);
+              }
+              reader.readAsDataURL(file);
+            }
+          });
+        <% }); %>
+      });
+
+      function change_theme(dark_mode) {
+        if (dark_mode) {
+          // for contrast with child segments
+          $("body").css("background-color", "#121212");
+          // most Semantic UI elements have the "ui" class
+          // useful to skip over elements with some class, such as "ignore_dark_mode"
+          $(".ui").not(".ignore_dark_mode").addClass("inverted");
+          // change the state of all dark mode toggle buttons
+          $(".dark_mode_toggle:checkbox").prop("checked", true);
+        } else {
+          $("body").css("background-color", "");
+          $(".inverted").not(".ignore_dark_mode").removeClass("inverted");
+          $(".dark_mode_toggle:checkbox").prop("checked", false);
+        }
+      }
+      change_theme(true);
+    </script>
+  </body>
+</html>

@@ -15,7 +15,6 @@ export class NovelAITTSService extends TTSService {
 
   protected override async computeInput(input: InferProps<typeof TTSServicePropTypes>, tries = 0): Promise<string> {
     const voiceSeed = input.voiceId || 'Anananan'; // default unisex voice seed
-    console.log(input.prompt);
     return axios<ArrayBuffer>({
       url: this.apiEndpoint,
       method: 'get',

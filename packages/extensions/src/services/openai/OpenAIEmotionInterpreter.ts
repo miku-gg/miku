@@ -77,7 +77,7 @@ export const Emotion2ImgProps = {
 export type OpenAIEmotionConfig = {embedding: number[], emotion: string}[];
 
 export const EmotionInterpreterPropTypes = {
-  prompt: PropTypes.string.isRequired,
+  prompt: PropTypes.string,
   openai_key: PropTypes.string,
   emotionConfigHash: PropTypes.string,
   images: PropTypes.shape(Emotion2ImgProps)
