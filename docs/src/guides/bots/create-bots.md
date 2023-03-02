@@ -26,7 +26,7 @@ To create a bot you need to create a JSON file with a valid structure.
       }
     },
     "prompt_completer": {
-        "service": 'chatgpt_completer' | 'pygmalion_completer'; // The prompt completer that will be used to generate the bot responses 
+        "service": 'openai_completer' | 'pygmalion_completer'; // The prompt completer that will be used to generate the bot responses 
         "props": { // depends on the service used
             "model": "text-davinci-003" // The model that will be used to generate the bot responses
         }

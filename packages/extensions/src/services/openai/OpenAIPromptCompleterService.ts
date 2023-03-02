@@ -3,11 +3,11 @@ import { Configuration, OpenAIApi } from "openai";
 import PropTypes, { InferProps } from "prop-types";
 import GPT3Tokenizer from 'gpt3-tokenizer';
 
-export interface ChatGPTServiceConfig extends Miku.Services.ServiceConfig {
+export interface OpenAIPromptCompleterServiceConfig extends Miku.Services.ServiceConfig {
   apiKey: string;
 }
 
-export const ChatGPTServicePropTypes = {
+export const OpenAIPromptCompleterServicePropTypes = {
   "openai_key": PropTypes.string,
   "model": PropTypes.oneOf(['text-davinci-003']),
   "temperature": PropTypes.number,
@@ -18,10 +18,10 @@ export const ChatGPTServicePropTypes = {
   "stop": PropTypes.arrayOf(PropTypes.string.isRequired),
 }
 
-export class ChatGPTService extends Miku.Services.Service {
+export class OpenAIPromptCompleterService extends Miku.Services.Service {
   private tokenizer: GPT3Tokenizer;
   private openai: OpenAIApi;
-  protected defaultProps: InferProps<typeof ChatGPTServicePropTypes>  = {
+  protected defaultProps: InferProps<typeof OpenAIPromptCompleterServicePropTypes>  = {
     "openai_key": "",
     "model": 'text-davinci-003',
     "temperature": 0.9,
@@ -33,10 +33,10 @@ export class ChatGPTService extends Miku.Services.Service {
   };
 
   protected getPropTypes(): PropTypes.ValidationMap<any> {
-    return ChatGPTServicePropTypes;
+    return OpenAIPromptCompleterServicePropTypes;
   }
 
-  constructor(config: ChatGPTServiceConfig) {
+  constructor(config: OpenAIPromptCompleterServiceConfig) {
     super(config);
     this.openai = new OpenAIApi(new Configuration({
       apiKey: config.apiKey,

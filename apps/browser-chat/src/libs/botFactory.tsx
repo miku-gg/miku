@@ -60,8 +60,8 @@ class BotFactory {
     const searchParams = queryString.parse(location.search);
 
     switch (service) {
-      case MikuExtensions.Services.ServicesNames.ChatGPT:
-        chatPromptCompleter = new MikuExtensions.ChatPromptCompleters.ChatGPTPromptCompleter({
+      case MikuExtensions.Services.ServicesNames.OpenAI:
+        chatPromptCompleter = new MikuExtensions.ChatPromptCompleters.OpenAIPromptCompleter({
           serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
           props: {
             ...props,

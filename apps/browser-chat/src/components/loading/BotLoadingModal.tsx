@@ -121,7 +121,7 @@ export default function BotLoadingModal(): JSX.Element {
               >
                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src="/miku.png" alt="Bonnie image"/>
                 <h5 className="mb-1 text-xl font-medium text-white">Miku</h5>
-                <span className="text-sm text-gray-100 bg-green-600 py-1 px-2 mt-4 rounded-lg">Open AI</span>
+                <span className="text-sm text-gray-100 bg-green-600 py-1 px-2 mt-4 rounded-lg">Davinci</span>
               </button>
               <button
                 disabled={IS_ALPHA_LIVE}

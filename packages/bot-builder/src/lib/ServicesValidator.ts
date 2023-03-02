@@ -26,8 +26,8 @@ class ServicesValidator {
 const servicesValidator = new ServicesValidator();
 
 servicesValidator.addService(
-  MikuExtensions.Services.ServicesNames.ChatGPT,
-  MikuExtensions.Services.ChatGPTServicePropTypes
+  MikuExtensions.Services.ServicesNames.OpenAI,
+  MikuExtensions.Services.OpenAIPromptCompleterServicePropTypes
 );
 
 servicesValidator.addService(

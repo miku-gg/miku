@@ -1,30 +1,30 @@
 import * as Core from '@mikugg/core';
 import { InferProps } from "prop-types";
-import { ChatGPTServicePropTypes } from '../services/openai/ChatGPTService';
+import { OpenAIPromptCompleterServicePropTypes } from '../services/openai/OpenAIPromptCompleterService';
 
-type ChatGPTPropTypes = InferProps<typeof ChatGPTServicePropTypes>;
+type OpenAIPropTypes = InferProps<typeof OpenAIPromptCompleterServicePropTypes>;
 
-export interface ChatGPTParams extends Core.ChatPromptCompleters.ChatPromptCompleterConfig {
+export interface OpenAIParams extends Core.ChatPromptCompleters.ChatPromptCompleterConfig {
   serviceEndpoint: string;
-  props: ChatGPTPropTypes;
+  props: OpenAIPropTypes;
   signer: Core.Services.ServiceQuerySigner
 }
 
 /**
- * ChatGPTPromptCompleter is a class that receives commands and completes prompts it using ChatGPT.
+ * OpenAIPromptCompleter is a class that receives commands and completes prompts it using OpenAI.
  * 
- * @method completePrompt - A function that completes a prompt using ChatGPT API.
+ * @method completePrompt - A function that completes a prompt using OpenAI API.
  * 
  * @property {OpenAIManager} openaiManger - The OpenAIManager.
  */
-export class ChatGPTPromptCompleter extends Core.ChatPromptCompleters.ChatPromptCompleter {
-  private props: ChatGPTPropTypes;
-  private service: Core.Services.ServiceClient<ChatGPTPropTypes, string>;
+export class OpenAIPromptCompleter extends Core.ChatPromptCompleters.ChatPromptCompleter {
+  private props: OpenAIPropTypes;
+  private service: Core.Services.ServiceClient<OpenAIPropTypes, string>;
 
-  constructor(params: ChatGPTParams) {
+  constructor(params: OpenAIParams) {
     super(params);
     this.props = params.props;
-    this.service = new Core.Services.ServiceClient<ChatGPTPropTypes, string>(params.serviceEndpoint, params.signer);
+    this.service = new Core.Services.ServiceClient<OpenAIPropTypes, string>(params.serviceEndpoint, params.signer);
   }
   
   public override async getCost(prompt: string): Promise<number> {
@@ -40,7 +40,8 @@ export class ChatGPTPromptCompleter extends Core.ChatPromptCompleters.ChatPrompt
    * 
    * @returns The completed prompt.
    */
-  protected async completePrompt(prompt: string): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
+  protected async completePrompt(memory: Core.Memory.ShortTermMemory): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
+    const prompt = memory.buildMemoryPrompt();
     const result = await this.service.query({
       ...this.getProps(),
       prompt
@@ -56,7 +57,7 @@ export class ChatGPTPromptCompleter extends Core.ChatPromptCompleters.ChatPrompt
     };
   }
 
-  private getProps(): ChatGPTPropTypes {
+  private getProps(): OpenAIPropTypes {
     return {
       ...this.props,
       stop: [

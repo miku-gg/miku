@@ -32,7 +32,7 @@ export default async function buildBot(req: Request, res: Response) {
       "prompt_completer": {
           "service": req.body.chat_completer,
           "props": {
-              "model": req.body.chat_completer === 'chatgpt_completer' ? 'text-davinci-003' : 'pygmalion-6b' 
+              "model": req.body.chat_completer === 'openai_completer' ? 'text-davinci-003' : 'pygmalion-6b' 
           }
       },
       "outputListeners": [
