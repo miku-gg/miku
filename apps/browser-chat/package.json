@@ -1,7 +1,7 @@
 {
   "name": "browser-chat",
   "private": true,
-  "version": "0.0.18-alpha.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "start": "vite",
