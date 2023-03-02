@@ -34,10 +34,14 @@
                 <label>Bot version</label>
                 <input type="text" placeholder="1" required name="version">
               </div>
+              <div class="field four wide">
+                <label>Author name</label>
+                <input type="text" placeholder="" required name="author">
+              </div>
             </div>
             <div class="field">
-              <label>Description</label>
-              <textarea required rows="2" name="description"></textarea>
+              <label>Short Description</label>
+              <textarea required rows="2" name="description" maxlength="256"></textarea>
             </div>
             <div class="field four wide">
               <label>Name that interacts with the bot</label>
@@ -117,7 +121,7 @@
                 <h4><%= config[0] %></h4>
                 <div>
                   <label class="inline-block">
-                    <input type="file" style="display: none;" id="<%= config[2] %>" name="<%= config[2] %>">
+                    <input type="file" style="display: none;" id="<%= config[2] %>" name="<%= config[2] %>" required>
                     <img
                       id="<%= config[2] %>-preview"
                       class="ui small image transition-all hover:opacity-60 cursor-pointer"

@@ -14,6 +14,7 @@ export default async function buildBot(req: Request, res: Response) {
       "bot_name": req.body.bot_name,
       "version": req.body.version,
       "description": req.body.description,
+      "author": req.body.author,
       "configVersion": 1,
       "subject": req.body.subject,
       "profile_pic": '',
