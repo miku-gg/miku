@@ -87,7 +87,6 @@ export abstract class ChatPromptCompleter {
     command: Commands.Command,
   ): Promise<OutputEnvironment> {
     this.memory.pushMemory(Commands.commandToMemoryLine(command));
-    const prompt = this.memory.buildMemoryPrompt();
 
     const promptResult = await this.completePrompt(this.memory);
     const output = await this.handleCompletionOutput(promptResult);

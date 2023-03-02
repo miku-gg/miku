@@ -1,6 +1,7 @@
 import * as Core from '@mikugg/core';
 import { InferProps } from "prop-types";
-import { OpenAIPromptCompleterServicePropTypes } from '../services/openai/OpenAIPromptCompleterService';
+import { OpenAIChatModels, OpenAIMessage, OpenAIPromptCompleterServicePropTypes } from '../services/openai/OpenAIPromptCompleterService';
+import { ShortTermMemory } from '@mikugg/core/dist/memory';
 
 type OpenAIPropTypes = InferProps<typeof OpenAIPromptCompleterServicePropTypes>;
 
@@ -42,13 +43,29 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters.ChatPromptC
    */
   protected async completePrompt(memory: Core.Memory.ShortTermMemory): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
     const prompt = memory.buildMemoryPrompt();
+    const props = this.getProps();
+    const stop = OpenAIChatModels.includes(props.model || '') ?
+      props.stop?.filter((_stop: string) => _stop != `${this.memory.getBotSubject()}: `) :
+      props.stop;
     const result = await this.service.query({
       ...this.getProps(),
+      stop,
+      messages: this.getChatMessages(memory),
       prompt
     }, await this.getCost(prompt));
-    return {text: result};
+    return {text: result.replace(`${this.memory.getBotSubject()}: `, ``)};
   }
 
+  protected getChatMessages(memory: ShortTermMemory): OpenAIMessage[] {
+    const basePrompt = memory.getContextPrompt() + memory.getInitiatorPrompt();
+    return [
+      { role: 'system', content: basePrompt },
+      ...memory.getMemory().map(message => ({
+        role: (message.subject == memory.getBotSubject()) ? 'assistant' : 'user',
+        content: `${message.subject}: ${message.text}`
+      }))
+    ];
+  }
 
   protected async handleCompletionOutput(output: Core.ChatPromptCompleters.ChatPromptResponse): Promise<Core.OutputListeners.DialogOutputEnvironment> {
     let promptResponse = output.text.replace(`\n${this.memory.getBotSubject()}: `, '')
