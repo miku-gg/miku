@@ -109,7 +109,7 @@ export const Conversation = ({ loading, sendPrompt }: any) => {
             }}
           />
           <img
-            className="absolute bottom-0 h-[25rem] z-10 conversation-bot-image object-cover"
+            className="absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover"
             src={`${VITE_IMAGES_DIRECTORY_ENDPOINT}/${emotionImage}`}
             alt="character"
             onError={({ currentTarget }) => {

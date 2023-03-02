@@ -38,7 +38,7 @@
     "gpt3-tokenizer": "^1.1.5",
     "ipfs-only-hash": "^4.0.0",
     "lodash.trim": "^4.5.1",
-    "openai": "^3.1.0",
+    "openai": "^3.2.1",
     "prop-types": "^15.8.1"
   },
   "gitHead": "fdedec3c8725dfd89c7062c0115ca23c1645f863"

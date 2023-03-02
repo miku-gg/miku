@@ -5,8 +5,6 @@ export interface GPTShortTermMemoryConfig extends MikuCore.Memory.MemoryPromptCo
   language: MikuCore.ChatPromptCompleters.Language;
 }
 
-
-
 export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
 
   constructor({prompt_context, prompt_initiator, subjects, botSubject}: GPTShortTermMemoryConfig, memorySize = 15) {

@@ -27,7 +27,6 @@ export default async function addBot(req: Request, res: Response) {
       } else {
         const data = entry.getData().toString('base64');
         const hash = await Hash.of(data);
-        console.log(entry.name, entry.name, hash);
         assert(entry.name === hash, `Hash mismatch for ${entry.name}`);
         const imgPath = `${config.IMG_PATH}/${hash}`;
         if (!fs.existsSync(imgPath)) {

@@ -28,6 +28,7 @@ importers:
       ipfs-only-hash: ^4.0.0
       multer: 1.4.5-lts.1
       nodemon: ^2.0.20
+      open: ^8.4.2
       path: ^0.12.7
       ts-node: ^10.9.1
       typescript: ^4.9.5
@@ -48,6 +49,7 @@ importers:
       express: 4.18.2
       ipfs-only-hash: 4.0.0
       multer: 1.4.5-lts.1
+      open: 8.4.2
       path: 0.12.7
       ts-node: 10.9.1_uayvamxqnl5yeiojjysxwopmsy
       typescript: 4.9.5
@@ -236,7 +238,7 @@ importers:
       gpt3-tokenizer: ^1.1.5
       ipfs-only-hash: ^4.0.0
       lodash.trim: ^4.5.1
-      openai: ^3.1.0
+      openai: ^3.2.1
       prop-types: ^15.8.1
       ts-node: ^10.9.1
       typescript: ^4.9.4
@@ -251,7 +253,7 @@ importers:
       gpt3-tokenizer: 1.1.5
       ipfs-only-hash: 4.0.0
       lodash.trim: 4.5.1
-      openai: 3.1.0
+      openai: 3.2.1
       prop-types: 15.8.1
     devDependencies:
       '@typescript-eslint/eslint-plugin': 5.53.0_ny4s7qc6yg74faf3d6xty2ofzy
@@ -3352,7 +3354,6 @@ packages:
   /define-lazy-prop/2.0.0:
     resolution: {integrity: sha512-Ds09qNh8yw3khSjiJjiUInaGX9xlqZDY7JVryGxdxV7NPeuqQfplOpQ66yJFZut3jLa5zOwkXw1g9EI2uKh4Og==}
     engines: {node: '>=8'}
-    dev: true
 
   /defined/1.0.1:
     resolution: {integrity: sha512-hsBd2qSVCRE+5PmNdHt1uzyrFu5d3RwmFDKzyNZMFq/EwDNJF7Ee5+D5oEKF0hU6LhtoUF1macFvOe4AskQC1Q==}
@@ -4799,7 +4800,6 @@ packages:
     resolution: {integrity: sha512-F+i2BKsFrH66iaUFc0woD8sLy8getkwTwtOBjvs56Cx4CgJDeKQeqfz8wAYiSb8JOprWhHH5p77PbmYCvvUuXQ==}
     engines: {node: '>=8'}
     hasBin: true
-    dev: true
 
   /is-extglob/2.1.1:
     resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
@@ -4891,7 +4891,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       is-docker: 2.2.1
-    dev: true
 
   /isarray/1.0.0:
     resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==}
@@ -5989,10 +5988,9 @@ packages:
       define-lazy-prop: 2.0.0
       is-docker: 2.2.1
       is-wsl: 2.2.0
-    dev: true
 
-  /openai/3.1.0:
-    resolution: {integrity: sha512-v5kKFH5o+8ld+t0arudj833Mgm3GcgBnbyN9946bj6u7bvel4Yg6YFz2A4HLIYDzmMjIo0s6vSG9x73kOwvdCg==}
+  /openai/3.2.1:
+    resolution: {integrity: sha512-762C9BNlJPbjjlWZi4WYK9iM2tAVAv0uUp1UmI34vb0CN5T2mjB/qM6RYBmNKMh/dN9fC+bxqPwWJZUTWW052A==}
     dependencies:
       axios: 0.26.1
       form-data: 4.0.0

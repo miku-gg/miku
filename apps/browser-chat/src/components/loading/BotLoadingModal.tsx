@@ -3,8 +3,9 @@ import { FormEvent, useEffect, useReducer, useState } from 'react';
 import { Disclosure } from '@headlessui/react'
 import { getBotHashFromUrl, useBot } from '../../libs/botLoader';
 
-const MIKU_BOT = 'QmdDSTD9QV1rTkHRYFtyAJWkYandNXnJeVmrr1xZ8effkS';
+const MIKU_BOT = 'QmbE1Dp8ciYYB2Nkuw2YjhNCd4h1BsJ3YyYSjxjXAagdn9';
 const ELAINA_BOT = 'QmXThSy6BjidXAeTr3nez9ikXsWh5xZgJZxLbbmcCimdAP';
+const NALA_BOT = 'QmTgg126TbobkJgPWKRdwehF1NbHdMQqVHPofr5ZR3wb4N';
 export const IS_ALPHA_LIVE = window.location.hostname === 'alpha.miku.gg';
 
 export default function BotLoadingModal(): JSX.Element {
@@ -121,7 +122,15 @@ export default function BotLoadingModal(): JSX.Element {
               >
                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src="/miku.png" alt="Bonnie image"/>
                 <h5 className="mb-1 text-xl font-medium text-white">Miku</h5>
-                <span className="text-sm text-gray-100 bg-green-600 py-1 px-2 mt-4 rounded-lg">Open AI</span>
+                <span className="text-sm text-gray-100 bg-green-600 py-1 px-2 mt-4 rounded-lg">Davinci</span>
+              </button>
+              <button
+                className="flex flex-col w-full items-center pb-10 bg-gray-800 p-9 rounded-lg hover:bg-gray-700 hover:shadow-xl select-none transition-all"
+                onClick={onBotSelect.bind(null, NALA_BOT)}
+              >
+                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src="/nala.png" alt="Bonnie image"/>
+                <h5 className="mb-1 text-xl font-medium text-white">Nala</h5>
+                <span className="text-sm text-gray-100 bg-green-600 py-1 px-2 mt-4 rounded-lg">GPT3.5-T</span>
               </button>
               <button
                 disabled={IS_ALPHA_LIVE}

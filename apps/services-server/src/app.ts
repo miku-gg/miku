@@ -25,9 +25,9 @@ const addRoute = (path: string, cb: (body: any) => Promise<{ status: number, res
 };
 
 if (OPENAI_API_KEY) {
-  new MikuExtensions.Services.ChatGPTService({
+  new MikuExtensions.Services.OpenAIPromptCompleterService({
     apiKey: OPENAI_API_KEY,
-    serviceId: MikuExtensions.Services.ServicesNames.ChatGPT,
+    serviceId: MikuExtensions.Services.ServicesNames.OpenAI,
     billingEndpoint: '',
     addRoute
   });  
