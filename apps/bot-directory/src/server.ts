@@ -10,6 +10,7 @@ import multer from 'multer';
 import addEmotion from './paths/addEmotion';
 import fs from 'fs';
 import config from './config';
+const Hash = require('ipfs-only-hash');
 const ejs = require('ejs');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env')});

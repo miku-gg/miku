@@ -30,9 +30,9 @@ export default async function buildBot(req: Request, res: Response) {
         }
       },
       "prompt_completer": {
-          "service": req.body.chat_completer,
+          "service": req.body.model === 'pygmalion-6b' ? Miku.Services.ServicesNames.Pygmalion : Miku.Services.ServicesNames.OpenAI,
           "props": {
-              "model": req.body.chat_completer === 'openai_completer' ? 'text-davinci-003' : 'pygmalion-6b' 
+            "model": req.body.model
           }
       },
       "outputListeners": [
