@@ -22,7 +22,7 @@
       .ui.card.inverted .content .header,
       .ui.card.inverted .content .meta,
       .ui.card.inverted .content .description,
-      .ui.card.inverted .extra.content a {
+      .ui.card.inverted .extra.content {
         color: white;
       }
     </style>
@@ -53,9 +53,19 @@
                 </div>
               </div>
               <div class="extra content">
-                <a>
+                <p>
                   Version <%= bot.version %>
-                </a>
+                </p>
+                <p>
+                  Author: <%= bot.author || 'Unknown' %>
+                </p>
+              </div>
+              <div>
+                <form action="/bot/delete/<%= bot.hash %>" method="post" onsubmit="return confirm('Do you really want to delete <%= bot.bot_name %>?');">
+                  <button type="submit" class="absolute text-red-600 right-2 bottom-4">
+                    <i class="trash icon"></i>
+                  </button>
+                </form>
               </div>
             </div>
           </div>

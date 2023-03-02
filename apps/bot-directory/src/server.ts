@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import buildBot from './paths/buildBot';
 import addBot from './paths/addBot';
+import deleteBot from './paths/deleteBot';
 import getItem from './paths/getItem';
 import addImage from './paths/addImage';
 import multer from 'multer';
@@ -45,6 +46,7 @@ app.get('/build', (req, res) => res.render('bot_form'));
 app.post('/build', upload.any(), buildBot);
 
 app.post('/bot',  upload.single("file"), addBot);
+app.post('/bot/delete/:hash', deleteBot);
 app.get('/bot/:hash', getItem.bind(null, 'json', 'bots'));
 app.post('/image', multer().array('files'), addImage);
 app.get('/image/:hash', getItem.bind(null, 'image', 'imgs'));
