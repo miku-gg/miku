@@ -34,6 +34,7 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<Core.
   private cleanText(text: string) {
     let cleanText = "";
     let lastOpen: undefined | string = undefined;
+    text = ' ' + text;
     for (let x = 0; x < text.length; x++)
     {
         const ch = text.charAt(x);
