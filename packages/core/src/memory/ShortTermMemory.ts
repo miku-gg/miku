@@ -28,11 +28,11 @@ export interface MemoryPromptConfig {
  * It is used by the ChatPromptCompleter to build the prompt.
  */
 export abstract class ShortTermMemory {
+  public memorySize: number;
   protected memory: MemoryLine[] = [];
   protected contextPrompt: string;
   protected initiatorPrompt: string;
   protected basePrompt: string;
-  protected memorySize: number;
   protected subjects: string[];
   protected botSubject: string;
 

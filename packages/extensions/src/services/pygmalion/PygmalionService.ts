@@ -40,7 +40,7 @@ export class PygmalionService extends Miku.Services.Service {
       "use_authors_note": false,
       "use_world_info": false,
       "max_context_length": modelSettings.max_length,
-      "max_length": 50,
+      "max_length": 2048,
       "rep_pen": modelSettings.rep_pen,
       "rep_pen_range": modelSettings.rep_pen_range,
       "rep_pen_slope": modelSettings.rep_pen_slope,

@@ -58,9 +58,11 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters.ChatPromptC
 
   protected getChatMessages(memory: ShortTermMemory): OpenAIMessage[] {
     const basePrompt = memory.getContextPrompt() + memory.getInitiatorPrompt();
+    const memoryLines = memory.getMemory();
+    const memorySize = this.memory.memorySize;
     return [
       { role: 'system', content: basePrompt },
-      ...memory.getMemory().map(message => ({
+      ...memoryLines.filter((_, index) => memoryLines.length - memorySize < index  ).map(message => ({
         role: (message.subject == memory.getBotSubject()) ? 'assistant' : 'user',
         content: `${message.subject}: ${message.text}`
       }))
