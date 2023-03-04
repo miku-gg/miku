@@ -62,7 +62,7 @@ export const Chat = ({ sendPrompt }: any): JSX.Element => {
   }, [value]);
 
   const handleChange = (chatType: number) => {
-    setcurrentChatValue(chatType);
+    // setcurrentChatValue(chatType);
   };
 
   return (

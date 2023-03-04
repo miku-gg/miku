@@ -194,14 +194,11 @@ class BotFactory {
       });
     });
 
-    const emotionListener = dialogOutputListeners.find((listener) => listener instanceof MikuExtensions.OutputListeners.EmotionRenderer)
-
     new MikuCore.ChatBot({
       promptCompleter: promptCompleter,
       commandGenerators: [textWriter],
       outputListeners: {
         dialogOutputListeners,
-        contextOutputListeners: emotionListener ? [emotionListener] : []
       },
     });
 
