@@ -6,6 +6,7 @@ import { getBotHashFromUrl, useBot } from '../../libs/botLoader';
 const MIKU_BOT = 'QmbE1Dp8ciYYB2Nkuw2YjhNCd4h1BsJ3YyYSjxjXAagdn9';
 const ELAINA_BOT = 'QmXThSy6BjidXAeTr3nez9ikXsWh5xZgJZxLbbmcCimdAP';
 const NALA_BOT = 'QmTgg126TbobkJgPWKRdwehF1NbHdMQqVHPofr5ZR3wb4N';
+const NALA_BOT_KOREAN = 'QmPNpRcnb5TwDNkqb339rvf7kSYrVAqxRJwrdUYV6wFLfC';
 export const IS_ALPHA_LIVE = window.location.hostname === 'alpha.miku.gg';
 
 export default function BotLoadingModal(): JSX.Element {
@@ -105,13 +106,13 @@ export default function BotLoadingModal(): JSX.Element {
       forceUpdate();
     }
     return (
-      <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-50 backdrop-blur-sm">
-        <div className="relative w-auto my-6 mx-auto max-w-3xl">
+      <div className="flex justify-center flex-wrap items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-50 backdrop-blur-sm">
+        <div className="relative w-auto my-6 mx-auto max-w-4xl">
           <div className="border-0 rounded-lg shadow-2xl relative flex flex-col w-full bg-gray-900 outline-none focus:outline-none p-10 items-center">
             <div className="text-2xl mb-10 text-white">
               Select Bot
             </div>
-            <div className="flex flex-row justify-between gap-6 max-[450px]:flex-wrap">
+            <div className="flex flex-row justify-between gap-6 max-md:flex-wrap">
               <button
                 className="flex flex-col w-full items-center pb-10 bg-gray-800 p-9 rounded-lg hover:bg-gray-700 hover:shadow-xl select-none transition-all"
                 onClick={onBotSelect.bind(null, MIKU_BOT)}
@@ -126,6 +127,14 @@ export default function BotLoadingModal(): JSX.Element {
               >
                 <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src="/nala.png" alt="Bonnie image"/>
                 <h5 className="mb-1 text-xl font-medium text-white">Nala</h5>
+                <span className="text-sm text-gray-100 bg-green-600 py-1 px-2 mt-4 rounded-lg">GPT3.5-T</span>
+              </button>
+              <button
+                className="flex flex-col w-full items-center pb-10 bg-gray-800 p-9 rounded-lg hover:bg-gray-700 hover:shadow-xl select-none transition-all"
+                onClick={onBotSelect.bind(null, NALA_BOT_KOREAN)}
+              >
+                <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src="/nala.png" alt="Bonnie image"/>
+                <h5 className="mb-1 text-xl font-medium text-white">Nala (Korean)</h5>
                 <span className="text-sm text-gray-100 bg-green-600 py-1 px-2 mt-4 rounded-lg">GPT3.5-T</span>
               </button>
               <button

@@ -34,18 +34,21 @@ export const Chat = ({ sendPrompt }: any): JSX.Element => {
 
   const updateCost = useCallback(
     debounce((value: string) => {
-      setLoadingCost(true);
-      const update_id = Math.random().toString(36).substring(2, 15);
-      lastCostId.id = update_id;
-      botFactory
-        .getInstance()
-        ?.computeCost(value)
-        .then((cost) => {
-          if (lastCostId.id === update_id) {
-            setLoadingCost(false);
-            setCost(cost);
-          }
-        });
+      if (value) {
+        setLoadingCost(true);
+        const update_id = Math.random().toString(36).substring(2, 15);
+        lastCostId.id = update_id;
+        botFactory
+          .getInstance()
+          ?.computeCost(value)
+          .then((cost) => {
+            if (lastCostId.id === update_id) {
+              setLoadingCost(false);
+              setCost(cost);
+            }
+          })
+          .catch(() => setLoadingCost(false));  
+      }
     }, 1000),
     []
   );
