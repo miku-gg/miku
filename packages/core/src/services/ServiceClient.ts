@@ -1,6 +1,6 @@
 import axios from 'axios';
-import base64 from 'base-64';
 import { Wallet } from '@ethersproject/wallet';
+import { encode } from './utils';
 
 export interface ServiceRequestQuery {
   input: string;
@@ -88,6 +88,6 @@ export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
   }
 
   private inputPropsToBase64(input: ServiceInputProps): string {
-    return base64.encode(JSON.stringify(input));
+    return encode(JSON.stringify(input));
   }
 }

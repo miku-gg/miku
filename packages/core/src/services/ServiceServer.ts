@@ -1,7 +1,7 @@
 import PropTypes, { InferProps } from 'prop-types';
-import base64 from 'base-64';
 import { verifyMessage } from '@ethersproject/wallet';
 import { ServiceRequestBody } from './ServiceClient';
+import { decode } from './utils';
 
 export interface ServiceConfig {
   serviceId: string;
@@ -82,7 +82,7 @@ export abstract class Service<Output = string> {
   }
 
   protected inputBase64ToProps(input: string): InferProps<typeof this.propTypes> {
-    const inputProps = JSON.parse(base64.decode(input)) as InferProps<typeof this.propTypes>;
+    const inputProps = JSON.parse(decode(input)) as InferProps<typeof this.propTypes>;
     
     return {
       ...this.defaultProps,
