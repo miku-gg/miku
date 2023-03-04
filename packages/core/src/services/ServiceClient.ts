@@ -67,7 +67,7 @@ export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
         tokenLimit,
         timestamp: Date.now(),
       };
-      console.log(`%c[SERVICE REQUEST]%c ${this.serviceName}`, 'background: #333; color: #bada55', 'color: lime', input, metadata);
+      console.log(`%c[SERVICE REQUEST]%c ${this.serviceName}`, 'background: #333; color: cyan', 'color: lime', input, metadata);
       const _query = {
         input: this.inputPropsToBase64(input),
         ...metadata,
@@ -80,9 +80,10 @@ export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
           'Content-Type': 'application/json',
         }
       });
+      console.log(`%c[SERVICE RESPONSE]%c ${this.serviceName}`, 'background: #333; color: #bada55', 'color: lime', result);
       return result.data;
     } catch (error) {
-      console.error(error);
+      console.log(`%c[SERVICE ERROR]%c ${this.serviceName}`, 'background: #333; color: crimson', 'color: lime', error);
       throw 'Error querying service';
     }
   }
