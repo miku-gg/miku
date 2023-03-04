@@ -247,7 +247,17 @@ export const HistoryConsole = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-2.5 overflow-auto gap-3 w-full font-mono text-sm text-white bg-[#323232] rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-{#323232} border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500">
+    <div className="flex flex-col-reverse scrollbar h-full p-2.5 gap-3 overflow-y-scroll w-full font-mono text-sm text-white bg-[#323232] rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-{#323232} border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500">
+      {/* HISTORY CURRENT CHAT */}
+      <HistoryMemoryLines
+        editedIndex={editedIndex}
+        setEditedIndex={(i: number) => setEditedIndex(i)}
+        editedText={editedText}
+        setEditedText={(t: string) => setEditedText(t)}
+        botSubject={(botConfig?.short_term_memory?.props as {botSubject: string})?.botSubject || ''}
+        memoryLines={history?.getMemory() || []}
+        onEditedSubmit={updateMemoryLine}
+      />
       {/* HISTORY CONTEXT */}
       <div className="text-left w-full h-fi text-slate-400">
         {history
@@ -263,16 +273,6 @@ export const HistoryConsole = () => {
             <p key={`basePrompt_${i}`}>{text}</p>
           ))}
       </div>
-      {/* HISTORY CURRENT CHAT */}
-      <HistoryMemoryLines
-        editedIndex={editedIndex}
-        setEditedIndex={(i: number) => setEditedIndex(i)}
-        editedText={editedText}
-        setEditedText={(t: string) => setEditedText(t)}
-        botSubject={(botConfig?.short_term_memory?.props as {botSubject: string})?.botSubject || ''}
-        memoryLines={history?.getMemory() || []}
-        onEditedSubmit={updateMemoryLine}
-      />
     </div>
   );
 }

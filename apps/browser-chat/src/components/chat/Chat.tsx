@@ -71,18 +71,18 @@ export const Chat = ({ sendPrompt }: any): JSX.Element => {
                 onFormSubmit(e)
               }
             }}
-            className="w-full bg-transparent outline-none border-none text-md p-3 resize-none"
+            className="w-full bg-transparent outline-none border-none text-md p-3 resize-none scrollbar"
             name="input-user-textarea"
             rows={2}
             autoComplete="off"
             placeholder="Type a message..."
           />
-          <button className="absolute right-3 bottom-3 text-gray-400 hover:text-white transition-all">
+          <button className="absolute right-3 bottom-3 text-violet-400 hover:text-violet-300 transition-all">
             <PaperPlane />
           </button>
           <div className="absolute bottom-2 left-3 flex items-center">
             <Tooltip title="Amount of credits interaction would consume." placement="right">
-              <div className="inline-flex items-left rounded-full text-center text-sm justify-between text-violet-500 font-mono select-none">
+              <div className="inline-flex items-left rounded-full text-center text-sm justify-between text-violet-400 font-mono select-none">
                 <div className={loadingCost ? "text-violet-300" : ""}>
                   {cost}
                 </div>
