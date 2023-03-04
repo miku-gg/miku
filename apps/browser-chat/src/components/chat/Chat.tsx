@@ -56,7 +56,7 @@ export const Chat = ({ sendPrompt }: any): JSX.Element => {
 
   return (
     <div className="flex items-end w-full h-1/6 max-lg:pb-5 max-lg:px-5">
-      <div className="flex flex-col justify-between h-3/4 w-full rounded-lg max-sm:rounded-none gap-3">
+      <div className="flex flex-col justify-between w-full rounded-lg max-sm:rounded-none gap-3">
         <form
           onSubmit={onFormSubmit}
           onClick={() => document.getElementById("input-user-textarea")?.focus()}
@@ -71,9 +71,8 @@ export const Chat = ({ sendPrompt }: any): JSX.Element => {
                 onFormSubmit(e)
               }
             }}
-            className="w-full bg-transparent outline-none border-none text-md p-3 resize-none scrollbar"
+            className="w-full bg-transparent outline-none border-none text-md p-3 resize-none scrollbar max-lg:h-12"
             name="input-user-textarea"
-            rows={2}
             autoComplete="off"
             placeholder="Type a message..."
           />
