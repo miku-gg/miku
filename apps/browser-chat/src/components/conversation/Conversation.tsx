@@ -3,9 +3,7 @@ import React, { useEffect, useReducer, useState } from "react";
 import "./conversation.css";
 
 import historyIcon from "../../assets/icons/chat-history.png";
-// import settingsIcon from "../../assets/icons/settings.png";
 import infoIcon from "../../assets/icons/information.png";
-// import backgroundIcon from "../../assets/icons/background.png";
 
 import { Loader } from "../loading/Loader";
 import botFactory from "../../libs/botFactory";
