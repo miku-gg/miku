@@ -34,10 +34,12 @@ export class ServiceQuerySigner {
 export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
   private serviceEndpoint: string;
   private signer: ServiceQuerySigner;
+  private serviceName: string;
 
-  constructor(serviceEndpoint: string, signer: ServiceQuerySigner) {
+  constructor(serviceEndpoint: string, signer: ServiceQuerySigner, serviceName: string) {
     this.serviceEndpoint = serviceEndpoint;
     this.signer = signer;
+    this.serviceName = serviceName;
   }
 
   public async getQueryCost(input: ServiceInputProps): Promise<number> {
@@ -60,11 +62,15 @@ export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
 
   public async query(input: ServiceInputProps, tokenLimit: number): Promise<ServiceOutputProps> {
     try {
-      const _query = {
-        input: this.inputPropsToBase64(input),
+      const metadata = {
         address: this.signer.getAddress(),
         tokenLimit,
         timestamp: Date.now(),
+      };
+      console.log(`%c[SERVICE REQUEST]%c ${this.serviceName}`, 'background: #333; color: #bada55', 'color: lime', input, metadata);
+      const _query = {
+        input: this.inputPropsToBase64(input),
+        ...metadata,
       };
       const result = await axios.post<ServiceOutputProps,  axios.AxiosResponse<ServiceOutputProps, any>, ServiceRequestBody>(`${this.serviceEndpoint}/query`, {
         query: _query,

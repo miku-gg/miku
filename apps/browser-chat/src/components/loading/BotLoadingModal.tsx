@@ -101,10 +101,6 @@ export default function BotLoadingModal(): JSX.Element {
 
   if (!botHash) {
     const onBotSelect = (botHash: string) => {
-      // const searchParams = queryString.parse(location.search);
-      // const newSearchParams = {...searchParams, botHash};
-      // const newSearchString = queryString.stringify(newSearchParams);
-      // window.location.search = newSearchString;
       setBotHash(botHash);
       forceUpdate();
     }

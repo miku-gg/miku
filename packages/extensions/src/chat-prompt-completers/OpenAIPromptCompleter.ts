@@ -2,6 +2,8 @@ import * as Core from '@mikugg/core';
 import { InferProps } from "prop-types";
 import { OpenAIChatModels, OpenAIMessage, OpenAIPromptCompleterServicePropTypes } from '../services/openai/OpenAIPromptCompleterService';
 import { ShortTermMemory } from '@mikugg/core/dist/memory';
+import { ServicesNames } from '../services';
+import trim from 'lodash.trim';
 
 type OpenAIPropTypes = InferProps<typeof OpenAIPromptCompleterServicePropTypes>;
 
@@ -25,7 +27,11 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters.ChatPromptC
   constructor(params: OpenAIParams) {
     super(params);
     this.props = params.props;
-    this.service = new Core.Services.ServiceClient<OpenAIPropTypes, string>(params.serviceEndpoint, params.signer);
+    this.service = new Core.Services.ServiceClient<OpenAIPropTypes, string>(
+      params.serviceEndpoint,
+      params.signer,
+      ServicesNames.OpenAI
+    );
   }
   
   public override async getCost(prompt: string): Promise<number> {
@@ -57,14 +63,14 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters.ChatPromptC
   }
 
   protected getChatMessages(memory: ShortTermMemory): OpenAIMessage[] {
-    const basePrompt = memory.getContextPrompt() + memory.getInitiatorPrompt();
-    const memoryLines = memory.getMemory();
+    const basePrompt = memory.getContextPrompt();
+    const memoryLines = [...this.getInitiatorPromptAsMemories(memory), ...memory.getMemory()];
     const memorySize = this.memory.memorySize;
     return [
       { role: 'system', content: basePrompt },
       ...memoryLines.filter((_, index) => memoryLines.length - memorySize < index  ).map(message => ({
-        role: (message.subject == memory.getBotSubject()) ? 'assistant' : 'user',
-        content: `${message.subject}: ${message.text}`
+        role: (message.subject == memory.getBotSubject() || !message.subject) ? 'assistant' : 'user',
+        content: message.subject ? `${message.subject}: "${message.text}"` : message.text
       }))
     ];
   }
@@ -74,6 +80,26 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters.ChatPromptC
     return {
       text: promptResponse
     };
+  }
+
+  private getInitiatorPromptAsMemories(memory: ShortTermMemory): Core.Memory.MemoryLine[] {
+    const initiatorPromptLines = memory.getInitiatorPrompt().split("\n");
+    const subjects = memory.getSubjects() || [];
+    const botSubject = memory.getBotSubject();
+    const _subject = subjects[0] || 'You';
+
+    return initiatorPromptLines.map((line, index) => {
+      let subject = _subject;
+      if (!line.startsWith(`${subject}:`)) {
+        subject = trim(line).startsWith(`${botSubject}:`) ? botSubject : '';
+      }
+
+      return {
+        text: trim(line.replace(`${subject}:`, '')),
+        subject: subject,
+        type: Core.Commands.CommandType.DIALOG
+      };
+    }).filter(line => trim(line.text));
   }
 
   private getProps(): OpenAIPropTypes {

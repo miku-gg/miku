@@ -121,7 +121,7 @@ class BotFactory {
             ...props,
             apiKey
           }
-        });
+        }, service);
         break;
       case MikuExtensions.Services.ServicesNames.NovelAITTS:
         outputListener = new MikuExtensions.OutputListeners.TTSOutputListener({
@@ -131,7 +131,7 @@ class BotFactory {
             ...props,
             apiKey: String(searchParams['novelai'] || '') || ''
           }
-        });
+        }, service);
         break;
     }
 

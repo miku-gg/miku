@@ -1,6 +1,6 @@
-import PropTypes, { InferProps } from 'prop-types';
+import { InferProps } from 'prop-types';
 import * as Core from '@mikugg/core';
-import { Emotion, EmotionInterpreterOutput, EmotionInterpreterPropTypes, EmotionInterpreterProps } from '../services';
+import { ServicesNames, EmotionInterpreterOutput, EmotionInterpreterPropTypes, EmotionInterpreterProps } from '../services';
 
 export interface EmotionRendererParams {
   serviceEndpoint: string;
@@ -17,7 +17,11 @@ protected service: Core.Services.ServiceClient<EmotionInterpreterProps, EmotionI
   constructor(params: EmotionRendererParams) {
     super();
     this.props = params.props;
-    this.service = new Core.Services.ServiceClient<EmotionInterpreterProps, EmotionInterpreterOutput>(params.serviceEndpoint, params.signer);
+    this.service = new Core.Services.ServiceClient<EmotionInterpreterProps, EmotionInterpreterOutput>(
+      params.serviceEndpoint,
+      params.signer,
+      ServicesNames.OpenAIEmotionInterpreter
+    );
   }
 
   protected override async handleOutput(output: Core.OutputListeners.DialogOutputEnvironment): Promise<EmotionRendererOutput> {
