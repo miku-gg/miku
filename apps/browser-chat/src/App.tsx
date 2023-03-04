@@ -45,7 +45,7 @@ export const App = () => {
           "linear-gradient(180deg, rgba(12,10,29,1) 0%, rgb(30 26 65) 100%)",
       }}
     >
-      <div className="w-5/12 h-full max-lg:w-full">
+      <div className="w-5/12 h-full max-lg:w-full flex flex-col gap-3">
         <Conversation loading={loading} sendPrompt={sendPrompt}/>
         <Chat sendPrompt={sendPrompt} />
       </div>

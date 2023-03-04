@@ -1,6 +1,6 @@
 import axios from 'axios';
-import base64 from 'base-64';
 import { Wallet } from '@ethersproject/wallet';
+import { encode } from './utils';
 
 export interface ServiceRequestQuery {
   input: string;
@@ -34,10 +34,12 @@ export class ServiceQuerySigner {
 export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
   private serviceEndpoint: string;
   private signer: ServiceQuerySigner;
+  private serviceName: string;
 
-  constructor(serviceEndpoint: string, signer: ServiceQuerySigner) {
+  constructor(serviceEndpoint: string, signer: ServiceQuerySigner, serviceName: string) {
     this.serviceEndpoint = serviceEndpoint;
     this.signer = signer;
+    this.serviceName = serviceName;
   }
 
   public async getQueryCost(input: ServiceInputProps): Promise<number> {
@@ -60,11 +62,15 @@ export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
 
   public async query(input: ServiceInputProps, tokenLimit: number): Promise<ServiceOutputProps> {
     try {
-      const _query = {
-        input: this.inputPropsToBase64(input),
+      const metadata = {
         address: this.signer.getAddress(),
         tokenLimit,
         timestamp: Date.now(),
+      };
+      console.log(`%c[SERVICE REQUEST]%c ${this.serviceName}`, 'background: #333; color: cyan', 'color: lime', input, metadata);
+      const _query = {
+        input: this.inputPropsToBase64(input),
+        ...metadata,
       };
       const result = await axios.post<ServiceOutputProps,  axios.AxiosResponse<ServiceOutputProps, any>, ServiceRequestBody>(`${this.serviceEndpoint}/query`, {
         query: _query,
@@ -74,14 +80,15 @@ export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
           'Content-Type': 'application/json',
         }
       });
+      console.log(`%c[SERVICE RESPONSE]%c ${this.serviceName}`, 'background: #333; color: #bada55', 'color: lime', result);
       return result.data;
     } catch (error) {
-      console.error(error);
+      console.log(`%c[SERVICE ERROR]%c ${this.serviceName}`, 'background: #333; color: crimson', 'color: lime', error);
       throw 'Error querying service';
     }
   }
 
   private inputPropsToBase64(input: ServiceInputProps): string {
-    return base64.encode(JSON.stringify(input));
+    return encode(JSON.stringify(input));
   }
 }

@@ -34,11 +34,13 @@
     "@types/base-64": "^1.0.0",
     "@types/node": "^18.11.18",
     "@types/prop-types": "^15.7.5",
+    "@types/utf8": "^3.0.1",
     "axios": "^1.2.4",
     "base-64": "^1.0.0",
     "events": "^3.3.0",
     "prop-types": "^15.8.1",
-    "queue": "^6.0.2"
+    "queue": "^6.0.2",
+    "utf8": "^3.0.0"
   },
   "gitHead": "fdedec3c8725dfd89c7062c0115ca23c1645f863"
 }

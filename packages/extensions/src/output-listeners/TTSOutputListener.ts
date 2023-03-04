@@ -1,6 +1,8 @@
 import * as Core from '@mikugg/core';
 import { TTSServicePropTypes } from '../services/tts/TTSService';
 import { InferProps } from 'prop-types';
+import { ServicesNames } from '../services';
+import trim from 'lodash.trim';
 
 type TTSServiceProps = InferProps<typeof TTSServicePropTypes>
 
@@ -14,10 +16,14 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<Core.
   protected service: Core.Services.ServiceClient<TTSServiceProps, string>;
   protected props: TTSServiceProps;
 
-  constructor(params: TTSOutputListenerParams) {
+  constructor(params: TTSOutputListenerParams, serviceName: ServicesNames) {
     super();
     this.props = params.props;
-    this.service = new Core.Services.ServiceClient<TTSServiceProps, string>(params.serviceEndpoint, params.signer);
+    this.service = new Core.Services.ServiceClient<TTSServiceProps, string>(
+      params.serviceEndpoint,
+      params.signer,
+      serviceName
+    );
   }
 
   protected override async handleOutput(output: Core.OutputListeners.DialogOutputEnvironment): Promise<string> {
@@ -32,9 +38,13 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<Core.
   }
 
   private cleanText(text: string) {
+    // sanitize text
+    text = trim(text)
+    if (text.startsWith("\"") && text.endsWith("\"")) text = text.substring(1, text.length - 1);
+    text = ' ' + text;
+
     let cleanText = "";
     let lastOpen: undefined | string = undefined;
-    text = ' ' + text;
     for (let x = 0; x < text.length; x++)
     {
         const ch = text.charAt(x);

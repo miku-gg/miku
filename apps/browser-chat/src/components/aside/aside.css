@@ -1,20 +1,20 @@
 .scrollbar::-webkit-scrollbar {
-  width: 10px;
+  width: 0.3em;
 }
 
 .scrollbar::-webkit-scrollbar-track {
   border-radius: 100vh;
-  background: skyblue;
+  background: transparent;
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-  background: white;
+  background: rgb(167 139 250);
   border-radius: 100vh;
-  border: 3px solid skyblue;
+  border: 0;
 }
 
 .scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #c0a0b9;
+  background: rgb(196 181 253);
 }
 
 .button-transparent {
@@ -25,7 +25,7 @@
   background: transparent;
 }
 .button-transparent:hover {
-  box-shadow: 0 0 16px 0 #6f4cffe0;
+  box-shadow: 0px 0px 10px 0px rgb(205 95 234);
 }
 
 .button-purple {

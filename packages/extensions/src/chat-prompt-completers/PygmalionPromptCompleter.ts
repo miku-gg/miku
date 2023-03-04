@@ -1,8 +1,7 @@
 import * as Core from '@mikugg/core';
 import { InferProps } from "prop-types";
 import trim from 'lodash.trim';
-import { PygmalionServicePropTypes } from '../services';
-import { ShortTermMemory } from '@mikugg/core/dist/memory';
+import { PygmalionServicePropTypes, ServicesNames } from '../services';
 
 type PygmalionPropTypes = InferProps<typeof PygmalionServicePropTypes>;
 
@@ -19,7 +18,11 @@ export class PygmalionPromptCompleter extends Core.ChatPromptCompleters.ChatProm
   constructor(params: PygmalionParams) {
     super(params);
     this.props = params.props;
-    this.service = new Core.Services.ServiceClient<PygmalionPropTypes, string>(params.serviceEndpoint, params.signer);
+    this.service = new Core.Services.ServiceClient<PygmalionPropTypes, string>(
+      params.serviceEndpoint,
+      params.signer,
+      ServicesNames.Pygmalion
+    );
   }
   
   public override async getCost(prompt: string): Promise<number> {
@@ -35,7 +38,7 @@ export class PygmalionPromptCompleter extends Core.ChatPromptCompleters.ChatProm
    * 
    * @returns The completed prompt.
    */
-  protected async completePrompt(memory: ShortTermMemory): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
+  protected async completePrompt(memory: Core.Memory.ShortTermMemory): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
     const prompt = memory.buildMemoryPrompt();
     const result = await this.service.query({
       ...this.getProps(),
