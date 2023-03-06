@@ -12,8 +12,9 @@ import { PopUp } from "../pup-up/pup-up";
 import { ChatHistory, HistoryManagementButtons } from "../chat-history/chat-history";
 import { BotDetails } from "../bot-details/BotDetails";
 import "./conversation.css";
-import { Reload } from "../../assets/icons/svg";
+import { Reload, LeftArrow, RightArrow } from "../../assets/icons/svg";
 import { UnmuteIcon } from "@primer/octicons-react";
+import { ShortTermMemory } from "@mikugg/core/dist/memory";
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT || 'http://localhost:8585/images';
 
@@ -41,7 +42,14 @@ export const Conversation = ({ loading, sendPrompt }: any) => {
         setEmotionImage(emotionInterpreterConfig.props?.images?.neutral || '');
       }
     }
-    botFactory.getInstance()?.subscribeDialog((output) => {
+    const bot = botFactory.getInstance();
+    bot?.subscribeDialog((output) => {
+      let memory: ShortTermMemory = bot.getMemory();
+
+      if(!memory.hasResponse(output.text)) {
+        memory.pushResponse(output);
+      }
+      
       setMessage(output.text);
       setEmotionImage(output.imgHash);
     });
@@ -62,6 +70,47 @@ export const Conversation = ({ loading, sendPrompt }: any) => {
   
   const displayBotDetails = () =>{
     setHandleBotDetailsInfo(true)
+  }
+
+  const handleResponses = (shortTermMemory: ShortTermMemory) => {
+    const responses = shortTermMemory.getResponses();
+    let selectedResponse = responses[shortTermMemory?.getSelectedResponseIndex()];
+
+    setMessage(selectedResponse.text);
+    setEmotionImage(selectedResponse.imgHash);
+
+    let memory = shortTermMemory.getMemory();
+    memory[memory.length-1].text = selectedResponse.text;
+  }
+
+  const onLeftClick = (event: React.UIEvent) => {
+    const bot = botFactory.getInstance();
+    const shortTermMemory = bot?.getMemory();
+    const responses = shortTermMemory?.getResponses();
+    let selectedResponseIndex = shortTermMemory?.getSelectedResponseIndex();
+
+    if(responses && selectedResponseIndex !== undefined && selectedResponseIndex-1 > -1) {
+      shortTermMemory?.setSelectedResponseIndex(selectedResponseIndex-1)
+      const memoryLines = shortTermMemory?.getMemory();
+      if(memoryLines && shortTermMemory) {
+        handleResponses(shortTermMemory);
+      }
+    }
+  }
+
+  const onRightClick = (event: React.UIEvent) => {
+    const bot = botFactory.getInstance();
+    const shortTermMemory = bot?.getMemory();
+    const responses = shortTermMemory?.getResponses();
+    let selectedResponseIndex = shortTermMemory?.getSelectedResponseIndex();
+
+    if(responses && selectedResponseIndex !== undefined && selectedResponseIndex+1 < responses.length) {
+      shortTermMemory?.setSelectedResponseIndex(selectedResponseIndex+1)
+      const memoryLines = shortTermMemory?.getMemory();
+      if(memoryLines && shortTermMemory) {
+        handleResponses(shortTermMemory);
+      }
+    }
   }
 
   const onRegenerateClick = (event: React.UIEvent) => {
@@ -135,6 +184,26 @@ export const Conversation = ({ loading, sendPrompt }: any) => {
             {
               !loading ? (
                 <button
+                  className="reload-button absolute top-[-2.5em] left-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
+                  onClick={onLeftClick}
+                >
+                  <LeftArrow />
+                </button>
+              ) : null
+            }
+            {
+              !loading ? (
+                <button
+                  className="reload-button absolute top-[-2.5em] left-12 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
+                  onClick={onRightClick}
+                >
+                  <RightArrow />
+                </button>
+              ) : null
+            }
+            {
+              !loading ? (
+                <button
                   className="reload-button absolute top-[-2.5em] right-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
                   onClick={onRegenerateClick}
                 >
@@ -163,7 +232,7 @@ export const Conversation = ({ loading, sendPrompt }: any) => {
         >
         <p className="ml-4 text-start text-2xl text-white">Conversation History</p>
         <ChatHistory />
-        <div className="w-full flex justify-center gap-7 pb-3 flex-wrap">
+        <div className="w-full flex justify-center gap-7 pb-3 flex-wrap red-500 text-red-500">
           <HistoryManagementButtons onLoad={() => forceUpdate()} />
         </div>
       </PopUp> 

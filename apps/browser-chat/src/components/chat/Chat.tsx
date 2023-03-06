@@ -28,6 +28,7 @@ export const Chat = ({ sendPrompt }: any): JSX.Element => {
   
     if (value) {
       sendPrompt(event, value, MikuCore.Commands.CommandType.DIALOG);
+      botFactory.getInstance()?.getMemory()?.clearResponses();
       setValue("");  
     }
   }  
