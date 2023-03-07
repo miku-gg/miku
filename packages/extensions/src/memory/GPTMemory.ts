@@ -33,17 +33,18 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
     let prompt = this.basePrompt;
 
     for (let i = Math.max(this.memory.length - this.memorySize, 0); i < this.memory.length; i++) {
+      const memoryText = this.memory[i].text.replace(/\n\n/g, '\n').replace(/\n/g, ' ');
       switch (this.memory[i].type) {
         case MikuCore.Commands.CommandType.DIALOG:
-          prompt += '\n' + this.memory[i].subject + ': ' + this.memory[i].text;
+          prompt += '\n' + this.memory[i].subject + ': ' + memoryText;
           break;
         case MikuCore.Commands.CommandType.CONTEXT:
-          prompt += '\n' + this.memory[i].text;
+          prompt += '\n' + memoryText;
           break;
       }
     }
-    prompt += `\n${this.botSubject}: `;
-    for(let i = 0; i < 10; i++) prompt = prompt.replace('\n\n', '\n');
+    prompt += `\n${this.botSubject}:`;
+    for(let i = 0; i < 10; i++) prompt = prompt.replace(/\n\n/g, '\n');
 
     return prompt;
   }
