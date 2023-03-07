@@ -30,6 +30,7 @@ export const Conversation = () => {
   const [ _, forceUpdate ] = useReducer((x) => x + 1, 0);
   const [ responseIds, setResponseIds ] = useState<string[]>([]);
   const [ responseIndex, setResponseIndex ] = useState<number>(0);
+  const [ isAudioSubscribed, setIsAudioSubscribed ] = useState<boolean>(false);
 
   let response: BotReponse | null = null;
   let prevResponse: BotReponse | null = null;
@@ -50,7 +51,7 @@ export const Conversation = () => {
     }
   }
 
-  const loading = response?.loadingText || response?.loadingAudio || response?.loadingEmotion || false;
+  const loading = response?.loadingText || (isAudioSubscribed && response?.loadingAudio) || response?.loadingEmotion || false;
 
   useEffect(() => {
     if (botConfig) {
@@ -71,13 +72,17 @@ export const Conversation = () => {
       fillResponse(output.commandId, 'emotion', output.imgHash);
       forceUpdate();
     });
-    bot?.subscribeAudio((base64: string, output) => {
+    const audioSubscribed = bot?.subscribeAudio((base64: string, output) => {
       fillResponse(output.commandId, 'audio', base64);
       forceUpdate();
       if (base64) {
         playAudio(base64);
       }
     });
+
+    if (audioSubscribed) {
+      setIsAudioSubscribed(true);
+    }
   }, [botConfig]);
 
   const handleHistoryButtonClick = () => setShowHistory(true);
