@@ -3,26 +3,51 @@ import { InferProps } from "prop-types";
 import trim from 'lodash.trim';
 import { PygmalionServicePropTypes, ServicesNames } from '../services';
 
-export const parsePygmalionResponse = (text: string, _botSubject: string, _subjects: string[]): string => {
-  text = trim(text);
-  const botSubject: string = _botSubject;
+const buildTextStops = (_subjects: string[]): string[] => {
   const subjects: string[] = _subjects.map((subject) => `${subject}:`);
-  const stops = ['<|endoftext|>', ...subjects,  `\n${botSubject}:`];
- 
-  const isCleanResponse = stops.reduce((prev, cur) => {
-    return prev && !text.includes(cur);
-  }, true);
-  
-  if (!isCleanResponse) {
+  return ['<|endoftext|>', ...subjects];
+}
+
+const hasTextStop = (text: string, _subjects: string[]): boolean => {
+  const stops = buildTextStops(_subjects);
+  return stops.reduce((prev, cur) => {
+    return prev || text.includes(cur);
+  }, false)
+}
+
+export const parsePygmalionResponse = (text: string, _botSubject: string, _subjects: string[]): string => {
+  const botSubject: string = _botSubject;
+  const hasStop = hasTextStop(text, _subjects);
+  const removeLineGroups = (text: string): string => {
+    return text.replace(/\n\n/g, '\n');
+  }
+  const removeLastLineBreak = (text: string): string => {
+    return text[text.length - 1] === '\n' ? text.substring(0, text.length - 1) : text;
+  }
+  text = text.split(`${botSubject}:`).join('');
+  text = trim(text);
+  text = removeLineGroups(text)
+  if (hasStop) {
+    const stops = buildTextStops(_subjects);
     text = text.substring(
       0,
       stops.reduce((prev, cur) => {
-        let subjectTextIndex = text.indexOf(`${cur}:`);
+        let subjectTextIndex = text.indexOf(cur);
         return (subjectTextIndex === -1) ? prev : Math.min(prev, subjectTextIndex);
       }, text.length)
-    );
+    )
+    text = removeLastLineBreak(text);
+  } else {
+    text = trim(text);
+    text = removeLastLineBreak(text);
+    text = text.substring(0, text.lastIndexOf('\n'));
   }
-  text = text.replace(`${botSubject}:`, '');
+
+  text = trim(text);
+  while (text.startsWith('!')) text = text.substring(1);
+  while (text.startsWith('?')) text = text.substring(1);
+
+  text = trim(text);
   return text;
 }
 
@@ -63,18 +88,33 @@ export class PygmalionPromptCompleter extends Core.ChatPromptCompleters.ChatProm
    */
   protected async completePrompt(memory: Core.Memory.ShortTermMemory): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
     const prompt = memory.buildMemoryPrompt();
-    const result = await this.service.query({
-      ...this.getProps(),
-      prompt
-    }, await this.getCost(prompt));
+    let result = '';
+    let isParsedResultSmall = false;
+    let tries = 0;
+
+    while ((isParsedResultSmall || !hasTextStop(result, memory.getSubjects())) && tries++ < 3) {
+      if (isParsedResultSmall) result = '';
+      result += await this.service.query({
+        ...this.getProps(),
+        prompt: prompt + result
+      }, await this.getCost(prompt + result));
+
+      const resultParsed = parsePygmalionResponse(result, memory.getBotSubject(), memory.getSubjects());
+      isParsedResultSmall = resultParsed.length < 4;
+      if (hasTextStop(result, memory.getSubjects()) && !isParsedResultSmall) {
+        result = resultParsed;
+        break;
+      }
+      result = resultParsed;
+    }
+
     return {text: result};
   }
 
   protected async handleCompletionOutput(output: Core.ChatPromptCompleters.ChatPromptResponse, _command: Core.Commands.Command): Promise<Core.OutputListeners.DialogOutputEnvironment> {
-    const text = parsePygmalionResponse(output.text, this.memory.getBotSubject(), this.memory.getSubjects());
     return {
       commandId: _command.commandId,
-      text
+      text: output.text
     };
   }
 

@@ -23,7 +23,7 @@ jobs:
         with:
           submodules: true
       - name: Install
-        run: npm i -g pnpm && pnpm install && pnpm run build
+        run: npm i -g pnpm && pnpm install && pnpm test && pnpm run build
         env:
           VITE_SERVICES_ENDPOINT: ${{ secrets.VITE_SERVICES_ENDPOINT }}
           VITE_BOT_DIRECTORY_ENDPOINT: ${{ secrets.VITE_BOT_DIRECTORY_ENDPOINT }}
