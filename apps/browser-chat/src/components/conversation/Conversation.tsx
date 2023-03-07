@@ -175,7 +175,7 @@ export const Conversation = () => {
               )}
             </div>
             {
-              (!loading && responseIds.length > 0) ? (
+              (!loading && responseIds.length > 1) ? (
                 <div className="response-swiping absolute top-[-2em] left-2 inline-flex justify-between gap-4 bg-slate-900/80 p-2 text-white rounded-t-md">
                   <button
                     className="text-gray-300 disabled:text-gray-500 hover:text-white transition-all"
