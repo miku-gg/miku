@@ -26,17 +26,26 @@ export interface CommandHandlerInput {
   subject: string;
 }
 
+
 /**
- * Command type
+ * _CommandRaw type
  * 
  * @property {CommandType} type - The type of the command.
  * @property {CommandHandlerInput} input - The input of the command.
  */
-export interface Command {
+export interface _CommandRaw {
   type: CommandType;
   input: CommandHandlerInput;
 }
 
+/**
+ * Command type
+ * 
+ * @property {string} commandId - The id of the command.
+ */
+export interface Command extends _CommandRaw {
+  commandId: string;
+}
 
 export const commandToMemoryLine = (command: Command): MemoryLine => {
   return {

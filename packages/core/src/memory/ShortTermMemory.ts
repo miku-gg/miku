@@ -36,7 +36,7 @@ export abstract class ShortTermMemory {
   protected subjects: string[];
   protected botSubject: string;
 
-  constructor({prompt_context, prompt_initiator, subjects, botSubject}: MemoryPromptConfig, memorySize = 30) {
+  constructor({prompt_context, prompt_initiator, subjects, botSubject}: MemoryPromptConfig, memorySize = 30, selectedResponseIndex = 0) {
     this.contextPrompt = prompt_context;
     this.initiatorPrompt = prompt_initiator;
     this.basePrompt = prompt_context + prompt_initiator;

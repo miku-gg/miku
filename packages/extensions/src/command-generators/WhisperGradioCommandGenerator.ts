@@ -58,7 +58,7 @@ export class WhisperGradioCommandGenerator extends Core.CommandGenerators.APICom
     base64Input: string,
     subject: string,
     commandType: Core.Commands.CommandType  
-  }): Promise<Core.Commands.Command> {
+  }): Promise<Core.Commands._CommandRaw> {
     const response = await this.api.translate(input.base64Input);
     return {
       type: input.commandType,

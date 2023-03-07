@@ -47,7 +47,7 @@ export class PygmalionPromptCompleter extends Core.ChatPromptCompleters.ChatProm
     return {text: result};
   }
 
-  protected async handleCompletionOutput(output: Core.ChatPromptCompleters.ChatPromptResponse): Promise<Core.OutputListeners.DialogOutputEnvironment> {
+  protected async handleCompletionOutput(output: Core.ChatPromptCompleters.ChatPromptResponse, _command: Core.Commands.Command): Promise<Core.OutputListeners.DialogOutputEnvironment> {
     let text: string = trim(output.text);
     const botSubject: string = this.memory.getBotSubject();
     const subjects: string[] = this.memory.getSubjects();
@@ -68,6 +68,7 @@ export class PygmalionPromptCompleter extends Core.ChatPromptCompleters.ChatProm
     }
     text = text.replace(`${botSubject}:`, '');
     return {
+      commandId: _command.commandId,
       text
     };
   }

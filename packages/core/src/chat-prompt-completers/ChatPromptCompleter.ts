@@ -75,7 +75,7 @@ export abstract class ChatPromptCompleter {
    * @param output - The output of the prompt completion.
    * @returns A promise that resolves to the output environment.
    */
-  protected abstract handleCompletionOutput(output: ChatPromptResponse): Promise<OutputEnvironment>;
+  protected abstract handleCompletionOutput(output: ChatPromptResponse, _command: Commands.Command): Promise<OutputEnvironment>;
 
   /**
    * _processCommand is a private function that processes a command.
@@ -89,7 +89,7 @@ export abstract class ChatPromptCompleter {
     this.memory.pushMemory(Commands.commandToMemoryLine(command));
 
     const promptResult = await this.completePrompt(this.memory);
-    const output = await this.handleCompletionOutput(promptResult);
+    const output = await this.handleCompletionOutput(promptResult, command);
     this.memory.pushMemory({
       type: Commands.CommandType.DIALOG,
       text: output.text,
@@ -112,7 +112,10 @@ export abstract class ChatPromptCompleter {
         .push(async (cb) => {
           this._processCommand(command)
             .then((result) => {
-              resolve(result)
+              resolve({
+                ...result,
+                commandId: command.commandId
+              })
               cb && cb();
             })
             .catch((err) => {
