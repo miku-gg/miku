@@ -43,6 +43,7 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
       }
     }
     prompt += `\n${this.botSubject}: `;
+    for(let i = 0; i < 10; i++) prompt = prompt.replace('\n\n', '\n');
 
     return prompt;
   }

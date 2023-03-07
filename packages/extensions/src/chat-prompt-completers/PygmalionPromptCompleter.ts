@@ -50,8 +50,8 @@ export class PygmalionPromptCompleter extends Core.ChatPromptCompleters.ChatProm
   protected async handleCompletionOutput(output: Core.ChatPromptCompleters.ChatPromptResponse, _command: Core.Commands.Command): Promise<Core.OutputListeners.DialogOutputEnvironment> {
     let text: string = trim(output.text);
     const botSubject: string = this.memory.getBotSubject();
-    const subjects: string[] = this.memory.getSubjects();
-    const stops = ['<|endoftext|>', ...subjects];
+    const subjects: string[] = this.memory.getSubjects().map((subject) => `${subject}:`);
+    const stops = ['<|endoftext|>', ...subjects,  `\n${botSubject}:`];
    
     const isCleanResponse = stops.reduce((prev, cur) => {
       return prev && !text.includes(cur);

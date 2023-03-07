@@ -39,12 +39,12 @@ export class PygmalionService extends Miku.Services.Service {
       "use_memory": false,
       "use_authors_note": false,
       "use_world_info": false,
-      "max_context_length": modelSettings.max_length,
-      "max_length": 2048,
+      "max_context_length": modelSettings.max_context_length,
+      "max_length": modelSettings.max_length,
       "rep_pen": modelSettings.rep_pen,
       "rep_pen_range": modelSettings.rep_pen_range,
       "rep_pen_slope": modelSettings.rep_pen_slope,
-      "temperature": modelSettings.temp,
+      "temperature": modelSettings.temperature,
       "tfs": modelSettings.tfs,
       "top_a": modelSettings.top_a,
       "top_k": modelSettings.top_k,
@@ -63,6 +63,6 @@ export class PygmalionService extends Miku.Services.Service {
   protected async calculatePrice(input: InferProps<typeof this.propTypesRequired>): Promise<number> {
     const modelSettings = getPygmalionModelSettings(input.model);
     const gptTokens = this.tokenizer.encode(input.prompt).bpe.length;
-    return gptTokens + (modelSettings?.max_length || 0) * Math.max(1, modelSettings?.numseqs || 1);
+    return gptTokens + (modelSettings?.max_length || 0);
   }
 }
