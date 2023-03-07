@@ -1,4 +1,5 @@
-import { Command } from "../commands";
+import { Command, _CommandRaw } from "../commands";
+import { v4 } from "uuid";
 
 /**
  * CommandGenerator is an abstract class that is used to generate commands from inputs.
@@ -14,7 +15,7 @@ export abstract class CommandGenerator<GeneratorInputType> {
    * @param input - The input to generate a command from.
    * @returns A promise that resolves with the generated command.
    */
-  protected abstract generate(input: GeneratorInputType): Promise<Command>;
+  protected abstract generate(input: GeneratorInputType): Promise<_CommandRaw>;
 
   /** 
    * Subscribe to the command generator.
@@ -33,19 +34,32 @@ export abstract class CommandGenerator<GeneratorInputType> {
    * @param input - The input to generate a command from.
    * @returns A promise that resolves when the command is emitted.
    */
-  public async emit(input: GeneratorInputType): Promise<void> {
-    const command = await this.generate(input);
-    const pendings: Promise<any>[] = [];
-    this.subscriptions.forEach(fn => pendings.push(fn(command)));
-    await Promise.all(pendings);
+  public emit(input: GeneratorInputType): {
+    wait: Promise<void[]>,
+    commandId: string,
+  } {
+    const commandId = v4();
+    const wait = this.generate(input).then(command => {
+      const pendings: Promise<any>[] = [];
+      this.subscriptions.forEach(fn => pendings.push(fn({
+        ...command,
+        commandId
+      })));
+      return Promise.all(pendings);
+    });
+
+    return {
+      wait,
+      commandId,
+    }
   }
 }
 
 /**
  * TextCommandGenerator generates commands from text
  */
-export class TextCommandGenerator extends CommandGenerator<Command> {
-  public async generate(input: Command): Promise<Command> {
+export class TextCommandGenerator extends CommandGenerator<_CommandRaw> {
+  public async generate(input: _CommandRaw): Promise<_CommandRaw> {
     return input;
   }
 }

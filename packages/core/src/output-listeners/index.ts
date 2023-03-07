@@ -1,5 +1,6 @@
 
 export interface OutputEnvironment {
+  commandId: string
   text: string
 }
 
@@ -19,7 +20,7 @@ export interface OptionsOutputEnvironment extends OutputEnvironment {
 }
 
 export abstract class OutputListener<T extends OutputEnvironment, W = void>  {
-  private subscriptions: Set<(result: W) => void> = new Set();
+  private subscriptions: Set<(result: W, output: T) => void> = new Set();
   private errorSubscription: (error: Error, el: OutputListener<T, W>) => void = () => {};
 
   public subscribeError(fn: (error: Error, el?: OutputListener<T, W>) => void): () => void {
@@ -31,11 +32,11 @@ export abstract class OutputListener<T extends OutputEnvironment, W = void>  {
 
   public sendOutput(output: T): void {
     this.handleOutput(output)
-      .then((result: W) => this.subscriptions.forEach(fn => fn(result)))
+      .then((result: W) => this.subscriptions.forEach(fn => fn(result, output)))
       .catch((error: Error) => this.errorSubscription(error, this));
   }
 
-  public subscribe(fn: (output: W) => void): () => void {
+  public subscribe(fn: (result: W, output: T) => void): () => void {
     this.subscriptions.add(fn);
     return () => this.subscriptions.delete(fn);
   }

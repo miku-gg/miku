@@ -13,8 +13,9 @@ interface BotFactoryConfig {
 
 interface BotInstanceInterface {
   subscribeDialog(cb: (output: MikuExtensions.OutputListeners.EmotionRendererOutput) => void): void;
-  subscribeAudio(cb: (base64: string) => void): void;
-  sendPrompt(text: string, type: number, subject?: string): Promise<void>;
+  subscribeAudio(cb: (base64: string, command: MikuCore.OutputListeners.OutputEnvironment) => void): void;
+  subscribePromptSent(cb: (command: MikuCore.Commands.Command) => void): () => void;
+  sendPrompt(text: string, type: number, subject?: string): {wait: Promise<void[]>, commandId: string};
   getCurrentPrompt(): string;
   getMemory(): MikuCore.Memory.ShortTermMemory;
   computeCost(prompt: string): Promise<number>;
@@ -211,23 +212,31 @@ class BotFactory {
         return !!listener;
       },
 
-      subscribeAudio(cb: (base64: string) => void): boolean {
+      subscribeAudio(cb: (base64: string, output: MikuCore.OutputListeners.OutputEnvironment) => void): boolean {
         const listener =  dialogOutputListeners.find((listener) => listener instanceof MikuExtensions.OutputListeners.TTSOutputListener);
         listener?.subscribe(cb);
         return !!listener;
       },
 
-      sendPrompt(text: string, type: number, subject: string = 'You'): Promise<void> {
-        return textWriter.emit({
+      subscribePromptSent(cb: (command: MikuCore.Commands.Command) => void): () => void {
+        return textWriter.subscribe(cb);
+      },
+
+      sendPrompt(text: string, type: number, subject: string = 'You'): {wait: Promise<void[]>, commandId: string} {
+        const { wait, commandId } = textWriter.emit({
           type,
           input: {
             text,
             subject,
           },
-        }).catch((error) => {
-          toast.error('Error sending prompt');
-          throw error;
         });
+        return {
+          wait: wait.catch((error) => {
+            toast.error('Error sending prompt');
+            throw error;
+          }),
+          commandId,
+        }
       },
 
       getCurrentPrompt() {

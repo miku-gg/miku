@@ -1,7 +1,4 @@
 import { Commands } from "..";
-import { DialogOutputEnvironment } from "../output-listeners/index";
-
-type EmotionRendererOutput = DialogOutputEnvironment & {emotion: string, imgHash: string};
 
 export interface MemoryLine {
   text: string;
@@ -33,13 +30,11 @@ export interface MemoryPromptConfig {
 export abstract class ShortTermMemory {
   public memorySize: number;
   protected memory: MemoryLine[] = [];
-  protected responses: EmotionRendererOutput[] = [];
   protected contextPrompt: string;
   protected initiatorPrompt: string;
   protected basePrompt: string;
   protected subjects: string[];
   protected botSubject: string;
-  protected selectedResponseIndex;
 
   constructor({prompt_context, prompt_initiator, subjects, botSubject}: MemoryPromptConfig, memorySize = 30, selectedResponseIndex = 0) {
     this.contextPrompt = prompt_context;
@@ -48,7 +43,6 @@ export abstract class ShortTermMemory {
     this.memorySize = memorySize;
     this.subjects = subjects;
     this.botSubject = botSubject;
-    this.selectedResponseIndex = selectedResponseIndex;
   }
 
   public abstract pushMemory(memory: MemoryLine): void;
@@ -64,36 +58,5 @@ export abstract class ShortTermMemory {
 
   public getSubjects(): string[] {
     return this.subjects;
-  }
-
-  public pushResponse(response: EmotionRendererOutput): void {
-    this.responses.push(response);
-  }
-
-  public getResponses(): EmotionRendererOutput[] {
-    return this.responses;
-  }
-
-  public hasResponse(text: string): boolean {
-    for (let i = 0; i < this.responses.length; i++) {
-      const response = this.responses[i];
-      if (response.text === text) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public getSelectedResponseIndex(): number{
-    return this.selectedResponseIndex;
-  }
-
-  public setSelectedResponseIndex(i: number) {
-    this.selectedResponseIndex = i;
-  }
-
-  clearResponses(): void {
-    this.selectedResponseIndex = 0;
-    this.responses = [];
   }
 }

@@ -39,17 +39,15 @@
 }
 
 .audio-button,
-.reload-button {
+.reload-button,
+.response-swiping {
   opacity: 0;
   transition: all .2s ease-in;
 }
 
 .reload-button:hover,
-.response-container:hover .reload-button {
-  opacity: 1;
-}
-
-.reload-button:hover,
+.response-container:hover .reload-button,
+.response-container:hover .response-swiping,
 .response-container:hover .audio-button {
   opacity: 1;
 }

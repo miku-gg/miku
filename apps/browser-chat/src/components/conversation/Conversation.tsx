@@ -14,7 +14,7 @@ import { BotDetails } from "../bot-details/BotDetails";
 import "./conversation.css";
 import { Reload, LeftArrow, RightArrow } from "../../assets/icons/svg";
 import { UnmuteIcon } from "@primer/octicons-react";
-import { ShortTermMemory } from "@mikugg/core/dist/memory";
+import { responsesStore, fillResponse, BotReponse } from "../../libs/responsesStore";
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT || 'http://localhost:8585/images';
 
@@ -23,93 +23,75 @@ const playAudio = (base64: string): void => {
   snd.play();
 }
 
-export const Conversation = ({ loading, sendPrompt }: any) => {
-  const [message, setMessage] = useState<string>();
-  const [backgroundImage, setBackgroundImage] = useState<string>();
-  const [emotionImage, setEmotionImage] = useState<string>();
+export const Conversation = () => {
   const { botConfig } = useBot();
   const [ showHistory, setShowHistory ] = useState<Boolean>(false)
   const [ handleBotDetailsInfo, setHandleBotDetailsInfo ] = useState<boolean>(false);
-  const [_, forceUpdate] = useReducer((x) => x + 1, 0);
-  const [lastAudio, setLastAudio] = useState<string>('');
+  const [ _, forceUpdate ] = useReducer((x) => x + 1, 0);
+  const [ responseIds, setResponseIds ] = useState<string[]>([]);
+  const [ responseIndex, setResponseIndex ] = useState<number>(0);
+
+  let response: BotReponse | null = null;
+  let prevResponse: BotReponse | null = null;
+  if (responseIds && responseIndex < responseIds.length) {
+    response = responsesStore.get(responseIds[responseIndex]) || null;
+    if (responseIds.length > 1 && responseIndex < responseIds.length - 1) {
+      prevResponse = responsesStore.get(responseIds[responseIndex + 1]) || null;
+    }
+  }
+
+  let backgroundImage = botConfig?.background_pic || '';
+  let emotionImage = response?.emotion || prevResponse?.emotion || '';
+  if (!emotionImage) {
+    const emotionInterpreterConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter)
+    if (emotionInterpreterConfig) {
+      // @ts-ignore
+      emotionImage = emotionInterpreterConfig.props?.images?.neutral;
+    }
+  }
+
+  const loading = response?.loadingText || response?.loadingAudio || response?.loadingEmotion || false;
 
   useEffect(() => {
     if (botConfig) {
-      setBackgroundImage(botConfig.background_pic);
-      const emotionInterpreterConfig = botConfig.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter)
-      if (emotionInterpreterConfig) {
-        // @ts-ignore
-        setEmotionImage(emotionInterpreterConfig.props?.images?.neutral || '');
-      }
+      setResponseIds([]);
+      setResponseIndex(0);
+      forceUpdate();
     }
     const bot = botFactory.getInstance();
+    bot?.subscribePromptSent((command) => {
+      fillResponse(command.commandId);
+      setResponseIds(responseIds => [command.commandId, ...responseIds]);
+      setResponseIndex(0);
+      forceUpdate();
+    })
+ 
     bot?.subscribeDialog((output) => {
-      let memory: ShortTermMemory = bot.getMemory();
-
-      if(!memory.hasResponse(output.text)) {
-        memory.pushResponse(output);
-      }
-      
-      setMessage(output.text);
-      setEmotionImage(output.imgHash);
+      fillResponse(output.commandId, 'text', output.text);
+      fillResponse(output.commandId, 'emotion', output.imgHash);
+      forceUpdate();
     });
-  }, [botConfig]);
-
-  useEffect(() => {
-    botFactory.getInstance()?.subscribeAudio((base64: string) => {
+    bot?.subscribeAudio((base64: string, output) => {
+      fillResponse(output.commandId, 'audio', base64);
+      forceUpdate();
       if (base64) {
         playAudio(base64);
-        setLastAudio(base64);  
       }
     });
   }, [botConfig]);
 
-  const handleHistoryButtonClick = () =>{
-    setShowHistory(true)
-  }
-  
-  const displayBotDetails = () =>{
-    setHandleBotDetailsInfo(true)
-  }
+  const handleHistoryButtonClick = () => setShowHistory(true);
+  const displayBotDetails = () => setHandleBotDetailsInfo(true)
 
-  const handleResponses = (shortTermMemory: ShortTermMemory) => {
-    const responses = shortTermMemory.getResponses();
-    let selectedResponse = responses[shortTermMemory?.getSelectedResponseIndex()];
-
-    setMessage(selectedResponse.text);
-    setEmotionImage(selectedResponse.imgHash);
-
-    let memory = shortTermMemory.getMemory();
-    memory[memory.length-1].text = selectedResponse.text;
+  const onRightClick = (event: React.UIEvent) => {
+    if (responseIndex > 0 && responseIds.length > 0) {
+      setResponseIndex(responseIndex - 1);
+    }
   }
 
   const onLeftClick = (event: React.UIEvent) => {
-    const bot = botFactory.getInstance();
-    const shortTermMemory = bot?.getMemory();
-    const responses = shortTermMemory?.getResponses();
-    let selectedResponseIndex = shortTermMemory?.getSelectedResponseIndex();
-
-    if(responses && selectedResponseIndex !== undefined && selectedResponseIndex-1 > -1) {
-      shortTermMemory?.setSelectedResponseIndex(selectedResponseIndex-1)
-      const memoryLines = shortTermMemory?.getMemory();
-      if(memoryLines && shortTermMemory) {
-        handleResponses(shortTermMemory);
-      }
-    }
-  }
-
-  const onRightClick = (event: React.UIEvent) => {
-    const bot = botFactory.getInstance();
-    const shortTermMemory = bot?.getMemory();
-    const responses = shortTermMemory?.getResponses();
-    let selectedResponseIndex = shortTermMemory?.getSelectedResponseIndex();
-
-    if(responses && selectedResponseIndex !== undefined && selectedResponseIndex+1 < responses.length) {
-      shortTermMemory?.setSelectedResponseIndex(selectedResponseIndex+1)
-      const memoryLines = shortTermMemory?.getMemory();
-      if(memoryLines && shortTermMemory) {
-        handleResponses(shortTermMemory);
-      }
+    if (responseIndex < responseIds.length - 1) {
+      setResponseIndex(responseIndex + 1);
     }
   }
 
@@ -127,7 +109,13 @@ export const Conversation = ({ loading, sendPrompt }: any) => {
 
       const lastMemoryLine = memoryLines[memoryLines.length - 2];
 
-      sendPrompt(event, lastMemoryLine.text, lastMemoryLine.type);
+      event.preventDefault();
+      setResponseIds(_responseIds => {
+        const responseIds = [..._responseIds];
+        responseIds.shift();
+        return responseIds;
+      });
+      botFactory.getInstance()?.sendPrompt(lastMemoryLine.text, lastMemoryLine.type);
     }
   }
 
@@ -168,41 +156,41 @@ export const Conversation = ({ loading, sendPrompt }: any) => {
         {/* RESPONSE CONTAINER */}
         <div
           className={
-            (!message && !loading)
+            (!responseIds.length)
               ? "hidden"
               : "absolute bottom-10 z-10 flex justify-center items-center w-full h-1/4"
           }
         >
           <div className="response-container h-3/4 w-10/12 relative">
             <div className="flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b from-slate-900/[.7] to-gray-500/50 rounded-md overflow-auto border-[4px] drop-shadow-2xl shadow-black">
-              {loading ? (
+              {!response || loading ? (
                 <Loader />
               ) : (
-                <p className="text-lg font-bold text-white ">{message}</p>
+                <p className="text-lg font-bold text-white ">{response?.text || ''}</p>
               )}
             </div>
             {
-              !loading ? (
-                <button
-                  className="reload-button absolute top-[-2.5em] left-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
-                  onClick={onLeftClick}
-                >
-                  <LeftArrow />
-                </button>
+              (!loading && responseIds.length > 0) ? (
+                <div className="response-swiping absolute top-[-2em] left-2 inline-flex justify-between gap-4 bg-slate-900/80 p-2 text-white rounded-t-md">
+                  <button
+                    className="text-gray-300 disabled:text-gray-500 hover:text-white transition-all"
+                    onClick={onLeftClick}
+                    disabled={responseIndex >= responseIds.length - 1}
+                  >
+                    <LeftArrow />
+                  </button>
+                  <button
+                    className="text-gray-300 disabled:text-gray-500 hover:text-white transition-all"
+                    onClick={onRightClick}
+                    disabled={responseIndex <= 0}
+                  >
+                    <RightArrow />
+                  </button>
+                </div>
               ) : null
             }
             {
-              !loading ? (
-                <button
-                  className="reload-button absolute top-[-2.5em] left-12 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
-                  onClick={onRightClick}
-                >
-                  <RightArrow />
-                </button>
-              ) : null
-            }
-            {
-              !loading ? (
+              !loading && responseIndex === 0 ? (
                 <button
                   className="reload-button absolute top-[-2.5em] right-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
                   onClick={onRegenerateClick}
@@ -213,10 +201,10 @@ export const Conversation = ({ loading, sendPrompt }: any) => {
               ) : null
             }
             {
-              (!loading && lastAudio) ? (
+              (!loading && response?.audio) ? (
                 <button
                   className="audio-button absolute bottom-3 left-3 inline-flex items-center gap-2 text-gray-400 rounded-md hover:text-white"
-                  onClick={() => playAudio(lastAudio)}
+                  onClick={() => playAudio(response?.audio || '')}
                 >
                   <UnmuteIcon size={24} />
                 </button>

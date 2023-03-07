@@ -225,7 +225,6 @@ export const HistoryConsole = () => {
 
   const updateMemoryLine = () => {
     const memory = botFactory.getInstance()?.getMemory();
-    memory?.clearResponses();
     const lines = memory?.getMemory() || [];
     if (editedText === lines[editedIndex].text) {
       setEditedIndex(-1);

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import debounce from "lodash.debounce";
-import { DropDown } from "../dropdown/Dropdown";
 import botFactory from "../../libs/botFactory";
 import { Microphone } from "../microphone/Microphone";
 import * as MikuCore from "@mikugg/core";
@@ -17,7 +16,7 @@ function SmallSpinner(): JSX.Element {
 }
 
 const lastCostId = { id: "" };
-export const Chat = ({ sendPrompt }: any): JSX.Element => {
+export const Chat = (): JSX.Element => {
   const [value, setValue] = useState<string>("");
   const [loadingCost, setLoadingCost] = useState<boolean>(false);
   const [cost, setCost] = useState<number>(0);
@@ -27,8 +26,7 @@ export const Chat = ({ sendPrompt }: any): JSX.Element => {
     event.stopPropagation();
   
     if (value) {
-      sendPrompt(event, value, MikuCore.Commands.CommandType.DIALOG);
-      botFactory.getInstance()?.getMemory()?.clearResponses();
+      botFactory.getInstance()?.sendPrompt(value, MikuCore.Commands.CommandType.DIALOG);
       setValue("");  
     }
   }  
