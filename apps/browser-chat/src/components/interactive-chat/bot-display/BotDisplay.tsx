@@ -13,7 +13,7 @@ import { PopUp } from "../../pup-up/pup-up";
 import { ChatHistory, HistoryManagementButtons } from "../../chat-history/chat-history";
 import { BotDetails } from "../../bot-details/BotDetails";
 import "./BotDisplay.css";
-import { Reload, LeftArrow, RightArrow } from "../../../assets/icons/svg";
+import { Reload, LeftArrow, RightArrow, Dice } from "../../../assets/icons/svg";
 import { UnmuteIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
@@ -166,7 +166,7 @@ export const BotDisplay = () => {
               {!response || loading ? (
                 <Loader />
               ) : (
-                <p className="text-lg font-bold text-white ">{response?.text || ''}</p>
+                <p className="text-md font-bold text-white ">{response?.text || ''}</p>
               )}
             </div>
             {
@@ -195,7 +195,7 @@ export const BotDisplay = () => {
                   className="reload-button absolute top-[-2.5em] right-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
                   onClick={onRegenerateClick}
                 >
-                  <Reload />
+                  <Dice />
                   Regenerate
                 </button>
               ) : null
@@ -212,13 +212,14 @@ export const BotDisplay = () => {
             }
             {
               (!loading && responsesGenerated.length > 1 && responseIndex === 0) ? (
-                <div className="absolute top-[-0.1em] right-[1em] flex flex-col items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-b-md text-xs">
+                <div className="reload-button absolute bottom-[-3.4em] right-[1em] flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-b-md text-xs max-w-[90%] overflow-auto">
                   {
                     responsesGenerated.map((responseId, index) => (
                       <button
+                        className={`inline-flex transition-all items-center hover:text-white ${responseIds[0] === responseId ? 'text-white' : 'text-gray-400'}`}
                         key={responseId}
                         onClick={(event) => onOptionClick(responseId, event)}>
-                          Option {index + 1}
+                          <Dice />
                       </button>
                     ))
                   }

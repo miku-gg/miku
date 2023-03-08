@@ -33,6 +33,11 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<Core.
     }, await this.service.getQueryCost(this.props));
   }
 
+
+  protected getResultOnError(output: Core.OutputListeners.DialogOutputEnvironment): string {
+    return '';
+  }
+
   public override async getCost(): Promise<number> {
     return this.service.getQueryCost(this.props);
   }
