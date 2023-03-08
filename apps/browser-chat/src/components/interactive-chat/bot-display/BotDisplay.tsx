@@ -1,45 +1,42 @@
+import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
-import React, { useEffect, useReducer, useState } from "react";
-import "./conversation.css";
+import React, { useContext, useEffect, useReducer, useState } from "react";
+import "./BotDisplay.css";
 
-import historyIcon from "../../assets/icons/chat-history.png";
-import infoIcon from "../../assets/icons/information.png";
+import historyIcon from "../../../assets/icons/chat-history.png";
+import infoIcon from "../../../assets/icons/information.png";
 
-import { Loader } from "../loading/Loader";
-import botFactory from "../../libs/botFactory";
-import { useBot } from "../../libs/botLoader";
-import { PopUp } from "../pup-up/pup-up";
-import { ChatHistory, HistoryManagementButtons } from "../chat-history/chat-history";
-import { BotDetails } from "../bot-details/BotDetails";
-import "./conversation.css";
-import { Reload, LeftArrow, RightArrow } from "../../assets/icons/svg";
+import { Loader } from "../../loading/Loader";
+import botFactory from "../../../libs/botFactory";
+import { useBot } from "../../../libs/botLoader";
+import { PopUp } from "../../pup-up/pup-up";
+import { ChatHistory, HistoryManagementButtons } from "../../chat-history/chat-history";
+import { BotDetails } from "../../bot-details/BotDetails";
+import "./BotDisplay.css";
+import { Reload, LeftArrow, RightArrow, Dice } from "../../../assets/icons/svg";
 import { UnmuteIcon } from "@primer/octicons-react";
-import { responsesStore, fillResponse, BotReponse } from "../../libs/responsesStore";
+import { InteractiveResponsesContext } from "../../../libs/useResponses";
+import { responsesStore } from "../../../libs/responsesStore";
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT || 'http://localhost:8585/images';
 
-const playAudio = (base64: string): void => {
-  const snd = new Audio(base64);
-  snd.play();
-}
-
-export const Conversation = () => {
+export const BotDisplay = () => {
   const { botConfig } = useBot();
   const [ showHistory, setShowHistory ] = useState<Boolean>(false)
   const [ handleBotDetailsInfo, setHandleBotDetailsInfo ] = useState<boolean>(false);
-  const [ _, forceUpdate ] = useReducer((x) => x + 1, 0);
-  const [ responseIds, setResponseIds ] = useState<string[]>([]);
-  const [ responseIndex, setResponseIndex ] = useState<number>(0);
-  const [ isAudioSubscribed, setIsAudioSubscribed ] = useState<boolean>(false);
-
-  let response: BotReponse | null = null;
-  let prevResponse: BotReponse | null = null;
-  if (responseIds && responseIndex < responseIds.length) {
-    response = responsesStore.get(responseIds[responseIndex]) || null;
-    if (responseIds.length > 1 && responseIndex < responseIds.length - 1) {
-      prevResponse = responsesStore.get(responseIds[responseIndex + 1]) || null;
-    }
-  }
+  const {
+    responseIds,
+    setResponseIds,
+    responseIndex,
+    setResponseIndex,
+    responsesGenerated,
+    setResponsesGenerated,
+    loading,
+    response,
+    prevResponse,
+    playAudio,
+    onUpdate,
+  } = useContext(InteractiveResponsesContext);
 
   let backgroundImage = botConfig?.background_pic || '';
   let emotionImage = response?.emotion || prevResponse?.emotion || '';
@@ -50,40 +47,6 @@ export const Conversation = () => {
       emotionImage = emotionInterpreterConfig.props?.images?.neutral;
     }
   }
-
-  const loading = response?.loadingText || (isAudioSubscribed && response?.loadingAudio) || response?.loadingEmotion || false;
-
-  useEffect(() => {
-    if (botConfig) {
-      setResponseIds([]);
-      setResponseIndex(0);
-      forceUpdate();
-    }
-    const bot = botFactory.getInstance();
-    bot?.subscribePromptSent((command) => {
-      fillResponse(command.commandId);
-      setResponseIds(responseIds => [command.commandId, ...responseIds]);
-      setResponseIndex(0);
-      forceUpdate();
-    })
- 
-    bot?.subscribeDialog((output) => {
-      fillResponse(output.commandId, 'text', output.text);
-      fillResponse(output.commandId, 'emotion', output.imgHash);
-      forceUpdate();
-    });
-    const audioSubscribed = bot?.subscribeAudio((base64: string, output) => {
-      fillResponse(output.commandId, 'audio', base64);
-      forceUpdate();
-      if (base64) {
-        playAudio(base64);
-      }
-    });
-
-    if (audioSubscribed) {
-      setIsAudioSubscribed(true);
-    }
-  }, [botConfig]);
 
   const handleHistoryButtonClick = () => setShowHistory(true);
   const displayBotDetails = () => setHandleBotDetailsInfo(true)
@@ -120,7 +83,39 @@ export const Conversation = () => {
         responseIds.shift();
         return responseIds;
       });
-      botFactory.getInstance()?.sendPrompt(lastMemoryLine.text, lastMemoryLine.type);
+      const result = botFactory.getInstance()?.sendPrompt(lastMemoryLine.text, lastMemoryLine.type);
+      if (result?.commandId) {
+        setResponsesGenerated(_responsesGenerated => {
+          const responsesGenerated = [result.commandId, ..._responsesGenerated];
+          return responsesGenerated;
+        });
+      }
+    }
+  }
+
+  const onOptionClick = (responseId: string, event: React.UIEvent) => {
+    setResponseIds(_ids => {
+      const ids = [..._ids]
+      ids.shift();
+      return [responseId, ...ids];
+    });
+    const shortTermMemory = botFactory.getInstance()?.getMemory();
+    const memoryLines = shortTermMemory?.getMemory();
+    if (shortTermMemory && memoryLines && memoryLines.length >= 2) {
+      shortTermMemory.clearMemories();
+      memoryLines.forEach((line, index) => {
+        if (index < memoryLines.length - 1) {
+          shortTermMemory.pushMemory(line);
+        }
+      })
+      const text = responsesStore.get(responseId)?.text;
+      if (text) {
+        shortTermMemory.pushMemory({
+          text,
+          type: MikuCore.Commands.CommandType.DIALOG,
+          subject: shortTermMemory.getBotSubject()
+        });
+      }
     }
   }
 
@@ -171,7 +166,7 @@ export const Conversation = () => {
               {!response || loading ? (
                 <Loader />
               ) : (
-                <p className="text-lg font-bold text-white ">{response?.text || ''}</p>
+                <p className="text-md font-bold text-white ">{response?.text || ''}</p>
               )}
             </div>
             {
@@ -200,7 +195,7 @@ export const Conversation = () => {
                   className="reload-button absolute top-[-2.5em] right-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
                   onClick={onRegenerateClick}
                 >
-                  <Reload />
+                  <Dice />
                   Regenerate
                 </button>
               ) : null
@@ -215,6 +210,22 @@ export const Conversation = () => {
                 </button>
               ) : null
             }
+            {
+              (!loading && responsesGenerated.length > 1 && responseIndex === 0) ? (
+                <div className="reload-button absolute bottom-[-3.4em] right-[1em] flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-b-md text-xs max-w-[90%] overflow-auto">
+                  {
+                    responsesGenerated.map((responseId, index) => (
+                      <button
+                        className={`inline-flex transition-all items-center hover:text-white ${responseIds[0] === responseId ? 'text-white' : 'text-gray-400'}`}
+                        key={responseId}
+                        onClick={(event) => onOptionClick(responseId, event)}>
+                          <Dice />
+                      </button>
+                    ))
+                  }
+                </div>
+              ) : null
+            }
           </div>
         </div>
       </div>
@@ -226,7 +237,7 @@ export const Conversation = () => {
         <p className="ml-4 text-start text-2xl text-white">Conversation History</p>
         <ChatHistory />
         <div className="w-full flex justify-center gap-7 pb-3 flex-wrap red-500 text-red-500">
-          <HistoryManagementButtons onLoad={() => forceUpdate()} />
+          <HistoryManagementButtons onLoad={() => onUpdate()} />
         </div>
       </PopUp> 
       <PopUp 

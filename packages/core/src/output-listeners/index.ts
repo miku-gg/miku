@@ -33,7 +33,10 @@ export abstract class OutputListener<T extends OutputEnvironment, W = void>  {
   public sendOutput(output: T): void {
     this.handleOutput(output)
       .then((result: W) => this.subscriptions.forEach(fn => fn(result, output)))
-      .catch((error: Error) => this.errorSubscription(error, this));
+      .catch((error: Error) => {
+        this.errorSubscription(error, this);
+        this.subscriptions.forEach(fn => fn(this.getResultOnError(output), output));
+      })
   }
 
   public subscribe(fn: (result: W, output: T) => void): () => void {
@@ -44,6 +47,8 @@ export abstract class OutputListener<T extends OutputEnvironment, W = void>  {
   public async getCost(): Promise<number> {
     return 0;
   }
+
+  protected abstract getResultOnError(output: T): W;
 }
 
 export class SimpleListener<T extends OutputEnvironment> extends OutputListener<T, T>  {
@@ -52,6 +57,10 @@ export class SimpleListener<T extends OutputEnvironment> extends OutputListener<
   }
 
   protected async handleOutput(output: T): Promise<T> {
+    return output;
+  }
+
+  protected getResultOnError(output: T) {
     return output;
   }
 }

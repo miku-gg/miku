@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import debounce from "lodash.debounce";
-import botFactory from "../../libs/botFactory";
-import { Microphone } from "../microphone/Microphone";
+import botFactory from "../../../libs/botFactory";
+import { Microphone } from "../../microphone/Microphone";
 import * as MikuCore from "@mikugg/core";
 import Tooltip from "@mui/material/Tooltip"
-import { PaperPlane } from "../../assets/icons/svg";
-import './Chat.css';
+import { PaperPlane } from "../../../assets/icons/svg";
+import './ChatInputBox.css';
+import { InteractiveResponsesContext } from "../../../libs/useResponses";
 
 function SmallSpinner(): JSX.Element {
   return (
@@ -16,18 +17,22 @@ function SmallSpinner(): JSX.Element {
 }
 
 const lastCostId = { id: "" };
-export const Chat = (): JSX.Element => {
+export const ChatInputBox = (): JSX.Element => {
   const [value, setValue] = useState<string>("");
   const [loadingCost, setLoadingCost] = useState<boolean>(false);
   const [cost, setCost] = useState<number>(0);
+  const {responseIndex, loading, setResponsesGenerated} = useContext(InteractiveResponsesContext);
+
+  const disabled = loading || responseIndex > 0;
 
   const onFormSubmit = (event: React.UIEvent | React.FormEvent): void => {
     event.preventDefault();
     event.stopPropagation();
   
     if (value) {
-      botFactory.getInstance()?.sendPrompt(value, MikuCore.Commands.CommandType.DIALOG);
-      setValue("");  
+      const result = botFactory.getInstance()?.sendPrompt(value, MikuCore.Commands.CommandType.DIALOG);
+      setResponsesGenerated(result ? [result.commandId] : []);
+      setValue("");
     }
   }  
 
@@ -62,27 +67,34 @@ export const Chat = (): JSX.Element => {
         <form
           onSubmit={onFormSubmit}
           onClick={() => document.getElementById("input-user-textarea")?.focus()}
-          className="flex justify-between w-full placeholder:italic overflow-x-clip gap-2 relative border border-[#7957D2] pb-10 rounded-md outline-none button-transparent"
+          aria-disabled={disabled}
+          className="flex justify-between w-full placeholder:italic overflow-x-clip gap-2 relative border border-[#7957D2] pb-10 rounded-md outline-none button-transparent aria-disabled:shadow-none aria-disabled:blur-[1px]"
         >
           <textarea
             id="input-user-textarea"
             value={value}
+            aria-disabled={disabled}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && e.ctrlKey) {
+              if (disabled) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+              }
+              if (e.key === "Enter" && !e.shiftKey) {
                 onFormSubmit(e)
               }
             }}
-            className="w-full bg-transparent outline-none border-none text-md p-3 resize-none scrollbar max-lg:h-12"
+            className="w-full bg-transparent outline-none border-none text-md p-3 resize-none scrollbar max-lg:h-12 aria-disabled:caret-transparent"
             name="input-user-textarea"
             autoComplete="off"
             placeholder="Type a message..."
           />
-          <button className="absolute right-3 bottom-3 text-violet-400 hover:text-violet-300 transition-all">
+          <button className="absolute right-3 bottom-3 text-violet-400 hover:text-violet-300 transition-all disabled:hover:text-violet-400" disabled={disabled}>
             <PaperPlane />
           </button>
           <div className="absolute bottom-2 left-3 flex items-center">
-            <Tooltip title="Amount of credits interaction would consume." placement="right">
+            <Tooltip title="Amount of credits interaction would consume." placement="right" disableHoverListener={disabled}>
               <div className="inline-flex items-left rounded-full text-center text-sm justify-between text-violet-400 font-mono select-none">
                 <div className={loadingCost ? "text-violet-300" : ""}>
                   {cost}

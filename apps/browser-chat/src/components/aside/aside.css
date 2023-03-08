@@ -1,19 +1,19 @@
-.scrollbar::-webkit-scrollbar {
+.App .scrollbar::-webkit-scrollbar {
   width: 0.3em;
 }
 
-.scrollbar::-webkit-scrollbar-track {
+.App .scrollbar::-webkit-scrollbar-track {
   border-radius: 100vh;
   background: transparent;
 }
 
-.scrollbar::-webkit-scrollbar-thumb {
+.App .scrollbar::-webkit-scrollbar-thumb {
   background: rgb(167 139 250);
   border-radius: 100vh;
   border: 0;
 }
 
-.scrollbar::-webkit-scrollbar-thumb:hover {
+.App .scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgb(196 181 253);
 }
 
