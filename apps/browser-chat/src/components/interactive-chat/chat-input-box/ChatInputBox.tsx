@@ -90,6 +90,7 @@ export const ChatInputBox = (): JSX.Element => {
             autoComplete="off"
             placeholder="Type a message..."
           />
+          <Microphone onInputText={(text: string) => setValue(text)} />
           <button className="absolute right-3 bottom-3 text-violet-400 hover:text-violet-300 transition-all disabled:hover:text-violet-400" disabled={disabled}>
             <PaperPlane />
           </button>

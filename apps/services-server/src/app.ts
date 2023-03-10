@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import multer from 'multer';
 import * as MikuExtensions from '@mikugg/extensions';
 
 // Load environment variables
@@ -13,10 +14,25 @@ const AZURE_API_KEY = process.env.AZURE_API_KEY || '';
 const NOVELAI_API_KEY = process.env.NOVELAI_API_KEY || '';
 const PYGMALION_ENDPOINT = process.env.PYGMALION_ENDPOINT || '';
 const EMOTIONS_ENDPOINT = process.env.EMOTIONS_ENDPOINT || '';
+const AUDIO_FILE_PATH = '_temp';
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, `${AUDIO_FILE_PATH}/`)
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '.wav')
+  }
+})
+const uploadAudio = multer({ storage });
+app.post('/audio-upload', uploadAudio.single('file'), (req, res) => {
+  console.log('received file', req.file);
+  res.status(200).send(req.file?.filename || '');
+});
+
 const addRoute = (path: string, cb: (body: any) => Promise<{ status: number, response: any}>) => {
   app.post(path, async (req, res) => {
     const result = await cb(req.body);
@@ -78,6 +94,17 @@ if (EMOTIONS_ENDPOINT && OPENAI_API_KEY) {
     defaultConfigHash: 'QmWLtYCXoDXEjw2nuXfkoXv9T7J8umcnF6CyyRjtFuW1UE',
     serviceId: MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter,
     billingEndpoint: '',
+    addRoute
+  });  
+}
+
+if (OPENAI_API_KEY) {
+  new MikuExtensions.Services.WhisperService({
+    apiKey: OPENAI_API_KEY,
+    serviceId: MikuExtensions.Services.ServicesNames.WhisperSTT,
+    audioFilePath: AUDIO_FILE_PATH,
+    billingEndpoint: '',
+    costPerRequest: 0,
     addRoute
   });  
 }

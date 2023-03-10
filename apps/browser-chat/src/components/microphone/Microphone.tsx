@@ -1,12 +1,15 @@
+import { IMediaRecorder, MediaRecorder, register } from 'extendable-media-recorder';
+import { connect } from 'extendable-media-recorder-wav-encoder';
 import { useEffect, useState } from "react";
 import MicIcon from "../../assets/icons/microphone.png";
+import botFactory from "../../libs/botFactory";
 
-const mediaRecorder: { value: MediaRecorder | null } = {
+connect().then(_connection => register(_connection));
+const mediaRecorder: { value: IMediaRecorder | null } = {
   value: null,
 };
 let audio: string = "";
-
-export const Microphone = () => {
+export const Microphone = ({ onInputText }: {onInputText: (text: string) => void}) => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
   const handleStartRecording = async () => {
@@ -17,7 +20,7 @@ export const Microphone = () => {
         audio: true,
         video: false,
       });
-      const recorder = new MediaRecorder(stream);
+      const recorder = new MediaRecorder(stream, {mimeType: 'audio/wav'});
       mediaRecorder.value = recorder;
       recorder.ondataavailable = (event: BlobEvent) => {
         recordedChunks.push(event.data);
@@ -25,10 +28,13 @@ export const Microphone = () => {
 
       recorder.onstop = () => {
         const blob = new Blob(recordedChunks, {
-          type: "audio/ogg; codecs=opus",
+          type: "audio/wav; codecs=0",
         });
         const reader = new FileReader();
         reader.readAsDataURL(blob);
+        botFactory.getInstance()?.speechToText(blob).then((text) => {
+          onInputText(text || '');
+        })
         reader.onloadend = () => {
           const base64data = reader.result as string;
           audio = base64data;
