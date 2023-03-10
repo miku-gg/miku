@@ -7,8 +7,10 @@ import Tooltip from "@mui/material/Tooltip"
 import { PaperPlane } from "../../../assets/icons/svg";
 import './ChatInputBox.css';
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
+import queryString from "query-string";
+import { IS_ALPHA_LIVE } from "../../loading/BotLoadingModal";
 
-function SmallSpinner(): JSX.Element {
+export function SmallSpinner(): JSX.Element {
   return (
     <div className="absolute left-2 top-[0.1em]">
         <span className="loader"></span>
@@ -60,6 +62,7 @@ export const ChatInputBox = (): JSX.Element => {
   useEffect(() => {
     updateCost(value);
   }, [value]);
+  const searchParams = queryString.parse(location.search);
 
   return (
     <div className="flex items-end w-full h-1/6 max-lg:pb-5 max-lg:px-5">
@@ -90,6 +93,14 @@ export const ChatInputBox = (): JSX.Element => {
             autoComplete="off"
             placeholder="Type a message..."
           />
+          { searchParams["openai"] || !IS_ALPHA_LIVE ?
+            <div className="absolute right-10 bottom-[0.4em]">
+                <Microphone
+                  onInputText={(text: string) => setValue(_text => _text ? _text + ' ' + text : text)}
+                  disabled={disabled}
+                />
+            </div> : null
+          }
           <button className="absolute right-3 bottom-3 text-violet-400 hover:text-violet-300 transition-all disabled:hover:text-violet-400" disabled={disabled}>
             <PaperPlane />
           </button>

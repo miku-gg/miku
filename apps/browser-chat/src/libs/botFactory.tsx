@@ -15,6 +15,7 @@ interface BotInstanceInterface {
   subscribeDialog(cb: (output: MikuExtensions.OutputListeners.EmotionRendererOutput) => void): void;
   subscribeAudio(cb: (base64: string, command: MikuCore.OutputListeners.OutputEnvironment) => void): void;
   subscribePromptSent(cb: (command: MikuCore.Commands.Command) => void): () => void;
+  speechToText(audioFile: Blob): Promise<string>;
   sendPrompt(text: string, type: number, subject?: string): {wait: Promise<void[]>, commandId: string};
   getCurrentPrompt(): string;
   getMemory(): MikuCore.Memory.ShortTermMemory;
@@ -147,6 +148,11 @@ class BotFactory {
   }
 
   public create(botConfig: BotConfig): BotInstanceInterface {
+    const whisper = new MikuExtensions.CommandGenerators.WhisperServiceClient(
+      `${this.config.servicesEndpoint}/audio-upload`,
+      `${this.config.servicesEndpoint}/${MikuExtensions.Services.ServicesNames.WhisperSTT}`,
+      this.signer,
+    );
     const textWriter = new MikuCore.CommandGenerators.TextCommandGenerator();
     const memory = this.getMemory(botConfig.short_term_memory);
     const promptCompleter = this.getPromptCompleter({
@@ -220,6 +226,10 @@ class BotFactory {
 
       subscribePromptSent(cb: (command: MikuCore.Commands.Command) => void): () => void {
         return textWriter.subscribe(cb);
+      },
+
+      async speechToText(file: Blob): Promise<string> {
+        return whisper.query(file);
       },
 
       sendPrompt(text: string, type: number, subject: string = 'You'): {wait: Promise<void[]>, commandId: string} {

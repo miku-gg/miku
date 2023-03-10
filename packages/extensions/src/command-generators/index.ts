@@ -1,1 +1,1 @@
-export * from './WhisperGradioCommandGenerator'
+export * from './WhisperServiceClient'
