@@ -1,6 +1,6 @@
 {
   "name": "@mikugg/extensions",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@mikugg/core": "*",
+    "@mikugg/core": "^0.2.0",
     "@types/axios": "^0.14.0",
     "@types/lodash.trim": "^4.5.7",
     "@types/node": "^18.11.18",
