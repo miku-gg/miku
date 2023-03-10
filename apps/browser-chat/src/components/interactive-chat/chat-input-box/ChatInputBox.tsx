@@ -8,7 +8,7 @@ import { PaperPlane } from "../../../assets/icons/svg";
 import './ChatInputBox.css';
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 
-function SmallSpinner(): JSX.Element {
+export function SmallSpinner(): JSX.Element {
   return (
     <div className="absolute left-2 top-[0.1em]">
         <span className="loader"></span>
@@ -90,7 +90,12 @@ export const ChatInputBox = (): JSX.Element => {
             autoComplete="off"
             placeholder="Type a message..."
           />
-          <Microphone onInputText={(text: string) => setValue(text)} />
+          <div className="absolute right-10 bottom-[0.4em]">
+            <Microphone
+              onInputText={(text: string) => setValue(_text => _text + ' ' + text)}
+              disabled={disabled}
+            />
+          </div>
           <button className="absolute right-3 bottom-3 text-violet-400 hover:text-violet-300 transition-all disabled:hover:text-violet-400" disabled={disabled}>
             <PaperPlane />
           </button>

@@ -29,7 +29,6 @@ const storage = multer.diskStorage({
 })
 const uploadAudio = multer({ storage });
 app.post('/audio-upload', uploadAudio.single('file'), (req, res) => {
-  console.log('received file', req.file);
   res.status(200).send(req.file?.filename || '');
 });
 
