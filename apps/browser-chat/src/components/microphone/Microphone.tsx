@@ -39,20 +39,19 @@ export const Microphone = ({ onInputText, disabled}: {disabled: boolean, onInput
         const reader = new FileReader();
         reader.readAsDataURL(blob);
         const bot = botFactory.getInstance();
-        if (bot) {
-          setLoading(true);
-          bot.speechToText(blob).then((text) => {
-            onInputText(text || '');
-            setLoading(false);
-          }).catch(() => setLoading(false));
-        }
+        setLoading(true);
         reader.onloadend = () => {
           const base64data = reader.result as string;
           audio = base64data;
-          new Audio('/recording-end.mp3').play();
+          if (bot) {
+            bot.speechToText(blob).then((text) => {
+              onInputText(text || '');
+              setLoading(false);
+            }).catch(() => setLoading(false));
+          }
           setIsRecording(false);
-          mediaRecorder.value = null;
           mediaRecorder.stream?.getTracks().forEach((track) => track.stop());
+          mediaRecorder.value = null;
           mediaRecorder.stream = null;
         };
       };
@@ -67,6 +66,7 @@ export const Microphone = ({ onInputText, disabled}: {disabled: boolean, onInput
 
   const handleStopRecording = (e: React.MouseEvent) => {
     e.preventDefault();
+    new Audio('/recording-end.mp3').play();
     mediaRecorder.value?.stop();
     mediaRecorder.stream?.getTracks().forEach((track) => track.stop());
     setIsRecording(false);

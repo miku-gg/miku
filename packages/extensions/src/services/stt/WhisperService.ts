@@ -3,10 +3,8 @@ import PropTypes, { InferProps } from "prop-types";
 import { Configuration, OpenAIApi } from 'openai';
 import fs from 'fs';
 
-const HEX_STRING_REGEX = /[0-9A-Fa-f]{6}/g;
-
 export const WhisperServicePropTypes = {
-  apiKey: PropTypes.string,
+  openai_key: PropTypes.string,
   language: PropTypes.oneOf(['en', 'es', 'ko']),
   file: PropTypes.string,
   model: PropTypes.string,
@@ -20,7 +18,7 @@ export interface WhisperServiceConfig extends Miku.Services.ServiceConfig {
 
 export class WhisperService extends Miku.Services.Service<string> {
   protected defaultProps: InferProps<typeof WhisperServicePropTypes>  = {
-    apiKey: '',
+    openai_key: '',
     language: 'en',
     model: 'whisper-1'
   };
@@ -48,17 +46,42 @@ export class WhisperService extends Miku.Services.Service<string> {
   }
 
   protected async computeInput(input: InferProps<typeof WhisperServicePropTypes>): Promise<string> {
-    if (!input.file || !HEX_STRING_REGEX.test(input.file.split('.')[0])) return '';
     const filePath = this.audioFilePath + '/' + input.file;
-    const stream = fs.createReadStream(filePath);
-    const resp = await this.openai.createTranscription(
-      // @ts-ignore
-      stream,
-      "whisper-1",
-    ).catch(e => console.error(e));
-
-    fs.unlinkSync(filePath);
-
+    try {
+      const [_filename, _fileextension] = input.file?.split('.') || ['',''];
+      if (!input.file || isNaN(Number(_filename)) || _fileextension !== 'wav') {
+        try {
+          fs.unlinkSync(filePath);
+        } catch (e) {}
+        return ''
+      }
+  
+      let openai = this.openai;
+      if (input.openai_key) {
+        openai = new OpenAIApi(new Configuration({
+          apiKey: input.openai_key,
+        }));
+      }
+      const stream = fs.createReadStream(filePath);
+      const resp = await openai.createTranscription(
+        // @ts-ignore
+        stream,
+        "whisper-1",
+      ).catch(e => {
+        try {
+          fs.unlinkSync(filePath);
+        } catch (e) {}
+      });
+  
+      try {
+        fs.unlinkSync(filePath);
+      } catch (e) {}
     return resp?.data?.text || '';
+    } catch (e) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch (e) {}
+    return '';
+    }
   };
 }

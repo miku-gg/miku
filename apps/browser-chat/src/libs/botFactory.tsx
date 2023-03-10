@@ -148,10 +148,12 @@ class BotFactory {
   }
 
   public create(botConfig: BotConfig): BotInstanceInterface {
+    const searchParams = queryString.parse(location.search);
     const whisper = new MikuExtensions.CommandGenerators.WhisperServiceClient(
       `${this.config.servicesEndpoint}/audio-upload`,
       `${this.config.servicesEndpoint}/${MikuExtensions.Services.ServicesNames.WhisperSTT}`,
       this.signer,
+      String(searchParams['openai'] || '') || ''  
     );
     const textWriter = new MikuCore.CommandGenerators.TextCommandGenerator();
     const memory = this.getMemory(botConfig.short_term_memory);
