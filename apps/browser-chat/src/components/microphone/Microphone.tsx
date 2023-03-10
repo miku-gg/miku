@@ -72,13 +72,13 @@ export const Microphone = ({ onInputText, disabled}: {disabled: boolean, onInput
     setIsRecording(false);
   };
 
-  const BASE_CLASS = 'text-violet-400 hover:text-violet-300 transition-all disabled:hover:text-violet-400';
+  const BASE_CLASS = 'text-violet-400 hover:text-violet-300 disabled:hover:text-violet-400';
   const RECORDING_CLASS = 'text-red-400 hover:text-red-400';
   const LOADING_CLASS = 'w-6 text-gray-400';
 
   return (
     <button
-      className={`${BASE_CLASS} ${isRecording ? RECORDING_CLASS : (loading ? LOADING_CLASS : '') }`}
+      className={`transition-all ${isRecording ? RECORDING_CLASS : (loading ? LOADING_CLASS : BASE_CLASS) }`}
       disabled={disabled}
       onClick={isRecording ? handleStopRecording : handleStartRecording}>
         {loading ? <SmallSpinner /> : <MicrophoneIcon width={16} />}

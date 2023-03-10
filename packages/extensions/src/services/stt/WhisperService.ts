@@ -49,12 +49,15 @@ export class WhisperService extends Miku.Services.Service<string> {
 
   protected async computeInput(input: InferProps<typeof WhisperServicePropTypes>): Promise<string> {
     if (!input.file || !HEX_STRING_REGEX.test(input.file.split('.')[0])) return '';
-    const stream = fs.createReadStream(this.audioFilePath + '/' + input.file);
+    const filePath = this.audioFilePath + '/' + input.file;
+    const stream = fs.createReadStream(filePath);
     const resp = await this.openai.createTranscription(
       // @ts-ignore
       stream,
       "whisper-1",
     ).catch(e => console.error(e));
+
+    fs.unlinkSync(filePath);
 
     return resp?.data?.text || '';
   };

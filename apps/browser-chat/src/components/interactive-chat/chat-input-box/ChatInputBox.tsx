@@ -96,7 +96,7 @@ export const ChatInputBox = (): JSX.Element => {
           { searchParams["openai"] || !IS_ALPHA_LIVE ?
             <div className="absolute right-10 bottom-[0.4em]">
                 <Microphone
-                  onInputText={(text: string) => setValue(_text => _text + ' ' + text)}
+                  onInputText={(text: string) => setValue(_text => _text ? _text + ' ' + text : text)}
                   disabled={disabled}
                 />
             </div> : null
