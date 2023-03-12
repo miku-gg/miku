@@ -1,0 +1,20 @@
+{
+  "service": "sbert_emotion_interpreter",
+  "props": {
+    "model": "all-MiniLM-L6-v2",
+    "start_context": "elaina_arrived",
+    "context_base_description_embeddings": "QmWLtYCXoDXEjw2nuXfkoXv9T7J8umcnF6CyyRjtFuW1UE",
+    "contexts": [
+      {
+        "id": "elaina_arrived",
+        "emotion_embeddings": "QmWLtYCXoDXEjw2nuXfkoXv9T7J8umcnF6CyyRjtFuW1UE",
+        "emotion_images": [
+          {
+            "id": "pleasure",
+            "source": "QmWLtYCXoDXEjw2nuXfkoXv9T7J8umcnF6CyyRjtFuW1UE"
+          }
+        ]
+      }
+    ]
+  }
+}
