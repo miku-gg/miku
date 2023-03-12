@@ -3,7 +3,7 @@ import fs from "fs";
 import config from "../config";
 
 
-export default function getItem(responseType: 'json' | 'image' | 'string', folder: 'bots' | 'imgs' | 'emotions' | 'embeddings', req: Request, res: Response) {
+export default function getItem(responseType: 'json' | 'image' | 'string' | 'csv', folder: 'bots' | 'imgs' | 'emotions' | 'embeddings', req: Request, res: Response) {
   try {
     const hash = req.params?.hash || '';
     const itemPath = `${config.DB_PATH}/${folder}/${hash}`;
@@ -13,6 +13,14 @@ export default function getItem(responseType: 'json' | 'image' | 'string', folde
     if (responseType === 'json') {
       const raw = fs.readFileSync(itemPath, 'utf8');
       res.send(JSON.parse(raw));
+    } else if (responseType === 'csv') {
+      let raw = fs.readFileSync(itemPath, 'utf8');
+      let csv = Buffer.from(raw, 'utf8');
+      res.setHeader('Content-Type', 'text/csv');
+      res.writeHead(200, {
+        'Content-Type': 'text/csv'
+      });
+      res.end(csv);
     } else if(responseType === 'image') {
       let raw = fs.readFileSync(itemPath, 'base64');
       let img = Buffer.from(raw, 'base64');
