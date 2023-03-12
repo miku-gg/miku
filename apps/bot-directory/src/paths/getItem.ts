@@ -3,7 +3,7 @@ import fs from "fs";
 import config from "../config";
 
 
-export default function getItem(responseType: 'json' | 'image' | 'string', folder: 'bots' | 'imgs' | 'emotions', req: Request, res: Response) {
+export default function getItem(responseType: 'json' | 'image' | 'string', folder: 'bots' | 'imgs' | 'emotions' | 'embeddings', req: Request, res: Response) {
   try {
     const hash = req.params?.hash || '';
     const itemPath = `${config.DB_PATH}/${folder}/${hash}`;

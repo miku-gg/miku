@@ -36,11 +36,12 @@ def encode_csv():
       print(file_path)
       file.save(file_path)
       df = pd.read_csv(file_path)
-      embeddings = model.encode(df['text'], convert_to_tensor=True).tolist()
+      embeddings = model.encode(df["text"], convert_to_tensor=True).tolist()
       df_embeddings = pd.DataFrame()
+      df_embeddings["name"] = df["name"]
       df_embeddings["embedding"] = embeddings
       embeddings_file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'embeddings_' +filename)
-      df_embeddings.to_csv(embeddings_file_path)
+      df_embeddings.to_csv(embeddings_file_path, index=False)
       
       return send_file(embeddings_file_path, as_attachment=True)
   return 'File not allowed', 400

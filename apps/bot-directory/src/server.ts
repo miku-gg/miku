@@ -54,6 +54,9 @@ app.get('/image/:hash', getItem.bind(null, 'image', 'imgs'));
 app.post('/emotion', multer().single('file'), addEmotion);
 app.get('/emotion/:hash', getItem.bind(null, 'json', 'emotions'));
 
+app.post('/embeddings', multer().single('file'), addEmotion);
+app.get('/embeddings/:hash', getItem.bind(null, 'json', 'embeddings'));
+
 app.listen(process.env.PORT || 8585, () => {
   console.log(`Bots server running on http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`);
   open(`http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`)
