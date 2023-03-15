@@ -105,7 +105,7 @@ if (OPENAI_API_KEY) {
     billingEndpoint: '',
     costPerRequest: 0,
     addRoute
-  });  
+  });
 }
 
 export default app;
