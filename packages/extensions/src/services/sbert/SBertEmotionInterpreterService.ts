@@ -13,7 +13,11 @@ const CONTEXT_CHANGE_EMBEDDINGS_HASH = 'Qmcrx4SX9iLA3TF6xLz7Sr5gxXHHCG4GkREkudrR
 
 const EmotionContextPropTypes = {
   id: PropTypes.string.isRequired,
-  embeddingsHash: PropTypes.string.isRequired,
+  emotion_embeddings: PropTypes.string.isRequired,
+  emotion_images: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    hashes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+  })).isRequired,
 };
 
 export const SBertEmotionInterpreterPropTypes = {
