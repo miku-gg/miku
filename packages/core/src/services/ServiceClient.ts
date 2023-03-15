@@ -24,7 +24,7 @@ export class ServiceQuerySigner {
   public async signQuery(query: ServiceRequestQuery): Promise<string> {
     const _query = JSON.stringify(query);
     return await this.wallet.signMessage(_query);
-  };
+  }
 
   public getAddress(): string {
     return this.wallet.address;
