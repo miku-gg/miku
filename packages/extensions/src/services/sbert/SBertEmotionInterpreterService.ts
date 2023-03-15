@@ -4,7 +4,12 @@ import * as  Core from '@mikugg/core';
 import PropTypes from 'prop-types';
 import { SBertSimilarityAPIClient } from './SBertEmbeddingsAPI';
 
-const CONTEXT_CHANGE_EMBEDDINGS_HASH = '0x0';
+//Standard emotions
+//QmW5t2rHBedbHHDsCWZ8hf1aEdyqh8872Eg5n9MsUUZ3Ac
+//Lewd emotions
+//QmVTv5EvHm6k1T6RbLK9FnVnAGRR16W46m9yZCViXuwQQZ
+
+const CONTEXT_CHANGE_EMBEDDINGS_HASH = 'Qmcrx4SX9iLA3TF6xLz7Sr5gxXHHCG4GkREkudrRjp1BKj';
 
 const EmotionContextPropTypes = {
   id: PropTypes.string.isRequired,
@@ -92,7 +97,7 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
     const { similarities: contextChangeSimilarities } = await this.similarityAPI.searchSimilarities({
       text: botResponse,
       embeddingsHash: CONTEXT_CHANGE_EMBEDDINGS_HASH,
-      topK: 4,
+      topK: 5,
     });
 
     const shouldContextChange = contextChangeSimilarities.reduce((acc, similarity) => {

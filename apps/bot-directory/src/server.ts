@@ -8,6 +8,7 @@ import getItem from './paths/getItem';
 import addImage from './paths/addImage';
 import multer from 'multer';
 import addEmotion from './paths/addEmotion';
+import addEmbedding from './paths/addEmbedding';
 import fs from 'fs';
 import config from './config';
 import open from 'open';
@@ -54,7 +55,7 @@ app.get('/image/:hash', getItem.bind(null, 'image', 'imgs'));
 app.post('/emotion', multer().single('file'), addEmotion);
 app.get('/emotion/:hash', getItem.bind(null, 'json', 'emotions'));
 
-app.post('/embeddings', multer().single('file'), addEmotion);
+app.post('/embeddings', multer().single('file'), addEmbedding);
 app.get('/embeddings/:hash', getItem.bind(null, 'csv', 'embeddings'));
 
 app.listen(process.env.PORT || 8585, () => {
