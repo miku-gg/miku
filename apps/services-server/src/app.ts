@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -14,6 +15,9 @@ const AZURE_API_KEY = process.env.AZURE_API_KEY || '';
 const NOVELAI_API_KEY = process.env.NOVELAI_API_KEY || '';
 const PYGMALION_ENDPOINT = process.env.PYGMALION_ENDPOINT || '';
 const EMOTIONS_ENDPOINT = process.env.EMOTIONS_ENDPOINT || '';
+const SBERT_EMOTIONS_ENABLED = Number(process.env.SBERT_EMOTIONS_ENABLED || '0');
+const SBERT_SIMILARITY_API_URL = process.env.SBERT_SIMILARITY_API_URL || '';
+const SBERT_SIMILARITY_API_TOKEN = '';
 const AUDIO_FILE_PATH = '_temp';
 
 const app = express();
@@ -104,6 +108,16 @@ if (OPENAI_API_KEY) {
     audioFilePath: AUDIO_FILE_PATH,
     billingEndpoint: '',
     costPerRequest: 0,
+    addRoute
+  });
+}
+
+if (SBERT_EMOTIONS_ENABLED) {
+  new MikuExtensions.Services.SBertEmotionInterpreterService({
+    serviceId: MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter,
+    billingEndpoint: '',
+    sbertSimilarityAPIToken: SBERT_SIMILARITY_API_TOKEN,
+    sbertSimilarityAPIUrl: SBERT_SIMILARITY_API_URL,
     addRoute
   });
 }

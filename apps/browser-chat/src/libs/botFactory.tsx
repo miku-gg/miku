@@ -109,6 +109,15 @@ class BotFactory {
           } as MikuExtensions.Services.EmotionInterpreterProps,
         });
         break;
+      case MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter:
+        outputListener = new MikuExtensions.OutputListeners.SBertEmotionRenderer({
+          serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+          signer: signer,
+          props: {
+            ...props,
+          } as MikuExtensions.Services.SBertEmotionInterpreterProps,
+        });
+        break;
       case MikuExtensions.Services.ServicesNames.AzureTTS:
       case MikuExtensions.Services.ServicesNames.ElevenLabsTTS:
         let apiKey = searchParams[

@@ -14,18 +14,20 @@ const CONTEXT_CHANGE_EMBEDDINGS_HASH = 'Qmcrx4SX9iLA3TF6xLz7Sr5gxXHHCG4GkREkudrR
 const EmotionContextPropTypes = {
   id: PropTypes.string.isRequired,
   emotion_embeddings: PropTypes.string.isRequired,
+  context_change_trigger: PropTypes.string.isRequired,
   emotion_images: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string.isRequired,
     hashes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-  })).isRequired,
+  }).isRequired).isRequired,
 };
 
 export const SBertEmotionInterpreterPropTypes = {
   botResponse: PropTypes.string.isRequired,
   completePrompt: PropTypes.string.isRequired,
   currentContextId: PropTypes.string.isRequired,
+  start_context: PropTypes.string.isRequired,
   contexts: PropTypes.arrayOf(PropTypes.shape(EmotionContextPropTypes).isRequired).isRequired,
-  contextDescriptionsHash: PropTypes.string.isRequired,
+  context_base_description_embeddings: PropTypes.string.isRequired,
 }
 
 export type EmotionContext = PropTypes.InferProps<typeof EmotionContextPropTypes>
@@ -39,8 +41,8 @@ export interface SbertEmotionInterpreterOutput {
 }
 
 interface SBertEmotionInterpreterServiceConfig extends Core.Services.ServiceConfig {
-  sbertEmbeddingsAPIUrl: string
-  sbertEmbeddingsAPIToken: string
+  sbertSimilarityAPIUrl: string
+  sbertSimilarityAPIToken: string
 }
 
 export class SBertEmotionInterpreterService extends Core.Services.Service<SbertEmotionInterpreterOutput> {
@@ -49,8 +51,8 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
   constructor(config: SBertEmotionInterpreterServiceConfig) {
     super(config);
     this.similarityAPI = new SBertSimilarityAPIClient({
-      url: config.sbertEmbeddingsAPIUrl,
-      authToken: config.sbertEmbeddingsAPIToken,
+      url: config.sbertSimilarityAPIUrl,
+      authToken: config.sbertSimilarityAPIToken,
     });
   }
 
@@ -58,7 +60,8 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
     botResponse: '',
     completePrompt: '',
     currentContextId: '',
-    contextDescriptionsHash: '',
+    start_context: '',
+    context_base_description_embeddings: '',
     contexts: [],
   };
 
@@ -67,7 +70,7 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
   }
 
   protected async computeInput(input: SBertEmotionInterpreterProps): Promise<SbertEmotionInterpreterOutput> {
-    const { completePrompt, botResponse, currentContextId, contexts, contextDescriptionsHash } = input;
+    const { completePrompt, botResponse, currentContextId, contexts, context_base_description_embeddings: contextDescriptionsHash } = input;
 
     const nextContext = await this.findContext(contexts, currentContextId, contextDescriptionsHash, completePrompt, botResponse);
 
