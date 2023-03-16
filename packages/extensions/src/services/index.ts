@@ -3,6 +3,7 @@ export * from "./openai/OpenAIEmotionInterpreter";
 export * from "./pygmalion/PygmalionService";
 export * from "./pygmalion/PygmalionSettings";
 export * from "./stt/WhisperService";
+export * from "./sbert/SBertEmotionInterpreterService";
 export * as TTS from "./tts";
 
 export enum ServicesNames {
