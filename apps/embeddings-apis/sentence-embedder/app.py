@@ -5,7 +5,7 @@ import pandas as pd
 from werkzeug.utils import secure_filename
 
 # load embeddings model
-model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cpu')
 UPLOAD_FOLDER = '_temp'
 ALLOWED_EXTENSIONS = {'csv'}
 

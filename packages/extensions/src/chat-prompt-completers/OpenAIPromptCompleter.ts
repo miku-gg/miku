@@ -76,7 +76,7 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters.ChatPromptC
   }
 
   protected async handleCompletionOutput(output: Core.ChatPromptCompleters.ChatPromptResponse, _command: Core.Commands.Command): Promise<Core.OutputListeners.DialogOutputEnvironment> {
-    let promptResponse = output.text.replace(`\n${this.memory.getBotSubject()}: `, '')
+    const promptResponse = output.text.replace(`\n${this.memory.getBotSubject()}: `, '')
     return {
       commandId: _command.commandId,
       text: promptResponse

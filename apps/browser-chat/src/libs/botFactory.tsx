@@ -12,6 +12,8 @@ interface BotFactoryConfig {
 }
 
 interface BotInstanceInterface {
+  subscribeContextChangeSuggestion(cb: (contextId: string) => void): void;
+  changeContext(contextId: string): boolean;
   subscribeDialog(cb: (output: MikuExtensions.OutputListeners.EmotionRendererOutput) => void): void;
   subscribeAudio(cb: (base64: string, command: MikuCore.OutputListeners.OutputEnvironment) => void): void;
   subscribePromptSent(cb: (command: MikuCore.Commands.Command) => void): () => void;
@@ -221,10 +223,28 @@ class BotFactory {
     });
 
     return {
+      subscribeContextChangeSuggestion(
+        cb: (contextId: string) => void
+      ): boolean {
+        const listener = dialogOutputListeners.find((listener) => listener instanceof MikuExtensions.OutputListeners.SBertEmotionRenderer) as MikuExtensions.OutputListeners.SBertEmotionRenderer;
+        listener?.subscribe(function (output: MikuExtensions.OutputListeners.SBertEmotionRendererOutput) {
+          if (output.nextContextId === listener.getCurrentContextId()) return;
+          cb(output.nextContextId);
+        });
+        return !!listener;
+      },
+
+      changeContext(contextId: string): boolean {
+        const listener = dialogOutputListeners.find((listener) => listener instanceof MikuExtensions.OutputListeners.SBertEmotionRenderer);
+        if (!listener) return false;
+        (listener as MikuExtensions.OutputListeners.SBertEmotionRenderer).setContextId(contextId);
+        return true;
+      },
+
       subscribeDialog(
         cb: (output: MikuExtensions.OutputListeners.EmotionRendererOutput) => void
       ): boolean {
-        const listener = dialogOutputListeners.find((listener) => listener instanceof MikuExtensions.OutputListeners.EmotionRenderer);
+        const listener = dialogOutputListeners.find((listener) => listener instanceof MikuExtensions.OutputListeners.SBertEmotionRenderer || listener instanceof MikuExtensions.OutputListeners.EmotionRenderer);
         listener?.subscribe(cb);
         return !!listener;
       },

@@ -7,7 +7,7 @@ export interface SBertEmotionRendererParams {
   props: SBertEmotionInterpreterProps;
 }
 
-export type SBertEmotionRendererOutput = Core.OutputListeners.DialogOutputEnvironment & {emotion: string, imgHash: string};
+export type SBertEmotionRendererOutput = Core.OutputListeners.DialogOutputEnvironment & {emotion: string, imgHash: string, nextContextId: string};
 
 
 export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SBertEmotionRendererOutput> {
@@ -21,7 +21,7 @@ export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SB
     this.service = new Core.Services.ServiceClient<SBertEmotionInterpreterProps, SbertEmotionInterpreterOutput>(
       params.serviceEndpoint,
       params.signer,
-      ServicesNames.OpenAIEmotionInterpreter
+      ServicesNames.SBertEmotionInterpreter
     );
     this.currentContextId = params.props.start_context;
   }
@@ -43,6 +43,7 @@ export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SB
 
       return {
         ...output,
+        nextContextId: result.nextContextId,
         emotion: emotion.id,
         imgHash: emotion.hashes[0] || ''
       }
@@ -57,6 +58,7 @@ export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SB
 
       return {
         ...output,
+        nextContextId: context.id,
         emotion: 'neutral',
         imgHash: emotion.hashes[0] || ''
       };
@@ -67,5 +69,13 @@ export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SB
     return this.service.getQueryCost({
       ...this.props
     });
+  }
+
+  public getCurrentContextId(): string {
+    return this.currentContextId;
+  }
+
+  public setContextId(contextId: string): string {
+    return this.currentContextId = contextId;
   }
 }

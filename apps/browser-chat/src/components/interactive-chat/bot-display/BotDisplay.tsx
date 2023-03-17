@@ -13,7 +13,7 @@ import { PopUp } from "../../pup-up/pup-up";
 import { ChatHistory, HistoryManagementButtons } from "../../chat-history/chat-history";
 import { BotDetails } from "../../bot-details/BotDetails";
 import "./BotDisplay.css";
-import { Reload, LeftArrow, RightArrow, Dice } from "../../../assets/icons/svg";
+import { Reload, LeftArrow, RightArrow, Dice, Wand } from "../../../assets/icons/svg";
 import { UnmuteIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
@@ -41,10 +41,16 @@ export const BotDisplay = () => {
   let backgroundImage = botConfig?.background_pic || '';
   let emotionImage = response?.emotion || prevResponse?.emotion || '';
   if (!emotionImage) {
-    const emotionInterpreterConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter)
-    if (emotionInterpreterConfig) {
+    const openAIEmotionConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter)
+    const sbertEmotionConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter)
+    if (sbertEmotionConfig) {
+      const props = sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
+      const images = props.contexts.find(context => context.id === props.start_context)?.emotion_images || [];
+      const imageCandidates = images.find(image => image.id === 'neutral')?.hashes;
+      emotionImage = imageCandidates ? imageCandidates[0] : '';
+    } else {
       // @ts-ignore
-      emotionImage = emotionInterpreterConfig.props?.images?.neutral;
+      emotionImage = openAIEmotionConfig?.props?.images?.neutral || '';
     }
   }
 
@@ -207,6 +213,15 @@ export const BotDisplay = () => {
                   onClick={() => playAudio(response?.audio || '')}
                 >
                   <UnmuteIcon size={24} />
+                </button>
+              ) : null
+            }
+            {
+              (!loading) ? (
+                <button
+                  className="audio-button absolute bottom-3 right-3 inline-flex items-center gap-2 text-gray-400 rounded-md hover:text-white"
+                >
+                  <Wand />
                 </button>
               ) : null
             }

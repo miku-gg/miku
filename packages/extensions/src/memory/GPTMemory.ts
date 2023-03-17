@@ -7,7 +7,7 @@ export interface GPTShortTermMemoryConfig extends MikuCore.Memory.MemoryPromptCo
 
 export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
 
-  constructor({prompt_context, prompt_initiator, subjects, botSubject}: GPTShortTermMemoryConfig, memorySize = 15) {
+  constructor({prompt_context, prompt_initiator, subjects, botSubject}: GPTShortTermMemoryConfig, memorySize = 25) {
     super({
       prompt_context: prompt_context,
       prompt_initiator: prompt_initiator,

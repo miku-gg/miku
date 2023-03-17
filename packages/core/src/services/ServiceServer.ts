@@ -53,6 +53,7 @@ export abstract class Service<Output = string> {
           response: result,
         }
       } catch(error) {
+        console.error(error);
         return {
           status: 400,
           response: 'Error: ' + error,

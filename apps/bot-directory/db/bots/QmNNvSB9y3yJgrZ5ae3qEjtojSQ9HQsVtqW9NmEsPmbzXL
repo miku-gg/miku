@@ -42,246 +42,246 @@
           {
             "id": "saya_at_work",
             "context_change_trigger": "Saya is now with her work clothing.",
-            "emotion_embeddings": "QmW5t2rHBedbHHDsCWZ8hf1aEdyqh8872Eg5n9MsUUZ3Ac",
+            "emotion_embeddings": "QmZT2i7TSsUyxT8Mmwdau4NSEZyWPdTopRRKcPBQEoFitQ",
             "emotion_images": [
               {
                 "id": "angry",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "sad",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "happy",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "disgusted",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "begging",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "scared",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "excited",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "hopeful",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "longing",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "proud",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "neutral",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "rage",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "scorn",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "blushed",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "pleasure",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "lustful",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "shocked",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "confused",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "disappointed",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "embarrassed",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "guilty",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "shy",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "frustrated",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "annoyed",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "exhausted",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "tired",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "curious",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "intrigued",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "amused",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               }
             ]
           },
           {
             "id": "saya_casual",
             "context_change_trigger": "Saya is now with relaxed, casual clothing.",
-            "emotion_embeddings": "QmW5t2rHBedbHHDsCWZ8hf1aEdyqh8872Eg5n9MsUUZ3Ac",
+            "emotion_embeddings": "QmZT2i7TSsUyxT8Mmwdau4NSEZyWPdTopRRKcPBQEoFitQ",
             "emotion_images": [
               {
                 "id": "angry",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "sad",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "happy",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "disgusted",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "begging",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "scared",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "excited",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "hopeful",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "longing",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "proud",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "neutral",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "rage",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "scorn",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "blushed",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "pleasure",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "lustful",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "shocked",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "confused",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "disappointed",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "embarrassed",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "guilty",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "shy",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "frustrated",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "annoyed",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "exhausted",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "tired",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "curious",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "intrigued",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "amused",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               }
             ]
           },
@@ -292,59 +292,59 @@
             "emotion_images": [
               {
                 "id": "desire",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "pleasure",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "anticipation",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "confidence",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "arousal",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "ecstasy",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "relief",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "release",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "intensity",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "comfort",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "vulnerability",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "discomfort",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "surrender",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               },
               {
                 "id": "pain",
-                "source": "QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"
+                "hashes": ["QmNNRWWcPRR2uLFrXNV63qMfhebqqnrxWuy7ydKEu6A22z"]
               }
             ]
           }
