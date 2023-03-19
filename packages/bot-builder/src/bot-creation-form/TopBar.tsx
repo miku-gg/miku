@@ -1,5 +1,6 @@
 import React from 'react';
 import { useCharacterCreationForm } from './CharacterCreationFormContext';
+import classNames from 'classnames';
 
 interface TopBarProps {
   steps: number[];
@@ -13,10 +14,24 @@ const TopBar: React.FC<TopBarProps> = ({ steps }) => {
       {steps.map((step, index) => (
         <React.Fragment key={step}>
           <div
-            className={`topBar__node${currentStep === step ? ' topBar__node--active' : ''}`}
-            onClick={() => setCurrentStep(step)}
+            className={classNames('topBar__node', {
+              'topBar__node--completed': step < currentStep,
+              'topBar__node--active': step === currentStep,
+              'topBar__node--disabled': step > currentStep,
+            })}
+            onClick={() => {
+              if (step <= currentStep) {
+                setCurrentStep(step);
+              }
+            }}
           />
-          {index < steps.length - 1 && <div className="topBar__connector" />}
+          {index < steps.length - 1 && (
+            <div
+              className={classNames('topBar__connector', {
+                'topBar__connector--completed': step < currentStep,
+              })}
+            />
+          )}
         </React.Fragment>
       ))}
     </div>

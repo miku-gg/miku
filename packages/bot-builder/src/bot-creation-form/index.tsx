@@ -1,24 +1,20 @@
 import React, { useRef } from 'react';
 import { CharacterCreationFormProvider, useCharacterCreationForm } from './CharacterCreationFormContext';
-import { CharacterData, validateStep } from './CharacterData';
+import { CharacterData, validateStep } from './libs/CharacterData';
 import Step1Description from './Step1Description';
 import Step2ModelAndVoice from './Step2ModelAndVoice';
-import './CharacterCreation.scss';
 import TopBar from './TopBar';
 import Step3Expressions from './Step3Expressions';
 import Step4Preview from './Step4Preview';
+import './index.scss';
+import { downloadBotFile } from './libs/bot-file-builder';
+import { downloadBlob } from './libs/file-download';
 
 
 const save = (characterData: CharacterData) => {
   const characterDataJSON = JSON.stringify(characterData, null, 2);
   const blob = new Blob([characterDataJSON], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'character_data.json';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  downloadBlob(blob, `character_${characterData.name}.json`)
 };
 
 const _CharacterCreationForm: React.FC = () => {
@@ -64,6 +60,10 @@ const _CharacterCreationForm: React.FC = () => {
     fileInputRef.current?.click();
   };
 
+  const handleBuildBot = async () => {
+    await downloadBotFile(characterData)
+  }
+
   return (
     <div className="characterCreationForm">
       <h1>Create a Character</h1>
@@ -76,7 +76,12 @@ const _CharacterCreationForm: React.FC = () => {
       </div>
       <div className="characterCreationForm__navigationButtons">
         {currentStep > 1 && <button onClick={handleBack}>Back</button>}
-        <button onClick={handleNext}>{currentStep === 4 ? "Build" : "Next"}</button>
+        {currentStep === 4 ? (
+          <button onClick={handleBuildBot}>{"Build"}</button>
+        ) : (
+          <button onClick={handleNext}>Next</button>
+        )}
+        
       </div>
       <button className="characterCreationForm__save" onClick={handleSave}>Save</button>
       <button className="characterCreationForm__load" onClick={load}>Load</button>

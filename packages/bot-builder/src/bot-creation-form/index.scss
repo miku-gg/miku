@@ -209,11 +209,21 @@ $node-color-active: #773aff;
     cursor: pointer;
     transition: background-color 0.2s;
 
-    &--active {
-      background-color: $node-color-active;
+    &--completed {
+      background-color: $node-color-completed;
     }
 
-    &:hover {
+    &--active {
+      background-color: $node-color-active;
+      border: 2px solid #fff;
+    }
+
+    &--disabled {
+      background-color: #6f7396;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(&--disabled) {
       background-color: $node-color-completed;
     }
   }
@@ -222,6 +232,10 @@ $node-color-active: #773aff;
     width: 50px;
     height: 4px;
     background-color: $node-color;
+
+    &--completed {
+      background-color: $node-color-completed;
+    }
   }
 }
 

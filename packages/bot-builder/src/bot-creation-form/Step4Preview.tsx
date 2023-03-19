@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useCharacterCreationForm } from './CharacterCreationFormContext';
+import { models, voices } from './libs/CharacterData';
 
 const Step4Preview: React.FC = () => {
   const { characterData } = useCharacterCreationForm();
   const [selectedBackgroundIndex, setSelectedBackgroundIndex] = useState(0);
   const [selectedEmotionGroupIndex, setSelectedEmotionGroupIndex] = useState(0);
   const [selectedEmotionIndex, setSelectedEmotionIndex] = useState(0);
+
+  const model = models[characterData.model] || models['gpt3.5-turbo'];
+  const voice = voices[characterData.voice] || voices['elevenlabs_tts:EXAVITQu4vr4xnSDxMaL'];
   
   const handleEmotionGroupChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedEmotionGroupIndex(event.target.value as unknown as number || 0);
@@ -69,8 +73,8 @@ const Step4Preview: React.FC = () => {
             <img src={characterData.avatar} alt={`${characterData.name}'s avatar`} />
           )}
           <div className="step4Preview__tags">
-            <span className="step4Preview__tag">{characterData.model}</span>
-            <span className="step4Preview__tag">{characterData.voice}</span>
+            <span className="step4Preview__tag">{model.label}</span>
+            <span className="step4Preview__tag">{voice.label}</span>
           </div>
         </div>
         <div className="step4Preview__preview">

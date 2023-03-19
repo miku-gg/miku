@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { CharacterData, validateCharacterData } from "./CharacterData";
+import { CharacterData } from "./libs/CharacterData";
 
 
 interface CharacterCreationFormContextData {
@@ -26,13 +26,17 @@ const useCharacterCreationForm = () => {
 const CharacterCreationFormProvider = ({ children }: {children: JSX.Element}): JSX.Element => {
   const [characterData, setCharacterData] = useState<CharacterData>({
     name: '',
+    version: '1',
     avatar: '',
+    description: '',
+    shortDescription: '',
+    author: '',
     backgroundImages: [],
     scenario: '',
     greeting: '',
     sampleConversation: '',
     model: 'gpt3.5-turbo',
-    voice: 'Voice1',
+    voice: 'elevenlabs_tts:EXAVITQu4vr4xnSDxMaL',
     attributes: [
       { key: 'species', value: 'human' },
     ],

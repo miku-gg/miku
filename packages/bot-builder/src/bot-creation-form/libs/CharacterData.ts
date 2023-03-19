@@ -1,14 +1,13 @@
-export const validModels = [ 'davinci', 'gpt3.5-turbo', 'pygmalion', 'gpt4' ] as const;
+export const validModels = [ 'davinci', 'gpt3.5-turbo', 'pygmalion-6b' ] as const;
 export const validVoices = [
-  'Voice1',
-  'Voice2',
-  'Voice3'
+  'elevenlabs_tts:MF3mGyEYCl7XYWbV9V6O',
+  'elevenlabs_tts:EXAVITQu4vr4xnSDxMaL'
 ] as const;
 export type Model = typeof validModels[number]
 export type Voice = typeof validVoices[number]
 
 export const models: Record<Model, { label: string; price: 'cheap' | 'normal' | 'expensive'; description: string }> = {
-  davinci: {
+  'davinci': {
     label: 'Davinci',
     price: 'expensive',
     description: 'The most advanced model, capable of understanding complex prompts and generating detailed responses.',
@@ -18,31 +17,22 @@ export const models: Record<Model, { label: string; price: 'cheap' | 'normal' | 
     price: 'normal',
     description: 'A powerful model with a balance of capabilities and affordability.',
   },
-  pygmalion: {
+  'pygmalion-6b': {
     label: 'Pygmalion',
     price: 'cheap',
     description: 'An economical model suitable for simpler tasks and understanding basic prompts.',
-  },
-  gpt4: {
-    label: 'GPT-4',
-    price: 'expensive',
-    description: 'The latest cutting-edge model, offering the highest level of natural language understanding and generation.',
-  },
+  }
 };
 
 export const voices: Record<Voice, { label: string; price: 'cheap' | 'normal' | 'expensive' }> = {
-  Voice1: {
-    label: 'Voice 1',
-    price: 'cheap',
-  },
-  Voice2: {
-    label: 'Voice 2',
-    price: 'normal',
-  },
-  Voice3: {
-    label: 'Voice 3',
+  'elevenlabs_tts:MF3mGyEYCl7XYWbV9V6O': {
+    label: 'ElevenLabs: Elli',
     price: 'expensive',
   },
+  'elevenlabs_tts:EXAVITQu4vr4xnSDxMaL': {
+    label: 'ElevenLabs: Bella',
+    price: 'expensive',
+  }
 };
 
 export type EmotionHashConfig = {
@@ -82,7 +72,11 @@ export type BackgroundImage = {
 
 export type CharacterData = {
   name: string;
-  avatar?: string;
+  version: string;
+  avatar: string;
+  author: string;
+  description: string;
+  shortDescription: string;
   backgroundImages: BackgroundImage[];
   scenario: string;
   greeting: string;
@@ -105,8 +99,24 @@ export const validateCharacterData = (characterData: CharacterData): ValidationE
     errors.push({ field: 'name', message: 'Character name is required.' });
   }
 
+  if (!characterData.version || characterData.version.trim() === '') {
+    errors.push({ field: 'name', message: 'Character version is required.' });
+  }
+
   if (!characterData.avatar) {
     errors.push({ field: 'avatar', message: 'Avatar is required.' });
+  }
+
+  if (!characterData.author || characterData.author.trim() === '') {
+    errors.push({ field: 'author', message: 'Author is required.' });
+  }
+
+  if (!characterData.description || characterData.description.trim() === '') {
+    errors.push({ field: 'description', message: 'Character description is required.' });
+  }
+
+  if (!characterData.shortDescription || characterData.shortDescription.trim() === '') {
+    errors.push({ field: 'shortDescription', message: 'Character short description is required.' });
   }
 
   if (!characterData.scenario || characterData.scenario.trim() === '') {
@@ -192,6 +202,10 @@ export const validateStep = (step: number, characterData: CharacterData) => {
       return validationErrors.filter(
         (error) =>
           error.field === "name" ||
+          error.field === "version" ||
+          error.field === "author" ||
+          error.field === "avatar" ||
+          error.field === "description" ||
           error.field === "scenario" ||
           error.field === "greeting" ||
           error.field.startsWith("attributes") ||

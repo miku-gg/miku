@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useCharacterCreationForm } from './CharacterCreationFormContext';
-import { models, voices, Voice } from './CharacterData';
+import { models, voices, Voice } from './libs/CharacterData';
 
 const Step2ModelAndVoice: React.FC = () => {
   const { characterData, setCharacterData } = useCharacterCreationForm();
@@ -63,7 +63,7 @@ const Step2ModelAndVoice: React.FC = () => {
               {voices[characterData.voice].price}
             </span>
             <audio
-              src={`/voicePreviews/${characterData.voice}.mp3`} // Replace with the correct path to the voice preview files
+              src={`/voices/${characterData.voice}.mp3`} // Replace with the correct path to the voice preview files
               controls
               className="step2ModelAndVoice__voicePreview"
             >

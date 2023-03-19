@@ -2,8 +2,8 @@
 
 import React, { useRef } from 'react';
 import { useCharacterCreationForm } from './CharacterCreationFormContext';
-import { checkImageDimensionsAndType } from './utils';
-import { Attribute, BackgroundImage } from './CharacterData';
+import { checkImageDimensionsAndType } from './libs/utils';
+import { Attribute, BackgroundImage } from './libs/CharacterData';
 import placeholderImage from './assets/placeholder.png'; // Replace with the actual path to the image
 
 const Step1Description: React.FC = () => {
@@ -128,6 +128,18 @@ const Step1Description: React.FC = () => {
           className="step1Description__input"
         />
       </div>
+      
+      <div className="step1Description__formGroup">
+        <label htmlFor="name">Character version:</label>
+        <input
+          type="text"
+          id="version"
+          name="version"
+          value={characterData.version || ''}
+          onChange={handleInputChange}
+          className="step1Description__input"
+        />
+      </div>
 
       <div className="step1Description__formGroup">
         <label htmlFor="avatar">Upload Avatar (256x256):</label>
@@ -148,22 +160,45 @@ const Step1Description: React.FC = () => {
       </div>
 
       <div className="step1Description__formGroup">
+        <label htmlFor="author">Author:</label>
+        <input
+          type="text"
+          id="author"
+          name="author"
+          maxLength={64}
+          value={characterData.author}
+          onChange={handleInputChange}
+        />
+      </div>
+
+      <div className="step1Description__formGroup">
+        <label htmlFor="shortDescription">Character Short Description:</label>
+        <input
+          type="text"
+          id="shortDescription"
+          name="shortDescription"
+          value={characterData.shortDescription}
+          maxLength={256}
+          onChange={handleInputChange}
+        />
+      </div>
+
+      <div className="step1Description__formGroup">
+        <label htmlFor="description">Character Complete Description:</label>
+        <textarea
+          id="description"
+          name="description"
+          value={characterData.description}
+          onChange={handleInputChange}
+        />
+      </div>
+
+      <div className="step1Description__formGroup">
         <label htmlFor="scenario">Describe the Scenario:</label>
         <textarea
           id="scenario"
           name="scenario"
           value={characterData.scenario || ''}
-          onChange={handleInputChange}
-          className="step1Description__textarea"
-        />
-      </div>
-
-      <div className="step1Description__formGroup">
-        <label htmlFor="greeting">Character Greeting:</label>
-        <textarea
-          id="greeting"
-          name="greeting"
-          value={characterData.greeting || ''}
           onChange={handleInputChange}
           className="step1Description__textarea"
         />
@@ -219,6 +254,18 @@ const Step1Description: React.FC = () => {
           )}
         </div>
       </div>
+
+      <div className="step1Description__formGroup">
+        <label htmlFor="greeting">Character Greeting:</label>
+        <textarea
+          id="greeting"
+          name="greeting"
+          value={characterData.greeting || ''}
+          onChange={handleInputChange}
+          className="step1Description__textarea"
+        />
+      </div>
+
       <div className="step1Description__formGroup">
         <label htmlFor="backgroundImage">Upload Background Images (1024x1024):</label>
         {characterData.backgroundImages?.map((backgroundImage, index) => (

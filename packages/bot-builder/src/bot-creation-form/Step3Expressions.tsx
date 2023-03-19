@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { useCharacterCreationForm } from './CharacterCreationFormContext';
-import { EmotionGroup, emotionHashConfigs } from './CharacterData';
+import { EmotionGroup, emotionHashConfigs } from './libs/CharacterData';
 import placeholderImage from './assets/placeholder.png'; // Replace with the actual path to the image
-import { checkImageDimensionsAndType } from './utils';
+import { checkImageDimensionsAndType } from './libs/utils';
 
 const EmotionImage = (
   {id, emotionId, handleImageChange, renderImagePreview, groupIndex}: {
