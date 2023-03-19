@@ -1,6 +1,6 @@
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./BotDisplay.css";
 
 import historyIcon from "../../../assets/icons/chat-history.png";
@@ -13,10 +13,11 @@ import { PopUp } from "../../pup-up/pup-up";
 import { ChatHistory, HistoryManagementButtons } from "../../chat-history/chat-history";
 import { BotDetails } from "../../bot-details/BotDetails";
 import "./BotDisplay.css";
-import { Reload, LeftArrow, RightArrow, Dice } from "../../../assets/icons/svg";
+import { LeftArrow, RightArrow, Dice, Wand } from "../../../assets/icons/svg";
 import { UnmuteIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
+import { Tooltip } from "@mui/material";
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT || 'http://localhost:8585/images';
 
@@ -35,16 +36,46 @@ export const BotDisplay = () => {
     response,
     prevResponse,
     playAudio,
+    currentContext,
+    setCurrentContext,
     onUpdate,
   } = useContext(InteractiveResponsesContext);
+  const [ contextSuggestion, setContextSuggestion ] = useState<string>('');
 
   let backgroundImage = botConfig?.background_pic || '';
   let emotionImage = response?.emotion || prevResponse?.emotion || '';
   if (!emotionImage) {
-    const emotionInterpreterConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter)
-    if (emotionInterpreterConfig) {
+    const openAIEmotionConfig = botConfig?.outputListeners.find((listener: {service: string}) => listener.service === MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter)
+    const sbertEmotionConfig = botConfig?.outputListeners.find((listener: {service: string}) => listener.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter)
+    if (sbertEmotionConfig) {
+      const props = sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
+      const images = props.contexts.find(context => context.id === currentContext)?.emotion_images || [];
+      const imageCandidates = images.find(image => image.id === 'neutral')?.hashes;
+      emotionImage = imageCandidates ? imageCandidates[0] : '';
+    } else {
       // @ts-ignore
-      emotionImage = emotionInterpreterConfig.props?.images?.neutral;
+      emotionImage = openAIEmotionConfig?.props?.images?.neutral || '';
+    }
+  }
+
+  useEffect(() => {
+    const bot = botFactory.getInstance();
+    bot?.subscribeContextChangeSuggestion((contextId) => {
+      setContextSuggestion(contextId);
+    });
+  }, [botConfig])
+
+  const updateContext = () => {
+    const bot = botFactory.getInstance();
+    const sbertEmotionConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter);
+    if (bot && sbertEmotionConfig) {
+      const props = sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps
+      const context = props.contexts.find(context => context.id === contextSuggestion);
+      if (context) {
+        bot.changeContext(contextSuggestion);
+        setCurrentContext(contextSuggestion);
+        bot.sendPrompt(`*${context.context_change_trigger}*`, MikuCore.Commands.CommandType.DIALOG);
+      }
     }
   }
 
@@ -208,6 +239,18 @@ export const BotDisplay = () => {
                 >
                   <UnmuteIcon size={24} />
                 </button>
+              ) : null
+            }
+            {
+              (!loading && contextSuggestion) ? (
+                <Tooltip title="Randomize character outfit" placement="left">
+                  <button
+                    className="wand-button absolute bottom-4 right-4 inline-flex items-center gap-2 text-white rounded-md hover:text-white"
+                    onClick={updateContext}
+                  >
+                    <Wand />
+                  </button>
+                </Tooltip>
               ) : null
             }
             {

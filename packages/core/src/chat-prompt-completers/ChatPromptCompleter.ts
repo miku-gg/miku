@@ -40,7 +40,7 @@ export interface ChatPromptResponse {
  * @subcategory ChatPromptCompleter
  */
 export abstract class ChatPromptCompleter {
-  protected memory: ShortTermMemory;
+  public memory: ShortTermMemory;
   private commandQueue: Queue;
 
   /**
@@ -60,7 +60,7 @@ export abstract class ChatPromptCompleter {
    */
   public async getCost(prompt: string): Promise<number> {
     return 0;
-  };
+  }
 
   /**
    * 

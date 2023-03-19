@@ -67,19 +67,19 @@ export class ChatBot {
           switch (command.type) {
             case Commands.CommandType.DIALOG:
               this.outputListeners.dialogOutputListeners?.map((e) => {
-                e.sendOutput(output as OutputListeners.DialogOutputEnvironment)
+                e.sendOutput(output as OutputListeners.DialogOutputEnvironment, this.promptCompleter.memory)
               });
             case Commands.CommandType.CONTEXT:
               this.outputListeners.contextOutputListeners?.map((e) => {
-                e.sendOutput(output as OutputListeners.ContextOutputEnvironment)
+                e.sendOutput(output as OutputListeners.ContextOutputEnvironment, this.promptCompleter.memory)
               });
             case Commands.CommandType.ACTION:
               this.outputListeners.actionOutputListeners?.map((e) => {
-                e.sendOutput(output as OutputListeners.ActionOutputEnvironment)
+                e.sendOutput(output as OutputListeners.ActionOutputEnvironment, this.promptCompleter.memory)
               });
             case Commands.CommandType.OPTIONS:
               this.outputListeners.optionsOutputListeners?.map((e) => {
-                e.sendOutput(output as OutputListeners.OptionsOutputEnvironment)
+                e.sendOutput(output as OutputListeners.OptionsOutputEnvironment, this.promptCompleter.memory)
               });
           }
         }

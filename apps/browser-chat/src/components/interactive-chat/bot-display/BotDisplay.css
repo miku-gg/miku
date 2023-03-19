@@ -55,3 +55,22 @@
 .reload-button:hover {
   box-shadow: 0 0 6px 0 white;
 }
+
+.wand-button {
+  animation: blinker 1s linear infinite;
+  transition: all .2s ease-in;
+}
+
+.wand-button svg {
+  filter: drop-shadow(0px 0px 2px hsla(0, 0%, 100%, 0.904));
+}
+
+.wand-button:hover {
+  animation: none;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: .4;
+  }
+}

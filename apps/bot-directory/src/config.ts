@@ -7,6 +7,7 @@ const config = {
   "IMG_PATH": `${DB_PATH}/imgs`,
   "BOT_PATH": `${DB_PATH}/bots`,
   "EMOTIONS_PATH": `${DB_PATH}/emotions`,
+  "EMBEDDINGS_PATH": `${DB_PATH}/embeddings`,
 }
 
 fs.mkdir(config.BOT_PATH, { recursive: true }, (err) => {

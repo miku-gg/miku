@@ -102,10 +102,11 @@ export class OpenAIPromptCompleterService extends Miku.Services.Service {
       presence_penalty: 0.6,
       messages: input.messages,
       stop: input.stop.length ? input.stop : undefined,
-    })
+    });
     const choices = response?.data?.choices || [];
+    const completion = choices.length ? (choices[0].message?.content || '') : '';
 
-    return choices.length ? (choices[0].message?.content || '') : '';
+    return completion.replace(/"+/g, "\"")
   }
 
   protected async calculatePrice(input: InferProps<typeof this.propTypesRequired>): Promise<number> {

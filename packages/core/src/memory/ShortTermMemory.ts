@@ -19,7 +19,7 @@ export interface MemoryPromptConfig {
   prompt_initiator: string;
   subjects: string[];
   botSubject: string;
-};
+}
 
 
 /**
@@ -49,6 +49,7 @@ export abstract class ShortTermMemory {
   public abstract clearMemories(): void;
   public abstract getMemory(): MemoryLine[];
   public abstract buildMemoryPrompt(): string;
+  public abstract buildMemoryLinesPrompt(memorySize?: number): string;
   public abstract getContextPrompt(): string;
   public abstract getInitiatorPrompt(): string;
 

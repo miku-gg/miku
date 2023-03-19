@@ -1,5 +1,5 @@
-import * as MikuExtensions from "@mikugg/extensions";
 import { createContext, useEffect, useReducer, useState } from "react";
+import * as MikuExtensions from "@mikugg/extensions";
 import { BotReponse, fillResponse, responsesStore } from "./responsesStore";
 import { useBot } from "./botLoader";
 import botFactory from "./botFactory";
@@ -20,6 +20,8 @@ export const InteractiveResponsesContext = createContext<{
   setResponsesGenerated: StateSetter<string[]>,
   isAudioSubscribed: boolean,
   setIsAudioSubscribed: StateSetter<boolean>,
+  currentContext: string,
+  setCurrentContext: StateSetter<string>,
   response: BotReponse | null,
   prevResponse: BotReponse | null,
   loading: boolean,
@@ -34,6 +36,8 @@ export const InteractiveResponsesContext = createContext<{
   setResponsesGenerated: () => {},
   isAudioSubscribed: false,
   setIsAudioSubscribed: () => {},
+  currentContext: '',
+  setCurrentContext: () => {},
   response: null,
   prevResponse: null,
   loading: false,
@@ -47,6 +51,7 @@ export const InteractiveResponsesContextProvider = ({ children }: {children: JSX
   const [ responseIndex, setResponseIndex ] = useState<number>(0);
   const [ responsesGenerated, setResponsesGenerated ] = useState<string[]>([]);
   const [ isAudioSubscribed, setIsAudioSubscribed ] = useState<boolean>(false);
+  const [ currentContext, setCurrentContext ] = useState<string>('');
   const [ _, onUpdate ] = useReducer((x) => x + 1, 0);  
 
   let response: BotReponse | null = null;
@@ -63,6 +68,12 @@ export const InteractiveResponsesContextProvider = ({ children }: {children: JSX
       setResponseIds([]);
       setResponseIndex(0);
       onUpdate();
+
+      const sbertEmotionConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter)
+      if (sbertEmotionConfig) {
+        const props = sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
+        setCurrentContext(props.start_context || '');
+      }
     }
     const bot = botFactory.getInstance();
     bot?.subscribePromptSent((command) => {
@@ -77,6 +88,7 @@ export const InteractiveResponsesContextProvider = ({ children }: {children: JSX
       fillResponse(output.commandId, 'emotion', output.imgHash);
       onUpdate();
     });
+    
     const audioSubscribed = bot?.subscribeAudio((base64: string, output) => {
       fillResponse(output.commandId, 'audio', base64);
       onUpdate();
@@ -107,6 +119,8 @@ export const InteractiveResponsesContextProvider = ({ children }: {children: JSX
       loading,
       playAudio,
       onUpdate,
+      currentContext,
+      setCurrentContext,
     }}>
       {children}
     </InteractiveResponsesContext.Provider>

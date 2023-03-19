@@ -1,0 +1,43 @@
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+
+  &__node {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: $node-color;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &--completed {
+      background-color: $node-color-completed;
+    }
+
+    &--active {
+      background-color: $node-color-active;
+      border: 2px solid #fff;
+    }
+
+    &--disabled {
+      background-color: #6f7396;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(&--disabled) {
+      background-color: $node-color-completed;
+    }
+  }
+
+  &__connector {
+    width: 50px;
+    height: 4px;
+    background-color: $node-color;
+
+    &--completed {
+      background-color: $node-color-completed;
+    }
+  }
+}

@@ -7,7 +7,7 @@ export interface GPTShortTermMemoryConfig extends MikuCore.Memory.MemoryPromptCo
 
 export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
 
-  constructor({prompt_context, prompt_initiator, subjects, botSubject}: GPTShortTermMemoryConfig, memorySize = 15) {
+  constructor({prompt_context, prompt_initiator, subjects, botSubject}: GPTShortTermMemoryConfig, memorySize = 25) {
     super({
       prompt_context: prompt_context,
       prompt_initiator: prompt_initiator,
@@ -29,10 +29,9 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
     this.memory = [];
   }
 
-  public buildMemoryPrompt() {
-    let prompt = this.basePrompt;
-
-    for (let i = Math.max(this.memory.length - this.memorySize, 0); i < this.memory.length; i++) {
+  public buildMemoryLinesPrompt(memorySize = this.memorySize): string {
+    let prompt = '';
+    for (let i = Math.max(this.memory.length - memorySize, 0); i < this.memory.length; i++) {
       const memoryText = this.memory[i].text.replace(/\n\n/g, '\n').replace(/\n/g, ' ');
       switch (this.memory[i].type) {
         case MikuCore.Commands.CommandType.DIALOG:
@@ -43,6 +42,12 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
           break;
       }
     }
+    return prompt;
+  }
+
+  public buildMemoryPrompt() {
+    let prompt = this.basePrompt;
+    prompt += this.buildMemoryLinesPrompt();
     prompt += `\n${this.botSubject}:`;
     for(let i = 0; i < 10; i++) prompt = prompt.replace(/\n\n/g, '\n');
 

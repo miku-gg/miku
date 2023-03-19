@@ -1,0 +1,23 @@
+@import 'variables';
+@import 'buttons';
+@import 'topbar';
+@import 'step1-description';
+@import 'step2-model-voice';
+@import 'step3-expressions';
+@import 'step4-preview';
+
+body {
+  background-color: $background-1;
+  font-family: 'Roboto', sans-serif;
+  color: $text-1;
+}
+
+.characterCreationForm__navigationButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+
+  button {
+    @include button-styles;
+  }
+}
