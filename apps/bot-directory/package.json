@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mikugg/bot-builder": "^0.2.1",
+    "@mikugg/bot-builder": "workspace:*",
     "@mikugg/extensions": "workspace:*",
     "@types/body-parser": "^1.19.2",
     "@types/cors": "^2.8.13",

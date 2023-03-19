@@ -60,5 +60,5 @@ app.get('/embeddings/:hash', getItem.bind(null, 'csv', 'embeddings'));
 
 app.listen(process.env.PORT || 8585, () => {
   console.log(`Bots server running on http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`);
-  //open(`http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`)
+  open(`http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`)
 })

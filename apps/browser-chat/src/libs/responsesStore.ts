@@ -24,11 +24,11 @@ export const fillResponse = (commandId: string, type?: 'text' | 'audio' | 'emoti
   if (!type) {
     responsesStore.set(commandId, current);
   } else {
-    let loadingType = `loading${type.charAt(0).toUpperCase()}${type.slice(1)}` as 'loadingText' | 'loadingAudio' | 'loadingEmotion';
+    const loadingType = `loading${type.charAt(0).toUpperCase()}${type.slice(1)}` as 'loadingText' | 'loadingAudio' | 'loadingEmotion';
     responsesStore.set(commandId, {
       ...current,
       [loadingType]: false,
       [type]: value || '',
-    });  
+    });
   }
 }

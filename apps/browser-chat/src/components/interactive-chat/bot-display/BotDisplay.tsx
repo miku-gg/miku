@@ -45,8 +45,8 @@ export const BotDisplay = () => {
   let backgroundImage = botConfig?.background_pic || '';
   let emotionImage = response?.emotion || prevResponse?.emotion || '';
   if (!emotionImage) {
-    const openAIEmotionConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter)
-    const sbertEmotionConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter)
+    const openAIEmotionConfig = botConfig?.outputListeners.find((listener: {service: string}) => listener.service === MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter)
+    const sbertEmotionConfig = botConfig?.outputListeners.find((listener: {service: string}) => listener.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter)
     if (sbertEmotionConfig) {
       const props = sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
       const images = props.contexts.find(context => context.id === currentContext)?.emotion_images || [];
