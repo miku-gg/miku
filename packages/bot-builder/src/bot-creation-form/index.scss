@@ -341,6 +341,21 @@ $node-color-active: #773aff;
       background-color: #3663d3;
     }
   }
+
+  .step3Expressions__emotionDropzone {
+    border: 1px dashed #ccc;
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .step3Expressions__emotionDropzone.drag-over {
+    border-color: #333;
+  }
+  
+  .step3Expressions__emotionPreview {
+    max-width: 100%;
+  }  
 }
 
 

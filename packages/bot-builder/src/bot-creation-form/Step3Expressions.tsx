@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import { useCharacterCreationForm } from './CharacterCreationFormContext';
 import { EmotionGroup, emotionHashConfigs } from './libs/CharacterData';
 import placeholderImage from './assets/placeholder.png'; // Replace with the actual path to the image
@@ -8,34 +8,50 @@ const EmotionImage = (
   {id, emotionId, handleImageChange, renderImagePreview, groupIndex}: {
     id: string,
     emotionId: string,
-    handleImageChange: (event: React.ChangeEvent<HTMLInputElement>, groupIndex: number, emotionId: string) => void
+    handleImageChange: (file: File, groupIndex: number, emotionId: string) => void
     renderImagePreview: (groupIndex: number, emotionId: string) => string,
     groupIndex: number
   }
 ): JSX.Element => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [dragOver, setDragOver] = useState<boolean>(false);
+
+  const onDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDragOver(false);
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      handleImageChange(file, groupIndex, emotionId);
+    }
+  };
+
+  const onDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDragOver(true);
+  };
+
+  const onDragLeave = () => {
+    setDragOver(false);
+  };
+
   return (
     <div className="step3Expressions__emotion">
       <label htmlFor={id}>{emotionId}</label>
-      <input
-        type="file"
-        id={id}
-        name={id}
-        accept="image/png, image/gif"
-        ref={fileInputRef}
-        onChange={(event) => handleImageChange(event, groupIndex, emotionId)}
-        className="step3Expressions__emotionInput"
-        hidden
-      />
-      <img
-        src={renderImagePreview(groupIndex, emotionId)}
-        alt={`Emotion ${emotionId}`}
-        className="step3Expressions__emotionPreview"
-        onClick={() => fileInputRef.current?.click()}
-      />
+      <div
+        className={`step3Expressions__emotionDropzone ${dragOver ? 'drag-over' : ''}`}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+      >
+        <img
+          src={renderImagePreview(groupIndex, emotionId)}
+          alt={`Emotion ${emotionId}`}
+          className="step3Expressions__emotionPreview"
+        />
+      </div>
     </div>
   )
 }
+
 
 
 const Step3Expressions: React.FC = () => {
@@ -75,11 +91,10 @@ const Step3Expressions: React.FC = () => {
   };
 
   const handleImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    file: File,
     groupIndex: number,
     emotionId: string
   ) => {
-    const file = event.target.files?.[0];
     if (file) {
       const isValidSizeAndType = await checkImageDimensionsAndType(file, ['image/png', 'image/gif'], 1024, 1024);
       if (isValidSizeAndType) {
