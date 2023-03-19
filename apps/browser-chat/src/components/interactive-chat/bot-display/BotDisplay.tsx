@@ -17,6 +17,7 @@ import { LeftArrow, RightArrow, Dice, Wand } from "../../../assets/icons/svg";
 import { UnmuteIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
+import { Tooltip } from "@mui/material";
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT || 'http://localhost:8585/images';
 
@@ -36,8 +37,10 @@ export const BotDisplay = () => {
     prevResponse,
     playAudio,
     currentContext,
+    setCurrentContext,
     onUpdate,
   } = useContext(InteractiveResponsesContext);
+  const [ contextSuggestion, setContextSuggestion ] = useState<string>('');
 
   let backgroundImage = botConfig?.background_pic || '';
   let emotionImage = response?.emotion || prevResponse?.emotion || '';
@@ -52,6 +55,27 @@ export const BotDisplay = () => {
     } else {
       // @ts-ignore
       emotionImage = openAIEmotionConfig?.props?.images?.neutral || '';
+    }
+  }
+
+  useEffect(() => {
+    const bot = botFactory.getInstance();
+    bot?.subscribeContextChangeSuggestion((contextId) => {
+      setContextSuggestion(contextId);
+    });
+  }, [botConfig])
+
+  const updateContext = () => {
+    const bot = botFactory.getInstance();
+    const sbertEmotionConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter);
+    if (bot && sbertEmotionConfig) {
+      const props = sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps
+      const context = props.contexts.find(context => context.id === contextSuggestion);
+      if (context) {
+        bot.changeContext(contextSuggestion);
+        setCurrentContext(contextSuggestion);
+        bot.sendPrompt(`*${context.context_change_trigger}*`, MikuCore.Commands.CommandType.DIALOG);
+      }
     }
   }
 
@@ -218,12 +242,15 @@ export const BotDisplay = () => {
               ) : null
             }
             {
-              (!loading) ? (
-                <button
-                  className="audio-button absolute bottom-3 right-3 inline-flex items-center gap-2 text-gray-400 rounded-md hover:text-white"
-                >
-                  <Wand />
-                </button>
+              (!loading && contextSuggestion) ? (
+                <Tooltip title="Randomize character outfit" placement="left">
+                  <button
+                    className="wand-button absolute bottom-4 right-4 inline-flex items-center gap-2 text-white rounded-md hover:text-white"
+                    onClick={updateContext}
+                  >
+                    <Wand />
+                  </button>
+                </Tooltip>
               ) : null
             }
             {

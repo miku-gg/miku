@@ -21,6 +21,7 @@ export const InteractiveResponsesContext = createContext<{
   isAudioSubscribed: boolean,
   setIsAudioSubscribed: StateSetter<boolean>,
   currentContext: string,
+  setCurrentContext: StateSetter<string>,
   response: BotReponse | null,
   prevResponse: BotReponse | null,
   loading: boolean,
@@ -36,6 +37,7 @@ export const InteractiveResponsesContext = createContext<{
   isAudioSubscribed: false,
   setIsAudioSubscribed: () => {},
   currentContext: '',
+  setCurrentContext: () => {},
   response: null,
   prevResponse: null,
   loading: false,
@@ -95,11 +97,6 @@ export const InteractiveResponsesContextProvider = ({ children }: {children: JSX
       }
     });
 
-    bot?.subscribeContextChangeSuggestion((contextId) => {
-      setCurrentContext(contextId);
-      bot.changeContext(contextId);
-    });
-
     if (audioSubscribed) {
       setIsAudioSubscribed(true);
     }
@@ -123,6 +120,7 @@ export const InteractiveResponsesContextProvider = ({ children }: {children: JSX
       playAudio,
       onUpdate,
       currentContext,
+      setCurrentContext,
     }}>
       {children}
     </InteractiveResponsesContext.Provider>
