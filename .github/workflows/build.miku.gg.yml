@@ -1,4 +1,4 @@
-name: alpha.miku.gg deployment
+name: build.miku.gg deployment
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
         run: npm i -g pnpm && pnpm install && pnpm run build-bot-builder
 
   deploy_job:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    #if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Deploy Job
     steps:
