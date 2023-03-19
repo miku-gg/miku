@@ -1,0 +1,139 @@
+.step3Expressions {
+  font-family: Arial, sans-serif;
+
+  h2 {
+    color: #fffef9;
+    margin-bottom: 1rem;
+  }
+
+  .step3Expressions__group {
+    background-color: #25284b;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+
+    .step3Expressions__groupHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h3 {
+        color: #fffef9;
+        margin: 0;
+      }
+
+      .step3Expressions__removeGroupButton {
+        background-color: #e84f61;
+        color: #fffef9;
+        border: none;
+        border-radius: 3px;
+        padding: 5px 10px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #c9404e;
+        }
+      }
+    }
+  }
+
+  .step3Expressions__formGroup {
+    margin-bottom: 1rem;
+
+    label {
+      display: block;
+      color: #6f7396;
+      margin-bottom: 5px;
+    }
+
+    input[type='text'],
+    textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid $text-3;
+      background-color: $background-1;
+      color: $text-1;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      &:hover {
+        border-color: $text-2;
+      }
+    
+      &:focus {
+        border-color: $badge-cheap;
+        box-shadow: 0 0 0 2px rgba($badge-cheap, 0.3);
+      }
+    }
+  }
+
+  .step3Expressions__controls {
+    display: flex;
+    justify-content: space-between;
+    
+    button {
+      @include button-styles;
+    }
+  }
+
+  .step3Expressions__emotions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .step3Expressions__emotion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 128px;
+    margin-bottom: 1rem;
+
+    label {
+      display: block;
+      color: #6f7396;
+      margin-bottom: 5px;
+    }
+
+    .step3Expressions__emotionPreview {
+      width: 128px;
+      height: 128px;
+      object-fit: cover;
+      border-radius: 3px;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  .step3Expressions__addGroupButton {
+    background-color: #4978fa;
+    color: #fffef9;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 10px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #3663d3;
+    }
+  }
+
+  .step3Expressions__emotionDropzone {
+    border: 1px dashed #ccc;
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .step3Expressions__emotionDropzone.drag-over {
+    border-color: #333;
+  }
+  
+  .step3Expressions__emotionPreview {
+    max-width: 100%;
+  }
+}

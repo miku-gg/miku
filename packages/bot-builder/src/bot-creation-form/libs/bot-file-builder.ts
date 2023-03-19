@@ -103,7 +103,7 @@ export async function createCharacterConfig(characterData: CharacterData) {
           contexts: characterData.emotionGroups.map((emotionGroup, index) => {
             return {
               id: emotionGroup.name,
-              context_change_trigger: emotionGroup.description,
+              context_change_trigger: emotionGroup.trigger,
               emotion_embeddings: emotionGroup.emotionsHash,
               emotion_images: emotionHashes[index].emotions,
             }

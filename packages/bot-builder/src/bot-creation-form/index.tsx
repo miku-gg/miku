@@ -6,7 +6,7 @@ import Step2ModelAndVoice from './Step2ModelAndVoice';
 import TopBar from './TopBar';
 import Step3Expressions from './Step3Expressions';
 import Step4Preview from './Step4Preview';
-import './index.scss';
+import './styles/main.scss';
 import { downloadBotFile } from './libs/bot-file-builder';
 import { downloadBlob } from './libs/file-download';
 

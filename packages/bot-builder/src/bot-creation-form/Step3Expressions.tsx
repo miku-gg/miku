@@ -60,6 +60,7 @@ const Step3Expressions: React.FC = () => {
   const handleAddGroup = () => {
     const newGroup: EmotionGroup = {
       name: '',
+      trigger: '',
       description: '',
       emotionsHash: '',
       images: [],
@@ -193,6 +194,15 @@ const Step3Expressions: React.FC = () => {
               id={`group_${groupIndex}_description`}
               name="description"
               value={group.description}
+              onChange={(event) => handleInputChange(event, groupIndex)}
+            />
+          </div>
+          <div className="step3Expressions__formGroup">
+            <label htmlFor={`group_${groupIndex}_trigger`}>Context Trigger:</label>
+            <textarea
+              id={`group_${groupIndex}_trigger`}
+              name="trigger"
+              value={group.trigger}
               onChange={(event) => handleInputChange(event, groupIndex)}
             />
           </div>

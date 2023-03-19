@@ -59,6 +59,7 @@ export type Attribute = {
 
 export type EmotionGroup = {
   name: string;
+  trigger: string;
   description: string;
   emotionsHash: string; // indicates a hash of one of the emotions has configs
   images: { emotion: string, sources: string[] }[] // emotion is the emotion id in the config
@@ -161,6 +162,14 @@ export const validateCharacterData = (characterData: CharacterData): ValidationE
     characterData.emotionGroups.forEach((emotionGroup, groupIndex) => {
       if (!emotionGroup.description || emotionGroup.description.trim() === '') {
         errors.push({ field: `emotionGroups[${groupIndex}].description`, message: 'Emotion group description is required.' });
+      }
+
+      if (!emotionGroup.name || emotionGroup.name.trim() === '') {
+        errors.push({ field: `emotionGroups[${groupIndex}].name`, message: 'Emotion group name is required.' });
+      }
+
+      if (!emotionGroup.trigger || emotionGroup.trigger.trim() === '') {
+        errors.push({ field: `emotionGroups[${groupIndex}].trigger`, message: 'Emotion group trigger is required.' });
       }
 
       emotionGroup.images.forEach((image, imageIndex) => {
