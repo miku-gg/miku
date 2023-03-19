@@ -17,6 +17,7 @@ on:
 
 jobs:
   build_and_test_job:
+    # if: github.event_name != 'push' || github.ref != 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Build and Test Job
     steps:
@@ -24,10 +25,10 @@ jobs:
         with:
           submodules: true
       - name: Install
-        run: npm i -g pnpm && pnpm install && pnpm run build
+        run: npm i -g pnpm && pnpm install && pnpm test && pnpm run build
 
   deploy_job:
-    #if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Deploy Job
     steps:
@@ -42,5 +43,10 @@ jobs:
           aws-region: us-west-2
       - name: Install
         run: npm i -g pnpm && pnpm install && pnpm run build
+        env:
+          VITE_SERVICES_ENDPOINT: ${{ secrets.VITE_SERVICES_ENDPOINT }}
+          VITE_BOT_DIRECTORY_ENDPOINT: ${{ secrets.VITE_BOT_DIRECTORY_ENDPOINT }}
+          VITE_IMAGES_DIRECTORY_ENDPOINT: ${{ secrets.VITE_IMAGES_DIRECTORY_ENDPOINT }}
+          VITE_GA_KEY: ${{ secrets.VITE_GA_KEY}}
       - name: Deploy to S3
         run: aws s3 sync apps/browser-chat/dist ${{ secrets.S3_BUCKET_ALPHA }} --delete

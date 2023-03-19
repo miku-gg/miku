@@ -15,6 +15,7 @@ on:
 
 jobs:
   build_and_test_job:
+    # if: github.event_name != 'push' || github.ref != 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Build and Test Job
     steps:
