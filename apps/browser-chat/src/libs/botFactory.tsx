@@ -228,8 +228,13 @@ class BotFactory {
       ): boolean {
         const listener = dialogOutputListeners.find((listener) => listener instanceof MikuExtensions.OutputListeners.SBertEmotionRenderer) as MikuExtensions.OutputListeners.SBertEmotionRenderer;
         listener?.subscribe(function (output: MikuExtensions.OutputListeners.SBertEmotionRendererOutput) {
-          if (output.nextContextId === listener.getCurrentContextId()) return;
-          cb(output.nextContextId);
+          if (!output.shouldContextChange) return;
+          if (output.nextContextId !== listener.getCurrentContextId()) {
+            cb(output.nextContextId);
+          } else {
+            const contextId = listener.contextIds.find((contextId) => contextId !== listener.getCurrentContextId());
+            cb(contextId || output.nextContextId);
+          }
         });
         return !!listener;
       },

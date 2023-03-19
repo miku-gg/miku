@@ -1,6 +1,6 @@
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./BotDisplay.css";
 
 import historyIcon from "../../../assets/icons/chat-history.png";
@@ -13,7 +13,7 @@ import { PopUp } from "../../pup-up/pup-up";
 import { ChatHistory, HistoryManagementButtons } from "../../chat-history/chat-history";
 import { BotDetails } from "../../bot-details/BotDetails";
 import "./BotDisplay.css";
-import { Reload, LeftArrow, RightArrow, Dice, Wand } from "../../../assets/icons/svg";
+import { LeftArrow, RightArrow, Dice, Wand } from "../../../assets/icons/svg";
 import { UnmuteIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
@@ -35,6 +35,7 @@ export const BotDisplay = () => {
     response,
     prevResponse,
     playAudio,
+    currentContext,
     onUpdate,
   } = useContext(InteractiveResponsesContext);
 
@@ -45,7 +46,7 @@ export const BotDisplay = () => {
     const sbertEmotionConfig = botConfig?.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter)
     if (sbertEmotionConfig) {
       const props = sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
-      const images = props.contexts.find(context => context.id === props.start_context)?.emotion_images || [];
+      const images = props.contexts.find(context => context.id === currentContext)?.emotion_images || [];
       const imageCandidates = images.find(image => image.id === 'neutral')?.hashes;
       emotionImage = imageCandidates ? imageCandidates[0] : '';
     } else {

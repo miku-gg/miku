@@ -35,6 +35,7 @@ export type EmotionContext = PropTypes.InferProps<typeof EmotionContextPropTypes
 export type SBertEmotionInterpreterProps = PropTypes.InferProps<typeof SBertEmotionInterpreterPropTypes>;
 
 export interface SbertEmotionInterpreterOutput {
+  shouldContextChange: boolean
   emotionId: string
   contextId: string
   nextContextId: string
@@ -72,7 +73,7 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
   protected async computeInput(input: SBertEmotionInterpreterProps): Promise<SbertEmotionInterpreterOutput> {
     const { completePrompt, botResponse, currentContextId, contexts, context_base_description_embeddings: contextDescriptionsHash } = input;
 
-    const {currentContext, nextContext} = await this.findContext(contexts, currentContextId, contextDescriptionsHash, completePrompt, botResponse);
+    const {currentContext, nextContext, shouldContextChange} = await this.findContext(contexts, currentContextId, contextDescriptionsHash, completePrompt);
 
     const { similarities: emotionSimilarities } = await this.similarityAPI.searchSimilarities({
       text: botResponse,
@@ -83,6 +84,7 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
     const emotionId = emotionSimilarities.length > 0 ? emotionSimilarities[0].id : '';
 
     return {
+      shouldContextChange,
       emotionId,
       contextId: currentContext.id,
       nextContextId: nextContext.id,
@@ -93,7 +95,7 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
     return 0;
   }
 
-  protected async findContext(contexts: EmotionContext[], currentContextId: string, contextDescriptionsHash: string, completePrompt: string, botResponse: string): Promise<{currentContext: EmotionContext, nextContext: EmotionContext}> {
+  protected async findContext(contexts: EmotionContext[], currentContextId: string, contextDescriptionsHash: string, completePrompt: string): Promise<{currentContext: EmotionContext, nextContext: EmotionContext, shouldContextChange: boolean}> {
     const context = contexts.find(context => context.id === currentContextId);
 
     if (!context) {
@@ -104,13 +106,13 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
 
     // figure out if we need to change context
     const { similarities: contextChangeSimilarities } = await this.similarityAPI.searchSimilarities({
-      text: botResponse,
+      text: completePrompt,
       embeddingsHash: CONTEXT_CHANGE_EMBEDDINGS_HASH,
       topK: 5,
     });
 
     const shouldContextChange = contextChangeSimilarities.reduce((acc, similarity) => {
-      return acc && similarity.score > 0.38;
+      return acc && similarity.score > 0.30;
     }, true);
 
     // if we need to change context, we need to find the new context
@@ -128,6 +130,6 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
       }
     }
 
-    return {nextContext, currentContext: context};
+    return {nextContext, shouldContextChange, currentContext: context};
   }
 }

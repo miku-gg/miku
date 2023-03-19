@@ -7,13 +7,14 @@ export interface SBertEmotionRendererParams {
   props: SBertEmotionInterpreterProps;
 }
 
-export type SBertEmotionRendererOutput = Core.OutputListeners.DialogOutputEnvironment & {emotion: string, imgHash: string, nextContextId: string};
+export type SBertEmotionRendererOutput = Core.OutputListeners.DialogOutputEnvironment & {emotion: string, imgHash: string, nextContextId: string, shouldContextChange: boolean};
 
 
 export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SBertEmotionRendererOutput> {
   private props: SBertEmotionInterpreterProps;
   protected service: Core.Services.ServiceClient<SBertEmotionInterpreterProps, SbertEmotionInterpreterOutput>;
   private currentContextId: string;
+  public contextIds: string[];
 
   constructor(params: SBertEmotionRendererParams) {
     super();
@@ -23,15 +24,16 @@ export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SB
       params.signer,
       ServicesNames.SBertEmotionInterpreter
     );
+    this.contextIds = params.props.contexts.map((context) => context.id);
     this.currentContextId = params.props.start_context;
   }
 
-  protected override async handleOutput(output: Core.OutputListeners.DialogOutputEnvironment): Promise<SBertEmotionRendererOutput> {
+  protected override async handleOutput(output: Core.OutputListeners.DialogOutputEnvironment, memory: Core.Memory.ShortTermMemory): Promise<SBertEmotionRendererOutput> {
     try {
       const result = await this.service.query({
         ...this.props,
         botResponse: output.text,
-        completePrompt: output.text,
+        completePrompt: memory.buildMemoryLinesPrompt(2),
         currentContextId: this.currentContextId,
       }, await this.getCost());
 
@@ -43,6 +45,7 @@ export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SB
 
       return {
         ...output,
+        shouldContextChange: result.shouldContextChange,
         nextContextId: result.nextContextId,
         emotion: emotion.id,
         imgHash: emotion.hashes[0] || ''
@@ -58,6 +61,7 @@ export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SB
 
       return {
         ...output,
+        shouldContextChange: false,
         nextContextId: context.id,
         emotion: 'neutral',
         imgHash: emotion.hashes[0] || ''

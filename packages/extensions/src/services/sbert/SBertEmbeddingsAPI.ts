@@ -32,11 +32,8 @@ export class SBertSimilarityAPIClient {
   }
 
   async searchSimilarities(input: SBertSimilarityParams): Promise<{ similarities: SimilarityResult[] }> {
-    console.log('searching similarities');
     const { similiartySearchEndpoint } = this;
     const { embeddingsHash, text, topK } = input;
-    console.log('similiartySearchEndpoint', similiartySearchEndpoint);
-    console.log(input);
 
     const { data: similarities } = await axios.post<SimilarityResult[]>(`${similiartySearchEndpoint.url}/search`, {
       text,

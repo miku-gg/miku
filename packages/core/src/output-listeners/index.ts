@@ -1,3 +1,4 @@
+import { ShortTermMemory } from "../memory/ShortTermMemory";
 
 export interface OutputEnvironment {
   commandId: string
@@ -28,10 +29,10 @@ export abstract class OutputListener<T extends OutputEnvironment, W = void>  {
     return () => this.errorSubscription = () => {};
   }
 
-  protected abstract handleOutput(output: T): Promise<W>;
+  protected abstract handleOutput(output: T, memory?: ShortTermMemory): Promise<W>;
 
-  public sendOutput(output: T): void {
-    this.handleOutput(output)
+  public sendOutput(output: T, memory: ShortTermMemory): void {
+    this.handleOutput(output, memory)
       .then((result: W) => this.subscriptions.forEach(fn => fn(result, output)))
       .catch((error: Error) => {
         this.errorSubscription(error, this);
@@ -56,7 +57,7 @@ export class SimpleListener<T extends OutputEnvironment> extends OutputListener<
     super();
   }
 
-  protected async handleOutput(output: T): Promise<T> {
+  protected async handleOutput(output: T, memory?: ShortTermMemory): Promise<T> {
     return output;
   }
 
