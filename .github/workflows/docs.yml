@@ -10,8 +10,8 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - master
-    paths:
-      - docs/**
+    # paths:
+    #   - docs/**
 
 jobs:
   build_and_test_job:
