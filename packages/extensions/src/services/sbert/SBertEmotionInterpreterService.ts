@@ -120,11 +120,15 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
       const { similarities: contextSimilarities } = await this.similarityAPI.searchSimilarities({
         text: completePrompt,
         embeddingsHash: contextDescriptionsHash,
-        topK: 1,
+        topK: 2,
       });
-      
 
-      nextContext = contexts.find(context => context.id === contextSimilarities[0].id) || context;
+      const fstContextOptionId = contextSimilarities.length && contextSimilarities[0].id || context.id;
+      const sndContextOptionId = contextSimilarities.length > 1 && contextSimilarities[1].id  || context.id;
+
+      const nextContextId = fstContextOptionId === context.id ? sndContextOptionId : fstContextOptionId;
+
+      nextContext = contexts.find(context => context.id === nextContextId) || context;
       if (!nextContext) {
         throw new Error(`Context ${nextContext} not found`);
       }

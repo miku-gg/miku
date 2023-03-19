@@ -33,7 +33,6 @@ def encode_csv():
   if file and allowed_file(file.filename):
       filename = secure_filename(file.filename)
       file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-      print(file_path)
       file.save(file_path)
       df = pd.read_csv(file_path)
       embeddings = model.encode(df["text"], convert_to_tensor=True).tolist()

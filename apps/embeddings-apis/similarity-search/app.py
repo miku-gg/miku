@@ -20,7 +20,6 @@ def find_similarity():
   limit = 10
   text_embedding = model.encode([text], convert_to_tensor=True)
   file_path = './_temp/' + embeddings_file_hash + '.csv'
-  print(text)
   wget.download(DB_ENDPOINT + "/" + embeddings_file_hash, file_path)
   df = pd.read_csv(file_path)
   cosine_scores = util.cos_sim(text_embedding, df["embedding"].apply(literal_eval))
@@ -34,7 +33,6 @@ def find_similarity():
     })
   # remove downloaded file
   os.remove(file_path)
-  print(result)
   return result
 
 if __name__ == '__main__':
