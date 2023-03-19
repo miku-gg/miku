@@ -1,0 +1,47 @@
+name: docs.miku.gg deployment
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - docs/**
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - master
+    paths:
+      - docs/**
+
+jobs:
+  build_and_test_job:
+    if: github.event_name != 'push' || github.ref != 'refs/heads/master'
+    runs-on: ubuntu-latest
+    name: Build and Test Job
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Install
+        run: npm i -g pnpm && pnpm install && pnpm run build --scope=@mikugg/docs
+
+  deploy_job:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    name: Deploy Job
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Setup AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      - name: Install
+        run: npm i -g pnpm && pnpm install && pnpm run build --scope=@mikugg/docs
+      - name: Deploy to S3
+        run: aws s3 sync docs/.retype ${{ secrets.S3_BUCKET_DOCS }} --delete
+      - name: Invalidate Cloudfront distribution
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_DISTRIBUTION_DOCS }} --paths "/*"
