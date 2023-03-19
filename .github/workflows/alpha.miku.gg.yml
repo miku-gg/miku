@@ -17,7 +17,7 @@ on:
 
 jobs:
   build_and_test_job:
-    # if: github.event_name != 'push' || github.ref != 'refs/heads/master'
+    if: github.event_name != 'push' || github.ref != 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Build and Test Job
     steps:
@@ -28,7 +28,7 @@ jobs:
         run: npm i -g pnpm && pnpm install && pnpm test && pnpm run build
 
   deploy_job:
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Deploy Job
     steps:
