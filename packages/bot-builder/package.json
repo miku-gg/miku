@@ -18,7 +18,8 @@
     "start": "tsc --watch",
     "lint": "eslint . --ext .ts",
     "prepare": "npm run build",
-    "dev": "vite"
+    "dev": "vite",
+    "build-vite": "vite build"
   },
   "author": "",
   "license": "MIT",

@@ -43,4 +43,4 @@ jobs:
       - name: Install
         run: npm i -g pnpm && pnpm install && pnpm run build
       - name: Deploy to S3
-        run: aws s3 sync docs/.retype s3://alpha.miku.gg --delete
+        run: aws s3 sync apps/browser-chat/dist ${{ secrets.S3_BUCKET_ALPHA }} --delete

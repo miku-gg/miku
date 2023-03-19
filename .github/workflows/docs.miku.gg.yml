@@ -41,4 +41,4 @@ jobs:
       - name: Install
         run: npm i -g pnpm && pnpm install && pnpm run build --scope=@mikugg/docs
       - name: Deploy to S3
-        run: aws s3 sync docs/.retype s3://docs.miku.gg --delete
+        run: aws s3 sync docs/.retype ${{ secrets.S3_BUCKET_DOCS }} --delete
