@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer, util
 import pandas as pd
 import wget
 from ast import literal_eval
+from waitress import serve
 
 
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cpu')
@@ -36,4 +37,9 @@ def find_similarity():
   return result
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8601)
+    if os.environ.get('PROD') == '1':
+        print("Running in production mode...")
+        serve(app, host='0.0.0.0', port=8080)
+    else:
+        app.run(debug=True, port=8600)
+

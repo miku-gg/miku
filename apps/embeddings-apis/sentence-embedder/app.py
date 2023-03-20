@@ -3,6 +3,7 @@ from flask import Flask, request, send_file
 from sentence_transformers import SentenceTransformer
 import pandas as pd
 from werkzeug.utils import secure_filename
+from waitress import serve
 
 # load embeddings model
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cpu')
@@ -45,6 +46,9 @@ def encode_csv():
       return send_file(embeddings_file_path, as_attachment=True)
   return 'File not allowed', 400
 
-
 if __name__ == '__main__':
-    app.run(debug=True, port=8600)
+    if os.environ.get('PROD') == '1':
+        print("Running in production mode...")
+        serve(app, host='0.0.0.0', port=8080)
+    else:
+        app.run(debug=True, port=8600)
