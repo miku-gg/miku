@@ -7,7 +7,7 @@ import sys
 try:
     from dotenv import load_dotenv
 except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "python-dotenv"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "python-dotenv"], shell=True)
     from dotenv import load_dotenv
 
 def get_private_ip():

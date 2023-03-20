@@ -13,6 +13,10 @@ AUTH_TOKEN = os.environ.get('AUTH_TOKEN')
 
 app = Flask(__name__)
 
+@app.route('/', methods=['GET'])
+def homepage():
+  return 'sentence-similarity'
+
 @app.route('/search', methods=['POST'])
 def find_similarity():
   auth_header = request.headers.get('Authorization')

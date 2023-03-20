@@ -1,0 +1,41 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - add-python-server-deployments
+    # paths:
+    #   - apps/embeddings-apis/sentence-embedder
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        cd apps/embeddings-apis/sentence-embedder
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Deploy to EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY_SENTENCE_EMBEDDER }}
+        HOST: ${{ secrets.EC2_HOST_SENTENCE_EMBEDDER }}
+        USER: ${{ secrets.EC2_USER_SENTENCE_EMBEDDER }}
+        SERVICE_NAME: "sentence-embedder"
+        DOMAIN_SUBDOMAIN: "sentence-embedder.apis.miku.gg"
+      run: |
+        echo "$PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        scp -i private_key.pem -r apps/embeddings-apis/sentence-embedder $USER@$HOST:/home/$USER/$SERVICE_NAME
+        ssh -i private_key.pem $USER@$HOST "sudo systemctl stop $DOMAIN_SUBDOMAIN.service"
+        ssh -i private_key.pem $USER@$HOST "cd $SERVICE_NAME && gunicorn --bind 127.0.0.1:8080 app:app &"
+        ssh -i private_key.pem $USER@$HOST "sudo systemctl start $DOMAIN_SUBDOMAIN.service"
