@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, abort
 from sentence_transformers import SentenceTransformer, util
 import pandas as pd
 import wget
@@ -10,11 +10,20 @@ from waitress import serve
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cpu')
 
 DB_ENDPOINT = os.environ.get("DB_ENDPOINT") or "http://localhost:8585/embeddings"
+AUTH_TOKEN = os.environ.get('AUTH_TOKEN')
 
 app = Flask(__name__)
 
 @app.route('/search', methods=['POST'])
 def find_similarity():
+  auth_header = request.headers.get('Authorization')
+  if not auth_header:
+      abort(401, 'Authorization header is missing')
+
+  auth_token = auth_header.split(' ')[-1]
+  if auth_token != AUTH_TOKEN:
+      abort(401, 'Invalid token')
+
   content = request.get_json()
   embeddings_file_hash = content["embeddings_file_hash"]
   text = content["text"]
