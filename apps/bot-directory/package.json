@@ -12,8 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mikugg/bot-builder": "workspace:*",
-    "@mikugg/extensions": "workspace:*",
+    "@mikugg/bot-builder": "*",
+    "@mikugg/extensions": "*",
     "@types/body-parser": "^1.19.2",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",

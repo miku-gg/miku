@@ -4,10 +4,10 @@
   "scripts": {
     "bootstrap": "npx lerna bootstrap --include-dependencies",
     "docs": "lerna run start --scope=@mikugg/docs",
-    "start": "(cp .env apps/browser-chat || true) && lerna run start --parallel --ignore @mikugg/docs",
+    "start": "lerna run start --parallel --ignore @mikugg/docs",
     "test": "lerna run test --scope=@mikugg/extensions",
     "pull": "git reset --hard HEAD && git pull origin master && pnpm install && rm -rf apps/browser-chat/node_modules/.vite",
-    "build": "(cp .env apps/browser-chat || true) && npx lerna run build",
+    "build": "npx lerna run build",
     "build-bot-builder": "npx lerna run build-vite --scope=@mikugg/bot-builder"
   },
   "workspaces": [
