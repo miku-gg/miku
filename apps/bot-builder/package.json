@@ -6,7 +6,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/miku-gg/miku.git",
-    "directory": "packages/bot-builder"
+    "directory": "apps/bot-builder"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,15 +14,12 @@
     "dist/**/*"
   ],
   "scripts": {
-    "build": "tsc",
-    "start": "tsc --watch",
-    "lint": "eslint . --ext .ts",
-    "prepare": "npm run build",
-    "dev": "vite",
-    "build-vite": "vite build"
+    "build": "vite build",
+    "start": "vite --host",
+    "lint": "eslint . --ext .tsx"
   },
   "author": "",
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "devDependencies": {
     "@babel/core": "^7.21.3",
     "@babel/preset-env": "^7.20.2",
@@ -44,8 +41,9 @@
     "vite": "^4.0.0"
   },
   "dependencies": {
-    "@mikugg/core": "^0.2.0",
-    "@mikugg/extensions": "^0.2.1",
+    "@ipld/dag-pb": "^4.0.2",
+    "@mikugg/core": "*",
+    "@mikugg/extensions": "*",
     "@types/axios": "^0.14.0",
     "@types/base-64": "^1.0.0",
     "@types/prop-types": "^15.7.5",
@@ -53,8 +51,11 @@
     "axios": "^1.2.4",
     "base-64": "^1.0.0",
     "classnames": "^2.3.2",
+    "digest": "link:multiformats/hashes/digest",
     "ipfs-only-hash": "^4.0.0",
+    "ipld-dag-pb": "^0.22.3",
     "jszip": "^3.10.1",
+    "multiformats": "^11.0.2",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "remove": "^0.1.5",

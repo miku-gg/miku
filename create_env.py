@@ -44,15 +44,15 @@ def main():
         key = key.strip()
         if '=' in key:
             key_name, default_value = key.split('=', 1)
-            current_value = os.getenv(key_name, default_value)
-            
-            if current_value == '' and "<" in default_value and ">" in default_value:
+            current_value = os.getenv(key_name)
+            if current_value is None and "<" in default_value and ">" in default_value:
                 new_value = input(f"Enter value for {key_name} (default: {default_value}): ")
                 if new_value == "":
                     new_value = ""  # Save an empty string if no input is provided
                 
                 env[key_name] = new_value
             else:
+                current_value = current_value if current_value is not None else default_value
                 if "localhost" in current_value:
                     current_value = current_value.replace("localhost", get_private_ip())
 

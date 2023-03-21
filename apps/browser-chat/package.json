@@ -13,7 +13,7 @@
     "@emotion/styled": "^11.10.6",
     "@headlessui/react": "^1.7.9",
     "@heroicons/react": "^2.0.14",
-    "@mikugg/bot-builder": "*",
+    "@mikugg/bot-validator": "*",
     "@mikugg/core": "*",
     "@mikugg/extensions": "*",
     "@mui/material": "^5.11.10",

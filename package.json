@@ -7,8 +7,7 @@
     "start": "lerna run start --parallel --ignore @mikugg/docs",
     "test": "lerna run test --scope=@mikugg/extensions",
     "pull": "git reset --hard HEAD && git pull origin master && pnpm install && rm -rf apps/browser-chat/node_modules/.vite",
-    "build": "npx lerna run build",
-    "build-bot-builder": "npx lerna run build-vite --scope=@mikugg/bot-builder"
+    "build": "npx lerna run build"
   },
   "workspaces": [
     "packages/*",

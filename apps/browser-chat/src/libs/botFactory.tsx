@@ -1,6 +1,6 @@
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
-import { BotConfig } from "@mikugg/bot-builder";
+import { BotConfig } from "@mikugg/bot-validator";
 import queryString from "query-string";
 import { toast } from 'react-toastify';
 import { IS_ALPHA_LIVE } from "../components/loading/BotLoadingModal";

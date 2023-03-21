@@ -51,6 +51,7 @@ export async function emotionGroupsEmbedder(groups: EmotionGroup[]): Promise<str
     const csv = createCSVFromEmotionGroups(groups);
     console.log(csv);
     const base64Result = await embeddCSV(csv);
+    console.log('base64Result:', base64Result);
     return base64Result;
   } catch (error) {
     console.error('An error occurred:', error);

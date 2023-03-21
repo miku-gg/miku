@@ -1,7 +1,7 @@
 import { CharacterData } from "./CharacterData";
 import { downloadBlob, generateZipFile } from "./file-download";
 import { emotionGroupsEmbedder } from "./file-embedder";
-import { hashBase64 } from "./utils";
+import { hashBase64, hashBase64URI } from "./utils";
 
 export enum BUILDING_STEPS {
   STEP_0_NOT_BUILDING = 0,
@@ -41,10 +41,10 @@ const generatePrompts = (characterData: CharacterData): {context: string, initia
 
 export async function createCharacterConfig(characterData: CharacterData, emotionsEmbeddingsHash: string) {
   // Replace base64 images with their hashes
-  const profilePicHash = await hashBase64(characterData.avatar);
+  const profilePicHash = await hashBase64URI(characterData.avatar);
   const backgroundHashes = await Promise.all(
     characterData.backgroundImages.map(async (bg) => {
-      const hash = await hashBase64(bg.source);
+      const hash = await hashBase64URI(bg.source);
       return { source: hash, description: bg.description };
     })
   );
@@ -52,7 +52,7 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
     characterData.emotionGroups.map(async (emotionGroup) => {
       const hashes = await Promise.all(
         emotionGroup.images.map(async (emotion) => {
-          const hash = await hashBase64(emotion.sources[0]);
+          const hash = await hashBase64URI(emotion.sources[0]);
           return { id: emotion.emotion, hashes: [hash] };
         })
       );

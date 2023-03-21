@@ -25,7 +25,7 @@ jobs:
         with:
           submodules: true
       - name: Install
-        run: npm i -g pnpm && pnpm install && pnpm test && pnpm run build
+        run: npm i -g pnpm && pnpm install && pnpm test && pnpm run build --scope=@mikugg/browser-chat
 
   deploy_job:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -42,7 +42,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
       - name: Install
-        run: npm i -g pnpm && pnpm install && pnpm run build
+        run: npm i -g pnpm && pnpm install && pnpm run build --scope=@mikugg/browser-chat
         env:
           VITE_SERVICES_ENDPOINT: ${{ secrets.VITE_SERVICES_ENDPOINT }}
           VITE_BOT_DIRECTORY_ENDPOINT: ${{ secrets.VITE_BOT_DIRECTORY_ENDPOINT }}

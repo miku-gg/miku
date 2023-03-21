@@ -19,7 +19,7 @@
     "prepare": "npm run build"
   },
   "author": "",
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",

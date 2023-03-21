@@ -22,7 +22,6 @@ class ServicesValidator {
   }
 }
 
-
 const servicesValidator = new ServicesValidator();
 
 servicesValidator.addService(
