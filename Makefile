@@ -1,6 +1,5 @@
 install:
-	python install.py
-	python create_env.py
+	./install.sh
 
 run:
 	python run.py

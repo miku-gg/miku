@@ -29,7 +29,8 @@ pip --version >nul 2>&1 || (
 )
 echo Pip is installed.
 
-echo Installing dependencies...
+echo Installing Node.js dependencies...
+call npm install -g pnpm
 call pnpm install
 if errorlevel 1 (
     echo ERROR: Failed to install dependencies.
@@ -49,7 +50,6 @@ if errorlevel 1 (
 )
 
 echo Generating .env file...
-call python install.py
 call python create_env.py
 if errorlevel 1 (
     echo ERROR: Failed to generate .env file.
