@@ -14,17 +14,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install dependencies
-      run: |
-        cd apps/embeddings-apis/sentence-embedder
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
     - name: Deploy to EC2
       env:
         PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY_SENTENCE_EMBEDDER }}
@@ -36,6 +25,8 @@ jobs:
         echo "$PRIVATE_KEY" > private_key.pem
         chmod 600 private_key.pem
         scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r apps/embeddings-apis/sentence-embedder $USER@$HOST:/home/$USER/$SERVICE_NAME
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "sudo apt-get install -y python3-pip"
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "pip3 install -r /home/$USER/$SERVICE_NAME/requirements.txt"
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "sudo systemctl stop $DOMAIN_SUBDOMAIN.service"
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "cd $SERVICE_NAME && gunicorn --bind 127.0.0.1:8080 app:app &"
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "sudo systemctl start $DOMAIN_SUBDOMAIN.service"
