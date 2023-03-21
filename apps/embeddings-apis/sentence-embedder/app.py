@@ -3,6 +3,7 @@ from flask import Flask, request, send_file
 from sentence_transformers import SentenceTransformer
 import pandas as pd
 from werkzeug.utils import secure_filename
+from flask_cors import CORS
 
 # load embeddings model
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cpu')
@@ -10,6 +11,7 @@ UPLOAD_FOLDER = '_temp'
 ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
+CORS(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):

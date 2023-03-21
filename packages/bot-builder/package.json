@@ -46,8 +46,12 @@
   "dependencies": {
     "@mikugg/core": "^0.2.0",
     "@mikugg/extensions": "^0.2.1",
+    "@types/axios": "^0.14.0",
+    "@types/base-64": "^1.0.0",
     "@types/prop-types": "^15.7.5",
     "@types/react": "^18.0.26",
+    "axios": "^1.2.4",
+    "base-64": "^1.0.0",
     "classnames": "^2.3.2",
     "ipfs-only-hash": "^4.0.0",
     "jszip": "^3.10.1",
