@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def homepage():
-  return 'sentence-similarity'
+  return 'similarity-search'
 
 @app.route('/search', methods=['POST'])
 def find_similarity():
@@ -55,5 +55,5 @@ if __name__ == '__main__':
         print("Running in production mode...")
         httpd.serve_forever()
     else:
-        app.run(debug=True, port=8600)
+        app.run(debug=True, port=8601)
 
