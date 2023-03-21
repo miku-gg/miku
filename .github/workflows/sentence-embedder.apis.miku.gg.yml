@@ -24,7 +24,7 @@ jobs:
       run: |
         echo "$PRIVATE_KEY" > private_key.pem
         chmod 600 private_key.pem
-        scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r apps/embeddings-apis/sentence-embedder $USER@$HOST:/home/$USER/$SERVICE_NAME
+        scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r apps/embeddings-apis/sentence-embedder/ $USER@$HOST:/home/$USER/$SERVICE_NAME
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "sudo apt-get install -y python3-pip"
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "pip3 install -r /home/$USER/$SERVICE_NAME/requirements.txt"
         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "sudo systemctl stop $DOMAIN_SUBDOMAIN.service"
