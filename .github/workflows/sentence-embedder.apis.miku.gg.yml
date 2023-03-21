@@ -3,9 +3,9 @@ name: sentence-embedder.apis.miku.gg
 on:
   push:
     branches:
-      - add-python-server-deployments
-    # paths:
-    #   - apps/embeddings-apis/sentence-embedder
+      - master
+    paths:
+      - apps/embeddings-apis/sentence-embedder
 jobs:
   deploy:
     runs-on: ubuntu-latest

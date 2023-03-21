@@ -3,9 +3,9 @@ name: similarity-search.apis.miku.gg
 on:
   push:
     branches:
-      - add-python-server-deployments
-    # paths:
-    #   - apps/embeddings-apis/similarity-search
+      - master
+    paths:
+      - apps/embeddings-apis/similarity-search
 jobs:
   deploy:
     runs-on: ubuntu-latest
