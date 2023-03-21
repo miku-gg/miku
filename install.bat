@@ -1,24 +1,63 @@
 @echo off
+echo Checking if Python is installed...
 python --version >nul 2>&1 || (
-    echo Python is not installed. Please install Python from https://www.python.org/downloads/ and add it to your PATH.
+    echo ERROR: Python is not installed.
+    echo Please install Python from https://www.python.org/downloads/ and add it to your PATH.
+    echo Press any key to exit.
+    pause >nul
     exit /b 1
 )
-npm --version >nul 2>&1 || (
-    echo Node.js is not installed. Please install Node.js from https://nodejs.org/en/download/ and add it to your PATH.
-    exit /b 1
-)
-pip --version >nul 2>&1 || (
-    echo Pip is not installed. Please install pip from https://pip.pypa.io/en/stable/installation/ and add it to your PATH.
-    exit /b 1
-)
+echo Python is installed.
 
-echo Installing dependencies...
+echo Checking if Node.js is installed...
+npm --version >nul 2>&1 || (
+    echo ERROR: Node.js is not installed.
+    echo Please install Node.js from https://nodejs.org/en/download/ and add it to your PATH.
+    echo Press any key to exit.
+    pause >nul
+    exit /b 1
+)
+echo Node.js is installed.
+
+echo Checking if Pip is installed...
+pip --version >nul 2>&1 || (
+    echo ERROR: Pip is not installed.
+    echo Please install pip from https://pip.pypa.io/en/stable/installation/ and add it to your PATH.
+    echo Press any key to exit.
+    pause >nul
+    exit /b 1
+)
+echo Pip is installed.
+
+echo Installing Node.js dependencies...
+call npm install -g pnpm
 call pnpm install
+if errorlevel 1 (
+    echo ERROR: Failed to install dependencies.
+    echo Press any key to exit.
+    pause >nul
+    exit /b 1
+)
 
 echo Installing Python dependencies...
 call pip install -r apps/embeddings-apis/sentence-embedder/requirements.txt
 call pip install -r apps/embeddings-apis/similarity-search/requirements.txt
+if errorlevel 1 (
+    echo ERROR: Failed to install Python dependencies.
+    echo Press any key to exit.
+    pause >nul
+    exit /b 1
+)
 
 echo Generating .env file...
-call python install.py
 call python create_env.py
+if errorlevel 1 (
+    echo ERROR: Failed to generate .env file.
+    echo Press any key to exit.
+    pause >nul
+    exit /b 1
+)
+
+echo All dependencies have been installed and .env file generated successfully.
+echo Press any key to exit.
+pause >nul

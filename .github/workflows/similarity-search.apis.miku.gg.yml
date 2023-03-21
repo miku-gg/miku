@@ -1,0 +1,33 @@
+name: similarity-search.apis.miku.gg
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - apps/embeddings-apis/similarity-search
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install rsync
+      run: sudo apt-get update && sudo apt-get install -y rsync
+
+    - name: Deploy to EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY_SIMILARITY_SEARCH }}
+        HOST: ${{ secrets.EC2_HOST_SIMILARITY_SEARCH }}
+        USER: ${{ secrets.EC2_USER_SIMILARITY_SEARCH }}
+        SERVICE_NAME: "similarity-search"
+        DOMAIN_SUBDOMAIN: "similarity-search.apis.miku.gg"
+      run: |
+        echo "$PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        rsync -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem" -avz --exclude '.git' apps/embeddings-apis/similarity-search/ $USER@$HOST:/home/$USER/$SERVICE_NAME
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "sudo apt-get install -y python3-pip"
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "pip3 install -r /home/$USER/$SERVICE_NAME/requirements.txt"
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem $USER@$HOST "sudo systemctl restart $DOMAIN_SUBDOMAIN.service"
