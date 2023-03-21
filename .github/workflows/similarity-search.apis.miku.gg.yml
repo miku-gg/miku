@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - apps/embeddings-apis/similarity-search
+      - apps/embeddings-apis/similarity-search/**
 jobs:
   deploy:
     runs-on: ubuntu-latest
