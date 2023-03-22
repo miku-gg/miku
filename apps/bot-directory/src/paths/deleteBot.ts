@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { Request, Response } from "express";
-import { BotConfig } from "@mikugg/bot-builder";
+import { BotConfig } from "../../../../packages/bot-validator/dist";
 import * as Miku from "@mikugg/extensions";
 import config from '../config';
 

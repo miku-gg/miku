@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { CharacterCreationFormProvider, useCharacterCreationForm } from './CharacterCreationFormContext';
 import { CharacterData, validateStep } from './libs/CharacterData';
 import Step1Description from './Step1Description';
@@ -7,9 +7,9 @@ import TopBar from './TopBar';
 import Step3Expressions from './Step3Expressions';
 import Step4Preview from './Step4Preview';
 import './styles/main.scss';
-import { downloadBotFile } from './libs/bot-file-builder';
+import { BUILDING_STEPS, downloadBotFile } from './libs/bot-file-builder';
 import { downloadBlob } from './libs/file-download';
-
+import Modal from './Modal';
 
 const save = (characterData: CharacterData) => {
   const characterDataJSON = JSON.stringify(characterData, null, 2);
@@ -19,6 +19,7 @@ const save = (characterData: CharacterData) => {
 
 const _CharacterCreationForm: React.FC = () => {
   const { characterData, setCharacterData, currentStep, nextStep, prevStep} = useCharacterCreationForm();
+  const [ buildingStep, setBuildingStep ] = useState<BUILDING_STEPS>(BUILDING_STEPS.STEP_0_NOT_BUILDING);
 
   const handleNext = () => {
     const stepErrors = validateStep(currentStep, characterData);
@@ -61,7 +62,7 @@ const _CharacterCreationForm: React.FC = () => {
   };
 
   const handleBuildBot = async () => {
-    await downloadBotFile(characterData)
+    await downloadBotFile(characterData, setBuildingStep)
   }
 
   return (
@@ -92,6 +93,25 @@ const _CharacterCreationForm: React.FC = () => {
         ref={fileInputRef}
         onChange={handleFileLoad}
       />
+      {buildingStep > BUILDING_STEPS.STEP_0_NOT_BUILDING && (
+        <Modal overlayClose={buildingStep === BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP} onClose={() => setBuildingStep(BUILDING_STEPS.STEP_0_NOT_BUILDING)}>
+          {buildingStep !== BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP && <div className="loading"></div>}
+          <div className="loading-text">
+            {(function() {
+              switch (buildingStep) {
+                case BUILDING_STEPS.STEP_1_GENERATING_EMBEDDINGS:
+                  return "Generating embeddings...";
+                case BUILDING_STEPS.STEP_2_GENERATING_ZIP:
+                  return "Generating .miku file...";
+                case BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP:
+                  return "Please download the .miku file";
+                default:
+                  return "Building bot...";
+              }
+            })()}
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

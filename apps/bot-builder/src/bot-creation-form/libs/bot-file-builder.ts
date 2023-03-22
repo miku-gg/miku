@@ -1,9 +1,13 @@
 import { CharacterData } from "./CharacterData";
-import Hash from 'ipfs-only-hash';
 import { downloadBlob, generateZipFile } from "./file-download";
+import { emotionGroupsEmbedder } from "./file-embedder";
+import { hashBase64, hashBase64URI } from "./utils";
 
-const hashImage = async (base64Image: string): Promise<string> => {
-  return Hash.of(base64Image) as string;
+export enum BUILDING_STEPS {
+  STEP_0_NOT_BUILDING = 0,
+  STEP_1_GENERATING_EMBEDDINGS = 1,
+  STEP_2_GENERATING_ZIP = 2,
+  STEP_3_DOWNLOADING_ZIP = 3,
 }
 
 const generatePrompts = (characterData: CharacterData): {context: string, initiator: string} => {
@@ -35,12 +39,12 @@ const generatePrompts = (characterData: CharacterData): {context: string, initia
 };
 
 
-export async function createCharacterConfig(characterData: CharacterData) {
+export async function createCharacterConfig(characterData: CharacterData, emotionsEmbeddingsHash: string) {
   // Replace base64 images with their hashes
-  const profilePicHash = await hashImage(characterData.avatar.split(',')[1]);
+  const profilePicHash = await hashBase64URI(characterData.avatar);
   const backgroundHashes = await Promise.all(
     characterData.backgroundImages.map(async (bg) => {
-      const hash = await hashImage(bg.source.split(',')[1]);
+      const hash = await hashBase64URI(bg.source);
       return { source: hash, description: bg.description };
     })
   );
@@ -48,7 +52,7 @@ export async function createCharacterConfig(characterData: CharacterData) {
     characterData.emotionGroups.map(async (emotionGroup) => {
       const hashes = await Promise.all(
         emotionGroup.images.map(async (emotion) => {
-          const hash = await hashImage(emotion.sources[0].split(',')[1]);
+          const hash = await hashBase64URI(emotion.sources[0]);
           return { id: emotion.emotion, hashes: [hash] };
         })
       );
@@ -99,7 +103,7 @@ export async function createCharacterConfig(characterData: CharacterData) {
         props: {
           model: 'all-MiniLM-L6-v2',
           start_context: characterData.emotionGroups[0].name,
-          context_base_description_embeddings: '',
+          context_base_description_embeddings: emotionsEmbeddingsHash,
           contexts: characterData.emotionGroups.map((emotionGroup, index) => {
             return {
               id: emotionGroup.name,
@@ -116,13 +120,20 @@ export async function createCharacterConfig(characterData: CharacterData) {
   return characterConfig;
 }
 
-export async function downloadBotFile(characterData: CharacterData) {
-  const botConfig = await createCharacterConfig(characterData);
-  const files = [
+export async function downloadBotFile(characterData: CharacterData, setBuildingStep: (step: BUILDING_STEPS) => void) {
+  setBuildingStep(BUILDING_STEPS.STEP_1_GENERATING_EMBEDDINGS);
+  const emotionsEmbeddings = await emotionGroupsEmbedder(characterData.emotionGroups);
+  const emotionsEmbeddingsHash = await hashBase64(emotionsEmbeddings);
+
+  setBuildingStep(BUILDING_STEPS.STEP_2_GENERATING_ZIP);
+  const botConfig = await createCharacterConfig(characterData, emotionsEmbeddingsHash);
+  const images = [
     characterData.avatar,
     ...characterData.backgroundImages.map((bg) => bg.source),
     ...characterData.emotionGroups.map((emotionGroup) => emotionGroup.images.map((emotion) => emotion.sources[0])).flat(2),
   ]
-  const blob = await generateZipFile(botConfig, files);
+  const blob = await generateZipFile(botConfig, images, emotionsEmbeddings);
+
   await downloadBlob(blob, `${characterData.name}_${Date.now()}.miku`);
+  setBuildingStep(BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP);
 }

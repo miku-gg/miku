@@ -38,6 +38,19 @@ Make sure to add Python, Node.js, and pip to your system's PATH.
 
 2. Run `make run`. This will start both the Node.js and Python servers.
 
+## Servers
+The UIs that are up an running are
+```
+# Bot directory UI
+http://localhost:8585/
+
+# Chat interactor UI
+http://localhost:5173/
+
+# Bot Builder UI
+http://localhost:8587/
+```
+
 ## Documentation
 
 For more information on how to use the Mikugg project, please refer to the official documentation at [https://docs.miku.gg](https://docs.miku.gg).

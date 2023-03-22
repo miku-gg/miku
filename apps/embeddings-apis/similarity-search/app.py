@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer, util
 import pandas as pd
 import wget
 from ast import literal_eval
+from flask_cors import CORS
 
 
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cpu')
@@ -12,6 +13,7 @@ DB_ENDPOINT = os.environ.get("DB_ENDPOINT") or "http://localhost:8585/embeddings
 AUTH_TOKEN = os.environ.get('AUTH_TOKEN')
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/', methods=['GET'])
 def homepage():

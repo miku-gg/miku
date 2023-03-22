@@ -1,4 +1,4 @@
-import { BotConfig } from "@mikugg/bot-builder";
+import { BotConfig } from "@mikugg/bot-validator";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import botFactory from './botFactory';
 import queryString from "query-string";
