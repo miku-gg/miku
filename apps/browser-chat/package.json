@@ -1,5 +1,5 @@
 {
-  "name": "browser-chat",
+  "name": "@mikugg/browser-chat",
   "private": true,
   "version": "0.2.3",
   "type": "module",
