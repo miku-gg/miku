@@ -10,7 +10,7 @@ python --version >nul 2>&1 || (
 echo Python is installed.
 
 echo Checking if Node.js is installed...
-npm --version >nul 2>&1 || (
+call npm --version >nul 2>&1 || (
     echo ERROR: Node.js is not installed.
     echo Please install Node.js from https://nodejs.org/en/download/ and add it to your PATH.
     echo Press any key to exit.
