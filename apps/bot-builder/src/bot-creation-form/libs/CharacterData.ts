@@ -1,55 +1,11 @@
-export const validModels = [ 'davinci', 'gpt3.5-turbo', 'pygmalion-6b' ] as const;
-export const validVoices = [
-  'elevenlabs_tts:MF3mGyEYCl7XYWbV9V6O',
-  'elevenlabs_tts:EXAVITQu4vr4xnSDxMaL'
-] as const;
-export type Model = typeof validModels[number]
-export type Voice = typeof validVoices[number]
+import { emotionHashConfigs} from '../data/emotions';
+import { validVoices, Voice } from '../data/voices';
+import { validModels, Model } from '../data/models';
 
-export const models: Record<Model, { label: string; price: 'cheap' | 'normal' | 'expensive'; description: string }> = {
-  'davinci': {
-    label: 'Davinci',
-    price: 'expensive',
-    description: 'The most advanced model, capable of understanding complex prompts and generating detailed responses.',
-  },
-  'gpt3.5-turbo': {
-    label: 'GPT-3.5 Turbo',
-    price: 'normal',
-    description: 'A powerful model with a balance of capabilities and affordability.',
-  },
-  'pygmalion-6b': {
-    label: 'Pygmalion',
-    price: 'cheap',
-    description: 'An economical model suitable for simpler tasks and understanding basic prompts.',
-  }
-};
+export { type EmotionHashConfig, emotionHashConfigs} from '../data/emotions';
+export { validVoices, type Voice, voices } from '../data/voices';
+export { validModels, type Model, models } from '../data/models';
 
-export const voices: Record<Voice, { label: string; price: 'cheap' | 'normal' | 'expensive' }> = {
-  'elevenlabs_tts:MF3mGyEYCl7XYWbV9V6O': {
-    label: 'ElevenLabs: Elli',
-    price: 'expensive',
-  },
-  'elevenlabs_tts:EXAVITQu4vr4xnSDxMaL': {
-    label: 'ElevenLabs: Bella',
-    price: 'expensive',
-  }
-};
-
-export type EmotionHashConfig = {
-  name: string;
-  hash: string;
-  emotionIds: string[];
-}
-
-export const emotionHashConfigs: EmotionHashConfig[] = [
-  // Fill this array with your actual emotion hash configs
-  {
-    name: 'Emotion Set 1',
-    hash: 'emotion_set_1',
-    emotionIds: ['happy', 'sad', 'angry', 'surprised'],
-  },
-  // Add more emotion hash configs here...
-];
 
 export type Attribute = {
   key: string;
