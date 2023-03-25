@@ -87,6 +87,9 @@ const Step3Expressions: React.FC = () => {
     if (characterData.emotionGroups) {
       const newGroups = [...characterData.emotionGroups];
       newGroups[groupIndex] = { ...newGroups[groupIndex], [name]: value };
+      if (name === 'emotionsHash') {
+        newGroups[groupIndex].images = [];
+      }
       setCharacterData({ ...characterData, emotionGroups: newGroups });
     }
   };

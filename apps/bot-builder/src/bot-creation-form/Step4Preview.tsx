@@ -13,6 +13,7 @@ const Step4Preview: React.FC = () => {
   
   const handleEmotionGroupChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedEmotionGroupIndex(event.target.value as unknown as number || 0);
+    setSelectedEmotionIndex(0);
   };
 
   const renderBackgroundSelector = () => {
