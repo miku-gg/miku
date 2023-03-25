@@ -62,8 +62,21 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
 
   const {context, initiator} = generatePrompts(characterData);
 
-  const modelService = ['davinci', 'gpt3.5-turbo'].includes(characterData.model) ? 'openai_completer' : 'pygmalion_completer';
-  const [voiceService, voiceId] = characterData.voice.split(':')
+  
+  let modelService = 'openai_completer';
+  switch (characterData.model) {
+    case 'davinci':
+    case 'gpt-3.5-turbo':
+      modelService = 'openai_completer';
+      break;
+    case 'pygmalion-6b':
+      modelService = 'pygmalion_completer';
+      break;
+    case 'llama-30b':
+      modelService = 'llama_completer';
+      break;
+  }
+  const [voiceService, voiceId] = characterData.voice.split('.')
 
   // Map character data to the desired JSON structure
   const characterConfig = {

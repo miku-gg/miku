@@ -15,6 +15,7 @@ export default async function addBot(req: Request, res: Response) {
     if (!file?.path) throw 'file not found';
     const zip = new AdmZip(file.path);
     await Promise.all(zip.getEntries().map(async (entry) => {
+      if (entry.isDirectory) return;
       if (entry.comment === 'Bot Config') {
         const data = entry.getData().toString('utf8');
         const hash = await Hash.of(data);
@@ -24,6 +25,14 @@ export default async function addBot(req: Request, res: Response) {
           throw 'Bot already exists';
         }
         await fs.writeFileSync(botPath, data);
+      } else if (entry.comment === 'Emotions Embeddings') {
+        const data = entry.getData().toString('utf8');
+        const hash = await Hash.of(data);
+        assert(entry.name === hash, `Hash mismatch for Emotions Embeddings`);
+        const botPath = `${config.EMBEDDINGS_PATH}/${hash}`;
+        if (!fs.existsSync(botPath)) {
+          await fs.writeFileSync(botPath, data);
+        }
       } else {
         const data = entry.getData().toString('base64');
         const hash = await Hash.of(data);
