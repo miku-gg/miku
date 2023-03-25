@@ -18,6 +18,7 @@ import { UnmuteIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
+import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT || 'http://localhost:8585/images';
 
@@ -42,7 +43,11 @@ export const BotDisplay = () => {
   } = useContext(InteractiveResponsesContext);
   const [ contextSuggestion, setContextSuggestion ] = useState<string>('');
 
-  let backgroundImage = botConfig?.background_pic || '';
+  let backgroundImage = Number(botConfig?.configVersion || 1) > 1 ? (
+    ((botConfig as BotConfigV2)?.backgrounds || [{source: ''}])[0].source || ''
+  ) : (
+    (botConfig as BotConfigV1)?.background_pic || ''
+  );
   let emotionImage = response?.emotion || prevResponse?.emotion || '';
   if (!emotionImage) {
     const openAIEmotionConfig = botConfig?.outputListeners.find((listener: {service: string}) => listener.service === MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter)
