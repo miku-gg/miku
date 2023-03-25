@@ -4,11 +4,12 @@ This is the Mikugg project, which includes multiple applications and services. T
 
 ## Prerequisites
 
-- Python 3.x: Download and install from [https://www.python.org/downloads/](https://www.python.org/downloads/)
+- Python 3.9: Download and install from [https://www.python.org/downloads/](https://www.python.org/downloads/)
 - Node.js: Download and install from [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 - Pip: Download and install from [https://pip.pypa.io/en/stable/installation/](https://pip.pypa.io/en/stable/installation/)
 
-Make sure to add Python, Node.js, and pip to your system's PATH.
+> **Note**
+> On windows, Make sure to add Python, Node.js, and pip to your system's **PATH**.
 
 ## Installation
 
@@ -48,7 +49,7 @@ http://localhost:8585/
 http://localhost:5173/
 
 # Bot Builder UI
-http://localhost:8587/
+http://localhost:8586/
 ```
 
 ## Documentation
