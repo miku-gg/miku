@@ -42,6 +42,7 @@ export const BotDisplay = () => {
     onUpdate,
   } = useContext(InteractiveResponsesContext);
   const [ contextSuggestion, setContextSuggestion ] = useState<string>('');
+  const [ emotionImgIsLoading, setEmotionImgIsLoading ] = useState(false);
 
   let backgroundImage = Number(botConfig?.configVersion || 1) > 1 ? (
     ((botConfig as BotConfigV2)?.backgrounds || [{source: ''}])[0].source || ''
@@ -62,6 +63,10 @@ export const BotDisplay = () => {
       emotionImage = openAIEmotionConfig?.props?.images?.neutral || '';
     }
   }
+
+  useEffect(() => {
+    setEmotionImgIsLoading(false);
+  }, [emotionImage]);
 
   useEffect(() => {
     const bot = botFactory.getInstance();
@@ -158,9 +163,9 @@ export const BotDisplay = () => {
   return (
     // MAIN CONTAINER
     <>
-      <div className="relative flex flex-col w-full h-5/6 items-center">
+      <div className="relative flex flex-col w-full h-full items-center">
         {/* MAIN IMAGE */}
-        <div className="relative flex flex-col justify-center items-center w-full h-full">
+        <div className="absolute flex flex-col justify-center items-center w-full h-full overflow-hidden bot-display-images-container">
           <div className="flex items-center justify-between pt-3 px-3 absolute z-10 top-0 w-full">
             <div className="flex gap-3">
               <button className="rounded-full" onClick={displayBotDetails}><img src={infoIcon}/></button>
@@ -180,13 +185,15 @@ export const BotDisplay = () => {
             }}
           />
           <img
-            className="absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover"
+            className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${emotionImgIsLoading ? 'fade-in up-and-down' : ''}`}
             src={`${VITE_IMAGES_DIRECTORY_ENDPOINT}/${emotionImage}`}
             alt="character"
             onError={({ currentTarget }) => {
               currentTarget.onerror = null;
               currentTarget.src = "/default_character.png";
             }}
+            onLoadStart={() => setEmotionImgIsLoading(false)}
+            onLoad={() => setEmotionImgIsLoading(true)}
           />
         </div>
         {/* RESPONSE CONTAINER */}

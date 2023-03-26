@@ -38,3 +38,62 @@
 .button-purple:hover {
   background-color: #6f4cffe0 !important;
 }
+
+
+/* Custom audio player */
+.custom-audio-player {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.custom-audio-player button {
+  background-color: #7957D2;
+  color: white;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+.custom-audio-player input[type='range'] {
+  background-color: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  width: 100px;
+  margin-left: 4px;
+}
+
+.custom-audio-player input[type='range']::-webkit-slider-runnable-track {
+  height: 3px;
+  background-color: #7957D2;
+  border-radius: 2px;
+}
+
+.custom-audio-player input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 12px;
+  width: 12px;
+  background-color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -4.5px;
+}
+
+.custom-audio-player input[type='range']::-moz-range-track {
+  height: 3px;
+  background-color: #7957D2;
+  border-radius: 2px;
+}
+
+.custom-audio-player input[type='range']::-moz-range-thumb {
+  height: 12px;
+  width: 12px;
+  background-color: white;
+  border-radius: 50%;
+  cursor: pointer;
+}

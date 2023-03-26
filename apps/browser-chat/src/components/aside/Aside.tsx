@@ -1,4 +1,4 @@
-import { useEffect, useState, useReducer } from "react";
+import { useEffect, useState, useReducer, useRef } from "react";
 import "./aside.css";
 import botFactory from "../../libs/botFactory";
 import { useBot } from "../../libs/botLoader";
@@ -6,6 +6,64 @@ import { PopUp } from "../pup-up/pup-up";
 import { BotDetails } from "../bot-details/BotDetails";
 import { toast } from "react-toastify";
 import { HistoryConsole, HistoryManagementButtons } from "../chat-history/chat-history";
+import { DropDown } from "../dropdown/Dropdown";
+import { MuteIcon, PlayIcon } from "@primer/octicons-react";
+
+interface CustomAudioPlayerProps {
+  src: string;
+}
+
+const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({ src }) => {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState<boolean>(true);
+  const [volume, setVolume] = useState<number>(1);
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (playing) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setPlaying(!playing);
+    }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  };
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.play().catch((error) => {
+        console.error('Autoplay error:', error);
+        setPlaying(false);
+      });
+    }
+  }, [src])
+
+  return (
+    <div className="custom-audio-player">
+      <audio ref={audioRef} src={src} autoPlay loop />
+      <button onClick={togglePlay}>{playing ? <MuteIcon /> : <PlayIcon />}</button>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value={volume}
+        onChange={handleVolumeChange}
+      />
+    </div>
+  );
+};
+
+
+export default CustomAudioPlayer;
 
 export const Aside = () => {
   const history = botFactory.getInstance()?.getMemory();
@@ -13,6 +71,18 @@ export const Aside = () => {
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
   const [chatHistoryToggle, setChatHistoryToggle] = useState<boolean>(true);
   const [handleBotDetails, setHandleBotDetails] = useState<boolean>(false);
+  const musicPieces = [
+    'devonshire',
+    'folk_round',
+    'lobby',
+    'yumemi',
+    'waltz',
+    'gymnopedie',
+    'calmant',
+    'canon_d',
+    'air_prelude',
+  ];
+  const [musicIndex, setMusicIndex] = useState<number>(0);
 
   useEffect(() => {
     botFactory.getInstance()?.subscribeDialog(() => {
@@ -71,6 +141,14 @@ export const Aside = () => {
         <div className="flex justify-between items-center w-full h-[3rem]">
           <div className="flex w-2/6 h-full gap-4">
             <HistoryManagementButtons onLoad={() => forceUpdate()} />
+          </div>
+          <div className="flex gap-4">
+            <DropDown
+              items={musicPieces}
+              onChange={(index) => setMusicIndex(index)}
+              selectedIndex={musicIndex}
+            />
+            <CustomAudioPlayer src={`public/music/${musicPieces[musicIndex]}.mp3`} />
           </div>
         </div>
       </div>
