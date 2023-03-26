@@ -10,7 +10,8 @@
     "jsx": "react",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "importHelpers": true,
   },
   "include": ["src/**/*"],
   "exclude": [

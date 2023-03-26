@@ -396,12 +396,14 @@ importers:
       stylelint-prettier: ^3.0.0
       stylelint-scss: ^4.5.0
       stylelint-selector-bem-pattern: ^2.1.1
+      tslib: ^2.5.0
       tslint: ^6.1.3
       tslint-react: ^5.0.0
       typescript: ^5.0.2
     dependencies:
       '@bem-react/classname': 1.5.12
       '@bem-react/classnames': 1.3.10
+      tslib: 2.5.0
     devDependencies:
       '@babel/plugin-syntax-flow': 7.18.6
       '@babel/plugin-transform-react-jsx': 7.21.0
