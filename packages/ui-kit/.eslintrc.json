@@ -4,7 +4,8 @@
     "plugin:prettier/recommended"
   ],
   "plugins": [
-    "prettier"
+    "prettier",
+    "@bem-react"
   ],
   "rules": {
     "prettier/prettier": [
@@ -12,6 +13,18 @@
       {
         "singleQuote": true,
         "trailingComma": "es5"
+      }
+    ],
+    "@bem-react/no-classname-runtime": "warn",
+    "@bem-react/whitelist-levels-imports": [
+      "warn",
+      {
+        "defaultLevel": "common",
+        "whiteList": {
+          "common": ["common"],
+          "desktop": ["common", "desktop"],
+          "mobile": ["common", "mobile"]
+        }
       }
     ]
   },

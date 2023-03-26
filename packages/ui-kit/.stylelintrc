@@ -1,0 +1,20 @@
+{
+  "plugins": [
+    "stylelint-selector-bem-pattern",
+    "stylelint-scss",
+    "stylelint-prettier"
+  ],
+  "extends": [
+    "stylelint-config-recommended-scss",
+    "stylelint-config-prettier"
+  ],
+  "rules": {
+    "prettier/prettier": true,
+    "selector-class-pattern": [
+      "^([a-zA-Z0-9\\-_]+)(__([a-zA-Z0-9\\-_]+))?((--|\\$)([a-zA-Z0-9\\-_]+))?$",
+      {
+        "resolveNestedSelectors": true
+      }
+    ]
+  }
+}

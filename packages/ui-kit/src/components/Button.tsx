@@ -1,18 +1,16 @@
-import React from "react";
-import classNames from "classnames";
-import "./Button.scss";
+import React from 'react';
+import { cn } from '@bem-react/classname';
+import './Button.scss';
 
 export interface ButtonProps {
-  theme: "primary" | "secondary";
+  theme: 'primary' | 'secondary';
   children: React.ReactNode;
 }
 
 const Button: React.FC<ButtonProps> = ({ theme, children }) => {
-  const classes = classNames({
-    Button: true,
-    [`Button--${theme}`]: true,
-  });
-  return <div className={classes}>{children}</div>;
+  const cnButton = cn('Button');
+  const cnTheme = cnButton({ theme });
+  return <div className={cnTheme}>{children}</div>;
 };
 
 export default Button;
