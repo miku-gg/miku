@@ -17,9 +17,12 @@
   background: #c0a0b9;
 }
 
+.bot-display-images-container {
+  box-shadow: 0px 0px 20px 0px rgb(205 95 234);
+}
+
 .conversation-background-image {
   transition: all .2s ease-in;
-  box-shadow: 0px 0px 20px 0px rgb(205 95 234);
   pointer-events: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -36,6 +39,7 @@
   -moz-user-select: none;
   -o-user-select: none;
   user-select: none;
+  opacity: 0;
 }
 
 .audio-button,
@@ -72,5 +76,23 @@
 @keyframes blinker {
   50% {
     opacity: .4;
+  }
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity .5s ease;
+}
+
+.up-and-down {
+  animation: up-and-down 3s ease-in-out infinite;
+}
+
+@keyframes up-and-down {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
   }
 }
