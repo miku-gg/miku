@@ -148,7 +148,7 @@ export const Aside = () => {
               onChange={(index) => setMusicIndex(index)}
               selectedIndex={musicIndex}
             />
-            <CustomAudioPlayer src={`public/music/${musicPieces[musicIndex]}.mp3`} />
+            <CustomAudioPlayer src={`music/${musicPieces[musicIndex]}.mp3`} />
           </div>
         </div>
       </div>
