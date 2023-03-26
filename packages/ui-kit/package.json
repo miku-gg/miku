@@ -1,14 +1,20 @@
 {
   "name": "@mikugg/ui-kit",
-  "version": "1.0.0",
-  "type": "module",
+  "version": "0.2.3",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miku-gg/miku.git",
+    "directory": "packages/extensions"
+  },
+  "type": "module",
   "main": "build/index.js",
   "module": "build/index.es.js",
   "files": [
     "build"
   ],
   "scripts": {
+    "prepare": "npm run build",
     "build": "rollup -c --bundleConfigAsCjs",
     "start": "rollup -c -w --bundleConfigAsCjs",
     "lint:ts": "tslint 'src/**/*.{ts,tsx}'",
@@ -53,7 +59,8 @@
   },
   "peerDependencies": {
     "react": ">=18.2.0",
-    "react-dom": ">=18.2.0"
+    "react-dom": ">=18.2.0",
+    "@babel/core": ">=7.0.0-0 <8.0.0"
   },
   "dependencies": {
     "@bem-react/classname": "^1.5.12",
