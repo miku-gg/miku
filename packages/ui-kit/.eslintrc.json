@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "react-app",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": [
+      "warn",
+      {
+        "singleQuote": true,
+        "trailingComma": "es5"
+      }
+    ]
+  },
+  "ignorePatterns": [
+    "build/**/*"
+  ]
+}
