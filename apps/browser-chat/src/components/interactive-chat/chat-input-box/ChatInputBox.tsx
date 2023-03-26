@@ -65,7 +65,7 @@ export const ChatInputBox = (): JSX.Element => {
   const searchParams = queryString.parse(location.search);
 
   return (
-    <div className="flex items-end w-full h-1/6 max-lg:pb-5 max-lg:px-5">
+    <div className="flex items-end w-full max-lg:pb-5 max-lg:px-5">
       <div className="flex flex-col justify-between w-full rounded-lg max-sm:rounded-none gap-3">
         <form
           onSubmit={onFormSubmit}

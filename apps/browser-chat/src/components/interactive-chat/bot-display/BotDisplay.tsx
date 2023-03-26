@@ -158,9 +158,9 @@ export const BotDisplay = () => {
   return (
     // MAIN CONTAINER
     <>
-      <div className="relative flex flex-col w-full h-5/6 items-center">
+      <div className="relative flex flex-col w-full h-full items-center">
         {/* MAIN IMAGE */}
-        <div className="relative flex flex-col justify-center items-center w-full h-full">
+        <div className="absolute flex flex-col justify-center items-center w-full h-full">
           <div className="flex items-center justify-between pt-3 px-3 absolute z-10 top-0 w-full">
             <div className="flex gap-3">
               <button className="rounded-full" onClick={displayBotDetails}><img src={infoIcon}/></button>
