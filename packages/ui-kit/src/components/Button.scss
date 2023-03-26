@@ -1,0 +1,12 @@
+@import '../variables';
+
+.Button {
+  background-color: $purple-1;
+  display: inline-block;
+  padding: 0.8em 1em;
+  color: #fffef9;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  text-align: center;
+}

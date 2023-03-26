@@ -1,0 +1,34 @@
+{
+  "extends": [
+    "react-app",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "prettier",
+    "@bem-react"
+  ],
+  "rules": {
+    "prettier/prettier": [
+      "warn",
+      {
+        "singleQuote": true,
+        "trailingComma": "es5"
+      }
+    ],
+    "@bem-react/no-classname-runtime": "warn",
+    "@bem-react/whitelist-levels-imports": [
+      "warn",
+      {
+        "defaultLevel": "common",
+        "whiteList": {
+          "common": ["common"],
+          "desktop": ["common", "desktop"],
+          "mobile": ["common", "mobile"]
+        }
+      }
+    ]
+  },
+  "ignorePatterns": [
+    "build/**/*"
+  ]
+}

@@ -10,6 +10,7 @@ import './styles/main.scss';
 import { BUILDING_STEPS, downloadBotFile } from './libs/bot-file-builder';
 import { downloadBlob } from './libs/file-download';
 import Modal from './Modal';
+import { Button } from '@mikugg/ui-kit';
 
 const save = (characterData: CharacterData) => {
   const characterDataJSON = JSON.stringify(characterData, null, 2);
@@ -78,9 +79,13 @@ const _CharacterCreationForm: React.FC = () => {
       <div className="characterCreationForm__navigationButtons">
         {currentStep > 1 && <button onClick={handleBack}>Back</button>}
         {currentStep === 4 ? (
-          <button onClick={handleBuildBot}>{"Build"}</button>
+          <Button theme='primary' onClick={handleBuildBot}>
+            Build
+          </Button>
         ) : (
-          <button onClick={handleNext}>Next</button>
+          <Button theme='primary' onClick={handleNext}>
+            Next
+          </Button>
         )}
         
       </div>
