@@ -8,8 +8,8 @@ const Step4Preview: React.FC = () => {
   const [selectedEmotionGroupIndex, setSelectedEmotionGroupIndex] = useState(0);
   const [selectedEmotionIndex, setSelectedEmotionIndex] = useState(0);
 
-  const model = models[characterData.model] || models['gpt3.5-turbo'];
-  const voice = voices[characterData.voice] || voices['elevenlabs_tts:EXAVITQu4vr4xnSDxMaL'];
+  const model = models[characterData.model] || models['gpt-3.5-turbo'];
+  const voice = voices[characterData.voice] || voices['elevenlabs_tts.EXAVITQu4vr4xnSDxMaL'];
   
   const handleEmotionGroupChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedEmotionGroupIndex(event.target.value as unknown as number || 0);
