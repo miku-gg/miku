@@ -7,7 +7,10 @@ on:
     paths:
       - apps/bot-builder/**
       - packages/**
-      - ./*
+      - .github/workflows/build.miku.gg.yml
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
@@ -15,6 +18,10 @@ on:
     paths:
       - apps/bot-builder/**
       - packages/**
+      - .github/workflows/build.miku.gg.yml
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
 
 jobs:
   build_and_test_job:
