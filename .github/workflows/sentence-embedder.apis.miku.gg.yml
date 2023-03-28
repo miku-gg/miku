@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - apps/embeddings-apis/sentence-embedder/**
+      - .github/workflows/sentence-embedder.apis.miku.gg.yml
 jobs:
   deploy:
     runs-on: ubuntu-latest

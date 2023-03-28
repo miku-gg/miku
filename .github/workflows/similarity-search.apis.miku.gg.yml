@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - apps/embeddings-apis/similarity-search/**
+      - .github/workflows/similarity-search.apis.miku.gg.yml
 jobs:
   deploy:
     runs-on: ubuntu-latest
