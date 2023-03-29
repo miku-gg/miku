@@ -13,12 +13,12 @@ export const hashBase64URI = async (base64Content: string): Promise<string> => {
   return hashBase64(base64Content.split(',')[1]);
 }
 
-export const checkImageDimensionsAndType = (file: File, types = ['image/png'], width=256, height=256): Promise<boolean> => {
+export const checkImageDimensionsAndType = (file: File, types = ['image/png']): Promise<boolean> => {
   return new Promise((resolve) => {
     const img = new Image();
     img.src = URL.createObjectURL(file);
     img.onload = () => {
-      resolve(img.width === width && img.height === height && (!types || types.includes(file.type)));
+      resolve((!types || types.includes(file.type)));
     };
   });
 }

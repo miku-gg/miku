@@ -52,16 +52,20 @@
   }
 
   &__emotionImage {
-    width: 512px;
-    height: 512px;
+    width: 600px;
+    height: 600px;
     object-fit: cover; // Resize the image to fit the container while maintaining aspect ratio
     background-size: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: center;
 
     img {
-      width: 100%;
-      height: 100%;
+      height: 80%;
       object-fit: cover;
       border-radius: 5px;
+      bottom: 0;
+      // position: absolute;
     }
   }
 

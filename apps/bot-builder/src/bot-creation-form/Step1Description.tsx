@@ -71,7 +71,7 @@ const Step1Description: React.FC = () => {
       const validImages: BackgroundImage[] = [];
   
       for (const file of Array.from(files)) {
-        const isValidSize = await checkImageDimensionsAndType(file, ['image/png', 'image/jpg'], 1024, 1024);
+        const isValidSize = await checkImageDimensionsAndType(file, ['image/png', 'image/jpeg']);
         if (isValidSize) {
           const reader = new FileReader();
           reader.readAsDataURL(file);

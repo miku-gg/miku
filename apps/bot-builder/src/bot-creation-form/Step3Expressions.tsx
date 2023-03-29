@@ -100,7 +100,7 @@ const Step3Expressions: React.FC = () => {
     emotionId: string
   ) => {
     if (file) {
-      const isValidSizeAndType = await checkImageDimensionsAndType(file, ['image/png', 'image/gif'], 1024, 1024);
+      const isValidSizeAndType = await checkImageDimensionsAndType(file, ['image/png', 'image/gif']);
       if (isValidSizeAndType) {
         if (characterData.emotionGroups) {
           const reader = new FileReader();
