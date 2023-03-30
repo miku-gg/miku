@@ -1,4 +1,4 @@
-import {describe, expect, test, jest} from '@jest/globals';
+import {describe, expect, test} from '@jest/globals';
 import { parsePygmalionResponse } from '../PygmalionPromptCompleter';
 
 
@@ -27,9 +27,51 @@ const testCasesToParse = [
 
 
 describe("PygmalionPromptCompleter", () => {
-  test("handleCompletionOutput should work", () => {
+  test("Example cases should work", () => {
     testCasesToParse.forEach(([input, output]) => {
       expect(parsePygmalionResponse(input, 'Elaina', ['You'])).toEqual(output);
     })
+  });
+
+  test('should remove botSubject prefix', () => {
+    const inputText = 'BotSubject: This is a test message.';
+    const expectedOutput = 'This is a test message.';
+    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', []);
+    expect(actualOutput).toEqual(expectedOutput);
+  });
+
+  test('should remove text after any stop', () => {
+    const inputText = 'BotSubject: This is a test message. SubjectA: This should be removed.';
+    const expectedOutput = 'This is a test message.';
+    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', ['SubjectA']);
+    expect(actualOutput).toEqual(expectedOutput);
+  });
+
+  test('should remove consecutive line breaks', () => {
+    const inputText = 'BotSubject: This is a test message.\n\nAnother line.';
+    const expectedOutput = 'This is a test message.';
+    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', []);
+    expect(actualOutput).toEqual(expectedOutput);
+  });
+
+  test('should remove leading and trailing whitespace', () => {
+    const inputText = '  BotSubject: This is a test message.  ';
+    const expectedOutput = 'This is a test message.';
+    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', []);
+    expect(actualOutput).toEqual(expectedOutput);
+  });
+
+  test('should remove leading exclamation and question marks', () => {
+    const inputText = 'BotSubject: !!?!This is a test message.';
+    const expectedOutput = 'This is a test message.';
+    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', []);
+    expect(actualOutput).toEqual(expectedOutput);
+  });
+
+  test('should handle complex input', () => {
+    const inputText = '  BotSubject: !!?!This is a test message.\n\nSubjectA: This should be removed.\nSubjectB: Also remove this.  ';
+    const expectedOutput = 'This is a test message.';
+    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
+    expect(actualOutput).toEqual(expectedOutput);
   });
 })

@@ -30,7 +30,7 @@
   <body>
     <div class="ui basic segment">
      <%- include('header', {active: '/'}); %>
-      <div class="flex gap-6">
+      <div class="flex gap-6 flex-wrap">
         <% bots.forEach(function(bot){ %>
           <div class="w-60">
             <div class="ui card">
@@ -51,7 +51,7 @@
                     <div class="bg-green-700 rounded-md px-2 py-1 mt-1 inline-block">GPT3.5-T</div>
                   <% break; }  %>
                 </div>
-                <div class="description">
+                <div class="description h-12 overflow-auto">
                   <%= bot.description || 'No description' %>
                 </div>
               </div>

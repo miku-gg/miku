@@ -32,7 +32,7 @@ export const parsePygmalionResponse = (text: string, _botSubject: string, _subje
     text = text.substring(
       0,
       stops.reduce((prev, cur) => {
-        let subjectTextIndex = text.indexOf(cur);
+        const subjectTextIndex = text.indexOf(cur);
         return (subjectTextIndex === -1) ? prev : Math.min(prev, subjectTextIndex);
       }, text.length)
     )
@@ -40,12 +40,12 @@ export const parsePygmalionResponse = (text: string, _botSubject: string, _subje
   } else {
     text = trim(text);
     text = removeLastLineBreak(text);
-    text = text.substring(0, text.lastIndexOf('\n'));
+    const firstLineBreak = text.lastIndexOf('\n');
+    text = text.substring(0, firstLineBreak !== -1 ? firstLineBreak : text.length);
   }
 
   text = trim(text);
-  while (text.startsWith('!')) text = text.substring(1);
-  while (text.startsWith('?')) text = text.substring(1);
+  while (text.startsWith('!') || text.startsWith('?')) text = text.substring(1);
 
   text = trim(text);
   return text;
