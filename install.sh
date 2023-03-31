@@ -25,6 +25,7 @@ fi
 echo "Pip is installed."
 
 echo "Installing Node.js dependencies..."
+rm -rf apps/browser-chat/node_modules/.vite || true
 npm install -g pnpm
 pnpm install
 if [ $? -ne 0 ]; then

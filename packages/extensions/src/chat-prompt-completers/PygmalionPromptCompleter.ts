@@ -8,7 +8,7 @@ const buildTextStops = (_subjects: string[]): string[] => {
   return ['<|endoftext|>', ...subjects];
 }
 
-const hasTextStop = (text: string, _subjects: string[]): boolean => {
+export const hasTextStop = (text: string, _subjects: string[]): boolean => {
   const stops = buildTextStops(_subjects);
   return stops.reduce((prev, cur) => {
     return prev || text.includes(cur);

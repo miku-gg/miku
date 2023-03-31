@@ -36,14 +36,14 @@ async function embeddCSV(csv: string): Promise<string> {
   const csvBlob = new Blob([csv], { type: 'text/csv' });
   formData.append('file', csvBlob, 'emotion-groups.csv');
 
-  const response: AxiosResponse<ArrayBuffer>  = await axios.post(`${sentenceEmbedderAPIEndpoint}/encode_csv`, formData, {
+  const response: AxiosResponse<string>  = await axios.post(`${sentenceEmbedderAPIEndpoint}/encode_csv`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
-    responseType: 'arraybuffer',
+    responseType: 'text',
   });
 
-  return arrayBufferToBase64(response.data);
+  return response.data;
 }
 
 export async function emotionGroupsEmbedder(groups: EmotionGroup[]): Promise<string> {

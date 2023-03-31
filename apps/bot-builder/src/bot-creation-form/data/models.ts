@@ -1,4 +1,4 @@
-export const validModels = [ 'davinci', 'gpt-3.5-turbo', 'pygmalion-6b', 'llama-30b' ] as const;
+export const validModels = [ 'gpt-3.5-turbo', 'pygmalion-6b', 'llama-30b' ] as const;
 export type Model = typeof validModels[number]
 
 export const models: Record<Model, { label: string; price: 'cheap' | 'normal' | 'expensive'; description: string }> = {
@@ -6,11 +6,6 @@ export const models: Record<Model, { label: string; price: 'cheap' | 'normal' | 
     label: 'LLaMA-30B',
     price: 'expensive',
     description: 'Powerful chat model. Self-hosted, uncensored.',
-  },
-  'davinci': {
-    label: 'Davinci',
-    price: 'expensive',
-    description: 'An advanced model, capable of understanding complex prompts and generating detailed responses. Censored, cloud hosted.',
   },
   'gpt-3.5-turbo': {
     label: 'GPT-3.5 Turbo',

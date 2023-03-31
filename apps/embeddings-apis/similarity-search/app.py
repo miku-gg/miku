@@ -26,7 +26,7 @@ def find_similarity():
       abort(401, 'Authorization header is missing')
 
   auth_token = auth_header.split(' ')[-1]
-  if auth_token != AUTH_TOKEN:
+  if AUTH_TOKEN and auth_token != AUTH_TOKEN:
       abort(401, 'Invalid token')
 
   content = request.get_json()
@@ -57,5 +57,5 @@ if __name__ == '__main__':
         print("Running in production mode...")
         httpd.serve_forever()
     else:
-        app.run(debug=True, port=8601)
+        app.run(host='0.0.0.0', debug=True, port=8601)
 

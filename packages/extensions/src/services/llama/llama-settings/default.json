@@ -1,0 +1,17 @@
+{
+	"max_new_tokens": 50,
+	"do_sample": true,
+	"temperature": 0.7,
+	"top_p": 0.18,
+	"typical_p": 1,
+	"repetition_penalty": 1.15,
+	"encoder_repetition_penalty": 1,
+	"top_k": 40,
+	"min_length": 1,
+	"no_repeat_ngram_size": 0,
+	"num_beams": 1,
+	"penalty_alpha": 0,
+	"length_penalty": 1,
+	"early_stopping": false,
+	"seed": -1
+}

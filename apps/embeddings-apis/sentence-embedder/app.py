@@ -58,4 +58,4 @@ if __name__ == '__main__':
         print("Running in production mode...")
         httpd.serve_forever()
     else:
-        app.run(debug=True, port=8600)
+        app.run(host='0.0.0.0', debug=True, port=8600)
