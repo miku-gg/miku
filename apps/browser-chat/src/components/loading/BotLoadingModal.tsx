@@ -36,7 +36,7 @@ export default function BotLoadingModal(): JSX.Element {
     }
   }, [])
   
-  if (IS_ALPHA_LIVE && !searchParams.openai) {
+  if (IS_ALPHA_LIVE && (!searchParams.openai && !searchParams.llama)) {
     return (
       <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-50 backdrop-blur-sm">
         <div className="relative w-auto my-6 mx-auto max-w-3xl">
