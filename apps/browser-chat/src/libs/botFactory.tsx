@@ -191,12 +191,13 @@ class BotFactory {
     // HOTFIX for alpha demo
     if (IS_ALPHA_LIVE) {
       outputListenerConfigs = botConfig.outputListeners.filter((listener: {service: MikuExtensions.Services.ServicesNames}) => {
-        if (
-          listener.service === MikuExtensions.Services.ServicesNames.AzureTTS &&
-          !queryString.parse(location.search)['azure']
-        ) {
-          return false;
-        }
+        // allow azure requirement for now
+        // if (
+        //   listener.service === MikuExtensions.Services.ServicesNames.AzureTTS &&
+        //   !queryString.parse(location.search)['azure']
+        // ) {
+        //   return false;
+        // }
 
         if (
           listener.service === MikuExtensions.Services.ServicesNames.ElevenLabsTTS &&

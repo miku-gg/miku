@@ -14,13 +14,13 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2
       '@mikugg/core':
-        specifier: ^0.2.3
+        specifier: ^0.3.0
         version: link:../../packages/core
       '@mikugg/extensions':
-        specifier: ^0.2.3
+        specifier: ^0.3.0
         version: link:../../packages/extensions
       '@mikugg/ui-kit':
-        specifier: workspace:^0.2.3
+        specifier: workspace:^0.3.0
         version: link:../../packages/ui-kit
       '@types/axios':
         specifier: ^0.14.0
@@ -129,10 +129,10 @@ importers:
   apps/bot-directory:
     dependencies:
       '@mikugg/bot-validator':
-        specifier: ^0.2.3
+        specifier: ^0.3.0
         version: link:../../packages/bot-validator
       '@mikugg/extensions':
-        specifier: ^0.2.3
+        specifier: ^0.3.0
         version: link:../../packages/extensions
       '@types/body-parser':
         specifier: ^1.19.2
@@ -211,13 +211,13 @@ importers:
         specifier: ^2.0.14
         version: 2.0.16(react@18.2.0)
       '@mikugg/bot-validator':
-        specifier: ^0.2.3
+        specifier: ^0.3.0
         version: link:../../packages/bot-validator
       '@mikugg/core':
-        specifier: ^0.2.3
+        specifier: ^0.3.0
         version: link:../../packages/core
       '@mikugg/extensions':
-        specifier: ^0.2.3
+        specifier: ^0.3.0
         version: link:../../packages/extensions
       '@mui/material':
         specifier: ^5.11.10
@@ -299,7 +299,7 @@ importers:
   apps/services-server:
     dependencies:
       '@mikugg/extensions':
-        specifier: ^0.2.3
+        specifier: ^0.3.0
         version: link:../../packages/extensions
       '@types/body-parser':
         specifier: ^1.19.2
@@ -357,10 +357,10 @@ importers:
   packages/bot-validator:
     dependencies:
       '@mikugg/core':
-        specifier: ^0.2.3
+        specifier: ^0.3.1
         version: link:../core
       '@mikugg/extensions':
-        specifier: ^0.2.3
+        specifier: ^0.3.1
         version: link:../extensions
       '@types/node':
         specifier: ^18.15.5
@@ -455,7 +455,7 @@ importers:
   packages/extensions:
     dependencies:
       '@mikugg/core':
-        specifier: ^0.2.3
+        specifier: ^0.3.1
         version: link:../core
       '@types/axios':
         specifier: ^0.14.0
