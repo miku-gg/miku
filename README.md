@@ -81,5 +81,5 @@ pnpm pull
 #### publish
 ```bash
 # publish public packages to npm
-npx lerna publish
+npx lerna publish --no-private
 ```
