@@ -1,6 +1,6 @@
 {
   "name": "@mikugg/bot-builder",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "private": true,
   "description": "",
   "repository": {
@@ -42,9 +42,9 @@
   },
   "dependencies": {
     "@ipld/dag-pb": "^4.0.2",
-    "@mikugg/core": "^0.2.3",
-    "@mikugg/extensions": "^0.2.3",
-    "@mikugg/ui-kit": "workspace:^0.2.3",
+    "@mikugg/core": "^0.3.0",
+    "@mikugg/extensions": "^0.3.0",
+    "@mikugg/ui-kit": "workspace:^0.3.0",
     "@types/axios": "^0.14.0",
     "@types/base-64": "^1.0.0",
     "@types/prop-types": "^15.7.5",

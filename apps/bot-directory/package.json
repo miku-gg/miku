@@ -1,6 +1,6 @@
 {
   "name": "@mikugg/bot-directory",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "private": true,
   "description": "",
   "main": "src/server.ts",
@@ -12,8 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mikugg/bot-validator": "^0.2.3",
-    "@mikugg/extensions": "^0.2.3",
+    "@mikugg/bot-validator": "^0.3.0",
+    "@mikugg/extensions": "^0.3.0",
     "@types/body-parser": "^1.19.2",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",

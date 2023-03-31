@@ -1,6 +1,6 @@
 {
   "name": "@mikugg/ui-kit",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "",
   "repository": {
     "type": "git",
@@ -58,9 +58,9 @@
     "typescript": "^5.0.2"
   },
   "peerDependencies": {
+    "@babel/core": ">=7.0.0-0 <8.0.0",
     "react": ">=18.2.0",
-    "react-dom": ">=18.2.0",
-    "@babel/core": ">=7.0.0-0 <8.0.0"
+    "react-dom": ">=18.2.0"
   },
   "dependencies": {
     "@bem-react/classname": "^1.5.12",
