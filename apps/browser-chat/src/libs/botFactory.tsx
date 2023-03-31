@@ -86,7 +86,10 @@ class BotFactory {
       case MikuExtensions.Services.ServicesNames.LLaMA:
         chatPromptCompleter = new MikuExtensions.ChatPromptCompleters.LLaMAPromptCompleter({
           serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
-          props: props,
+          props: {
+            ...props,
+            gradioEndpoint: String(searchParams['llama'] || '') || ''
+          },
           signer: signer,
           memory: memory,
         });

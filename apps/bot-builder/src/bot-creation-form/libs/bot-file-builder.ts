@@ -44,14 +44,18 @@ const generatePromptsStandard = (characterData: CharacterData): {context: string
 const generatePromptRPBT = (characterData: CharacterData): {context: string, initiator: string, botSubject: string, subject: string} => {
   let context = RPBT;
   context += `\nPlayer: You'll play as ${characterData.name}. ${characterData.description}`
-  context += characterData.attributes
-    .map((attr) => ` ${characterData.name} has ${attr.value}.`)
-    .join('');
   context += `The responses from ${characterData.name} shoud include the description of how they feel or what is the character doing at that moment in between asterisks (*)`;
+  context += `\nRPBT: Can you give me the character attributes for ${characterData.name}?\n`;
+  context += `\Player: Yes. These are the following:\n`;
+  context += characterData.attributes
+    .map((attr) => ` ${attr.key}: ${attr.value}\n`)
+    .join('');
+  context += `\nRPBT: Can you give me some conversation example?\n`
+  context += `\nPlayer: Yes, here are some examples:\n`
+  context += characterData.sampleConversation.replaceAll(`${characterData.name}:`, `${characterData.name}:`).replaceAll('You:', 'Anon:');
+  context += `\nPlayer: Those are the conversation examples.\n`
   context += `\nRPBT: Ok, I'll play as ${characterData.name} and you will play as "Anon".\n`
-  context += characterData.sampleConversation.replaceAll(`${characterData.name}:`, `RPBT (${characterData.name}):`).replaceAll('You:', 'Anon:');
-
-  let initiator = `Anon: ${characterData.scenario}`;
+  let initiator = `Anon: ${characterData.scenario}\n`;
   initiator += characterData.greeting.replaceAll(`${characterData.name}:`, `RPBT (${characterData.name}):`).replaceAll('You:', 'Anon:');
 
   return {

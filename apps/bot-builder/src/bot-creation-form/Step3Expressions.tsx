@@ -107,6 +107,13 @@ const Step3Expressions: React.FC = () => {
           reader.onloadend = () => {
             const base64 = reader.result as string;
             const newGroups = [...characterData.emotionGroups];
+            const emotionHashConfig = emotionHashConfigs.find(
+              (config) => config.hash === newGroups[groupIndex].emotionsHash
+            );
+            if (emotionHashConfig?.emotionIds.includes(emotionId) === false) {
+              console.warn(`Invalid emotion id: ${emotionId}`)
+              return;
+            }
             const images = newGroups[groupIndex].images || [];
             const imageIndex = images.findIndex((img) => img.emotion === emotionId);
             if (imageIndex >= 0) {
@@ -121,6 +128,20 @@ const Step3Expressions: React.FC = () => {
         }
       } else {
         alert('Please upload an image with dimensions of 1024x1024 pixels in PNG or GIF format.');
+      }
+    }
+  };
+
+  const handleMultipleImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    groupIndex: number
+  ) => {
+    const files = event.target.files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const emotionId = file.name.split('.')[0];
+        handleImageChange(file, groupIndex, emotionId);
       }
     }
   };
@@ -140,7 +161,7 @@ const Step3Expressions: React.FC = () => {
       return placeholderImage;
     }
   };
-  
+
   const renderEmotionGroups = () => {
     if (!characterData.emotionGroups) return null;
 
@@ -207,6 +228,14 @@ const Step3Expressions: React.FC = () => {
               name="trigger"
               value={group.trigger}
               onChange={(event) => handleInputChange(event, groupIndex)}
+            />
+          </div>
+          <div className="step3Expressions__formGroup">
+            <input
+              type="file"
+              multiple
+              accept="image/png, image/gif"
+              onChange={(event) => handleMultipleImageChange(event, groupIndex)}
             />
           </div>
           <div className="step3Expressions__formGroup">
