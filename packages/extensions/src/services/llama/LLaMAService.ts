@@ -10,7 +10,8 @@ export interface LLaMaServiceConfig extends Miku.Services.ServiceConfig {
 
 export const LLaMAServicePropTypes = {
   "model": PropTypes.oneOf(llamaModels),
-  "prompt": PropTypes.string
+  "prompt": PropTypes.string,
+  "gradioEndpoint": PropTypes.string
 }
 
 export class LLaMAService extends Miku.Services.Service {
@@ -18,7 +19,8 @@ export class LLaMAService extends Miku.Services.Service {
   private gradioEndpoint: string;
   protected defaultProps: InferProps<typeof LLaMAServicePropTypes>  = {
     "model": 'llama-30b',
-    "prompt": ''
+    "prompt": '',
+    "gradioEndpoint": ''
   };
 
   protected getPropTypes(): PropTypes.ValidationMap<any> {
@@ -34,7 +36,9 @@ export class LLaMAService extends Miku.Services.Service {
   protected async computeInput(input: InferProps<typeof this.propTypesRequired>): Promise<string> {
     const modelSettings = getLLaMAModelSettings(input.model);
     if (!modelSettings) return '';
-    const completion = await axios.post<{data: string}>(`${this.gradioEndpoint}/run/textgen`, {
+    let gradioEndpoint = this.gradioEndpoint;
+    if (input.gradioEndpoint) gradioEndpoint = input.gradioEndpoint;
+    const completion = await axios.post<{data: string}>(`${gradioEndpoint}/run/textgen`, {
       data: [
         input.prompt,
         modelSettings.max_new_tokens,
