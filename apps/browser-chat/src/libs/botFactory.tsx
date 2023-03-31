@@ -83,6 +83,14 @@ class BotFactory {
           memory: memory,
         });
         break;
+      case MikuExtensions.Services.ServicesNames.LLaMA:
+        chatPromptCompleter = new MikuExtensions.ChatPromptCompleters.LLaMAPromptCompleter({
+          serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+          props: props,
+          signer: signer,
+          memory: memory,
+        });
+        break;
     }
 
     if(!chatPromptCompleter) throw `Chat completer '${service}' not found`;
@@ -268,7 +276,7 @@ class BotFactory {
         return whisper.query(file);
       },
 
-      sendPrompt(text: string, type: number, subject: string = 'You'): {wait: Promise<void[]>, commandId: string} {
+      sendPrompt(text: string, type: number, subject: string = botConfig.subject): {wait: Promise<void[]>, commandId: string} {
         const { wait, commandId } = textWriter.emit({
           type,
           input: {

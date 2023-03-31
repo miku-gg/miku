@@ -30,7 +30,8 @@ pip --version >nul 2>&1 || (
 echo Pip is installed.
 
 echo Installing Node.js dependencies...
-call npm install -g pnpm
+del /q/s apps\browser-chat\node_modules\.vite > nul 2>&1 || exit
+call npm install -g pnpm 0
 call pnpm install
 if errorlevel 1 (
     echo ERROR: Failed to install dependencies.

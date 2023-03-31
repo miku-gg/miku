@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'url'
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import plainText from 'vite-plugin-plain-text';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -8,7 +9,8 @@ export default defineConfig({
     port: 8586,
   },
   plugins: [
-    react()
+    react(),
+    plainText([/\/LICENSE$/, '**/*.text', /\.glsl$/]),
   ],
   define: {
     'setImmediate': 'setTimeout.bind(null)',
