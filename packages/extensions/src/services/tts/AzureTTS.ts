@@ -21,18 +21,7 @@ export class AzureTTSService extends TTSService {
   }
 
   protected override async computeInput(input: InferProps<typeof TTSServicePropTypes>, tries = 0): Promise<string> {
-    // const speakingStyle: string = {
-    //   "happy": "cheerful",
-    //   "sad": "sad",
-    //   "neutral": "friendly",
-    //   "angry": "angry",
-    //   "confused": "neutral",
-    //   "surprised": "cheerful",
-    //   "disgusted": "unfriendly",
-    //   "fearful": "terrified",
-    //   "unchanged": "friendly",
-    // }[input.mood || 'neutral'] || 'neutral';
-    const speakingStyle = 'cheerful';
+    const speakingStyle = input.emotion || 'default';
     const langExpression = {
       'en': 'en-US',
       'es': 'es-CO',
