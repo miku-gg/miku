@@ -6,6 +6,7 @@ import botFactory from "./botFactory";
 
 const playAudio = (base64: string): void => {
   const snd = new Audio(base64);
+  snd.playbackRate = 1.25;
   snd.play();
 }
 
@@ -86,6 +87,12 @@ export const InteractiveResponsesContextProvider = ({ children }: {children: JSX
     bot?.subscribeDialog((output) => {
       fillResponse(output.commandId, 'text', output.text);
       fillResponse(output.commandId, 'emotion', output.imgHash);
+      onUpdate();
+    });
+
+    bot?.subscribePromptSentError((commandId) => {
+      setResponseIds(responseIds => responseIds.filter(id => id !== commandId));
+      setResponseIndex(0);
       onUpdate();
     });
     

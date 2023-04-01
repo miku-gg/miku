@@ -6,8 +6,10 @@ export const validVoices = [
   'elevenlabs_tts.ErXwobaYiN019PkySvjV',
   'azure_tts.en-US-JennyNeural',
   'azure_tts.en-US-AriaNeural',
-  'azure_tts.en-US-SaraNeural',
+  'azure_tts.en-US-SaraNeural.whispering',
   'azure_tts.en-GB-SoniaNeural',
+  'azure_tts.en-US-JaneNeural.angry',
+  'azure_tts.en-US-JaneNeural.excited',
   'azure_tts.en-US-TonyNeural',
   'azure_tts.en-US-DavisNeural'
 ] as const;
@@ -34,13 +36,21 @@ export const voices: Record<Voice, { label: string; price: 'cheap' | 'normal' | 
     label: 'Aria (Azure)',
     price: 'cheap',
   },
-  'azure_tts.en-US-SaraNeural': {
+  'azure_tts.en-US-SaraNeural.whispering': {
     label: 'Sara (Azure)',
-    price: 'cheap',
+    price: 'cheap'
   },
   'azure_tts.en-GB-SoniaNeural': {
     label: 'Sonia (Azure)',
     price: 'cheap',
+  },
+  'azure_tts.en-US-JaneNeural.angry': {
+    label: 'Jane (Azure)',
+    price: 'cheap'
+  },
+  'azure_tts.en-US-JaneNeural.excited': {
+    label: 'Jane (Azure) - Excited',
+    price: 'cheap'
   },
   'elevenlabs_tts.TxGEqnHWrfWFTfGW9XjX': {
     label: 'Josh (ElevenLabs)',

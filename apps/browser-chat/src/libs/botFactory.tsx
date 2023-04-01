@@ -17,6 +17,7 @@ interface BotInstanceInterface {
   subscribeDialog(cb: (output: MikuExtensions.OutputListeners.EmotionRendererOutput) => void): void;
   subscribeAudio(cb: (base64: string, command: MikuCore.OutputListeners.OutputEnvironment) => void): void;
   subscribePromptSent(cb: (command: MikuCore.Commands.Command) => void): () => void;
+  subscribePromptSentError(cb: (commandId: string) => void): () => void;
   speechToText(audioFile: Blob): Promise<string>;
   sendPrompt(text: string, type: number, subject?: string): {wait: Promise<void[]>, commandId: string};
   getCurrentPrompt(): string;
@@ -233,6 +234,7 @@ class BotFactory {
         dialogOutputListeners,
       },
     });
+    const promptSentErrorCallbacks: ((commandId: string) => void)[] = [];
 
     return {
       subscribeContextChangeSuggestion(
@@ -276,6 +278,13 @@ class BotFactory {
         return textWriter.subscribe(cb);
       },
 
+      subscribePromptSentError(cb: (commandId: string) => void): () => void {
+        promptSentErrorCallbacks.push(cb)
+        return () => {
+          promptSentErrorCallbacks.splice(promptSentErrorCallbacks.indexOf(cb), 1);
+        };
+      },
+
       async speechToText(file: Blob): Promise<string> {
         return whisper.query(file);
       },
@@ -291,6 +300,7 @@ class BotFactory {
         return {
           wait: wait.catch((error) => {
             toast.error('Error sending prompt');
+            promptSentErrorCallbacks.forEach(cb => cb(commandId));
             throw error;
           }),
           commandId,
