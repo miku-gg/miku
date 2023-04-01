@@ -9,6 +9,7 @@ export const validVoices = [
   'azure_tts.en-US-SaraNeural.whispering',
   'azure_tts.en-GB-SoniaNeural',
   'azure_tts.en-US-JaneNeural.angry',
+  'azure_tts.en-US-JaneNeural.excited',
   'azure_tts.en-US-TonyNeural',
   'azure_tts.en-US-DavisNeural'
 ] as const;
@@ -45,6 +46,10 @@ export const voices: Record<Voice, { label: string; price: 'cheap' | 'normal' | 
   },
   'azure_tts.en-US-JaneNeural.angry': {
     label: 'Jane (Azure)',
+    price: 'cheap'
+  },
+  'azure_tts.en-US-JaneNeural.excited': {
+    label: 'Jane (Azure) - Excited',
     price: 'cheap'
   },
   'elevenlabs_tts.TxGEqnHWrfWFTfGW9XjX': {
