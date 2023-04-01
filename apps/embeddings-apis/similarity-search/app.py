@@ -32,7 +32,7 @@ def find_similarity():
   content = request.get_json()
   embeddings_file_hash = content["embeddings_file_hash"]
   text = content["text"]
-  limit = 10
+  limit = content["limit"] or 10
   text_embedding = model.encode([text], convert_to_tensor=True)
   file_path = './_temp/' + embeddings_file_hash + '.csv'
   wget.download(DB_ENDPOINT + "/" + embeddings_file_hash, file_path)

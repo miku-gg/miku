@@ -1,10 +1,10 @@
 {
 	"max_new_tokens": 50,
 	"do_sample": true,
-	"temperature": 0.7,
+	"temperature": 0.8,
 	"top_p": 0.18,
 	"typical_p": 1,
-	"repetition_penalty": 1.15,
+	"repetition_penalty": 1.2,
 	"encoder_repetition_penalty": 1,
 	"top_k": 40,
 	"min_length": 1,

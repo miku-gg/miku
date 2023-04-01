@@ -85,7 +85,7 @@ export const BotDisplay = () => {
         bot.changeContext(contextSuggestion);
         setCurrentContext(contextSuggestion);
         // @ts-ignore
-        bot.sendPrompt(`*${context.context_change_trigger}*`, MikuCore.Commands.CommandType.DIALOG, botConfig?.short_term_memory.props?.botSubject);
+        bot.sendPrompt(`*I notice that ${context.context_change_trigger}*`, MikuCore.Commands.CommandType.DIALOG);
       }
     }
   }

@@ -103,17 +103,20 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
     }
 
     let nextContext = context;
+    let shouldContextChange = false;
 
     // figure out if we need to change context
-    const { similarities: contextChangeSimilarities } = await this.similarityAPI.searchSimilarities({
-      text: completePrompt,
-      embeddingsHash: CONTEXT_CHANGE_EMBEDDINGS_HASH,
-      topK: 5,
-    });
-
-    const shouldContextChange = contextChangeSimilarities.reduce((acc, similarity) => {
-      return acc && similarity.score > 0.30;
-    }, true);
+    if (contexts.length > 1) {
+      const { similarities: contextChangeSimilarities } = await this.similarityAPI.searchSimilarities({
+        text: completePrompt,
+        embeddingsHash: CONTEXT_CHANGE_EMBEDDINGS_HASH,
+        topK: 5,
+      });
+  
+      shouldContextChange =  contextChangeSimilarities.slice(0, 5).reduce((acc, similarity) => {
+        return acc && similarity.score > 0.28;
+      }, true);
+    }
 
     // if we need to change context, we need to find the new context
     if (shouldContextChange) {
