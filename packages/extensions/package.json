@@ -7,6 +7,10 @@
     "url": "https://github.com/miku-gg/miku.git",
     "directory": "packages/extensions"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -46,5 +50,5 @@
     "openai": "^3.2.1",
     "prop-types": "^15.8.1"
   },
-  "gitHead": "95f9e6d28ef62c3ca3b5e670f461fe76d2e649d8"
+  "gitHead": "ab4437d4ceef72a398055f6cd1a2677be89ddc85"
 }

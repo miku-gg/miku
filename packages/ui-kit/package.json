@@ -7,6 +7,10 @@
     "url": "https://github.com/miku-gg/miku.git",
     "directory": "packages/extensions"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "main": "build/index.js",
   "module": "build/index.es.js",
@@ -67,5 +71,5 @@
     "@bem-react/classnames": "^1.3.10",
     "tslib": "^2.5.0"
   },
-  "gitHead": "95f9e6d28ef62c3ca3b5e670f461fe76d2e649d8"
+  "gitHead": "ab4437d4ceef72a398055f6cd1a2677be89ddc85"
 }

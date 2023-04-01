@@ -7,6 +7,10 @@
     "url": "https://github.com/miku-gg/miku.git",
     "directory": "packages/core"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -44,5 +48,5 @@
     "utf8": "^3.0.0",
     "uuid": "^9.0.0"
   },
-  "gitHead": "95f9e6d28ef62c3ca3b5e670f461fe76d2e649d8"
+  "gitHead": "ab4437d4ceef72a398055f6cd1a2677be89ddc85"
 }
