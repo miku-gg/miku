@@ -88,14 +88,25 @@ export abstract class ChatPromptCompleter {
   ): Promise<OutputEnvironment> {
     this.memory.pushMemory(Commands.commandToMemoryLine(command));
 
-    const promptResult = await this.completePrompt(this.memory);
-    const output = await this.handleCompletionOutput(promptResult, command);
-    this.memory.pushMemory({
-      type: Commands.CommandType.DIALOG,
-      text: output.text,
-      subject: this.memory.getBotSubject()
-    });
-    return output;
+    try {
+      const promptResult = await this.completePrompt(this.memory);
+      const output = await this.handleCompletionOutput(promptResult, command);
+      this.memory.pushMemory({
+        type: Commands.CommandType.DIALOG,
+        text: output.text,
+        subject: this.memory.getBotSubject()
+      });
+      return output;  
+    } catch (error) {
+      const memories = this.memory.getMemory();
+      this.memory.clearMemories();
+      memories.forEach((memory, index) => {
+        if (index < memories.length - 1) {
+          this.memory.pushMemory(memory);
+        }
+      });
+      throw error;
+    }
   }
 
   /**

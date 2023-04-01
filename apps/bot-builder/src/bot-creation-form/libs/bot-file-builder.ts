@@ -2,6 +2,8 @@ import { CharacterData } from "./CharacterData";
 import { downloadBlob, generateZipFile } from "./file-download";
 import { emotionGroupsEmbedder } from "./file-embedder";
 import { hashBase64, hashBase64URI } from "./utils";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { plainText as RPBT } from '../data/RBPT.text';
 
 export enum BUILDING_STEPS {
@@ -48,14 +50,15 @@ const generatePromptRPBT = (characterData: CharacterData): {context: string, ini
   context += `\nRPBT: Can you give me the character attributes for ${characterData.name}?\n`;
   context += `\Player: Yes. These are the following:\n`;
   context += characterData.attributes
-    .map((attr) => ` ${attr.key}: ${attr.value}\n`)
+    .map((attr) => `(${attr.key} = ${attr.value})\n`)
     .join('');
   context += `\nRPBT: Can you give me some conversation example?\n`
   context += `\nPlayer: Yes, here are some examples:\n`
-  context += characterData.sampleConversation.replaceAll(`${characterData.name}:`, `${characterData.name}:`).replaceAll('You:', 'Anon:');
+  context += characterData.sampleConversation.replaceAll(`${characterData.name}:`, `RPBT (${characterData.name}):`).replaceAll('You:', 'Anon:');
   context += `\nPlayer: Those are the conversation examples.\n`
-  context += `\nRPBT: Ok, I'll play as ${characterData.name} and you will play as "Anon".\n`
-  let initiator = `Anon: ${characterData.scenario}\n`;
+  context += `\nRPBT: What is the current scenario?.\n`
+  let initiator = `Player: ${characterData.scenario}\n`;
+  context += `\nRPBT: Ok, I'll play as "${characterData.name}" and you will play as "Anon".\n`
   initiator += characterData.greeting.replaceAll(`${characterData.name}:`, `RPBT (${characterData.name}):`).replaceAll('You:', 'Anon:');
 
   return {
@@ -97,7 +100,6 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
   );
 
   const {context, initiator, botSubject, subject} = generatePrompts(characterData);
-
   
   let modelService = 'openai_completer';
   switch (characterData.model) {
@@ -111,7 +113,7 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
       modelService = 'llama_completer';
       break;
   }
-  const [voiceService, voiceId] = characterData.voice.split('.')
+  const [voiceService, voiceId, emotion] = characterData.voice.split('.')
 
   // Map character data to the desired JSON structure
   const characterConfig = {
@@ -144,6 +146,7 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
         service: voiceService,
         props: {
           voiceId: voiceId,
+          emotion: emotion || 'chat'
         },
       },
       {

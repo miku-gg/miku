@@ -15,6 +15,11 @@ def main():
     browser_chat_env_file_path = os.path.join(os.getcwd(), "apps", "browser-chat", ".env")
     shutil.copyfile(env_file_path, browser_chat_env_file_path)
 
+    # remove .vite
+    browser_chat_vite_cache = os.path.join(os.getcwd(), "apps", "browser-chat", "node_modules", ".vite")
+    if os.path.exists(browser_chat_vite_cache):
+        shutil.rmtree(browser_chat_vite_cache)
+
     # Start the pnpm servers
     pnpm_process = subprocess.Popen([pnpm_path, "start"])
 
