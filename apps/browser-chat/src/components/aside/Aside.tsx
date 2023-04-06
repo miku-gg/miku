@@ -5,9 +5,13 @@ import { useBot } from "../../libs/botLoader";
 import { PopUp } from "../pup-up/pup-up";
 import { BotDetails } from "../bot-details/BotDetails";
 import { toast } from "react-toastify";
-import { HistoryConsole, HistoryManagementButtons } from "../chat-history/chat-history";
+import {
+  HistoryConsole,
+  HistoryManagementButtons,
+} from "../chat-history/chat-history";
 import { DropDown } from "../dropdown/Dropdown";
 import { MuteIcon, PlayIcon } from "@primer/octicons-react";
+import { BotSettings } from "../bot-settings/BotSettings";
 
 interface CustomAudioPlayerProps {
   src: string;
@@ -40,16 +44,18 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({ src }) => {
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.play().catch((error) => {
-        console.error('Autoplay error:', error);
+        console.error("Autoplay error:", error);
         setPlaying(false);
       });
     }
-  }, [src])
+  }, [src]);
 
   return (
     <div className="custom-audio-player">
       <audio ref={audioRef} src={src} autoPlay loop />
-      <button onClick={togglePlay}>{playing ? <MuteIcon /> : <PlayIcon />}</button>
+      <button onClick={togglePlay}>
+        {playing ? <MuteIcon /> : <PlayIcon />}
+      </button>
       <input
         type="range"
         min="0"
@@ -62,7 +68,6 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({ src }) => {
   );
 };
 
-
 export default CustomAudioPlayer;
 
 export const Aside = () => {
@@ -71,16 +76,17 @@ export const Aside = () => {
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
   const [chatHistoryToggle, setChatHistoryToggle] = useState<boolean>(true);
   const [handleBotDetails, setHandleBotDetails] = useState<boolean>(false);
+  const [handleBotSettings, setHandleBotSettings] = useState<boolean>(false);
   const musicPieces = [
-    'devonshire',
-    'folk_round',
-    'lobby',
-    'yumemi',
-    'waltz',
-    'gymnopedie',
-    'calmant',
-    'canon_d',
-    'air_prelude',
+    "devonshire",
+    "folk_round",
+    "lobby",
+    "yumemi",
+    "waltz",
+    "gymnopedie",
+    "calmant",
+    "canon_d",
+    "air_prelude",
   ];
   const [musicIndex, setMusicIndex] = useState<number>(0);
 
@@ -96,6 +102,10 @@ export const Aside = () => {
 
   const displayBotDetails = () => {
     setHandleBotDetails(true);
+  };
+
+  const displayBotSettings = () => {
+    setHandleBotSettings(true);
   };
 
   return (
@@ -124,7 +134,22 @@ export const Aside = () => {
               >
                 Bot details
               </button>
-              <button className="button-purple min-w-[10em]" onClick={() => toast.warn("Feature not available yet. Please read the docs to do it manually.")}>Load bot</button>
+              <button
+                className="button-purple min-w-[10em]"
+                onClick={() =>
+                  toast.warn(
+                    "Feature not available yet. Please read the docs to do it manually."
+                  )
+                }
+              >
+                Load bot
+              </button>
+              <button
+                className="button-transparent min-w-[10em]"
+                onClick={displayBotSettings}
+              >
+                Settings
+              </button>
             </div>
             {/* USERNAME // TOKENS */}
             <div className="h-full w-auto text-right pr-2">
@@ -159,6 +184,22 @@ export const Aside = () => {
         darkTheme
       >
         <BotDetails />
+      </PopUp>
+      <PopUp
+        closePopUpFunction={() => setHandleBotSettings(false)}
+        isShowingPupUp={handleBotSettings}
+        className="w-6/12"
+        darkTheme
+        footer={
+          <button
+            className="button-purple min-w-[10em]"
+            onClick={() => setHandleBotSettings(false)}
+          >
+            Save
+          </button>
+        }
+      >
+        <BotSettings />
       </PopUp>
     </>
   );
