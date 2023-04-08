@@ -1,13 +1,33 @@
 
 import * as MikuCore from '@mikugg/core';
 
-export interface GPTShortTermMemoryConfig extends MikuCore.Memory.MemoryPromptConfig {
+export interface ContextPromptParts {
+  persona: string
+  attributes: [string, string][]
+  sampleChat: string[]
+  scenario: string
+  greeting: string
+  botSubject: string;
+  subject: string;
+}
+
+export abstract class ContextPromptBuildStrategy {
+  abstract buildContextPrompt(parts: ContextPromptParts): string
+  abstract buildInitiatorPrompt(parts: ContextPromptParts): string
+}
+
+export interface ShortTermMemoryV2Config extends MikuCore.Memory.MemoryPromptConfig {
+  persona: string
+  attributes: string[]
+  sampleChat: string[]
+  scenario: string
+  greeting: string
   language: MikuCore.ChatPromptCompleters.Language;
 }
 
-export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
+export class ShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
 
-  constructor({prompt_context, prompt_initiator, subjects, botSubject}: GPTShortTermMemoryConfig, memorySize = 25) {
+  constructor({prompt_context, prompt_initiator, subjects, botSubject}: ShortTermMemoryV2Config, memorySize = 25) {
     super({
       prompt_context: prompt_context,
       prompt_initiator: prompt_initiator,
@@ -46,7 +66,7 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
   }
 
   public buildMemoryPrompt() {
-    let prompt = this.getContextPrompt();
+    let prompt = this.basePrompt;
     prompt += this.buildMemoryLinesPrompt();
     prompt += `\n${this.botSubject}:`;
     for(let i = 0; i < 10; i++) prompt = prompt.replace(/\n\n/g, '\n');
