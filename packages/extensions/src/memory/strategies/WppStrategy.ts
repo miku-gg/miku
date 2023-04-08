@@ -1,13 +1,13 @@
-import { ContextPromptBuildStrategy, ContextPromptParts } from '../MemoryV2';
+import { ContextPromptBuildStrategy, ContextPromptParts } from '../GPTMemoryV2';
 
-export class WppStrategy extends ContextPromptBuildStrategy {
+import { replaceAll } from './RPBTStrategy';
+
+export class WppStrategy implements ContextPromptBuildStrategy {
   buildContextPrompt(parts: ContextPromptParts): string {
-    // Implementation for WppStrategy
-    // Here you can customize how the context prompt is built for WppStrategy
-    const { persona, attributes, sampleChat, scenario, greeting, botSubject } = parts;
+    const { persona, attributes, sampleChat, scenario, botSubject } = parts;
 
     const formattedAttributes = attributes
-    .map(([key, value]) =>  `${key}(${value.replaceAll(',', ' + ')})})`)
+    .map(([key, value]) =>  `${key}(${replaceAll(value, ',', ' + ')})})`)
     .join(', ');
 
     return `[character("${botSubject}")] {\n${formattedAttributes}\nDescription(${persona})\n}\n[EXAMPLE DIALOGE]${sampleChat.join(' ')}\n[Roleplay Start]\n${scenario}`;
@@ -16,5 +16,9 @@ export class WppStrategy extends ContextPromptBuildStrategy {
   buildInitiatorPrompt(parts: ContextPromptParts): string {
     const { greeting } = parts;
     return greeting;
+  }
+
+  getBotSubject(parts: ContextPromptParts): string {
+    return parts.botSubject;
   }
 }

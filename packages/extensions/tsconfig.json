@@ -11,10 +11,7 @@
   "declarationMap": true,
   "declaration": true,
   "outDir": "./dist",
-  "strict": true,
-  "lib": [
-    "ES2021.String"
-  ]
+  "strict": true
 },
 "include": ["src"],
 "exclude": ["node_modules", "dist", "**/__tests__/*"]

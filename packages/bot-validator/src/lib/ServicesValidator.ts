@@ -69,5 +69,16 @@ servicesValidator.addService(
     "botSubject": PropTypes.string,
   }
 );
+servicesValidator.addService(
+  MikuExtensions.Services.ServicesNames.GPTShortTermMemoryV2,
+  {
+    "prompt_context": PropTypes.string,
+    "prompt_initiator": PropTypes.string,
+    "language": PropTypes.oneOf(['en', 'es']),
+    "subjects": PropTypes.arrayOf(PropTypes.string),
+    "botSubject": PropTypes.string,
+    "buildStrategySlug": PropTypes.string
+  }
+);
 
 export default servicesValidator;

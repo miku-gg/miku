@@ -2,80 +2,12 @@ import { CharacterData } from "./CharacterData";
 import { downloadBlob, generateZipFile } from "./file-download";
 import { emotionGroupsEmbedder } from "./file-embedder";
 import { hashBase64, hashBase64URI } from "./utils";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { plainText as RPBT } from '../data/RBPT.text';
 
 export enum BUILDING_STEPS {
   STEP_0_NOT_BUILDING = 0,
   STEP_1_GENERATING_EMBEDDINGS = 1,
   STEP_2_GENERATING_ZIP = 2,
   STEP_3_DOWNLOADING_ZIP = 3,
-}
-
-const generatePromptsStandard = (characterData: CharacterData): {context: string, initiator: string, botSubject: string, subject: string} => {
-  const characterAttributes = characterData.attributes
-    .map((attr) => `${attr.key}('${attr.value}')`)
-    .join("");
-
-  const characterDescription =
-    characterData.description && characterData.description.trim()
-      ? `Description('${characterData.description}')`
-      : "";
-
-  const characterPart = `[Character('${characterData.name}'){${characterAttributes}${characterDescription ? " + " + characterDescription : ""}}]`;
-
-  const exampleDialoguePart =
-    characterData.sampleConversation && characterData.sampleConversation.trim()
-      ? `[EXAMPLE DIALOGUE] ${characterData.sampleConversation}`
-      : "";
-
-  const roleplayStartPart =
-    characterData.greeting && characterData.greeting.trim()
-      ? `[Roleplay Start] ${characterData.greeting}`
-      : `[Roleplay Start]`;
-
-  return {
-    context: `${characterPart} ${exampleDialoguePart}`,
-    initiator: roleplayStartPart,
-    subject: 'You',
-    botSubject: characterData.name,
-  };
-};
-
-const generatePromptRPBT = (characterData: CharacterData): {context: string, initiator: string, botSubject: string, subject: string} => {
-  let context = RPBT;
-  context += `\nPlayer: You'll play as ${characterData.name}. ${characterData.description}`
-  context += `The responses from ${characterData.name} shoud include the description of how they feel or what is the character doing at that moment in between asterisks (*)`;
-  context += `\nRPBT: Can you give me the character attributes for ${characterData.name}?\n`;
-  context += `\Player: Yes. These are the following:\n`;
-  context += characterData.attributes
-    .map((attr) => `(${attr.key} = ${attr.value})\n`)
-    .join('');
-  context += `\nRPBT: Can you give me some conversation example?\n`
-  context += `\nPlayer: Yes, here are some examples:\n`
-  context += characterData.sampleConversation.replaceAll(`${characterData.name}:`, `RPBT (${characterData.name}):`).replaceAll('You:', 'Anon:');
-  context += `\nPlayer: Those are the conversation examples.\n`
-  context += `\nRPBT: What is the current scenario?.\n`
-  let initiator = `Player: ${characterData.scenario}\n`;
-  context += `\nRPBT: Ok, I'll play as "${characterData.name}" and you will play as "Anon".\n`
-  initiator += characterData.greeting.replaceAll(`${characterData.name}:`, `RPBT (${characterData.name}):`).replaceAll('You:', 'Anon:');
-
-  return {
-    context,
-    initiator,
-    subject: 'Anon',
-    botSubject: `RPBT (${characterData.name})`,
-  }
-}
-
-const generatePrompts = (characterData: CharacterData): {context: string, initiator: string, botSubject: string, subject: string} => {
-  switch (characterData.model) {
-    case 'llama-30b':
-      return generatePromptRPBT(characterData);
-    default:
-      return generatePromptsStandard(characterData);
-  }
 }
 
 export async function createCharacterConfig(characterData: CharacterData, emotionsEmbeddingsHash: string) {
@@ -98,8 +30,6 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
       return { name: emotionGroup.name, description: emotionGroup.description, emotions: hashes };
     })
   );
-
-  const {context, initiator, botSubject, subject} = generatePrompts(characterData);
   
   let modelService = 'openai_completer';
   switch (characterData.model) {
@@ -115,24 +45,35 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
   }
   const [voiceService, voiceId, emotion] = characterData.voice.split('.')
 
+  const buildStrategySlug = characterData.model === 'llama-30b' ? 'rpbt' : 'wpp';
+
   // Map character data to the desired JSON structure
   const characterConfig = {
     bot_name: characterData.name,
-    version: '1',
+    version: characterData.version,
     description: characterData.shortDescription,
     author: characterData.author,
     configVersion: 2,
-    subject,
+    subject: 'Anon',
     profile_pic: profilePicHash,
     backgrounds: backgroundHashes,
     short_term_memory: {
-      service: 'gpt_short-memory',
+      service: 'gpt_short-memory-v2',
       props: {
-        prompt_context: context,
-        prompt_initiator: initiator,
+        prompt_context: '',
+        prompt_initiator: '',
         language: 'en',
-        subjects: [subject],
-        botSubject: botSubject,
+        subjects: ['Anon'],
+        botSubject: characterData.name,
+        buildStrategySlug,
+        parts: {
+          persona: characterData.description,
+          attributes: characterData.attributes.map((attribute) => [attribute.key, attribute.value]),
+          sampleChat: characterData.sampleConversation.split('\n'),
+          scenario: characterData.scenario,
+          greeting: characterData.greeting,
+          botSubject: characterData.name
+        }
       },
     },
     prompt_completer: {

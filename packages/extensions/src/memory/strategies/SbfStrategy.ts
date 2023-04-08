@@ -1,10 +1,8 @@
-import { ContextPromptBuildStrategy, ContextPromptParts } from '../MemoryV2';
+import { ContextPromptBuildStrategy, ContextPromptParts } from '../GPTMemoryV2';
 
-export class SbfStrategy extends ContextPromptBuildStrategy {
+export class SbfStrategy implements ContextPromptBuildStrategy {
   buildContextPrompt(parts: ContextPromptParts): string {
-    // Implementation for SbfStrategy
-    // Here you can customize how the context prompt is built for SbfStrategy
-    const { persona, attributes, sampleChat, scenario, greeting, botSubject } = parts;
+    const { persona, attributes, sampleChat, scenario, botSubject } = parts;
 
     const formattedAttributes = attributes
       .map(([key, value]) => `${key}: ${value}`)
@@ -16,5 +14,9 @@ export class SbfStrategy extends ContextPromptBuildStrategy {
   buildInitiatorPrompt(parts: ContextPromptParts): string {
     const { greeting } = parts;
     return greeting;
+  }
+
+  getBotSubject(parts: ContextPromptParts): string {
+    return parts.botSubject;
   }
 }

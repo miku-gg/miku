@@ -46,6 +46,11 @@ class BotFactory {
           props as MikuExtensions.Memory.GPTShortTermMemoryConfig
         );
         break;
+      case MikuExtensions.Services.ServicesNames.GPTShortTermMemoryV2:
+        memory = new MikuExtensions.Memory.GPTShortTermMemoryV2(
+          props as MikuExtensions.Memory.GPTShortTermMemoryV2Config
+        );
+        break;
     }
 
     if(!memory) throw `Memory '${service}' not found`;

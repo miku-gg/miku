@@ -16,6 +16,7 @@ export enum ServicesNames {
   ElevenLabsTTS = "elevenlabs_tts",
   NovelAITTS = "novelai_tts",
   GPTShortTermMemory = "gpt_short-memory",
+  GPTShortTermMemoryV2 = "gpt_short-memory-v2",
   OpenAIEmotionInterpreter = "openai_emotion-interpreter",
   SBertEmotionInterpreter = "sbert_emotion-interpreter",
   WhisperSTT = "whisper_stt",

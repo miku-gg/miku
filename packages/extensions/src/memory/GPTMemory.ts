@@ -30,7 +30,7 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
   }
 
   public buildMemoryLinesPrompt(memorySize = this.memorySize): string {
-    let prompt = '';
+    let prompt = this.getInitiatorPrompt();
     for (let i = Math.max(this.memory.length - memorySize, 0); i < this.memory.length; i++) {
       const memoryText = this.memory[i].text.replace(/\n\n/g, '\n').replace(/\n/g, ' ');
       switch (this.memory[i].type) {
@@ -48,7 +48,7 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
   public buildMemoryPrompt() {
     let prompt = this.getContextPrompt();
     prompt += this.buildMemoryLinesPrompt();
-    prompt += `\n${this.botSubject}:`;
+    prompt += `\n${this.getBotSubject()}:`;
     for(let i = 0; i < 10; i++) prompt = prompt.replace(/\n\n/g, '\n');
 
     return prompt;
@@ -60,5 +60,9 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
 
   public getInitiatorPrompt(): string {
     return this.initiatorPrompt;
+  }
+
+  public override getBotSubject(): string {
+    return this.botSubject;
   }
 }
