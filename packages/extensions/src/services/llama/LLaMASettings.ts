@@ -16,6 +16,10 @@ export interface LLaMASettings {
 	"length_penalty": number,
 	"early_stopping": boolean,
 	"seed": number
+	"add_bos_token": boolean,
+	"custom_stopping_strings": string[],
+	"truncation_length": number,
+	"ban_eos_token": boolean
 }
 
 export const llamaModels = [
