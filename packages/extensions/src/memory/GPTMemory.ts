@@ -1,5 +1,8 @@
 
 import * as MikuCore from '@mikugg/core';
+import GPT3Tokenizer from 'gpt3-tokenizer';
+
+const tokenizer = new GPT3Tokenizer({ type: 'gpt3' });
 
 export interface GPTShortTermMemoryConfig extends MikuCore.Memory.MemoryPromptConfig {
   language: MikuCore.ChatPromptCompleters.Language;
@@ -47,7 +50,20 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
 
   public buildMemoryPrompt() {
     let prompt = this.getContextPrompt();
-    prompt += this.buildMemoryLinesPrompt();
+    let memorySize = this.memorySize;
+    let memoryLinesPrompt = '';
+
+    // Entire prompt under 2048 tokens
+    const MAX_PROMPT_TOKENS = 1900;
+    do {
+      memoryLinesPrompt = this.buildMemoryLinesPrompt(memorySize--);
+    } while (
+      memorySize &&
+      memoryLinesPrompt.length > this.getInitiatorPrompt().length &&
+      tokenizer.encode(prompt + memoryLinesPrompt).bpe.length > MAX_PROMPT_TOKENS
+    );
+
+    prompt += memoryLinesPrompt;
     prompt += `\n${this.getBotSubject()}:`;
     for(let i = 0; i < 10; i++) prompt = prompt.replace(/\n\n/g, '\n');
 
