@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 const RangeInput: React.FC<{
-  label: string;
+  title: string;
   value: number;
   helperText?: string;
   min: number;
   max: number;
   step: number;
+  onInput: (index: number) => void;
 }> = (props) => {
   const [value, setValue] = useState<number>(props.value);
 
@@ -21,7 +22,9 @@ const RangeInput: React.FC<{
 
   const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(e.target.value);
+    props.onInput?.(newValue);
     setValue(newValue);
+
     updateRangeSliders();
   };
 
@@ -32,7 +35,7 @@ const RangeInput: React.FC<{
   return (
     <div className="relative pt-1">
       <ul className="w-full">
-        <label className="form-label block-block">{props.label}</label>
+        <label className="form-label block-block">{props.title}</label>
         <input
           className="float-right w-36 inline-block border border-[#7957D2] rounded-md outline-none bg-transparent"
           value={value}

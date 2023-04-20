@@ -6,11 +6,19 @@ const BoolInput: React.FC<{
   value: boolean;
   title: string;
   tooltip?: string;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onChange: (index: boolean) => void;
 }> = (props) => {
+  const [value, setValue] = useState<boolean>(props.value);
   return (
     <div className="flex items-center gap-1">
-      <input type="checkbox" checked={props.value} onChange={props.onChange} />
+      <input
+        type="checkbox"
+        checked={value}
+        onChange={() => {
+          props.onChange?.(!value);
+          setValue(!value);
+        }}
+      />
       {props.title}
       {props.tooltip ? (
         <Tooltip title={props.tooltip} placement="right">
