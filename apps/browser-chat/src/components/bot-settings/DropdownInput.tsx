@@ -21,7 +21,9 @@ const DropdownInput: React.FC<{
       <div className="ml-auto">
         <DropDown
           items={props.items}
-          onChange={props.onChange}
+          onChange={(i) => {
+            props.onChange(i);
+          }}
           selectedIndex={props.index}
           top={true}
         />

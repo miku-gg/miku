@@ -70,6 +70,8 @@ export const BotSettings = () => {
     botSettings.voiceGeneration
   );
 
+  const [completionModelIndex, setCompletionModelIndex] = useState<number>(0);
+
   let genSettings: chatGenSettings = {
     temp: 0.7,
     maxTokens: 200,
@@ -157,12 +159,15 @@ export const BotSettings = () => {
         ) : null}
         <DropdownInput
           title="Completion Model"
-          index={completionModels.indexOf(botSettings.completionModel)}
+          index={completionModelIndex}
           items={completionModels}
           tooltip={"What model is used to generate the text."}
-          onChange={(i) => (botSettings.completionModel = completionModels[i])}
+          onChange={(i) => {
+            botSettings.completionModel = completionModels[i];
+            setCompletionModelIndex(i);
+          }}
         />
-        {completionModels.indexOf(botSettings.completionModel) === 0 ? (
+        {completionModelIndex === 0 ? (
           <div className="flex flex-col gap-8">
             <RangeInput
               title="Max New Tokens"
@@ -321,7 +326,7 @@ export const BotSettings = () => {
             />
           </div>
         ) : null}
-        {completionModels.indexOf(botSettings.completionModel) === 1 ? (
+        {completionModelIndex === 1 ? (
           <div className="flex flex-col gap-8">
             <RangeInput
               title="Temperature"
@@ -352,7 +357,7 @@ export const BotSettings = () => {
             />
           </div>
         ) : null}
-        {completionModels.indexOf(botSettings.completionModel) === 2 ? (
+        {completionModelIndex === 2 ? (
           <div className="flex flex-col gap-8">
             <RangeInput
               title="Max New Tokens"
