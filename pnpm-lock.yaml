@@ -363,7 +363,7 @@ importers:
         specifier: ^0.3.4
         version: link:../core
       '@mikugg/extensions':
-        specifier: ^0.3.7
+        specifier: ^0.3.8
         version: link:../extensions
       '@types/node':
         specifier: ^18.15.5

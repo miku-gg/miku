@@ -5,6 +5,31 @@ import queryString from "query-string";
 
 const BOT_DIRECTORY_ENDPOINT = import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT || 'http://localhost:8585/bot';
 
+// interface BotDecorationParams {
+//   model: 
+//     'gpt3.5-turbo' |
+//     'gpt4' |
+//     'oa' |
+//     'llama-7b' |
+//     'llama-13b' |
+//     'llama-30b' |
+//     'llama-65b' |
+//     'alpaca-7b' |
+//     'alpaca-13b' |
+//     'vicuna-13b' |
+//     'gpt4all-7b' |
+//     'gpt4all-13b' |
+//     'gpt4-x-alpaca-7b' |
+//     'gpt4-x-alpaca-13b' |
+//     'pygmalion-6b',
+//   promptStrategy: 'wpp' | 'sbf' | 'rpbt' | 'miku' | 'assistant',
+//   ttsService: 'elevenlabs_tts' | 'azure_tts',
+//   ttsVoiceId: string,
+// }
+
+// function getBotConfigDecoratedWithParams(botConfig: BotConfig, params: BotDecorationParams): BotConfig {
+// }
+
 export function loadBotConfig(botHash: string): Promise<{
   success: boolean,
   bot?: BotConfig,
