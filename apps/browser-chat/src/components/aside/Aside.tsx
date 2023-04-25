@@ -12,6 +12,7 @@ import {
 import { DropDown } from "../dropdown/Dropdown";
 import { MuteIcon, PlayIcon } from "@primer/octicons-react";
 import { BotSettings } from "../bot-settings/BotSettings";
+import { BotSettingsFooter } from "../bot-settings/BotSettingsFooter";
 
 interface CustomAudioPlayerProps {
   src: string;
@@ -191,12 +192,7 @@ export const Aside = () => {
         className="w-6/12"
         darkTheme
         footer={
-          <button
-            className="button-purple min-w-[10em]"
-            onClick={() => setHandleBotSettings(false)}
-          >
-            Save
-          </button>
+          <BotSettingsFooter onClick={() => setHandleBotSettings(false)} />
         }
       >
         <BotSettings />

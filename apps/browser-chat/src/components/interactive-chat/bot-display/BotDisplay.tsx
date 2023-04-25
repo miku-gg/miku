@@ -24,6 +24,7 @@ import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
 import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
 import { BotSettings } from "../../bot-settings/BotSettings";
+import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT =
   import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
@@ -382,14 +383,7 @@ export const BotDisplay = () => {
         isShowingPupUp={showBotSettings}
         className="w-6/12"
         darkTheme
-        footer={
-          <button
-            className="button-purple min-w-[10em]"
-            onClick={() => setShowBotSettings(false)}
-          >
-            Save
-          </button>
-        }
+        footer={<BotSettingsFooter onClick={() => setShowBotSettings(false)} />}
       >
         <BotSettings />
       </PopUp>
