@@ -12,11 +12,13 @@ type mikuSettings = {
   sttModel: string;
   voiceGeneration: boolean;
   // completionModel: "LLaMA-30B" | "GPT-3.5 Turbo" | "Pygmalion";
-  completionModel: string;
+  modelService: string;
   // voiceModel: "ElevenLabs" | "Azure" | "Novel";
   voiceModel: string;
   voiceId: string;
   readNonSpokenText: boolean;
+  // llamaMode: "llama-7b" | "llama-13b" | "llama-30b" | "llama-65b" | "alpaca-7b" | "alpaca-13b" | "gpt4all-13b";
+  llamaModel: string;
 };
 
 type chatGenSettings = {
@@ -51,7 +53,16 @@ type chatGenSettings = {
 };
 
 export const BotSettings = () => {
-  const completionModels = ["LLaMA-30B", "GPT-3.5 Turbo", "Pygmalion"];
+  const modelServices = ["llama", "openai", "pygmalion"];
+  const llamaModels = [
+    "llama-7b",
+    "llama-13b",
+    "llama-30b",
+    "llama-65b",
+    "alpaca-7b",
+    "alpaca-13b",
+    "gpt4all-13b",
+  ];
   const promptMethods = ["RPBT", "Miku", "Pygmalion", "OpenAI"];
   const sttModels = ["Whisper"];
   const voiceModels = ["ElevenLabs", "Azure", "Novel"];
@@ -60,17 +71,18 @@ export const BotSettings = () => {
     promptMethod: "RPBT",
     sttModel: "Whisper",
     voiceGeneration: true,
-    completionModel: "LLaMA-30B",
+    modelService: "llama",
     voiceModel: "ElevenLabs",
     voiceId: "",
     readNonSpokenText: false,
+    llamaModel: "llama-30b",
   };
 
   const [voiceGeneration, setVoiceGeneration] = useState<boolean>(
     botSettings.voiceGeneration
   );
 
-  const [completionModelIndex, setCompletionModelIndex] = useState<number>(0);
+  const [modelServiceIndex, setServiceModelIndex] = useState<number>(0);
 
   let genSettings: chatGenSettings = {
     temp: 0.7,
@@ -158,20 +170,29 @@ export const BotSettings = () => {
           </div>
         ) : null}
         <DropdownInput
-          title="Completion Model"
-          index={completionModelIndex}
-          items={completionModels}
+          title="Model Service"
+          index={modelServiceIndex}
+          items={modelServices}
           tooltip={"What model is used to generate the text."}
           onChange={(i) => {
-            botSettings.completionModel = completionModels[i];
-            setCompletionModelIndex(i);
+            botSettings.modelService = modelServices[i];
+            setServiceModelIndex(i);
           }}
         />
-        {completionModelIndex === 0 ? (
+        {modelServiceIndex === 0 ? (
           <div className="flex flex-col gap-8">
+            <DropdownInput
+              title="LLaMA model"
+              index={llamaModels.indexOf(botSettings.llamaModel)}
+              items={llamaModels}
+              tooltip={"What llama model is used to generate the text."}
+              onChange={(i) => {
+                botSettings.llamaModel = llamaModels[i];
+              }}
+            />
             <RangeInput
               title="Max New Tokens"
-              helperText="Number of tokens the AI should generate. Higher numbers will take longer to generate. ${genSettings.maxTokens}"
+              helperText={`Number of tokens the AI should generate. Higher numbers will take longer to generate. ${genSettings.maxTokens}`}
               min={16}
               max={512}
               step={4}
@@ -326,7 +347,7 @@ export const BotSettings = () => {
             />
           </div>
         ) : null}
-        {completionModelIndex === 1 ? (
+        {modelServiceIndex === 1 ? (
           <div className="flex flex-col gap-8">
             <RangeInput
               title="Temperature"
@@ -357,7 +378,7 @@ export const BotSettings = () => {
             />
           </div>
         ) : null}
-        {completionModelIndex === 2 ? (
+        {modelServiceIndex === 2 ? (
           <div className="flex flex-col gap-8">
             <RangeInput
               title="Max New Tokens"
