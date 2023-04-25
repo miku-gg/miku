@@ -383,7 +383,7 @@ export const BotDisplay = () => {
         isShowingPupUp={showBotSettings}
         className="w-6/12"
         darkTheme
-        footer={<BotSettingsFooter onClick={() => setShowBotSettings(false)} />}
+        footer={<BotSettingsFooter />}
       >
         <BotSettings />
       </PopUp>

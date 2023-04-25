@@ -191,9 +191,7 @@ export const Aside = () => {
         isShowingPupUp={handleBotSettings}
         className="w-6/12"
         darkTheme
-        footer={
-          <BotSettingsFooter onClick={() => setHandleBotSettings(false)} />
-        }
+        footer={<BotSettingsFooter />}
       >
         <BotSettings />
       </PopUp>

@@ -1,7 +1,3 @@
-interface botSettingsFooterProps {
-  onClick: () => void;
-}
-
 const handleExport = () => {
   console.log("EXPORT");
 };
@@ -10,7 +6,7 @@ const handleImport = () => {
   console.log("Import");
 };
 
-export const BotSettingsFooter = ({ onClick }: botSettingsFooterProps) => {
+export const BotSettingsFooter = () => {
   return (
     <div className="flex gap-4 justify-center">
       <button
