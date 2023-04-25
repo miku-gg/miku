@@ -52,6 +52,46 @@ type chatGenSettings = {
   presencePenalty: number;
 };
 
+let botSettings: mikuSettings = {
+  promptMethod: "RPBT",
+  sttModel: "Whisper",
+  voiceGeneration: true,
+  modelService: "llama",
+  voiceModel: "ElevenLabs",
+  voiceId: "",
+  readNonSpokenText: false,
+  llamaModel: "llama-30b",
+};
+
+let genSettings: chatGenSettings = {
+  temp: 0.7,
+  maxTokens: 200,
+  topP: 0.5,
+  topK: 40,
+  typicalP: 1,
+  repetitionPenalty: 1.2,
+  encoderRepitionPenalty: 1,
+  noRepeatNgramSize: 0,
+  minLength: 0,
+  doSample: true,
+  seed: -1,
+  penaltyAlpha: 0,
+  numBeams: 1,
+  lengthPenalty: 1,
+  earlyStopping: false,
+  addBosToken: true,
+  banEosToken: false,
+  truncateLength: 2048,
+  stoppingStrings: "",
+  repetitionPenaltyRange: 1024,
+  repetitionPenaltySlope: 0.9,
+  topA: 0,
+  tailFreeSampling: 0.9,
+  order: [6, 0, 1, 2, 3, 4, 5],
+  frequencyPenalty: 0.7,
+  presencePenalty: 0.7,
+};
+
 export const BotSettings = () => {
   const modelServices = ["llama", "openai", "pygmalion"];
   const llamaModels = [
@@ -67,51 +107,11 @@ export const BotSettings = () => {
   const sttModels = ["Whisper"];
   const voiceModels = ["ElevenLabs", "Azure", "Novel"];
 
-  let botSettings: mikuSettings = {
-    promptMethod: "RPBT",
-    sttModel: "Whisper",
-    voiceGeneration: true,
-    modelService: "llama",
-    voiceModel: "ElevenLabs",
-    voiceId: "",
-    readNonSpokenText: false,
-    llamaModel: "llama-30b",
-  };
-
   const [voiceGeneration, setVoiceGeneration] = useState<boolean>(
     botSettings.voiceGeneration
   );
 
   const [modelServiceIndex, setServiceModelIndex] = useState<number>(0);
-
-  let genSettings: chatGenSettings = {
-    temp: 0.7,
-    maxTokens: 200,
-    topP: 0.5,
-    topK: 40,
-    typicalP: 1,
-    repetitionPenalty: 1.2,
-    encoderRepitionPenalty: 1,
-    noRepeatNgramSize: 0,
-    minLength: 0,
-    doSample: true,
-    seed: -1,
-    penaltyAlpha: 0,
-    numBeams: 1,
-    lengthPenalty: 1,
-    earlyStopping: false,
-    addBosToken: true,
-    banEosToken: false,
-    truncateLength: 2048,
-    stoppingStrings: "",
-    repetitionPenaltyRange: 1024,
-    repetitionPenaltySlope: 0.9,
-    topA: 0,
-    tailFreeSampling: 0.9,
-    order: [6, 0, 1, 2, 3, 4, 5],
-    frequencyPenalty: 0.7,
-    presencePenalty: 0.7,
-  };
 
   return (
     <>
