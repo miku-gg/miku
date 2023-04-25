@@ -17,6 +17,11 @@
   background: rgb(196 181 253);
 }
 
+.App .scrollbar {
+  scrollbar-color: rgb(167 139 250) transparent;
+  scrollbar-width: auto;
+}
+
 .button-transparent {
   transition: all 0.3s ease;
   border-radius: 0.375rem;
