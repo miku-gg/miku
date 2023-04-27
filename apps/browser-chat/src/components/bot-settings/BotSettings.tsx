@@ -162,6 +162,7 @@ export const BotSettings = () => {
               {voiceModels.indexOf(botSettings.voiceModel) === 0 ? (
                 <div className="ml-auto">
                   <TextInput
+                    title="Voice id."
                     value={voiceId}
                     placeholder="Voice id."
                     tooltip="What voice id to use."
@@ -289,7 +290,9 @@ export const BotSettings = () => {
             />
             <TextInput
               value={seed}
+              title="Seed"
               placeholder="-1 for random."
+              tooltip='Controls the "random" of the model. If you have the same seed, settings, and input you (should) get the same output.'
               onChange={(e) => {
                 genSettings.seed = parseInt(e.target.value);
                 setSeed(e.target.value);
@@ -350,7 +353,7 @@ export const BotSettings = () => {
             />
             <TextInput
               value={stoppingStrings}
-              placeholder="Custom stopping strings"
+              title="Custom stopping strings"
               tooltip={
                 'In addition to the defaults. Written between "" and separated by commas. For instance: "\nYour Assistant:", "\nThe assistant:"'
               }
@@ -517,6 +520,7 @@ export const BotSettings = () => {
             />
             <TextInput
               value={order}
+              title="Sampler Order"
               placeholder="Example: 6,0,1,2,3,4,5"
               tooltip="The order the different samplers (TopP, TopK, TypicalP, etc) are applied."
               onChange={(e) => {
