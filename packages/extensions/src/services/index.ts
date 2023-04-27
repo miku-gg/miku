@@ -1,9 +1,7 @@
 export * from "./openai/OpenAIPromptCompleterService";
 export * from "./openai/OpenAIEmotionInterpreter";
 export * from "./pygmalion/PygmalionService";
-export * from "./pygmalion/PygmalionSettings";
 export * from "./llama/LLaMAService";
-export * from "./llama/LLaMASettings";
 export * from "./stt/WhisperService";
 export * from "./sbert/SBertEmotionInterpreterService";
 export * as TTS from "./tts";

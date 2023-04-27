@@ -19,9 +19,11 @@ type mikuSettings = {
   readNonSpokenText: boolean;
   // llamaMode: "llama-7b" | "llama-13b" | "llama-30b" | "llama-65b" | "alpaca-7b" | "alpaca-13b" | "gpt4all-13b";
   llamaModel: string;
+  oldTopP: number;
 };
 
 type chatGenSettings = {
+  maxContextLength: number;
   temp: number;
   maxTokens: number;
   topP: number;
@@ -50,6 +52,7 @@ type chatGenSettings = {
 
   frequencyPenalty: number;
   presencePenalty: number;
+  oaiModel: string;
 };
 
 let botSettings: mikuSettings = {
@@ -61,9 +64,11 @@ let botSettings: mikuSettings = {
   voiceId: "",
   readNonSpokenText: false,
   llamaModel: "llama-30b",
+  oldTopP: 0.5,
 };
 
-let genSettings: chatGenSettings = {
+export let genSettings: chatGenSettings = {
+  maxContextLength: 2048,
   temp: 0.7,
   maxTokens: 200,
   topP: 0.5,
@@ -87,9 +92,10 @@ let genSettings: chatGenSettings = {
   repetitionPenaltySlope: 0.9,
   topA: 0,
   tailFreeSampling: 0.9,
-  order: [6, 0, 1, 2, 3, 4, 5],
+  order: [6, 0, 1, 2, 3, 4, 5], // allow user to change this somehow eventually:tm:
   frequencyPenalty: 0.7,
   presencePenalty: 0.7,
+  oaiModel: "gpt-3.5-turbo",
 };
 
 export const BotSettings = () => {
@@ -103,6 +109,7 @@ export const BotSettings = () => {
     "alpaca-13b",
     "gpt4all-13b",
   ];
+  const oaiModels = ["text-davinci-003", "gpt-3.5-turbo", "gpt-4"];
   const promptMethods = ["RPBT", "Miku", "Pygmalion", "OpenAI"];
   const sttModels = ["Whisper"];
   const voiceModels = ["ElevenLabs", "Azure", "Novel"];
@@ -176,6 +183,8 @@ export const BotSettings = () => {
           tooltip={"What model is used to generate the text."}
           onChange={(i) => {
             botSettings.modelService = modelServices[i];
+            if (i == 1 && genSettings.topP == 0.5) genSettings.topP = 1.0;
+            if (i != 1 && genSettings.topP == 1.0) genSettings.topP = 0.5;
             setServiceModelIndex(i);
           }}
         />
@@ -215,7 +224,10 @@ export const BotSettings = () => {
               max={1}
               step={0.01}
               value={genSettings.topP}
-              onInput={(value) => (genSettings.topP = value)}
+              onInput={(value) => {
+                genSettings.topP = value;
+                botSettings.oldTopP = value;
+              }}
             />
             <RangeInput
               title="Top K"
@@ -349,6 +361,15 @@ export const BotSettings = () => {
         ) : null}
         {modelServiceIndex === 1 ? (
           <div className="flex flex-col gap-8">
+            <DropdownInput
+              title="OpenAI model"
+              index={oaiModels.indexOf(genSettings.oaiModel)}
+              items={oaiModels}
+              tooltip={"What OpenAI model is used to generate the text."}
+              onChange={(i) => {
+                genSettings.oaiModel = oaiModels[i];
+              }}
+            />
             <RangeInput
               title="Temperature"
               helperText="Randomness of sampling. High values can increase creativity but may make text less sensible. Lower values will make text more predictable but can become repetitious."
@@ -376,10 +397,28 @@ export const BotSettings = () => {
               value={genSettings.presencePenalty}
               onInput={(value) => (genSettings.presencePenalty = value)}
             />
+            <RangeInput
+              title="Top P"
+              helperText="1 to disable. An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. We generally recommend altering this or temperature but not both."
+              min={0}
+              max={1}
+              step={0.01}
+              value={genSettings.topP}
+              onInput={(value) => (genSettings.topP = value)}
+            />
           </div>
         ) : null}
         {modelServiceIndex === 2 ? (
           <div className="flex flex-col gap-8">
+            <RangeInput
+              title="Max Context Length"
+              helperText="Maximum length the prompt can reach (in tokens) before truncation."
+              min={512}
+              max={2048}
+              step={8}
+              value={genSettings.maxContextLength}
+              onInput={(value) => (genSettings.maxContextLength = value)}
+            />
             <RangeInput
               title="Max New Tokens"
               helperText="Number of tokens the AI should generate. Higher numbers will take longer to generate."
@@ -405,7 +444,10 @@ export const BotSettings = () => {
               max={1}
               step={0.01}
               value={genSettings.topP}
-              onInput={(value) => (genSettings.topP = value)}
+              onInput={(value) => {
+                genSettings.topP = value;
+                botSettings.oldTopP = value;
+              }}
             />
             <RangeInput
               title="Top K"
