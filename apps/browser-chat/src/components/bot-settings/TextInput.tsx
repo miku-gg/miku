@@ -6,6 +6,7 @@ const TextInput: React.FC<{
   value: string;
   placeholder?: string;
   tooltip?: string;
+  disabled?: boolean;
   onChange: ChangeEventHandler<HTMLTextAreaElement>;
 }> = (props) => {
   return (
@@ -18,6 +19,7 @@ const TextInput: React.FC<{
         name="input-user-textarea"
         autoComplete="off"
         placeholder={props.placeholder}
+        disabled={props.disabled}
       />
       {props.tooltip ? (
         <Tooltip title={props.tooltip} placement="right">

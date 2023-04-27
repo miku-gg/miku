@@ -1,5 +1,5 @@
 import { DropDown } from "../dropdown/Dropdown";
-import { useState } from "react";
+import { useState, useReducer } from "react";
 import RangeInput from "./RangeInput";
 import BoolInput from "./BoolInput";
 import TextInput from "./TextInput";
@@ -17,8 +17,6 @@ type mikuSettings = {
   voiceModel: string;
   voiceId: string;
   readNonSpokenText: boolean;
-  // llamaMode: "llama-7b" | "llama-13b" | "llama-30b" | "llama-65b" | "alpaca-7b" | "alpaca-13b" | "gpt4all-13b";
-  llamaModel: string;
   oldTopP: number;
 };
 
@@ -63,7 +61,6 @@ let botSettings: mikuSettings = {
   voiceModel: "ElevenLabs",
   voiceId: "",
   readNonSpokenText: false,
-  llamaModel: "llama-30b",
   oldTopP: 0.5,
 };
 
@@ -99,16 +96,8 @@ export let genSettings: chatGenSettings = {
 };
 
 export const BotSettings = () => {
+  const [_, forceUpdate] = useReducer((x) => x + 1, 0);
   const modelServices = ["llama", "openai", "pygmalion"];
-  const llamaModels = [
-    "llama-7b",
-    "llama-13b",
-    "llama-30b",
-    "llama-65b",
-    "alpaca-7b",
-    "alpaca-13b",
-    "gpt4all-13b",
-  ];
   const oaiModels = ["text-davinci-003", "gpt-3.5-turbo", "gpt-4"];
   const promptMethods = ["RPBT", "Miku", "Pygmalion", "OpenAI"];
   const sttModels = ["Whisper"];
@@ -120,6 +109,13 @@ export const BotSettings = () => {
 
   const [modelServiceIndex, setServiceModelIndex] = useState<number>(0);
 
+  const [voiceId, setVoiceId] = useState<string>("");
+  const [order, setOrder] = useState<string>(genSettings.order.toString());
+  const [seed, setSeed] = useState<string>(genSettings.seed.toString());
+  const [stoppingStrings, setStoppingStrings] = useState<string>(
+    genSettings.stoppingStrings
+  );
+
   return (
     <>
       <p className="text-white text-2xl text-start m-4">Bot Settings</p>
@@ -130,14 +126,20 @@ export const BotSettings = () => {
           index={promptMethods.indexOf(botSettings.promptMethod)}
           items={promptMethods}
           tooltip="How the character definitions are sent to the model."
-          onChange={(i) => (botSettings.promptMethod = promptMethods[i])}
+          onChange={(i) => {
+            botSettings.promptMethod = promptMethods[i];
+            forceUpdate();
+          }}
         />
         <DropdownInput
           title="Speech-to-text"
           index={sttModels.indexOf(botSettings.sttModel)}
           items={sttModels}
           tooltip={"Used to turn your speech into text to prompt the model."}
-          onChange={(i) => (botSettings.sttModel = sttModels[i])}
+          onChange={(i) => {
+            botSettings.sttModel = sttModels[i];
+            forceUpdate();
+          }}
         />
         <BoolInput
           value={botSettings.voiceGeneration}
@@ -160,10 +162,13 @@ export const BotSettings = () => {
               {voiceModels.indexOf(botSettings.voiceModel) === 0 ? (
                 <div className="ml-auto">
                   <TextInput
-                    value={botSettings.voiceId}
+                    value={voiceId}
                     placeholder="Voice id."
                     tooltip="What voice id to use."
-                    onChange={(e) => (botSettings.voiceId = e.target.value)}
+                    onChange={(e) => {
+                      botSettings.voiceId = e.target.value;
+                      setVoiceId(e.target.value);
+                    }}
                   />
                 </div>
               ) : null}
@@ -190,15 +195,6 @@ export const BotSettings = () => {
         />
         {modelServiceIndex === 0 ? (
           <div className="flex flex-col gap-8">
-            <DropdownInput
-              title="LLaMA model"
-              index={llamaModels.indexOf(botSettings.llamaModel)}
-              items={llamaModels}
-              tooltip={"What llama model is used to generate the text."}
-              onChange={(i) => {
-                botSettings.llamaModel = llamaModels[i];
-              }}
-            />
             <RangeInput
               title="Max New Tokens"
               helperText={`Number of tokens the AI should generate. Higher numbers will take longer to generate. ${genSettings.maxTokens}`}
@@ -292,9 +288,12 @@ export const BotSettings = () => {
               onChange={(e) => (genSettings.doSample = e)}
             />
             <TextInput
-              value={genSettings.seed.toString()}
+              value={seed}
               placeholder="-1 for random."
-              onChange={(e) => (genSettings.seed = parseInt(e.target.value))}
+              onChange={(e) => {
+                genSettings.seed = parseInt(e.target.value);
+                setSeed(e.target.value);
+              }}
             />
             <RangeInput
               title="Penalty Alpha"
@@ -350,12 +349,15 @@ export const BotSettings = () => {
               onInput={(value) => (genSettings.truncateLength = value)}
             />
             <TextInput
-              value={genSettings.stoppingStrings}
+              value={stoppingStrings}
               placeholder="Custom stopping strings"
               tooltip={
                 'In addition to the defaults. Written between "" and separated by commas. For instance: "\nYour Assistant:", "\nThe assistant:"'
               }
-              onChange={(e) => (genSettings.stoppingStrings = e.target.value)}
+              onChange={(e) => {
+                genSettings.stoppingStrings = e.target.value;
+                setStoppingStrings(e.target.value);
+              }}
             />
           </div>
         ) : null}
@@ -368,6 +370,7 @@ export const BotSettings = () => {
               tooltip={"What OpenAI model is used to generate the text."}
               onChange={(i) => {
                 genSettings.oaiModel = oaiModels[i];
+                forceUpdate();
               }}
             />
             <RangeInput
@@ -511,6 +514,15 @@ export const BotSettings = () => {
               step={0.01}
               value={genSettings.repetitionPenaltySlope}
               onInput={(value) => (genSettings.repetitionPenaltySlope = value)}
+            />
+            <TextInput
+              value={order}
+              placeholder="Example: 6,0,1,2,3,4,5"
+              tooltip="The order the different samplers (TopP, TopK, TypicalP, etc) are applied."
+              onChange={(e) => {
+                setOrder(e.target.value);
+                genSettings.order = e.target.value.split(",").map(Number);
+              }}
             />
           </div>
         ) : null}
