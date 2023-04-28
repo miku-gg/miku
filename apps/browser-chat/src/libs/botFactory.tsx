@@ -37,6 +37,7 @@ interface BotInstanceInterface {
   ): { wait: Promise<void[]>; commandId: string };
   getCurrentPrompt(): string;
   getMemory(): MikuCore.Memory.ShortTermMemory;
+  getBotConfig(): BotConfig;
   computeCost(prompt: string, settings: string): Promise<number>;
 }
 
@@ -291,6 +292,9 @@ class BotFactory {
     const promptSentErrorCallbacks: ((commandId: string) => void)[] = [];
 
     return {
+      getBotConfig(): BotConfig {
+        return botConfig;
+      },
       subscribeContextChangeSuggestion(
         cb: (contextId: string) => void
       ): boolean {

@@ -1,9 +1,24 @@
 import { DropDown } from "../dropdown/Dropdown";
-import { useState, useReducer } from "react";
+import { useState, useReducer, useEffect } from "react";
 import RangeInput from "./RangeInput";
 import BoolInput from "./BoolInput";
 import TextInput from "./TextInput";
 import DropdownInput from "./DropdownInput";
+import { useBot } from "../../libs/botLoader";
+
+enum ServicesNames {
+  OpenAI = "openai_completer",
+  Pygmalion = "pygmalion_completer",
+  LLaMA = "llama_completer",
+  AzureTTS = "azure_tts",
+  ElevenLabsTTS = "elevenlabs_tts",
+  NovelAITTS = "novelai_tts",
+  GPTShortTermMemory = "gpt_short-memory",
+  GPTShortTermMemoryV2 = "gpt_short-memory-v2",
+  OpenAIEmotionInterpreter = "openai_emotion-interpreter",
+  SBertEmotionInterpreter = "sbert_emotion-interpreter",
+  WhisperSTT = "whisper_stt",
+}
 
 type mikuSettings = {
   // promptMethod: "RPBT" | "Miku" | "Pygmalion" | "OpenAI";
@@ -104,7 +119,6 @@ export const BotSettings = () => {
   const promptMethods = ["RPBT", "Miku", "Pygmalion", "OpenAI"];
   const sttModels = ["Whisper"];
   const voiceModels = ["ElevenLabs", "Azure", "Novel"];
-
   const [voiceGeneration, setVoiceGeneration] = useState<boolean>(
     botSettings.voiceGeneration
   );
@@ -117,6 +131,36 @@ export const BotSettings = () => {
   const [stoppingStrings, setStoppingStrings] = useState<string>(
     genSettings.stoppingStrings
   );
+
+  const { botConfig } = useBot();
+
+  useEffect(() => {
+    switch (botConfig?.prompt_completer.service) {
+      case ServicesNames.OpenAI: {
+        genSettings.topP = 1.0;
+        botSettings.modelService = "openai";
+        genSettings.oaiModel = JSON.parse(
+          // there's prolly a better way to do this but linter cries if u just do botConfig?.prompt_completer.props.model
+          JSON.stringify(botConfig?.prompt_completer.props)
+        ).model;
+        setServiceModelIndex(1);
+        break;
+      }
+      case ServicesNames.Pygmalion: {
+        botSettings.modelService = "pygmalion";
+        setServiceModelIndex(2);
+        break;
+      }
+      case ServicesNames.LLaMA: {
+        botSettings.modelService = "llama";
+        setServiceModelIndex(0);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, []);
 
   return (
     <>
@@ -191,8 +235,6 @@ export const BotSettings = () => {
           tooltip={"What model is used to generate the text."}
           onChange={(i) => {
             botSettings.modelService = modelServices[i];
-            if (i == 1 && genSettings.topP == 0.5) genSettings.topP = 1.0;
-            if (i != 1 && genSettings.topP == 1.0) genSettings.topP = 0.5;
             setServiceModelIndex(i);
           }}
         />

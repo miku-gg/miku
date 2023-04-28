@@ -23,7 +23,7 @@ import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
 import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
-import { BotSettings } from "../../bot-settings/BotSettings";
+import { BotSettings, genSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT =
@@ -186,7 +186,11 @@ export const BotDisplay = () => {
       });
       const result = botFactory
         .getInstance()
-        ?.sendPrompt(lastMemoryLine.text, lastMemoryLine.type);
+        ?.sendPrompt(
+          lastMemoryLine.text,
+          lastMemoryLine.type,
+          JSON.stringify(genSettings)
+        );
       if (result?.commandId) {
         setResponsesGenerated((_responsesGenerated) => {
           const responsesGenerated = [result.commandId, ..._responsesGenerated];

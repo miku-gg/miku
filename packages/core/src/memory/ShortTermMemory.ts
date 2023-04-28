@@ -3,8 +3,8 @@ import { Commands } from "..";
 export interface MemoryLine {
   text: string;
   subject: string;
-  settings: string;
   type: Commands.CommandType;
+  settings?: string;
 }
 
 /**
