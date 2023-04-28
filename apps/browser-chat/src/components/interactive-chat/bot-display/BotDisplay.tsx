@@ -23,8 +23,114 @@ import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
 import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
-import { BotSettings, genSettings } from "../../bot-settings/BotSettings";
+import { BotSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
+
+enum ServicesNames {
+  OpenAI = "openai_completer",
+  Pygmalion = "pygmalion_completer",
+  LLaMA = "llama_completer",
+  AzureTTS = "azure_tts",
+  ElevenLabsTTS = "elevenlabs_tts",
+  NovelAITTS = "novelai_tts",
+  GPTShortTermMemory = "gpt_short-memory",
+  GPTShortTermMemoryV2 = "gpt_short-memory-v2",
+  OpenAIEmotionInterpreter = "openai_emotion-interpreter",
+  SBertEmotionInterpreter = "sbert_emotion-interpreter",
+  WhisperSTT = "whisper_stt",
+}
+
+type mikuSettings = {
+  // promptMethod: "RPBT" | "Miku" | "Pygmalion" | "OpenAI";
+  promptMethod: string;
+  // sttModel: "Whisper";
+  sttModel: string;
+  voiceGeneration: boolean;
+  // completionModel: "LLaMA-30B" | "GPT-3.5 Turbo" | "Pygmalion";
+  modelService: string;
+  // voiceModel: "ElevenLabs" | "Azure" | "Novel";
+  voiceModel: string;
+  voiceId: string;
+  readNonSpokenText: boolean;
+  oldTopP: number;
+};
+
+type chatGenSettings = {
+  maxContextLength: number;
+  temp: number;
+  maxTokens: number;
+  topP: number;
+  topK: number;
+  typicalP: number;
+  repetitionPenalty: number;
+  encoderRepitionPenalty: number;
+  noRepeatNgramSize: number;
+  minLength: number;
+  doSample: boolean;
+  seed: number;
+  penaltyAlpha: number;
+  numBeams: number;
+  addBosToken: boolean;
+  banEosToken: boolean;
+  lengthPenalty: number;
+  earlyStopping: boolean;
+  truncateLength: number;
+  stoppingStrings: string;
+  skipSpecialTokens: boolean;
+
+  repetitionPenaltyRange: number;
+  repetitionPenaltySlope: number;
+  topA: number;
+  tailFreeSampling: number;
+  order: number[];
+
+  frequencyPenalty: number;
+  presencePenalty: number;
+  oaiModel: string;
+};
+
+export let botSettings: mikuSettings = {
+  promptMethod: "RPBT",
+  sttModel: "Whisper",
+  voiceGeneration: true,
+  modelService: "llama",
+  voiceModel: "ElevenLabs",
+  voiceId: "",
+  readNonSpokenText: false,
+  oldTopP: 0.5,
+};
+
+export let genSettings: chatGenSettings = {
+  maxContextLength: 2048,
+  temp: 0.7,
+  maxTokens: 200,
+  topP: 0.5,
+  topK: 40,
+  typicalP: 1,
+  repetitionPenalty: 1.2,
+  encoderRepitionPenalty: 1,
+  noRepeatNgramSize: 0,
+  minLength: 0,
+  doSample: true,
+  seed: -1,
+  penaltyAlpha: 0,
+  numBeams: 1,
+  lengthPenalty: 1,
+  earlyStopping: false,
+  addBosToken: true,
+  banEosToken: false,
+  truncateLength: 2048,
+  stoppingStrings: "",
+  skipSpecialTokens: true,
+  repetitionPenaltyRange: 1024,
+  repetitionPenaltySlope: 0.9,
+  topA: 0,
+  tailFreeSampling: 0.9,
+  order: [6, 0, 1, 2, 3, 4, 5], // allow user to change this somehow eventually:tm:
+  frequencyPenalty: 0.7,
+  presencePenalty: 0.7,
+  oaiModel: "gpt-3.5-turbo",
+};
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT =
   import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
@@ -114,6 +220,33 @@ export const BotDisplay = () => {
     }
 
     fetchFile();
+    setEmotionImgIsLoading(false);
+
+    switch (botConfig?.prompt_completer.service) {
+      case ServicesNames.OpenAI: {
+        genSettings.topP = 1.0;
+        botSettings.modelService = "openai";
+        genSettings.oaiModel = JSON.parse(
+          // there's prolly a better way to do this but linter cries if u just do botConfig?.prompt_completer.props.model
+          JSON.stringify(botConfig?.prompt_completer.props)
+        ).model;
+        console.log("COCK!!!");
+
+        break;
+      }
+      case ServicesNames.Pygmalion: {
+        botSettings.modelService = "pygmalion";
+        break;
+      }
+      case ServicesNames.LLaMA: {
+        botSettings.modelService = "llama";
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    console.log(`MIDRIFF!!! ${JSON.stringify(botConfig)}`);
   }, [emotionImage]);
 
   useEffect(() => {

@@ -5,114 +5,14 @@ import BoolInput from "./BoolInput";
 import TextInput from "./TextInput";
 import DropdownInput from "./DropdownInput";
 import { useBot } from "../../libs/botLoader";
-
-enum ServicesNames {
-  OpenAI = "openai_completer",
-  Pygmalion = "pygmalion_completer",
-  LLaMA = "llama_completer",
-  AzureTTS = "azure_tts",
-  ElevenLabsTTS = "elevenlabs_tts",
-  NovelAITTS = "novelai_tts",
-  GPTShortTermMemory = "gpt_short-memory",
-  GPTShortTermMemoryV2 = "gpt_short-memory-v2",
-  OpenAIEmotionInterpreter = "openai_emotion-interpreter",
-  SBertEmotionInterpreter = "sbert_emotion-interpreter",
-  WhisperSTT = "whisper_stt",
-}
-
-type mikuSettings = {
-  // promptMethod: "RPBT" | "Miku" | "Pygmalion" | "OpenAI";
-  promptMethod: string;
-  // sttModel: "Whisper";
-  sttModel: string;
-  voiceGeneration: boolean;
-  // completionModel: "LLaMA-30B" | "GPT-3.5 Turbo" | "Pygmalion";
-  modelService: string;
-  // voiceModel: "ElevenLabs" | "Azure" | "Novel";
-  voiceModel: string;
-  voiceId: string;
-  readNonSpokenText: boolean;
-  oldTopP: number;
-};
-
-type chatGenSettings = {
-  maxContextLength: number;
-  temp: number;
-  maxTokens: number;
-  topP: number;
-  topK: number;
-  typicalP: number;
-  repetitionPenalty: number;
-  encoderRepitionPenalty: number;
-  noRepeatNgramSize: number;
-  minLength: number;
-  doSample: boolean;
-  seed: number;
-  penaltyAlpha: number;
-  numBeams: number;
-  addBosToken: boolean;
-  banEosToken: boolean;
-  lengthPenalty: number;
-  earlyStopping: boolean;
-  truncateLength: number;
-  stoppingStrings: string;
-  skipSpecialTokens: boolean;
-
-  repetitionPenaltyRange: number;
-  repetitionPenaltySlope: number;
-  topA: number;
-  tailFreeSampling: number;
-  order: number[];
-
-  frequencyPenalty: number;
-  presencePenalty: number;
-  oaiModel: string;
-};
-
-let botSettings: mikuSettings = {
-  promptMethod: "RPBT",
-  sttModel: "Whisper",
-  voiceGeneration: true,
-  modelService: "llama",
-  voiceModel: "ElevenLabs",
-  voiceId: "",
-  readNonSpokenText: false,
-  oldTopP: 0.5,
-};
-
-export let genSettings: chatGenSettings = {
-  maxContextLength: 2048,
-  temp: 0.7,
-  maxTokens: 200,
-  topP: 0.5,
-  topK: 40,
-  typicalP: 1,
-  repetitionPenalty: 1.2,
-  encoderRepitionPenalty: 1,
-  noRepeatNgramSize: 0,
-  minLength: 0,
-  doSample: true,
-  seed: -1,
-  penaltyAlpha: 0,
-  numBeams: 1,
-  lengthPenalty: 1,
-  earlyStopping: false,
-  addBosToken: true,
-  banEosToken: false,
-  truncateLength: 2048,
-  stoppingStrings: "",
-  skipSpecialTokens: true,
-  repetitionPenaltyRange: 1024,
-  repetitionPenaltySlope: 0.9,
-  topA: 0,
-  tailFreeSampling: 0.9,
-  order: [6, 0, 1, 2, 3, 4, 5], // allow user to change this somehow eventually:tm:
-  frequencyPenalty: 0.7,
-  presencePenalty: 0.7,
-  oaiModel: "gpt-3.5-turbo",
-};
+import {
+  botSettings,
+  genSettings,
+} from "../interactive-chat/bot-display/BotDisplay";
 
 export const BotSettings = () => {
+  const { botConfig } = useBot();
+
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
   const modelServices = ["llama", "openai", "pygmalion"];
   const oaiModels = ["text-davinci-003", "gpt-3.5-turbo", "gpt-4"];
@@ -125,42 +25,16 @@ export const BotSettings = () => {
 
   const [modelServiceIndex, setServiceModelIndex] = useState<number>(0);
 
+  useEffect(() => {
+    setServiceModelIndex(modelServices.indexOf(botSettings.modelService)); // u cant just go useState<number>(modelServices.indexOf(botSettings.modelSerivce)) bc uhh actually idk y it just doesnt work
+  }, []);
+
   const [voiceId, setVoiceId] = useState<string>("");
   const [order, setOrder] = useState<string>(genSettings.order.toString());
   const [seed, setSeed] = useState<string>(genSettings.seed.toString());
   const [stoppingStrings, setStoppingStrings] = useState<string>(
     genSettings.stoppingStrings
   );
-
-  const { botConfig } = useBot();
-
-  useEffect(() => {
-    switch (botConfig?.prompt_completer.service) {
-      case ServicesNames.OpenAI: {
-        genSettings.topP = 1.0;
-        botSettings.modelService = "openai";
-        genSettings.oaiModel = JSON.parse(
-          // there's prolly a better way to do this but linter cries if u just do botConfig?.prompt_completer.props.model
-          JSON.stringify(botConfig?.prompt_completer.props)
-        ).model;
-        setServiceModelIndex(1);
-        break;
-      }
-      case ServicesNames.Pygmalion: {
-        botSettings.modelService = "pygmalion";
-        setServiceModelIndex(2);
-        break;
-      }
-      case ServicesNames.LLaMA: {
-        botSettings.modelService = "llama";
-        setServiceModelIndex(0);
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }, []);
 
   return (
     <>

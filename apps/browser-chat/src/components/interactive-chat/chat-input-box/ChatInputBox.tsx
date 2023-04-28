@@ -9,7 +9,7 @@ import "./ChatInputBox.css";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import queryString from "query-string";
 import { IS_ALPHA_LIVE } from "../../loading/BotLoadingModal";
-import { genSettings } from "../../bot-settings/BotSettings";
+import { genSettings } from "../bot-display/BotDisplay";
 
 export function SmallSpinner(): JSX.Element {
   return (
