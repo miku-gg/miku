@@ -41,6 +41,7 @@ type chatGenSettings = {
   earlyStopping: boolean;
   truncateLength: number;
   stoppingStrings: string;
+  skipSpecialTokens: boolean;
 
   repetitionPenaltyRange: number;
   repetitionPenaltySlope: number;
@@ -85,6 +86,7 @@ export let genSettings: chatGenSettings = {
   banEosToken: false,
   truncateLength: 2048,
   stoppingStrings: "",
+  skipSpecialTokens: true,
   repetitionPenaltyRange: 1024,
   repetitionPenaltySlope: 0.9,
   topA: 0,
@@ -361,6 +363,12 @@ export const BotSettings = () => {
                 genSettings.stoppingStrings = e.target.value;
                 setStoppingStrings(e.target.value);
               }}
+            />
+            <BoolInput
+              value={genSettings.skipSpecialTokens}
+              title="Skip special tokens"
+              tooltip="Some specific models need this unset."
+              onChange={(e) => (genSettings.skipSpecialTokens = e)}
             />
           </div>
         ) : null}
