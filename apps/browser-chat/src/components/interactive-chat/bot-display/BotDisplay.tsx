@@ -220,6 +220,7 @@ export const BotDisplay = () => {
         shortTermMemory.pushMemory({
           text,
           type: MikuCore.Commands.CommandType.DIALOG,
+          settings: JSON.stringify(genSettings),
           subject: shortTermMemory.getBotSubject(),
         });
       }
