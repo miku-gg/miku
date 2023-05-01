@@ -107,10 +107,9 @@ export const BotSettings = () => {
                         newConfig.outputListeners.voiceId = botSettings.voiceId;
                         break;
                     }
-
-                    // botFactory.updateInstance(newConfig);
-                    // updateBotConfig(newConfig);
-                    // setBotConfig(newConfig);
+                    botFactory.updateInstance(newConfig);
+                    setBotConfig(newConfig);
+                    updateHistoryNumber();
                   }
                 }}
                 top={true}

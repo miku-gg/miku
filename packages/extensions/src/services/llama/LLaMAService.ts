@@ -39,7 +39,7 @@ export class LLaMAService extends Miku.Services.Service {
     let gradioEndpoint = this.gradioEndpoint;
     if (input.gradioEndpoint) gradioEndpoint = input.gradioEndpoint;
     const completion = await axios.post<{ results: { text: string }[] }>(
-      `${gradioEndpoint}/run/textgen`,
+      `${gradioEndpoint}/v1/generate`,
       {
         prompt: input.prompt,
         max_new_tokens: modelSettings.maxTokens,
