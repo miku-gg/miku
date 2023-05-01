@@ -42,7 +42,7 @@ export enum ServicesNames {
 
 type mikuSettings = {
   // promptMethod: "RPBT" | "Miku" | "Pygmalion" | "OpenAI";
-  promptMethod: string;
+  promptStrategy: string;
   // sttModel: "Whisper";
   sttModel: string;
   voiceGeneration: boolean;
@@ -89,7 +89,7 @@ type chatGenSettings = {
 };
 
 export let botSettings: mikuSettings = {
-  promptMethod: "RPBT",
+  promptStrategy: "RPBT",
   sttModel: "Whisper",
   voiceGeneration: true,
   modelService: "llama",

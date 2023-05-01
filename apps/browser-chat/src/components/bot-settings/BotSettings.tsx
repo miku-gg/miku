@@ -18,7 +18,7 @@ export const BotSettings = () => {
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
   const modelServices = ["llama", "openai", "pygmalion"];
   const oaiModels = ["text-davinci-003", "gpt-3.5-turbo", "gpt-4"];
-  const promptMethods = ["RPBT", "Miku", "Pygmalion", "OpenAI"];
+  const promptStrategies = ["RPBT", "Miku", "Pygmalion", "OpenAI"];
   const sttModels = ["Whisper"];
   const voiceModels = ["elevenlabs_tts", "azure_tts", "novelai_tts"];
   const [voiceGeneration, setVoiceGeneration] = useState<boolean>(
@@ -51,12 +51,12 @@ export const BotSettings = () => {
       <div className="max-w-96 h-full scrollbar overflow-auto text-clip text-start text-white m-4">
         Misc. settings for miku and how the model is prompted.
         <DropdownInput
-          title="Prompt Method"
-          index={promptMethods.indexOf(botSettings.promptMethod)}
-          items={promptMethods}
+          title="Prompt Strategy"
+          index={promptStrategies.indexOf(botSettings.promptStrategy)}
+          items={promptStrategies}
           tooltip="How the character definitions are sent to the model."
           onChange={(i) => {
-            botSettings.promptMethod = promptMethods[i];
+            botSettings.promptStrategy = promptStrategies[i];
             forceUpdate();
           }}
         />
