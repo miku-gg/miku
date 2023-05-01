@@ -4,7 +4,7 @@ import { BotConfig } from "@mikugg/bot-validator";
 import queryString from "query-string";
 import { toast } from "react-toastify";
 import { IS_ALPHA_LIVE } from "../components/loading/BotLoadingModal";
-import { genSettings } from "../components/interactive-chat/bot-display/BotDisplay";
+import { botSettings } from "../components/interactive-chat/bot-display/BotDisplay";
 
 const MOCK_PRIVATE_KEY =
   "2658e4257eaaf9f72295ce012fa8f8cc4a600cdaf4051884d2c02593c717c173";
@@ -191,7 +191,7 @@ class BotFactory {
             signer: signer,
             props: {
               ...props,
-              settings: JSON.stringify(genSettings),
+              settings: JSON.stringify(botSettings),
               apiKey,
             },
           },
@@ -205,7 +205,7 @@ class BotFactory {
             signer: signer,
             props: {
               ...props,
-              settings: JSON.stringify(genSettings),
+              settings: JSON.stringify(botSettings),
               apiKey: String(searchParams["novelai"] || "") || "",
             },
           },

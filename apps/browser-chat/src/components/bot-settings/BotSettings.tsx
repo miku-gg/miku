@@ -43,7 +43,7 @@ export const BotSettings = () => {
   useEffect(() => {
     setVoiceModelServiceIndex(voiceModels.indexOf(botSettings.voiceModel));
     setServiceModelIndex(modelServices.indexOf(botSettings.modelService)); // u cant just go useState<number>(modelServices.indexOf(botSettings.modelSerivce)) bc uhh actually idk y it just doesnt work
-    setVoiceId(genSettings.voiceId);
+    setVoiceId(botSettings.voiceId);
   }, []);
 
   return (
@@ -96,19 +96,19 @@ export const BotSettings = () => {
                         newConfig.outputListeners[0].service =
                           ServicesNames.ElevenLabsTTS;
                         newConfig.outputListeners[0].props.voiceId =
-                          genSettings.voiceId;
+                          botSettings.voiceId;
                         break;
                       case 1:
                         newConfig.outputListeners[0].service =
                           ServicesNames.AzureTTS;
                         newConfig.outputListeners[0].props.voiceId =
-                          genSettings.voiceId;
+                        botSettings.voiceId;
                         break;
                       case 2:
                         newConfig.outputListeners[0].service =
                           ServicesNames.NovelAITTS;
                         newConfig.outputListeners[0].props.voiceId =
-                          genSettings.voiceId;
+                        botSettings.voiceId;
                         break;
                     }
                     botFactory.updateInstance(newConfig);
@@ -125,12 +125,12 @@ export const BotSettings = () => {
                   value={voiceId}
                   tooltip="What voice id to use."
                   onChange={(e) => {
-                    genSettings.voiceId = e.target.value;
+                    botSettings.voiceId = e.target.value;
                     setVoiceId(e.target.value);
                     if (botConfig) {
                       const newConfig = JSON.parse(JSON.stringify(botConfig));
                       newConfig.outputListeners[0].props.voiceId =
-                        genSettings.voiceId;
+                      botSettings.voiceId;
                       botFactory.updateInstance(newConfig);
                       updateBotConfig(newConfig);
                       setBotConfig(newConfig);
@@ -141,11 +141,11 @@ export const BotSettings = () => {
               </div>
             </div>
             <BoolInput
-              value={genSettings.readNonSpokenText}
+              value={botSettings.readNonSpokenText}
               title="Read non-spoken text"
               tooltip="Read text enclosed in *asteriks*."
               onChange={(e) => {
-                genSettings.readNonSpokenText = e;
+                botSettings.readNonSpokenText = e;
                 if (botConfig) {
                   // i actually dont know why i need to do this but if i dont it wont send the updated gen settings to the tts service
                   botFactory.updateInstance(botConfig);

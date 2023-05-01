@@ -50,6 +50,8 @@ type mikuSettings = {
   modelService: string;
   // voiceModel: "ElevenLabs" | "Azure" | "Novel";
   voiceModel: string;
+  voiceId: string;
+  readNonSpokenText: boolean;
 };
 
 type chatGenSettings = {
@@ -84,8 +86,6 @@ type chatGenSettings = {
   frequencyPenalty: number;
   presencePenalty: number;
   oaiModel: string;
-  voiceId: string;
-  readNonSpokenText: boolean;
 };
 
 export let botSettings: mikuSettings = {
@@ -94,6 +94,8 @@ export let botSettings: mikuSettings = {
   voiceGeneration: true,
   modelService: "llama",
   voiceModel: "ElevenLabs",
+  voiceId: "",
+  readNonSpokenText: true,
 };
 
 export let genSettings: chatGenSettings = {
@@ -126,8 +128,6 @@ export let genSettings: chatGenSettings = {
   frequencyPenalty: 0.7,
   presencePenalty: 0.7,
   oaiModel: "",
-  voiceId: "",
-  readNonSpokenText: true,
 };
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT =
@@ -228,8 +228,8 @@ export const BotDisplay = () => {
     });
     if (botConfig) {
       const newConfig = JSON.parse(JSON.stringify(botConfig));
-      genSettings.voiceId = newConfig.outputListeners[0].props.voiceId;
-      newConfig.outputListeners[0].props.voiceId = genSettings.voiceId;
+      botSettings.voiceId = newConfig.outputListeners[0].props.voiceId;
+      newConfig.outputListeners[0].props.voiceId = botSettings.voiceId;
       botSettings.voiceModel = newConfig.outputListeners[0].service;
       botFactory.updateInstance(newConfig);
     }
