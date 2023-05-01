@@ -52,7 +52,6 @@ type mikuSettings = {
   voiceModel: string;
   voiceId: string;
   readNonSpokenText: boolean;
-  oldTopP: number;
 };
 
 type chatGenSettings = {
@@ -97,7 +96,6 @@ export let botSettings: mikuSettings = {
   voiceModel: "ElevenLabs",
   voiceId: "",
   readNonSpokenText: false,
-  oldTopP: 0.5,
 };
 
 export let genSettings: chatGenSettings = {
@@ -129,7 +127,7 @@ export let genSettings: chatGenSettings = {
   order: [6, 0, 1, 2, 3, 4, 5], // allow user to change this somehow eventually:tm:
   frequencyPenalty: 0.7,
   presencePenalty: 0.7,
-  oaiModel: "gpt-3.5-turbo",
+  oaiModel: "",
 };
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT =

@@ -150,8 +150,10 @@ export const BotSettings = () => {
                   break;
                 case 1:
                   newConfig.prompt_completer.service = ServicesNames.OpenAI;
-                  if (!genSettings.oaiModel)
+                  if (!genSettings.oaiModel) {
+                    genSettings.topP = 1.0;
                     genSettings.oaiModel = "gpt-3.5-turbo";
+                  }
                   break;
                 case 2:
                   newConfig.prompt_completer.service = ServicesNames.Pygmalion;
@@ -192,7 +194,6 @@ export const BotSettings = () => {
               value={genSettings.topP}
               onInput={(value) => {
                 genSettings.topP = value;
-                botSettings.oldTopP = value;
               }}
             />
             <RangeInput
@@ -427,7 +428,6 @@ export const BotSettings = () => {
               value={genSettings.topP}
               onInput={(value) => {
                 genSettings.topP = value;
-                botSettings.oldTopP = value;
               }}
             />
             <RangeInput
