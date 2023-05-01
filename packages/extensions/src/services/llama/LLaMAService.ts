@@ -38,7 +38,7 @@ export class LLaMAService extends Miku.Services.Service {
     if (!modelSettings) return "";
     let gradioEndpoint = this.gradioEndpoint;
     if (input.gradioEndpoint) gradioEndpoint = input.gradioEndpoint;
-    const completion = await axios.post<{ results: { text: string }[] }>(
+    const completion = await axios.post(
       `${gradioEndpoint}/v1/generate`,
       {
         prompt: input.prompt,
@@ -48,6 +48,7 @@ export class LLaMAService extends Miku.Services.Service {
         top_p: modelSettings.topP,
         typical_p: modelSettings.typicalP,
         repetition_penalty: modelSettings.repetitionPenalty,
+        encoder_repetition_penalty: modelSettings.encoderRepitionPenalty,
         top_k: modelSettings.topK,
         min_length: modelSettings.minLength,
         no_repeat_ngram_size: modelSettings.noRepeatNgramSize,
@@ -60,7 +61,9 @@ export class LLaMAService extends Miku.Services.Service {
         truncation_length: modelSettings.truncateLength,
         ban_eos_token: modelSettings.banEosToken,
         skip_special_tokens: modelSettings.skipSpecialTokens,
-        stopping_strings: modelSettings.stoppingStrings.split(","),
+        stopping_strings: modelSettings.stoppingStrings
+          ? modelSettings.stoppingStrings.split(",")
+          : [],
       },
       {
         headers: {
@@ -70,10 +73,7 @@ export class LLaMAService extends Miku.Services.Service {
     );
 
     return (
-      (completion?.data?.results[0].text || [""])[0].replace(
-        input.prompt,
-        ""
-      ) || ""
+      (completion.data.results[0].text || [""]).replace(input.prompt, "") || ""
     );
   }
 
