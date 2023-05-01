@@ -151,6 +151,8 @@ export const BotSettings = () => {
                   break;
                 case 1:
                   newConfig.prompt_completer.service = ServicesNames.OpenAI;
+                  if (!genSettings.oaiModel)
+                    genSettings.oaiModel = "gpt-3.5-turbo";
                   break;
                 case 2:
                   newConfig.prompt_completer.service = ServicesNames.Pygmalion;
