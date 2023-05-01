@@ -9,7 +9,7 @@ import settingsIcon from "../../../assets/icons/settings.png";
 
 import { Loader } from "../../loading/Loader";
 import botFactory from "../../../libs/botFactory";
-import { useBot } from "../../../libs/botLoader";
+import { BotLoaderContext, useBot } from "../../../libs/botLoader";
 import { PopUp } from "../../pup-up/pup-up";
 import {
   ChatHistory,
@@ -50,8 +50,6 @@ type mikuSettings = {
   modelService: string;
   // voiceModel: "ElevenLabs" | "Azure" | "Novel";
   voiceModel: string;
-  voiceId: string;
-  readNonSpokenText: boolean;
 };
 
 type chatGenSettings = {
@@ -86,6 +84,8 @@ type chatGenSettings = {
   frequencyPenalty: number;
   presencePenalty: number;
   oaiModel: string;
+  voiceId: string;
+  readNonSpokenText: boolean;
 };
 
 export let botSettings: mikuSettings = {
@@ -94,8 +94,6 @@ export let botSettings: mikuSettings = {
   voiceGeneration: true,
   modelService: "llama",
   voiceModel: "ElevenLabs",
-  voiceId: "",
-  readNonSpokenText: false,
 };
 
 export let genSettings: chatGenSettings = {
@@ -128,6 +126,8 @@ export let genSettings: chatGenSettings = {
   frequencyPenalty: 0.7,
   presencePenalty: 0.7,
   oaiModel: "",
+  voiceId: "",
+  readNonSpokenText: true,
 };
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT =
@@ -219,11 +219,19 @@ export const BotDisplay = () => {
 
     fetchFile();
     setEmotionImgIsLoading(false);
-    const botConfigJson = JSON.stringify(botConfig?.outputListeners);
-    if (botConfigJson) {
-      const botConfigObject = JSON.parse(botConfigJson)[0];
-      botSettings.voiceId = botConfigObject.props.voiceId;
-      botSettings.voiceModel = botConfigObject.service;
+  }, [emotionImage]);
+
+  useEffect(() => {
+    const bot = botFactory.getInstance();
+    bot?.subscribeContextChangeSuggestion((contextId) => {
+      setContextSuggestion(contextId);
+    });
+    if (botConfig) {
+      const newConfig = JSON.parse(JSON.stringify(botConfig));
+      genSettings.voiceId = newConfig.outputListeners[0].props.voiceId;
+      newConfig.outputListeners[0].props.voiceId = genSettings.voiceId;
+      botSettings.voiceModel = newConfig.outputListeners[0].service;
+      botFactory.updateInstance(newConfig);
     }
 
     switch (botConfig?.prompt_completer.service) {
@@ -246,13 +254,6 @@ export const BotDisplay = () => {
         break;
       }
     }
-  }, [emotionImage]);
-
-  useEffect(() => {
-    const bot = botFactory.getInstance();
-    bot?.subscribeContextChangeSuggestion((contextId) => {
-      setContextSuggestion(contextId);
-    });
   }, [botConfig]);
 
   const updateContext = () => {

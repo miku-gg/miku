@@ -10,7 +10,7 @@ import {
   genSettings,
 } from "../interactive-chat/bot-display/BotDisplay";
 import botFactory from "../../libs/botFactory";
-import { useBot } from "../../libs/botLoader";
+import { BotLoaderContext, useBot } from "../../libs/botLoader";
 import { InteractiveResponsesContext } from "../../libs/useResponses";
 import { updateHistoryNumber } from "../chat-history/chat-history";
 
@@ -37,12 +37,13 @@ export const BotSettings = () => {
   );
 
   const { botConfig } = useBot();
-  const { setBotConfig } = useContext(InteractiveResponsesContext);
+  const { updateBotConfig } = useContext(InteractiveResponsesContext);
+  const { setBotConfig } = useContext(BotLoaderContext);
 
   useEffect(() => {
     setVoiceModelServiceIndex(voiceModels.indexOf(botSettings.voiceModel));
     setServiceModelIndex(modelServices.indexOf(botSettings.modelService)); // u cant just go useState<number>(modelServices.indexOf(botSettings.modelSerivce)) bc uhh actually idk y it just doesnt work
-    setVoiceId(botSettings.voiceId);
+    setVoiceId(genSettings.voiceId);
   }, []);
 
   return (
@@ -92,22 +93,26 @@ export const BotSettings = () => {
                     const newConfig = JSON.parse(JSON.stringify(botConfig));
                     switch (i) {
                       case 0:
-                        newConfig.outputListeners.service =
+                        newConfig.outputListeners[0].service =
                           ServicesNames.ElevenLabsTTS;
-                        newConfig.outputListeners.voiceId = botSettings.voiceId;
+                        newConfig.outputListeners[0].props.voiceId =
+                          genSettings.voiceId;
                         break;
                       case 1:
-                        newConfig.outputListeners.service =
+                        newConfig.outputListeners[0].service =
                           ServicesNames.AzureTTS;
-                        newConfig.outputListeners.voiceId = botSettings.voiceId;
+                        newConfig.outputListeners[0].props.voiceId =
+                          genSettings.voiceId;
                         break;
                       case 2:
-                        newConfig.outputListeners.service =
+                        newConfig.outputListeners[0].service =
                           ServicesNames.NovelAITTS;
-                        newConfig.outputListeners.voiceId = botSettings.voiceId;
+                        newConfig.outputListeners[0].props.voiceId =
+                          genSettings.voiceId;
                         break;
                     }
                     botFactory.updateInstance(newConfig);
+                    updateBotConfig(newConfig);
                     setBotConfig(newConfig);
                     updateHistoryNumber();
                   }
@@ -120,17 +125,35 @@ export const BotSettings = () => {
                   value={voiceId}
                   tooltip="What voice id to use."
                   onChange={(e) => {
-                    botSettings.voiceId = e.target.value;
+                    genSettings.voiceId = e.target.value;
                     setVoiceId(e.target.value);
+                    if (botConfig) {
+                      const newConfig = JSON.parse(JSON.stringify(botConfig));
+                      newConfig.outputListeners[0].props.voiceId =
+                        genSettings.voiceId;
+                      botFactory.updateInstance(newConfig);
+                      updateBotConfig(newConfig);
+                      setBotConfig(newConfig);
+                      updateHistoryNumber();
+                    }
                   }}
                 />
               </div>
             </div>
             <BoolInput
-              value={botSettings.readNonSpokenText}
+              value={genSettings.readNonSpokenText}
               title="Read non-spoken text"
               tooltip="Read text enclosed in *asteriks*."
-              onChange={(e) => (botSettings.readNonSpokenText = e)}
+              onChange={(e) => {
+                genSettings.readNonSpokenText = e;
+                if (botConfig) {
+                  // i actually dont know why i need to do this but if i dont it wont send the updated gen settings to the tts service
+                  botFactory.updateInstance(botConfig);
+                  updateBotConfig(botConfig);
+                  setBotConfig(botConfig);
+                  updateHistoryNumber();
+                }
+              }}
             />
           </div>
         ) : null}
@@ -161,6 +184,7 @@ export const BotSettings = () => {
                   break;
               }
               botFactory.updateInstance(newConfig);
+              updateBotConfig(newConfig);
               setBotConfig(newConfig);
               updateHistoryNumber();
             }

@@ -29,7 +29,7 @@ export const InteractiveResponsesContext = createContext<{
   loading: boolean;
   playAudio: (base64: string) => void;
   onUpdate: () => void;
-  setBotConfig: (bc: BotConfig) => void;
+  updateBotConfig: (bc: BotConfig) => void;
 }>({
   responseIds: [],
   responseIndex: 0,
@@ -46,7 +46,7 @@ export const InteractiveResponsesContext = createContext<{
   loading: false,
   playAudio: () => {},
   onUpdate: () => {},
-  setBotConfig: () => {},
+  updateBotConfig: () => {},
 });
 
 export const InteractiveResponsesContextProvider = ({
@@ -72,7 +72,7 @@ export const InteractiveResponsesContextProvider = ({
     }
   }
 
-  const setBotConfig = (bc: BotConfig) => {
+  const updateBotConfig = (bc: BotConfig) => {
     botConfig = bc; // this doesn't trigger the useEFfect below for some reason so i have a number too
     setBotNumber(botNumber + 1);
   };
@@ -153,7 +153,7 @@ export const InteractiveResponsesContextProvider = ({
         onUpdate,
         currentContext,
         setCurrentContext,
-        setBotConfig,
+        updateBotConfig,
       }}
     >
       {children}
