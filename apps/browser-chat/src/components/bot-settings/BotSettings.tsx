@@ -136,7 +136,7 @@ export const BotSettings = () => {
         ) : null}
         <DropdownInput
           title="Model Service"
-          helperText="Changing this resets conversation history! export before chaning and import after"
+          helperText="Changing this resets conversation history! Export conversation history before changing and import it after"
           index={modelServiceIndex}
           items={modelServices}
           tooltip={"What model is used to generate the text."}
