@@ -9,15 +9,26 @@ const DropdownInput: React.FC<{
   title: string;
   onChange: (index: number) => void;
   tooltip?: string;
+  helperText?: string;
 }> = (props) => {
   return (
     <div className="flex items-center gap-1 my-4">
-      {props.title}
-      {props.tooltip ? (
-        <Tooltip title={props.tooltip} placement="right">
-          <InformationCircleIcon className="h-6 w-6" aria-hidden="true" />
-        </Tooltip>
-      ) : null}
+      <ul className="w-full">
+        <div className="flex items-center">
+          {props.title}
+          {props.tooltip ? (
+            <Tooltip title={props.tooltip} placement="right">
+              <InformationCircleIcon className="h-6 w-6" aria-hidden="true" />
+            </Tooltip>
+          ) : null}
+        </div>
+        {props.helperText ? (
+          <p className="mt-[-0.125rem] pb-2 text-sm text-gray-500">
+            {props.helperText}
+          </p>
+        ) : null}
+      </ul>
+
       <div className="ml-auto">
         <DropDown
           items={props.items}
