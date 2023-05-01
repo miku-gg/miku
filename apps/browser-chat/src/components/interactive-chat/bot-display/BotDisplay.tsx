@@ -26,7 +26,7 @@ import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
 import { BotSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
 
-enum ServicesNames {
+export enum ServicesNames {
   OpenAI = "openai_completer",
   Pygmalion = "pygmalion_completer",
   LLaMA = "llama_completer",
@@ -221,16 +221,21 @@ export const BotDisplay = () => {
 
     fetchFile();
     setEmotionImgIsLoading(false);
+    const botConfigJson = JSON.stringify(botConfig?.outputListeners);
+    if (botConfigJson) {
+      const botConfigObject = JSON.parse(botConfigJson)[0];
+      botSettings.voiceId = botConfigObject.props.voiceId;
+      botSettings.voiceModel = botConfigObject.service;
+    }
 
     switch (botConfig?.prompt_completer.service) {
       case ServicesNames.OpenAI: {
         genSettings.topP = 1.0;
         botSettings.modelService = "openai";
-        genSettings.oaiModel = JSON.parse(
-          // there's prolly a better way to do this but linter cries if u just do botConfig?.prompt_completer.props.model
+        const openAIModel = JSON.parse(
           JSON.stringify(botConfig?.prompt_completer.props)
-        ).model;
-        console.log("COCK!!!");
+        ).model; // there's prolly a better way to do this but linter cries if u just do botConfig?.prompt_completer.props.model
+        if (openAIModel) genSettings.oaiModel = openAIModel;
 
         break;
       }
@@ -242,11 +247,7 @@ export const BotDisplay = () => {
         botSettings.modelService = "llama";
         break;
       }
-      default: {
-        break;
-      }
     }
-    console.log(`MIDRIFF!!! ${JSON.stringify(botConfig)}`);
   }, [emotionImage]);
 
   useEffect(() => {

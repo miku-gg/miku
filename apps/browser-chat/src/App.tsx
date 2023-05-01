@@ -16,9 +16,11 @@ export const App = () => {
       }}
     >
       <InteractiveResponsesContextProvider>
-        <InteractiveChat />
+        <>
+          <InteractiveChat />
+          <Aside />
+        </>
       </InteractiveResponsesContextProvider>
-      <Aside />
       <BotLoadingModal />
       <ToastContainer
         position="top-left"

@@ -1,23 +1,32 @@
 import { useEffect, useReducer, useState } from "react";
 import { toast } from "react-toastify";
-import * as MikuCore from '@mikugg/core';
+import * as MikuCore from "@mikugg/core";
 import botFactory from "../../libs/botFactory";
 import { useBot } from "../../libs/botLoader";
-import { CheckIcon, PencilIcon } from '@primer/octicons-react'
+import { CheckIcon, PencilIcon } from "@primer/octicons-react";
 import "./chat-history.css";
-import trim from 'lodash.trim';
+import trim from "lodash.trim";
 
-export const HistoryManagementButtons = ({ onLoad }: {onLoad: () => void}) => {
+export const HistoryManagementButtons = ({
+  onLoad,
+}: {
+  onLoad: () => void;
+}) => {
   const history = botFactory.getInstance()?.getMemory();
   const { botConfig, botHash, loading } = useBot();
 
   const handleSave = () => {
-    const json = JSON.stringify({ botHash, memory: history?.getMemory() || [] });
+    const json = JSON.stringify({
+      botHash,
+      memory: history?.getMemory() || [],
+    });
     const blob = new Blob([json], { type: "application/json" });
     const a = document.createElement("a");
     const url = URL.createObjectURL(blob);
     a.href = url;
-    a.download = `${botConfig?.bot_name || 'unknown'}_history_${Date.now()}.json`;
+    a.download = `${
+      botConfig?.bot_name || "unknown"
+    }_history_${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -26,7 +35,7 @@ export const HistoryManagementButtons = ({ onLoad }: {onLoad: () => void}) => {
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    event.target.value = '';
+    event.target.value = "";
     if (!file) {
       return;
     }
@@ -34,7 +43,7 @@ export const HistoryManagementButtons = ({ onLoad }: {onLoad: () => void}) => {
     reader.onload = () => {
       try {
         if (!botConfig || !botHash || loading) {
-          toast.warn('Please, load a bot before uploading a history');
+          toast.warn("Please, load a bot before uploading a history");
           return;
         }
         let json = reader.result as string;
@@ -45,12 +54,12 @@ export const HistoryManagementButtons = ({ onLoad }: {onLoad: () => void}) => {
         json = json.replace(/"type":"context"/g, '"type":0');
 
         const newData = JSON.parse(json) as {
-          memory: MikuCore.Memory.MemoryLine[],
-          botHash: string,
+          memory: MikuCore.Memory.MemoryLine[];
+          botHash: string;
         };
 
         if (!newData.botHash || newData.botHash !== botHash) {
-          toast.error('Incompatible bot hash');
+          toast.error("Incompatible bot hash");
           return;
         }
 
@@ -58,10 +67,10 @@ export const HistoryManagementButtons = ({ onLoad }: {onLoad: () => void}) => {
         newData.memory.forEach((line) => {
           history?.pushMemory(line);
         });
-        toast.success('Memory loaded!');
+        toast.success("Memory loaded!");
         onLoad();
       } catch (e) {
-        toast.error('Error reading json file');
+        toast.error("Error reading json file");
       }
     };
     reader.readAsText(file);
@@ -86,8 +95,8 @@ export const HistoryManagementButtons = ({ onLoad }: {onLoad: () => void}) => {
         />
       </label>
     </>
-  )
-}
+  );
+};
 
 const HistoryMemoryLine = ({
   botSubject,
@@ -100,24 +109,20 @@ const HistoryMemoryLine = ({
   onEditedSubmit,
   onCancelEdit,
 }: {
-  botSubject: string
-  text: string
-  subject: string
-  editing: boolean
-  editingText: string
-  setEditingText: (text: string) => void
-  onEditedSelected: () => void
-  onEditedSubmit: () => void
-  onCancelEdit: () => void
+  botSubject: string;
+  text: string;
+  subject: string;
+  editing: boolean;
+  editingText: string;
+  setEditingText: (text: string) => void;
+  onEditedSelected: () => void;
+  onEditedSubmit: () => void;
+  onCancelEdit: () => void;
 }): JSX.Element => {
-
-
   const subjectDisplay = (
     <p
       className={`${
-        (subject === botSubject)
-          ? "text-yellow-300"
-          : "text-green-600"
+        subject === botSubject ? "text-yellow-300" : "text-green-600"
       }`}
     >
       {subject}:
@@ -128,7 +133,10 @@ const HistoryMemoryLine = ({
     <div className="w-full">
       {editing ? (
         <div className="flex gap-2 items-center w-full">
-          <button className="text-gray-400 hover:text-gray-100" onClick={onEditedSubmit}>
+          <button
+            className="text-gray-400 hover:text-gray-100"
+            onClick={onEditedSubmit}
+          >
             <CheckIcon size={16} />
           </button>
           {subjectDisplay}
@@ -137,9 +145,9 @@ const HistoryMemoryLine = ({
             value={editingText}
             onChange={(e) => setEditingText(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Escape') {
+              if (e.key === "Escape") {
                 onCancelEdit();
-              } else if (e.key === 'Enter') {
+              } else if (e.key === "Enter") {
                 onEditedSubmit();
               }
             }}
@@ -147,14 +155,16 @@ const HistoryMemoryLine = ({
         </div>
       ) : (
         <div className="memory-line-display flex gap-2 items-center">
-          <button className="memory-edit-button text-gray-400 hover:text-gray-100" onClick={onEditedSelected}>
+          <button
+            className="memory-edit-button text-gray-400 hover:text-gray-100"
+            onClick={onEditedSelected}
+          >
             <PencilIcon size={16} />
           </button>
           {subjectDisplay}
-          <p className={`${
-            (subject === botSubject)
-              ? "text-white"
-              : "text-gray-400"
+          <p
+            className={`${
+              subject === botSubject ? "text-white" : "text-gray-400"
             } text-left`}
           >
             {text}
@@ -162,9 +172,8 @@ const HistoryMemoryLine = ({
         </div>
       )}
     </div>
-  )
-}
-
+  );
+};
 
 const HistoryMemoryLines = ({
   botSubject,
@@ -173,15 +182,15 @@ const HistoryMemoryLines = ({
   setEditedIndex,
   editedText,
   setEditedText,
-  onEditedSubmit
+  onEditedSubmit,
 }: {
-  botSubject: string,
-  memoryLines: MikuCore.Memory.MemoryLine[],
-  editedIndex: number,
-  setEditedIndex: (index: number) => void,
-  editedText: string,
-  setEditedText: (text: string) => void,
-  onEditedSubmit: () => void,
+  botSubject: string;
+  memoryLines: MikuCore.Memory.MemoryLine[];
+  editedIndex: number;
+  setEditedIndex: (index: number) => void;
+  editedText: string;
+  setEditedText: (text: string) => void;
+  onEditedSubmit: () => void;
 }) => {
   return (
     <div className="flex flex-col justify-start items-start w-full h-fit">
@@ -206,7 +215,13 @@ const HistoryMemoryLines = ({
       })}
     </div>
   );
-}
+};
+
+let historyNumber = 0;
+// this another case of (i think) me not knowing how useEffect works like in useResponses.tsx i am using a number to update it
+export const updateHistoryNumber = () => {
+  historyNumber += 1;
+};
 
 export const HistoryConsole = () => {
   const { botConfig } = useBot();
@@ -214,14 +229,13 @@ export const HistoryConsole = () => {
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
 
   const [editedIndex, setEditedIndex] = useState<number>(-1);
-  const [editedText, setEditedText] = useState<string>('');
+  const [editedText, setEditedText] = useState<string>("");
 
   useEffect(() => {
     botFactory.getInstance()?.subscribeDialog(() => {
       forceUpdate();
     });
-  }, [botConfig]);
-
+  }, [botConfig, historyNumber]);
 
   const updateMemoryLine = () => {
     const memory = botFactory.getInstance()?.getMemory();
@@ -235,7 +249,7 @@ export const HistoryConsole = () => {
     } else {
       lines[editedIndex] = {
         ...lines[editedIndex],
-        text: editedText
+        text: editedText,
       };
     }
     memory?.clearMemories();
@@ -254,7 +268,10 @@ export const HistoryConsole = () => {
         setEditedIndex={(i: number) => setEditedIndex(i)}
         editedText={editedText}
         setEditedText={(t: string) => setEditedText(t)}
-        botSubject={(botConfig?.short_term_memory?.props as {botSubject: string})?.botSubject || ''}
+        botSubject={
+          (botConfig?.short_term_memory?.props as { botSubject: string })
+            ?.botSubject || ""
+        }
         memoryLines={history?.getMemory() || []}
         onEditedSubmit={updateMemoryLine}
       />
@@ -275,8 +292,7 @@ export const HistoryConsole = () => {
       </div>
     </div>
   );
-}
-
+};
 
 export const ChatHistory = () => {
   return (

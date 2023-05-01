@@ -1,33 +1,33 @@
 import { DropDown } from "../dropdown/Dropdown";
-import { useState, useReducer, useEffect } from "react";
+import { useState, useReducer, useEffect, useContext } from "react";
 import RangeInput from "./RangeInput";
 import BoolInput from "./BoolInput";
 import TextInput from "./TextInput";
 import DropdownInput from "./DropdownInput";
-import { useBot } from "../../libs/botLoader";
 import {
+  ServicesNames,
   botSettings,
   genSettings,
 } from "../interactive-chat/bot-display/BotDisplay";
+import botFactory from "../../libs/botFactory";
+import { useBot } from "../../libs/botLoader";
+import { InteractiveResponsesContext } from "../../libs/useResponses";
+import { updateHistoryNumber } from "../chat-history/chat-history";
 
 export const BotSettings = () => {
-  const { botConfig } = useBot();
-
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
   const modelServices = ["llama", "openai", "pygmalion"];
   const oaiModels = ["text-davinci-003", "gpt-3.5-turbo", "gpt-4"];
   const promptMethods = ["RPBT", "Miku", "Pygmalion", "OpenAI"];
   const sttModels = ["Whisper"];
-  const voiceModels = ["ElevenLabs", "Azure", "Novel"];
+  const voiceModels = ["elevenlabs_tts", "azure_tts", "novelai_tts"];
   const [voiceGeneration, setVoiceGeneration] = useState<boolean>(
     botSettings.voiceGeneration
   );
 
   const [modelServiceIndex, setServiceModelIndex] = useState<number>(0);
-
-  useEffect(() => {
-    setServiceModelIndex(modelServices.indexOf(botSettings.modelService)); // u cant just go useState<number>(modelServices.indexOf(botSettings.modelSerivce)) bc uhh actually idk y it just doesnt work
-  }, []);
+  const [voiceModelServiceIndex, setVoiceModelServiceIndex] =
+    useState<number>(0);
 
   const [voiceId, setVoiceId] = useState<string>("");
   const [order, setOrder] = useState<string>(genSettings.order.toString());
@@ -35,6 +35,15 @@ export const BotSettings = () => {
   const [stoppingStrings, setStoppingStrings] = useState<string>(
     genSettings.stoppingStrings
   );
+
+  const { botConfig } = useBot();
+  const { setBotConfig } = useContext(InteractiveResponsesContext);
+
+  useEffect(() => {
+    setVoiceModelServiceIndex(voiceModels.indexOf(botSettings.voiceModel));
+    setServiceModelIndex(modelServices.indexOf(botSettings.modelService)); // u cant just go useState<number>(modelServices.indexOf(botSettings.modelSerivce)) bc uhh actually idk y it just doesnt work
+    setVoiceId(botSettings.voiceId);
+  }, []);
 
   return (
     <>
@@ -75,24 +84,48 @@ export const BotSettings = () => {
             <div className="flex items-center gap-1">
               <DropDown
                 items={voiceModels}
-                selectedIndex={voiceModels.indexOf(botSettings.voiceModel)}
-                onChange={(i) => (botSettings.voiceModel = voiceModels[i])}
+                selectedIndex={voiceModelServiceIndex}
+                onChange={(i) => {
+                  botSettings.voiceModel = voiceModels[i];
+                  setVoiceModelServiceIndex(i);
+                  if (botConfig) {
+                    const newConfig = JSON.parse(JSON.stringify(botConfig));
+                    switch (i) {
+                      case 0:
+                        newConfig.outputListeners.service =
+                          ServicesNames.ElevenLabsTTS;
+                        newConfig.outputListeners.voiceId = botSettings.voiceId;
+                        break;
+                      case 1:
+                        newConfig.outputListeners.service =
+                          ServicesNames.AzureTTS;
+                        newConfig.outputListeners.voiceId = botSettings.voiceId;
+                        break;
+                      case 2:
+                        newConfig.outputListeners.service =
+                          ServicesNames.NovelAITTS;
+                        newConfig.outputListeners.voiceId = botSettings.voiceId;
+                        break;
+                    }
+
+                    // botFactory.updateInstance(newConfig);
+                    // updateBotConfig(newConfig);
+                    // setBotConfig(newConfig);
+                  }
+                }}
                 top={true}
               />
-              {voiceModels.indexOf(botSettings.voiceModel) === 0 ? (
-                <div className="ml-auto">
-                  <TextInput
-                    title="Voice id."
-                    value={voiceId}
-                    placeholder="Voice id."
-                    tooltip="What voice id to use."
-                    onChange={(e) => {
-                      botSettings.voiceId = e.target.value;
-                      setVoiceId(e.target.value);
-                    }}
-                  />
-                </div>
-              ) : null}
+              <div className="ml-auto">
+                <TextInput
+                  title="Voice id."
+                  value={voiceId}
+                  tooltip="What voice id to use."
+                  onChange={(e) => {
+                    botSettings.voiceId = e.target.value;
+                    setVoiceId(e.target.value);
+                  }}
+                />
+              </div>
             </div>
             <BoolInput
               value={botSettings.readNonSpokenText}
@@ -110,6 +143,23 @@ export const BotSettings = () => {
           onChange={(i) => {
             botSettings.modelService = modelServices[i];
             setServiceModelIndex(i);
+            if (botConfig) {
+              const newConfig = botConfig;
+              switch (i) {
+                case 0:
+                  newConfig.prompt_completer.service = ServicesNames.LLaMA;
+                  break;
+                case 1:
+                  newConfig.prompt_completer.service = ServicesNames.OpenAI;
+                  break;
+                case 2:
+                  newConfig.prompt_completer.service = ServicesNames.Pygmalion;
+                  break;
+              }
+              botFactory.updateInstance(newConfig);
+              setBotConfig(newConfig);
+              updateHistoryNumber();
+            }
           }}
         />
         {modelServiceIndex === 0 ? (
