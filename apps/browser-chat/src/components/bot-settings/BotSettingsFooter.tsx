@@ -8,15 +8,15 @@ const handleImport = () => {
 
 export const BotSettingsFooter = () => {
   return (
-    <div className="flex gap-4 justify-center">
+    <>
       <button
-        className="button-transparent min-w-[10em]"
+        className="button-transparent min-w-[10em] py-1"
         onClick={handleExport}
       >
-        Export
+        Export settings
       </button>
-      <label className="button-purple min-w-[10em] flex items-center justify-center cursor-pointer py-2">
-        Import
+      <label className="button-purple min-w-[10em] flex items-center justify-center cursor-pointer py-1">
+        Import settings
         <input
           id="load-history-input"
           className="hidden"
@@ -25,6 +25,6 @@ export const BotSettingsFooter = () => {
           onChange={handleImport}
         />
       </label>
-    </div>
+    </>
   );
 };

@@ -14,7 +14,9 @@ import { BotLoaderContext, useBot } from "../../libs/botLoader";
 import { InteractiveResponsesContext } from "../../libs/useResponses";
 import { updateHistoryNumber } from "../chat-history/chat-history";
 
-export const BotSettings = () => {
+export const BotSettings: React.FC<{
+  mobile?: boolean;
+}> = (props) => {
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
 
   const modelServices = ["llama", "openai", "pygmalion"];
@@ -26,7 +28,7 @@ export const BotSettings = () => {
 
   const oaiModels = ["text-davinci-003", "gpt-3.5-turbo", "gpt-4"];
   const promptStrategies = ["wpp", "sbf", "rpbt"];
-  const sttModels = ["Whisper"];
+  // const sttModels = ["whisper_stt"];
 
   const [voiceGeneration, setVoiceGeneration] = useState<boolean>(
     botSettings.voiceGeneration
@@ -53,7 +55,6 @@ export const BotSettings = () => {
 
   return (
     <>
-      <p className="text-white text-2xl text-start m-4">Bot Settings</p>
       <div className="max-w-96 h-full scrollbar overflow-auto text-clip text-start text-white m-4">
         Misc. settings for miku and how the model is prompted.
         {JSON.parse(JSON.stringify(botConfig)).short_term_memory.service ==
@@ -89,7 +90,7 @@ export const BotSettings = () => {
             }}
           />
         ) : null}
-        <DropdownInput
+        {/* <DropdownInput
           title="Speech-to-text"
           index={sttModels.indexOf(botSettings.sttModel)}
           items={sttModels}
@@ -98,7 +99,7 @@ export const BotSettings = () => {
             botSettings.sttModel = sttModels[i];
             forceUpdate();
           }}
-        />
+        /> */}
         <BoolInput
           value={botSettings.voiceGeneration}
           title="Voice generation"
@@ -126,45 +127,52 @@ export const BotSettings = () => {
           }}
         />
         {voiceGeneration ? (
-          <div className="p-4 my-4 bg-[#323232]">
-            <div className="flex items-center gap-1">
-              <DropDown
-                items={voiceServices}
-                selectedIndex={voiceServiceServiceIndex}
-                onChange={(i) => {
-                  if (botSettings.voiceService == voiceServices[i]) return;
-                  botSettings.voiceService = voiceServices[i];
-                  setvoiceServiceServiceIndex(i);
-                  if (botConfig) {
-                    const newConfig = JSON.parse(JSON.stringify(botConfig));
-                    switch (i) {
-                      case 0:
-                        newConfig.outputListeners[0].service =
-                          ServicesNames.ElevenLabsTTS;
-                        newConfig.outputListeners[0].props.voiceId =
-                          botSettings.voiceId;
-                        break;
-                      case 1:
-                        newConfig.outputListeners[0].service =
-                          ServicesNames.AzureTTS;
-                        newConfig.outputListeners[0].props.voiceId =
-                          botSettings.voiceId;
-                        break;
-                      case 2:
-                        newConfig.outputListeners[0].service =
-                          ServicesNames.NovelAITTS;
-                        newConfig.outputListeners[0].props.voiceId =
-                          botSettings.voiceId;
-                        break;
+          <div className="p-4 my-4 bg-[#323232] gap-2">
+            <div
+              className={`${
+                props.mobile ? "flex" : ""
+              } items-center gap-1 pb-4`}
+            >
+              <div>
+                <label className="form-label block-block">TTS Service</label>
+                <DropDown
+                  items={voiceServices}
+                  selectedIndex={voiceServiceServiceIndex}
+                  onChange={(i) => {
+                    if (botSettings.voiceService == voiceServices[i]) return;
+                    botSettings.voiceService = voiceServices[i];
+                    setvoiceServiceServiceIndex(i);
+                    if (botConfig) {
+                      const newConfig = JSON.parse(JSON.stringify(botConfig));
+                      switch (i) {
+                        case 0:
+                          newConfig.outputListeners[0].service =
+                            ServicesNames.ElevenLabsTTS;
+                          newConfig.outputListeners[0].props.voiceId =
+                            botSettings.voiceId;
+                          break;
+                        case 1:
+                          newConfig.outputListeners[0].service =
+                            ServicesNames.AzureTTS;
+                          newConfig.outputListeners[0].props.voiceId =
+                            botSettings.voiceId;
+                          break;
+                        case 2:
+                          newConfig.outputListeners[0].service =
+                            ServicesNames.NovelAITTS;
+                          newConfig.outputListeners[0].props.voiceId =
+                            botSettings.voiceId;
+                          break;
+                      }
+                      botFactory.updateInstance(newConfig);
+                      updateBotConfig(newConfig);
+                      setBotConfig(newConfig);
+                      updateHistoryNumber();
                     }
-                    botFactory.updateInstance(newConfig);
-                    updateBotConfig(newConfig);
-                    setBotConfig(newConfig);
-                    updateHistoryNumber();
-                  }
-                }}
-                top={true}
-              />
+                  }}
+                  top={true}
+                />
+              </div>
               <div className="ml-auto">
                 <TextInput
                   title="Voice id."

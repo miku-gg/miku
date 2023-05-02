@@ -521,11 +521,14 @@ export const BotDisplay = () => {
       <PopUp
         closePopUpFunction={() => setShowBotSettings(false)}
         isShowingPupUp={showBotSettings}
-        className="w-6/12"
+        className="gap-2 justify-between"
         darkTheme
-        footer={<BotSettingsFooter />}
       >
+        <p className="ml-4 text-start text-2xl text-white">Setings</p>
         <BotSettings />
+        <div className="w-full flex justify-center gap-2 flex-wrap red-500 text-red-500">
+          <BotSettingsFooter />
+        </div>
       </PopUp>
       <PopUp
         className="gap-4 justify-between"
