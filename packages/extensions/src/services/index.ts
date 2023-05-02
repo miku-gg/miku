@@ -18,4 +18,5 @@ export enum ServicesNames {
   OpenAIEmotionInterpreter = "openai_emotion-interpreter",
   SBertEmotionInterpreter = "sbert_emotion-interpreter",
   WhisperSTT = "whisper_stt",
+  None = "",
 }

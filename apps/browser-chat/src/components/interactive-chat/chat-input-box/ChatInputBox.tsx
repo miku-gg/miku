@@ -9,7 +9,7 @@ import "./ChatInputBox.css";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import queryString from "query-string";
 import { IS_ALPHA_LIVE } from "../../loading/BotLoadingModal";
-import { genSettings } from "../bot-display/BotDisplay";
+import { botSettings, genSettings } from "../bot-display/BotDisplay";
 
 export function SmallSpinner(): JSX.Element {
   return (
@@ -49,7 +49,7 @@ export const ChatInputBox = (): JSX.Element => {
 
   const updateCost = useCallback(
     debounce((value: string) => {
-      if (value) {
+      if (value && botSettings.voiceGeneration) {
         setLoadingCost(true);
         const update_id = Math.random().toString(36).substring(2, 15);
         lastCostId.id = update_id;

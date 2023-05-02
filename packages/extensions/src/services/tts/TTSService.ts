@@ -3,7 +3,6 @@ import PropTypes, { InferProps } from "prop-types";
 
 export const TTSServicePropTypes = {
   apiKey: PropTypes.string,
-  voiceId: PropTypes.string,
   language: PropTypes.oneOf(["en", "es"]),
   emotion: PropTypes.string,
   prompt: PropTypes.string,
@@ -19,7 +18,6 @@ export interface TTSServiceConfig extends Miku.Services.ServiceConfig {
 export abstract class TTSService extends Miku.Services.Service {
   protected defaultProps: InferProps<typeof TTSServicePropTypes> = {
     apiKey: "",
-    voiceId: "",
     language: "en",
     emotion: "default",
     prompt: "",

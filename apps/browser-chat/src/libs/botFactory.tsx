@@ -190,7 +190,6 @@ class BotFactory {
             serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
             signer: signer,
             props: {
-              ...props,
               settings: JSON.stringify(botSettings),
               apiKey,
             },
@@ -204,9 +203,21 @@ class BotFactory {
             serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
             signer: signer,
             props: {
-              ...props,
               settings: JSON.stringify(botSettings),
               apiKey: String(searchParams["novelai"] || "") || "",
+            },
+          },
+          service
+        );
+        break;
+      case MikuExtensions.Services.ServicesNames.None:
+        outputListener = new MikuExtensions.OutputListeners.TTSOutputListener(
+          {
+            serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+            signer: signer,
+            props: {
+              settings: "",
+              apiKey: "",
             },
           },
           service
@@ -217,8 +228,10 @@ class BotFactory {
     if (!outputListener) throw `Output listener '${service}' not found`;
 
     outputListener.subscribeError((error) => {
-      toast.error("Error calling service: " + service);
-      console.error(error);
+      if (service != "") {
+        toast.error("Error calling service: " + service);
+        console.error(error);
+      }
     });
 
     return outputListener;

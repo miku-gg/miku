@@ -19,6 +19,7 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<
 > {
   protected service: Core.Services.ServiceClient<TTSServiceProps, string>;
   protected props: TTSServiceProps;
+  protected serviceName: string;
 
   constructor(params: TTSOutputListenerParams, serviceName: ServicesNames) {
     super();
@@ -28,18 +29,23 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<
       params.signer,
       serviceName
     );
+    this.serviceName = serviceName;
   }
 
   protected override async handleOutput(
     output: Core.OutputListeners.DialogOutputEnvironment
   ): Promise<string> {
-    return this.service.query(
-      {
-        ...this.props,
-        prompt: this.cleanText(output.text),
-      },
-      await this.service.getQueryCost(this.props)
-    );
+    if (this.serviceName != "") {
+      return this.service.query(
+        {
+          ...this.props,
+          prompt: this.cleanText(output.text),
+        },
+        await this.service.getQueryCost(this.props)
+      );
+    } else {
+      return "";
+    }
   }
 
   protected getResultOnError(

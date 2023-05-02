@@ -9,7 +9,7 @@ import settingsIcon from "../../../assets/icons/settings.png";
 
 import { Loader } from "../../loading/Loader";
 import botFactory from "../../../libs/botFactory";
-import { BotLoaderContext, useBot } from "../../../libs/botLoader";
+import { useBot } from "../../../libs/botLoader";
 import { PopUp } from "../../pup-up/pup-up";
 import {
   ChatHistory,
@@ -41,17 +41,14 @@ export enum ServicesNames {
 }
 
 type mikuSettings = {
-  // promptMethod: "RPBT" | "Miku" | "Pygmalion" | "OpenAI";
   promptStrategy: string;
-  // sttModel: "Whisper";
   sttModel: string;
   voiceGeneration: boolean;
-  // completionModel: "LLaMA-30B" | "GPT-3.5 Turbo" | "Pygmalion";
   modelService: string;
-  // voiceModel: "ElevenLabs" | "Azure" | "Novel";
-  voiceModel: string;
+  voiceService: string;
   voiceId: string;
   readNonSpokenText: boolean;
+  oldVoiceService: string;
 };
 
 type chatGenSettings = {
@@ -89,13 +86,14 @@ type chatGenSettings = {
 };
 
 export let botSettings: mikuSettings = {
-  promptStrategy: "RPBT",
+  promptStrategy: "",
   sttModel: "Whisper",
   voiceGeneration: true,
   modelService: "llama",
-  voiceModel: "ElevenLabs",
+  voiceService: "ElevenLabs",
   voiceId: "",
   readNonSpokenText: true,
+  oldVoiceService: "",
 };
 
 export let genSettings: chatGenSettings = {
@@ -230,7 +228,11 @@ export const BotDisplay = () => {
       const newConfig = JSON.parse(JSON.stringify(botConfig));
       botSettings.voiceId = newConfig.outputListeners[0].props.voiceId;
       newConfig.outputListeners[0].props.voiceId = botSettings.voiceId;
-      botSettings.voiceModel = newConfig.outputListeners[0].service;
+      newConfig.outputListeners[0].service == ""
+        ? botSettings.oldVoiceService
+        : (botSettings.voiceService = newConfig.outputListeners[0].service);
+      botSettings.promptStrategy =
+        newConfig.short_term_memory.props.buildStrategySlug;
       botFactory.updateInstance(newConfig);
     }
 

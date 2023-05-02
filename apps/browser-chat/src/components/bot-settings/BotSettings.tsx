@@ -16,18 +16,21 @@ import { updateHistoryNumber } from "../chat-history/chat-history";
 
 export const BotSettings = () => {
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
+
   const modelServices = ["llama", "openai", "pygmalion"];
+  const [modelServiceIndex, setServiceModelIndex] = useState<number>(0);
+
+  const voiceServices = ["elevenlabs_tts", "azure_tts", "novelai_tts"];
+  const [voiceServiceServiceIndex, setvoiceServiceServiceIndex] =
+    useState<number>(0);
+
   const oaiModels = ["text-davinci-003", "gpt-3.5-turbo", "gpt-4"];
-  const promptStrategies = ["RPBT", "Miku", "Pygmalion", "OpenAI"];
+  const promptStrategies = ["wpp", "sbf", "rpbt"];
   const sttModels = ["Whisper"];
-  const voiceModels = ["elevenlabs_tts", "azure_tts", "novelai_tts"];
+
   const [voiceGeneration, setVoiceGeneration] = useState<boolean>(
     botSettings.voiceGeneration
   );
-
-  const [modelServiceIndex, setServiceModelIndex] = useState<number>(0);
-  const [voiceModelServiceIndex, setVoiceModelServiceIndex] =
-    useState<number>(0);
 
   const [voiceId, setVoiceId] = useState<string>("");
   const [order, setOrder] = useState<string>(genSettings.order.toString());
@@ -41,7 +44,9 @@ export const BotSettings = () => {
   const { setBotConfig } = useContext(BotLoaderContext);
 
   useEffect(() => {
-    setVoiceModelServiceIndex(voiceModels.indexOf(botSettings.voiceModel));
+    setvoiceServiceServiceIndex(
+      voiceServices.indexOf(botSettings.voiceService)
+    );
     setServiceModelIndex(modelServices.indexOf(botSettings.modelService)); // u cant just go useState<number>(modelServices.indexOf(botSettings.modelSerivce)) bc uhh actually idk y it just doesnt work
     setVoiceId(botSettings.voiceId);
   }, []);
@@ -51,16 +56,39 @@ export const BotSettings = () => {
       <p className="text-white text-2xl text-start m-4">Bot Settings</p>
       <div className="max-w-96 h-full scrollbar overflow-auto text-clip text-start text-white m-4">
         Misc. settings for miku and how the model is prompted.
-        <DropdownInput
-          title="Prompt Strategy"
-          index={promptStrategies.indexOf(botSettings.promptStrategy)}
-          items={promptStrategies}
-          tooltip="How the character definitions are sent to the model."
-          onChange={(i) => {
-            botSettings.promptStrategy = promptStrategies[i];
-            forceUpdate();
-          }}
-        />
+        {JSON.parse(JSON.stringify(botConfig)).short_term_memory.service ==
+        "gpt_short-memory-v2" ? (
+          <DropdownInput
+            title="Prompt Strategy"
+            index={promptStrategies.indexOf(botSettings.promptStrategy)}
+            items={promptStrategies}
+            tooltip="How the character definitions are sent to the model."
+            onChange={(i) => {
+              if (botSettings.promptStrategy == promptStrategies[i]) return;
+              botSettings.promptStrategy = promptStrategies[i];
+              forceUpdate();
+              if (botConfig) {
+                const newConfig = JSON.parse(JSON.stringify(botConfig));
+                switch (i) {
+                  case 0:
+                    newConfig.short_term_memory.props.buildStrategySlug = "wpp";
+                    break;
+                  case 1:
+                    newConfig.short_term_memory.props.buildStrategySlug = "sbf";
+                    break;
+                  case 2:
+                    newConfig.short_term_memory.props.buildStrategySlug =
+                      "rpbt";
+                    break;
+                }
+                botFactory.updateInstance(newConfig);
+                updateBotConfig(newConfig);
+                setBotConfig(newConfig);
+                updateHistoryNumber();
+              }
+            }}
+          />
+        ) : null}
         <DropdownInput
           title="Speech-to-text"
           index={sttModels.indexOf(botSettings.sttModel)}
@@ -76,19 +104,37 @@ export const BotSettings = () => {
           title="Voice generation"
           tooltip="What is used to turn the bots speech into text."
           onChange={(e) => {
+            if (botSettings.voiceGeneration == e) return;
             botSettings.voiceGeneration = e;
             setVoiceGeneration(e);
+            if (botConfig) {
+              const newConfig = JSON.parse(JSON.stringify(botConfig));
+              if (e) {
+                newConfig.outputListeners[0].service =
+                  botSettings.oldVoiceService;
+              } else {
+                botSettings.oldVoiceService =
+                  newConfig.outputListeners[0].service;
+                newConfig.outputListeners[0].service = "";
+              }
+
+              botFactory.updateInstance(newConfig);
+              updateBotConfig(newConfig);
+              setBotConfig(newConfig);
+              updateHistoryNumber();
+            }
           }}
         />
         {voiceGeneration ? (
           <div className="p-4 my-4 bg-[#323232]">
             <div className="flex items-center gap-1">
               <DropDown
-                items={voiceModels}
-                selectedIndex={voiceModelServiceIndex}
+                items={voiceServices}
+                selectedIndex={voiceServiceServiceIndex}
                 onChange={(i) => {
-                  botSettings.voiceModel = voiceModels[i];
-                  setVoiceModelServiceIndex(i);
+                  if (botSettings.voiceService == voiceServices[i]) return;
+                  botSettings.voiceService = voiceServices[i];
+                  setvoiceServiceServiceIndex(i);
                   if (botConfig) {
                     const newConfig = JSON.parse(JSON.stringify(botConfig));
                     switch (i) {
@@ -102,13 +148,13 @@ export const BotSettings = () => {
                         newConfig.outputListeners[0].service =
                           ServicesNames.AzureTTS;
                         newConfig.outputListeners[0].props.voiceId =
-                        botSettings.voiceId;
+                          botSettings.voiceId;
                         break;
                       case 2:
                         newConfig.outputListeners[0].service =
                           ServicesNames.NovelAITTS;
                         newConfig.outputListeners[0].props.voiceId =
-                        botSettings.voiceId;
+                          botSettings.voiceId;
                         break;
                     }
                     botFactory.updateInstance(newConfig);
@@ -125,12 +171,13 @@ export const BotSettings = () => {
                   value={voiceId}
                   tooltip="What voice id to use."
                   onChange={(e) => {
+                    if (botSettings.voiceId == e.target.value) return;
                     botSettings.voiceId = e.target.value;
                     setVoiceId(e.target.value);
                     if (botConfig) {
                       const newConfig = JSON.parse(JSON.stringify(botConfig));
                       newConfig.outputListeners[0].props.voiceId =
-                      botSettings.voiceId;
+                        botSettings.voiceId;
                       botFactory.updateInstance(newConfig);
                       updateBotConfig(newConfig);
                       setBotConfig(newConfig);
@@ -145,6 +192,7 @@ export const BotSettings = () => {
               title="Read non-spoken text"
               tooltip="Read text enclosed in *asteriks*."
               onChange={(e) => {
+                if (botSettings.readNonSpokenText == e) return;
                 botSettings.readNonSpokenText = e;
                 if (botConfig) {
                   // i actually dont know why i need to do this but if i dont it wont send the updated gen settings to the tts service
@@ -164,6 +212,7 @@ export const BotSettings = () => {
           items={modelServices}
           tooltip={"What model is used to generate the text."}
           onChange={(i) => {
+            if (botSettings.modelService == modelServices[i]) return;
             botSettings.modelService = modelServices[i];
             setServiceModelIndex(i);
             if (botConfig) {
