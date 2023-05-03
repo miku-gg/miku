@@ -14,23 +14,28 @@ import { BotLoaderContext, useBot } from "../../libs/botLoader";
 import { InteractiveResponsesContext } from "../../libs/useResponses";
 import { updateHistoryNumber } from "../chat-history/chat-history";
 
+let botSettingsNumber = 0;
+export const updateBotSettingsNumber = () => {
+  botSettingsNumber += 1;
+};
+
 export const BotSettings: React.FC<{
   mobile?: boolean;
 }> = (props) => {
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
 
-  const modelServices = ["llama", "openai", "pygmalion"];
-  const [modelServiceIndex, setServiceModelIndex] = useState<number>(0);
+  const promptServices = ["llama", "openai", "pygmalion"];
+  const [promptServiceIndex, setPromptServiceIndex] = useState<number>(0);
 
   const voiceServices = ["elevenlabs_tts", "azure_tts", "novelai_tts"];
-  const [voiceServiceServiceIndex, setvoiceServiceServiceIndex] =
+  const [voiceServiceServiceIndex, setVoiceServiceServiceIndex] =
     useState<number>(0);
 
   const oaiModels = ["text-davinci-003", "gpt-3.5-turbo", "gpt-4"];
   const promptStrategies = ["wpp", "sbf", "rpbt"];
   // const sttModels = ["whisper_stt"];
 
-  const [voiceGeneration, setVoiceGeneration] = useState<boolean>(
+  let [voiceGeneration, setVoiceGeneration] = useState<boolean>(
     botSettings.voiceGeneration
   );
 
@@ -46,17 +51,26 @@ export const BotSettings: React.FC<{
   const { setBotConfig } = useContext(BotLoaderContext);
 
   useEffect(() => {
-    setvoiceServiceServiceIndex(
+    setVoiceServiceServiceIndex(
       voiceServices.indexOf(botSettings.voiceService)
     );
-    setServiceModelIndex(modelServices.indexOf(botSettings.modelService)); // u cant just go useState<number>(modelServices.indexOf(botSettings.modelSerivce)) bc uhh actually idk y it just doesnt work
+    setPromptServiceIndex(promptServices.indexOf(botSettings.promptService)); // u cant just go useState<number>(promptServices.indexOf(botSettings.modelService)) bc uhh actually idk y it just doesnt work
     setVoiceId(botSettings.voiceId);
-  }, []);
+    setVoiceGeneration(botSettings.voiceGeneration);
+    if (botSettings.voiceService == "" && botSettings.voiceGeneration) {
+      botSettings.voiceService = botSettings.oldVoiceService;
+    }
+    forceUpdate();
+  }, [botSettingsNumber]);
 
   return (
     <>
       <div className="max-w-96 h-full scrollbar overflow-auto text-clip text-start text-white m-4">
-        Misc. settings for miku and how the model is prompted.
+        <p className="pb-2">
+          Misc. settings for miku and how the model is prompted. Chaning
+          anything above (and including) the model service dropdown will reset
+          conversation history. Save conversation history before doing so.
+        </p>
         {JSON.parse(JSON.stringify(botConfig)).short_term_memory.service ==
         "gpt_short-memory-v2" ? (
           <DropdownInput
@@ -101,7 +115,7 @@ export const BotSettings: React.FC<{
           }}
         /> */}
         <BoolInput
-          value={botSettings.voiceGeneration}
+          value={voiceGeneration}
           title="Voice generation"
           tooltip="What is used to turn the bots speech into text."
           onChange={(e) => {
@@ -122,7 +136,6 @@ export const BotSettings: React.FC<{
               botFactory.updateInstance(newConfig);
               updateBotConfig(newConfig);
               setBotConfig(newConfig);
-              updateHistoryNumber();
             }
           }}
         />
@@ -141,7 +154,7 @@ export const BotSettings: React.FC<{
                   onChange={(i) => {
                     if (botSettings.voiceService == voiceServices[i]) return;
                     botSettings.voiceService = voiceServices[i];
-                    setvoiceServiceServiceIndex(i);
+                    setVoiceServiceServiceIndex(i);
                     if (botConfig) {
                       const newConfig = JSON.parse(JSON.stringify(botConfig));
                       switch (i) {
@@ -215,14 +228,13 @@ export const BotSettings: React.FC<{
         ) : null}
         <DropdownInput
           title="Model Service"
-          helperText="Changing this resets conversation history! Export conversation history before changing and import it after"
-          index={modelServiceIndex}
-          items={modelServices}
+          index={promptServiceIndex}
+          items={promptServices}
           tooltip={"What model is used to generate the text."}
           onChange={(i) => {
-            if (botSettings.modelService == modelServices[i]) return;
-            botSettings.modelService = modelServices[i];
-            setServiceModelIndex(i);
+            if (botSettings.promptService == promptServices[i]) return;
+            botSettings.promptService = promptServices[i];
+            setPromptServiceIndex(i);
             if (botConfig) {
               const newConfig = botConfig;
               switch (i) {
@@ -247,7 +259,7 @@ export const BotSettings: React.FC<{
             }
           }}
         />
-        {modelServiceIndex === 0 ? (
+        {promptServiceIndex === 0 ? (
           <div className="flex flex-col gap-8">
             <RangeInput
               title="Max New Tokens"
@@ -422,13 +434,13 @@ export const BotSettings: React.FC<{
             />
           </div>
         ) : null}
-        {modelServiceIndex === 1 ? (
+        {promptServiceIndex === 1 ? (
           <div className="flex flex-col gap-8">
             <DropdownInput
               title="OpenAI model"
               index={oaiModels.indexOf(genSettings.oaiModel)}
               items={oaiModels}
-              tooltip={"What OpenAI model is used to generate the text."}
+              tooltip="What OpenAI model is used to generate the text."
               onChange={(i) => {
                 genSettings.oaiModel = oaiModels[i];
                 forceUpdate();
@@ -472,7 +484,7 @@ export const BotSettings: React.FC<{
             />
           </div>
         ) : null}
-        {modelServiceIndex === 2 ? (
+        {promptServiceIndex === 2 ? (
           <div className="flex flex-col gap-8">
             <RangeInput
               title="Max Context Length"

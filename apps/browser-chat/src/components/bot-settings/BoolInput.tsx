@@ -1,4 +1,9 @@
-import React, { useState, useEffect, ChangeEventHandler } from "react";
+import React, {
+  useState,
+  useEffect,
+  ChangeEventHandler,
+  ChangeEvent,
+} from "react";
 import { Tooltip } from "@mui/material";
 import { InformationCircleIcon } from "@heroicons/react/20/solid";
 
@@ -6,19 +11,15 @@ const BoolInput: React.FC<{
   value: boolean;
   title: string;
   tooltip?: string;
-  onChange: (index: boolean) => void;
+  onChange: (value: boolean) => void;
 }> = (props) => {
-  const [value, setValue] = useState<boolean>(props.value);
+  const onChange = (ev: ChangeEvent<HTMLInputElement>) => {
+    props.onChange?.(ev.currentTarget.checked);
+  };
+
   return (
     <div className="flex items-center gap-1">
-      <input
-        type="checkbox"
-        checked={value}
-        onChange={() => {
-          props.onChange?.(!value);
-          setValue(!value);
-        }}
-      />
+      <input type="checkbox" checked={props.value} onChange={onChange} />
       {props.title}
       {props.tooltip ? (
         <Tooltip title={props.tooltip} placement="right">

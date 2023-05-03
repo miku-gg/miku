@@ -23,7 +23,10 @@ import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
 import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
-import { BotSettings } from "../../bot-settings/BotSettings";
+import {
+  BotSettings,
+  updateBotSettingsNumber,
+} from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
 
 export enum ServicesNames {
@@ -40,18 +43,18 @@ export enum ServicesNames {
   WhisperSTT = "whisper_stt",
 }
 
-type mikuSettings = {
+export type BotSettings = {
   promptStrategy: string;
   sttModel: string;
   voiceGeneration: boolean;
-  modelService: string;
+  promptService: string;
   voiceService: string;
   voiceId: string;
   readNonSpokenText: boolean;
   oldVoiceService: string;
 };
 
-type chatGenSettings = {
+export type GenSettings = {
   maxContextLength: number;
   temp: number;
   maxTokens: number;
@@ -85,18 +88,18 @@ type chatGenSettings = {
   oaiModel: string;
 };
 
-export let botSettings: mikuSettings = {
+export let botSettings: BotSettings = {
   promptStrategy: "",
   sttModel: "Whisper",
   voiceGeneration: true,
-  modelService: "llama",
+  promptService: "llama",
   voiceService: "ElevenLabs",
   voiceId: "",
   readNonSpokenText: true,
   oldVoiceService: "",
 };
 
-export let genSettings: chatGenSettings = {
+export let genSettings: GenSettings = {
   maxContextLength: 2048,
   temp: 0.7,
   maxTokens: 200,
@@ -228,31 +231,34 @@ export const BotDisplay = () => {
       const newConfig = JSON.parse(JSON.stringify(botConfig));
       botSettings.voiceId = newConfig.outputListeners[0].props.voiceId;
       newConfig.outputListeners[0].props.voiceId = botSettings.voiceId;
-      newConfig.outputListeners[0].service == ""
-        ? botSettings.oldVoiceService
-        : (botSettings.voiceService = newConfig.outputListeners[0].service);
+      if (botSettings.voiceService == "" && botSettings.voiceGeneration) {
+        botSettings.voiceService = botSettings.oldVoiceService;
+      }
+      botSettings.voiceService = newConfig.outputListeners[0].service;
       botSettings.promptStrategy =
         newConfig.short_term_memory.props.buildStrategySlug;
       botFactory.updateInstance(newConfig);
+      updateBotSettingsNumber();
     }
 
     switch (botConfig?.prompt_completer.service) {
       case ServicesNames.OpenAI: {
         genSettings.topP = 1.0;
-        botSettings.modelService = "openai";
+        botSettings.promptService = "openai";
         const openAIModel = JSON.parse(
           JSON.stringify(botConfig?.prompt_completer.props)
         ).model; // there's prolly a better way to do this but linter cries if u just do botConfig?.prompt_completer.props.model
-        if (openAIModel) genSettings.oaiModel = openAIModel;
+        if (openAIModel && genSettings.oaiModel == "")
+          genSettings.oaiModel = openAIModel;
 
         break;
       }
       case ServicesNames.Pygmalion: {
-        botSettings.modelService = "pygmalion";
+        botSettings.promptService = "pygmalion";
         break;
       }
       case ServicesNames.LLaMA: {
-        botSettings.modelService = "llama";
+        botSettings.promptService = "llama";
         break;
       }
     }
