@@ -19,7 +19,6 @@ const EmotionImage = (
     event.preventDefault();
     setDragOver(false);
     const file = event.dataTransfer.files[0];
-    console.log(file);
     if (file) {
       handleImageChange(file, groupIndex, emotionId);
     }
@@ -51,7 +50,6 @@ const EmotionImage = (
 
 const Step3Expressions: React.FC = () => {
   const { characterData, setCharacterData } = useCharacterCreationForm();
-  console.log(characterData);
 
   const handleAddGroup = () => {
     const newGroup: EmotionGroup = {
@@ -95,7 +93,6 @@ const Step3Expressions: React.FC = () => {
     groupIndex: number,
     emotionId: string
   ) => {
-    console.log('image change', file, emotionId);
     if (file) {
       const isValidSizeAndType = await checkImageDimensionsAndType(file, ['image/png', 'image/gif', 'video/webm']);
       if (isValidSizeAndType) {

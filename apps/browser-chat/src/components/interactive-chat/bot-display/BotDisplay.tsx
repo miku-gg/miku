@@ -72,14 +72,11 @@ export const BotDisplay = () => {
     async function fetchFile() {
       try {
         setEmotionImgIsLoading(true);
-        console.log(emotionImage);
         const response = await fetch(`${VITE_IMAGES_DIRECTORY_ENDPOINT}/${emotionImage}`);
         if (response.ok) {
-          console.log(response.headers);
           const contentType = response.headers.get("Content-Type");
           const data = await response.blob();
           const newBlobUrl = URL.createObjectURL(data);
-          console.log(data);
           setBlobUrl(newBlobUrl);
           setFileType(contentType);
           setEmotionImgIsLoading(false);
