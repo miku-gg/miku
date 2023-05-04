@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import fs from "fs";
 import config from "../config";
 
-
 export default function getItem(responseType: 'json' | 'image' | 'string' | 'csv', folder: 'bots' | 'imgs' | 'emotions' | 'embeddings', req: Request, res: Response) {
   try {
     const hash = req.params?.hash || '';
@@ -22,11 +21,25 @@ export default function getItem(responseType: 'json' | 'image' | 'string' | 'csv
       });
       res.end(csv);
     } else if(responseType === 'image') {
-      let raw = fs.readFileSync(itemPath, 'base64');
-      let img = Buffer.from(raw, 'base64');
-      res.setHeader('Content-Type', 'image/png');
+      let img = fs.readFileSync(itemPath);
+      const fileSignature: {[key: string]: string} = {
+        '89504E47': 'image/png',
+        '47494638': 'image/gif',
+        'FFD8FFE0': 'image/jpeg',
+        'FFD8FFE1': 'image/jpeg',
+        'FFD8FFE2': 'image/jpeg',
+        '1A45DFA3': 'video/webm',
+      };
+
+      const signature = img.toString('hex', 0, 4).toUpperCase();
+      let filetype = 'image/png';
+      if (signature in fileSignature) {
+        filetype = fileSignature[signature] || 'image/png';
+      }
+
+      res.setHeader('Content-Type', filetype);
       res.writeHead(200, {
-        'Content-Type': 'image/png',
+        'Content-Type': filetype,
         'Content-Length': img.length
       });
       res.end(img);
