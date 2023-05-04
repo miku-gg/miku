@@ -20,7 +20,7 @@ import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
 import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
 
-const VITE_IMAGES_DIRECTORY_ENDPOINT = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT || 'http://localhost:8585/images';
+const VITE_IMAGES_DIRECTORY_ENDPOINT = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT || 'http://localhost:8585/image';
 
 
 export const BotDisplay = () => {
@@ -69,17 +69,17 @@ export const BotDisplay = () => {
   }
 
   useEffect(() => {
-  }, [emotionImage]);
-
-  useEffect(() => {
     async function fetchFile() {
       try {
         setEmotionImgIsLoading(true);
+        console.log(emotionImage);
         const response = await fetch(`${VITE_IMAGES_DIRECTORY_ENDPOINT}/${emotionImage}`);
         if (response.ok) {
+          console.log(response.headers);
           const contentType = response.headers.get("Content-Type");
           const data = await response.blob();
           const newBlobUrl = URL.createObjectURL(data);
+          console.log(data);
           setBlobUrl(newBlobUrl);
           setFileType(contentType);
           setEmotionImgIsLoading(false);
@@ -194,7 +194,7 @@ export const BotDisplay = () => {
     if (fileType === "video/webm") {
       return (
         <video
-          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${emotionImgIsLoading ? 'fade-in up-and-down' : ''}`}
+          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${!emotionImgIsLoading ? 'fade-in up-and-down' : ''}`}
           src={blobUrl}
           loop
           autoPlay
@@ -205,7 +205,7 @@ export const BotDisplay = () => {
     } else {
       return (
         <img
-          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${emotionImgIsLoading ? 'fade-in up-and-down' : ''}`}
+          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${!emotionImgIsLoading ? 'fade-in up-and-down' : ''}`}
           src={blobUrl}
           alt="character"
           onError={({ currentTarget }) => {
