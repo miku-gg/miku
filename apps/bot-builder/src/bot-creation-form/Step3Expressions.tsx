@@ -9,7 +9,7 @@ const EmotionImage = (
     id: string,
     emotionId: string,
     handleImageChange: (file: File, groupIndex: number, emotionId: string) => void
-    renderImagePreview: (groupIndex: number, emotionId: string) => string,
+    renderImagePreview: (groupIndex: number, emotionId: string) => JSX.Element,
     groupIndex: number
   }
 ): JSX.Element => {
@@ -19,6 +19,7 @@ const EmotionImage = (
     event.preventDefault();
     setDragOver(false);
     const file = event.dataTransfer.files[0];
+    console.log(file);
     if (file) {
       handleImageChange(file, groupIndex, emotionId);
     }
@@ -42,20 +43,15 @@ const EmotionImage = (
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
       >
-        <img
-          src={renderImagePreview(groupIndex, emotionId)}
-          alt={`Emotion ${emotionId}`}
-          className="step3Expressions__emotionPreview"
-        />
+        {renderImagePreview(groupIndex, emotionId)}
       </div>
     </div>
   )
 }
 
-
-
 const Step3Expressions: React.FC = () => {
   const { characterData, setCharacterData } = useCharacterCreationForm();
+  console.log(characterData);
 
   const handleAddGroup = () => {
     const newGroup: EmotionGroup = {
@@ -99,8 +95,9 @@ const Step3Expressions: React.FC = () => {
     groupIndex: number,
     emotionId: string
   ) => {
+    console.log('image change', file, emotionId);
     if (file) {
-      const isValidSizeAndType = await checkImageDimensionsAndType(file, ['image/png', 'image/gif']);
+      const isValidSizeAndType = await checkImageDimensionsAndType(file, ['image/png', 'image/gif', 'video/webm']);
       if (isValidSizeAndType) {
         if (characterData.emotionGroups) {
           const reader = new FileReader();
@@ -119,7 +116,7 @@ const Step3Expressions: React.FC = () => {
             if (imageIndex >= 0) {
               images[imageIndex].sources = [base64];
             } else {
-              images.push({ emotion: emotionId, sources: [base64] });
+              images.push({ emotion: emotionId, sources: [base64], fileTypes: file.type });
             }
             newGroups[groupIndex].images = images;
             setCharacterData({ ...characterData, emotionGroups: newGroups });
@@ -150,15 +147,36 @@ const Step3Expressions: React.FC = () => {
   const renderImagePreview = (
     groupIndex: number,
     emotionId: string
-  ): string => {
+  ): JSX.Element => {
+    let src = ''
     const group = characterData.emotionGroups?.[groupIndex];
-    if (!group) return '';
+    if (!group) src = '';
 
     const image = group.images.find((img) => img.emotion === emotionId);
     if (image && image.sources.length > 0) {
-      return image.sources[0] || '';
+      src = image.sources[0] || '';
     } else {
-      return placeholderImage;
+      src = placeholderImage;
+    }
+
+    if (image && image.fileTypes === 'video/webm') {
+      return (
+        <video
+          src={src}
+          className="step3Expressions__emotionPreview"
+          autoPlay
+          loop
+          muted
+        />
+      );
+    } else {
+      return (
+        <img
+          src={src}
+          alt={`Emotion ${emotionId}`}
+          className="step3Expressions__emotionPreview"
+        />
+      );
     }
   };
 
@@ -234,7 +252,7 @@ const Step3Expressions: React.FC = () => {
             <input
               type="file"
               multiple
-              accept="image/png, image/gif"
+              accept="image/png, image/gif, video/webm"
               onChange={(event) => handleMultipleImageChange(event, groupIndex)}
             />
           </div>

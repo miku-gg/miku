@@ -198,7 +198,7 @@ export const BotDisplay = () => {
           src={blobUrl}
           loop
           autoPlay
-          muted={!hasPlayedAudio}
+          muted
           onPlay={() => setHasPlayedAudio(true)}
         />
       );
@@ -214,7 +214,7 @@ export const BotDisplay = () => {
           }}
         />
       );
-    }  
+    }
   };
 
   return (

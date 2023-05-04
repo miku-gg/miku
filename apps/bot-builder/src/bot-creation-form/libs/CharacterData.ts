@@ -18,7 +18,7 @@ export type EmotionGroup = {
   trigger: string;
   description: string;
   emotionsHash: string; // indicates a hash of one of the emotions has configs
-  images: { emotion: string, sources: string[] }[] // emotion is the emotion id in the config
+  images: { emotion: string, sources: string[], fileTypes?: string }[] // emotion is the emotion id in the config
 };
 
 export type BackgroundImage = {
