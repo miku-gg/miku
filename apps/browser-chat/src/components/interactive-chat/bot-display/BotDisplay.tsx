@@ -95,7 +95,7 @@ export let botSettings: BotSettings = {
   promptService: "llama",
   voiceService: "ElevenLabs",
   voiceId: "",
-  readNonSpokenText: true,
+  readNonSpokenText: false,
   oldVoiceService: "",
 };
 
