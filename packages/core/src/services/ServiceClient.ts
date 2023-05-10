@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { Wallet } from '@ethersproject/wallet';
-import { encode } from './utils';
+import axios from "axios";
+import { Wallet } from "@ethersproject/wallet";
+import { encode } from "./utils";
 
 export interface ServiceRequestQuery {
   input: string;
@@ -10,7 +10,7 @@ export interface ServiceRequestQuery {
 }
 
 export interface ServiceRequestBody {
-  query: ServiceRequestQuery
+  query: ServiceRequestQuery;
   signature: string;
 }
 
@@ -36,55 +36,94 @@ export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
   private signer: ServiceQuerySigner;
   private serviceName: string;
 
-  constructor(serviceEndpoint: string, signer: ServiceQuerySigner, serviceName: string) {
+  constructor(
+    serviceEndpoint: string,
+    signer: ServiceQuerySigner,
+    serviceName: string
+  ) {
     this.serviceEndpoint = serviceEndpoint;
     this.signer = signer;
     this.serviceName = serviceName;
   }
 
   public async getQueryCost(input: ServiceInputProps): Promise<number> {
-    try {
-      const result = await axios.post<{price: number}>(`${this.serviceEndpoint}/price`, {
-        query: {
-          input: this.inputPropsToBase64(input)
-        }
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-      return result.data.price
-    } catch (error) {
-      console.error(error);
-      throw 'Error getting cost';
+    if (this.serviceName != "") {
+      try {
+        const result = await axios.post<{ price: number }>(
+          `${this.serviceEndpoint}/price`,
+          {
+            query: {
+              input: this.inputPropsToBase64(input),
+            },
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        return result.data.price;
+      } catch (error) {
+        console.error(error);
+        throw "Error getting cost";
+      }
+    } else {
+      return 0;
     }
   }
 
-  public async query(input: ServiceInputProps, tokenLimit: number): Promise<ServiceOutputProps> {
+  public async query(
+    input: ServiceInputProps,
+    tokenLimit: number
+  ): Promise<ServiceOutputProps> {
     try {
       const metadata = {
         address: this.signer.getAddress(),
         tokenLimit,
         timestamp: Date.now(),
       };
-      console.log(`%c[SERVICE REQUEST]%c ${this.serviceName}`, 'background: #333; color: cyan', 'color: lime', input, metadata);
+      console.log(
+        `%c[SERVICE REQUEST]%c ${this.serviceName}`,
+        "background: #333; color: cyan",
+        "color: lime",
+        input,
+        metadata
+      );
       const _query = {
         input: this.inputPropsToBase64(input),
         ...metadata,
       };
-      const result = await axios.post<ServiceOutputProps,  axios.AxiosResponse<ServiceOutputProps, any>, ServiceRequestBody>(`${this.serviceEndpoint}/query`, {
-        query: _query,
-        signature: await this.signer.signQuery(_query),
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
+      const result = await axios.post<
+        ServiceOutputProps,
+        axios.AxiosResponse<ServiceOutputProps, any>,
+        ServiceRequestBody
+      >(
+        `${this.serviceEndpoint}/query`,
+        {
+          query: _query,
+          signature: await this.signer.signQuery(_query),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
-      console.log(`%c[SERVICE RESPONSE]%c ${this.serviceName}`, 'background: #333; color: #bada55', 'color: lime', result);
+      );
+      console.log(
+        `%c[SERVICE RESPONSE]%c ${this.serviceName}`,
+        "background: #333; color: #bada55",
+        "color: lime",
+        result
+      );
       return result.data;
     } catch (error) {
-      console.log(`%c[SERVICE ERROR]%c ${this.serviceName}`, 'background: #333; color: crimson', 'color: lime', error);
-      throw 'Error querying service';
+      console.log(
+        `%c[SERVICE ERROR]%c ${this.serviceName}`,
+        "background: #333; color: crimson",
+        "color: lime",
+        error
+      );
+      throw "Error querying service";
     }
   }
 

@@ -3,12 +3,13 @@ import { Commands } from "..";
 export interface MemoryLine {
   text: string;
   subject: string;
+  settings: string;
   type: Commands.CommandType;
 }
 
 /**
  * MemoryPromptConfig is an interface that represents the configuration for the ShortTermMemory.
- * 
+ *
  * contextPrompt: string - The context prompt.
  * initiatorPrompt: string - The initiator prompt.
  * subjects: string[] - The subjects of the conversation.
@@ -20,7 +21,6 @@ export interface MemoryPromptConfig {
   subjects: string[];
   botSubject: string;
 }
-
 
 /**
  * ShortTermMemory is an abstract class that represents a short term memory.
@@ -36,7 +36,16 @@ export abstract class ShortTermMemory {
   protected subjects: string[];
   protected botSubject: string;
 
-  constructor({prompt_context, prompt_initiator, subjects, botSubject}: MemoryPromptConfig, memorySize = 30, selectedResponseIndex = 0) {
+  constructor(
+    {
+      prompt_context,
+      prompt_initiator,
+      subjects,
+      botSubject,
+    }: MemoryPromptConfig,
+    memorySize = 30,
+    selectedResponseIndex = 0
+  ) {
     this.contextPrompt = prompt_context;
     this.initiatorPrompt = prompt_initiator;
     this.basePrompt = prompt_context + prompt_initiator;

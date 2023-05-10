@@ -17,12 +17,17 @@
   background: #c0a0b9;
 }
 
+.scrollbar {
+  scrollbar-color: rgb(167 139 250) transparent;
+  scrollbar-width: auto;
+}
+
 .bot-display-images-container {
   box-shadow: 0px 0px 20px 0px rgb(205 95 234);
 }
 
 .conversation-background-image {
-  transition: all .2s ease-in;
+  transition: all 0.2s ease-in;
   pointer-events: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -32,7 +37,7 @@
 }
 
 .conversation-bot-image {
-  transition: all .2s ease-in;
+  transition: all 0.2s ease-in;
   pointer-events: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -46,7 +51,7 @@
 .reload-button,
 .response-swiping {
   opacity: 0;
-  transition: all .2s ease-in;
+  transition: all 0.2s ease-in;
 }
 
 .reload-button:hover,
@@ -62,7 +67,7 @@
 
 .wand-button {
   animation: blinker 1s linear infinite;
-  transition: all .2s ease-in;
+  transition: all 0.2s ease-in;
 }
 
 .wand-button svg {
@@ -75,13 +80,13 @@
 
 @keyframes blinker {
   50% {
-    opacity: .4;
+    opacity: 0.4;
   }
 }
 
 .fade-in {
   opacity: 1;
-  transition: opacity .5s ease;
+  transition: opacity 0.5s ease;
 }
 
 .up-and-down {
@@ -89,7 +94,8 @@
 }
 
 @keyframes up-and-down {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
