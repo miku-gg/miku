@@ -14,6 +14,9 @@ const Step2ModelAndVoice: React.FC = () => {
 
   return (
     <div className="step2ModelAndVoice">
+      <div className="step2ModelAndVoice__description">
+        The following are just default values, they can be changed by the bot user.
+      </div>
       <div className="step2ModelAndVoice__formGroup">
         <label htmlFor="model">Prompt Completion Model:</label>
         <select
