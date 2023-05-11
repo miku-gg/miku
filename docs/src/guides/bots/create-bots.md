@@ -6,7 +6,7 @@ order: 1800
 
 ### Creating a bot
 
-To create a bot, go to your local `https://localhost:8585/` where the bot directory is. Then click on the `Build bot` button in the header.
+To create a bot, go to your local `http://localhost:8585/` where the bot directory is. Then click on the `Build bot` button in the header.
 
 ![](/assets/create_bot_ui.png)
 
