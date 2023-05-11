@@ -6,6 +6,10 @@ order: 1800
 
 ### Creating a bot
 
+!!!warning Deprecated Builder
+The current builder is deprecated. Please use https://build.miku.gg instead (or http://localhost:8586 locally).
+!!!
+
 To create a bot, go to your local `http://localhost:8585/` where the bot directory is. Then click on the `Build bot` button in the header.
 
 ![](/assets/create_bot_ui.png)
