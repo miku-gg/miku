@@ -56,7 +56,6 @@ http://localhost:8586/
 
 For more information on how to use the Mikugg project, please refer to the official documentation at [https://docs.miku.gg](https://docs.miku.gg).
 
-
 # Local Development (Linux)
 ```
 pnpm install

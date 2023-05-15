@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Checking if Python is installed..."
-if ! command -v python &>/dev/null; then
+if ! command -v python3 &>/dev/null; then
     echo "ERROR: Python is not installed."
     echo "Please install Python from https://www.python.org/downloads/ and add it to your PATH."
     exit 1
@@ -17,7 +17,7 @@ fi
 echo "Node.js is installed."
 
 echo "Checking if Pip is installed..."
-if ! command -v pip &>/dev/null; then
+if ! command -v pip3 &>/dev/null; then
     echo "ERROR: Pip is not installed."
     echo "Please install pip from https://pip.pypa.io/en/stable/installation/ and add it to your PATH."
     exit 1
@@ -26,7 +26,18 @@ echo "Pip is installed."
 
 echo "Installing Node.js dependencies..."
 rm -rf apps/browser-chat/node_modules/.vite || true
-npm install -g pnpm
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if ! command -v brew &>/dev/null; then
+        echo "ERROR: Homebrew is not installed."
+        echo "Please install Homebrew from https://brew.sh/ and try again."
+        exit 1
+    fi
+    brew install pnpm
+else
+    npm install -g pnpm
+fi
+
 pnpm install
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to install dependencies."
@@ -34,15 +45,15 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Installing Python dependencies..."
-pip install -r apps/embeddings-apis/sentence-embedder/requirements.txt
-pip install -r apps/embeddings-apis/similarity-search/requirements.txt
+pip3 install -r apps/embeddings-apis/sentence-embedder/requirements.txt
+pip3 install -r apps/embeddings-apis/similarity-search/requirements.txt
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to install Python dependencies."
     exit 1
 fi
 
 echo "Generating .env file..."
-python create_env.py
+python3 create_env.py
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to generate .env file."
     exit 1
