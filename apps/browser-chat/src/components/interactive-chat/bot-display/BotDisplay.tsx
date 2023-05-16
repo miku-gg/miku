@@ -90,12 +90,13 @@ export type GenSettings = {
 
 export let botSettings: BotSettings = {
   promptStrategy: "",
+
   sttModel: "Whisper",
   voiceGeneration: true,
   promptService: "llama",
   voiceService: "ElevenLabs",
   voiceId: "",
-  readNonSpokenText: true,
+  readNonSpokenText: false,
   oldVoiceService: "",
 };
 
@@ -156,18 +157,18 @@ export const BotDisplay = () => {
     setCurrentContext,
     onUpdate,
   } = useContext(InteractiveResponsesContext);
-  const [ contextSuggestion, setContextSuggestion ] = useState<string>('');
-  const [ emotionImgIsLoading, setEmotionImgIsLoading ] = useState(false);
-  const [ hasPlayedAudio, setHasPlayedAudio ] = useState(false);
-  const [ fileType, setFileType ] = useState<string | null>(null);
-  const [ blobUrl, setBlobUrl ] = useState<string>('');
-  
-  let backgroundImage = Number(botConfig?.configVersion || 1) > 1 ? (
-    ((botConfig as BotConfigV2)?.backgrounds || [{source: ''}])[0].source || ''
-  ) : (
-    (botConfig as BotConfigV1)?.background_pic || ''
-  );
-  let emotionImage = response?.emotion || prevResponse?.emotion || '';
+  const [contextSuggestion, setContextSuggestion] = useState<string>("");
+  const [emotionImgIsLoading, setEmotionImgIsLoading] = useState(false);
+  const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
+  const [fileType, setFileType] = useState<string | null>(null);
+  const [blobUrl, setBlobUrl] = useState<string>("");
+
+  let backgroundImage =
+    Number(botConfig?.configVersion || 1) > 1
+      ? ((botConfig as BotConfigV2)?.backgrounds || [{ source: "" }])[0]
+          .source || ""
+      : (botConfig as BotConfigV1)?.background_pic || "";
+  let emotionImage = response?.emotion || prevResponse?.emotion || "";
   if (!emotionImage) {
     const openAIEmotionConfig = botConfig?.outputListeners.find(
       (listener: { service: string }) =>
@@ -199,7 +200,9 @@ export const BotDisplay = () => {
     async function fetchFile() {
       try {
         setEmotionImgIsLoading(true);
-        const response = await fetch(`${VITE_IMAGES_DIRECTORY_ENDPOINT}/${emotionImage}`);
+        const response = await fetch(
+          `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${emotionImage}`
+        );
         if (response.ok) {
           const contentType = response.headers.get("Content-Type");
           const data = await response.blob();
@@ -215,10 +218,10 @@ export const BotDisplay = () => {
         console.error("Error fetching file:", error);
       }
     }
-  
+
     fetchFile();
+    setEmotionImgIsLoading(false);
   }, [emotionImage]);
-  
 
   useEffect(() => {
     const bot = botFactory.getInstance();
@@ -367,11 +370,12 @@ export const BotDisplay = () => {
   };
 
   const renderEmotionElement = (): JSX.Element => {
-  
     if (fileType === "video/webm") {
       return (
         <video
-          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${!emotionImgIsLoading ? 'fade-in up-and-down' : ''}`}
+          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${
+            !emotionImgIsLoading ? "fade-in up-and-down" : ""
+          }`}
           src={blobUrl}
           loop
           autoPlay
@@ -382,7 +386,9 @@ export const BotDisplay = () => {
     } else {
       return (
         <img
-          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${!emotionImgIsLoading ? 'fade-in up-and-down' : ''}`}
+          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${
+            !emotionImgIsLoading ? "fade-in up-and-down" : ""
+          }`}
           src={blobUrl}
           alt="character"
           onError={({ currentTarget }) => {

@@ -63,6 +63,9 @@ export function validateBotConfig(config: BotConfig): void {
       case 2:
         PropTypes.checkPropTypes(BotConfigV2PropTypes, config, 'config', 'BotConfigV2');
         break;
+      case 1:
+        PropTypes.checkPropTypes(BotConfigV1PropTypes, config, 'config', 'BotConfigV1');
+        break;
       // Add more cases for newer config versions in the future
       default:
         throw `Unsupported configVersion: ${config.configVersion}`;

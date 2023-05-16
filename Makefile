@@ -2,9 +2,9 @@ install:
 	./install.sh
 
 run:
-	python run.py
+	python3 run.py
 
 pull:
 	pnpm pull
-	python install.py
-	python create_env.py
+	python3 install.py
+	python3 create_env.py
