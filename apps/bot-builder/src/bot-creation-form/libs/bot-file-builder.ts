@@ -10,7 +10,10 @@ export enum BUILDING_STEPS {
   STEP_3_DOWNLOADING_ZIP = 3,
 }
 
-export async function createCharacterConfig(characterData: CharacterData, emotionsEmbeddingsHash: string) {
+export async function createCharacterConfig(
+  characterData: CharacterData,
+  emotionsEmbeddingsHash: string
+) {
   // Replace base64 images with their hashes
   const profilePicHash = await hashBase64URI(characterData.avatar);
   const backgroundHashes = await Promise.all(
@@ -27,25 +30,30 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
           return { id: emotion.emotion, hashes: [hash] };
         })
       );
-      return { name: emotionGroup.name, description: emotionGroup.description, emotions: hashes };
+      return {
+        name: emotionGroup.name,
+        description: emotionGroup.description,
+        emotions: hashes,
+      };
     })
   );
-  
-  let modelService = 'openai_completer';
+
+  let promptService = "openai_completer";
   switch (characterData.model) {
-    case 'gpt-3.5-turbo':
-      modelService = 'openai_completer';
+    case "gpt-3.5-turbo":
+      promptService = "openai_completer";
       break;
-    case 'pygmalion-6b':
-      modelService = 'pygmalion_completer';
+    case "pygmalion-6b":
+      promptService = "pygmalion_completer";
       break;
-    case 'llama-30b':
-      modelService = 'llama_completer';
+    case "llama-30b":
+      promptService = "llama_completer";
       break;
   }
-  const [voiceService, voiceId, emotion] = characterData.voice.split('.')
+  const [voiceService, voiceId, emotion] = characterData.voice.split(".");
 
-  const buildStrategySlug = characterData.model === 'llama-30b' ? 'rpbt' : 'wpp';
+  const buildStrategySlug =
+    characterData.model === "llama-30b" ? "rpbt" : "wpp";
 
   // Map character data to the desired JSON structure
   const characterConfig = {
@@ -54,30 +62,33 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
     description: characterData.shortDescription,
     author: characterData.author,
     configVersion: 2,
-    subject: 'Anon',
+    subject: "Anon",
     profile_pic: profilePicHash,
     backgrounds: backgroundHashes,
     short_term_memory: {
-      service: 'gpt_short-memory-v2',
+      service: "gpt_short-memory-v2",
       props: {
-        prompt_context: '',
-        prompt_initiator: '',
-        language: 'en',
-        subjects: ['Anon'],
+        prompt_context: "",
+        prompt_initiator: "",
+        language: "en",
+        subjects: ["Anon"],
         botSubject: characterData.name,
         buildStrategySlug,
         parts: {
           persona: characterData.description,
-          attributes: characterData.attributes.map((attribute) => [attribute.key, attribute.value]),
-          sampleChat: characterData.sampleConversation.split('\n'),
+          attributes: characterData.attributes.map((attribute) => [
+            attribute.key,
+            attribute.value,
+          ]),
+          sampleChat: characterData.sampleConversation.split("\n"),
           scenario: characterData.scenario,
           greeting: characterData.greeting,
-          botSubject: characterData.name
-        }
+          botSubject: characterData.name,
+        },
       },
     },
     prompt_completer: {
-      service: modelService,
+      service: promptService,
       props: {
         model: characterData.model,
       },
@@ -87,13 +98,13 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
         service: voiceService,
         props: {
           voiceId: voiceId,
-          emotion: emotion || 'chat'
+          emotion: emotion || "chat",
         },
       },
       {
-        service: 'sbert_emotion-interpreter',
+        service: "sbert_emotion-interpreter",
         props: {
-          model: 'all-MiniLM-L6-v2',
+          model: "all-MiniLM-L6-v2",
           start_context: characterData.emotionGroups[0].name,
           context_base_description_embeddings: emotionsEmbeddingsHash,
           contexts: characterData.emotionGroups.map((emotionGroup, index) => {
@@ -102,8 +113,8 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
               context_change_trigger: emotionGroup.trigger,
               emotion_embeddings: emotionGroup.emotionsHash,
               emotion_images: emotionHashes[index].emotions,
-            }
-          })
+            };
+          }),
         },
       },
     ],
@@ -112,18 +123,30 @@ export async function createCharacterConfig(characterData: CharacterData, emotio
   return characterConfig;
 }
 
-export async function downloadBotFile(characterData: CharacterData, setBuildingStep: (step: BUILDING_STEPS) => void) {
+export async function downloadBotFile(
+  characterData: CharacterData,
+  setBuildingStep: (step: BUILDING_STEPS) => void
+) {
   setBuildingStep(BUILDING_STEPS.STEP_1_GENERATING_EMBEDDINGS);
-  const emotionsEmbeddings = await emotionGroupsEmbedder(characterData.emotionGroups);
+  const emotionsEmbeddings = await emotionGroupsEmbedder(
+    characterData.emotionGroups
+  );
   const emotionsEmbeddingsHash = await hashBase64(emotionsEmbeddings);
 
   setBuildingStep(BUILDING_STEPS.STEP_2_GENERATING_ZIP);
-  const botConfig = await createCharacterConfig(characterData, emotionsEmbeddingsHash);
+  const botConfig = await createCharacterConfig(
+    characterData,
+    emotionsEmbeddingsHash
+  );
   const images = [
     characterData.avatar,
     ...characterData.backgroundImages.map((bg) => bg.source),
-    ...characterData.emotionGroups.map((emotionGroup) => emotionGroup.images.map((emotion) => emotion.sources[0])).flat(2),
-  ]
+    ...characterData.emotionGroups
+      .map((emotionGroup) =>
+        emotionGroup.images.map((emotion) => emotion.sources[0])
+      )
+      .flat(2),
+  ];
   const blob = await generateZipFile(botConfig, images, emotionsEmbeddings);
 
   await downloadBlob(blob, `${characterData.name}_${Date.now()}.miku`);

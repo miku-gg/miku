@@ -3,10 +3,10 @@ import PropTypes, { InferProps } from "prop-types";
 
 export const TTSServicePropTypes = {
   apiKey: PropTypes.string,
-  voiceId: PropTypes.string,
-  language: PropTypes.oneOf(['en', 'es']),
+  language: PropTypes.oneOf(["en", "es"]),
   emotion: PropTypes.string,
-  prompt: PropTypes.string
+  prompt: PropTypes.string,
+  settings: PropTypes.string,
 };
 
 export interface TTSServiceConfig extends Miku.Services.ServiceConfig {
@@ -16,12 +16,12 @@ export interface TTSServiceConfig extends Miku.Services.ServiceConfig {
 }
 
 export abstract class TTSService extends Miku.Services.Service {
-  protected defaultProps: InferProps<typeof TTSServicePropTypes>  = {
-    apiKey: '',
-    voiceId: '',
-    language: 'en',
-    emotion: 'default',
-    prompt: ''
+  protected defaultProps: InferProps<typeof TTSServicePropTypes> = {
+    apiKey: "",
+    language: "en",
+    emotion: "default",
+    prompt: "",
+    settings: "",
   };
   protected costPerRequest: number;
   protected apiKey: string;
@@ -29,8 +29,8 @@ export abstract class TTSService extends Miku.Services.Service {
 
   constructor(config: TTSServiceConfig) {
     super(config);
-    this.apiKey = config.apiKey || '';
-    this.apiEndpoint = config.apiEndpoint || '';
+    this.apiKey = config.apiKey || "";
+    this.apiEndpoint = config.apiEndpoint || "";
     this.costPerRequest = config.costPerRequest;
   }
 
@@ -38,7 +38,9 @@ export abstract class TTSService extends Miku.Services.Service {
     return TTSServicePropTypes;
   }
 
-  protected override async calculatePrice(input: PropTypes.InferProps<PropTypes.ValidationMap<any>>): Promise<number> {
+  protected override async calculatePrice(
+    input: PropTypes.InferProps<PropTypes.ValidationMap<any>>
+  ): Promise<number> {
     return this.costPerRequest;
   }
 }
