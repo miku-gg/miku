@@ -220,6 +220,7 @@ const Step3Expressions: React.FC = () => {
           <div className="step3Expressions__formGroup">
             <label htmlFor={`group_${groupIndex}_name`}>Name:</label>
             <input
+              placeholder="Enter a name for this emotion group"
               type="text"
               id={`group_${groupIndex}_name`}
               name="name"
@@ -228,8 +229,9 @@ const Step3Expressions: React.FC = () => {
             />
           </div>
           <div className="step3Expressions__formGroup">
-            <label htmlFor={`group_${groupIndex}_description`}>Description:</label>
+            <label htmlFor={`group_${groupIndex}_description`}>Trigger embedding:</label>
             <textarea
+              placeholder="Enter a text that will trigger this emotion group. This could be a list of keywords or a sentence. This text will be converted to an embedding."
               id={`group_${groupIndex}_description`}
               name="description"
               value={group.description}
@@ -237,8 +239,9 @@ const Step3Expressions: React.FC = () => {
             />
           </div>
           <div className="step3Expressions__formGroup">
-            <label htmlFor={`group_${groupIndex}_trigger`}>Context Trigger:</label>
+            <label htmlFor={`group_${groupIndex}_trigger`}>Switch sentence:</label>
             <textarea
+              placeholder="Enter a text that will be added to the prompt when this emotion group is triggered."
               id={`group_${groupIndex}_trigger`}
               name="trigger"
               value={group.trigger}

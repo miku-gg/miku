@@ -90,6 +90,7 @@ export type GenSettings = {
 
 export let botSettings: BotSettings = {
   promptStrategy: "",
+
   sttModel: "Whisper",
   voiceGeneration: true,
   promptService: "llama",
