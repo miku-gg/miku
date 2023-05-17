@@ -15,12 +15,12 @@ importers:
         version: 4.0.2
       '@mikugg/core':
         specifier: ^0.3.0
-        version: link:../../packages/core
+        version: 0.3.0
       '@mikugg/extensions':
         specifier: ^0.3.0
-        version: link:../../packages/extensions
+        version: 0.3.1
       '@mikugg/ui-kit':
-        specifier: workspace:^0.3.0
+        specifier: ^0.4.0
         version: link:../../packages/ui-kit
       '@types/axios':
         specifier: ^0.14.0
@@ -130,10 +130,10 @@ importers:
     dependencies:
       '@mikugg/bot-validator':
         specifier: ^0.3.0
-        version: link:../../packages/bot-validator
+        version: 0.3.4
       '@mikugg/extensions':
         specifier: ^0.3.0
-        version: link:../../packages/extensions
+        version: 0.3.1
       '@types/body-parser':
         specifier: ^1.19.2
         version: 1.19.2
@@ -212,13 +212,13 @@ importers:
         version: 2.0.16(react@18.2.0)
       '@mikugg/bot-validator':
         specifier: ^0.3.0
-        version: link:../../packages/bot-validator
+        version: 0.3.4
       '@mikugg/core':
         specifier: ^0.3.0
-        version: link:../../packages/core
+        version: 0.3.0
       '@mikugg/extensions':
         specifier: ^0.3.0
-        version: link:../../packages/extensions
+        version: 0.3.1
       '@mui/material':
         specifier: ^5.11.10
         version: 5.11.14(@emotion/react@11.10.6)(@emotion/styled@11.10.6)(@types/react@18.0.28)(react-dom@18.2.0)(react@18.2.0)
@@ -303,7 +303,7 @@ importers:
     dependencies:
       '@mikugg/extensions':
         specifier: ^0.3.0
-        version: link:../../packages/extensions
+        version: 0.3.1
       '@types/body-parser':
         specifier: ^1.19.2
         version: 1.19.2
@@ -360,10 +360,10 @@ importers:
   packages/bot-validator:
     dependencies:
       '@mikugg/core':
-        specifier: ^0.3.4
+        specifier: ^0.4.0
         version: link:../core
       '@mikugg/extensions':
-        specifier: ^0.3.8
+        specifier: ^0.4.0
         version: link:../extensions
       '@types/node':
         specifier: ^18.15.5
@@ -458,7 +458,7 @@ importers:
   packages/extensions:
     dependencies:
       '@mikugg/core':
-        specifier: ^0.3.4
+        specifier: ^0.4.0
         version: link:../core
       '@types/axios':
         specifier: ^0.14.0
@@ -3013,6 +3013,106 @@ packages:
       - bluebird
       - supports-color
     dev: true
+
+  /@mikugg/bot-validator@0.3.4:
+    resolution: {integrity: sha512-RGDE8ycDzyQ5mlfb0KQPFag1ZZAyJl32+Qd4H9HxXLR5DBq+DXihKpHT/drAPTXKeJ+HaSAnp4HfhqdWpz3PGw==}
+    dependencies:
+      '@mikugg/core': 0.3.4
+      '@mikugg/extensions': 0.3.8
+      '@types/node': 18.15.5
+      '@types/prop-types': 15.7.5
+      prop-types: 15.8.1
+    transitivePeerDependencies:
+      - debug
+      - encoding
+      - supports-color
+    dev: false
+
+  /@mikugg/core@0.3.0:
+    resolution: {integrity: sha512-T2eWvVPpY8/l98j7dJjko8iyswLdhSygNQuYkZLrQ737Hnsz/cUXmEqWp24xN8loBvz6PCf0PtMu/T+TJHAzgg==}
+    dependencies:
+      '@ethersproject/wallet': 5.7.0
+      '@keenondrums/singleton': 1.0.0
+      '@types/axios': 0.14.0
+      '@types/base-64': 1.0.0
+      '@types/node': 18.15.5
+      '@types/prop-types': 15.7.5
+      '@types/utf8': 3.0.1
+      '@types/uuid': 9.0.1
+      axios: 1.3.4
+      base-64: 1.0.0
+      events: 3.3.0
+      prop-types: 15.8.1
+      queue: 6.0.2
+      utf8: 3.0.0
+      uuid: 9.0.0
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /@mikugg/core@0.3.4:
+    resolution: {integrity: sha512-47wAcRVC3WEib2OFXKZ9vxcRRrJGe60YWg8183YJXqTtNWnDNhkSwzWeIa5YZ6h7ja7OIs7VZsf33ILCLEq2DA==}
+    dependencies:
+      '@ethersproject/wallet': 5.7.0
+      '@keenondrums/singleton': 1.0.0
+      '@types/axios': 0.14.0
+      '@types/base-64': 1.0.0
+      '@types/node': 18.15.5
+      '@types/prop-types': 15.7.5
+      '@types/utf8': 3.0.1
+      '@types/uuid': 9.0.1
+      axios: 1.3.4
+      base-64: 1.0.0
+      events: 3.3.0
+      prop-types: 15.8.1
+      queue: 6.0.2
+      utf8: 3.0.0
+      uuid: 9.0.0
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /@mikugg/extensions@0.3.1:
+    resolution: {integrity: sha512-TaVoT7YTYolTTZrZUmkQzxzY5m7wTGhVwb7rNwzD0SK1EzelqNwifmL/y6XG6h7vBQpjKfJIifuh62zw+8u7xw==}
+    dependencies:
+      '@mikugg/core': 0.3.4
+      '@types/axios': 0.14.0
+      '@types/lodash.trim': 4.5.7
+      '@types/node': 18.15.5
+      '@types/prop-types': 15.7.5
+      axios: 1.3.4
+      compute-cosine-similarity: 1.0.0
+      gpt3-tokenizer: 1.1.5
+      ipfs-only-hash: 4.0.0
+      lodash.trim: 4.5.1
+      openai: 3.2.1
+      prop-types: 15.8.1
+    transitivePeerDependencies:
+      - debug
+      - encoding
+      - supports-color
+    dev: false
+
+  /@mikugg/extensions@0.3.8:
+    resolution: {integrity: sha512-X6WivB68jt2RvrTyMkjmG5wrTYUyzfsiDUgdqhZILTAQR8oXbR3miYur3xmRZ18GmM2cApEU7z0BJVb1UL05FA==}
+    dependencies:
+      '@mikugg/core': 0.3.4
+      '@types/axios': 0.14.0
+      '@types/lodash.trim': 4.5.7
+      '@types/node': 18.15.5
+      '@types/prop-types': 15.7.5
+      axios: 1.3.4
+      compute-cosine-similarity: 1.0.0
+      gpt3-tokenizer: 1.1.5
+      ipfs-only-hash: 4.0.0
+      lodash.trim: 4.5.1
+      openai: 3.2.1
+      prop-types: 15.8.1
+    transitivePeerDependencies:
+      - debug
+      - encoding
+      - supports-color
+    dev: false
 
   /@mui/base@5.0.0-alpha.122(@types/react@18.0.28)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-IgZEFQyHa39J1+Q3tekVdhPuUm1fr3icddaNLmiAIeYTVXmR7KR5FhBAIL0P+4shlPq0liUPGlXryoTm0iCeFg==}
