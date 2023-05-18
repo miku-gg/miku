@@ -1,6 +1,6 @@
 {
   "name": "@mikugg/bot-validator",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "",
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@mikugg/core": "^0.4.0",
-    "@mikugg/extensions": "^0.4.0",
+    "@mikugg/extensions": "^0.4.1",
     "@types/node": "^18.15.5",
     "@types/prop-types": "^15.7.5",
     "prop-types": "^15.8.1"
