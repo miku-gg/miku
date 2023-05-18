@@ -67,7 +67,7 @@ export const BotSettings: React.FC<{
     <>
       <div className="max-w-96 h-full scrollbar overflow-auto text-clip text-start text-white m-4">
         <p className="pb-2">
-          Misc. settings for miku and how the model is prompted. Chaning
+          Misc. settings for miku and how the model is prompted. Changing
           anything above (and including) the model service dropdown will reset
           conversation history. Save conversation history before doing so.
         </p>
