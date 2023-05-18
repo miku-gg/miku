@@ -17,7 +17,7 @@ importers:
         specifier: ^0.4.0
         version: link:../../packages/core
       '@mikugg/extensions':
-        specifier: ^0.4.0
+        specifier: ^0.4.1
         version: link:../../packages/extensions
       '@mikugg/ui-kit':
         specifier: ^0.4.0
@@ -129,11 +129,11 @@ importers:
   apps/bot-directory:
     dependencies:
       '@mikugg/bot-validator':
-        specifier: ^0.3.0
-        version: 0.3.4
+        specifier: ^0.4.1
+        version: link:../../packages/bot-validator
       '@mikugg/extensions':
-        specifier: ^0.3.0
-        version: 0.3.1
+        specifier: ^0.4.1
+        version: link:../../packages/extensions
       '@types/body-parser':
         specifier: ^1.19.2
         version: 1.19.2
@@ -211,13 +211,13 @@ importers:
         specifier: ^2.0.14
         version: 2.0.14(react@18.2.0)
       '@mikugg/bot-validator':
-        specifier: ^0.4.0
+        specifier: ^0.4.1
         version: link:../../packages/bot-validator
       '@mikugg/core':
         specifier: ^0.4.0
         version: link:../../packages/core
       '@mikugg/extensions':
-        specifier: ^0.4.0
+        specifier: ^0.4.1
         version: link:../../packages/extensions
       '@mui/material':
         specifier: ^5.11.10
@@ -302,7 +302,7 @@ importers:
   apps/services-server:
     dependencies:
       '@mikugg/extensions':
-        specifier: ^0.4.0
+        specifier: ^0.4.1
         version: link:../../packages/extensions
       '@types/body-parser':
         specifier: ^1.19.2
@@ -363,7 +363,7 @@ importers:
         specifier: ^0.4.0
         version: link:../core
       '@mikugg/extensions':
-        specifier: ^0.4.0
+        specifier: ^0.4.1
         version: link:../extensions
       '@types/node':
         specifier: ^18.15.5
@@ -514,7 +514,7 @@ importers:
         version: 29.5.0(@types/node@18.15.5)(ts-node@10.9.1)
       ts-jest:
         specifier: ^29.0.5
-        version: 29.0.5(@babel/core@7.21.3)(jest@29.5.0)(typescript@4.9.5)
+        version: 29.0.5(@babel/core@7.21.8)(jest@29.5.0)(typescript@4.9.5)
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.15.5)(typescript@4.9.5)
@@ -667,6 +667,29 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
+  /@babel/core@7.21.8:
+    resolution: {integrity: sha512-YeM22Sondbo523Sz0+CirSPnbj9bG3P0CdHcBZdqUuaeOaYEFbOLoGU7lebvGP6P5J/WE9wOn7u7C4J9HvS1xQ==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      '@ampproject/remapping': 2.2.1
+      '@babel/code-frame': 7.21.4
+      '@babel/generator': 7.21.5
+      '@babel/helper-compilation-targets': 7.21.5(@babel/core@7.21.8)
+      '@babel/helper-module-transforms': 7.21.5
+      '@babel/helpers': 7.21.5
+      '@babel/parser': 7.21.8
+      '@babel/template': 7.20.7
+      '@babel/traverse': 7.21.5
+      '@babel/types': 7.21.5
+      convert-source-map: 1.9.0
+      debug: 4.3.4
+      gensync: 1.0.0-beta.2
+      json5: 2.2.3
+      semver: 6.3.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /@babel/eslint-parser@7.21.8(@babel/core@7.21.3)(eslint@8.36.0):
     resolution: {integrity: sha512-HLhI+2q+BP3sf78mFUZNCGc10KEmoUqtUT1OCdMZsN+qr4qFeLUod62/zAnF3jNQstwyasDkZnVXwfK2Bml7MQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || >=14.0.0}
@@ -716,6 +739,20 @@ packages:
       browserslist: 4.21.5
       lru-cache: 5.1.1
       semver: 6.3.0
+
+  /@babel/helper-compilation-targets@7.21.5(@babel/core@7.21.8):
+    resolution: {integrity: sha512-1RkbFGUKex4lvsB9yhIfWltJM5cZKUftB2eNajaDv3dCMEp49iBG0K14uH8NnX9IPux2+mK7JGEOB0jn48/J6w==}
+    engines: {node: '>=6.9.0'}
+    peerDependencies:
+      '@babel/core': ^7.0.0
+    dependencies:
+      '@babel/compat-data': 7.21.7
+      '@babel/core': 7.21.8
+      '@babel/helper-validator-option': 7.21.0
+      browserslist: 4.21.5
+      lru-cache: 5.1.1
+      semver: 6.3.0
+    dev: true
 
   /@babel/helper-create-class-features-plugin@7.21.8(@babel/core@7.21.3):
     resolution: {integrity: sha512-+THiN8MqiH2AczyuZrnrKL6cAxFRRQDKW9h1YkBvbgKmAm6mwiacig1qT73DHIWMGo40GRnsEfN3LA+E6NtmSw==}
@@ -3701,84 +3738,6 @@ packages:
       npmlog: 6.0.2
       write-file-atomic: 4.0.2
     dev: true
-
-  /@mikugg/bot-validator@0.3.4:
-    resolution: {integrity: sha512-RGDE8ycDzyQ5mlfb0KQPFag1ZZAyJl32+Qd4H9HxXLR5DBq+DXihKpHT/drAPTXKeJ+HaSAnp4HfhqdWpz3PGw==}
-    dependencies:
-      '@mikugg/core': 0.3.4
-      '@mikugg/extensions': 0.3.8
-      '@types/node': 18.15.5
-      '@types/prop-types': 15.7.5
-      prop-types: 15.8.1
-    transitivePeerDependencies:
-      - debug
-      - encoding
-      - supports-color
-    dev: false
-
-  /@mikugg/core@0.3.4:
-    resolution: {integrity: sha512-47wAcRVC3WEib2OFXKZ9vxcRRrJGe60YWg8183YJXqTtNWnDNhkSwzWeIa5YZ6h7ja7OIs7VZsf33ILCLEq2DA==}
-    dependencies:
-      '@ethersproject/wallet': 5.7.0
-      '@keenondrums/singleton': 1.0.0
-      '@types/axios': 0.14.0
-      '@types/base-64': 1.0.0
-      '@types/node': 18.15.5
-      '@types/prop-types': 15.7.5
-      '@types/utf8': 3.0.1
-      '@types/uuid': 9.0.1
-      axios: 1.2.4
-      base-64: 1.0.0
-      events: 3.3.0
-      prop-types: 15.8.1
-      queue: 6.0.2
-      utf8: 3.0.0
-      uuid: 9.0.0
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /@mikugg/extensions@0.3.1:
-    resolution: {integrity: sha512-TaVoT7YTYolTTZrZUmkQzxzY5m7wTGhVwb7rNwzD0SK1EzelqNwifmL/y6XG6h7vBQpjKfJIifuh62zw+8u7xw==}
-    dependencies:
-      '@mikugg/core': 0.3.4
-      '@types/axios': 0.14.0
-      '@types/lodash.trim': 4.5.7
-      '@types/node': 18.15.5
-      '@types/prop-types': 15.7.5
-      axios: 1.2.4
-      compute-cosine-similarity: 1.0.0
-      gpt3-tokenizer: 1.1.5
-      ipfs-only-hash: 4.0.0
-      lodash.trim: 4.5.1
-      openai: 3.2.1
-      prop-types: 15.8.1
-    transitivePeerDependencies:
-      - debug
-      - encoding
-      - supports-color
-    dev: false
-
-  /@mikugg/extensions@0.3.8:
-    resolution: {integrity: sha512-X6WivB68jt2RvrTyMkjmG5wrTYUyzfsiDUgdqhZILTAQR8oXbR3miYur3xmRZ18GmM2cApEU7z0BJVb1UL05FA==}
-    dependencies:
-      '@mikugg/core': 0.3.4
-      '@types/axios': 0.14.0
-      '@types/lodash.trim': 4.5.7
-      '@types/node': 18.15.5
-      '@types/prop-types': 15.7.5
-      axios: 1.2.4
-      compute-cosine-similarity: 1.0.0
-      gpt3-tokenizer: 1.1.5
-      ipfs-only-hash: 4.0.0
-      lodash.trim: 4.5.1
-      openai: 3.2.1
-      prop-types: 15.8.1
-    transitivePeerDependencies:
-      - debug
-      - encoding
-      - supports-color
-    dev: false
 
   /@mui/base@5.0.0-alpha.118(@types/react@18.0.26)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-GAEpqhnuHjRaAZLdxFNuOf2GDTp9sUawM46oHZV4VnYPFjXJDkIYFWfIQLONb0nga92OiqS5DD/scGzVKCL0Mw==}
@@ -12670,7 +12629,7 @@ packages:
     resolution: {integrity: sha512-0z3j8R7MCjy10kc/g+qg7Ln3alJTodw9aDuVWZa3uiWqfuBMKeAeP2ocWcxoyM3D73yz3Jt/Pu4qPr4wHSdB/Q==}
     dev: true
 
-  /ts-jest@29.0.5(@babel/core@7.21.3)(jest@29.5.0)(typescript@4.9.5):
+  /ts-jest@29.0.5(@babel/core@7.21.8)(jest@29.5.0)(typescript@4.9.5):
     resolution: {integrity: sha512-PL3UciSgIpQ7f6XjVOmbi96vmDHUqAyqDr8YxzopDqX3kfgYtX1cuNeBjP+L9sFXi6nzsGGA6R3fP3DDDJyrxA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     hasBin: true
@@ -12691,7 +12650,7 @@ packages:
       esbuild:
         optional: true
     dependencies:
-      '@babel/core': 7.21.3
+      '@babel/core': 7.21.8
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       jest: 29.5.0(@types/node@18.15.5)(ts-node@10.9.1)
