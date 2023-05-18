@@ -72,8 +72,10 @@ export class LLaMAService extends Miku.Services.Service {
       }
     );
 
+    const result = completion?.data?.results?.length ? completion?.data?.results[0] : {text: ''};
+
     return (
-      (completion.data.results[0].text || [""]).replace(input.prompt, "") || ""
+      (result.text || '').replace(input.prompt, "") || ""
     );
   }
 
