@@ -58,6 +58,7 @@ class BotFactory {
     service: MikuExtensions.Services.ServicesNames;
     props: object;
   }): MikuCore.Memory.ShortTermMemory {
+    const searchParams = queryString.parse(location.search);
     let memory: MikuCore.Memory.ShortTermMemory | null = null;
     switch (service) {
       case MikuExtensions.Services.ServicesNames.GPTShortTermMemory:
@@ -66,9 +67,15 @@ class BotFactory {
         );
         break;
       case MikuExtensions.Services.ServicesNames.GPTShortTermMemoryV2:
-        memory = new MikuExtensions.Memory.GPTShortTermMemoryV2(
-          props as MikuExtensions.Memory.GPTShortTermMemoryV2Config
-        );
+        const _props = props as MikuExtensions.Memory.GPTShortTermMemoryV2Config;
+        const strategySlugFromURL = String(searchParams["strategy"] || "");
+        const buildStrategySlug = MikuExtensions.Memory.Strategies.isOfTypeStrategySlug(strategySlugFromURL) ?
+          strategySlugFromURL :
+          _props.buildStrategySlug;
+        memory = new MikuExtensions.Memory.GPTShortTermMemoryV2({
+          ..._props,
+          buildStrategySlug,
+        });
         break;
     }
 

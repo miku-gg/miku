@@ -405,7 +405,7 @@ export const BotDisplay = () => {
     <>
       <div className="relative flex flex-col w-full h-full items-center">
         {/* MAIN IMAGE */}
-        <div className="absolute flex flex-col justify-center items-center w-full h-full overflow-hidden bot-display-images-container">
+        <div className="absolute flex flex-col justify-center items-center w-full h-full overflow-hidden bot-display-images-container rounded-xl">
           <div className="flex items-center justify-between pt-3 px-3 absolute z-10 top-0 w-full">
             <div className="flex gap-3">
               <button className="rounded-full" onClick={displayBotDetails}>

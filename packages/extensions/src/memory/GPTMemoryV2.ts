@@ -2,6 +2,7 @@
 import * as Strategies from './strategies';
 import { GPTShortTermMemory, GPTShortTermMemoryConfig } from './GPTMemory';
 
+export * as Strategies from './strategies';
 export interface ContextPromptParts {
   persona: string
   attributes: [string, string][]
