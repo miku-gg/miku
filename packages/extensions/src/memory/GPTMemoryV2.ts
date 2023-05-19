@@ -31,6 +31,8 @@ function getStrategyFromSlug(slug: Strategies.StrategySlug): ContextPromptBuildS
       return new Strategies.SbfStrategy();
     case 'rpbt':
       return new Strategies.RPBTStrategy();
+    case 'pyg':
+      return new Strategies.PygStrategy();
     default:
       throw new Error(`Invalid strategy slug: ${slug}`);
   }
