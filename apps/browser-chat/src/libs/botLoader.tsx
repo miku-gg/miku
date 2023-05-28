@@ -1,34 +1,11 @@
 import { BotConfig } from "@mikugg/bot-validator";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import botFactory from './botFactory';
 import queryString from "query-string";
+import { BotConfigSettings, DEFAULT_BOT_SETTINGS } from "./botSettingsUtils";
+import * as MikuCore from "@mikugg/core";
 
 const BOT_DIRECTORY_ENDPOINT = import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT || 'http://localhost:8585/bot';
-
-// interface BotDecorationParams {
-//   model: 
-//     'gpt3.5-turbo' |
-//     'gpt4' |
-//     'oa' |
-//     'llama-7b' |
-//     'llama-13b' |
-//     'llama-30b' |
-//     'llama-65b' |
-//     'alpaca-7b' |
-//     'alpaca-13b' |
-//     'vicuna-13b' |
-//     'gpt4all-7b' |
-//     'gpt4all-13b' |
-//     'gpt4-x-alpaca-7b' |
-//     'gpt4-x-alpaca-13b' |
-//     'pygmalion-6b',
-//   promptStrategy: 'wpp' | 'sbf' | 'rpbt' | 'miku' | 'assistant',
-//   ttsService: 'elevenlabs_tts' | 'azure_tts',
-//   ttsVoiceId: string,
-// }
-
-// function getBotConfigDecoratedWithParams(botConfig: BotConfig, params: BotDecorationParams): BotConfig {
-// }
 
 export function loadBotConfig(botHash: string): Promise<{
   success: boolean,
@@ -61,50 +38,113 @@ export function getBotHashFromUrl(): string {
 export const BotLoaderContext = React.createContext<{
   botHash: string,
   botConfig: BotConfig | undefined,
+  botConfigSettings: BotConfigSettings,
   loading: boolean,
   error: boolean,
   setBotHash: (bot: string) => void,
   setBotConfig: (botConfig: BotConfig) => void,
+  setBotConfigSettings: (botConfigSettings: BotConfigSettings) => void,
   setLoading: (loading: boolean) => void,
   setError: (error: boolean) => void,
 }>({
   botHash: '',
   botConfig: undefined,
+  botConfigSettings: DEFAULT_BOT_SETTINGS,
   loading: true,
   error: false,
   setBotHash: () => {},
   setBotConfig: () => {},
+  setBotConfigSettings: () => {},
   setLoading: () => {},
   setError: () => {},
 });
 
-
 export const BotLoaderProvider = ({ children }: {children: JSX.Element}): JSX.Element => {
   const [botHash, setBotHash] = useState<string>('');
   const [botConfig, setBotConfig] = useState<BotConfig | undefined>(undefined);
+  const [botConfigSettings, setBotConfigSettings] = useState<BotConfigSettings>(DEFAULT_BOT_SETTINGS);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-  
 
   return (
-    <BotLoaderContext.Provider value={{ botConfig, loading, error, botHash, setBotConfig, setLoading, setError, setBotHash }}>
+    <BotLoaderContext.Provider value={{
+      botConfig, loading, error, botHash, setBotConfig, setLoading, setError, setBotHash, botConfigSettings, setBotConfigSettings
+    }}>
       {children}
     </BotLoaderContext.Provider>
   );
 };
 
+export interface CustomEndpoints {
+  oobabooga: string,
+  openai: string,
+  koboldai: string,
+  azure: string,
+  elevenlabs: string,
+  novelai: string,
+}
+export interface BotData {
+  hash: string
+  settings: BotConfigSettings
+  endpoints: CustomEndpoints
+}
+
+function getBotDataFromURL(): BotData {
+  const searchParams = queryString.parse(location.search);
+  return {
+    hash: String(searchParams['bot'] || '') || '',
+    settings: (function (): BotConfigSettings {
+      try {
+        const jsonString = MikuCore.Services.decode(String(searchParams['settings'] || '') || '');
+        return JSON.parse(jsonString) as BotConfigSettings;
+      } catch (e) {
+        console.warn('Unable to load settings.')
+        return DEFAULT_BOT_SETTINGS;
+      }
+    })(),
+    endpoints: {
+      oobabooga: String(searchParams['oobabooga'] || '') || '',
+      openai: String(searchParams['openai'] || '') || '',
+      koboldai: String(searchParams['koboldai'] || '') || '',
+      azure: String(searchParams['azure'] || '') || '',
+      elevenlabs: String(searchParams['elevenlabs'] || '') || '',
+      novelai: String(searchParams['novelai'] || '') || '',
+    }
+  }
+}
+
+function setBotDataInURL(botData: BotData) {
+  const { endpoints } = botData;
+  const newSearchParams = {
+    bot: botData.hash,
+    settings: MikuCore.Services.encode(JSON.stringify(botData.settings)),
+  };
+  
+  for (const key in endpoints) {
+    if (endpoints[key]) newSearchParams[key] = endpoints[key]
+  }
+
+  const newSearchString = queryString.stringify(newSearchParams);
+  window.history.replaceState({}, 'bot', `/?${newSearchString}`);
+}
+
 export function useBot(): {
   botHash: string,
   botConfig: BotConfig | undefined,
+  botConfigSettings: BotConfigSettings,
+  setBotConfigSettings: (botConfigSettings: BotConfigSettings) => void,
   loading: boolean,
   error: boolean,
   setBotHash: (botHash: string) => void,
 } {
   const {
     botConfig, setBotConfig, loading, setLoading, error, setError, botHash, setBotHash,
-  } = useContext(BotLoaderContext)
+    botConfigSettings, setBotConfigSettings
+  } = useContext(BotLoaderContext);
 
-  const _botLoadCallback = useCallback((_hash: string = getBotHashFromUrl()) =>{
+  // Get data from url params
+
+  const _botLoadCallback = useCallback((_hash: string = getBotHashFromUrl(), _botData: BotData = getBotDataFromURL()) =>{
     setLoading(true);
     setBotHash(_hash);
     loadBotConfig(_hash).then((res) => {
@@ -113,7 +153,7 @@ export function useBot(): {
         const newSearchParams = {...searchParams, bot: _hash};
         const newSearchString = queryString.stringify(newSearchParams);
         window.history.replaceState({}, 'bot', `/?${newSearchString}`);
-        botFactory.updateInstance(res.bot);
+        botFactory.updateInstance(res.bot, _botData.endpoints);
         setBotConfig(res.bot);
         setBotHash(res.hash);
         setError(false);
@@ -124,9 +164,21 @@ export function useBot(): {
     });
   }, [setBotConfig, setError, setLoading, setBotHash]);
 
+  const _setBotConfigSettings = useCallback((_botConfigSettings: BotConfigSettings) => {
+    const newBotData = {
+      ...getBotDataFromURL(),
+      settings: _botConfigSettings,
+    };
+    setBotConfigSettings(_botConfigSettings);
+    _botLoadCallback(newBotData.hash, newBotData);
+    setBotDataInURL(newBotData);
+  }, [setBotConfigSettings, _botLoadCallback])
+
   return {
     botHash,
     botConfig,
+    botConfigSettings,
+    setBotConfigSettings: _setBotConfigSettings,
     loading,
     error,
     setBotHash: (_hash?: string) => _botLoadCallback(_hash),

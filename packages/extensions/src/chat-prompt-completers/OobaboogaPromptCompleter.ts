@@ -1,31 +1,31 @@
 import * as Core from "@mikugg/core";
 import { InferProps } from "prop-types";
-import { LLaMAServicePropTypes, ServicesNames } from "../services";
+import { OobaboogaServicePropTypes, ServicesNames } from "../services";
 import {
   hasTextStop,
   parsePygmalionResponse,
 } from "./PygmalionPromptCompleter";
-type LLaMAPropTypes = InferProps<typeof LLaMAServicePropTypes>;
+type OobaboogaPropTypes = InferProps<typeof OobaboogaServicePropTypes>;
 
-export interface LLaMAParams
+export interface OobaboogaParams
   extends Core.ChatPromptCompleters.ChatPromptCompleterConfig {
   serviceEndpoint: string;
-  props: LLaMAPropTypes;
+  props: OobaboogaPropTypes;
   signer: Core.Services.ServiceQuerySigner;
 }
 
-export class LLaMAPromptCompleter extends Core.ChatPromptCompleters
+export class OobaboogaPromptCompleter extends Core.ChatPromptCompleters
   .ChatPromptCompleter {
-  private props: LLaMAPropTypes;
-  private service: Core.Services.ServiceClient<LLaMAPropTypes, string>;
+  private props: OobaboogaPropTypes;
+  private service: Core.Services.ServiceClient<OobaboogaPropTypes, string>;
 
-  constructor(params: LLaMAParams) {
+  constructor(params: OobaboogaParams) {
     super(params);
     this.props = params.props;
-    this.service = new Core.Services.ServiceClient<LLaMAPropTypes, string>(
+    this.service = new Core.Services.ServiceClient<OobaboogaPropTypes, string>(
       params.serviceEndpoint,
       params.signer,
-      ServicesNames.LLaMA
+      ServicesNames.Oobabooga
     );
   }
 
@@ -95,7 +95,7 @@ export class LLaMAPromptCompleter extends Core.ChatPromptCompleters
     };
   }
 
-  private getProps(): LLaMAPropTypes {
+  private getProps(): OobaboogaPropTypes {
     return this.props;
   }
 }

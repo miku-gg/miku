@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useCharacterCreationForm } from './CharacterCreationFormContext';
-import { models, voices, Voice } from './libs/CharacterData';
+import { voices, Voice } from './libs/CharacterData';
 
 const Step2ModelAndVoice: React.FC = () => {
   const { characterData, setCharacterData } = useCharacterCreationForm();
@@ -16,31 +16,6 @@ const Step2ModelAndVoice: React.FC = () => {
     <div className="step2ModelAndVoice">
       <div className="step2ModelAndVoice__description">
         The following are just default values, they can be changed by the bot user.
-      </div>
-      <div className="step2ModelAndVoice__formGroup">
-        <label htmlFor="model">Prompt Completion Model:</label>
-        <select
-          id="model"
-          name="model"
-          value={characterData.model || ''}
-          onChange={handleInputChange}
-          className="step2ModelAndVoice__modelSelect"
-        >
-          <option value="">Select a model</option>
-          {Object.entries(models).map(([key, { label }]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
-          ))}
-        </select>
-        {characterData.model && (
-          <div className="step2ModelAndVoice__modelDescription">
-            <span className={`step2ModelAndVoice__priceBadge step2ModelAndVoice__priceBadge--${models[characterData.model].price}`}>
-              {models[characterData.model].price}
-            </span>
-            {models[characterData.model].description}
-          </div>
-        )}
       </div>
       <div className="step2ModelAndVoice__formGroup">
         <label htmlFor="voice">Voice:</label>

@@ -1,10 +1,9 @@
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import { BotConfig } from "@mikugg/bot-validator";
-import queryString from "query-string";
 import { toast } from "react-toastify";
-import { IS_ALPHA_LIVE } from "../components/loading/BotLoadingModal";
 import { botSettings } from "../components/interactive-chat/bot-display/BotDisplay";
+import { CustomEndpoints } from "./botLoader";
 
 const MOCK_PRIVATE_KEY =
   "2658e4257eaaf9f72295ce012fa8f8cc4a600cdaf4051884d2c02593c717c173";
@@ -58,7 +57,6 @@ class BotFactory {
     service: MikuExtensions.Services.ServicesNames;
     props: object;
   }): MikuCore.Memory.ShortTermMemory {
-    const searchParams = queryString.parse(location.search);
     let memory: MikuCore.Memory.ShortTermMemory | null = null;
     switch (service) {
       case MikuExtensions.Services.ServicesNames.GPTShortTermMemory:
@@ -67,15 +65,14 @@ class BotFactory {
         );
         break;
       case MikuExtensions.Services.ServicesNames.GPTShortTermMemoryV2:
-        const _props = props as MikuExtensions.Memory.GPTShortTermMemoryV2Config;
-        const strategySlugFromURL = String(searchParams["strategy"] || "");
-        const buildStrategySlug = MikuExtensions.Memory.Strategies.isOfTypeStrategySlug(strategySlugFromURL) ?
-          strategySlugFromURL :
-          _props.buildStrategySlug;
-        memory = new MikuExtensions.Memory.GPTShortTermMemoryV2({
-          ..._props,
-          buildStrategySlug,
-        });
+        // const _props = ;
+        // const strategySlugFromURL = String(searchParams["strategy"] || "");
+        // const buildStrategySlug = MikuExtensions.Memory.Strategies.isOfTypeStrategySlug(strategySlugFromURL) ?
+        //   strategySlugFromURL :
+        //   _props.buildStrategySlug;
+        memory = new MikuExtensions.Memory.GPTShortTermMemoryV2(
+          props as MikuExtensions.Memory.GPTShortTermMemoryV2Config
+        );
         break;
     }
 
@@ -89,17 +86,18 @@ class BotFactory {
     props,
     memory,
     signer,
+    endpoints,
   }: {
     service: MikuExtensions.Services.ServicesNames;
     props: object;
     memory: MikuCore.Memory.ShortTermMemory;
     signer: MikuCore.Services.ServiceQuerySigner;
+    endpoints?: CustomEndpoints
   }): MikuCore.ChatPromptCompleters.ChatPromptCompleter {
     let chatPromptCompleter: MikuCore.ChatPromptCompleters.ChatPromptCompleter | null =
       null;
 
     // for alpha demo
-    const searchParams = queryString.parse(location.search);
 
     switch (service) {
       case MikuExtensions.Services.ServicesNames.OpenAI:
@@ -108,7 +106,7 @@ class BotFactory {
             serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
             props: {
               ...props,
-              openai_key: String(searchParams["openai"] || "") || "",
+              openai_key: String(endpoints?.openai) || "",
             },
             signer: signer,
             memory: memory,
@@ -123,13 +121,13 @@ class BotFactory {
             memory: memory,
           });
         break;
-      case MikuExtensions.Services.ServicesNames.LLaMA:
+      case MikuExtensions.Services.ServicesNames.Oobabooga:
         chatPromptCompleter =
-          new MikuExtensions.ChatPromptCompleters.LLaMAPromptCompleter({
+          new MikuExtensions.ChatPromptCompleters.OobaboogaPromptCompleter({
             serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
             props: {
               ...props,
-              gradioEndpoint: String(searchParams["llama"] || "") || "",
+              gradioEndpoint: String(endpoints?.oobabooga) || "",
             },
             signer: signer,
             memory: memory,
@@ -146,10 +144,12 @@ class BotFactory {
     service,
     props,
     signer,
+    endpoints,
   }: {
     service: MikuExtensions.Services.ServicesNames;
     props: object;
     signer: MikuCore.Services.ServiceQuerySigner;
+    endpoints?: CustomEndpoints;
   }): MikuCore.OutputListeners.OutputListener<
     MikuCore.OutputListeners.OutputEnvironment,
     any
@@ -159,9 +159,6 @@ class BotFactory {
       any
     > | null = null;
 
-    // for alpha demo
-    const searchParams = queryString.parse(location.search);
-
     switch (service) {
       case MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter:
         outputListener = new MikuExtensions.OutputListeners.EmotionRenderer({
@@ -169,7 +166,7 @@ class BotFactory {
           signer: signer,
           props: {
             ...props,
-            openai_key: String(searchParams["openai"] || "") || "",
+            openai_key: String(endpoints?.openai) || "",
           } as MikuExtensions.Services.EmotionInterpreterProps,
         });
         break;
@@ -186,11 +183,7 @@ class BotFactory {
       case MikuExtensions.Services.ServicesNames.AzureTTS:
       case MikuExtensions.Services.ServicesNames.ElevenLabsTTS:
         let apiKey =
-          searchParams[
-            MikuExtensions.Services.ServicesNames.AzureTTS === service
-              ? "azure"
-              : "elevenlabs"
-          ] || "";
+          (MikuExtensions.Services.ServicesNames.AzureTTS === service ? endpoints?.azure : endpoints?.elevenlabs) || '';
         apiKey = apiKey ? String(apiKey) : "";
         outputListener = new MikuExtensions.OutputListeners.TTSOutputListener(
           {
@@ -211,7 +204,7 @@ class BotFactory {
             signer: signer,
             props: {
               settings: JSON.stringify(botSettings),
-              apiKey: String(searchParams["novelai"] || "") || "",
+              apiKey: String(endpoints?.novelai) || "",
             },
           },
           service
@@ -232,7 +225,10 @@ class BotFactory {
         break;
     }
 
-    if (!outputListener) throw `Output listener '${service}' not found`;
+    if (!outputListener) {
+      toast.error(`Output listener '${service}' not found`);
+      throw `Output listener '${service}' not found`;
+    }
 
     outputListener.subscribeError((error) => {
       if (service != "") {
@@ -244,13 +240,12 @@ class BotFactory {
     return outputListener;
   }
 
-  public create(botConfig: BotConfig): BotInstanceInterface {
-    const searchParams = queryString.parse(location.search);
+  public create(botConfig: BotConfig, endpoints?: CustomEndpoints): BotInstanceInterface {
     const whisper = new MikuExtensions.CommandGenerators.WhisperServiceClient(
       `${this.config.servicesEndpoint}/audio-upload`,
       `${this.config.servicesEndpoint}/${MikuExtensions.Services.ServicesNames.WhisperSTT}`,
       this.signer,
-      String(searchParams["openai"] || "") || ""
+      endpoints?.openai || ''
     );
     const textWriter = new MikuCore.CommandGenerators.TextCommandGenerator();
     const memory = this.getMemory(botConfig.short_term_memory);
@@ -259,11 +254,12 @@ class BotFactory {
       props: botConfig.prompt_completer.props,
       memory: memory,
       signer: this.signer,
+      endpoints,
     });
     let outputListenerConfigs = botConfig.outputListeners;
 
     // HOTFIX for alpha demo
-    if (IS_ALPHA_LIVE) {
+    /*
       outputListenerConfigs = botConfig.outputListeners.filter(
         (listener: { service: MikuExtensions.Services.ServicesNames }) => {
           // allow azure requirement for now
@@ -292,8 +288,7 @@ class BotFactory {
 
           return true;
         }
-      );
-    }
+      );*/
 
     const dialogOutputListeners = outputListenerConfigs.map(
       (outputListenerConfig) => {
@@ -463,8 +458,8 @@ export default (function () {
     getInstance: (): BotInstanceInterface | null => {
       return botInstance;
     },
-    updateInstance: (botConfig: BotConfig) => {
-      botInstance = botFactory.create(botConfig);
+    updateInstance: (botConfig: BotConfig, endpoints?: CustomEndpoints) => {
+      botInstance = botFactory.create(botConfig, endpoints);
       return botInstance;
     },
   };

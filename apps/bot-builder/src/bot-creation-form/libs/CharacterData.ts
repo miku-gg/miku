@@ -1,10 +1,8 @@
 import { emotionHashConfigs} from '../data/emotions';
 import { validVoices, Voice } from '../data/voices';
-import { validModels, Model } from '../data/models';
 
 export { type EmotionHashConfig, emotionHashConfigs} from '../data/emotions';
 export { validVoices, type Voice, voices } from '../data/voices';
-export { validModels, type Model, models } from '../data/models';
 
 
 export type Attribute = {
@@ -38,7 +36,7 @@ export type CharacterData = {
   scenario: string;
   greeting: string;
   sampleConversation: string;
-  model: Model;
+  model: 'openai';
   voice: Voice;
   attributes: Attribute[];
   emotionGroups: EmotionGroup[];
@@ -95,10 +93,6 @@ export const validateCharacterData = (characterData: CharacterData): ValidationE
         errors.push({ field: `attributes[${index}].value`, message: 'Attribute value is required.' });
       }
     });
-  }
-
-  if (!validModels.includes(characterData.model)) {
-    errors.push({ field: 'model', message: 'Selected model is not valid.' });
   }
 
   if (!validVoices.includes(characterData.voice)) {
@@ -180,7 +174,6 @@ export const validateStep = (step: number, characterData: CharacterData) => {
     case 2:
       return validationErrors.filter(
         (error) =>
-          error.field === "model" ||
           error.field === "voice"
       );
     case 3:

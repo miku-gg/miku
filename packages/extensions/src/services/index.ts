@@ -1,7 +1,7 @@
 export * from "./openai/OpenAIPromptCompleterService";
 export * from "./openai/OpenAIEmotionInterpreter";
 export * from "./pygmalion/PygmalionService";
-export * from "./llama/LLaMAService";
+export * from "./oobabooga/OobaboogaService";
 export * from "./stt/WhisperService";
 export * from "./sbert/SBertEmotionInterpreterService";
 export * as TTS from "./tts";
@@ -9,7 +9,7 @@ export * as TTS from "./tts";
 export enum ServicesNames {
   OpenAI = "openai_completer",
   Pygmalion = "pygmalion_completer",
-  LLaMA = "llama_completer",
+  Oobabooga = "oobabooga_completer",
   AzureTTS = "azure_tts",
   ElevenLabsTTS = "elevenlabs_tts",
   NovelAITTS = "novelai_tts",

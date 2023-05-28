@@ -23,25 +23,8 @@ import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
 import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
-import {
-  BotSettings,
-  updateBotSettingsNumber,
-} from "../../bot-settings/BotSettings";
+import { BotSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
-
-export enum ServicesNames {
-  OpenAI = "openai_completer",
-  Pygmalion = "pygmalion_completer",
-  LLaMA = "llama_completer",
-  AzureTTS = "azure_tts",
-  ElevenLabsTTS = "elevenlabs_tts",
-  NovelAITTS = "novelai_tts",
-  GPTShortTermMemory = "gpt_short-memory",
-  GPTShortTermMemoryV2 = "gpt_short-memory-v2",
-  OpenAIEmotionInterpreter = "openai_emotion-interpreter",
-  SBertEmotionInterpreter = "sbert_emotion-interpreter",
-  WhisperSTT = "whisper_stt",
-}
 
 export type BotSettings = {
   promptStrategy: string;
@@ -239,11 +222,10 @@ export const BotDisplay = () => {
       botSettings.promptStrategy =
         newConfig.short_term_memory.props.buildStrategySlug;
       botFactory.updateInstance(newConfig);
-      updateBotSettingsNumber();
     }
 
     switch (botConfig?.prompt_completer.service) {
-      case ServicesNames.OpenAI: {
+      case MikuExtensions.Services.ServicesNames.OpenAI: {
         genSettings.topP = 1.0;
         botSettings.promptService = "openai";
         const openAIModel = JSON.parse(
@@ -254,11 +236,11 @@ export const BotDisplay = () => {
 
         break;
       }
-      case ServicesNames.Pygmalion: {
+      case MikuExtensions.Services.ServicesNames.Pygmalion: {
         botSettings.promptService = "pygmalion";
         break;
       }
-      case ServicesNames.LLaMA: {
+      case MikuExtensions.Services.ServicesNames.Oobabooga: {
         botSettings.promptService = "llama";
         break;
       }

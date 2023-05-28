@@ -3,29 +3,29 @@ import PropTypes, { InferProps } from "prop-types";
 import GPT3Tokenizer from "gpt3-tokenizer";
 import axios from "axios";
 
-export interface LLaMaServiceConfig extends Miku.Services.ServiceConfig {
+export interface OobaboogaServiceConfig extends Miku.Services.ServiceConfig {
   gradioEndpoint: string;
 }
 
-export const LLaMAServicePropTypes = {
+export const OobaboogaServicePropTypes = {
   settings: PropTypes.string,
   prompt: PropTypes.string,
   gradioEndpoint: PropTypes.string,
 };
 
-export class LLaMAService extends Miku.Services.Service {
+export class OobaboogaService extends Miku.Services.Service {
   private tokenizer: GPT3Tokenizer;
   private gradioEndpoint: string;
-  protected defaultProps: InferProps<typeof LLaMAServicePropTypes> = {
+  protected defaultProps: InferProps<typeof OobaboogaServicePropTypes> = {
     prompt: "",
     gradioEndpoint: "",
   };
 
   protected getPropTypes(): PropTypes.ValidationMap<any> {
-    return LLaMAServicePropTypes;
+    return OobaboogaServicePropTypes;
   }
 
-  constructor(config: LLaMaServiceConfig) {
+  constructor(config: OobaboogaServiceConfig) {
     super(config);
     this.gradioEndpoint = config.gradioEndpoint;
     this.tokenizer = new GPT3Tokenizer({ type: "gpt3" });
@@ -87,3 +87,4 @@ export class LLaMAService extends Miku.Services.Service {
     return gptTokens + (modelSettings.maxTokens || 0);
   }
 }
+

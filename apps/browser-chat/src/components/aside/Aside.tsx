@@ -186,18 +186,6 @@ export const Aside = () => {
       >
         <BotDetails />
       </PopUp>
-      <PopUp
-        closePopUpFunction={() => setHandleBotSettings(false)}
-        isShowingPupUp={handleBotSettings}
-        className="w-6/12"
-        darkTheme
-      >
-        <p className="ml-4 text-start text-2xl text-white">Setings</p>
-        <BotSettings mobile={true} />
-        <div className="w-full flex justify-center gap-7 pb-3 flex-wrap red-500 text-red-500">
-          <BotSettingsFooter />
-        </div>
-      </PopUp>
     </>
   );
 };

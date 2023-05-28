@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCharacterCreationForm } from './CharacterCreationFormContext';
-import { models, voices } from './libs/CharacterData';
+import { voices } from './libs/CharacterData';
 
 const Step4Preview: React.FC = () => {
   const { characterData } = useCharacterCreationForm();
@@ -8,7 +8,6 @@ const Step4Preview: React.FC = () => {
   const [selectedEmotionGroupIndex, setSelectedEmotionGroupIndex] = useState(0);
   const [selectedEmotionIndex, setSelectedEmotionIndex] = useState(0);
 
-  const model = models[characterData.model] || models['gpt-3.5-turbo'];
   const voice = voices[characterData.voice] || voices['elevenlabs_tts.EXAVITQu4vr4xnSDxMaL'];
   
   const handleEmotionGroupChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -74,7 +73,6 @@ const Step4Preview: React.FC = () => {
             <img src={characterData.avatar} alt={`${characterData.name}'s avatar`} />
           )}
           <div className="step4Preview__tags">
-            <span className="step4Preview__tag">{model.label}</span>
             <span className="step4Preview__tag">{voice.label}</span>
           </div>
         </div>
