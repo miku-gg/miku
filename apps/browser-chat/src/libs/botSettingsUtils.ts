@@ -144,10 +144,10 @@ export const DEFAULT_OPENAI_SETTINGS: OpenAISettings = {
 };
 
 export enum PromptStrategy {
-  WPP,
-  SBF,
-  RPBT,
-  PYG
+  WPP = 'wpp',
+  SBF = 'sbf',
+  RPBT = 'rpbt',
+  PYG = 'pyg'
 }
 
 export const PROMPT_STRATEGIES: {
@@ -173,9 +173,9 @@ export const PROMPT_STRATEGIES: {
 ];
 
 export enum VoiceServiceType {
-  ELEVENLABS_TTS,
-  AZURE_TTS,
-  NOVELAI_TTS
+  ELEVENLABS_TTS = 'elevenlabs_tts',
+  AZURE_TTS = 'azure_tts',
+  NOVELAI_TTS = 'novelai_tts'
 }
 
 
@@ -198,7 +198,7 @@ export const VOICE_SERVICES: {
 ];
 
 export enum STTEndpointType {
-  WHISPER
+  WHISPER = 'whisper'
 }
 
 export interface BotConfigSettings {

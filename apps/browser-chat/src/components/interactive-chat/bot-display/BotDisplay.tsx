@@ -83,44 +83,12 @@ export let botSettings: BotSettings = {
   oldVoiceService: "",
 };
 
-export let genSettings: GenSettings = {
-  maxContextLength: 2048,
-  temp: 0.7,
-  maxTokens: 200,
-  topP: 0.5,
-  topK: 40,
-  typicalP: 1,
-  repetitionPenalty: 1.2,
-  encoderRepitionPenalty: 1,
-  noRepeatNgramSize: 0,
-  minLength: 0,
-  doSample: true,
-  seed: -1,
-  penaltyAlpha: 0,
-  numBeams: 1,
-  lengthPenalty: 1,
-  earlyStopping: false,
-  addBosToken: true,
-  banEosToken: false,
-  truncateLength: 2048,
-  stoppingStrings: "",
-  skipSpecialTokens: true,
-  repetitionPenaltyRange: 1024,
-  repetitionPenaltySlope: 0.9,
-  topA: 0,
-  tailFreeSampling: 0.9,
-  order: [6, 0, 1, 2, 3, 4, 5], // allow user to change this somehow eventually:tm:
-  frequencyPenalty: 0.7,
-  presencePenalty: 0.7,
-  oaiModel: "",
-};
-
 const VITE_IMAGES_DIRECTORY_ENDPOINT =
   import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
   "http://localhost:8585/image";
 
 export const BotDisplay = () => {
-  const { botConfig } = useBot();
+  const { botHash, botConfig, botConfigSettings, setBotConfigSettings } = useBot();
   const [showHistory, setShowHistory] = useState<Boolean>(false);
   const [handleBotDetailsInfo, setHandleBotDetailsInfo] =
     useState<boolean>(false);
@@ -211,41 +179,7 @@ export const BotDisplay = () => {
     bot?.subscribeContextChangeSuggestion((contextId) => {
       setContextSuggestion(contextId);
     });
-    if (botConfig) {
-      const newConfig = JSON.parse(JSON.stringify(botConfig));
-      botSettings.voiceId = newConfig.outputListeners[0].props.voiceId;
-      newConfig.outputListeners[0].props.voiceId = botSettings.voiceId;
-      if (botSettings.voiceService == "" && botSettings.voiceGeneration) {
-        botSettings.voiceService = botSettings.oldVoiceService;
-      }
-      botSettings.voiceService = newConfig.outputListeners[0].service;
-      botSettings.promptStrategy =
-        newConfig.short_term_memory.props.buildStrategySlug;
-      botFactory.updateInstance(newConfig);
-    }
-
-    switch (botConfig?.prompt_completer.service) {
-      case MikuExtensions.Services.ServicesNames.OpenAI: {
-        genSettings.topP = 1.0;
-        botSettings.promptService = "openai";
-        const openAIModel = JSON.parse(
-          JSON.stringify(botConfig?.prompt_completer.props)
-        ).model; // there's prolly a better way to do this but linter cries if u just do botConfig?.prompt_completer.props.model
-        if (openAIModel && genSettings.oaiModel == "")
-          genSettings.oaiModel = openAIModel;
-
-        break;
-      }
-      case MikuExtensions.Services.ServicesNames.Pygmalion: {
-        botSettings.promptService = "pygmalion";
-        break;
-      }
-      case MikuExtensions.Services.ServicesNames.Oobabooga: {
-        botSettings.promptService = "llama";
-        break;
-      }
-    }
-  }, [botConfig]);
+  }, [botHash]);
 
   const updateContext = () => {
     const bot = botFactory.getInstance();
@@ -313,7 +247,7 @@ export const BotDisplay = () => {
         ?.sendPrompt(
           lastMemoryLine.text,
           lastMemoryLine.type,
-          JSON.stringify(genSettings)
+          JSON.stringify(botConfigSettings.promptCompleterEndpoint.genSettings)
         );
       if (result?.commandId) {
         setResponsesGenerated((_responsesGenerated) => {
@@ -344,7 +278,7 @@ export const BotDisplay = () => {
         shortTermMemory.pushMemory({
           text,
           type: MikuCore.Commands.CommandType.DIALOG,
-          settings: JSON.stringify(genSettings),
+          settings: JSON.stringify(botConfigSettings.promptCompleterEndpoint.genSettings),
           subject: shortTermMemory.getBotSubject(),
         });
       }
@@ -514,9 +448,9 @@ export const BotDisplay = () => {
         darkTheme
       >
         <p className="ml-4 text-start text-2xl text-white">Setings</p>
-        <BotSettings />
+        <BotSettings botConfigSettings={botConfigSettings} onBotConfigSettingsChange={setBotConfigSettings} />
         <div className="w-full flex justify-center gap-2 flex-wrap red-500 text-red-500">
-          <BotSettingsFooter />
+          <BotSettingsFooter botConfigSettings={botConfigSettings} onBotConfigSettingsChange={setBotConfigSettings} />
         </div>
       </PopUp>
       <PopUp

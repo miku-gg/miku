@@ -9,7 +9,8 @@ import "./ChatInputBox.css";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import queryString from "query-string";
 import { IS_ALPHA_LIVE } from "../../loading/BotLoadingModal";
-import { botSettings, genSettings } from "../bot-display/BotDisplay";
+import { botSettings } from "../bot-display/BotDisplay";
+import { useBot } from "../../../libs/botLoader";
 
 export function SmallSpinner(): JSX.Element {
   return (
@@ -24,6 +25,7 @@ export const ChatInputBox = (): JSX.Element => {
   const [value, setValue] = useState<string>("");
   const [loadingCost, setLoadingCost] = useState<boolean>(false);
   const [cost, setCost] = useState<number>(0);
+  const { botConfigSettings } = useBot();
   const { responseIndex, loading, setResponsesGenerated } = useContext(
     InteractiveResponsesContext
   );
@@ -40,7 +42,7 @@ export const ChatInputBox = (): JSX.Element => {
         ?.sendPrompt(
           value,
           MikuCore.Commands.CommandType.DIALOG,
-          JSON.stringify(genSettings)
+          JSON.stringify(botConfigSettings.promptCompleterEndpoint.genSettings)
         );
       setResponsesGenerated(result ? [result.commandId] : []);
       setValue("");
@@ -55,7 +57,7 @@ export const ChatInputBox = (): JSX.Element => {
         lastCostId.id = update_id;
         botFactory
           .getInstance()
-          ?.computeCost(value, JSON.stringify(genSettings))
+          ?.computeCost(value, JSON.stringify(botConfigSettings.promptCompleterEndpoint.genSettings))
           .then((cost) => {
             if (lastCostId.id === update_id) {
               setLoadingCost(false);

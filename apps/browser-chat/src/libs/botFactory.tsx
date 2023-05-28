@@ -106,7 +106,7 @@ class BotFactory {
             serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
             props: {
               ...props,
-              openai_key: String(endpoints?.openai) || "",
+              openai_key: String(endpoints?.openai || "") || "",
             },
             signer: signer,
             memory: memory,
@@ -127,7 +127,7 @@ class BotFactory {
             serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
             props: {
               ...props,
-              gradioEndpoint: String(endpoints?.oobabooga) || "",
+              gradioEndpoint: String(endpoints?.oobabooga || "") || "",
             },
             signer: signer,
             memory: memory,
@@ -166,7 +166,7 @@ class BotFactory {
           signer: signer,
           props: {
             ...props,
-            openai_key: String(endpoints?.openai) || "",
+            openai_key: String(endpoints?.openai || "") || "",
           } as MikuExtensions.Services.EmotionInterpreterProps,
         });
         break;
@@ -184,7 +184,7 @@ class BotFactory {
       case MikuExtensions.Services.ServicesNames.ElevenLabsTTS:
         let apiKey =
           (MikuExtensions.Services.ServicesNames.AzureTTS === service ? endpoints?.azure : endpoints?.elevenlabs) || '';
-        apiKey = apiKey ? String(apiKey) : "";
+        apiKey = apiKey ? String(apiKey || "") : "";
         outputListener = new MikuExtensions.OutputListeners.TTSOutputListener(
           {
             serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
@@ -204,7 +204,7 @@ class BotFactory {
             signer: signer,
             props: {
               settings: JSON.stringify(botSettings),
-              apiKey: String(endpoints?.novelai) || "",
+              apiKey: String(endpoints?.novelai || "") || "",
             },
           },
           service

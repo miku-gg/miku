@@ -149,11 +149,23 @@ export function useBot(): {
     setBotHash(_hash);
     loadBotConfig(_hash).then((res) => {
       if (res.success && res.bot) {
-        const searchParams = queryString.parse(location.search);
-        const newSearchParams = {...searchParams, bot: _hash};
-        const newSearchString = queryString.stringify(newSearchParams);
-        window.history.replaceState({}, 'bot', `/?${newSearchString}`);
-        botFactory.updateInstance(res.bot, _botData.endpoints);
+        let decoratedConfig = res.bot;
+
+        decoratedConfig = {
+          ...res.bot,
+          short_term_memory: {
+            ...res.bot.short_term_memory,
+            props: {
+              ...res.bot.short_term_memory.props,
+              buildStrategySlug: _botData.settings.promptStrategy
+            }
+          }
+        }
+        
+        setBotConfigSettings(_botData.settings);
+        setBotDataInURL(_botData);
+
+        botFactory.updateInstance(decoratedConfig, _botData.endpoints);
         setBotConfig(res.bot);
         setBotHash(res.hash);
         setError(false);
@@ -169,9 +181,7 @@ export function useBot(): {
       ...getBotDataFromURL(),
       settings: _botConfigSettings,
     };
-    setBotConfigSettings(_botConfigSettings);
     _botLoadCallback(newBotData.hash, newBotData);
-    setBotDataInURL(newBotData);
   }, [setBotConfigSettings, _botLoadCallback])
 
   return {
@@ -181,6 +191,9 @@ export function useBot(): {
     setBotConfigSettings: _setBotConfigSettings,
     loading,
     error,
-    setBotHash: (_hash?: string) => _botLoadCallback(_hash),
+    setBotHash: (_hash?: string) => {
+      'wead'
+      _botLoadCallback(_hash)
+    },
   };
 }
