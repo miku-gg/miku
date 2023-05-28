@@ -2,8 +2,9 @@ import { BotConfig } from "@mikugg/bot-validator";
 import React, { useCallback, useContext, useState } from "react";
 import botFactory from './botFactory';
 import queryString from "query-string";
-import { BotConfigSettings, DEFAULT_BOT_SETTINGS } from "./botSettingsUtils";
+import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, VoiceServiceType } from "./botSettingsUtils";
 import * as MikuCore from "@mikugg/core";
+import * as MikuExtensions from "@mikugg/extensions";
 
 const BOT_DIRECTORY_ENDPOINT = import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT || 'http://localhost:8585/bot';
 
@@ -153,11 +154,73 @@ export function useBot(): {
 
         decoratedConfig = {
           ...res.bot,
+          prompt_completer: {
+            service: (function (): MikuExtensions.Services.ServicesNames {
+              switch (_botData.settings.promptCompleterEndpoint.type) {
+                case PromptCompleterEndpointType.OPENAI:
+                  return MikuExtensions.Services.ServicesNames.OpenAI
+                case PromptCompleterEndpointType.KOBOLDAI:
+                  return MikuExtensions.Services.ServicesNames.Pygmalion
+                case PromptCompleterEndpointType.OOBABOOGA:
+                default:
+                  return MikuExtensions.Services.ServicesNames.Oobabooga
+              }
+            })(),
+            props: {
+              ...(function (): object {
+                switch (_botData.settings.promptCompleterEndpoint.type) {
+                  case PromptCompleterEndpointType.OPENAI:
+                    return {
+                      openai_key: "",
+                      settings: "",
+                      prompt: "",
+                      messages: [],
+                      stop: [] as string[],
+                    }
+                  case PromptCompleterEndpointType.KOBOLDAI:
+                    return {
+                      settings: "",
+                      prompt: "",                  
+                    }
+                  case PromptCompleterEndpointType.OOBABOOGA:
+                  default:
+                    return {
+                      settings: "",
+                      prompt: "",
+                      gradioEndpoint: "",                    
+                    }
+                }
+              })()
+            }
+          },
           short_term_memory: {
             ...res.bot.short_term_memory,
             props: {
               ...res.bot.short_term_memory.props,
               buildStrategySlug: _botData.settings.promptStrategy
+            }
+          }
+        }
+        
+        if (_botData.settings.voice.voiceService.voiceId) {
+          const tts = decoratedConfig.outputListeners.find(listener => [
+            MikuExtensions.Services.ServicesNames.AzureTTS,
+            MikuExtensions.Services.ServicesNames.ElevenLabsTTS,
+            MikuExtensions.Services.ServicesNames.NovelAITTS,
+          ].includes(listener.service))
+
+          if (tts) {
+            tts.props = { voiceId: _botData.settings.voice.voiceService.voiceId };
+            switch (_botData.settings.voice.voiceService.type) {
+              case VoiceServiceType.AZURE_TTS:
+                tts.service = MikuExtensions.Services.ServicesNames.AzureTTS;
+                break;
+              case VoiceServiceType.ELEVENLABS_TTS:
+                tts.service = MikuExtensions.Services.ServicesNames.ElevenLabsTTS;
+                break;
+              case VoiceServiceType.NOVELAI_TTS:
+                tts.service = MikuExtensions.Services.ServicesNames.NovelAITTS;
+                break;
             }
           }
         }
