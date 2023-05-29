@@ -148,6 +148,8 @@ export function useBot(): {
   const _botLoadCallback = useCallback((_hash: string = getBotHashFromUrl(), _botData: BotData = getBotDataFromURL()) =>{
     setLoading(true);
     setBotHash(_hash);
+    const isDifferentBot = getBotHashFromUrl() !== _hash;
+    const memoryLines = botFactory.getInstance()?.getMemory().getMemory() || [];
     loadBotConfig(_hash).then((res) => {
       if (res.success && res.bot) {
         let decoratedConfig = res.bot;
@@ -229,6 +231,11 @@ export function useBot(): {
         setBotDataInURL(_botData);
 
         botFactory.updateInstance(decoratedConfig, _botData.endpoints);
+        if (!isDifferentBot && memoryLines.length) {
+          const memory = botFactory.getInstance()?.getMemory();
+          memory?.clearMemories();
+          memoryLines.forEach(memoryLine => memory?.pushMemory(memoryLine));
+        }
         setBotConfig(res.bot);
         setBotHash(res.hash);
         setError(false);
