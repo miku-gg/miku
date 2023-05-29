@@ -170,24 +170,25 @@ export function useBot(): {
             })(),
             props: {
               ...(function (): object {
+                const settings = JSON.stringify(_botData.settings.promptCompleterEndpoint.genSettings);
                 switch (_botData.settings.promptCompleterEndpoint.type) {
                   case PromptCompleterEndpointType.OPENAI:
                     return {
                       openai_key: "",
-                      settings: "",
+                      settings,
                       prompt: "",
                       messages: [],
                       stop: [] as string[],
                     }
                   case PromptCompleterEndpointType.KOBOLDAI:
                     return {
-                      settings: "",
+                      settings,
                       prompt: "",                  
                     }
                   case PromptCompleterEndpointType.OOBABOOGA:
                   default:
                     return {
-                      settings: "",
+                      settings,
                       prompt: "",
                       gradioEndpoint: "",                    
                     }
@@ -212,7 +213,10 @@ export function useBot(): {
           ].includes(listener.service))
 
           if (tts) {
-            tts.props = { voiceId: _botData.settings.voice.voiceService.voiceId };
+            tts.props = {
+              voiceId: _botData.settings.voice.voiceService.voiceId,
+              readNonSpokenText: _botData.settings.voice.readNonSpokenText,
+            };
             switch (_botData.settings.voice.voiceService.type) {
               case VoiceServiceType.AZURE_TTS:
                 tts.service = MikuExtensions.Services.ServicesNames.AzureTTS;

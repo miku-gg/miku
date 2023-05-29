@@ -41,8 +41,7 @@ export const ChatInputBox = (): JSX.Element => {
         .getInstance()
         ?.sendPrompt(
           value,
-          MikuCore.Commands.CommandType.DIALOG,
-          JSON.stringify(botConfigSettings.promptCompleterEndpoint.genSettings)
+          MikuCore.Commands.CommandType.DIALOG
         );
       setResponsesGenerated(result ? [result.commandId] : []);
       setValue("");
@@ -57,7 +56,7 @@ export const ChatInputBox = (): JSX.Element => {
         lastCostId.id = update_id;
         botFactory
           .getInstance()
-          ?.computeCost(value, JSON.stringify(botConfigSettings.promptCompleterEndpoint.genSettings))
+          ?.computeCost(value)
           .then((cost) => {
             if (lastCostId.id === update_id) {
               setLoadingCost(false);

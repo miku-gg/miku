@@ -6,10 +6,8 @@ import {
 } from "./TTSService";
 import { InferProps } from "prop-types";
 
-interface NovelAITTSConfig extends TTSServiceConfig {}
-
 export class NovelAITTSService extends TTSService {
-  constructor(config: NovelAITTSConfig) {
+  constructor(config: TTSServiceConfig) {
     super({
       ...config,
       apiEndpoint: "https://api.novelai.net/ai/generate-voice",
@@ -20,11 +18,7 @@ export class NovelAITTSService extends TTSService {
     input: InferProps<typeof TTSServicePropTypes>,
     tries = 0
   ): Promise<string> {
-    const settings = JSON.parse(input.settings!);
-    const speakPrompt = settings.readNonSpokenText
-      ? input.prompt
-      : input.prompt?.replace(/\([^)]*[^)]*\)/g, "");
-    const voiceSeed = settings.voiceId || "Anananan"; // default unisex voice seed
+    const voiceSeed = input.voiceId || "Anananan"; // default unisex voice seed
     return axios<ArrayBuffer>({
       url: this.apiEndpoint,
       method: "get",
@@ -34,7 +28,7 @@ export class NovelAITTSService extends TTSService {
         "User-Agent": "mikugg",
       },
       params: {
-        text: speakPrompt,
+        text: input.prompt,
         seed: voiceSeed,
         opus: false, // mp3 is supported in more browsers
         voice: -1, // always -1 for v2

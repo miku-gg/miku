@@ -59,7 +59,7 @@ export abstract class ChatPromptCompleter {
    * @returns A promise that resolves to the cost of the prompt completion.
    * @abstract
    */
-  public async getCost(prompt: string, settings: string): Promise<number> {
+  public async getCost(prompt: string): Promise<number> {
     return 0;
   }
 
@@ -70,8 +70,7 @@ export abstract class ChatPromptCompleter {
    * @abstract
    */
   protected abstract completePrompt(
-    memory: ShortTermMemory,
-    settings: string
+    memory: ShortTermMemory
   ): Promise<ChatPromptResponse>;
 
   /**
@@ -97,14 +96,12 @@ export abstract class ChatPromptCompleter {
 
     try {
       const promptResult = await this.completePrompt(
-        this.memory,
-        command.input.settings
+        this.memory
       );
       const output = await this.handleCompletionOutput(promptResult, command);
       this.memory.pushMemory({
         type: Commands.CommandType.DIALOG,
         text: output.text,
-        settings: command.input.settings,
         subject: this.memory.getBotSubject(),
       });
       return output;

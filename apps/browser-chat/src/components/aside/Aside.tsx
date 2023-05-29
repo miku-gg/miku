@@ -11,8 +11,6 @@ import {
 } from "../chat-history/chat-history";
 import { DropDown } from "../dropdown/Dropdown";
 import { MuteIcon, PlayIcon } from "@primer/octicons-react";
-import { BotSettings } from "../bot-settings/BotSettings";
-import { BotSettingsFooter } from "../bot-settings/BotSettingsFooter";
 
 interface CustomAudioPlayerProps {
   src: string;
@@ -77,7 +75,6 @@ export const Aside = () => {
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
   const [chatHistoryToggle, setChatHistoryToggle] = useState<boolean>(true);
   const [handleBotDetails, setHandleBotDetails] = useState<boolean>(false);
-  const [handleBotSettings, setHandleBotSettings] = useState<boolean>(false);
   const musicPieces = [
     "devonshire",
     "folk_round",
@@ -103,10 +100,6 @@ export const Aside = () => {
 
   const displayBotDetails = () => {
     setHandleBotDetails(true);
-  };
-
-  const displayBotSettings = () => {
-    setHandleBotSettings(true);
   };
 
   return (
@@ -144,12 +137,6 @@ export const Aside = () => {
                 }
               >
                 Load bot
-              </button>
-              <button
-                className="button-transparent min-w-[10em]"
-                onClick={displayBotSettings}
-              >
-                Settings
               </button>
             </div>
             {/* USERNAME // TOKENS */}

@@ -3,7 +3,6 @@ import RangeInput from "./RangeInput";
 import BoolInput from "./BoolInput";
 import TextInput from "./TextInput";
 import DropdownInput from "./DropdownInput";
-import botFactory from "../../libs/botFactory";
 import { BotConfigSettings, PROMPT_STRATEGIES, VOICE_SERVICES, PromptCompleterEndpointType, PROMPT_COMPLETERS, DEFAULT_OOBABOOGA_SETTINGS, DEFAULT_KOBOLDAI_SETTINGS, DEFAULT_OPENAI_SETTINGS, OobaboogaSettings, OPENAI_MODELS } from "../../libs/botSettingsUtils";
 
 export const BotSettings: React.FC<{

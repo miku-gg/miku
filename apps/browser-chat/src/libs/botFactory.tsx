@@ -2,7 +2,6 @@ import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import { BotConfig } from "@mikugg/bot-validator";
 import { toast } from "react-toastify";
-import { botSettings } from "../components/interactive-chat/bot-display/BotDisplay";
 import { CustomEndpoints } from "./botLoader";
 
 const MOCK_PRIVATE_KEY =
@@ -32,13 +31,12 @@ interface BotInstanceInterface {
   sendPrompt(
     text: string,
     type: number,
-    settings: string,
     subject?: string
   ): { wait: Promise<void[]>; commandId: string };
   getCurrentPrompt(): string;
   getMemory(): MikuCore.Memory.ShortTermMemory;
   getBotConfig(): BotConfig;
-  computeCost(prompt: string, settings: string): Promise<number>;
+  computeCost(prompt: string): Promise<number>;
 }
 
 class BotFactory {
@@ -189,8 +187,9 @@ class BotFactory {
           {
             serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
             signer: signer,
+            readNonSpokenText: props['readNonSpokenText'],
             props: {
-              settings: JSON.stringify(botSettings),
+              ...props,
               apiKey,
             },
           },
@@ -202,8 +201,9 @@ class BotFactory {
           {
             serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
             signer: signer,
+            readNonSpokenText: props['readNonSpokenText'],
             props: {
-              settings: JSON.stringify(botSettings),
+              ...props,
               apiKey: String(endpoints?.novelai || "") || "",
             },
           },
@@ -215,8 +215,9 @@ class BotFactory {
           {
             serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
             signer: signer,
+            readNonSpokenText: props['readNonSpokenText'],
             props: {
-              settings: "",
+              ...props,
               apiKey: "",
             },
           },
@@ -257,38 +258,6 @@ class BotFactory {
       endpoints,
     });
     let outputListenerConfigs = botConfig.outputListeners;
-
-    // HOTFIX for alpha demo
-    /*
-      outputListenerConfigs = botConfig.outputListeners.filter(
-        (listener: { service: MikuExtensions.Services.ServicesNames }) => {
-          // allow azure requirement for now
-          // if (
-          //   listener.service === MikuExtensions.Services.ServicesNames.AzureTTS &&
-          //   !queryString.parse(location.search)['azure']
-          // ) {
-          //   return false;
-          // }
-
-          if (
-            listener.service ===
-              MikuExtensions.Services.ServicesNames.ElevenLabsTTS &&
-            !queryString.parse(location.search)["elevenlabs"]
-          ) {
-            return false;
-          }
-
-          if (
-            listener.service ===
-              MikuExtensions.Services.ServicesNames.NovelAITTS &&
-            !queryString.parse(location.search)["novelai"]
-          ) {
-            return false;
-          }
-
-          return true;
-        }
-      );*/
 
     const dialogOutputListeners = outputListenerConfigs.map(
       (outputListenerConfig) => {
@@ -402,14 +371,12 @@ class BotFactory {
       sendPrompt(
         text: string,
         type: number,
-        settings: string,
         subject: string = botConfig.subject
       ): { wait: Promise<void[]>; commandId: string } {
         const { wait, commandId } = textWriter.emit({
           type,
           input: {
             text,
-            settings,
             subject,
           },
         });
@@ -431,13 +398,13 @@ class BotFactory {
         return memory;
       },
 
-      async computeCost(prompt: string, settings: string): Promise<number> {
+      async computeCost(prompt: string): Promise<number> {
         const dialogOutputListenersCosts = await Promise.all(
           dialogOutputListeners.map((listener) => listener.getCost())
         );
         return dialogOutputListenersCosts.reduce(
           (prev, cur) => prev + cur,
-          await promptCompleter.getCost(prompt, settings)
+          await promptCompleter.getCost(prompt)
         );
       },
     };

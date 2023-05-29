@@ -23,7 +23,6 @@ export enum CommandType {
  */
 export interface CommandHandlerInput {
   text: string;
-  settings: string;
   subject: string;
 }
 
@@ -51,7 +50,6 @@ export const commandToMemoryLine = (command: Command): MemoryLine => {
   return {
     subject: command.input.subject,
     text: command.input.text,
-    settings: command.input.settings,
     type: command.type,
   };
 };

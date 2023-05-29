@@ -87,12 +87,10 @@ export class PygmalionPromptCompleter extends Core.ChatPromptCompleters
   }
 
   public override async getCost(
-    prompt: string,
-    settings: string
+    prompt: string
   ): Promise<number> {
     return this.service.getQueryCost({
       ...this.getProps(),
-      settings,
       prompt,
     });
   }
@@ -105,8 +103,7 @@ export class PygmalionPromptCompleter extends Core.ChatPromptCompleters
    * @returns The completed prompt.
    */
   protected async completePrompt(
-    memory: Core.Memory.ShortTermMemory,
-    settings: string
+    memory: Core.Memory.ShortTermMemory
   ): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
     const prompt = memory.buildMemoryPrompt();
     let result = "";
@@ -121,10 +118,9 @@ export class PygmalionPromptCompleter extends Core.ChatPromptCompleters
       result += await this.service.query(
         {
           ...this.getProps(),
-          settings: settings,
           prompt: prompt + result,
         },
-        await this.getCost(prompt + result, settings)
+        await this.getCost(prompt + result)
       );
 
       const resultParsed = parsePygmalionResponse(

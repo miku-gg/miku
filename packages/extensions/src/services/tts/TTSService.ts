@@ -6,7 +6,7 @@ export const TTSServicePropTypes = {
   language: PropTypes.oneOf(["en", "es"]),
   emotion: PropTypes.string,
   prompt: PropTypes.string,
-  settings: PropTypes.string,
+  voiceId: PropTypes.string,
 };
 
 export interface TTSServiceConfig extends Miku.Services.ServiceConfig {
@@ -21,7 +21,7 @@ export abstract class TTSService extends Miku.Services.Service {
     language: "en",
     emotion: "default",
     prompt: "",
-    settings: "",
+    voiceId: "",
   };
   protected costPerRequest: number;
   protected apiKey: string;

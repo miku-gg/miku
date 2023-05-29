@@ -246,8 +246,7 @@ export const BotDisplay = () => {
         .getInstance()
         ?.sendPrompt(
           lastMemoryLine.text,
-          lastMemoryLine.type,
-          JSON.stringify(botConfigSettings.promptCompleterEndpoint.genSettings)
+          lastMemoryLine.type
         );
       if (result?.commandId) {
         setResponsesGenerated((_responsesGenerated) => {
@@ -278,7 +277,6 @@ export const BotDisplay = () => {
         shortTermMemory.pushMemory({
           text,
           type: MikuCore.Commands.CommandType.DIALOG,
-          settings: JSON.stringify(botConfigSettings.promptCompleterEndpoint.genSettings),
           subject: shortTermMemory.getBotSubject(),
         });
       }

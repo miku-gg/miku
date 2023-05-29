@@ -3,12 +3,12 @@ import { TTSServicePropTypes } from "../services/tts/TTSService";
 import { InferProps } from "prop-types";
 import { ServicesNames } from "../services";
 import trim from "lodash.trim";
-import { ShortTermMemory } from "@mikugg/core/dist/memory";
 
 type TTSServiceProps = InferProps<typeof TTSServicePropTypes>;
 
 export interface TTSOutputListenerParams {
   serviceEndpoint: string;
+  readNonSpokenText: boolean;
   props: TTSServiceProps;
   signer: Core.Services.ServiceQuerySigner;
 }
@@ -20,6 +20,7 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<
   protected service: Core.Services.ServiceClient<TTSServiceProps, string>;
   protected props: TTSServiceProps;
   protected serviceName: string;
+  protected readNonSpokenText: boolean;
 
   constructor(params: TTSOutputListenerParams, serviceName: ServicesNames) {
     super();
@@ -30,16 +31,20 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<
       serviceName
     );
     this.serviceName = serviceName;
+    this.readNonSpokenText = params.readNonSpokenText;
   }
 
   protected override async handleOutput(
     output: Core.OutputListeners.DialogOutputEnvironment
   ): Promise<string> {
-    if (this.serviceName != "") {
+    if (this.serviceName != "") {      
+      const prompt = this.readNonSpokenText
+      ? output.text
+      : this.cleanText(output.text);
       return this.service.query(
         {
           ...this.props,
-          prompt: this.cleanText(output.text),
+          prompt,
         },
         await this.service.getQueryCost(this.props)
       );
