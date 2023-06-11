@@ -5,7 +5,7 @@ import { PygmalionServicePropTypes, ServicesNames } from "../services";
 
 const buildTextStops = (_subjects: string[]): string[] => {
   const subjects: string[] = _subjects.map((subject) => `${subject}:`);
-  return ["<|endoftext|>", ...subjects];
+  return ["<|endoftext|>", "<START>", ...subjects];
 };
 
 export const hasTextStop = (text: string, _subjects: string[]): boolean => {

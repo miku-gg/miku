@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { useCharacterCreationForm } from './CharacterCreationFormContext';
-import { voices } from './libs/CharacterData';
+import React, { useState } from "react";
+
+import { Carousel, Container, ImageSlider, TextHeading } from "@mikugg/ui-kit";
+import { useCharacterCreationForm } from "./CharacterCreationFormContext";
+import BotSummary from "./Components/BotSummary";
 
 const Step4Preview: React.FC = () => {
   const { characterData } = useCharacterCreationForm();
@@ -8,10 +10,12 @@ const Step4Preview: React.FC = () => {
   const [selectedEmotionGroupIndex, setSelectedEmotionGroupIndex] = useState(0);
   const [selectedEmotionIndex, setSelectedEmotionIndex] = useState(0);
 
-  const voice = voices[characterData.voice] || voices['elevenlabs_tts.EXAVITQu4vr4xnSDxMaL'];
-  
-  const handleEmotionGroupChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedEmotionGroupIndex(event.target.value as unknown as number || 0);
+  const handleEmotionGroupChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSelectedEmotionGroupIndex(
+      (event.target.value as unknown as number) || 0
+    );
     setSelectedEmotionIndex(0);
   };
 
@@ -22,7 +26,9 @@ const Step4Preview: React.FC = () => {
           <div
             key={index}
             className={`step4Preview__backgroundThumbnail ${
-              selectedBackgroundIndex === index ? "step4Preview__backgroundThumbnail--selected" : ""
+              selectedBackgroundIndex === index
+                ? "step4Preview__backgroundThumbnail--selected"
+                : ""
             }`}
             style={{ backgroundImage: `url(${bg.source})` }}
             onClick={() => setSelectedBackgroundIndex(index)}
@@ -31,66 +37,70 @@ const Step4Preview: React.FC = () => {
       </div>
     );
   };
-  
-  const renderEmotionSlider = () => {
+
+  const renderEmotionPreview = () => {
     if (!characterData.emotionGroups) return null;
-  
-    const selectedEmotionGroup = characterData.emotionGroups[selectedEmotionGroupIndex];
-    const selectedEmotion = selectedEmotionGroup.images[selectedEmotionIndex];
-    const selectedBackground = characterData.backgroundImages[selectedBackgroundIndex];
-    
+
+    const selectedEmotionGroup =
+      characterData.emotionGroups[selectedEmotionGroupIndex];
+    const selectedBackground =
+      characterData.backgroundImages[selectedBackgroundIndex];
+
+    const calculateUpdatedIndex = (additional: number): void => {
+      const totalImages = selectedEmotionGroup.images.length;
+
+      setSelectedEmotionIndex(
+        (selectedEmotionIndex + additional + totalImages) % totalImages
+      );
+    };
+
     return (
-      <div className="step4Preview__emotionSlider">
-        <button
-          className="step4Preview__emotionSliderButton"
-          onClick={() =>
-            setSelectedEmotionIndex((prevIndex) => (prevIndex - 1 + selectedEmotionGroup.images.length) % selectedEmotionGroup.images.length)
-          }
-        >
-          Prev
-        </button>
-        <div className="step4Preview__emotionImage" style={{ backgroundImage: `url(${selectedBackground.source})` }}>
-          <img src={selectedEmotion.sources[0]} alt={selectedEmotion.emotion} />
-        </div>
-        <p className="step4Preview__emotionName">{selectedEmotion.emotion}</p>
-        <button
-          className="step4Preview__emotionSliderButton"
-          onClick={() => setSelectedEmotionIndex((prevIndex) => (prevIndex + 1) % selectedEmotionGroup.images.length)}
-        >
-          Next
-        </button>
-      </div>
+      <>
+        <ImageSlider
+          images={selectedEmotionGroup.images.map((image) => ({
+            ...image,
+            label: image.emotion,
+          }))}
+          backgroundImageSource={selectedBackground.source}
+          selectedIndex={selectedEmotionIndex}
+          onChange={calculateUpdatedIndex}
+        />
+        <Carousel
+          children={selectedEmotionGroup.images.map((image) => image.emotion)}
+          selectedIndex={selectedEmotionIndex}
+          onClick={(index) => setSelectedEmotionIndex(index)}
+          className="step4Preview__emotionCarousel"
+        />
+      </>
     );
   };
 
   return (
-    <div className="step4Preview">
+    <Container className="step4Preview">
+      <TextHeading size="h2">Step 4: Finished Character</TextHeading>
       <div className="step4Preview__content">
-        <div className="step4Preview__info">
-          <h2>{characterData.name}</h2>
-          <p>{characterData.scenario}</p>
-          {characterData.avatar && (
-            <img src={characterData.avatar} alt={`${characterData.name}'s avatar`} />
-          )}
-          <div className="step4Preview__tags">
-            <span className="step4Preview__tag">{voice.label}</span>
-          </div>
-        </div>
+        <BotSummary
+          image={characterData.avatar}
+          title={characterData.name}
+          description={characterData.scenario}
+          tags={[characterData.voice]}
+        />
+        {renderEmotionPreview()}
         <div className="step4Preview__preview">
           {renderBackgroundSelector()}
-          <select className="step4Preview__emotionGroupSelect" onChange={handleEmotionGroupChange}>
+          <select
+            className="step4Preview__emotionGroupSelect"
+            onChange={handleEmotionGroupChange}
+          >
             {characterData.emotionGroups?.map((emotionGroup, index) => (
               <option key={index} value={index}>
                 {emotionGroup.name}
               </option>
             ))}
           </select>
-          <div className="step4Preview__emotionImages">
-            {renderEmotionSlider()}
-          </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
 

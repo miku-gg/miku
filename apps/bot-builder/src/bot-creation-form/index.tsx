@@ -1,30 +1,46 @@
-import React, { useRef, useState } from 'react';
-import { CharacterCreationFormProvider, useCharacterCreationForm } from './CharacterCreationFormContext';
-import { CharacterData, validateStep } from './libs/CharacterData';
-import Step1Description from './Step1Description';
-import Step2ModelAndVoice from './Step2ModelAndVoice';
-import TopBar from './TopBar';
-import Step3Expressions from './Step3Expressions';
-import Step4Preview from './Step4Preview';
-import './styles/main.scss';
-import { BUILDING_STEPS, downloadBotFile } from './libs/bot-file-builder';
-import { downloadBlob } from './libs/file-download';
-import Modal from './Modal';
-import { Button } from '@mikugg/ui-kit';
+import React, { useRef, useState } from "react";
+
+import {
+  CharacterCreationFormProvider,
+  useCharacterCreationForm,
+} from "./CharacterCreationFormContext";
+
+import { Button, TextHeading } from "@mikugg/ui-kit";
+
+import { CharacterData, validateStep } from "./libs/CharacterData";
+import { BUILDING_STEPS, downloadBotFile } from "./libs/bot-file-builder";
+import { downloadBlob } from "./libs/file-download";
+
+import Modal from "./Modal";
+import Step1Description from "./Step1Description";
+import Step2ModelAndVoice from "./Step2ModelAndVoice";
+import Step3Expressions from "./Step3Expressions";
+import Step4Preview from "./Step4Preview";
+import TopBar from "./TopBar";
+
+import backIcon from "./assets/backArrow.svg";
+import loadIcon from "./assets/load.svg";
+import nextIcon from "./assets/nextArrow.svg";
+import saveIcon from "./assets/save.svg";
+
+import "./styles/main.scss";
 
 const save = (characterData: CharacterData) => {
   const characterDataJSON = JSON.stringify(characterData, null, 2);
-  const blob = new Blob([characterDataJSON], { type: 'application/json' });
-  downloadBlob(blob, `character_${characterData.name}.json`)
+  const blob = new Blob([characterDataJSON], { type: "application/json" });
+  downloadBlob(blob, `character_${characterData.name}.json`);
 };
 
 const _CharacterCreationForm: React.FC = () => {
-  const { characterData, setCharacterData, currentStep, nextStep, prevStep} = useCharacterCreationForm();
-  const [ buildingStep, setBuildingStep ] = useState<BUILDING_STEPS>(BUILDING_STEPS.STEP_0_NOT_BUILDING);
+  const { characterData, setCharacterData, currentStep, nextStep, prevStep } =
+    useCharacterCreationForm();
+  const [buildingStep, setBuildingStep] = useState<BUILDING_STEPS>(
+    BUILDING_STEPS.STEP_0_NOT_BUILDING
+  );
 
   const handleNext = () => {
     const stepErrors = validateStep(currentStep, characterData);
-  
+
     if (stepErrors.length > 0) {
       // Show an alert with the error messages
       const errorMessages = stepErrors.map((error) => error.message).join("\n");
@@ -51,7 +67,10 @@ const _CharacterCreationForm: React.FC = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const loadedData = JSON.parse(e.target?.result as string) as CharacterData;
+        const loadedData = JSON.parse(
+          e.target?.result as string
+        ) as CharacterData;
+        loadedData.sampleConversation = [''];
         setCharacterData(loadedData);
       };
       reader.readAsText(file);
@@ -63,46 +82,76 @@ const _CharacterCreationForm: React.FC = () => {
   };
 
   const handleBuildBot = async () => {
-    await downloadBotFile(characterData, setBuildingStep)
-  }
+    await downloadBotFile(characterData, setBuildingStep);
+  };
 
   return (
     <div className="characterCreationForm">
-      <h1>Create a Character</h1>
-      <TopBar steps={[1, 2, 3, 4]} />
+      <div className="characterCreationForm__headingContainer">
+        <TextHeading size="h1">Create a Character</TextHeading>
+        <TopBar
+          steps={[
+            { label: "01", description: "Description" },
+            { label: "02", description: "Prompt completion model" },
+            { label: "03", description: "Emotions grup" },
+            { label: "04", description: "Finished Character" },
+          ]}
+        />
+      </div>
       <div className="characterCreationForm__stepsContainer">
         {currentStep === 1 && <Step1Description />}
         {currentStep === 2 && <Step2ModelAndVoice />}
         {currentStep === 3 && <Step3Expressions />}
         {currentStep === 4 && <Step4Preview />}
       </div>
-      <div className="characterCreationForm__navigationButtons">
-        {currentStep > 1 && <button onClick={handleBack}>Back</button>}
-        {currentStep === 4 ? (
-          <Button theme='primary' onClick={handleBuildBot}>
-            Build
+      <div className="characterCreationForm__buttonsContainer">
+        <div>
+          <Button theme="transparent" onClick={handleSave} iconSRC={saveIcon}>
+            Save
           </Button>
-        ) : (
-          <Button theme='primary' onClick={handleNext}>
-            Next
+          <Button theme="transparent" onClick={load} iconSRC={loadIcon}>
+            Load
           </Button>
-        )}
-        
+        </div>
+        <input
+          type="file"
+          accept="application/json"
+          style={{ display: "none" }}
+          ref={fileInputRef}
+          onChange={handleFileLoad}
+        />
+        <div className="characterCreationForm__navigationButtons">
+          {currentStep > 1 && (
+            <Button iconSRC={backIcon} theme="transparent" onClick={handleBack}>
+              Back
+            </Button>
+          )}
+          {currentStep === 4 ? (
+            <Button theme="gradient" onClick={handleBuildBot}>
+              Built character
+            </Button>
+          ) : (
+            <Button
+              iconSRC={nextIcon}
+              iconPosition="right"
+              theme="gradient"
+              onClick={handleNext}
+            >
+              Next
+            </Button>
+          )}
+        </div>
       </div>
-      <button className="characterCreationForm__save" onClick={handleSave}>Save</button>
-      <button className="characterCreationForm__load" onClick={load}>Load</button>
-      <input
-        type="file"
-        accept="application/json"
-        style={{ display: 'none' }}
-        ref={fileInputRef}
-        onChange={handleFileLoad}
-      />
       {buildingStep > BUILDING_STEPS.STEP_0_NOT_BUILDING && (
-        <Modal overlayClose={buildingStep === BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP} onClose={() => setBuildingStep(BUILDING_STEPS.STEP_0_NOT_BUILDING)}>
-          {buildingStep !== BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP && <div className="loading"></div>}
+        <Modal
+          overlayClose={buildingStep === BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP}
+          onClose={() => setBuildingStep(BUILDING_STEPS.STEP_0_NOT_BUILDING)}
+        >
+          {buildingStep !== BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP && (
+            <div className="loading"></div>
+          )}
           <div className="loading-text">
-            {(function() {
+            {(function () {
               switch (buildingStep) {
                 case BUILDING_STEPS.STEP_1_GENERATING_EMBEDDINGS:
                   return "Generating embeddings...";

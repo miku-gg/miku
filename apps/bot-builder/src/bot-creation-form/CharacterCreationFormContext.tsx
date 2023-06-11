@@ -34,8 +34,8 @@ const CharacterCreationFormProvider = ({ children }: {children: JSX.Element}): J
     backgroundImages: [],
     scenario: '',
     greeting: '',
-    sampleConversation: '',
-    model: 'gpt-3.5-turbo',
+    sampleConversation: [''],
+    model: 'llama-30b',
     voice: 'elevenlabs_tts.EXAVITQu4vr4xnSDxMaL',
     attributes: [
       { key: 'species', value: 'human' },

@@ -35,8 +35,8 @@ export type CharacterData = {
   backgroundImages: BackgroundImage[];
   scenario: string;
   greeting: string;
-  sampleConversation: string;
-  model: 'openai';
+  sampleConversation: string[];
+  model: 'llama-30b';
   voice: Voice;
   attributes: Attribute[];
   emotionGroups: EmotionGroup[];
@@ -80,6 +80,11 @@ export const validateCharacterData = (characterData: CharacterData): ValidationE
 
   if (!characterData.greeting || characterData.greeting.trim() === '') {
     errors.push({ field: 'greeting', message: 'Greeting is required.' });
+  }
+
+  if (!characterData.sampleConversation.length || characterData.sampleConversation.findIndex(_ => _.trim() === '') !== -1) {
+    const errorIndex = characterData.sampleConversation.findIndex(_ => _.trim() === '');
+    errors.push({ field: `sampleConversation-${errorIndex}`, message: 'Sample conversation incomplete.' });
   }
 
   if (!characterData.attributes || characterData.attributes.length === 0) {
@@ -168,6 +173,7 @@ export const validateStep = (step: number, characterData: CharacterData) => {
           error.field === "scenario" ||
           error.field === "greeting" ||
           error.field.startsWith("attributes") ||
+          error.field.startsWith("sampleConversation") ||
           error.field === "avatar" ||
           error.field === "backgroundImages"
       );

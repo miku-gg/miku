@@ -1,39 +1,33 @@
-import React from 'react';
-import { useCharacterCreationForm } from './CharacterCreationFormContext';
-import classNames from 'classnames';
+import React from "react";
 
+import { Steps } from "@mikugg/ui-kit";
+import { useCharacterCreationForm } from "./CharacterCreationFormContext";
+
+export interface Step {
+  label: string;
+  description: string;
+}
 interface TopBarProps {
-  steps: number[];
+  steps: Step[];
+  handleChange?: (newStep: number) => void;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ steps }) => {
+const TopBar: React.FC<TopBarProps> = ({ steps, handleChange }) => {
   const { currentStep, setCurrentStep } = useCharacterCreationForm();
+
+  const onStepChange = (newSelectedIndex: number) => {
+    setCurrentStep && setCurrentStep(newSelectedIndex);
+
+    handleChange && handleChange(newSelectedIndex);
+  };
 
   return (
     <div className="topBar">
-      {steps.map((step, index) => (
-        <React.Fragment key={step}>
-          <div
-            className={classNames('topBar__node', {
-              'topBar__node--completed': step < currentStep,
-              'topBar__node--active': step === currentStep,
-              'topBar__node--disabled': step > currentStep,
-            })}
-            onClick={() => {
-              if (step <= currentStep) {
-                setCurrentStep(step);
-              }
-            }}
-          />
-          {index < steps.length - 1 && (
-            <div
-              className={classNames('topBar__connector', {
-                'topBar__connector--completed': step < currentStep,
-              })}
-            />
-          )}
-        </React.Fragment>
-      ))}
+      <Steps
+        steps={steps}
+        onChange={onStepChange}
+        selectedIndex={currentStep}
+      />
     </div>
   );
 };

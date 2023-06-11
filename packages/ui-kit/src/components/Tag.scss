@@ -1,0 +1,17 @@
+@import '../variables';
+
+.Tag {
+  font-size: 0.875rem;
+  color: $text-1;
+  padding: 0.25rem 1rem;
+  font-weight: 700;
+  line-height: 1rem;
+  letter-spacing: 0.01em;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.right {
+  flex-direction: row-reverse;
+}

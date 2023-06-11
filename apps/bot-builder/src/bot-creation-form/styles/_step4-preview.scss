@@ -1,43 +1,13 @@
 .step4Preview {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  width: 100%;
+  max-width: 852px;
+  max-height: 65vh;
 
   &__content {
-    display: flex;
-    justify-content: space-between;
     margin-top: 20px;
   }
 
-  &__info {
-    background-color: $background-1;
-    padding: 20px;
-    border-radius: 5px;
-    color: $text-1;
-
-    img {
-      width: 256px;
-      height: 256px;
-      object-fit: cover;
-      border-radius: 5px;
-    }
-  }
-
-  &__tags {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-  }
-
-  &__tag {
-    background-color: $badge-normal;
-    padding: 5px 10px;
-    border-radius: 5px;
-    color: $text-1;
-  }
-
   &__preview {
-    background-color: $background-2;
     padding: 20px;
     border-radius: 5px;
     color: $text-1;
@@ -79,7 +49,7 @@
     gap: 10px;
     margin-bottom: 20px;
   }
-  
+
   &__backgroundThumbnail {
     width: 100px;
     height: 100px;
@@ -89,13 +59,18 @@
     border: 2px solid transparent;
     cursor: pointer;
     transition: border-color 0.3s;
-  
+
     &:hover {
       border-color: #4978fa;
     }
-  
+
     &.step4Preview__backgroundThumbnail--selected {
       border-color: #4978fa;
     }
+  }
+
+  &__emotionCarousel {
+    margin: 0 auto;
+    width: 70%;
   }
 }

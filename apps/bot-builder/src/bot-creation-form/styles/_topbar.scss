@@ -5,36 +5,53 @@
   margin-bottom: 20px;
 
   &__node {
-    width: 20px;
-    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    font-weight: 700;
     border-radius: 50%;
-    background-color: $node-color;
     cursor: pointer;
     transition: background-color 0.2s;
+    border: 2px solid $node-conector-color;
 
     &--completed {
       background-color: $node-color-completed;
     }
 
     &--active {
-      background-color: $node-color-active;
-      border: 2px solid #fff;
+      color: $text-1;
+      width: 44px;
+      height: 44px;
+
+      & div {
+        background-color: $node-color-active;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+
+        &:hover:not(&--disabled) {
+          background-color: $node-color-completed;
+        }
+      }
     }
 
     &--disabled {
-      background-color: #6f7396;
+      background-color: transparent;
       cursor: not-allowed;
-    }
-
-    &:hover:not(&--disabled) {
-      background-color: $node-color-completed;
+      color: $text-2;
     }
   }
 
   &__connector {
-    width: 50px;
-    height: 4px;
-    background-color: $node-color;
+    width: 48px;
+    height: 2px;
+    background-color: $node-conector-color;
 
     &--completed {
       background-color: $node-color-completed;

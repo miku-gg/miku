@@ -1,24 +1,46 @@
-@import 'variables';
-@import 'buttons';
-@import 'topbar';
-@import 'modal';
-@import 'step1-description';
-@import 'step2-model-voice';
-@import 'step3-expressions';
-@import 'step4-preview';
+@import "variables";
+@import "buttons";
+@import "topbar";
+@import "modal";
+@import "step1-description";
+@import "step2-model-voice";
+@import "step3-expressions";
+@import "step4-preview";
 
 body {
-  background-color: $background-1;
-  font-family: 'Roboto', sans-serif;
+  background-color: #121a36;
+  font-family: "Poppins", "Roboto", sans-serif;
   color: $text-1;
 }
-
-.characterCreationForm__navigationButtons {
+.characterCreationForm {
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+  flex-direction: column;
 
-  button {
-    @include button-styles;
+  &__headingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__buttonsContainer {
+    height: 100%;
+    width: 100%;
+    max-width: 852px;
+    display: flex;
+    align-self: center;
+    align-items: end;
+    justify-content: space-between;
+
+    & div {
+      display: flex;
+      gap: 1rem;
+    }
+  }
+
+  &__navigationButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
   }
 }

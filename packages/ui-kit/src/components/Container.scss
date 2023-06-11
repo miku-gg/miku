@@ -1,0 +1,59 @@
+.container {
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+
+  border-radius: 1rem;
+  padding: 1.5rem;
+  padding-right: 0.5rem;
+
+  background-color: #1b2142;
+
+  &__scroll {
+    width: 100%;
+    padding-right: 1rem;
+    overflow-y: scroll;
+
+    -webkit-mask-image: linear-gradient(0deg, transparent, #000),
+      linear-gradient(270deg, transparent 10px, #000 0);
+    mask-image: linear-gradient(0deg, transparent, #000),
+      linear-gradient(270deg, transparent 10px, #000 0);
+
+    -webkit-mask-position: left bottom;
+    mask-position: left bottom;
+
+    -webkit-mask-size: 100% 20000px;
+    mask-size: 100% 20000px;
+
+    transition: -webkit-mask-position 0.3s;
+    transition: mask-position 0.3s;
+    transition: mask-position 0.3s, -webkit-mask-position 0.3s;
+
+    &::-webkit-scrollbar {
+      width: 0.5rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #6c7194;
+      border-radius: 0.25rem;
+    }
+
+    &:hover {
+      mask-position: left top;
+      -webkit-mask-position: left top;
+    }
+
+    &__children {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}

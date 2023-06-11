@@ -64,7 +64,7 @@ export async function createCharacterConfig(
             attribute.key,
             attribute.value,
           ]),
-          sampleChat: characterData.sampleConversation.split("\n"),
+          sampleChat: characterData.sampleConversation,
           scenario: characterData.scenario,
           greeting: characterData.greeting,
           botSubject: characterData.name,

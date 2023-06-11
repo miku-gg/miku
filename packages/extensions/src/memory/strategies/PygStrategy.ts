@@ -16,8 +16,9 @@ export class PygStrategy implements ContextPromptBuildStrategy {
       prompt += `<START>\n` + example + '\n';
     }
     prompt += `<START>\n`;
-    
-    return prompt
+    prompt = replaceAll(prompt, '{{char}}', parts.botSubject);
+    prompt = replaceAll(prompt, '{{user}}', 'Anon');
+    return prompt;
   }
 
   buildInitiatorPrompt(parts: ContextPromptParts): string {
