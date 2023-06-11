@@ -70,7 +70,6 @@ const _CharacterCreationForm: React.FC = () => {
         const loadedData = JSON.parse(
           e.target?.result as string
         ) as CharacterData;
-        loadedData.sampleConversation = [''];
         setCharacterData(loadedData);
       };
       reader.readAsText(file);
