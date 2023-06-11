@@ -110,7 +110,7 @@ export class OpenAIPromptCompleterService extends Miku.Services.Service {
       frequency_penalty: modelSettings.frequencyPenalty,
       presence_penalty: modelSettings.presencePenalty,
       messages: input.messages,
-      // stop: input.stop.length ? input.stop : undefined, // this makes all the models return empty msg idk y
+      stop: input.stop.length ? input.stop : undefined, // this makes all the models return empty msg idk y
     });
     const choices = response?.data?.choices || [];
     const completion = choices.length ? choices[0].message?.content || "" : "";

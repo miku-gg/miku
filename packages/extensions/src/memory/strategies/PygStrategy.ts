@@ -7,14 +7,15 @@ export class PygStrategy implements ContextPromptBuildStrategy {
 
     const formattedAttributes = attributes
       .map(([key, value]) => `${key}: ${value}`)
-      .join('; ');
+      .join('\n');
 
     let prompt = '';
     prompt += `${botSubject}'s persona: ${persona}. ${formattedAttributes}\n`;
+    prompt += `Scenario: ${scenario}\n`;
+    for (const example of sampleChat) {
+      prompt += `<START>\n` + example + '\n';
+    }
     prompt += `<START>\n`;
-    prompt += `${replaceAll(sampleChat.join('\n'), 'You:', 'Anon:')}\n`;
-    prompt += `<START>\n`;
-    prompt += `${scenario}`;
     
     return prompt
   }

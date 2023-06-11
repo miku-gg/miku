@@ -98,26 +98,26 @@ export type PromptCompleterEndpointConfig =
 };
 
 export const DEFAULT_OOBABOOGA_SETTINGS: OobaboogaSettings = {
-  temp: 0.8,
+  temp: 0.5,
   maxTokens: 60,
-  topP: 1.0,
+  topP: 0.9,
   topK: 0,
-  typicalP: 0.95,
-  repetitionPenalty: 1.2,
-  encoderRepitionPenalty: 1.2,
-  noRepeatNgramSize: 2,
-  minLength: 10,
+  typicalP: 1,
+  repetitionPenalty: 1.1,
+  encoderRepitionPenalty: 1,
+  noRepeatNgramSize: 0,
+  minLength: 0,
   doSample: true,
   seed: -1,
-  penaltyAlpha: 0.6,
+  penaltyAlpha: 0,
   numBeams: 1,
-  lengthPenalty: 0.8,
+  lengthPenalty: 1,
   earlyStopping: false,
   addBosToken: true,
-  banEosToken: true,
+  banEosToken: false,
   truncateLength: 2048,
-  stoppingStrings: "",
-  skipSpecialTokens: false,
+  stoppingStrings: "\nAnon:",
+  skipSpecialTokens: true,
 };
 
 export const DEFAULT_KOBOLDAI_SETTINGS: KoboldAIsettings = {
