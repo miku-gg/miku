@@ -1,20 +1,39 @@
+import { withNaming } from '@bem-react/classname';
 import React from 'react';
-import { cn } from '@bem-react/classname';
 import './Button.scss';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  theme: 'primary' | 'secondary';
   children: React.ReactNode;
+  isAnchor?: string;
+  theme: 'primary' | 'secondary' | 'transparent' | 'gradient';
+  iconSRC?: string;
+  iconPosition?: 'left' | 'right';
 }
 
-const Button: React.FC<ButtonProps> = ({ theme, children, ...rest }) => {
-  const cnButton = cn('Button');
-  const cnTheme = cnButton({ theme });
+const Button: React.FC<ButtonProps> = ({
+  iconPosition = '',
+  iconSRC,
+  isAnchor,
+  theme,
+  children,
+  ...rest
+}) => {
+  const cn = withNaming({ n: 'Button ', e: '-' });
+  const cnTheme = cn('theme', theme);
   return (
-    <button className={cnTheme} {...rest}>
-      {children}
-    </button>
+    <>
+      {isAnchor ? (
+        <a className={cnTheme()} href={isAnchor}>
+          {children}
+        </a>
+      ) : (
+        <button className={`${cnTheme()} ${iconPosition}`} {...rest}>
+          {iconSRC ? <img src={iconSRC} alt="button-icon" /> : null}
+          {children}
+        </button>
+      )}
+    </>
   );
 };
 

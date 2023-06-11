@@ -1,1 +1,40 @@
 $purple-1: #9747ff;
+$violet-2: #6c7293;
+$primary-color: #ff4e67;
+$secondary-color: #9747ff;
+$gradient-color: (90deg, #9747ff 0%, #ff4e67 100%);
+
+$text-1: #fafafa;
+$color-1: #5f6388;
+$error-text: #ff0000;
+
+$background-1: #25284b;
+$background-2: #1b1f3a;
+$background-3: #121a36;
+
+$badge-normal: #4978fa;
+$badge-expensive: #ff4e67;
+
+$node-color: #4978fa;
+$node-color-active: #ff4e67;
+$node-color-completed: #9747ff;
+$node-conector-color: #6c7293;
+
+.scrollbar::-webkit-scrollbar {
+  width: 0.3em;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  border-radius: 100vh;
+  background: $background-2;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: #a78bfa;
+  border-radius: 100vh;
+  border: 0;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #c4b5fd;
+}

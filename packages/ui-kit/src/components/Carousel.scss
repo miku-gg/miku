@@ -1,0 +1,78 @@
+@import '../variables';
+
+.Carousel {
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  &__leftScrollButton,
+  &__rightScrollButton {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c7293;
+    border: unset;
+    background: transparent;
+    cursor: pointer;
+
+    &:hover {
+      transition: 0.5s;
+      box-shadow: unset;
+      filter: drop-shadow(0 0 2px $secondary-color);
+    }
+  }
+
+  &__leftScrollButton {
+    transform: rotate(180deg);
+  }
+
+  &__itemContainer {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 1rem;
+    overflow-x: auto;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    background: transparent;
+    color: $text-1;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+      text-decoration-color: $purple-1;
+      text-decoration-thickness: 2px;
+    }
+  }
+
+  & .selectedItem {
+    text-decoration: underline;
+    text-decoration-color: $purple-1;
+    text-decoration-thickness: 2px;
+  }
+
+  &__image {
+    width: 9.25rem;
+    height: 9.25rem;
+    min-width: 9.25rem;
+    border-radius: 1rem;
+  }
+}

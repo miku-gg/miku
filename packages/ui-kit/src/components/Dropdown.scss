@@ -1,0 +1,133 @@
+.dropdown {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  font-family: 'Product Sans';
+  font-style: normal;
+  font-weight: 400;
+  user-select: none;
+
+  font-size: 14px;
+  line-height: 17px;
+
+  border: 1px solid #6c7293;
+  border-radius: 8px;
+
+  color: #fafafa;
+  cursor: pointer;
+
+  &__selected {
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+
+    &-placeholder {
+      color: #999;
+    }
+
+    &-name {
+      font-weight: bold;
+    }
+
+    &-description {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+
+  &__list {
+    font-family: 'Poppins', Arial, sans-serif;
+    font-style: normal;
+    color: #6c7293;
+
+    width: 100%;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    box-sizing: border-box;
+
+    top: 100%;
+    left: 0;
+    z-index: 1;
+
+    border-radius: 16px;
+    padding: 24px;
+    gap: 8px;
+    margin-top: 10px;
+
+    background-color: #1b2142;
+    border: 1px solid #6c7293;
+
+    &-item {
+      width: 100%;
+      transition: background-color 0.2s ease-in-out;
+
+      &:hover {
+        color: #fafafa;
+      }
+
+      &-name {
+        font-weight: 500;
+        line-height: 21px;
+      }
+
+      &-description {
+        font-size: 12px;
+        color: #b9b7b7;
+      }
+
+      &--selected {
+        color: #fafafa;
+      }
+    }
+  }
+
+  &.flavor-white {
+    .dropdown__selected {
+      border-radius: 8px;
+      background-color: #fafafa;
+      color: #1b2142;
+      border-color: #444;
+
+      &-placeholder {
+        color: #1b2142;
+      }
+
+      &-description {
+        color: #1b2142;
+      }
+    }
+
+    .dropdown__list {
+      background-color: #fafafa;
+      border-color: #1b2142;
+
+      &-item {
+        color: #1b2142;
+
+        &:hover {
+          color: #0026ff;
+        }
+
+        &-name {
+          font-weight: 500;
+          line-height: 21px;
+        }
+
+        &-description {
+          font-size: 12px;
+          color: #505050;
+        }
+
+        &--selected {
+          color: #0026ff;
+        }
+      }
+    }
+  }
+}

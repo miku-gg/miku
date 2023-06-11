@@ -1,0 +1,54 @@
+@import '../variables';
+
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+    border: 1px solid $node-conector-color;
+
+    color: $node-conector-color;
+
+    cursor: pointer;
+    user-select: none;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    &Active {
+      color: $text-1;
+      background-color: $node-color-active;
+      transition: background-color 0.2s;
+
+      width: 32px;
+      height: 32px;
+
+      border: 0;
+
+      &:hover:not(&Disabled) {
+        background-color: $node-color-completed;
+      }
+    }
+
+    &Disabled {
+      background-color: transparent;
+      cursor: not-allowed;
+    }
+  }
+
+  &__connector {
+    width: 48px;
+    height: 1px;
+
+    background-color: $node-conector-color;
+  }
+}

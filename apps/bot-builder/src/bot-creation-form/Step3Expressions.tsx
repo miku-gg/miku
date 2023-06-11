@@ -1,62 +1,30 @@
-import React, { useState } from 'react';
-import { useCharacterCreationForm } from './CharacterCreationFormContext';
-import { EmotionGroup, emotionHashConfigs } from './libs/CharacterData';
-import placeholderImage from './assets/placeholder.png'; // Replace with the actual path to the image
-import { checkImageDimensionsAndType } from './libs/utils';
+import React from "react";
 
-const EmotionImage = (
-  {id, emotionId, handleImageChange, renderImagePreview, groupIndex}: {
-    id: string,
-    emotionId: string,
-    handleImageChange: (file: File, groupIndex: number, emotionId: string) => void
-    renderImagePreview: (groupIndex: number, emotionId: string) => JSX.Element,
-    groupIndex: number
-  }
-): JSX.Element => {
-  const [dragOver, setDragOver] = useState<boolean>(false);
+import { useCharacterCreationForm } from "./CharacterCreationFormContext";
 
-  const onDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setDragOver(false);
-    const file = event.dataTransfer.files[0];
-    if (file) {
-      handleImageChange(file, groupIndex, emotionId);
-    }
-  };
+import { EmotionGroup, emotionHashConfigs } from "./libs/CharacterData";
+import { checkImageDimensionsAndType } from "./libs/utils";
 
-  const onDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setDragOver(true);
-  };
+import {
+  Button,
+  Container,
+  DragAndDropImages,
+  Input,
+  TextHeading,
+} from "@mikugg/ui-kit";
 
-  const onDragLeave = () => {
-    setDragOver(false);
-  };
-
-  return (
-    <div className="step3Expressions__emotion">
-      <label htmlFor={id}>{emotionId}</label>
-      <div
-        className={`step3Expressions__emotionDropzone ${dragOver ? 'drag-over' : ''}`}
-        onDrop={onDrop}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-      >
-        {renderImagePreview(groupIndex, emotionId)}
-      </div>
-    </div>
-  )
-}
+const closeIconBase64 =
+  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTciIHZpZXdCb3g9IjAgMCAxNiAxNyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeT0iMC41IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHJ4PSI4IiBmaWxsPSIjRkFGQUZBIi8+CjxyZWN0IHg9IjQiIHk9IjcuNSIgd2lkdGg9IjgiIGhlaWdodD0iMiIgZmlsbD0iIzFCMjE0MiIvPgo8L3N2Zz4K";
 
 const Step3Expressions: React.FC = () => {
   const { characterData, setCharacterData } = useCharacterCreationForm();
 
   const handleAddGroup = () => {
     const newGroup: EmotionGroup = {
-      name: '',
-      trigger: '',
-      description: '',
-      emotionsHash: '',
+      name: "",
+      trigger: "",
+      description: "",
+      emotionsHash: "",
       images: [],
     };
     setCharacterData({
@@ -74,14 +42,16 @@ const Step3Expressions: React.FC = () => {
   };
 
   const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
     groupIndex: number
   ) => {
     const { name, value } = event.target;
     if (characterData.emotionGroups) {
       const newGroups = [...characterData.emotionGroups];
       newGroups[groupIndex] = { ...newGroups[groupIndex], [name]: value };
-      if (name === 'emotionsHash') {
+      if (name === "emotionsHash") {
         newGroups[groupIndex].images = [];
       }
       setCharacterData({ ...characterData, emotionGroups: newGroups });
@@ -93,36 +63,39 @@ const Step3Expressions: React.FC = () => {
     groupIndex: number,
     emotionId: string
   ) => {
-    if (file) {
-      const isValidSizeAndType = await checkImageDimensionsAndType(file, ['image/png', 'image/gif', 'video/webm']);
-      if (isValidSizeAndType) {
-        if (characterData.emotionGroups) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const base64 = reader.result as string;
-            const newGroups = [...characterData.emotionGroups];
-            const emotionHashConfig = emotionHashConfigs.find(
-              (config) => config.hash === newGroups[groupIndex].emotionsHash
-            );
-            if (emotionHashConfig?.emotionIds.includes(emotionId) === false) {
-              console.warn(`Invalid emotion id: ${emotionId}`)
-              return;
-            }
-            const images = newGroups[groupIndex].images || [];
-            const imageIndex = images.findIndex((img) => img.emotion === emotionId);
-            if (imageIndex >= 0) {
-              images[imageIndex].sources = [base64];
-            } else {
-              images.push({ emotion: emotionId, sources: [base64], fileTypes: file.type });
-            }
-            newGroups[groupIndex].images = images;
-            setCharacterData({ ...characterData, emotionGroups: newGroups });
-          };
-          reader.readAsDataURL(file);
+    if (file && characterData.emotionGroups) {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        const newGroups = [...characterData.emotionGroups];
+        const emotionHashConfig = emotionHashConfigs.find(
+          (config) => config.hash === newGroups[groupIndex].emotionsHash
+        );
+
+        if (emotionHashConfig?.emotionIds.includes(emotionId) === false) {
+          console.warn(`Invalid emotion id: ${emotionId}`);
+          return;
         }
-      } else {
-        alert('Please upload an image with dimensions of 1024x1024 pixels in PNG or GIF format.');
-      }
+
+        const images = newGroups[groupIndex].images || [];
+        const imageIndex = images.findIndex((img) => img.emotion === emotionId);
+
+        if (imageIndex >= 0) {
+          images[imageIndex].sources = [base64];
+        } else {
+          images.push({
+            emotion: emotionId,
+            sources: [base64],
+            fileTypes: file.type,
+          });
+        }
+
+        newGroups[groupIndex].images = images;
+        setCharacterData({ ...characterData, emotionGroups: newGroups });
+      };
+
+      reader.readAsDataURL(file);
     }
   };
 
@@ -131,49 +104,13 @@ const Step3Expressions: React.FC = () => {
     groupIndex: number
   ) => {
     const files = event.target.files;
+
     if (files) {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const emotionId = file.name.split('.')[0];
+        const emotionId = file.name.split(".")[0];
         handleImageChange(file, groupIndex, emotionId);
       }
-    }
-  };
-  
-
-  const renderImagePreview = (
-    groupIndex: number,
-    emotionId: string
-  ): JSX.Element => {
-    let src = ''
-    const group = characterData.emotionGroups?.[groupIndex];
-    if (!group) src = '';
-
-    const image = group.images.find((img) => img.emotion === emotionId);
-    if (image && image.sources.length > 0) {
-      src = image.sources[0] || '';
-    } else {
-      src = placeholderImage;
-    }
-
-    if (image && image.fileTypes === 'video/webm') {
-      return (
-        <video
-          src={src}
-          className="step3Expressions__emotionPreview"
-          autoPlay
-          loop
-          muted
-        />
-      );
-    } else {
-      return (
-        <img
-          src={src}
-          alt={`Emotion ${emotionId}`}
-          className="step3Expressions__emotionPreview"
-        />
-      );
     }
   };
 
@@ -184,26 +121,36 @@ const Step3Expressions: React.FC = () => {
       const emotionHashConfig = emotionHashConfigs.find(
         (config) => config.hash === group.emotionsHash
       );
-
       const renderEmotionImages = () => {
         if (!emotionHashConfig) return null;
 
         return emotionHashConfig.emotionIds.map((emotionId) => {
-          // const fileInputRef = useRef<HTMLInputElement>(null);
-          const key = `emotion_${emotionId}_group_${groupIndex}`;
+          const PreviewImage = group.images.find(
+            (img) => img.emotion === emotionId
+          );
+
           return (
-            <EmotionImage
-              key={key}
-              id={key}
-              emotionId={emotionId}
-              handleImageChange={handleImageChange}
-              renderImagePreview={renderImagePreview}
-              groupIndex={groupIndex}
+            <DragAndDropImages
+              key={`emotion_${emotionId}_group_${group.emotionsHash}`}
+              size="sm"
+              dragAreaLabel={emotionId}
+              handleChange={(file) =>
+                handleImageChange(file, groupIndex, emotionId)
+              }
+              previewImage={PreviewImage?.sources[0]}
+              placeHolder="(1024x1024)"
+              errorMessage="Please upload an image with dimensions of 1024x1024 pixels in PNG or GIF format."
+              onFileValidate={(file) =>
+                checkImageDimensionsAndType(file, [
+                  "image/png",
+                  "image/gif",
+                  "video/webm",
+                ])
+              }
             />
           );
         });
       };
-
 
       return (
         <div key={`group_${groupIndex}`} className="step3Expressions__group">
@@ -214,40 +161,46 @@ const Step3Expressions: React.FC = () => {
               className="step3Expressions__removeGroupButton"
               onClick={() => handleRemoveGroup(groupIndex)}
             >
-              Remove Group
+              <img src={closeIconBase64} />
             </button>
           </div>
+
           <div className="step3Expressions__formGroup">
-            <label htmlFor={`group_${groupIndex}_name`}>Name:</label>
-            <input
-              placeholder="Enter a name for this emotion group"
-              type="text"
+            <Input
+              label="Name:"
+              placeHolder="Enter a name for this emotion group"
               id={`group_${groupIndex}_name`}
               name="name"
               value={group.name}
               onChange={(event) => handleInputChange(event, groupIndex)}
             />
           </div>
+
           <div className="step3Expressions__formGroup">
-            <label htmlFor={`group_${groupIndex}_description`}>Trigger embedding:</label>
-            <textarea
-              placeholder="Enter a text that will trigger this emotion group. This could be a list of keywords or a sentence. This text will be converted to an embedding."
+            <Input
+              isTextArea
+              label="Trigger embedding:"
+              placeHolder="Enter a text that will trigger this emotion group. This could be a list of keywords or a sentence. This text will be converted to an embedding."
               id={`group_${groupIndex}_description`}
               name="description"
               value={group.description}
               onChange={(event) => handleInputChange(event, groupIndex)}
+              className="step3Expressions__formGroup__textarea"
             />
           </div>
           <div className="step3Expressions__formGroup">
-            <label htmlFor={`group_${groupIndex}_trigger`}>Switch sentence:</label>
-            <textarea
-              placeholder="Enter a text that will be added to the prompt when this emotion group is triggered."
+            <Input
+              isTextArea
+              label="Switch sentence:"
+              placeHolder="Enter a text that will be added to the prompt when this emotion group is triggered."
               id={`group_${groupIndex}_trigger`}
               name="trigger"
               value={group.trigger}
               onChange={(event) => handleInputChange(event, groupIndex)}
+              className="step3Expressions__formGroup__textarea"
             />
           </div>
+
           <div className="step3Expressions__formGroup">
             <input
               type="file"
@@ -257,7 +210,9 @@ const Step3Expressions: React.FC = () => {
             />
           </div>
           <div className="step3Expressions__formGroup">
-            <label htmlFor={`group_${groupIndex}_emotionsHash`}>Emotion Set:</label>
+            <label htmlFor={`group_${groupIndex}_emotionsHash`}>
+              Emotion Set:
+            </label>
             <select
               id={`group_${groupIndex}_emotionsHash`}
               name="emotionsHash"
@@ -272,21 +227,23 @@ const Step3Expressions: React.FC = () => {
               ))}
             </select>
           </div>
-          <div className="step3Expressions__emotions">{renderEmotionImages()}</div>
+          <div className="step3Expressions__emotions">
+            {renderEmotionImages()}
+          </div>
         </div>
       );
     });
   };
 
   return (
-    <div className="step3Expressions">
-      <h2>Step 3: Emotion Groups</h2>
+    <Container className="step3Expressions">
+      <TextHeading size="h2">Step 3: Emotion Groups</TextHeading>
       {renderEmotionGroups()}
-      <button type="button" className="step3Expressions__addGroupButton" onClick={handleAddGroup}>
-        Add Emotion Group
-      </button>
-    </div>
+      <Button theme="gradient" onClick={handleAddGroup}>
+        + Add Emotion Group
+      </Button>
+    </Container>
   );
-}
+};
 
 export default Step3Expressions;

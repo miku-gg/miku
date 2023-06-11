@@ -1,0 +1,92 @@
+@import '../variables';
+
+.dragAndDropImages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-bottom: 1rem;
+
+  label {
+    color: $text-1;
+    margin-top: 0.5rem;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 15px;
+  }
+
+  &__dropzone {
+    border: 1px solid $node-conector-color;
+
+    width: 100%;
+    height: 100%;
+
+    border-radius: 1rem;
+    cursor: grab;
+    position: relative;
+
+    &.dragOver {
+      border-color: $purple-1;
+
+      .maxSizeText,
+      + label {
+        color: $purple-1;
+      }
+    }
+
+    &.smSize {
+      width: 8rem;
+      height: 8rem;
+    }
+
+    &.mdSize {
+      width: 12rem;
+      height: 12rem;
+    }
+
+    &.lgSize {
+      width: 16rem;
+      height: 16rem;
+    }
+  }
+
+  &__preview {
+    width: 100%;
+    height: 100%;
+
+    & img,
+    & video {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 1rem;
+    }
+  }
+
+  &__defaultImage {
+    width: 100%;
+    height: 100%;
+
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding: 1rem;
+    gap: 0.5rem;
+
+    color: $node-conector-color;
+
+    .maxSizeText {
+      font-size: 10px;
+      margin: 0;
+    }
+
+    & svg {
+      width: 40%;
+    }
+  }
+}

@@ -1,12 +1,69 @@
 @import '../variables';
 
 .Button {
-  background-color: $purple-1;
-  display: inline-block;
-  padding: 0.8em 1em;
-  color: #fffef9;
-  font-weight: 600;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  width: fit-content;
+  display: flex;
+
+  padding: 0.59375rem 1rem;
+  gap: 0.5rem;
+
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 21px;
+
+  color: $text-1;
+
+  border-radius: 0.625rem;
+  border: none;
+
   text-align: center;
+  text-decoration: none;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+  overflow: hidden;
+
+  transition: background-color 0.5s;
+
+  &.theme {
+    &-primary {
+      background-color: $primary-color;
+
+      &:hover {
+        background-color: #ff4e67ac;
+      }
+    }
+
+    &-secondary {
+      background-color: $secondary-color;
+
+      &:hover {
+        background-color: #9747ffac;
+      }
+    }
+
+    &-transparent {
+      background: transparent;
+      border: 1px solid $violet-2;
+      color: $violet-2;
+
+      &:hover {
+        background: rgb(255 255 255 / 7%);
+      }
+    }
+
+    &-gradient {
+      background: linear-gradient(90deg, $purple-1, transparent) $primary-color;
+      place-content: center;
+
+      &:hover {
+        background-color: $purple-1;
+      }
+    }
+  }
+
+  &.right {
+    flex-direction: row-reverse;
+  }
 }

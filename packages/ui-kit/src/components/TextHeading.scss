@@ -1,0 +1,26 @@
+@import '../variables';
+
+.TextHeading {
+  font-weight: 600;
+  line-height: 2rem;
+  color: $text-1;
+  margin: 0;
+}
+
+h1.TextHeading {
+  font-size: 1.375rem;
+  line-height: 33px;
+}
+
+h2.TextHeading {
+  font-size: 1.125rem;
+  line-height: 27px;
+}
+
+h3.TextHeading {
+  font-size: 0.875rem;
+  line-height: 21px;
+}
+
+h4.TextHeading {
+}
