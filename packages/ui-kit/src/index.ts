@@ -1,3 +1,5 @@
+import Accordion from './components/Accordion';
+import AccordionItem from './components/AccordionItem';
 import AreYouSure from './components/AreYouSure';
 import Button from './components/Button';
 import Carousel from './components/Carousel';
@@ -10,14 +12,16 @@ import Tag from './components/Tag';
 import TextHeading from './components/TextHeading';
 
 export {
-  Button,
-  Input,
-  TextHeading,
-  Tag,
-  Steps,
-  Container,
-  ImageSlider,
-  DragAndDropImages,
+  Accordion,
+  AccordionItem,
   AreYouSure,
+  Button,
   Carousel,
+  Container,
+  DragAndDropImages,
+  ImageSlider,
+  Input,
+  Steps,
+  Tag,
+  TextHeading,
 };
