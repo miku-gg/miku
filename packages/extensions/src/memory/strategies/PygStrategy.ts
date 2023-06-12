@@ -1,5 +1,4 @@
 import { ContextPromptBuildStrategy, ContextPromptParts } from '../GPTMemoryV2';
-import { replaceAll } from './RPBTStrategy';
 
 export class PygStrategy implements ContextPromptBuildStrategy {
   buildContextPrompt(parts: ContextPromptParts): string {
@@ -16,8 +15,6 @@ export class PygStrategy implements ContextPromptBuildStrategy {
       prompt += `<START>\n` + example + '\n';
     }
     prompt += `<START>\n`;
-    prompt = replaceAll(prompt, '{{char}}', parts.botSubject);
-    prompt = replaceAll(prompt, '{{user}}', 'Anon');
     return prompt;
   }
 

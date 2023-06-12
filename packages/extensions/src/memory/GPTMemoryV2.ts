@@ -1,6 +1,7 @@
 
 import * as Strategies from './strategies';
 import { GPTShortTermMemory, GPTShortTermMemoryConfig } from './GPTMemory';
+import { replaceAll } from './strategies/RPBTStrategy';
 
 export * as Strategies from './strategies';
 export interface ContextPromptParts {
@@ -53,11 +54,17 @@ export class GPTShortTermMemoryV2 extends GPTShortTermMemory {
   }
 
   public override getContextPrompt(): string {
-    return this.promptbuildStrategy.buildContextPrompt(this.promptParts);
+    let prompt = this.promptbuildStrategy.buildContextPrompt(this.promptParts);
+    prompt = replaceAll(prompt, '{{char}}', this.promptParts.botSubject);
+    prompt = replaceAll(prompt, '{{user}}', 'Anon');
+    return prompt;    
   }
 
   public override getInitiatorPrompt(): string {
-    return this.promptbuildStrategy.buildInitiatorPrompt(this.promptParts);
+    let prompt = this.promptbuildStrategy.buildInitiatorPrompt(this.promptParts);
+    prompt = replaceAll(prompt, '{{char}}', this.promptParts.botSubject);
+    prompt = replaceAll(prompt, '{{user}}', 'Anon');
+    return prompt;
   }
 
   public override getBotSubject(): string {
