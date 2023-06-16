@@ -19,25 +19,6 @@ const Step4Preview: React.FC = () => {
     setSelectedEmotionIndex(0);
   };
 
-  const renderBackgroundSelector = () => {
-    return (
-      <div className="step4Preview__backgroundSelector">
-        {characterData.backgroundImages?.map((bg, index) => (
-          <div
-            key={index}
-            className={`step4Preview__backgroundThumbnail ${
-              selectedBackgroundIndex === index
-                ? "step4Preview__backgroundThumbnail--selected"
-                : ""
-            }`}
-            style={{ backgroundImage: `url(${bg.source})` }}
-            onClick={() => setSelectedBackgroundIndex(index)}
-          />
-        ))}
-      </div>
-    );
-  };
-
   const renderEmotionPreview = () => {
     if (!characterData.emotionGroups) return null;
 
@@ -66,7 +47,7 @@ const Step4Preview: React.FC = () => {
           onChange={calculateUpdatedIndex}
         />
         <Carousel
-          children={selectedEmotionGroup.images.map((image) => image.emotion)}
+          items={selectedEmotionGroup.images.map((image) => image.emotion)}
           selectedIndex={selectedEmotionIndex}
           onClick={(index) => setSelectedEmotionIndex(index)}
           className="step4Preview__emotionCarousel"
@@ -85,19 +66,26 @@ const Step4Preview: React.FC = () => {
           description={characterData.scenario}
           tags={[characterData.model, characterData.voice]}
         />
+        <select
+          className="step4Preview__emotionGroupSelect"
+          onChange={handleEmotionGroupChange}
+        >
+          {characterData.emotionGroups.map((emotionGroup, index) => (
+            <option key={index} value={index}>
+              {emotionGroup.name}
+            </option>
+          ))}
+        </select>
         {renderEmotionPreview()}
         <div className="step4Preview__preview">
-          {renderBackgroundSelector()}
-          <select
-            className="step4Preview__emotionGroupSelect"
-            onChange={handleEmotionGroupChange}
-          >
-            {characterData.emotionGroups?.map((emotionGroup, index) => (
-              <option key={index} value={index}>
-                {emotionGroup.name}
-              </option>
-            ))}
-          </select>
+          <Carousel
+            items={characterData.backgroundImages.map(
+              (background) => background.source
+            )}
+            onClick={(index) => setSelectedBackgroundIndex(index)}
+            selectedIndex={selectedBackgroundIndex}
+            isImageCarousel
+          />
         </div>
       </div>
     </Container>
