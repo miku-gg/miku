@@ -10,27 +10,6 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "python-dotenv"])
     from dotenv import load_dotenv
 
-def get_private_ip():
-    hostname = socket.gethostname()
-    private_ip = ''
-    try:
-        ip_list = [ip for ip in socket.getaddrinfo(hostname, None, socket.AF_INET) if not ip[-1][0].startswith('127.')][:1]
-        if ip_list:
-            private_ip = ip_list[0][-1][0]
-    except Exception:
-        pass
-
-    if not private_ip:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(("8.8.8.8", 80))
-            private_ip = s.getsockname()[0]
-            s.close()
-        except Exception:
-            pass
-
-    return private_ip
-
 def main():
     load_dotenv()
     env_file_path = os.path.join(os.getcwd(), ".env")
@@ -53,9 +32,6 @@ def main():
                 env[key_name] = new_value
             else:
                 current_value = current_value if current_value is not None else default_value
-                if "localhost" in current_value:
-                    current_value = current_value.replace("localhost", get_private_ip())
-
                 env[key_name] = current_value if current_value is not None else default_value
 
     with open(env_file_path, "w") as f:
