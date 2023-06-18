@@ -18,16 +18,12 @@ export class ElevenLabsService extends TTSService {
   protected override async computeInput(
     input: InferProps<typeof TTSServicePropTypes>
   ): Promise<string> {
-    const settings = JSON.parse(input.settings!);
-    const requestUrl = `${this.apiEndpoint}/${settings.voiceId}`;
-    const speakPrompt = settings.readNonSpokenText
-      ? input.prompt
-      : input.prompt?.replace(/\([^)]*[^)]*\)/g, "");
+    const requestUrl = `${this.apiEndpoint}/${input.voiceId}`;
     return axios
       .post<ArrayBuffer>(
         requestUrl,
         {
-          text: speakPrompt,
+          text: input.prompt,
         },
         {
           headers: {

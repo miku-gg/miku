@@ -61,7 +61,7 @@ export const voices: Record<
     service: "azure_tts",
   },
   "azure_tts.en-US-SaraNeural.whispering": {
-    label: "Sara (Azure)",
+    label: "Sara (Azure) - Whispering",
     price: "cheap",
     service: "azure_tts",
   },

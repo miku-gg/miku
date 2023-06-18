@@ -14,7 +14,7 @@ const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const AZURE_API_KEY = process.env.AZURE_API_KEY || '';
 const NOVELAI_API_KEY = process.env.NOVELAI_API_KEY || '';
 const PYGMALION_ENDPOINT = process.env.PYGMALION_ENDPOINT || '';
-const LLAMA_ENDPOINT = process.env.LLAMA_ENDPOINT || '';
+const OOBABOOGA_ENDPOINT = process.env.OOBABOOGA_ENDPOINT || '';
 const EMOTIONS_ENDPOINT = process.env.EMOTIONS_ENDPOINT || '';
 const SBERT_EMOTIONS_ENABLED = Number(process.env.SBERT_EMOTIONS_ENABLED || '0');
 const SBERT_SIMILARITY_API_URL = process.env.SBERT_SIMILARITY_API_URL || '';
@@ -91,10 +91,10 @@ if (PYGMALION_ENDPOINT) {
   });  
 }
 
-if (LLAMA_ENDPOINT) {
-  new MikuExtensions.Services.LLaMAService({
-    gradioEndpoint: LLAMA_ENDPOINT,
-    serviceId: MikuExtensions.Services.ServicesNames.LLaMA,
+if (OOBABOOGA_ENDPOINT) {
+  new MikuExtensions.Services.OobaboogaService({
+    gradioEndpoint: OOBABOOGA_ENDPOINT,
+    serviceId: MikuExtensions.Services.ServicesNames.Oobabooga,
     billingEndpoint: '',
     addRoute
   });  

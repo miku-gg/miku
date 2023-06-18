@@ -49,11 +49,8 @@
     padding: 0;
 
     & textArea {
-      resize: none;
       background-color: transparent;
       margin: 0;
-      height: 2.5rem;
-      max-height: 2.5rem;
       min-height: 2.5rem;
 
       &:focus {
@@ -125,5 +122,24 @@
   &__addAttributeButton {
     margin-top: 1rem;
     font-size: 18px;
+  }
+
+  &__sample-conversation {
+    position: relative;
+    padding-bottom: 10px;
+
+    &:last-child {
+      padding: 0;
+    }
+
+    &__remove {
+      position: absolute;
+      top: 8px;
+      right: 9px;
+    }
+
+    textarea {
+      padding-right: 20px;
+    }
   }
 }

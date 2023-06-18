@@ -3,7 +3,7 @@
 import React from "react";
 import { Colors } from "./Components/ModelTag";
 
-import { models, voices } from "./libs/CharacterData";
+import { voices } from "./libs/CharacterData";
 
 import { Container, Tag, TextHeading } from "@mikugg/ui-kit";
 import { useCharacterCreationForm } from "./CharacterCreationFormContext";
@@ -41,33 +41,6 @@ const Step2ModelAndVoice: React.FC = () => {
   return (
     <Container className="step2ModelAndVoice">
       <TextHeading size="h2">Step 2: Prompt completion model</TextHeading>
-      <div className="step2ModelAndVoice__formGroup">
-        <label htmlFor="model">Model:</label>
-        <select
-          id="model"
-          name="model"
-          value={characterData.model || ""}
-          onChange={handleInputChange}
-          className="step2ModelAndVoice__modelSelect"
-        >
-          <option value="">Select a model</option>
-          {Object.entries(models).map(([key, { label }]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
-          ))}
-        </select>
-        {characterData.model && (
-          <div className="step2ModelAndVoice__description">
-            <Tag
-              className={`step2ModelAndVoice__priceBadge`}
-              text={models[characterData.model].price}
-              {...TagPropsByPrice[models[characterData.model].price]}
-            />
-            {models[characterData.model].description}
-          </div>
-        )}
-      </div>
       <div className="step2ModelAndVoice__formGroup">
         <label htmlFor="voice">Voice:</label>
         <select

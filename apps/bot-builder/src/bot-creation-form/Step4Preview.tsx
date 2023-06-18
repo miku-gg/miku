@@ -83,7 +83,7 @@ const Step4Preview: React.FC = () => {
           image={characterData.avatar}
           title={characterData.name}
           description={characterData.scenario}
-          tags={[characterData.model, characterData.voice]}
+          tags={[characterData.voice]}
         />
         {renderEmotionPreview()}
         <div className="step4Preview__preview">

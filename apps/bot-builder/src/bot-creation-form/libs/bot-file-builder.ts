@@ -37,23 +37,7 @@ export async function createCharacterConfig(
       };
     })
   );
-
-  let promptService = "openai_completer";
-  switch (characterData.model) {
-    case "gpt-3.5-turbo":
-      promptService = "openai_completer";
-      break;
-    case "pygmalion-6b":
-      promptService = "pygmalion_completer";
-      break;
-    case "llama-30b":
-      promptService = "llama_completer";
-      break;
-  }
   const [voiceService, voiceId, emotion] = characterData.voice.split(".");
-
-  const buildStrategySlug =
-    characterData.model === "llama-30b" ? "rpbt" : "wpp";
 
   // Map character data to the desired JSON structure
   const characterConfig = {
@@ -73,14 +57,14 @@ export async function createCharacterConfig(
         language: "en",
         subjects: ["Anon"],
         botSubject: characterData.name,
-        buildStrategySlug,
+        buildStrategySlug: "wpp",
         parts: {
           persona: characterData.description,
           attributes: characterData.attributes.map((attribute) => [
             attribute.key,
             attribute.value,
           ]),
-          sampleChat: characterData.sampleConversation.split("\n"),
+          sampleChat: characterData.sampleConversation,
           scenario: characterData.scenario,
           greeting: characterData.greeting,
           botSubject: characterData.name,
@@ -88,9 +72,9 @@ export async function createCharacterConfig(
       },
     },
     prompt_completer: {
-      service: promptService,
+      service: 'openai_completer',
       props: {
-        model: characterData.model,
+        model: '',
       },
     },
     outputListeners: [

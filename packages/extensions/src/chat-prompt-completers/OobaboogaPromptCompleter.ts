@@ -1,41 +1,39 @@
 import * as Core from "@mikugg/core";
 import { InferProps } from "prop-types";
-import { LLaMAServicePropTypes, ServicesNames } from "../services";
+import { OobaboogaServicePropTypes, ServicesNames } from "../services";
 import {
   hasTextStop,
   parsePygmalionResponse,
 } from "./PygmalionPromptCompleter";
-type LLaMAPropTypes = InferProps<typeof LLaMAServicePropTypes>;
+type OobaboogaPropTypes = InferProps<typeof OobaboogaServicePropTypes>;
 
-export interface LLaMAParams
+export interface OobaboogaParams
   extends Core.ChatPromptCompleters.ChatPromptCompleterConfig {
   serviceEndpoint: string;
-  props: LLaMAPropTypes;
+  props: OobaboogaPropTypes;
   signer: Core.Services.ServiceQuerySigner;
 }
 
-export class LLaMAPromptCompleter extends Core.ChatPromptCompleters
+export class OobaboogaPromptCompleter extends Core.ChatPromptCompleters
   .ChatPromptCompleter {
-  private props: LLaMAPropTypes;
-  private service: Core.Services.ServiceClient<LLaMAPropTypes, string>;
+  private props: OobaboogaPropTypes;
+  private service: Core.Services.ServiceClient<OobaboogaPropTypes, string>;
 
-  constructor(params: LLaMAParams) {
+  constructor(params: OobaboogaParams) {
     super(params);
     this.props = params.props;
-    this.service = new Core.Services.ServiceClient<LLaMAPropTypes, string>(
+    this.service = new Core.Services.ServiceClient<OobaboogaPropTypes, string>(
       params.serviceEndpoint,
       params.signer,
-      ServicesNames.LLaMA
+      ServicesNames.Oobabooga
     );
   }
 
   public override async getCost(
     prompt: string,
-    settings: string
   ): Promise<number> {
     return this.service.getQueryCost({
       ...this.getProps(),
-      settings,
       prompt,
     });
   }
@@ -47,8 +45,7 @@ export class LLaMAPromptCompleter extends Core.ChatPromptCompleters
    * @returns The completed prompt.
    */
   protected async completePrompt(
-    memory: Core.Memory.ShortTermMemory,
-    settings: string
+    memory: Core.Memory.ShortTermMemory
   ): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
     const prompt = memory.buildMemoryPrompt();
     let result = "";
@@ -63,10 +60,9 @@ export class LLaMAPromptCompleter extends Core.ChatPromptCompleters
       result += await this.service.query(
         {
           ...this.getProps(),
-          settings: settings,
           prompt: prompt + result,
         },
-        await this.getCost(prompt + result, settings)
+        await this.getCost(prompt + result)
       );
 
       const resultParsed = parsePygmalionResponse(
@@ -95,7 +91,7 @@ export class LLaMAPromptCompleter extends Core.ChatPromptCompleters
     };
   }
 
-  private getProps(): LLaMAPropTypes {
+  private getProps(): OobaboogaPropTypes {
     return this.props;
   }
 }

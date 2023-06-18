@@ -50,6 +50,31 @@ const Step1Description: React.FC = () => {
     setCharacterData({ ...characterData, attributes: newAttributes });
   };
 
+  const addSampleConversation = () => {
+    setCharacterData({
+      ...characterData,
+      sampleConversation: [...(characterData.sampleConversation || []), ''],
+    });
+  };
+
+  const removeSampleConversation = (index: number) => {
+    const _sampleConversation = characterData.sampleConversation?.filter(
+      (_, i) => i !== index
+    );
+    setCharacterData({ ...characterData, sampleConversation: _sampleConversation });
+  };
+
+  const handleSampleConversationChange = (index: number, event: {
+    target: { name: string; value: string };
+  }) => {
+    const _sampleConversation = [...(characterData.sampleConversation || [])];
+    _sampleConversation[index] = event.target.value;
+    setCharacterData({
+      ...characterData,
+      sampleConversation: _sampleConversation,
+    });
+  }
+
   const handleAvatarChange = async (file: File) => {
     if (file) {
       const reader = new FileReader();
@@ -234,16 +259,37 @@ const Step1Description: React.FC = () => {
       </div>
 
       <div className="step1Description__formGroup">
-        <Input
-          isTextArea
-          label="Sample Conversation:"
-          placeHolder={`E.g 'Aqua: "You there! You look like you know what's what. What sect are you from?"\nAnon: "I’m not really religious, but I guess I respect all the gods?"\nAqua: "All the gods? Don't you know that there's only one god who deserves your respect and worship, Aqua? I'm the most beautiful, powerful, and benevolent being in this world! I can knock out giant toads in one hit and perform the most amazing party tricks known to mankind! Did I mention how amazing I am?"\nAnon: "Huh...? Wait a minute... You're an Axis Order cultist. Everyone knows you're all weirdos... And isn't it terrible to pretend to be a god?"\nAqua: "What? Weirdos?! That's a lie spread by jealous people! Me and my followers are perfect in every way! How dare you insult me! And I'm not pretending!!"\nAnon: "Hey, calm down. I'm just telling you what I heard."\nAqua: "No, you're wrong! You're so wrong that it hurts my ears! You need to repent and join the Axis Order right now! Or else you'll face my wrath!"\nAnon: "We're brand-new adventurers who don’t even have any decent gear. What kind of 'allies' would join our party?"\nAqua: "Did you forget that I'M here? When word gets out we want party members, they'll come. I am an Arch-priest, you know—an advanced class! I can use all kinds of healing magic; I can cure paralysis and poisoning, even revive the dead! What party wouldn't want me? I’m the great Aqua, aren't I? Pretty soon they'll be knocking at our door. 'Please let us join you!' they'll say. Get it?!"\nAnon: "I want some cash..."\nAqua: "So does everybody. Myself included, of course! ...Think about it. Isn't this completely pathetic? Let’s say I— a goddess, remember!—was willing to live in a stable for the rest of my life; why would you let me? Wouldn't you be ashamed to do that? If you understand, then make with the goods! Baby me!"'`}
-          id="sampleConversation"
-          name="sampleConversation"
-          value={characterData.sampleConversation || ""}
-          onChange={handleInputChange}
-          className="step1Description__textarea"
-        />
+        {characterData.sampleConversation.map((_sample, index) => {
+          return (
+            <div className="step1Description__sample-conversation" key={`sample-conversation-${index}`}>
+              <Input
+                isTextArea
+                label={index === 0 ? "Sample Conversations:" : undefined}
+                placeHolder={`E.g 'Aqua: "You there! You look like you know what's what. What sect are you from?"\nAnon: "I’m not really religious, but I guess I respect all the gods?"\nAqua: "All the gods? Don't you know that there's only one god who deserves your respect and worship, Aqua? I'm the most beautiful, powerful, and benevolent being in this world! I can knock out giant toads in one hit and perform the most amazing party tricks known to mankind! Did I mention how amazing I am?"\nAnon: "Huh...? Wait a minute... You're an Axis Order cultist. Everyone knows you're all weirdos... And isn't it terrible to pretend to be a god?"\nAqua: "What? Weirdos?! That's a lie spread by jealous people! Me and my followers are perfect in every way! How dare you insult me! And I'm not pretending!!"\nAnon: "Hey, calm down. I'm just telling you what I heard."\nAqua: "No, you're wrong! You're so wrong that it hurts my ears! You need to repent and join the Axis Order right now! Or else you'll face my wrath!"\nAnon: "We're brand-new adventurers who don’t even have any decent gear. What kind of 'allies' would join our party?"\nAqua: "Did you forget that I'M here? When word gets out we want party members, they'll come. I am an Arch-priest, you know—an advanced class! I can use all kinds of healing magic; I can cure paralysis and poisoning, even revive the dead! What party wouldn't want me? I’m the great Aqua, aren't I? Pretty soon they'll be knocking at our door. 'Please let us join you!' they'll say. Get it?!"\nAnon: "I want some cash..."\nAqua: "So does everybody. Myself included, of course! ...Think about it. Isn't this completely pathetic? Let’s say I— a goddess, remember!—was willing to live in a stable for the rest of my life; why would you let me? Wouldn't you be ashamed to do that? If you understand, then make with the goods! Baby me!"'`}
+                id={`sampleConversation-${index}`}
+                name={`sampleConversation-${index}`}
+                value={_sample}
+                onChange={handleSampleConversationChange.bind(null, index)}
+                className="step1Description__textarea"
+              />
+              {
+                index > 0 ? (
+                  <button
+                    className="step1Description__attribute__remove step1Description__sample-conversation__remove"
+                    onClick={() => removeSampleConversation(index)}
+                  >
+                    <RemoveX />
+                  </button>
+                ) : null
+              }
+            </div>
+          )
+        })}
+        <div className="step1Description__addAttributeButton">
+          <Button theme="gradient" onClick={addSampleConversation}>
+            + Add Sample Conversation
+          </Button>
+        </div>
       </div>
 
       <div className="step1Description__formGroup">

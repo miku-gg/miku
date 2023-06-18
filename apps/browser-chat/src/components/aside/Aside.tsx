@@ -11,8 +11,6 @@ import {
 } from "../chat-history/chat-history";
 import { DropDown } from "../dropdown/Dropdown";
 import { MuteIcon, PlayIcon } from "@primer/octicons-react";
-import { BotSettings } from "../bot-settings/BotSettings";
-import { BotSettingsFooter } from "../bot-settings/BotSettingsFooter";
 
 interface CustomAudioPlayerProps {
   src: string;
@@ -77,7 +75,6 @@ export const Aside = () => {
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
   const [chatHistoryToggle, setChatHistoryToggle] = useState<boolean>(true);
   const [handleBotDetails, setHandleBotDetails] = useState<boolean>(false);
-  const [handleBotSettings, setHandleBotSettings] = useState<boolean>(false);
   const musicPieces = [
     "devonshire",
     "folk_round",
@@ -103,10 +100,6 @@ export const Aside = () => {
 
   const displayBotDetails = () => {
     setHandleBotDetails(true);
-  };
-
-  const displayBotSettings = () => {
-    setHandleBotSettings(true);
   };
 
   return (
@@ -145,12 +138,6 @@ export const Aside = () => {
               >
                 Load bot
               </button>
-              <button
-                className="button-transparent min-w-[10em]"
-                onClick={displayBotSettings}
-              >
-                Settings
-              </button>
             </div>
             {/* USERNAME // TOKENS */}
             <div className="h-full w-auto text-right pr-2">
@@ -185,18 +172,6 @@ export const Aside = () => {
         darkTheme
       >
         <BotDetails />
-      </PopUp>
-      <PopUp
-        closePopUpFunction={() => setHandleBotSettings(false)}
-        isShowingPupUp={handleBotSettings}
-        className="w-6/12"
-        darkTheme
-      >
-        <p className="ml-4 text-start text-2xl text-white">Setings</p>
-        <BotSettings mobile={true} />
-        <div className="w-full flex justify-center gap-7 pb-3 flex-wrap red-500 text-red-500">
-          <BotSettingsFooter />
-        </div>
       </PopUp>
     </>
   );

@@ -1,274 +1,164 @@
 import { DropDown } from "../dropdown/Dropdown";
-import { useState, useReducer, useEffect, useContext } from "react";
 import RangeInput from "./RangeInput";
 import BoolInput from "./BoolInput";
 import TextInput from "./TextInput";
 import DropdownInput from "./DropdownInput";
-import {
-  ServicesNames,
-  botSettings,
-  genSettings,
-} from "../interactive-chat/bot-display/BotDisplay";
-import botFactory from "../../libs/botFactory";
-import { BotLoaderContext, useBot } from "../../libs/botLoader";
-import { InteractiveResponsesContext } from "../../libs/useResponses";
-import { updateHistoryNumber } from "../chat-history/chat-history";
-
-let botSettingsNumber = 0;
-export const updateBotSettingsNumber = () => {
-  botSettingsNumber += 1;
-};
+import { BotConfigSettings, PROMPT_STRATEGIES, VOICE_SERVICES, PromptCompleterEndpointType, PROMPT_COMPLETERS, DEFAULT_OOBABOOGA_SETTINGS, DEFAULT_KOBOLDAI_SETTINGS, DEFAULT_OPENAI_SETTINGS, OobaboogaSettings, OPENAI_MODELS } from "../../libs/botSettingsUtils";
 
 export const BotSettings: React.FC<{
-  mobile?: boolean;
-}> = (props) => {
-  const [_, forceUpdate] = useReducer((x) => x + 1, 0);
+  botConfigSettings: BotConfigSettings;
+  onBotConfigSettingsChange: (_botConfigSettings: BotConfigSettings) => void;
+}> = ({botConfigSettings, onBotConfigSettingsChange}) => {
+  const {
+    promptCompleterEndpoint,
+    promptStrategy,
+    voice,
+  } = botConfigSettings;
 
-  const promptServices = ["llama", "openai", "pygmalion"];
-  const [promptServiceIndex, setPromptServiceIndex] = useState<number>(0);
-
-  const voiceServices = ["elevenlabs_tts", "azure_tts", "novelai_tts"];
-  const [voiceServiceServiceIndex, setVoiceServiceServiceIndex] =
-    useState<number>(0);
-
-  const oaiModels = ["text-davinci-003", "gpt-3.5-turbo", "gpt-4"];
-  const promptStrategies = ["wpp", "sbf", "rpbt"];
-  // const sttModels = ["whisper_stt"];
-
-  let [voiceGeneration, setVoiceGeneration] = useState<boolean>(
-    botSettings.voiceGeneration
-  );
-
-  const [voiceId, setVoiceId] = useState<string>("");
-  const [order, setOrder] = useState<string>(genSettings.order.toString());
-  const [seed, setSeed] = useState<string>(genSettings.seed.toString());
-  const [stoppingStrings, setStoppingStrings] = useState<string>(
-    genSettings.stoppingStrings
-  );
-
-  const { botConfig } = useBot();
-  const { updateBotConfig } = useContext(InteractiveResponsesContext);
-  const { setBotConfig } = useContext(BotLoaderContext);
-
-  useEffect(() => {
-    setVoiceServiceServiceIndex(
-      voiceServices.indexOf(botSettings.voiceService)
-    );
-    setPromptServiceIndex(promptServices.indexOf(botSettings.promptService)); // u cant just go useState<number>(promptServices.indexOf(botSettings.modelService)) bc uhh actually idk y it just doesnt work
-    setVoiceId(botSettings.voiceId);
-    setVoiceGeneration(botSettings.voiceGeneration);
-    if (botSettings.voiceService == "" && botSettings.voiceGeneration) {
-      botSettings.voiceService = botSettings.oldVoiceService;
-    }
-    forceUpdate();
-  }, [botSettingsNumber]);
+  const handleSettingsChange = function (updatedSettings: object) {
+    onBotConfigSettingsChange({
+        ...botConfigSettings,
+        // @ts-ignore
+        promptCompleterEndpoint: {
+            ...botConfigSettings.promptCompleterEndpoint,
+            genSettings: {
+                ...botConfigSettings.promptCompleterEndpoint.genSettings,
+                ...updatedSettings,
+            },
+        },
+    });
+  };  
 
   return (
     <>
       <div className="max-w-96 h-full scrollbar overflow-auto text-clip text-start text-white m-4">
         <p className="pb-2">
-          Misc. settings for miku and how the model is prompted. Changing
-          anything above (and including) the model service dropdown will reset
-          conversation history. Save conversation history before doing so.
+          Misc. settings for miku and how the model is prompted.
         </p>
-        {JSON.parse(JSON.stringify(botConfig)).short_term_memory.service ==
-        "gpt_short-memory-v2" ? (
-          <DropdownInput
-            title="Prompt Strategy"
-            index={promptStrategies.indexOf(botSettings.promptStrategy)}
-            items={promptStrategies}
-            tooltip="How the character definitions are sent to the model."
-            onChange={(i) => {
-              if (botSettings.promptStrategy == promptStrategies[i]) return;
-              botSettings.promptStrategy = promptStrategies[i];
-              forceUpdate();
-              if (botConfig) {
-                const newConfig = JSON.parse(JSON.stringify(botConfig));
-                switch (i) {
-                  case 0:
-                    newConfig.short_term_memory.props.buildStrategySlug = "wpp";
-                    break;
-                  case 1:
-                    newConfig.short_term_memory.props.buildStrategySlug = "sbf";
-                    break;
-                  case 2:
-                    newConfig.short_term_memory.props.buildStrategySlug =
-                      "rpbt";
-                    break;
-                }
-                botFactory.updateInstance(newConfig);
-                updateBotConfig(newConfig);
-                setBotConfig(newConfig);
-                updateHistoryNumber();
-              }
-            }}
-          />
-        ) : null}
-        {/* <DropdownInput
-          title="Speech-to-text"
-          index={sttModels.indexOf(botSettings.sttModel)}
-          items={sttModels}
-          tooltip={"Used to turn your speech into text to prompt the model."}
-          onChange={(i) => {
-            botSettings.sttModel = sttModels[i];
-            forceUpdate();
-          }}
-        /> */}
+        <DropdownInput
+          title="Prompt Strategy"
+          index={PROMPT_STRATEGIES.findIndex((_promptStrategy => promptStrategy === _promptStrategy.value))}
+          items={PROMPT_STRATEGIES.map(_stategy => _stategy.label)}
+          tooltip="How the character definitions are sent to the model."
+          onChange={(index) => onBotConfigSettingsChange({
+            ...botConfigSettings,
+            promptStrategy: PROMPT_STRATEGIES[index].value
+          })}
+        />
         <BoolInput
-          value={voiceGeneration}
+          value={voice.enabled}
           title="Voice generation"
           tooltip="What is used to turn the bots speech into text."
-          onChange={(e) => {
-            if (botSettings.voiceGeneration == e) return;
-            botSettings.voiceGeneration = e;
-            setVoiceGeneration(e);
-            if (botConfig) {
-              const newConfig = JSON.parse(JSON.stringify(botConfig));
-              if (e) {
-                newConfig.outputListeners[0].service =
-                  botSettings.oldVoiceService;
-              } else {
-                botSettings.oldVoiceService =
-                  newConfig.outputListeners[0].service;
-                newConfig.outputListeners[0].service = "";
-              }
-
-              botFactory.updateInstance(newConfig);
-              updateBotConfig(newConfig);
-              setBotConfig(newConfig);
+          onChange={(_value: boolean) => onBotConfigSettingsChange({
+            ...botConfigSettings,
+            voice: {
+              ...voice,
+              enabled: _value
             }
-          }}
+          })}
         />
-        {voiceGeneration ? (
+        {voice.enabled ? (
           <div className="p-4 my-4 bg-[#323232] gap-2">
             <div
-              className={`${
-                props.mobile ? "flex" : ""
-              } items-center gap-1 pb-4`}
+              className={`items-center gap-1 pb-4`}
             >
+              <BoolInput
+                value={voice.readNonSpokenText}
+                title="Read non-spoken text"
+                tooltip="Read text enclosed in *asteriks*."
+                onChange={_value => onBotConfigSettingsChange({
+                  ...botConfigSettings,
+                  voice: {
+                    ...voice,
+                    readNonSpokenText: _value
+                  }
+                })}
+              />
               <div>
                 <label className="form-label block-block">TTS Service</label>
                 <DropDown
-                  items={voiceServices}
-                  selectedIndex={voiceServiceServiceIndex}
-                  onChange={(i) => {
-                    if (botSettings.voiceService == voiceServices[i]) return;
-                    botSettings.voiceService = voiceServices[i];
-                    setVoiceServiceServiceIndex(i);
-                    if (botConfig) {
-                      const newConfig = JSON.parse(JSON.stringify(botConfig));
-                      switch (i) {
-                        case 0:
-                          newConfig.outputListeners[0].service =
-                            ServicesNames.ElevenLabsTTS;
-                          newConfig.outputListeners[0].props.voiceId =
-                            botSettings.voiceId;
-                          break;
-                        case 1:
-                          newConfig.outputListeners[0].service =
-                            ServicesNames.AzureTTS;
-                          newConfig.outputListeners[0].props.voiceId =
-                            botSettings.voiceId;
-                          break;
-                        case 2:
-                          newConfig.outputListeners[0].service =
-                            ServicesNames.NovelAITTS;
-                          newConfig.outputListeners[0].props.voiceId =
-                            botSettings.voiceId;
-                          break;
+                  items={VOICE_SERVICES.map(_voice => _voice.label)}
+                  selectedIndex={VOICE_SERVICES.findIndex(_voice => _voice.value === voice.voiceService.type)}
+                  onChange={index => onBotConfigSettingsChange({
+                    ...botConfigSettings,
+                    voice: {
+                      ...voice,
+                      voiceService: {
+                        ...voice.voiceService,
+                        type: VOICE_SERVICES[index].value
                       }
-                      botFactory.updateInstance(newConfig);
-                      updateBotConfig(newConfig);
-                      setBotConfig(newConfig);
-                      updateHistoryNumber();
                     }
-                  }}
+                  })}
                   top={true}
                 />
               </div>
-              <div className="ml-auto">
+              <div>
                 <TextInput
                   title="Voice id."
-                  value={voiceId}
+                  value={voice.voiceService.voiceId}
                   tooltip="What voice id to use."
-                  onChange={(e) => {
-                    if (botSettings.voiceId == e.target.value) return;
-                    botSettings.voiceId = e.target.value;
-                    setVoiceId(e.target.value);
-                    if (botConfig) {
-                      const newConfig = JSON.parse(JSON.stringify(botConfig));
-                      newConfig.outputListeners[0].props.voiceId =
-                        botSettings.voiceId;
-                      botFactory.updateInstance(newConfig);
-                      updateBotConfig(newConfig);
-                      setBotConfig(newConfig);
-                      updateHistoryNumber();
+                  onChange={event => onBotConfigSettingsChange({
+                    ...botConfigSettings,
+                    voice: {
+                      ...voice,
+                      voiceService: {
+                        ...voice.voiceService,
+                        voiceId: event.target.value
+                      }
                     }
-                  }}
+                  })}
                 />
               </div>
             </div>
-            <BoolInput
-              value={botSettings.readNonSpokenText}
-              title="Read non-spoken text"
-              tooltip="Read text enclosed in *asteriks*."
-              onChange={(e) => {
-                if (botSettings.readNonSpokenText == e) return;
-                botSettings.readNonSpokenText = e;
-                if (botConfig) {
-                  // i actually dont know why i need to do this but if i dont it wont send the updated gen settings to the tts service
-                  botFactory.updateInstance(botConfig);
-                  updateBotConfig(botConfig);
-                  setBotConfig(botConfig);
-                  updateHistoryNumber();
-                }
-              }}
-            />
           </div>
         ) : null}
         <DropdownInput
-          title="Model Service"
-          index={promptServiceIndex}
-          items={promptServices}
+          title="Prompt Completer"
+          index={PROMPT_COMPLETERS.findIndex((_promptCompleter => promptCompleterEndpoint.type === _promptCompleter.value))}
+          items={PROMPT_COMPLETERS.map(_promptCompleter => _promptCompleter.label)}
           tooltip={"What model is used to generate the text."}
-          onChange={(i) => {
-            if (botSettings.promptService == promptServices[i]) return;
-            botSettings.promptService = promptServices[i];
-            setPromptServiceIndex(i);
-            if (botConfig) {
-              const newConfig = botConfig;
-              switch (i) {
-                case 0:
-                  newConfig.prompt_completer.service = ServicesNames.LLaMA;
-                  break;
-                case 1:
-                  newConfig.prompt_completer.service = ServicesNames.OpenAI;
-                  if (!genSettings.oaiModel) {
-                    genSettings.topP = 1.0;
-                    genSettings.oaiModel = "gpt-3.5-turbo";
+          onChange={(index) => {
+            switch (PROMPT_COMPLETERS[index].value) {
+              case PromptCompleterEndpointType.OOBABOOGA:
+                onBotConfigSettingsChange({
+                  ...botConfigSettings,
+                  promptCompleterEndpoint: {
+                    type: PromptCompleterEndpointType.OOBABOOGA,
+                    genSettings: DEFAULT_OOBABOOGA_SETTINGS
                   }
-                  break;
-                case 2:
-                  newConfig.prompt_completer.service = ServicesNames.Pygmalion;
-                  break;
-              }
-              botFactory.updateInstance(newConfig);
-              updateBotConfig(newConfig);
-              setBotConfig(newConfig);
-              updateHistoryNumber();
+                })
+                break;
+              case PromptCompleterEndpointType.KOBOLDAI:
+                onBotConfigSettingsChange({
+                  ...botConfigSettings,
+                  promptCompleterEndpoint: {
+                    type: PromptCompleterEndpointType.KOBOLDAI,
+                    genSettings: DEFAULT_KOBOLDAI_SETTINGS
+                  }
+                })
+                break;
+              case PromptCompleterEndpointType.OPENAI:
+                onBotConfigSettingsChange({
+                  ...botConfigSettings,
+                  promptCompleterEndpoint: {
+                    type: PromptCompleterEndpointType.OPENAI,
+                    genSettings: DEFAULT_OPENAI_SETTINGS
+                  }
+                })
+                break;
             }
           }}
         />
-        {promptServiceIndex === 0 ? (
+        {botConfigSettings.promptCompleterEndpoint.type === PromptCompleterEndpointType.OOBABOOGA ? (
           <div className="flex flex-col gap-8">
             <RangeInput
               title="Max New Tokens"
-              helperText={`Number of tokens the AI should generate. Higher numbers will take longer to generate. ${genSettings.maxTokens}`}
+              helperText={`Number of tokens the AI should generate. Higher numbers will take longer to generate. ${botConfigSettings.promptCompleterEndpoint.genSettings.maxTokens}`}
               min={16}
               max={512}
               step={4}
-              value={genSettings.maxTokens}
-              onInput={(value) => (genSettings.maxTokens = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.maxTokens}
+              onInput={(value) => handleSettingsChange({ maxTokens: value })}
             />
             <RangeInput
               title="Temperature"
@@ -276,8 +166,8 @@ export const BotSettings: React.FC<{
               min={0.01}
               max={1.99}
               step={0.01}
-              value={genSettings.temp}
-              onInput={(value) => (genSettings.temp = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.temp}
+              onInput={(value) => handleSettingsChange({ temp: value })}
             />
             <RangeInput
               title="Top P"
@@ -285,10 +175,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={1}
               step={0.01}
-              value={genSettings.topP}
-              onInput={(value) => {
-                genSettings.topP = value;
-              }}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.topP}
+              onInput={(value) => handleSettingsChange({ topP: value })}
             />
             <RangeInput
               title="Top K"
@@ -296,8 +184,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={200}
               step={1}
-              value={genSettings.topK}
-              onInput={(value) => (genSettings.topK = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.topK}
+              onInput={(value) => handleSettingsChange({ topK: value })}
             />
             <RangeInput
               title="Typical P"
@@ -305,8 +193,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={1}
               step={0.01}
-              value={genSettings.typicalP}
-              onInput={(value) => (genSettings.typicalP = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.typicalP}
+              onInput={(value) => handleSettingsChange({ typicalP: value })}
             />
             <RangeInput
               title="Repetition Penalty"
@@ -314,19 +202,17 @@ export const BotSettings: React.FC<{
               min={1}
               max={1.5}
               step={0.01}
-              value={genSettings.repetitionPenalty}
-              onInput={(value) => (genSettings.repetitionPenalty = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.repetitionPenalty}
+              onInput={(value) => handleSettingsChange({ repetitionPenalty: value })}
             />
             <RangeInput
               title="Encoder Repetition Penalty"
-              helperText={
-                'Also known as the "Hallucinations filter". Used to penalize tokens that are *not* in the prior text. Higher value = more likely to stay in context, lower value = more likely to diverge.'
-              }
+              helperText='Also known as the "Hallucinations filter". Used to penalize tokens that are *not* in the prior text. Higher value = more likely to stay in context, lower value = more likely to diverge.'
               min={0.8}
               max={1.5}
               step={0.01}
-              value={genSettings.encoderRepitionPenalty}
-              onInput={(value) => (genSettings.encoderRepitionPenalty = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.encoderRepitionPenalty}
+              onInput={(value) => handleSettingsChange({ encoderRepitionPenalty: value })}
             />
             <RangeInput
               title="No Repeat Ngram Size"
@@ -334,8 +220,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={20}
               step={1}
-              value={genSettings.noRepeatNgramSize}
-              onInput={(value) => (genSettings.noRepeatNgramSize = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.noRepeatNgramSize}
+              onInput={(value) => handleSettingsChange({ noRepeatNgramSize: value })}
             />
             <RangeInput
               title="Min Length"
@@ -343,24 +229,21 @@ export const BotSettings: React.FC<{
               min={0}
               max={2000}
               step={1}
-              value={genSettings.noRepeatNgramSize}
-              onInput={(value) => (genSettings.noRepeatNgramSize = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.minLength}
+              onInput={(value) => handleSettingsChange({ minLength: value })}
             />
             <BoolInput
-              value={genSettings.doSample}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.doSample}
               title="Do Sample"
               tooltip="Whether or not to use sampling; use greedy decoding otherwise."
-              onChange={(e) => (genSettings.doSample = e)}
+              onChange={(value) => handleSettingsChange({ doSample: value })}
             />
             <TextInput
-              value={seed}
+              value={String(botConfigSettings.promptCompleterEndpoint.genSettings.seed)}
               title="Seed"
               placeholder="-1 for random."
               tooltip='Controls the "random" of the model. If you have the same seed, settings, and input you (should) get the same output.'
-              onChange={(e) => {
-                genSettings.seed = parseInt(e.target.value);
-                setSeed(e.target.value);
-              }}
+              onChange={(event) => handleSettingsChange({ seed: parseInt(event.target.value) })}
             />
             <RangeInput
               title="Penalty Alpha"
@@ -368,8 +251,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={5}
               step={0.01}
-              value={genSettings.penaltyAlpha}
-              onInput={(value) => (genSettings.penaltyAlpha = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.penaltyAlpha}
+              onInput={(value) => handleSettingsChange({ penaltyAlpha: value })}
             />
             <RangeInput
               title="Num Beams"
@@ -377,8 +260,8 @@ export const BotSettings: React.FC<{
               min={1}
               max={20}
               step={1}
-              value={genSettings.numBeams}
-              onInput={(value) => (genSettings.numBeams = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.numBeams}
+              onInput={(value) => handleSettingsChange({ numBeams: value })}
             />
             <RangeInput
               title="Length Penalty"
@@ -386,25 +269,25 @@ export const BotSettings: React.FC<{
               min={-5}
               max={5}
               step={0.1}
-              value={genSettings.lengthPenalty}
-              onInput={(value) => (genSettings.lengthPenalty = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.lengthPenalty}
+              onInput={(value) => handleSettingsChange({ lengthPenalty: value })}
             />
             <BoolInput
-              value={genSettings.earlyStopping}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.earlyStopping}
               title="Early Stopping"
-              onChange={(e) => (genSettings.earlyStopping = e)}
+              onChange={(value) => handleSettingsChange({ earlyStopping: value })}
             />
             <BoolInput
-              value={genSettings.addBosToken}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.addBosToken}
               title="Add BOS Token"
               tooltip="Add the bos_token to the beginning of prompts. Disabling this can make the replies more creative."
-              onChange={(e) => (genSettings.addBosToken = e)}
+              onChange={(value) => handleSettingsChange({ addBosToken: value })}
             />
             <BoolInput
-              value={genSettings.banEosToken}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.banEosToken}
               title="Ban EOS Token"
               tooltip="This forces the model to never end the generation prematurely."
-              onChange={(e) => (genSettings.banEosToken = e)}
+              onChange={(value) => handleSettingsChange({ banEosToken: value })}
             />
             <RangeInput
               title="Truncate Prompt"
@@ -412,39 +295,33 @@ export const BotSettings: React.FC<{
               min={0}
               max={4096}
               step={1}
-              value={genSettings.truncateLength}
-              onInput={(value) => (genSettings.truncateLength = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.truncateLength}
+              onInput={(value) => handleSettingsChange({ truncateLength: value })}
             />
             <TextInput
-              value={stoppingStrings}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.stoppingStrings}
               title="Custom stopping strings"
-              tooltip={
-                'In addition to the defaults. Written between "" and separated by commas. For instance: "\nYour Assistant:", "\nThe assistant:"'
-              }
-              onChange={(e) => {
-                genSettings.stoppingStrings = e.target.value;
-                setStoppingStrings(e.target.value);
-              }}
+              tooltip='In addition to the defaults. Written between "" and separated by commas. For instance: "\nYour Assistant:", "\nThe assistant:"'
+              onChange={(value) => handleSettingsChange({ stoppingStrings: value })}
             />
             <BoolInput
-              value={genSettings.skipSpecialTokens}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.skipSpecialTokens}
               title="Skip special tokens"
               tooltip="Some specific models need this unset."
-              onChange={(e) => (genSettings.skipSpecialTokens = e)}
+              onChange={(value) => handleSettingsChange({ skipSpecialTokens: value })}
             />
           </div>
         ) : null}
-        {promptServiceIndex === 1 ? (
+        {botConfigSettings.promptCompleterEndpoint.type === PromptCompleterEndpointType.OPENAI ? (
           <div className="flex flex-col gap-8">
             <DropdownInput
               title="OpenAI model"
-              index={oaiModels.indexOf(genSettings.oaiModel)}
-              items={oaiModels}
+              index={OPENAI_MODELS.indexOf(botConfigSettings.promptCompleterEndpoint.genSettings.oaiModel)}
+              items={[...OPENAI_MODELS]}
               tooltip="What OpenAI model is used to generate the text."
-              onChange={(i) => {
-                genSettings.oaiModel = oaiModels[i];
-                forceUpdate();
-              }}
+              onChange={index => handleSettingsChange({
+                oaimodel: OPENAI_MODELS[index]
+              })}
             />
             <RangeInput
               title="Temperature"
@@ -452,8 +329,10 @@ export const BotSettings: React.FC<{
               min={0.1}
               max={2}
               step={0.01}
-              value={genSettings.temp}
-              onInput={(value) => (genSettings.temp = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.temp}
+              onInput={(value) => handleSettingsChange({
+                temp: value
+              })}
             />
             <RangeInput
               title="Frequency Penalty"
@@ -461,8 +340,10 @@ export const BotSettings: React.FC<{
               min={-2.0}
               max={2.0}
               step={0.01}
-              value={genSettings.frequencyPenalty}
-              onInput={(value) => (genSettings.frequencyPenalty = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.frequencyPenalty}
+              onInput={(value) => handleSettingsChange({
+                frequencyPenalty: value
+              })}
             />
             <RangeInput
               title="Presence Penalty"
@@ -470,8 +351,10 @@ export const BotSettings: React.FC<{
               min={-2.0}
               max={2.0}
               step={0.01}
-              value={genSettings.presencePenalty}
-              onInput={(value) => (genSettings.presencePenalty = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.presencePenalty}
+              onInput={(value) => handleSettingsChange({
+                presencePenalty: value
+              })}
             />
             <RangeInput
               title="Top P"
@@ -479,12 +362,14 @@ export const BotSettings: React.FC<{
               min={0}
               max={1}
               step={0.01}
-              value={genSettings.topP}
-              onInput={(value) => (genSettings.topP = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.topP}
+              onInput={(value) => handleSettingsChange({
+                topP: value
+              })}
             />
           </div>
         ) : null}
-        {promptServiceIndex === 2 ? (
+        {botConfigSettings.promptCompleterEndpoint.type === PromptCompleterEndpointType.KOBOLDAI ? (
           <div className="flex flex-col gap-8">
             <RangeInput
               title="Max Context Length"
@@ -492,8 +377,8 @@ export const BotSettings: React.FC<{
               min={512}
               max={2048}
               step={8}
-              value={genSettings.maxContextLength}
-              onInput={(value) => (genSettings.maxContextLength = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.maxContextLength}
+              onInput={(value) => handleSettingsChange({ maxContextLength: value })}
             />
             <RangeInput
               title="Max New Tokens"
@@ -501,8 +386,8 @@ export const BotSettings: React.FC<{
               min={16}
               max={512}
               step={4}
-              value={genSettings.maxTokens}
-              onInput={(value) => (genSettings.maxTokens = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.maxTokens}
+              onInput={(value) => handleSettingsChange({ maxTokens: value })}
             />
             <RangeInput
               title="Temperature"
@@ -510,8 +395,8 @@ export const BotSettings: React.FC<{
               min={0.1}
               max={2}
               step={0.01}
-              value={genSettings.temp}
-              onInput={(value) => (genSettings.temp = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.temp}
+              onInput={(value) => handleSettingsChange({ temp: value })}
             />
             <RangeInput
               title="Top P"
@@ -519,10 +404,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={1}
               step={0.01}
-              value={genSettings.topP}
-              onInput={(value) => {
-                genSettings.topP = value;
-              }}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.topP}
+              onInput={(value) => handleSettingsChange({ topP: value })}
             />
             <RangeInput
               title="Top K"
@@ -530,8 +413,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={100}
               step={1}
-              value={genSettings.topK}
-              onInput={(value) => (genSettings.topK = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.topK}
+              onInput={(value) => handleSettingsChange({ topK: value })}
             />
             <RangeInput
               title="Top A"
@@ -539,8 +422,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={1}
               step={0.01}
-              value={genSettings.topA}
-              onInput={(value) => (genSettings.topA = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.topA}
+              onInput={(value) => handleSettingsChange({ topA: value })}
             />
             <RangeInput
               title="Tail Free Sampling"
@@ -548,8 +431,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={1}
               step={0.001}
-              value={genSettings.tailFreeSampling}
-              onInput={(value) => (genSettings.tailFreeSampling = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.tailFreeSampling}
+              onInput={(value) => handleSettingsChange({ tailFreeSampling: value })}
             />
             <RangeInput
               title="Typical P"
@@ -557,8 +440,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={1}
               step={0.01}
-              value={genSettings.typicalP}
-              onInput={(value) => (genSettings.typicalP = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.typicalP}
+              onInput={(value) => handleSettingsChange({ typicalP: value })}
             />
             <RangeInput
               title="Repetition Penalty"
@@ -566,8 +449,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={3}
               step={0.01}
-              value={genSettings.repetitionPenalty}
-              onInput={(value) => (genSettings.repetitionPenalty = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.repetitionPenalty}
+              onInput={(value) => handleSettingsChange({ repetitionPenalty: value })}
             />
             <RangeInput
               title="Repetition Penalty Range"
@@ -575,8 +458,8 @@ export const BotSettings: React.FC<{
               min={0}
               max={2048}
               step={1}
-              value={genSettings.repetitionPenaltyRange}
-              onInput={(value) => (genSettings.repetitionPenaltyRange = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.repetitionPenaltyRange}
+              onInput={(value) => handleSettingsChange({ repetitionPenaltyRange: value })}
             />
             <RangeInput
               title="Repetition Penalty Slope"
@@ -584,17 +467,17 @@ export const BotSettings: React.FC<{
               min={0}
               max={10}
               step={0.01}
-              value={genSettings.repetitionPenaltySlope}
-              onInput={(value) => (genSettings.repetitionPenaltySlope = value)}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.repetitionPenaltySlope}
+              onInput={(value) => handleSettingsChange({ repetitionPenaltySlope: value })}
             />
             <TextInput
-              value={order}
+              value={botConfigSettings.promptCompleterEndpoint.genSettings.order.join(",")}
               title="Sampler Order"
               placeholder="Example: 6,0,1,2,3,4,5"
               tooltip="The order the different samplers (TopP, TopK, TypicalP, etc) are applied."
               onChange={(e) => {
-                setOrder(e.target.value);
-                genSettings.order = e.target.value.split(",").map(Number);
+                const order = e.target.value.split(",").map(Number);
+                handleSettingsChange({ order });
               }}
             />
           </div>

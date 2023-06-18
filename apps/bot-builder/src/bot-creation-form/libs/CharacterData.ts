@@ -1,10 +1,8 @@
 import { emotionHashConfigs} from '../data/emotions';
 import { validVoices, Voice } from '../data/voices';
-import { validModels, Model } from '../data/models';
 
 export { type EmotionHashConfig, emotionHashConfigs} from '../data/emotions';
 export { validVoices, type Voice, voices } from '../data/voices';
-export { validModels, type Model, models } from '../data/models';
 
 
 export type Attribute = {
@@ -37,8 +35,8 @@ export type CharacterData = {
   backgroundImages: BackgroundImage[];
   scenario: string;
   greeting: string;
-  sampleConversation: string;
-  model: Model;
+  sampleConversation: string[];
+  model: 'llama-30b';
   voice: Voice;
   attributes: Attribute[];
   emotionGroups: EmotionGroup[];
@@ -84,6 +82,11 @@ export const validateCharacterData = (characterData: CharacterData): ValidationE
     errors.push({ field: 'greeting', message: 'Greeting is required.' });
   }
 
+  if (!characterData.sampleConversation.length || characterData.sampleConversation.findIndex(_ => _.trim() === '') !== -1) {
+    const errorIndex = characterData.sampleConversation.findIndex(_ => _.trim() === '');
+    errors.push({ field: `sampleConversation-${errorIndex}`, message: 'Sample conversation incomplete.' });
+  }
+
   if (!characterData.attributes || characterData.attributes.length === 0) {
     errors.push({ field: 'attributes', message: 'At least one attribute is required.' });
   } else {
@@ -95,10 +98,6 @@ export const validateCharacterData = (characterData: CharacterData): ValidationE
         errors.push({ field: `attributes[${index}].value`, message: 'Attribute value is required.' });
       }
     });
-  }
-
-  if (!validModels.includes(characterData.model)) {
-    errors.push({ field: 'model', message: 'Selected model is not valid.' });
   }
 
   if (!validVoices.includes(characterData.voice)) {
@@ -174,13 +173,13 @@ export const validateStep = (step: number, characterData: CharacterData) => {
           error.field === "scenario" ||
           error.field === "greeting" ||
           error.field.startsWith("attributes") ||
+          error.field.startsWith("sampleConversation") ||
           error.field === "avatar" ||
           error.field === "backgroundImages"
       );
     case 2:
       return validationErrors.filter(
         (error) =>
-          error.field === "model" ||
           error.field === "voice"
       );
     case 3:

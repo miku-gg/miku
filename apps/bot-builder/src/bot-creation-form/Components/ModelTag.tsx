@@ -1,4 +1,3 @@
-import { Model, models } from "../data/models";
 import { Voice, voiceServicesColorMap, voices } from "../data/voices";
 
 import { Tag } from "@mikugg/ui-kit";
@@ -13,17 +12,16 @@ export type Colors =
   | "#9747FF"
   | "#56CCF2"
   | "#828282";
-export type ValidServices = Voice | Model;
+export type ValidServices = Voice;
 export interface ModelTagProps {
   modelName: ValidServices;
 }
 
 const ModelTag = ({ modelName }: ModelTagProps) => {
   const backgroundColor: Colors =
-    voiceServicesColorMap.get(voices[modelName]?.service) ||
-    models[modelName]?.color;
+    voiceServicesColorMap.get(voices[modelName]?.service) || '#2F80ED';
 
-  const tagText: string = voices[modelName]?.label || models[modelName]?.label;
+  const tagText: string = voices[modelName]?.label || 'Unknown';
 
   return (
     <Tag

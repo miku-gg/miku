@@ -41,12 +41,10 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters
   }
 
   public override async getCost(
-    prompt: string,
-    settings: string
+    prompt: string
   ): Promise<number> {
     return this.service.getQueryCost({
       ...this.getProps(),
-      settings,
       prompt,
     });
   }
@@ -58,8 +56,7 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters
    * @returns The completed prompt.
    */
   protected async completePrompt(
-    memory: Core.Memory.ShortTermMemory,
-    settings: string
+    memory: Core.Memory.ShortTermMemory
   ): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
     const prompt = memory.buildMemoryPrompt();
     const props = this.getProps();
@@ -75,10 +72,9 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters
         ...this.getProps(),
         stop,
         messages: this.getChatMessages(memory),
-        settings: settings,
-        prompt,
+        prompt
       },
-      await this.getCost(prompt, settings)
+      await this.getCost(prompt)
     );
     return { text: result.replace(`${this.memory.getBotSubject()}: `, ``) };
   }
@@ -138,7 +134,6 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters
         return {
           text: trim(line.replace(`${subject}:`, "")),
           subject: subject,
-          settings: "lol",
           type: Core.Commands.CommandType.DIALOG,
         };
       })
