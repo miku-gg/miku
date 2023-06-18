@@ -266,7 +266,6 @@ export function useBot(): {
     loading,
     error,
     setBotHash: (_hash?: string) => {
-      'wead'
       _botLoadCallback(_hash)
     },
   };

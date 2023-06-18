@@ -201,6 +201,11 @@ export enum STTEndpointType {
   WHISPER = 'whisper'
 }
 
+export enum EmbeddingsService {
+  SBERT = 'sbert',
+  OPENAI = 'openai'
+}
+
 export interface BotConfigSettings {
   promptCompleterEndpoint: PromptCompleterEndpointConfig
   speechToTextEndpoint: {
@@ -208,6 +213,7 @@ export interface BotConfigSettings {
     type: STTEndpointType,
   }
   promptStrategy: PromptStrategy
+  embeddingsService: EmbeddingsService
   voice: {
     enabled: boolean
     readNonSpokenText: boolean
@@ -228,6 +234,7 @@ export const DEFAULT_BOT_SETTINGS: BotConfigSettings = {
     enabled: true,
     type: STTEndpointType.WHISPER
   },
+  embeddingsService: EmbeddingsService.SBERT,
   voice: {
     enabled: true,
     readNonSpokenText: false,
