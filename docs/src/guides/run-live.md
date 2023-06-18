@@ -1,14 +1,14 @@
 ---
-label: LLaMA demo
+label: Live demo
 icon: container
 order: 2000
 ---
 
-# LLaMA demo
+# Live demo
 
 You can interact with bots by using the [text-generation-webui](https://github.com/oobabooga/text-generation-webui) locally.
 
-[https://llama.miku.gg](https://llama.miku.gg) your browser to go to the LLaMA demo.
+[https://bots.miku.gg](https://bots.miku.gg) your browser to go to the LLaMA demo.
 
 ## Instructions
 
@@ -30,6 +30,6 @@ If you find errors running the public-api, you can take a look this [github issu
 !!!
 
 ### 2. Paste the API key in the demo
-Go to the [LLaMA demo](https://llama.miku.gg) and paste your API key in the text box. Then, click on the bot you want to interact with.
+Go to the [Live demo](https://bots.miku.gg) and paste your API key in the text box. Then, click on the bot you want to interact with.
 
 ![](/assets/llama-demo.png)

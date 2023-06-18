@@ -6,7 +6,7 @@ order: 1700
 
 # How to use it
 
-Once you have it running [locally](/guides/run-local) or [on the cloud](/guides/run-cloud), you can use it to chat with your bot.
+Once you have it running [locally](/guides/run-local) or [use the live version](/guides/run-live), you can use it to chat with your bot.
 
 First you will need to select one of the available bots.
 
