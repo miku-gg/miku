@@ -7,7 +7,7 @@ const MIKU_BOT = 'QmbE1Dp8ciYYB2Nkuw2YjhNCd4h1BsJ3YyYSjxjXAagdn9';
 const ELAINA_BOT = 'QmXThSy6BjidXAeTr3nez9ikXsWh5xZgJZxLbbmcCimdAP';
 const NALA_BOT = 'QmTgg126TbobkJgPWKRdwehF1NbHdMQqVHPofr5ZR3wb4N';
 const NALA_BOT_KOREAN = 'QmPNpRcnb5TwDNkqb339rvf7kSYrVAqxRJwrdUYV6wFLfC';
-export const IS_ALPHA_LIVE = window.location.hostname === 'alpha.miku.gg';
+export const IS_ALPHA_LIVE = false;
 
 export default function BotLoadingModal(): JSX.Element {
   const { botHash, loading, setBotHash } = useBot();
@@ -36,7 +36,7 @@ export default function BotLoadingModal(): JSX.Element {
     }
   }, [])
   
-  if (IS_ALPHA_LIVE && (!searchParams.openai && !searchParams.llama)) {
+  if (IS_ALPHA_LIVE && (!searchParams.openai && !searchParams.oobabooga && !searchParams.koboldai)) {
     return (
       <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-50 backdrop-blur-sm">
         <div className="relative w-auto my-6 mx-auto max-w-3xl">
@@ -138,7 +138,6 @@ export default function BotLoadingModal(): JSX.Element {
                 <span className="text-sm text-gray-100 bg-green-600 py-1 px-2 mt-4 rounded-lg">GPT3.5-T</span>
               </button>
               <button
-                disabled={IS_ALPHA_LIVE}
                 className="flex flex-col w-full items-center pb-10 bg-gray-800 p-9 rounded-lg hover:bg-gray-700 hover:shadow-xl select-none transition-all disabled:blur-sm disabled:hover:bg-gray-800 disabled:hover:shadow-none"
                 onClick={onBotSelect.bind(null, ELAINA_BOT)}
               >
@@ -147,12 +146,6 @@ export default function BotLoadingModal(): JSX.Element {
                 <span className="text-sm text-gray-100 bg-blue-600 py-1 px-2 mt-4 rounded-lg">Pygmalion</span>
               </button>
             </div>
-            {IS_ALPHA_LIVE ? (
-                <div className="mt-5 text-gray-300 italic max-w-xs">
-                  Elaina is disabled for alpha.miku.gg because there&apos;s no Pygmalion cloud service.
-                  Please use Miku instead or run the project locally.
-                </div>
-              ) : null}
           </div>
         </div>
       </div>

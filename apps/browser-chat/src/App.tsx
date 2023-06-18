@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Aside } from "./components/aside/Aside";
 import { InteractiveChat } from "./components/interactive-chat/InteractiveChat";
 import { InteractiveResponsesContextProvider } from "./libs/useResponses";
+import BotLoadingModal from "./components/loading/BotLoadingModal";
 
 export const App = () => {
   return (
@@ -20,6 +21,7 @@ export const App = () => {
           <Aside />
         </>
       </InteractiveResponsesContextProvider>
+      <BotLoadingModal />
       <ToastContainer
         position="top-left"
         autoClose={5000}
