@@ -1,0 +1,56 @@
+@import '../variables';
+
+.AccordionItem {
+  margin-bottom: 1rem;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 1rem;
+
+    border-top: 1px solid $node-conector-color;
+    border-bottom: 1px solid $node-conector-color;
+  }
+
+  &__content {
+    margin-top: 1rem;
+  }
+
+  &__buttonsContainer {
+    width: auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    & .removeButton,
+    & .closeButton {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 1rem;
+      height: 1rem;
+      padding: 0;
+
+      color: $text-1;
+      border-radius: 50%;
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.9;
+        outline: solid 1px $error-text;
+        filter: drop-shadow(0 0 3px $error-text);
+        transition: 0.5s;
+      }
+    }
+
+    & .closeButton:hover {
+      outline-color: $secondary-color;
+      filter: drop-shadow(0 0 3px $secondary-color);
+    }
+  }
+}

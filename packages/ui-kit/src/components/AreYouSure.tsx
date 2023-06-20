@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CloseIcon } from '../assets/svg';
+import { DashIcon } from '../assets/svg';
 import Button from './Button';
 import TextHeading from './TextHeading';
 
@@ -35,7 +35,7 @@ const AreYouSure = ({
                 className="AreYouSure__closeButton"
                 onClick={closePopUpFunction}
               >
-                <CloseIcon />
+                <DashIcon />
               </button>
             </div>
             <TextHeading size="h2">{modalMessage}</TextHeading>

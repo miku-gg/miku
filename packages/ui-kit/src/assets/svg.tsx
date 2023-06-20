@@ -16,7 +16,7 @@ export const ArrowIcon = () => {
     </svg>
   );
 };
-export const CloseIcon = () => {
+export const RemoveIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -28,6 +28,20 @@ export const CloseIcon = () => {
         fill="currentColor"
         d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.5 16.084l-1.403 1.416-4.09-4.096-4.102 4.096-1.405-1.405 4.093-4.092-4.093-4.098 1.405-1.405 4.088 4.089 4.091-4.089 1.416 1.403-4.092 4.087 4.092 4.094z"
       />
+    </svg>
+  );
+};
+export const DashIcon = () => {
+  return (
+    <svg
+      width="16"
+      height="17"
+      viewBox="0 0 16 17"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect y="0.5" width="16" height="16" rx="8" fill="currentColor" />
+      <rect x="4" y="7.5" width="8" height="2" fill="#1B2142" />
     </svg>
   );
 };

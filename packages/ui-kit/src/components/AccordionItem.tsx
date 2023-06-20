@@ -1,6 +1,11 @@
 import React, { useContext } from 'react';
 
 import { AccordionContext } from './Accordion';
+import TextHeading from './TextHeading';
+
+import { DashIcon, RemoveIcon } from '../assets/svg';
+
+import './AccordionItem.scss';
 
 export type AccordionItemProps = {
   title: string;
@@ -14,16 +19,33 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
   className = '',
 }) => {
   const accordionContext = useContext(AccordionContext);
-  const { selectedIndex, onChange, items } = accordionContext || {};
+  const { selectedIndex, onChange, onRemoveItem, items } =
+    accordionContext || {};
   const index = items ? items[title] : -1;
 
-  const handleClick = () => {
+  const handleRemoveItem = () => {
+    onRemoveItem && onRemoveItem(index);
+  };
+
+  const handleToggleAccordionItem = () => {
     onChange && onChange(selectedIndex === index ? -1 : index);
   };
 
   return (
-    <div className={`AccordionItem ${className}`} onClick={handleClick}>
-      <h3>{title}</h3>
+    <div className={`AccordionItem ${className}`}>
+      <div className="AccordionItem__header">
+        <TextHeading size="h3">{title}</TextHeading>
+        <div className="AccordionItem__buttonsContainer">
+          {onRemoveItem && (
+            <button onClick={handleRemoveItem} className="removeButton">
+              <RemoveIcon />
+            </button>
+          )}
+          <button onClick={handleToggleAccordionItem} className="closeButton">
+            <DashIcon />
+          </button>
+        </div>
+      </div>
       {selectedIndex === index && (
         <div className="AccordionItem__content">{children}</div>
       )}
