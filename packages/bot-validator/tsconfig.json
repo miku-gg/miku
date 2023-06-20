@@ -1,16 +1,18 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "stripInternal": true,
-    "target": "es2017",
-    "module": "CommonJS",
-    "moduleResolution": "node16",
-    "declarationMap": true,
-    "declaration": true,
-    "outDir": "./dist",
-    "strict": true
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "**/__tests__/*"]
+  "experimentalDecorators": true,
+  "esModuleInterop": true,
+  "stripInternal": true,
+  "target": "es6",
+  "module": "CommonJS",
+  "moduleResolution": "node16",
+  "resolveJsonModule": true,
+  "noImplicitOverride": true,
+  "declarationMap": true,
+  "declaration": true,
+  "outDir": "./dist",
+  "strict": true
+},
+"include": ["src"],
+"exclude": ["node_modules", "dist", "**/__tests__/*"]
 }

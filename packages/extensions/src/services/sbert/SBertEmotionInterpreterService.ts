@@ -71,9 +71,15 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
   }
 
   protected async computeInput(input: SBertEmotionInterpreterProps): Promise<SbertEmotionInterpreterOutput> {
-    const { completePrompt, botResponse, currentContextId, contexts, context_base_description_embeddings: contextDescriptionsHash } = input;
+    const { botResponse, currentContextId, contexts } = input;
 
-    const {currentContext, nextContext, shouldContextChange} = await this.findContext(contexts, currentContextId, contextDescriptionsHash, completePrompt);
+    // TODO: implement shouldContextChange detection
+    // const {currentContext, nextContext, shouldContextChange} = await this.findContext(contexts, currentContextId, contextDescriptionsHash, completePrompt);
+    const currentContext = contexts.find(context => context.id === currentContextId);
+    if (!currentContext) {
+      throw new Error(`Context ${currentContext} not found`);
+    }
+
 
     const { similarities: emotionSimilarities } = await this.similarityAPI.searchSimilarities({
       text: botResponse,
@@ -84,10 +90,10 @@ export class SBertEmotionInterpreterService extends Core.Services.Service<SbertE
     const emotionId = emotionSimilarities.length > 0 ? emotionSimilarities[0].id : '';
 
     return {
-      shouldContextChange,
+      shouldContextChange: false,
       emotionId,
       contextId: currentContext.id,
-      nextContextId: nextContext.id,
+      nextContextId: currentContext.id,
     };
   }
 

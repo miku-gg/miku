@@ -1,4 +1,4 @@
-import { BotConfig } from "@mikugg/bot-validator";
+import { BotConfig, mikuCardToBotConfig } from "@mikugg/bot-validator";
 import React, { useCallback, useContext, useState } from "react";
 import botFactory from './botFactory';
 import queryString from "query-string";
@@ -15,7 +15,9 @@ export function loadBotConfig(botHash: string): Promise<{
 }> {
   return fetch(`${BOT_DIRECTORY_ENDPOINT}/${botHash}`)
     .then((res) => res.json())
-    .then((bot) => {
+    .then((card) => {
+      const bot = mikuCardToBotConfig(card);
+      console.log('bot', bot);
       return {
         success: true,
         bot,

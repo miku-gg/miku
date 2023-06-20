@@ -31,13 +31,14 @@ app.get('/', (req, res) => {
     }
 
     /* read all json files */
-    files = await Promise.all(files.map(async (file) => {
-      const data = await fs.readFileSync(`${config.BOT_PATH}/${file}`, 'utf8');
-      return {
-        ...JSON.parse(data),
-        hash: file
-      };
-    }));
+    // files = await Promise.all(files.map(async (file) => {
+    //   const data = await fs.readFileSync(`${config.BOT_PATH}/${file}`, 'utf8');
+    //   return {
+    //     ...JSON.parse(data),
+    //     hash: file
+    //   };
+    // }));
+    files = []
 
     res.render('index', {bots: files});
   });
