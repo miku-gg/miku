@@ -14,9 +14,9 @@ function arrayBufferToBase64(arrayBuffer: ArrayBuffer) {
 }
 
 // Function to create a CSV file from the EmotionGroup array
-function createCSVFromEmotionGroups(groups: EmotionGroup[]): string {
+function createCSVForEmbeddings(items: {id: string, text: string}[]): string {
   const header = ['id', 'text'];
-  const data = groups.map((group) => [group.name, group.description]);
+  const data = items.map((item) => [item.id, item.text]);
 
 
   const escapeField = (field: string) => {
@@ -34,7 +34,7 @@ function createCSVFromEmotionGroups(groups: EmotionGroup[]): string {
 async function embeddCSV(csv: string): Promise<string> {
   const formData = new FormData();
   const csvBlob = new Blob([csv], { type: 'text/csv' });
-  formData.append('file', csvBlob, 'emotion-groups.csv');
+  formData.append('file', csvBlob, 'data_to_embedd.csv');
 
   const response: AxiosResponse<string>  = await axios.post(`${sentenceEmbedderAPIEndpoint}/encode_csv`, formData, {
     headers: {
@@ -46,13 +46,17 @@ async function embeddCSV(csv: string): Promise<string> {
   return response.data;
 }
 
-export async function emotionGroupsEmbedder(groups: EmotionGroup[]): Promise<string> {
+export async function itemsEmbedder(items: {id: string, text: string}[]): Promise<string> {
   try {
-    const csv = createCSVFromEmotionGroups(groups);
+    const csv = createCSVForEmbeddings(items);
     const base64Result = await embeddCSV(csv);
     return base64Result;
   } catch (error) {
     console.error('An error occurred:', error);
     return '';
   }
+}
+
+export async function emotionGroupsEmbedder(groups: EmotionGroup[]): Promise<string> {
+  return itemsEmbedder(groups.map(group => ({id: group.name, text: group.description})))
 }
