@@ -1,22 +1,22 @@
 import * as MikuExtensions from '@mikugg/extensions';
-import { MikuCard } from "./MikuCardValidator";
+import { MikuCard, EMOTION_GROUP_TEMPLATES } from "./MikuCardValidator";
 import { BotConfig } from "./BotConfigValidator";
 
-function parseAttributes(s: string): [string, string][] {
+export function parseAttributes(s: string): [string, string][] {
   return s.split("\n").map((x) => {
     const [a = '', b = ''] = x.split(": ");
     return [a.trim(), b.trim()];
   });
 }
 
-function parseExampleMessages(s: string): string[] {
+export function parseExampleMessages(s: string): string[] {
   return s.split("<START>\n").map((x) => x.trim()).filter(x => x);
 }
 
 const emotionTemplateSlugs = ['base-emotions', 'lewd-emotions'] as const;
 export type EmotionTemplateSlug = (typeof emotionTemplateSlugs)[number];
 
-export const emotionTemplates = new Map<EmotionTemplateSlug, string>([
+const emotionTemplates = new Map<EmotionTemplateSlug, string>([
   ['base-emotions', 'Qmdr5ooTdADLFZA6dCvTE28neq1S7aQwZyma7266weGJZV'],
   ['lewd-emotions', 'QmPNrWHqQJK4Uj1ZsBMTUT6RAPrVRTF6ngdydm8cQZe71C'],
 ]);
@@ -76,7 +76,7 @@ export const mikuCardToBotConfig = (card: MikuCard): BotConfig => {
         "service": MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter,
         "props": {
           "model": "all-MiniLM-L6-v2",
-          "start_context": mikugg.default_scenario,
+          "start_context": mikugg.start_scenario,
           "context_base_description_embeddings": "",
           "contexts": mikugg.scenarios.map((scenario) => {
             const emotion_group = mikugg.emotion_groups.find(_emotion_group => _emotion_group.id === scenario?.emotion_group);

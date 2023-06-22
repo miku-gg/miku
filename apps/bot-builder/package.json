@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@ipld/dag-pb": "^4.0.2",
+    "@mikugg/bot-validator": "^0.5.0",
     "@mikugg/core": "^0.5.0",
     "@mikugg/extensions": "^0.5.0",
     "@mikugg/ui-kit": "^0.5.0",
@@ -60,6 +61,7 @@
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "remove": "^0.1.5",
+    "uuid": "^9.0.0",
     "vite-plugin-plain-text": "^1.4.2"
   },
   "gitHead": "fdedec3c8725dfd89c7062c0115ca23c1645f863",

@@ -13,6 +13,9 @@ importers:
       '@ipld/dag-pb':
         specifier: ^4.0.2
         version: 4.0.2
+      '@mikugg/bot-validator':
+        specifier: workspace:^0.5.0
+        version: link:../../packages/bot-validator
       '@mikugg/core':
         specifier: ^0.5.0
         version: link:../../packages/core
@@ -67,6 +70,9 @@ importers:
       remove:
         specifier: ^0.1.5
         version: 0.1.5
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.0
       vite-plugin-plain-text:
         specifier: ^1.4.2
         version: 1.4.2

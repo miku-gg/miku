@@ -31,7 +31,7 @@ app.get('/', (req, res) => {
     }
 
     /* read all json files */
-    files = await Promise.all(files.map(async (file) => {
+    files = await Promise.all(files.filter(x => x.endsWith('.json')).map(async (file) => {
       const data = await fs.readFileSync(`${config.BOT_PATH}/${file}`, 'utf8');
       return {
         ...JSON.parse(data),

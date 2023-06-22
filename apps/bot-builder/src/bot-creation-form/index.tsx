@@ -7,15 +7,15 @@ import {
 
 import { Button, TextHeading } from "@mikugg/ui-kit";
 
-import { CharacterData, validateStep } from "./libs/CharacterData";
+import { validateStep } from "./libs/CharacterData";
 import { BUILDING_STEPS, downloadBotFile } from "./libs/bot-file-builder";
 import { downloadBlob } from "./libs/file-download";
 
 import Modal from "./Modal";
 import Step1Description from "./Step1Description";
-import Step2ModelAndVoice from "./Step2ModelAndVoice";
-import Step3Expressions from "./Step3Expressions";
-import Step4Preview from "./Step4Preview";
+// import Step2ModelAndVoice from "./Step2ModelAndVoice";
+// import Step3Expressions from "./Step3Expressions";
+// import Step4Preview from "./Step4Preview";
 import TopBar from "./TopBar";
 
 import backIcon from "./assets/backArrow.svg";
@@ -24,22 +24,23 @@ import nextIcon from "./assets/nextArrow.svg";
 import saveIcon from "./assets/save.svg";
 
 import "./styles/main.scss";
+import { MikuCard } from "@mikugg/bot-validator";
 
-const save = (characterData: CharacterData) => {
-  const characterDataJSON = JSON.stringify(characterData, null, 2);
-  const blob = new Blob([characterDataJSON], { type: "application/json" });
-  downloadBlob(blob, `character_${characterData.name}.json`);
+const save = (card: MikuCard) => {
+  const cardJSON = JSON.stringify(card, null, 2);
+  const blob = new Blob([cardJSON], { type: "application/json" });
+  downloadBlob(blob, `character_${card.data.name}.json`);
 };
 
 const _CharacterCreationForm: React.FC = () => {
-  const { characterData, setCharacterData, currentStep, nextStep, prevStep } =
+  const { card, setCard, currentStep, nextStep, prevStep } =
     useCharacterCreationForm();
   const [buildingStep, setBuildingStep] = useState<BUILDING_STEPS>(
     BUILDING_STEPS.STEP_0_NOT_BUILDING
   );
 
   const handleNext = () => {
-    const stepErrors = validateStep(currentStep, characterData);
+    const stepErrors = validateStep(currentStep, card);
 
     if (stepErrors.length > 0) {
       // Show an alert with the error messages
@@ -57,7 +58,7 @@ const _CharacterCreationForm: React.FC = () => {
 
   const handleSave = (event: React.MouseEvent) => {
     event.preventDefault();
-    save(characterData);
+    save(card);
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,8 +70,8 @@ const _CharacterCreationForm: React.FC = () => {
       reader.onload = (e) => {
         const loadedData = JSON.parse(
           e.target?.result as string
-        ) as CharacterData;
-        setCharacterData(loadedData);
+        ) as MikuCard;
+        setCard(loadedData);
       };
       reader.readAsText(file);
     }
@@ -81,7 +82,7 @@ const _CharacterCreationForm: React.FC = () => {
   };
 
   const handleBuildBot = async () => {
-    await downloadBotFile(characterData, setBuildingStep);
+    await downloadBotFile(card, setBuildingStep);
   };
 
   return (
@@ -99,9 +100,9 @@ const _CharacterCreationForm: React.FC = () => {
       </div>
       <div className="characterCreationForm__stepsContainer">
         {currentStep === 1 && <Step1Description />}
-        {currentStep === 2 && <Step2ModelAndVoice />}
+        {/* {currentStep === 2 && <Step2ModelAndVoice />}
         {currentStep === 3 && <Step3Expressions />}
-        {currentStep === 4 && <Step4Preview />}
+        {currentStep === 4 && <Step4Preview />} */}
       </div>
       <div className="characterCreationForm__buttonsContainer">
         <div>

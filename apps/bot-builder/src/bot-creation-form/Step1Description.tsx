@@ -10,69 +10,43 @@ import {
   TextHeading,
 } from "@mikugg/ui-kit";
 
-import { Attribute, BackgroundImage } from "./libs/CharacterData";
 import { checkImageDimensionsAndType } from "./libs/utils";
 
-import { RemoveX } from "./assets/svg";
+import { v4 as uuidv4 } from 'uuid';
 
 const Step1Description: React.FC = () => {
-  const { characterData, setCharacterData } = useCharacterCreationForm();
+  const { card, setCard } = useCharacterCreationForm();
 
-  const handleInputChange = (event: {
+  const handleV1CardInputChange = (event: {
     target: { name: string; value: string };
   }) => {
     const { name, value } = event.target;
-    setCharacterData({ ...characterData, [name]: value });
-  };
-
-  const handleAttributeChange = (
-    index: number,
-    updatedAttribute: Attribute
-  ) => {
-    const newAttributes = characterData.attributes?.map((attribute, i) =>
-      i === index ? updatedAttribute : attribute
-    );
-    setCharacterData({ ...characterData, attributes: newAttributes });
-  };
-
-  const addAttribute = () => {
-    const newAttribute: Attribute = { key: "", value: "" };
-    setCharacterData({
-      ...characterData,
-      attributes: [...(characterData.attributes || []), newAttribute],
+    setCard({
+      ...card,
+      data: {
+        ...card.data,
+        [name]: value
+      }
     });
   };
 
-  const removeAttribute = (index: number) => {
-    const newAttributes = characterData.attributes?.filter(
-      (_, i) => i !== index
-    );
-    setCharacterData({ ...characterData, attributes: newAttributes });
-  };
-
-  const addSampleConversation = () => {
-    setCharacterData({
-      ...characterData,
-      sampleConversation: [...(characterData.sampleConversation || []), ''],
-    });
-  };
-
-  const removeSampleConversation = (index: number) => {
-    const _sampleConversation = characterData.sampleConversation?.filter(
-      (_, i) => i !== index
-    );
-    setCharacterData({ ...characterData, sampleConversation: _sampleConversation });
-  };
-
-  const handleSampleConversationChange = (index: number, event: {
+  const handleMikuggInputChange = (event: {
     target: { name: string; value: string };
   }) => {
-    const _sampleConversation = [...(characterData.sampleConversation || [])];
-    _sampleConversation[index] = event.target.value;
-    setCharacterData({
-      ...characterData,
-      sampleConversation: _sampleConversation,
-    });
+    const { name, value } = event.target;
+    setCard({
+      ...card,
+      data: {
+        ...card.data,
+        extensions: {
+          ...card.data.extensions,
+          mikugg: {
+            ...(card.data.extensions.mikugg || {}),
+            [name]: value
+          },
+        }
+      }
+    })
   }
 
   const handleAvatarChange = async (file: File) => {
@@ -83,9 +57,18 @@ const Step1Description: React.FC = () => {
 
       await new Promise((resolve) => {
         reader.onloadend = () => {
-          setCharacterData({
-            ...characterData,
-            avatar: reader.result as string,
+          setCard({
+            ...card,
+            data: {
+              ...card.data,
+              extensions: {
+                ...card.data.extensions,
+                mikugg: {
+                  ...(card.data.extensions?.mikugg || {}),
+                  profile_pic: reader.result as string
+                }
+              }
+            }
           });
 
           resolve(null);
@@ -101,7 +84,11 @@ const Step1Description: React.FC = () => {
   ) => {
     const files = event.target.files;
     if (files) {
-      const validImages: BackgroundImage[] = [];
+      const validImages: {
+        id: string
+        description: string
+        source: string
+      }[] = [];
 
       for (const file of Array.from(files)) {
         const isValidSize = await checkImageDimensionsAndType(file, [
@@ -116,6 +103,7 @@ const Step1Description: React.FC = () => {
               validImages.push({
                 source: reader.result as string,
                 description: "",
+                id: uuidv4()
               });
               resolve(null);
             };
@@ -127,12 +115,21 @@ const Step1Description: React.FC = () => {
         }
       }
 
-      setCharacterData({
-        ...characterData,
-        backgroundImages: [
-          ...(characterData.backgroundImages || []),
-          ...validImages,
-        ],
+      setCard({
+        ...card,
+        data: {
+          ...card.data,          
+          extensions: {
+            ...card.data.extensions,
+            mikugg: {
+              ...(card.data.extensions.mikugg || {}),
+              backgrounds: [
+                ...(card.data.extensions.mikugg?.backgrounds || []),
+                ...validImages
+              ]
+            }
+          }
+        }
       });
     }
 
@@ -140,11 +137,20 @@ const Step1Description: React.FC = () => {
   };
 
   const handleRemoveBackgroundImage = (index: number) => {
-    const newBackgroundImages = [...(characterData.backgroundImages || [])];
+    const newBackgroundImages = [...(card.data.extensions.mikugg?.backgrounds || [])];
     newBackgroundImages.splice(index, 1);
-    setCharacterData({
-      ...characterData,
-      backgroundImages: newBackgroundImages,
+    setCard({
+      ...card,
+      data: {
+        ...card.data,          
+        extensions: {
+          ...card.data.extensions,
+          mikugg: {
+            ...(card.data.extensions.mikugg || {}),
+            backgrounds: newBackgroundImages
+          }
+        }
+      }
     });
   };
 
@@ -152,14 +158,23 @@ const Step1Description: React.FC = () => {
     event: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
-    const updatedBackgroundImages = [...(characterData.backgroundImages || [])];
+    const updatedBackgroundImages = [...(card.data.extensions.mikugg?.backgrounds || [])];
     updatedBackgroundImages[index] = {
       ...updatedBackgroundImages[index],
       description: event.target.value,
     };
-    setCharacterData({
-      ...characterData,
-      backgroundImages: updatedBackgroundImages,
+    setCard({
+      ...card,
+      data: {
+        ...card.data,          
+        extensions: {
+          ...card.data.extensions,
+          mikugg: {
+            ...(card.data.extensions.mikugg || {}),
+            backgrounds: updatedBackgroundImages
+          }
+        }
+      }
     });
   };
 
@@ -172,8 +187,8 @@ const Step1Description: React.FC = () => {
           id="name"
           name="name"
           label="Character name"
-          value={characterData.name || ""}
-          onChange={handleInputChange}
+          value={card.data.name || ""}
+          onChange={handleV1CardInputChange}
           className="step1Description__input"
         />
       </div>
@@ -182,10 +197,10 @@ const Step1Description: React.FC = () => {
         <Input
           placeHolder="The version of your character E.g *1.0*"
           label="Character version"
-          id="version"
-          name="version"
-          value={characterData.version || ""}
-          onChange={handleInputChange}
+          id="character_version"
+          name="character_version"
+          value={card.data.character_version || ""}
+          onChange={handleV1CardInputChange}
           className="step1Description__input"
         />
       </div>
@@ -197,7 +212,7 @@ const Step1Description: React.FC = () => {
           size="lg"
           className="step1Description__dragAndDropImages"
           handleChange={handleAvatarChange}
-          previewImage={characterData.avatar}
+          previewImage={card.data.extensions.mikugg.profile_pic}
           placeHolder="(256x256)"
           onFileValidate={(file) =>
             checkImageDimensionsAndType(file, ["image/png", "image/jpeg"])
@@ -208,26 +223,26 @@ const Step1Description: React.FC = () => {
 
       <div className="step1Description__formGroup">
         <Input
-          id="author"
-          name="author"
+          id="creator"
+          name="creator"
           placeHolder="The name of the author *user name*"
           label="Author"
           maxLength={64}
-          value={characterData.author}
-          onChange={handleInputChange}
+          value={card.data.creator}
+          onChange={handleV1CardInputChange}
           className="step1Description__input"
         />
       </div>
 
       <div className="step1Description__formGroup">
         <Input
-          id="shortDescription"
-          name="shortDescription"
+          id="short_description"
+          name="short_description"
           placeHolder="E.g *A character based in...*"
           label="Character short description"
-          value={characterData.shortDescription}
+          value={card.data.extensions.mikugg.short_description}
           maxLength={256}
-          onChange={handleInputChange}
+          onChange={handleMikuggInputChange}
           className="step1Description__input"
         />
       </div>
@@ -239,8 +254,8 @@ const Step1Description: React.FC = () => {
           placeHolder="E.g 'Aqua is a beautiful goddess of water who is selfish and arrogant. Aqua often acts superior to others and looks down on those who worship other gods. Aqua does not miss an opportunity to boast about her status. Aqua is also a crybaby who easily breaks down in tears when things don't go her way. Aqua is not very smart or lucky, and often causes trouble for herself and her party with her poor decisions and actions. Aqua has a habit of spending all her money on alcohol and parties, leaving her in debt and unable to pay for basic necessities. Aqua also has a low work ethic and prefers to slack off or avoid doing any tasks that require effort or responsibility. Aqua acts very cowardly against tough monsters, often making up lame excuses on why she cannot fight. Aqua has a very negative opinion of the undead and demons and will be very cold and aggressive to them. Aqua is incapable of lying convincingly. Aqua has a kind heart and will help those in need, especially if they are her followers or friends. Aqua has a strong sense of justice and will fight against evil with her powerful water, healing, and purification magic. Aqua also has a playful and cheerful side, and enjoys having fun with her party and performing party tricks. Aqua is worshipped by the Axis Order in this world, who are generally considered by everyone as strange overbearing cultists. Aqua currently lives in the city of Axel, a place for beginner adventurers.'"
           id="description"
           name="description"
-          value={characterData.description}
-          onChange={handleInputChange}
+          value={card.data.description}
+          onChange={handleV1CardInputChange}
           className="step1Description__textarea"
         />
       </div>
@@ -252,107 +267,47 @@ const Step1Description: React.FC = () => {
           placeHolder="E.g 'Aqua is gathering followers for her faith in the city Axel's town square.'"
           id="scenario"
           name="scenario"
-          value={characterData.scenario || ""}
-          onChange={handleInputChange}
+          value={card.data.scenario || ""}
+          onChange={handleV1CardInputChange}
           className="step1Description__textarea"
         />
       </div>
 
       <div className="step1Description__formGroup">
-        {characterData.sampleConversation.map((_sample, index) => {
-          return (
-            <div className="step1Description__sample-conversation" key={`sample-conversation-${index}`}>
-              <Input
-                isTextArea
-                label={index === 0 ? "Sample Conversations:" : undefined}
-                placeHolder={`E.g 'Aqua: "You there! You look like you know what's what. What sect are you from?"\nAnon: "I’m not really religious, but I guess I respect all the gods?"\nAqua: "All the gods? Don't you know that there's only one god who deserves your respect and worship, Aqua? I'm the most beautiful, powerful, and benevolent being in this world! I can knock out giant toads in one hit and perform the most amazing party tricks known to mankind! Did I mention how amazing I am?"\nAnon: "Huh...? Wait a minute... You're an Axis Order cultist. Everyone knows you're all weirdos... And isn't it terrible to pretend to be a god?"\nAqua: "What? Weirdos?! That's a lie spread by jealous people! Me and my followers are perfect in every way! How dare you insult me! And I'm not pretending!!"\nAnon: "Hey, calm down. I'm just telling you what I heard."\nAqua: "No, you're wrong! You're so wrong that it hurts my ears! You need to repent and join the Axis Order right now! Or else you'll face my wrath!"\nAnon: "We're brand-new adventurers who don’t even have any decent gear. What kind of 'allies' would join our party?"\nAqua: "Did you forget that I'M here? When word gets out we want party members, they'll come. I am an Arch-priest, you know—an advanced class! I can use all kinds of healing magic; I can cure paralysis and poisoning, even revive the dead! What party wouldn't want me? I’m the great Aqua, aren't I? Pretty soon they'll be knocking at our door. 'Please let us join you!' they'll say. Get it?!"\nAnon: "I want some cash..."\nAqua: "So does everybody. Myself included, of course! ...Think about it. Isn't this completely pathetic? Let’s say I— a goddess, remember!—was willing to live in a stable for the rest of my life; why would you let me? Wouldn't you be ashamed to do that? If you understand, then make with the goods! Baby me!"'`}
-                id={`sampleConversation-${index}`}
-                name={`sampleConversation-${index}`}
-                value={_sample}
-                onChange={handleSampleConversationChange.bind(null, index)}
-                className="step1Description__textarea"
-              />
-              {
-                index > 0 ? (
-                  <button
-                    className="step1Description__attribute__remove step1Description__sample-conversation__remove"
-                    onClick={() => removeSampleConversation(index)}
-                  >
-                    <RemoveX />
-                  </button>
-                ) : null
-              }
-            </div>
-          )
-        })}
-        <div className="step1Description__addAttributeButton">
-          <Button theme="gradient" onClick={addSampleConversation}>
-            + Add Sample Conversation
-          </Button>
-        </div>
+        <Input
+          isTextArea
+          label="Sample Conversations:"
+          placeHolder={`<START>\n'Aqua: "You there! You look like you know what's what. What sect are you from?"\nAnon: "I’m not really religious, but I guess I respect all the gods?"\nAqua: "All the gods? Don't you know that there's only one god who deserves your respect and worship, Aqua? I'm the most beautiful, powerful, and benevolent being in this world! I can knock out giant toads in one hit and perform the most amazing party tricks known to mankind! Did I mention how amazing I am?"\nAnon: "Huh...? Wait a minute... You're an Axis Order cultist. Everyone knows you're all weirdos... And isn't it terrible to pretend to be a god?"\nAqua: "What? Weirdos?! That's a lie spread by jealous people! Me and my followers are perfect in every way! How dare you insult me! And I'm not pretending!!"\nAnon: "Hey, calm down. I'm just telling you what I heard."\nAqua: "No, you're wrong! You're so wrong that it hurts my ears! You need to repent and join the Axis Order right now! Or else you'll face my wrath!"\nAnon: "We're brand-new adventurers who don’t even have any decent gear. What kind of 'allies' would join our party?"\nAqua: "Did you forget that I'M here? When word gets out we want party members, they'll come. I am an Arch-priest, you know—an advanced class! I can use all kinds of healing magic; I can cure paralysis and poisoning, even revive the dead! What party wouldn't want me? I’m the great Aqua, aren't I? Pretty soon they'll be knocking at our door. 'Please let us join you!' they'll say. Get it?!"\nAnon: "I want some cash..."\nAqua: "So does everybody. Myself included, of course! ...Think about it. Isn't this completely pathetic? Let’s say I— a goddess, remember!—was willing to live in a stable for the rest of my life; why would you let me? Wouldn't you be ashamed to do that? If you understand, then make with the goods! Baby me!"'`}
+          id={`mes_example`}
+          name={`mes_example`}
+          value={card.data.mes_example}
+          onChange={handleV1CardInputChange}
+          className="step1Description__textarea"
+        />
       </div>
 
       <div className="step1Description__formGroup">
-        <TextHeading size="h2">Character Attributes</TextHeading>
-        {characterData.attributes?.map((attribute, index) => {
-          const isLastAttribute: boolean =
-            index === (characterData.attributes?.length || 0) - 1;
-
-          return (
-            <div key={index} className="step1Description__attribute">
-              <div className="step1Description__attribute__fields">
-                <Input
-                  name={`attribute-key-${index}`}
-                  value={attribute.key}
-                  onChange={(e) =>
-                    handleAttributeChange(index, {
-                      ...attribute,
-                      key: e.target.value,
-                    })
-                  }
-                  className="step1Description__input"
-                  placeHolder="Attribute Key"
-                />
-                <Input
-                  name={`attribute-value-${index}`}
-                  value={attribute.value}
-                  onChange={(e) =>
-                    handleAttributeChange(index, {
-                      ...attribute,
-                      value: e.target.value,
-                    })
-                  }
-                  className="step1Description__input"
-                  placeHolder="Attribute Value"
-                />
-                <div className="step1Description__attribute__controls">
-                  <button
-                    className="step1Description__attribute__remove"
-                    onClick={() => removeAttribute(index)}
-                  >
-                    <RemoveX />
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        <div className="step1Description__addAttributeButton">
-          <Button theme="gradient" onClick={addAttribute}>
-            + Add Attribute
-          </Button>
-        </div>
+        <Input
+          isTextArea
+          label="Describe the Personality:"
+          placeHolder="species: human, role: priest"
+          id="personality"
+          name="personality"
+          value={card.data.personality || ""}
+          onChange={handleV1CardInputChange}
+          className="step1Description__textarea"
+        />
       </div>
 
       <div className="step1Description__formGroup">
         <Input
           isTextArea
           label="Character Greeting:"
-          id="greeting"
+          id="first_mes"
           placeHolder="E.g 'It’s a pleasure to meet you'"
-          name="greeting"
-          value={characterData.greeting || ""}
-          onChange={handleInputChange}
+          name="first_mes"
+          value={card.data.first_mes || ""}
+          onChange={handleV1CardInputChange}
           className="step1Description__textarea"
         />
       </div>
@@ -361,7 +316,7 @@ const Step1Description: React.FC = () => {
         <label htmlFor="backgroundImage">
           Upload Background Images (1024x1024):
         </label>
-        {characterData.backgroundImages?.map((backgroundImage, index) => (
+        {card.data.extensions.mikugg?.backgrounds?.map((backgroundImage, index) => (
           <div key={index} className="step1Description__backgroundImagePreview">
             <img
               src={backgroundImage.source}

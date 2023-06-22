@@ -27,7 +27,7 @@ type CharacterBook = {
   }>
 }
 
-type TavernCardV2 = {
+export type TavernCardV2 = {
   spec: 'chara_card_v2'
   spec_version: '2.0' // May 8th addition
   data: {
@@ -104,16 +104,51 @@ export const LICENSES = [
   'CC BY-NC-SA',
   'CC BY-NC-ND'
 ];
+
 export const EMOTION_GROUP_TEMPLATES = {
   'base-emotions': {
     id: 'base-emotions',
+    label: 'Base emotions',
     emotionIds: ['angry', 'sad', 'happy', 'disgusted', 'begging', 'scared', 'excited', 'hopeful', 'longing', 'proud', 'neutral', 'rage', 'scorn', 'blushed', 'pleasure', 'lustful', 'shocked', 'confused', 'disappointed', 'embarrassed', 'guilty', 'shy', 'frustrated', 'annoyed', 'exhausted', 'tired', 'curious', 'intrigued', 'amused']
   },
   'lewd-emotions': {
     id: 'lewd-emotions',
+    label: 'Lewd emotions',
     emotionIds: ['desire', 'pleasure', 'anticipation', 'condescension', 'arousal', 'ecstasy', 'relief', 'release', 'intensity', 'comfort', 'humiliation', 'discomfort', 'submission', 'pain', 'teasing', 'arrogant']
   }
 };
+
+export const EMPTY_MIKU_CARD: MikuCard = {
+  "spec": "chara_card_v2",
+  "spec_version": "2.0",
+  "data": {
+    "name": "",
+    "character_version": "1",
+    "system_prompt": "",
+    "description": "",
+    "personality": "",
+    "scenario": "",
+    "first_mes": "",
+    "mes_example": "",
+    "alternate_greetings": [],
+    "post_history_instructions": "",
+    "creator_notes": "",
+    "tags": [],
+    "creator": "",
+    "extensions": {
+      "mikugg": {
+        "license": "CC BY",
+        "profile_pic": "",
+        "short_description": "",
+        "start_scenario": "",
+        "scenarios": [],
+        "emotion_groups": [],
+        "backgrounds": [],
+        "voices": []
+      }
+    }
+  }
+}
 
 export function validateMikuCard(card: MikuCard): string[] {
   const errors: string[] = [];
