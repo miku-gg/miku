@@ -26,6 +26,7 @@ import nextIcon from "./assets/nextArrow.svg";
 import saveIcon from "./assets/save.svg";
 
 import "./styles/main.scss";
+import { downloadPng } from "./libs/encodePNG";
 
 const save = (card: MikuCard) => {
   const cardJSON = JSON.stringify(card, null, 2);
@@ -83,7 +84,8 @@ const _CharacterCreationForm: React.FC = () => {
   };
 
   const handleBuildBot = async () => {
-    await downloadBotFile(card, setBuildingStep);
+    // await downloadBotFile(card, setBuildingStep);
+    await downloadPng(JSON.stringify(card), card.data.extensions.mikugg.profile_pic, card.data.name);
   };
 
   return (
@@ -111,7 +113,7 @@ const _CharacterCreationForm: React.FC = () => {
             Save
           </Button>
           <Button theme="transparent" onClick={load} iconSRC={loadIcon}>
-            Load
+            Import
           </Button>
         </div>
         <input

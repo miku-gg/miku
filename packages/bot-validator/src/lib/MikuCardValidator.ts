@@ -58,6 +58,7 @@ export type MikuCard = TavernCardV2 & {
     extensions: {
       mikugg: {
         license: string // LICENSE of the bot, set by the bot author
+        language: string // Indicates the language of the bot, NOT used in the prompt
         short_description: string // Small description of the bot, NOT used in the prompt
         profile_pic: string // profile pic of the bot
         start_scenario: string // id of the first scenario
@@ -139,6 +140,7 @@ export const EMPTY_MIKU_CARD: MikuCard = {
     "extensions": {
       "mikugg": {
         "license": "CC BY",
+        "language": "en",
         "profile_pic": "",
         "short_description": "",
         "start_scenario": "",
