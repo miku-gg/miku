@@ -69,13 +69,11 @@ const Carousel: React.FC<CarouselProps> = ({
             onClick={() => onClick(index)}
           >
             {isImageCarousel ? (
-              <img
-                alt={`Carousel image ${index + 1}`}
-                src={item}
+              <div
+                style={{ backgroundImage: `url(${item})` }}
                 className={`Carousel__image ${
                   index === selectedIndex ? 'selectedImage' : ''
                 }`}
-                onClick={() => onClick(index)}
               />
             ) : (
               item
