@@ -60,7 +60,9 @@
     "multiformats": "^11.0.2",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
+    "react-modal": "^3.16.1",
     "remove": "^0.1.5",
+    "sharp": "^0.32.1",
     "uuid": "^9.0.0",
     "vite-plugin-plain-text": "^1.4.2"
   },

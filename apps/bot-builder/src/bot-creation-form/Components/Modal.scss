@@ -1,0 +1,71 @@
+@import "../styles/variables";
+
+.ReactModal__Html--open,
+.ReactModal__Body--open {
+  overflow: hidden;
+}
+
+.Modal {
+  position: absolute;
+  background: black;
+  color: white;
+  overflow: auto;
+  border-radius: 20px;
+  outline: none;
+  padding: 20px;
+  top: 100px;
+  z-index: 1;
+  max-width: 700px;
+  width: 100%;
+
+  &__overlay {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(black, 0.5);
+    backdrop-filter: blur(2px);
+    animation-name: overlay-animation;
+    animation-duration: 0.3s;
+    overflow: auto;
+    z-index: 99999;
+  }
+
+  &__header {
+    h2 {
+      font-size: 1.4em;
+    }
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .Modal {
+    padding-right: 20px;
+  }
+
+  .Modal__overlay {
+    align-items: initial;
+  }
+
+  .Modal__form-field {
+    flex-wrap: wrap;
+  }
+
+  .Modal__form-field-label,
+  .Modal__form-field-value {
+    width: 100%;
+  }
+}
+
+@keyframes overlay-animation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

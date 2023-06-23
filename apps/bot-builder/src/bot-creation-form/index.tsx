@@ -25,6 +25,8 @@ import saveIcon from "./assets/save.svg";
 
 import "./styles/main.scss";
 import { MikuCard } from "@mikugg/bot-validator";
+import Step3Scenarios from "./Step3Scenarios";
+import Step2Assets from "./Step2Assets";
 
 const save = (card: MikuCard) => {
   const cardJSON = JSON.stringify(card, null, 2);
@@ -92,17 +94,17 @@ const _CharacterCreationForm: React.FC = () => {
         <TopBar
           steps={[
             { label: "01", description: "Description" },
-            { label: "02", description: "Prompt completion model" },
-            { label: "03", description: "Emotions grup" },
+            { label: "02", description: "Assets" },
+            { label: "03", description: "Scenarios" },
             { label: "04", description: "Finished Character" },
           ]}
         />
       </div>
       <div className="characterCreationForm__stepsContainer">
         {currentStep === 1 && <Step1Description />}
-        {/* {currentStep === 2 && <Step2ModelAndVoice />}
-        {currentStep === 3 && <Step3Expressions />}
-        {currentStep === 4 && <Step4Preview />} */}
+        {currentStep === 2 && <Step2Assets />}
+        {currentStep === 3 && <Step3Scenarios />}
+        {/*currentStep === 4 && <Step4Preview />} */}
       </div>
       <div className="characterCreationForm__buttonsContainer">
         <div>

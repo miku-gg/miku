@@ -1,7 +1,7 @@
 import { MikuCard } from '@mikugg/bot-validator';
 import { emotionTemplates } from '../data/emotions';
 export { type EmotionTemplate, emotionTemplates } from '../data/emotions';
-export { validVoices, type Voice, voices } from '../data/voices';
+export { voices } from '../data/voices';
 
 export type ValidationError = {
   field: string;

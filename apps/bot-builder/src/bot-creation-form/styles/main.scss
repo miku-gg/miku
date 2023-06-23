@@ -3,34 +3,43 @@
 @import "topbar";
 @import "modal";
 @import "step1-description";
-@import "step2-model-voice";
-@import "step3-expressions";
+// @import "step2-model-voice";
+// @import "step3-expressions";
+@import "step3-scenarios";
 @import "step4-preview";
+
+* {
+  box-sizing: border-box;
+}
 
 body {
   background-color: #121a36;
   font-family: "Poppins", "Roboto", sans-serif;
   color: $text-1;
+  padding: 0;
+  margin: 0;
 }
 .characterCreationForm {
   display: flex;
   flex-direction: column;
+  max-height: 100vh;
+  max-width: 852px;
+  margin: 0 auto;
 
   &__headingContainer {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
+    padding-top: 1rem;
+    width: 100%;
   }
 
   &__buttonsContainer {
-    height: 100%;
     width: 100%;
-    max-width: 852px;
     display: flex;
     align-self: center;
     align-items: end;
     justify-content: space-between;
+    padding: 20px 0;
 
     & div {
       display: flex;
@@ -41,6 +50,13 @@ body {
   &__navigationButtons {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+  }
+
+  &__stepsContainer {
+    width: 100%;
+    border-radius: 1rem;
+    max-height: auto;
+    overflow: scroll;
+    margin: 0 auto;
   }
 }
