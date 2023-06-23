@@ -1,7 +1,6 @@
-import { CharacterData } from "./CharacterData";
+import { MikuCard } from "@mikugg/bot-validator";
 import { downloadBlob, generateZipFile } from "./file-download";
-import { emotionGroupsEmbedder } from "./file-embedder";
-import { hashBase64, hashBase64URI } from "./utils";
+import { hashBase64URI } from "./utils";
 
 export enum BUILDING_STEPS {
   STEP_0_NOT_BUILDING = 0,
@@ -10,129 +9,73 @@ export enum BUILDING_STEPS {
   STEP_3_DOWNLOADING_ZIP = 3,
 }
 
-export async function createCharacterConfig(
-  characterData: CharacterData,
-  emotionsEmbeddingsHash: string
-) {
-  // Replace base64 images with their hashes
-  const profilePicHash = await hashBase64URI(characterData.avatar);
-  const backgroundHashes = await Promise.all(
-    characterData.backgroundImages.map(async (bg) => {
-      const hash = await hashBase64URI(bg.source);
-      return { source: hash, description: bg.description };
-    })
-  );
-  const emotionHashes = await Promise.all(
-    characterData.emotionGroups.map(async (emotionGroup) => {
-      const hashes = await Promise.all(
-        emotionGroup.images.map(async (emotion) => {
-          const hash = await hashBase64URI(emotion.sources[0]);
-          return { id: emotion.emotion, hashes: [hash] };
-        })
-      );
-      return {
-        name: emotionGroup.name,
-        description: emotionGroup.description,
-        emotions: hashes,
-      };
-    })
-  );
-  const [voiceService, voiceId, emotion] = characterData.voice.split(".");
-
-  // Map character data to the desired JSON structure
-  const characterConfig = {
-    bot_name: characterData.name,
-    version: characterData.version,
-    description: characterData.shortDescription,
-    author: characterData.author,
-    configVersion: 2,
-    subject: "Anon",
-    profile_pic: profilePicHash,
-    backgrounds: backgroundHashes,
-    short_term_memory: {
-      service: "gpt_short-memory-v2",
-      props: {
-        prompt_context: "",
-        prompt_initiator: "",
-        language: "en",
-        subjects: ["Anon"],
-        botSubject: characterData.name,
-        buildStrategySlug: "wpp",
-        parts: {
-          persona: characterData.description,
-          attributes: characterData.attributes.map((attribute) => [
-            attribute.key,
-            attribute.value,
-          ]),
-          sampleChat: characterData.sampleConversation,
-          scenario: characterData.scenario,
-          greeting: characterData.greeting,
-          botSubject: characterData.name,
+export async function hashImagesOfMikuCard(
+  card: MikuCard
+): Promise<MikuCard> {
+  return {
+    ...card,
+    data: {
+      ...card.data,
+      extensions: {
+        ...card.data.extensions,
+        mikugg: {
+          ...card.data.extensions.mikugg,
+          profile_pic: await hashBase64URI(card.data.extensions.mikugg.profile_pic),
+          backgrounds: await Promise.all(
+            card.data.extensions.mikugg.backgrounds.map(async (bg) => {
+              return {
+                ...bg,
+                source: await hashBase64URI(bg.source),
+              };
+            })
+          ),
+          emotion_groups: await Promise.all(
+            card.data.extensions.mikugg.emotion_groups.map(async (emotionGroup) => {
+              return {
+                ...emotionGroup,
+                images: await Promise.all(
+                  emotionGroup.emotions.map(async (emotion) => {
+                    return {
+                      ...emotion,
+                      sources: await Promise.all(
+                        emotion.source.map(async (source) => {
+                          return await hashBase64URI(source);
+                        })
+                      ),
+                    };
+                  })
+                ),
+              };
+            })
+          ),
         },
       },
     },
-    prompt_completer: {
-      service: 'openai_completer',
-      props: {
-        model: '',
-      },
-    },
-    outputListeners: [
-      {
-        service: voiceService,
-        props: {
-          voiceId: voiceId,
-          emotion: emotion || "chat",
-        },
-      },
-      {
-        service: "sbert_emotion-interpreter",
-        props: {
-          model: "all-MiniLM-L6-v2",
-          start_context: characterData.emotionGroups[0].name,
-          context_base_description_embeddings: emotionsEmbeddingsHash,
-          contexts: characterData.emotionGroups.map((emotionGroup, index) => {
-            return {
-              id: emotionGroup.name,
-              context_change_trigger: emotionGroup.trigger,
-              emotion_embeddings: emotionGroup.emotionsHash,
-              emotion_images: emotionHashes[index].emotions,
-            };
-          }),
-        },
-      },
-    ],
   };
-
-  return characterConfig;
 }
 
 export async function downloadBotFile(
-  characterData: CharacterData,
+  _card: MikuCard,
   setBuildingStep: (step: BUILDING_STEPS) => void
 ) {
   setBuildingStep(BUILDING_STEPS.STEP_1_GENERATING_EMBEDDINGS);
-  const emotionsEmbeddings = await emotionGroupsEmbedder(
-    characterData.emotionGroups
-  );
-  const emotionsEmbeddingsHash = await hashBase64(emotionsEmbeddings);
+  const finalCard = await hashImagesOfMikuCard(_card);
 
   setBuildingStep(BUILDING_STEPS.STEP_2_GENERATING_ZIP);
-  const botConfig = await createCharacterConfig(
-    characterData,
-    emotionsEmbeddingsHash
-  );
   const images = [
-    characterData.avatar,
-    ...characterData.backgroundImages.map((bg) => bg.source),
-    ...characterData.emotionGroups
+    _card.data.extensions.mikugg.profile_pic,
+    ..._card.data.extensions.mikugg.backgrounds
+      .filter(bg => _card.data.extensions.mikugg.scenarios.some(scenario => scenario.background === bg.id))
+      .map((bg) => bg.source),
+    ..._card.data.extensions.mikugg.emotion_groups
+      .filter(group => _card.data.extensions.mikugg.scenarios.some(scenario => scenario.emotion_group === group.id))
       .map((emotionGroup) =>
-        emotionGroup.images.map((emotion) => emotion.sources[0])
+        emotionGroup.emotions.map((emotion) => emotion.source)
       )
-      .flat(2),
+      .flat(3),
   ];
-  const blob = await generateZipFile(botConfig, images, emotionsEmbeddings);
+  const blob = await generateZipFile(finalCard, images);
 
-  await downloadBlob(blob, `${characterData.name}_${Date.now()}.miku`);
+  await downloadBlob(blob, `${_card.data.name}_${Date.now()}.miku`);
   setBuildingStep(BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP);
 }

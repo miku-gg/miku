@@ -1,6 +1,7 @@
 // Step3Scenarios.tsx
 import React, { useState } from "react";
-import { Carousel, CheckBox, Container, ImageSlider, Input, TextHeading } from "@mikugg/ui-kit";
+import { v4 as uuidv4 } from 'uuid';
+import { AreYouSure, Button, Carousel, CheckBox, Container, ImageSlider, Input, TextHeading } from "@mikugg/ui-kit";
 import { useCharacterCreationForm } from "./CharacterCreationFormContext";
 import { MikuCard } from "@mikugg/bot-validator";
 import VoiceSelector from "./Components/VoiceSelector";
@@ -115,9 +116,10 @@ const EmotionsSelector: React.FC<{scenarioId: string}> = ({ scenarioId }) => {
 interface PreviewScenarioProps {
   card: MikuCard,
   scenarioId: string
+  fullWidth?: boolean
 }
 
-const PreviewScenario: React.FC<PreviewScenarioProps> = ({ card, scenarioId }) => {
+export const PreviewScenario: React.FC<PreviewScenarioProps> = ({ card, scenarioId, fullWidth }) => {
   const [selectedEmotionId, setSelectedEmotionId] = useState<string>('');
   const scenario = card.data.extensions.mikugg.scenarios.find(
     (scenario) => scenario.id === scenarioId
@@ -156,7 +158,7 @@ const PreviewScenario: React.FC<PreviewScenarioProps> = ({ card, scenarioId }) =
       backgroundImageSource={background}
       selectedIndex={emotionIndex}
       onChange={calculateUpdatedIndex}
-      fullWidth
+      fullWidth={fullWidth}
     />
   );
 }
@@ -165,6 +167,7 @@ const Step3Scenarios: React.FC = () => {
   const { card, setCard } = useCharacterCreationForm();
   const [selectedScenarioIndex, setSelectedScenarioIndex] = useState<number>(0);
   const scenarios = card.data.extensions.mikugg.scenarios;
+  const selectedScenario = scenarios[selectedScenarioIndex];
   const scenarioItems = scenarios.map(
     (scenario) => {
       const background = card.data.extensions.mikugg.backgrounds.find(
@@ -176,11 +179,15 @@ const Step3Scenarios: React.FC = () => {
       return {
         background,
         contentImage,
-        title: scenario.id,
+        title: scenario.name,
       }
     }
   );
-  const selectedScenario = scenarios[selectedScenarioIndex];
+  scenarioItems.push({
+    background: '/add-scenario.png',
+    contentImage: '',
+    title: 'New',
+  });
 
   const handleTextChange = (event: {target: {name: string, value: string}}) => {
     const { name, value } = event.target;
@@ -203,21 +210,62 @@ const Step3Scenarios: React.FC = () => {
     setCard(newCard);
   };
 
-  console.log(card.data.extensions.mikugg.backgrounds);
-
-  scenarioItems.push({
-    background: '/add-scenario.png',
-    contentImage: '',
-    title: 'New',
-  });
-
   return (
     <Container className="step3Scenarios">
       <TextHeading size="h2">Step 3: Scenarios</TextHeading>
       <div>
         <Carousel
           items={scenarioItems}
-          onClick={(index) => setSelectedScenarioIndex(index)}
+          onClick={(index, arrowClick) => {
+            if (index === scenarioItems.length - 1) {
+              if (arrowClick) {
+                setSelectedScenarioIndex(
+                  selectedScenarioIndex === 0 ?
+                  scenarios.length - 1 :
+                  0
+                );
+                return;
+              }
+              const emotion_group = card.data.extensions.mikugg.emotion_groups[0].id;
+              let voiceId = card.data.extensions.mikugg.voices[0].id;
+              let backgroundId = card.data.extensions.mikugg.backgrounds[0].id;
+              if (card.data.extensions.mikugg.scenarios.length) {
+                voiceId = card.data.extensions.mikugg.scenarios[0].voice;
+                backgroundId = card.data.extensions.mikugg.scenarios[0].background;
+              }
+              // add new scenario
+              const newCard: MikuCard = {
+                ...card,
+                data: {
+                  ...card.data,
+                  extensions: {
+                    ...card.data.extensions,
+                    mikugg: {
+                      ...card.data.extensions.mikugg,
+                      scenarios: [
+                        ...card.data.extensions.mikugg.scenarios,
+                        {
+                          id: uuidv4(),
+                          name: `scenario-${scenarios.length + 1}`,
+                          context: '',
+                          trigger_action: '',
+                          trigger_suggestion_similarity: '',
+                          emotion_group,
+                          background: backgroundId,
+                          voice: voiceId,
+                          children_scenarios: [],
+                        }
+                      ]
+                    }
+                  }
+                }
+              };
+              setCard(newCard);
+              setSelectedScenarioIndex(scenarios.length);
+            } else {
+              setSelectedScenarioIndex(index)
+            }
+          }}
           selectedIndex={selectedScenarioIndex}
           isImageCarousel
           size="small"
@@ -226,7 +274,7 @@ const Step3Scenarios: React.FC = () => {
       <div className="step3Scenarios__preview">
         <BackgroundSelector scenarioId={scenarios[selectedScenarioIndex].id} />
         <EmotionsSelector scenarioId={scenarios[selectedScenarioIndex].id} />
-        <PreviewScenario card={card} scenarioId={scenarios[selectedScenarioIndex].id} />
+        <PreviewScenario card={card} scenarioId={scenarios[selectedScenarioIndex].id} fullWidth />
       </div>
       <div className="step3Scenarios__start-and-voice">
         <div>
@@ -291,11 +339,11 @@ const Step3Scenarios: React.FC = () => {
         <div className="step3Scenarios__scenario-text">
           <div>
             <Input
-              id="id"
-              name="id"
+              id="name"
+              name="name"
               placeHolder="school"
-              label="Scenario ID"
-              value={selectedScenario.id}
+              label="Scenario name"
+              value={selectedScenario.name}
               onChange={handleTextChange}
               maxLength={256}
             />
@@ -330,19 +378,69 @@ const Step3Scenarios: React.FC = () => {
             />
           </div>
         </div>
-        <div>
-          {/* selected scenario: make default */}
-          {/* selected scenario: children scenarios */}
-        </div>
-        <div>
-          <div>
-            {/* selected scenario: delete */}
-          </div>
-          <div>
-            {/* selected scenario: cancel edition (only if not new scenario) */}
-            {/* selected scenario: save */}
-          </div>
-        </div>
+        {
+          scenarios.length > 1 ? (
+            <div className="step3Scenarios__fields-for-multiple">
+              <div className="step3Scenarios__child-scenarios">
+                <TextHeading size="h3">Child scenarios</TextHeading>
+                <div className="step3Scenarios__child-scenarios-list">
+                  {scenarios.filter(_scenario => _scenario.id !== selectedScenario.id).map((_scenario) => {
+                    return (
+                      <div className="step3Scenarios__child-scenarios-item" key={_scenario.id}>
+                        <CheckBox
+                          label={_scenario.name}
+                          value={selectedScenario.children_scenarios.includes(_scenario.id) || selectedScenario.children_scenarios.length === 0}
+                          onChange={(event) => {
+                            const newCard = { ...card };
+                            const scenario = newCard.data.extensions.mikugg.scenarios.find(
+                              (scenario) => scenario.id === selectedScenario.id
+                            );
+                            if (!scenario) return;
+                            if (event.target.checked) {
+                              scenario.children_scenarios.push(_scenario.id);
+                              if (scenario.children_scenarios.length === scenarios.length - 1) {
+                                scenario.children_scenarios = [];
+                              }
+                            } else {
+                              if (scenario.children_scenarios.length === 0) {
+                                scenario.children_scenarios = scenarios.filter(_scenario => _scenario.id !== selectedScenario.id).map(_scenario => _scenario.id);
+                              }
+                              scenario.children_scenarios = scenario.children_scenarios.filter(
+                                (id) => id !== _scenario.id
+                              );
+                            }
+                            setCard(newCard);
+                          }}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+              <div className="step3Scenarios__delete">
+                <Button theme="primary" onClick={() => {
+                  const newCard = { ...card };
+                  newCard.data.extensions.mikugg.scenarios = newCard.data.extensions.mikugg.scenarios.filter(
+                    (scenario) => scenario.id !== selectedScenario.id
+                  );
+                  if (
+                    newCard.data.extensions.mikugg.start_scenario === selectedScenario.id
+                  ) {
+                    newCard.data.extensions.mikugg.start_scenario = newCard.data.extensions.mikugg.scenarios[0].id;
+                  }
+                  newCard.data.extensions.mikugg.scenarios.forEach((scenario) => {
+                    scenario.children_scenarios = scenario.children_scenarios.filter(
+                      (id) => id !== selectedScenario.id
+                    );
+                  });
+                  setCard(newCard);
+                }}>
+                  Delete scenario
+                </Button>
+              </div>
+            </div>
+          ) : null
+        }
       </div>
     </Container>
   );

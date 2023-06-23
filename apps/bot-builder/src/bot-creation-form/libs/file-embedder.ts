@@ -1,6 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
 import base64 from 'base-64';
-import { EmotionGroup } from './CharacterData';
 
 const sentenceEmbedderAPIEndpoint = import.meta.env.PROD ? 'https://sentence-embedder.apis.miku.gg' : 'http://localhost:8600';
 
@@ -55,8 +54,4 @@ export async function itemsEmbedder(items: {id: string, text: string}[]): Promis
     console.error('An error occurred:', error);
     return '';
   }
-}
-
-export async function emotionGroupsEmbedder(groups: EmotionGroup[]): Promise<string> {
-  return itemsEmbedder(groups.map(group => ({id: group.name, text: group.description})))
 }

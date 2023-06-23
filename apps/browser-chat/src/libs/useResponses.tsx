@@ -7,7 +7,6 @@ import { BotConfig } from "@mikugg/bot-validator";
 
 const playAudio = (base64: string): void => {
   const snd = new Audio(base64);
-  snd.playbackRate = 1.25;
   snd.play();
 };
 

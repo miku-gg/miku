@@ -1,17 +1,14 @@
 @import "./variables";
 
-.step3Expressions {
-  width: 100%;
-  max-width: 852px;
-  max-height: 65vh;
+.step2Assets {
 
   h2 {
     color: #fffef9;
     margin-bottom: 1rem;
   }
 
-  .step3Expressions__group {
-    .step3Expressions__groupHeader {
+  .step2Assets__group {
+    .step2Assets__groupHeader {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -21,7 +18,7 @@
         margin: 0;
       }
 
-      .step3Expressions__removeGroupButton {
+      .step2Assets__removeGroupButton {
         width: 1rem;
         height: 1rem;
         display: flex;
@@ -35,7 +32,7 @@
     }
   }
 
-  .step3Expressions__formGroup {
+  .step2Assets__formGroup {
     margin-bottom: 1rem;
 
     &__textarea {
@@ -56,12 +53,12 @@
     }
   }
 
-  .step3Expressions__controls {
+  .step2Assets__controls {
     display: flex;
     justify-content: space-between;
   }
 
-  .step3Expressions__emotions {
+  .step2Assets__emotions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.875rem;
@@ -71,7 +68,7 @@
     border-radius: 1rem;
   }
 
-  .step3Expressions__emotion {
+  .step2Assets__emotion {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -84,7 +81,7 @@
       margin-bottom: 5px;
     }
 
-    .step3Expressions__emotionPreview {
+    .step2Assets__emotionPreview {
       width: 128px;
       height: 128px;
       object-fit: contain;
@@ -97,18 +94,18 @@
     }
   }
 
-  .step3Expressions__emotionDropzone {
+  .step2Assets__emotionDropzone {
     border: 1px dashed #ccc;
     padding: 10px;
     cursor: pointer;
     position: relative;
   }
 
-  .step3Expressions__emotionDropzone.drag-over {
+  .step2Assets__emotionDropzone.drag-over {
     border-color: #333;
   }
 
-  .step3Expressions__emotionPreview {
+  .step2Assets__emotionPreview {
     max-width: 100%;
   }
 }

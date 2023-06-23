@@ -6,17 +6,19 @@ import {
 } from "./CharacterCreationFormContext";
 
 import { Button, TextHeading } from "@mikugg/ui-kit";
+import { MikuCard } from "@mikugg/bot-validator";
 
 import { validateStep } from "./libs/CharacterData";
 import { BUILDING_STEPS, downloadBotFile } from "./libs/bot-file-builder";
 import { downloadBlob } from "./libs/file-download";
 
 import Modal from "./Modal";
-import Step1Description from "./Step1Description";
-// import Step2ModelAndVoice from "./Step2ModelAndVoice";
-// import Step3Expressions from "./Step3Expressions";
-// import Step4Preview from "./Step4Preview";
 import TopBar from "./TopBar";
+
+import Step1Description from "./Step1Description";
+import Step3Scenarios from "./Step3Scenarios";
+import Step2Assets from "./Step2Assets";
+import Step4Preview from "./Step4Preview";
 
 import backIcon from "./assets/backArrow.svg";
 import loadIcon from "./assets/load.svg";
@@ -24,9 +26,6 @@ import nextIcon from "./assets/nextArrow.svg";
 import saveIcon from "./assets/save.svg";
 
 import "./styles/main.scss";
-import { MikuCard } from "@mikugg/bot-validator";
-import Step3Scenarios from "./Step3Scenarios";
-import Step2Assets from "./Step2Assets";
 
 const save = (card: MikuCard) => {
   const cardJSON = JSON.stringify(card, null, 2);
@@ -104,7 +103,7 @@ const _CharacterCreationForm: React.FC = () => {
         {currentStep === 1 && <Step1Description />}
         {currentStep === 2 && <Step2Assets />}
         {currentStep === 3 && <Step3Scenarios />}
-        {/*currentStep === 4 && <Step4Preview />} */}
+        {currentStep === 4 && <Step4Preview />}
       </div>
       <div className="characterCreationForm__buttonsContainer">
         <div>
@@ -130,7 +129,7 @@ const _CharacterCreationForm: React.FC = () => {
           )}
           {currentStep === 4 ? (
             <Button theme="gradient" onClick={handleBuildBot}>
-              Built character
+              Build character
             </Button>
           ) : (
             <Button

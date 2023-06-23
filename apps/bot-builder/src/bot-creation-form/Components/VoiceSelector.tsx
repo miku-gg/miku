@@ -11,7 +11,7 @@ interface Voice {
   training_sample?: string
 }
 
-function getVoiceId(voice: {
+export function getVoiceId(voice: {
   provider: string
   provider_voice_id: string
   provider_emotion?: string

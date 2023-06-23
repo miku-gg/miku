@@ -118,12 +118,10 @@ export const validateStep = (step: number, mikuCard: MikuCard) => {
     case 2:
       return validationErrors.filter(
         (error) =>
-          error.field === "backgroundImages"
+          error.field === "backgroundImages" ||
+          error.field.startsWith("emotionGroups")
       );
     case 3:
-      return validationErrors.filter(
-        (error) => error.field.startsWith("emotionGroups")
-      );
     default:
       return [];
   }

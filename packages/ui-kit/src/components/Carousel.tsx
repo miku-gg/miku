@@ -5,15 +5,21 @@ import { ArrowIcon } from '../assets/svg';
 import './Carousel.scss';
 
 interface CarouselProps {
-  items: string[];
+  items: {
+    background?: string;
+    contentImage?: string;
+    title?: string;
+  }[];
   className?: string;
   isImageCarousel?: boolean;
-  onClick: (index: number) => void;
+  onClick: (index: number, arrowClick?: boolean) => void;
   selectedIndex: number;
+  size?: 'small' | 'medium' | 'large';
 }
 
 const Carousel: React.FC<CarouselProps> = ({
   items,
+  size,
   className = '',
   isImageCarousel,
   onClick,
@@ -44,12 +50,14 @@ const Carousel: React.FC<CarouselProps> = ({
     }
   }, [selectedIndex]);
 
+  const modifierSizeClass = size ? `Carousel--${size}` : '';
+
   return (
-    <div className={`Carousel ${className}`}>
+    <div className={`Carousel ${modifierSizeClass} ${className}`}>
       <button
         className="Carousel__leftScrollButton"
         onClick={() =>
-          onClick(selectedIndex === FIRST_INDEX ? lastIndex : selectedIndex - 1)
+          onClick(selectedIndex === FIRST_INDEX ? lastIndex : selectedIndex - 1, true)
         }
       >
         <ArrowIcon />
@@ -65,26 +73,33 @@ const Carousel: React.FC<CarouselProps> = ({
             className={`Carousel__item ${
               index === selectedIndex ? 'selectedItem' : ''
             }`}
-            key={`Carousel-item-${item}`}
-            onClick={() => onClick(index)}
+            key={`Carousel-item-${item.title}-index-${index}`}
+            onClick={() => onClick(index, false)}
           >
             {isImageCarousel ? (
               <div
-                style={{ backgroundImage: `url(${item})` }}
+                style={{ backgroundImage: `url(${item.background})` }}
                 className={`Carousel__image ${
                   index === selectedIndex ? 'selectedImage' : ''
                 }`}
-              />
-            ) : (
-              item
-            )}
+              >
+                {item.contentImage && (
+                  <img
+                    src={item.contentImage}
+                    alt={item.title}
+                    className="Carousel__imageContent"
+                  />
+                )}
+              </div>
+            ) : null}
+            {item.title}
           </button>
         ))}
       </div>
       <button
         className="Carousel__rightScrollButton"
         onClick={() =>
-          onClick(selectedIndex === lastIndex ? FIRST_INDEX : selectedIndex + 1)
+          onClick(selectedIndex === lastIndex ? FIRST_INDEX : selectedIndex + 1, true)
         }
       >
         <ArrowIcon />

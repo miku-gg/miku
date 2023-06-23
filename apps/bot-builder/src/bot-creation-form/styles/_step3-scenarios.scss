@@ -92,4 +92,41 @@
       }
     }
   }
+
+  &__child-scenarios {
+
+    &-list {
+      display: flex;
+      flex-wrap: wrap;
+      overflow: scroll;
+      // height: 3rem;
+      justify-content: flex-start;
+      gap: 1rem;
+      margin-top: 1rem;
+      width: 100%;
+      align-items: flex-start;
+      background-color: $background-1;
+      padding: 1rem;
+      border-radius: 1rem;
+    }
+
+    &-item {
+      display: inline-flex;
+      flex: 1;
+    }
+  }
+
+  &__delete {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
+  &__fields-for-multiple {
+    // display: flex;
+    // justify-content: space-between;
+    // align-items: flex-end;
+    margin-top: 1rem;
+    // gap: 1rem;
+  }
 }

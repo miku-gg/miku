@@ -63,6 +63,7 @@ export type MikuCard = TavernCardV2 & {
         start_scenario: string // id of the first scenario
         scenarios: { // scenarios of the bot conversation
           id: string // id of the scenario
+          name: string; // name of the scenario, only of labels in editor
           children_scenarios: string[] // ids of the scenarios that can be triggered from this scenario
           context: string // value to be inserted in the prompt when the scenario is triggered
           trigger_suggestion_similarity: string // keywords that can trigger this scenario, NOT in prompt

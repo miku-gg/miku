@@ -6,12 +6,13 @@ import './ImageSlider.scss';
 
 interface ImageSliderProps {
   images: {
-    sources: string[];
+    source: string;
     label: string;
     fileTypes?: string | undefined;
   }[];
   backgroundImageSource: string;
   selectedIndex: number;
+  fullWidth?: boolean;
   onChange: (index: number) => void;
 }
 
@@ -19,12 +20,20 @@ const ImageSlider = ({
   images,
   backgroundImageSource,
   selectedIndex,
+  fullWidth,
   onChange,
 }: ImageSliderProps) => {
   const selectedImage = images[selectedIndex];
 
   return (
-    <div className="ImageSlider">
+    <div
+      className="ImageSlider"
+      style={
+        fullWidth
+          ? { backgroundImage: `url(${backgroundImageSource})` }
+          : undefined
+      }
+    >
       <div className="ImageSlider__container">
         <button
           className="ImageSlider__prevButton"
@@ -35,11 +44,15 @@ const ImageSlider = ({
 
         <div
           className="ImageSlider__backgroundImage"
-          style={{ backgroundImage: `url(${backgroundImageSource})` }}
+          style={
+            !fullWidth
+              ? { backgroundImage: `url(${backgroundImageSource})` }
+              : undefined
+          }
         >
           <img
             className="ImageSlider__selectedImage"
-            src={selectedImage.sources[0]}
+            src={selectedImage.source}
             alt={`img:${selectedImage.label}`}
           />
         </div>

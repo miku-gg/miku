@@ -58,6 +58,8 @@
   &__list {
     font-style: normal;
     color: $node-conector-color;
+    max-height: 150px;
+    overflow-y: auto;
 
     width: 100%;
     position: absolute;

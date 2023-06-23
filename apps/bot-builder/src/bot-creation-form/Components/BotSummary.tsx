@@ -1,5 +1,5 @@
 import "./BotSummary.scss";
-import ModelTag, { ValidServices } from "./ModelTag";
+import { ValidServices } from "./ModelTag";
 
 interface BotSummaryProps {
   image: string;
@@ -15,11 +15,6 @@ const BotSummary = ({ image, title, description, tags }: BotSummaryProps) => {
       <div className="SummaryInfo__InfoContainer">
         <h1 className="SummaryInfo__Title">{title}</h1>
         <div className="SummaryInfo__Description scrollbar">{description}</div>
-        <div className="SummaryInfo__TagContainer">
-          {tags.map((model) => {
-            return <ModelTag key={model} modelName={model} />;
-          })}
-        </div>
       </div>
     </div>
   );

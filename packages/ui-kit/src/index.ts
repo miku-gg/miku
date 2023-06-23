@@ -11,6 +11,7 @@ import Input from './components/Input';
 import Steps from './components/Steps';
 import Tag from './components/Tag';
 import TextHeading from './components/TextHeading';
+import CheckBox from './components/CheckBox';
 
 export {
   Accordion,
@@ -26,4 +27,5 @@ export {
   Tag,
   TextHeading,
   Dropdown,
+  CheckBox,
 };
