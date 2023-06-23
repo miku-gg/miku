@@ -8,7 +8,7 @@ export const validModels = [
 ] as const;
 export type Model = (typeof validModels)[number];
 
-export const models: Record<
+export type ModelCatalog = Record<
   Model,
   {
     label: string;
@@ -16,7 +16,9 @@ export const models: Record<
     color: Colors;
     description: string;
   }
-> = {
+>;
+
+export const models: ModelCatalog = {
   "llama-30b": {
     label: "LLaMA",
     price: "normal",

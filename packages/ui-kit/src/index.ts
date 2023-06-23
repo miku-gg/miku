@@ -5,6 +5,7 @@ import Button from './components/Button';
 import Carousel from './components/Carousel';
 import Container from './components/Container';
 import DragAndDropImages from './components/DragAndDropImages';
+import Dropdown from './components/Dropdown';
 import ImageSlider from './components/ImageSlider';
 import Input from './components/Input';
 import Steps from './components/Steps';
@@ -24,4 +25,5 @@ export {
   Steps,
   Tag,
   TextHeading,
+  Dropdown,
 };

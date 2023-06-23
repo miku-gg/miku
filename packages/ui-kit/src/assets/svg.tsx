@@ -75,3 +75,19 @@ export const UploadIcon = () => {
     </svg>
   );
 };
+export const DownArrow = () => {
+  return (
+    <svg
+      width="10"
+      height="7"
+      viewBox="0 0 10 7"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5 6.5L0.669873 0.5L9.33013 0.500001L5 6.5Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};

@@ -22,14 +22,16 @@ export type Voice = (typeof validVoices)[number];
 export const validServices = ["elevenlabs_tts", "azure_tts"] as const;
 export type ValidVoiceServices = (typeof validServices)[number];
 
-export const voices: Record<
+export type VoiceCatalog = Record<
   Voice,
   {
     label: string;
     price: "cheap" | "normal" | "expensive";
     service: ValidVoiceServices;
   }
-> = {
+>;
+
+export const voices: VoiceCatalog = {
   "azure_tts.en-GB-SoniaNeural": {
     label: "Sonia (Azure)",
     price: "cheap",

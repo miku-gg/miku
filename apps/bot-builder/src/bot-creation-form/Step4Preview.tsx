@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 
-import { Carousel, Container, ImageSlider, TextHeading } from "@mikugg/ui-kit";
+import {
+  Carousel,
+  Container,
+  Dropdown,
+  ImageSlider,
+  TextHeading,
+} from "@mikugg/ui-kit";
+
 import { useCharacterCreationForm } from "./CharacterCreationFormContext";
 import BotSummary from "./Components/BotSummary";
 
@@ -9,13 +16,11 @@ const Step4Preview: React.FC = () => {
   const [selectedBackgroundIndex, setSelectedBackgroundIndex] = useState(0);
   const [selectedEmotionGroupIndex, setSelectedEmotionGroupIndex] = useState(0);
   const [selectedEmotionIndex, setSelectedEmotionIndex] = useState(0);
+  const [expandedEmotionGroupsDropdown, setExpandedEmotionGroupsDropdown] =
+    useState(false);
 
-  const handleEmotionGroupChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setSelectedEmotionGroupIndex(
-      (event.target.value as unknown as number) || 0
-    );
+  const handleDropdownChange = (selectedIndex: number) => {
+    setSelectedEmotionGroupIndex(selectedIndex);
     setSelectedEmotionIndex(0);
   };
 
@@ -66,16 +71,22 @@ const Step4Preview: React.FC = () => {
           description={characterData.scenario}
           tags={[characterData.model, characterData.voice]}
         />
-        <select
-          className="step4Preview__emotionGroupSelect"
-          onChange={handleEmotionGroupChange}
-        >
-          {characterData.emotionGroups.map((emotionGroup, index) => (
-            <option key={index} value={index}>
-              {emotionGroup.name}
-            </option>
-          ))}
-        </select>
+        <div className="step4Preview__emotionList">
+          <TextHeading className="step4Preview__emotionList__label" size="h3">
+            Emotion Group
+          </TextHeading>
+          <Dropdown
+            className="step4Preview__emotionList__dropdown"
+            items={characterData.emotionGroups.map((emotionGroup) => ({
+              ...emotionGroup,
+              description: undefined,
+            }))}
+            onChange={(selectedIndex) => handleDropdownChange(selectedIndex)}
+            selectedIndex={selectedEmotionGroupIndex}
+            expanded={expandedEmotionGroupsDropdown}
+            onToggle={setExpandedEmotionGroupsDropdown}
+          />
+        </div>
         {renderEmotionPreview()}
         <div className="step4Preview__preview">
           <Carousel
