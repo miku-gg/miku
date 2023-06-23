@@ -69,7 +69,22 @@
     }
   }
 
-  &__emotionCarousel {
+  &__emotionList {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &__label {
+      flex: 1;
+    }
+
+    &__dropdown {
+      flex: 6;
+    }
+  }
+
+  div &__emotionCarousel {
     margin: 0 auto;
     width: 70%;
   }

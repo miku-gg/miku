@@ -1,23 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { useCharacterCreationForm } from "./CharacterCreationFormContext";
 
-import { EmotionGroup, emotionHashConfigs } from "./libs/CharacterData";
-import { checkImageDimensionsAndType } from "./libs/utils";
-
 import {
+  Accordion,
+  AccordionItem,
   Button,
   Container,
   DragAndDropImages,
+  Dropdown,
   Input,
   TextHeading,
 } from "@mikugg/ui-kit";
-
-const closeIconBase64 =
-  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTciIHZpZXdCb3g9IjAgMCAxNiAxNyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeT0iMC41IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHJ4PSI4IiBmaWxsPSIjRkFGQUZBIi8+CjxyZWN0IHg9IjQiIHk9IjcuNSIgd2lkdGg9IjgiIGhlaWdodD0iMiIgZmlsbD0iIzFCMjE0MiIvPgo8L3N2Zz4K";
+import { EmotionGroup, emotionHashConfigs } from "./libs/CharacterData";
+import { checkImageDimensionsAndType } from "./libs/utils";
 
 const Step3Expressions: React.FC = () => {
   const { characterData, setCharacterData } = useCharacterCreationForm();
+  const [selectedItemByIndex, setSelectedItemByIndex] = useState<number>(0);
+  const [expandedEmotionSetDropdown, setExpandedEmotionSetDropdown] =
+    useState(false);
 
   const handleAddGroup = () => {
     const newGroup: EmotionGroup = {
@@ -41,6 +43,29 @@ const Step3Expressions: React.FC = () => {
     }
   };
 
+  const handleDropdownChange = (selectedIndex: number, groupIndex: number) => {
+    const selectedHashItem = emotionHashConfigs[selectedIndex].hash;
+
+    if (characterData.emotionGroups) {
+      const newGroups = [...characterData.emotionGroups];
+
+      newGroups[groupIndex] = {
+        ...newGroups[groupIndex],
+        emotionsHash: selectedHashItem,
+        images: [],
+      };
+
+      setCharacterData({ ...characterData, emotionGroups: newGroups });
+    }
+  };
+
+  const getDropdownEmotionSetIndex = (groupIndex: number) => {
+    return emotionHashConfigs.findIndex(
+      ({ hash }) =>
+        hash === characterData.emotionGroups[groupIndex].emotionsHash
+    );
+  };
+
   const handleInputChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -50,10 +75,10 @@ const Step3Expressions: React.FC = () => {
     const { name, value } = event.target;
     if (characterData.emotionGroups) {
       const newGroups = [...characterData.emotionGroups];
-      newGroups[groupIndex] = { ...newGroups[groupIndex], [name]: value };
-      if (name === "emotionsHash") {
-        newGroups[groupIndex].images = [];
-      }
+      newGroups[groupIndex] = {
+        ...newGroups[groupIndex],
+        [name]: value,
+      };
       setCharacterData({ ...characterData, emotionGroups: newGroups });
     }
   };
@@ -153,18 +178,11 @@ const Step3Expressions: React.FC = () => {
       };
 
       return (
-        <div key={`group_${groupIndex}`} className="step3Expressions__group">
-          <div className="step3Expressions__groupHeader">
-            <h3>Emotion Group {groupIndex + 1}</h3>
-            <button
-              type="button"
-              className="step3Expressions__removeGroupButton"
-              onClick={() => handleRemoveGroup(groupIndex)}
-            >
-              <img src={closeIconBase64} />
-            </button>
-          </div>
-
+        <AccordionItem
+          title={`Emotion Group ${groupIndex + 1}`}
+          key={`group_${groupIndex}`}
+          className="step3Expressions__group"
+        >
           <div className="step3Expressions__formGroup">
             <Input
               label="Name:"
@@ -213,24 +231,18 @@ const Step3Expressions: React.FC = () => {
             <label htmlFor={`group_${groupIndex}_emotionsHash`}>
               Emotion Set:
             </label>
-            <select
-              id={`group_${groupIndex}_emotionsHash`}
-              name="emotionsHash"
-              value={group.emotionsHash}
-              onChange={(event) => handleInputChange(event, groupIndex)}
-            >
-              <option value="">Select Emotion Set</option>
-              {emotionHashConfigs.map((config) => (
-                <option key={config.hash} value={config.hash}>
-                  {config.name}
-                </option>
-              ))}
-            </select>
+            <Dropdown
+              items={emotionHashConfigs}
+              onChange={(index) => handleDropdownChange(index, groupIndex)}
+              expanded={expandedEmotionSetDropdown}
+              onToggle={setExpandedEmotionSetDropdown}
+              selectedIndex={getDropdownEmotionSetIndex(groupIndex)}
+            />
           </div>
           <div className="step3Expressions__emotions">
             {renderEmotionImages()}
           </div>
-        </div>
+        </AccordionItem>
       );
     });
   };
@@ -238,7 +250,13 @@ const Step3Expressions: React.FC = () => {
   return (
     <Container className="step3Expressions">
       <TextHeading size="h2">Step 3: Emotion Groups</TextHeading>
-      {renderEmotionGroups()}
+      <Accordion
+        selectedIndex={selectedItemByIndex}
+        onChange={(index) => setSelectedItemByIndex(index)}
+        onRemoveItem={(index) => handleRemoveGroup(index)}
+      >
+        {renderEmotionGroups()}
+      </Accordion>
       <Button theme="gradient" onClick={handleAddGroup}>
         + Add Emotion Group
       </Button>

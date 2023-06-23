@@ -1,60 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+
+import { DownArrow } from '../assets/svg';
+
 import './Dropdown.scss';
 
 interface Item {
-  name: string;
-  description?: string;
   content?: React.ReactNode;
+  description?: string;
+  name: string;
 }
 
 interface DropdownProps {
-  items: Item[];
-  selectedIndex?: number;
-  onChange?: (index: number) => void;
-  expanded?: boolean;
-  onToggle?: (expanded: boolean) => void;
+  className?: string;
+  expanded: boolean;
   flavor?: 'default' | 'white';
+  items: Item[];
+  onChange: (index: number) => void;
+  onToggle: (expanded: boolean) => void;
   placeholder?: string;
+  selectedIndex: number;
 }
 
-export const Dropdown = ({
-  items,
-  selectedIndex: selectedIndexProp = -1,
-  onChange,
-  expanded: expandedProp = false,
-  onToggle,
+const Dropdown = ({
+  className = '',
+  expanded = false,
   flavor = 'default',
+  items,
+  onChange,
+  onToggle,
   placeholder = 'Select an item...',
+  selectedIndex = -1,
 }: DropdownProps) => {
-  const [selectedIndex, setSelectedIndex] = useState(selectedIndexProp);
-  const [expanded, setExpanded] = useState(expandedProp);
-
-  useEffect(() => {
-    if (selectedIndexProp !== -1) {
-      setSelectedIndex(selectedIndexProp);
-    }
-  }, [selectedIndexProp]);
-
   const handleItemClick = (newSelectedIndex: number) => {
-    setSelectedIndex(newSelectedIndex);
-
     onChange && onChange(newSelectedIndex);
-
-    setExpanded(false);
-
     onToggle && onToggle(false);
   };
 
   const handleToggleClick = () => {
-    setExpanded(!expanded);
-
     onToggle && onToggle(!expanded);
   };
 
   const selectedItem = items[selectedIndex];
 
   return (
-    <div className={`dropdown flavor-${flavor}`}>
+    <div tabIndex={0} className={`dropdown flavor-${flavor} ${className}`}>
       <div
         className="dropdown__selected"
         onClick={handleToggleClick}
@@ -73,6 +62,7 @@ export const Dropdown = ({
         ) : (
           <div className="dropdown__selected-placeholder">{placeholder}</div>
         )}
+        <DownArrow />
       </div>
       {expanded && (
         <div className="dropdown__list" role="listbox">
@@ -80,7 +70,7 @@ export const Dropdown = ({
             <div
               key={index}
               className={`dropdown__list-item${
-                index === selectedIndex ? '--selected' : ''
+                index === selectedIndex ? '-selected' : ''
               }`}
               onClick={() => handleItemClick(index)}
               role="option"
@@ -99,3 +89,5 @@ export const Dropdown = ({
     </div>
   );
 };
+
+export default Dropdown;
