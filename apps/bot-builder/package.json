@@ -45,7 +45,7 @@
     "@mikugg/bot-validator": "^0.5.0",
     "@mikugg/core": "^0.5.0",
     "@mikugg/extensions": "^0.5.0",
-    "@mikugg/ui-kit": "^0.5.0",
+    "@mikugg/ui-kit": "^0.5.1",
     "@types/axios": "^0.14.0",
     "@types/base-64": "^1.0.0",
     "@types/prop-types": "^15.7.5",

@@ -1,3 +1,5 @@
+@import '../variables';
+
 .dropdown {
   position: relative;
   width: 100%;
@@ -6,7 +8,7 @@
   justify-content: space-between;
   align-items: center;
 
-  font-family: 'Product Sans';
+  font-family: 'Poppins', Arial, sans-serif;
   font-style: normal;
   font-weight: 400;
   user-select: none;
@@ -14,8 +16,9 @@
   font-size: 14px;
   line-height: 17px;
 
-  border: 1px solid #6c7293;
+  border: 1px solid $node-conector-color;
   border-radius: 8px;
+  margin: 0.5rem 0;
 
   color: #fafafa;
   cursor: pointer;
@@ -24,6 +27,10 @@
     width: 100%;
     padding: 10px;
     text-align: left;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     &-placeholder {
       color: #999;
@@ -37,12 +44,20 @@
       font-size: 12px;
       color: #666;
     }
+
+    & svg {
+      color: $node-conector-color;
+    }
+  }
+
+  &:focus-within {
+    border: 1px solid $secondary-color;
+    box-shadow: 0 0 10px $secondary-color;
   }
 
   &__list {
-    font-family: 'Poppins', Arial, sans-serif;
     font-style: normal;
-    color: #6c7293;
+    color: $node-conector-color;
 
     width: 100%;
     position: absolute;
@@ -55,20 +70,19 @@
     left: 0;
     z-index: 1;
 
-    border-radius: 16px;
-    padding: 24px;
-    gap: 8px;
+    border-radius: 0.5rem;
     margin-top: 10px;
 
     background-color: #1b2142;
-    border: 1px solid #6c7293;
+    border: 1px solid $node-conector-color;
 
     &-item {
       width: 100%;
-      transition: background-color 0.2s ease-in-out;
+      padding: 0.5rem 1rem;
 
       &:hover {
         color: #fafafa;
+        background-color: $secondary-color;
       }
 
       &-name {
@@ -81,8 +95,23 @@
         color: #b9b7b7;
       }
 
-      &--selected {
+      &-selected {
         color: #fafafa;
+        width: 100%;
+        padding: 0.5rem 1rem;
+        background-color: $secondary-color;
+      }
+
+      &:first-child:hover,
+      &-selected:first-child {
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+      }
+
+      &:last-child:hover,
+      &-selected:last-child {
+        border-bottom-left-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
       }
     }
   }

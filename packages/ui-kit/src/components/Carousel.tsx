@@ -5,7 +5,7 @@ import { ArrowIcon } from '../assets/svg';
 import './Carousel.scss';
 
 interface CarouselProps {
-  children: string[];
+  items: string[];
   className?: string;
   isImageCarousel?: boolean;
   onClick: (index: number) => void;
@@ -13,7 +13,7 @@ interface CarouselProps {
 }
 
 const Carousel: React.FC<CarouselProps> = ({
-  children,
+  items,
   className = '',
   isImageCarousel,
   onClick,
@@ -22,7 +22,7 @@ const Carousel: React.FC<CarouselProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const prevSelectedIndexRef = useRef<number>(selectedIndex);
 
-  const lastIndex: number = children.length - 1;
+  const lastIndex: number = items.length - 1;
   const FIRST_INDEX: number = 0;
 
   useEffect(() => {
@@ -54,8 +54,13 @@ const Carousel: React.FC<CarouselProps> = ({
       >
         <ArrowIcon />
       </button>
-      <div className="Carousel__itemContainer" ref={containerRef}>
-        {children.map((item, index) => (
+      <div
+        className={`Carousel__itemContainer ${
+          isImageCarousel ? 'imageContainer' : ''
+        }`}
+        ref={containerRef}
+      >
+        {items.map((item, index) => (
           <button
             className={`Carousel__item ${
               index === selectedIndex ? 'selectedItem' : ''
@@ -64,10 +69,11 @@ const Carousel: React.FC<CarouselProps> = ({
             onClick={() => onClick(index)}
           >
             {isImageCarousel ? (
-              <img
-                alt={`Carousel image ${index + 1}`}
-                src={item}
-                className="Carousel__image"
+              <div
+                style={{ backgroundImage: `url(${item})` }}
+                className={`Carousel__image ${
+                  index === selectedIndex ? 'selectedImage' : ''
+                }`}
               />
             ) : (
               item
