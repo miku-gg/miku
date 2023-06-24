@@ -92,7 +92,9 @@ const _CharacterCreationForm: React.FC = () => {
           <Button theme="transparent" onClick={handleSave} iconSRC={saveIcon}>
             Save
           </Button>
-          <BotImport />
+          {
+            currentStep === 1 && <BotImport />
+          }
         </div>
         <div className="characterCreationForm__navigationButtons">
           {currentStep > 1 && (

@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { BotConfig, BotConfigV1, BotConfigV2, MikuCard, TavernCardV2, validateMikuCard } from '@mikugg/bot-validator';
+import { BotConfig, BotConfigV1, BotConfigV2, MikuCard, TavernCardV2 } from '@mikugg/bot-validator';
 import * as MikuExtensions from '@mikugg/extensions';
 import { Button, Tooltip } from '@mikugg/ui-kit';
 import extract from 'png-chunks-extract'

@@ -11,7 +11,7 @@ import { PreviewScenario } from "./Step3Scenarios";
 
 const Step4Preview: React.FC = () => {
   const { card } = useCharacterCreationForm();
-
+  
   return (
     <Container className="voiceServicesColorMap
     step4Preview">
@@ -22,6 +22,7 @@ const Step4Preview: React.FC = () => {
           title={card.data.name}
           description={card.data.extensions.mikugg.short_description}
           tags={[]}
+          bytes={JSON.stringify(card).length}
         />
         <PreviewScenario card={card} scenarioId={card.data.extensions.mikugg.scenarios[0].id} />
       </div>
