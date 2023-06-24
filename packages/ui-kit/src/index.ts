@@ -1,6 +1,7 @@
 import Accordion from './components/Accordion';
 import AccordionItem from './components/AccordionItem';
 import AreYouSure from './components/AreYouSure';
+import Modal from './components/Modal';
 import Button from './components/Button';
 import Carousel from './components/Carousel';
 import Container from './components/Container';
@@ -12,11 +13,14 @@ import Steps from './components/Steps';
 import Tag from './components/Tag';
 import TextHeading from './components/TextHeading';
 import CheckBox from './components/CheckBox';
+import Tooltip from './components/Tooltip';
 
 export {
   Accordion,
   AccordionItem,
   AreYouSure,
+  Modal,
+  Tooltip,
   Button,
   Carousel,
   Container,

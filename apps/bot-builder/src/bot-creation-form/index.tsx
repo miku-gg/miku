@@ -9,7 +9,7 @@ import { Button, TextHeading } from "@mikugg/ui-kit";
 import { MikuCard } from "@mikugg/bot-validator";
 
 import { validateStep } from "./libs/CharacterData";
-import { BUILDING_STEPS, downloadBotFile } from "./libs/bot-file-builder";
+import { BUILDING_STEPS } from "./libs/bot-file-builder";
 import { downloadBlob } from "./libs/file-download";
 
 import Modal from "./Modal";
@@ -21,17 +21,17 @@ import Step2Assets from "./Step2Assets";
 import Step4Preview from "./Step4Preview";
 
 import backIcon from "./assets/backArrow.svg";
-import loadIcon from "./assets/load.svg";
 import nextIcon from "./assets/nextArrow.svg";
 import saveIcon from "./assets/save.svg";
 
 import "./styles/main.scss";
 import { downloadPng } from "./libs/encodePNG";
+import BotImport from "./Components/BotImport";
 
 const save = (card: MikuCard) => {
   const cardJSON = JSON.stringify(card, null, 2);
   const blob = new Blob([cardJSON], { type: "application/json" });
-  downloadBlob(blob, `character_${card.data.name}.json`);
+  downloadBlob(blob, `${card.data.name}.miku-temp.json`);
 };
 
 const _CharacterCreationForm: React.FC = () => {
@@ -63,26 +63,6 @@ const _CharacterCreationForm: React.FC = () => {
     save(card);
   };
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileLoad = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const loadedData = JSON.parse(
-          e.target?.result as string
-        ) as MikuCard;
-        setCard(loadedData);
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  const load = () => {
-    fileInputRef.current?.click();
-  };
-
   const handleBuildBot = async () => {
     // await downloadBotFile(card, setBuildingStep);
     await downloadPng(JSON.stringify(card), card.data.extensions.mikugg.profile_pic, card.data.name);
@@ -112,17 +92,8 @@ const _CharacterCreationForm: React.FC = () => {
           <Button theme="transparent" onClick={handleSave} iconSRC={saveIcon}>
             Save
           </Button>
-          <Button theme="transparent" onClick={load} iconSRC={loadIcon}>
-            Import
-          </Button>
+          <BotImport />
         </div>
-        <input
-          type="file"
-          accept="application/json"
-          style={{ display: "none" }}
-          ref={fileInputRef}
-          onChange={handleFileLoad}
-        />
         <div className="characterCreationForm__navigationButtons">
           {currentStep > 1 && (
             <Button iconSRC={backIcon} theme="transparent" onClick={handleBack}>

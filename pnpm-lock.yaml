@@ -79,9 +79,6 @@ importers:
       react:
         specifier: ^18.2.0
         version: 18.2.0
-      react-modal:
-        specifier: ^3.16.1
-        version: 3.16.1(react-dom@18.2.0)(react@18.2.0)
       remove:
         specifier: ^0.1.5
         version: 0.1.5
@@ -554,6 +551,15 @@ importers:
       '@bem-react/classnames':
         specifier: ^1.3.10
         version: 1.3.10
+      '@types/react-modal':
+        specifier: ^3.16.0
+        version: 3.16.0
+      react-modal:
+        specifier: ^3.16.1
+        version: 3.16.1(react-dom@18.2.0)(react@18.2.0)
+      react-tooltip:
+        specifier: ^5.15.0
+        version: 5.15.0(react-dom@18.2.0)(react@18.2.0)
       tslib:
         specifier: ^2.5.0
         version: 2.5.0
@@ -606,6 +612,9 @@ importers:
       rollup:
         specifier: ^3.20.2
         version: 3.20.2
+      rollup-plugin-import-css:
+        specifier: ^3.2.1
+        version: 3.2.1(rollup@3.20.2)
       rollup-plugin-peer-deps-external:
         specifier: ^2.2.4
         version: 2.2.4(rollup@3.20.2)
@@ -2704,6 +2713,16 @@ packages:
       '@ethersproject/logger': 5.7.0
       '@ethersproject/properties': 5.7.0
       '@ethersproject/strings': 5.7.0
+    dev: false
+
+  /@floating-ui/core@1.3.1:
+    resolution: {integrity: sha512-Bu+AMaXNjrpjh41znzHqaz3r2Nr8hHuHZT6V2LBKMhyMl0FgKA62PNYbqnfgmzOhoWZj70Zecisbo4H1rotP5g==}
+    dev: false
+
+  /@floating-ui/dom@1.4.2:
+    resolution: {integrity: sha512-VKmvHVatWnewmGGy+7Mdy4cTJX71Pli6v/Wjb5RQBuq5wjUYx+Ef+kRThi8qggZqDgD8CogCpqhRoVp3+yQk+g==}
+    dependencies:
+      '@floating-ui/core': 1.3.1
     dev: false
 
   /@gar/promisify@1.1.3:
@@ -4848,6 +4867,12 @@ packages:
 
   /@types/react-is@18.2.0:
     resolution: {integrity: sha512-1vz2yObaQkLL7YFe/pme2cpvDsCwI1WXIfL+5eLz0MI9gFG24Re16RzUsI8t9XZn9ZWvgLNDrJBmrqXJO7GNQQ==}
+    dependencies:
+      '@types/react': 18.0.26
+    dev: false
+
+  /@types/react-modal@3.16.0:
+    resolution: {integrity: sha512-iphdqXAyUfByLbxJn5j6d+yh93dbMgshqGP0IuBeaKbZXx0aO+OXsvEkt6QctRdxjeM9/bR+Gp3h9F9djVWTQQ==}
     dependencies:
       '@types/react': 18.0.26
     dev: false
@@ -11516,6 +11541,18 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
+  /react-tooltip@5.15.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-OiH870zteP4T5B/J7cUGz37aY8C0Cny/i1qcLXevL+wZlW09mfjdcQ6FKP9OMMsRlszRwieOqAPT9l8rWz+BtA==}
+    peerDependencies:
+      react: '>=16.14.0'
+      react-dom: '>=16.14.0'
+    dependencies:
+      '@floating-ui/dom': 1.4.2
+      classnames: 2.3.2
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /react-transition-group@4.4.5(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
     peerDependencies:
@@ -11803,6 +11840,15 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
+    dev: true
+
+  /rollup-plugin-import-css@3.2.1(rollup@3.20.2):
+    resolution: {integrity: sha512-svr1JrBknT5ndEUM8nPaemTx/uF/5Tf4FAMQxvAYx2K9Sx7hL+JwB/rPuB1ZmUE1rjCnQHnz/fgik+noYM5+0w==}
+    peerDependencies:
+      rollup: ^2.x.x || ^3.x.x
+    dependencies:
+      '@rollup/pluginutils': 5.0.2(rollup@3.20.2)
+      rollup: 3.20.2
     dev: true
 
   /rollup-plugin-peer-deps-external@2.2.4(rollup@3.20.2):

@@ -177,6 +177,7 @@ const BackgroundsForm: React.FC = () => {
 
 interface EmotionGroup {
   id: string
+  name: string
   template: string
   emotions: {id: string, source: string[]}[]
 }
@@ -189,7 +190,8 @@ const EmotionsForm: React.FC = () => {
 
   const handleAddGroup = () => {
     const newGroup: EmotionGroup = {
-      id: '',
+      id: uuidv4(),
+      name: '',
       template: 'base-emotions',
       emotions: [],
     };
@@ -204,7 +206,7 @@ const EmotionsForm: React.FC = () => {
             emotion_groups: [...(card.data.extensions.mikugg?.emotion_groups || []), newGroup],
             scenarios: card.data.extensions.mikugg?.scenarios?.map(scenario => ({
               ...scenario,
-              emotion_groups: scenario.emotion_group || newGroup.id
+              emotion_group: scenario.emotion_group || newGroup.id
             }))
           }
         }
@@ -274,7 +276,7 @@ const EmotionsForm: React.FC = () => {
     );
   };
 
-  const handleEmotionGroupIdChange = (
+  const handleEmotionGroupNameChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >,
@@ -285,7 +287,7 @@ const EmotionsForm: React.FC = () => {
       const newGroups = [...card.data.extensions.mikugg.emotion_groups];
       newGroups[groupIndex] = {
         ...newGroups[groupIndex],
-        id: value,
+        name: value,
       };
 
       setCard({
@@ -421,9 +423,9 @@ const EmotionsForm: React.FC = () => {
               label="Name:"
               placeHolder="Enter a name for this emotion group"
               id={`group_${groupIndex}_name`}
-              name="id"
-              value={group.id}
-              onChange={(event) => handleEmotionGroupIdChange(event, groupIndex)}
+              name="name"
+              value={group.name}
+              onChange={(event) => handleEmotionGroupNameChange(event, groupIndex)}
             />
           </div>
           <div className="step2Assets__formGroup">

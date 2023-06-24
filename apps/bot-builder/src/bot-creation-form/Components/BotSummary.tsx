@@ -1,11 +1,10 @@
 import "./BotSummary.scss";
-import { ValidServices } from "./ModelTag";
 
 interface BotSummaryProps {
   image: string;
   title: string;
   description: string;
-  tags: ValidServices[];
+  tags: string[];
 }
 
 const BotSummary = ({ image, title, description, tags }: BotSummaryProps) => {

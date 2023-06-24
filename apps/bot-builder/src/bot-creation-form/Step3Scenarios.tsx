@@ -1,12 +1,11 @@
 // Step3Scenarios.tsx
 import React, { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { AreYouSure, Button, Carousel, CheckBox, Container, ImageSlider, Input, TextHeading } from "@mikugg/ui-kit";
+import { Modal, Button, Carousel, CheckBox, Container, ImageSlider, Input, TextHeading } from "@mikugg/ui-kit";
 import { useCharacterCreationForm } from "./CharacterCreationFormContext";
 import { MikuCard } from "@mikugg/bot-validator";
 import VoiceSelector from "./Components/VoiceSelector";
 import { BackgroundIcon, SlidesIcon } from "./assets/svg";
-import Modal from "./Components/Modal";
 
 const BackgroundSelector: React.FC<{scenarioId: string}> = ({ scenarioId }) => {
   const { card, setCard } = useCharacterCreationForm();
@@ -86,7 +85,7 @@ const EmotionsSelector: React.FC<{scenarioId: string}> = ({ scenarioId }) => {
             (emotion_group) => ({
               background,
               contentImage: emotion_group.emotions[0].source[0],
-              title: emotion_group.id,
+              title: emotion_group.name,
             })
           )}
           selectedIndex={

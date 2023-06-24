@@ -1,4 +1,6 @@
 import React from 'react';
+import Tooltip from './Tooltip';
+import { InfoIcon } from '../assets/svg';
 import './Input.scss';
 
 interface InputProps {
@@ -19,6 +21,7 @@ interface InputProps {
   onSubmit?: () => void;
   placeHolder?: string;
   value?: string;
+  description?: string;
 }
 
 const Input = ({
@@ -35,12 +38,30 @@ const Input = ({
   onSubmit,
   placeHolder,
   value,
+  description,
 }: InputProps) => {
   return (
     <div className={`Input ${className}`}>
       {label && (
         <label htmlFor={id} className="Input__label">
           {label}
+          {description && (
+            <>
+              <div
+                className="Input__infoIcon"
+                data-tooltip-id={`input-tooltip-${id}`}
+                data-tooltip-content={description}
+                data-tooltip-varaint="dark"
+              >
+                <InfoIcon />
+              </div>
+              <Tooltip
+                id={`input-tooltip-${id}`}
+                place="right"
+                className="Input__tooltip"
+              />
+            </>
+          )}
         </label>
       )}
       <label htmlFor={id} className={`Input__container ${iconPosition}`}>

@@ -9,8 +9,19 @@
     line-height: 1.25rem;
     color: $text-1;
     margin-bottom: 0.5rem;
-    display: block;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: .5rem;
     width: fit-content;
+  }
+
+  &__infoIcon {
+    display: flex;
+  }
+
+  &__tooltip {
+    padding-left: 20px !important;
   }
 
   &__container {

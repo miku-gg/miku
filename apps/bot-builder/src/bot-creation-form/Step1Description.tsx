@@ -81,6 +81,7 @@ const Step1Description: React.FC = () => {
           id="name"
           name="name"
           label="Character name"
+          description="The name of your character"
           value={card.data.name || ""}
           onChange={handleV1CardInputChange}
           className="step1Description__input"

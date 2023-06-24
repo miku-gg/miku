@@ -75,6 +75,7 @@ export type MikuCard = TavernCardV2 & {
         }[]
         emotion_groups: {
           id: string, // id of the emotion group
+          name: string, // name of the emotion group, NOT used in the prompt
           template: string, // template of group of emotions to be used
           emotions: { // list of emotions of the group, derived from the template
             id: string, // id of the emotion
@@ -144,7 +145,19 @@ export const EMPTY_MIKU_CARD: MikuCard = {
         "profile_pic": "",
         "short_description": "",
         "start_scenario": "",
-        "scenarios": [],
+        "scenarios": [
+          {
+            "id": "",
+            "name": "",
+            "children_scenarios": [],
+            "context": "",
+            "trigger_suggestion_similarity": "",
+            "trigger_action": "",
+            "background": "",
+            "emotion_group": "",
+            "voice": ""
+          }
+        ],
         "emotion_groups": [],
         "backgrounds": [],
         "voices": []
