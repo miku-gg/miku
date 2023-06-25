@@ -1,22 +1,23 @@
 import fs, { readFileSync } from 'fs';
-import { Express, Request, Response } from "express";
-import { BotConfig, MikuCard, extractCardFromBuffer, hashBase64URI, extractMikuCardImages, validateMikuCard } from "../../../../packages/bot-validator/dist";
+import { Request, Response } from "express";
+import { MikuCard, extractCardFromBuffer, extractMikuCardImages, validateMikuCard } from "../../../../packages/bot-validator/dist";
+import { itemsEmbedder } from '@mikugg/bot-validator';
 import config from '../config';
 const Hash = require('ipfs-only-hash');
 
-// async function getScenariosTriggerEmbeddingsHash (card: MikuCard): Promise<string> {
-//   const { scenarios } = card.data.extensions.mikugg;
+const sentenceEmbedderAPIEndpoint = 'http://localhost:8600';
 
-//   if (scenarios.length < 2) {
-//     return '';
-//   }
-  
-//   return await Hash.of(
-//     scenarios
-//       .map((scenario) => scenario.trigger_suggestion_similarity)
-//       .sort()
-//   );
-// }
+async function generateScenarioTriggerEmbeddings(botHash: string, card: MikuCard): Promise<void> {
+  const { scenarios } = card.data.extensions.mikugg;
+  const scenarioTriggerSuggestionItems: {id: string, text: string}[] = scenarios.map(scenario => ({
+    id: scenario.id,
+    text: scenario.trigger_suggestion_similarity
+  }));
+
+  const embeddings: string = await itemsEmbedder(scenarioTriggerSuggestionItems, sentenceEmbedderAPIEndpoint);
+  const embeddingsPath = `${config.EMBEDDINGS_PATH}/${botHash}`;
+  fs.writeFileSync(embeddingsPath, embeddings, 'binary');
+}
 
 // hashes the image, store is it IMG_PATH and returns the hash
 const addImage = async (hash: string, base64URL: string): Promise<string> => {
@@ -51,6 +52,7 @@ export default async function addBot(req: Request, res: Response) {
       throw 'Bot already exists';
     }
     fs.writeFileSync(cardPath, JSON.stringify(_extractedMikuCard), 'utf-8');
+    await generateScenarioTriggerEmbeddings(_extractedMikuCardHash, _extractedMikuCard);
 
     res.redirect('/');
     res.end();

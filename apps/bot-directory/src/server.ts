@@ -1,7 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import buildBot from './paths/buildBot';
 import addBot from './paths/addBot';
 import deleteBot from './paths/deleteBot';
 import getItem from './paths/getItem';
@@ -49,9 +48,6 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/build', (req, res) => res.render('bot_form'));
-app.post('/build', upload.any(), buildBot);
-
 app.post('/bot',  upload.single("file"), addBot);
 app.post('/bot/delete/:hash', deleteBot);
 app.get('/bot/:hash', getItem.bind(null, 'json', 'bots'));
@@ -66,5 +62,5 @@ app.get('/embeddings/:hash', getItem.bind(null, 'csv', 'embeddings'));
 
 app.listen(process.env.PORT || 8585, () => {
   console.log(`Bots server running on http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`);
-  open(`http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`)
+  // open(`http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`)
 })

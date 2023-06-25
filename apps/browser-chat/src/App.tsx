@@ -18,7 +18,7 @@ export const App = () => {
       <InteractiveResponsesContextProvider>
         <>
           <InteractiveChat />
-          <Aside />
+          {/* <Aside /> */}
         </>
       </InteractiveResponsesContextProvider>
       <BotLoadingModal />

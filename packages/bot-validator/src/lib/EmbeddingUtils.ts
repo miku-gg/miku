@@ -1,16 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
-import base64 from 'base-64';
-
-const sentenceEmbedderAPIEndpoint = import.meta.env.PROD ? 'https://sentence-embedder.apis.miku.gg' : 'http://localhost:8600';
-
-function arrayBufferToBase64(arrayBuffer: ArrayBuffer) {
-  let binary = '';
-  const bytes = new Uint8Array(arrayBuffer);
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-  return base64.encode(binary);
-}
+import FormData from 'form-data';
+import { Buffer } from 'buffer';
 
 // Function to create a CSV file from the EmotionGroup array
 function createCSVForEmbeddings(items: {id: string, text: string}[]): string {
@@ -30,10 +20,10 @@ function createCSVForEmbeddings(items: {id: string, text: string}[]): string {
 }
 
 // Function to send the CSV file to the API and store the result as base64
-async function embeddCSV(csv: string): Promise<string> {
+async function embeddCSV(csv: string, sentenceEmbedderAPIEndpoint: string): Promise<string> {
   const formData = new FormData();
-  const csvBlob = new Blob([csv], { type: 'text/csv' });
-  formData.append('file', csvBlob, 'data_to_embedd.csv');
+
+  formData.append('file', Buffer.from(csv, 'utf8'), 'data_to_embedd.csv');
 
   const response: AxiosResponse<string>  = await axios.post(`${sentenceEmbedderAPIEndpoint}/encode_csv`, formData, {
     headers: {
@@ -45,10 +35,10 @@ async function embeddCSV(csv: string): Promise<string> {
   return response.data;
 }
 
-export async function itemsEmbedder(items: {id: string, text: string}[]): Promise<string> {
+export async function itemsEmbedder(items: {id: string, text: string}[], sentenceEmbedderAPIEndpoint: string): Promise<string> {
   try {
     const csv = createCSVForEmbeddings(items);
-    const base64Result = await embeddCSV(csv);
+    const base64Result = await embeddCSV(csv, sentenceEmbedderAPIEndpoint);
     return base64Result;
   } catch (error) {
     console.error('An error occurred:', error);

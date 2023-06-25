@@ -25,6 +25,7 @@ import { Tooltip } from "@mui/material";
 import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
 import { BotSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
+import ScenarioSelector from "../scenario-selector/ScenarioSelector";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -88,7 +89,7 @@ const VITE_IMAGES_DIRECTORY_ENDPOINT =
   "http://localhost:8585/image";
 
 export const BotDisplay = () => {
-  const { botHash, botConfig, botConfigSettings, setBotConfigSettings } = useBot();
+  const { card, botHash, botConfig, botConfigSettings, setBotConfigSettings } = useBot();
   const [showHistory, setShowHistory] = useState<Boolean>(false);
   const [handleBotDetailsInfo, setHandleBotDetailsInfo] =
     useState<boolean>(false);
@@ -114,11 +115,7 @@ export const BotDisplay = () => {
   const [fileType, setFileType] = useState<string | null>(null);
   const [blobUrl, setBlobUrl] = useState<string>("");
 
-  let backgroundImage =
-    Number(botConfig?.configVersion || 1) > 1
-      ? ((botConfig as BotConfigV2)?.backgrounds || [{ source: "" }])[0]
-          .source || ""
-      : (botConfig as BotConfigV1)?.background_pic || "";
+  let backgroundImage = card?.data.extensions.mikugg.backgrounds.find(bg => bg.id === card?.data.extensions.mikugg.scenarios.find(scenario => scenario.id === currentContext)?.background || '')?.source || '';
   let emotionImage = response?.emotion || prevResponse?.emotion || "";
   if (!emotionImage) {
     const openAIEmotionConfig = botConfig?.outputListeners.find(
@@ -181,7 +178,7 @@ export const BotDisplay = () => {
     });
   }, [botHash]);
 
-  const updateContext = () => {
+  const updateContext = (_contextId: string) => {
     const bot = botFactory.getInstance();
     const sbertEmotionConfig = botConfig?.outputListeners.find(
       (listener) =>
@@ -192,14 +189,14 @@ export const BotDisplay = () => {
       const props =
         sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
       const context = props.contexts.find(
-        (context) => context.id === contextSuggestion
+        (context) => context.id === _contextId
       );
       if (context) {
-        bot.changeContext(contextSuggestion);
-        setCurrentContext(contextSuggestion);
+        bot.changeContext(_contextId);
+        setCurrentContext(_contextId);
         // @ts-ignore
         bot.sendPrompt(
-          `*I notice that ${context.context_change_trigger}*`,
+          `*${context.context_change_trigger}*`,
           MikuCore.Commands.CommandType.DIALOG
         );
       }
@@ -287,7 +284,7 @@ export const BotDisplay = () => {
     if (fileType === "video/webm") {
       return (
         <video
-          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${
+          className={`absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover ${
             !emotionImgIsLoading ? "fade-in up-and-down" : ""
           }`}
           src={blobUrl}
@@ -300,7 +297,7 @@ export const BotDisplay = () => {
     } else {
       return (
         <img
-          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${
+          className={`absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover ${
             !emotionImgIsLoading ? "fade-in up-and-down" : ""
           }`}
           src={blobUrl}
@@ -325,7 +322,7 @@ export const BotDisplay = () => {
               <button className="rounded-full" onClick={displayBotDetails}>
                 <img src={infoIcon} />
               </button>
-              {/* <button className="rounded-full"><img src={backgroundIcon}/></button> */}
+              <ScenarioSelector value={currentContext} onChange={updateContext} />
             </div>
             <div className="flex gap-3">
               <button
@@ -363,12 +360,14 @@ export const BotDisplay = () => {
           }
         >
           <div className="response-container h-3/4 w-10/12 relative">
-            <div className="flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b from-slate-900/[.7] to-gray-500/50 rounded-md overflow-auto border-[4px] drop-shadow-2xl shadow-black">
+            <div className="flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b text-sm from-slate-900/[.9] to-white-500/50 overflow-auto drop-shadow-2xl shadow-black">
               {!response || loading ? (
                 <Loader />
               ) : (
-                <p className="text-md font-bold text-white ">
-                  {response?.text || ""}
+                <p className="text-md font-bold text-white text-left">
+                  {response?.text.split('\n').map((item, index) => (
+                    <p key={`p-response-${item}-${index}`}>{item}</p>
+                  )) || ""}
                 </p>
               )}
             </div>
@@ -411,7 +410,7 @@ export const BotDisplay = () => {
               <Tooltip title="Randomize character outfit" placement="left">
                 <button
                   className="wand-button absolute bottom-4 right-4 inline-flex items-center gap-2 text-white rounded-md hover:text-white"
-                  onClick={updateContext}
+                  onClick={updateContext.bind(null, contextSuggestion)}
                 >
                   <Wand />
                 </button>

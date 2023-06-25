@@ -59,7 +59,7 @@ export const InteractiveResponsesContextProvider = ({
   const [isAudioSubscribed, setIsAudioSubscribed] = useState<boolean>(false);
   const [currentContext, setCurrentContext] = useState<string>("");
   const [_, onUpdate] = useReducer((x) => x + 1, 0);
-  let { botConfig } = useBot();
+  let { botConfig, card } = useBot();
   const [botNumber, setBotNumber] = useState<number>(0);
 
   let response: BotReponse | null = null;
@@ -77,8 +77,14 @@ export const InteractiveResponsesContextProvider = ({
   };
 
   useEffect(() => {
-    if (botConfig) {
-      setResponseIds([]);
+    if (botConfig && card) {
+      const firstScenario = card?.data.extensions.mikugg.scenarios.find(scenario => card?.data.extensions.mikugg.start_scenario === scenario.id);
+      const firstEmotionGroup = card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
+      let firstImage = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'neutral')?.source[0] : firstEmotionGroup?.emotions[0].source[0];
+      fillResponse('first', "text", card.data.first_mes);
+      fillResponse('first', "emotion", firstImage || '');
+      fillResponse('first', "audio", '');
+      setResponseIds(['first']);
       setResponseIndex(0);
       onUpdate();
 
@@ -126,7 +132,7 @@ export const InteractiveResponsesContextProvider = ({
     if (audioSubscribed) {
       setIsAudioSubscribed(true);
     }
-  }, [botConfig, botNumber]);
+  }, [card, botConfig, botNumber]);
 
   const loading =
     response?.loadingText ||
