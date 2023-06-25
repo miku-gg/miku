@@ -1,10 +1,9 @@
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
 import { Express, Request, Response } from "express";
-import { BotConfig, MikuCard, validateBotConfig, validateMikuCard } from "../../../../packages/bot-validator/dist";
+import { BotConfig, MikuCard, extractCardFromBuffer, hashBase64URI, validateBotConfig, validateMikuCard } from "../../../../packages/bot-validator/dist";
 import * as Miku from "@mikugg/extensions";
 import config from '../config';
 import AdmZip from "adm-zip";
-import { assert } from 'console';
 const Hash = require('ipfs-only-hash');
 
 // async function getScenariosTriggerEmbeddingsHash (card: MikuCard): Promise<string> {
@@ -21,130 +20,96 @@ const Hash = require('ipfs-only-hash');
 //   );
 // }
 
-async function validateSources(card: MikuCard): Promise<string[]> {
+// hashes the image, store is it IMG_PATH and returns the hash
+const extractImage = async (base64URL: string): Promise<string> => {
+  const hash = await hashBase64URI(base64URL);
+  const imgPath = `${config.IMG_PATH}/${hash}`;
+  if (!fs.existsSync(imgPath)) {
+    const imgBuffer = Buffer.from(base64URL.split(',')[1], 'base64');
+    fs.writeFileSync(imgPath, imgBuffer);
+  }
+  return hash;
+}
+
+const extractMikuCardImages = async (card: MikuCard): Promise<MikuCard> => {
   const { mikugg } = card.data.extensions;
 
-  const validations: {name: string, source: string}[] = [
-    {
-      name: 'mikugg.profile_pic',
-      source: mikugg.profile_pic,
-    },
-    ...mikugg.backgrounds.map((bg) => {
-      return  {
-        name: `mikugg.backgrouds.${bg.id}`,
-        source: bg.source,
+  const profile_pic = await extractImage(mikugg.profile_pic);
+  const backgrounds = await Promise.all(
+    mikugg.backgrounds.map(async (bg) => {
+      return {
+        ...bg,
+        source: await extractImage(bg.source),
       };
-    }),
-    ...mikugg.emotion_groups.flatMap((emotion_group) => {
-      return emotion_group.emotions.flatMap((emotion) => {
-        return emotion.source.map(_source => {
-          return {
-            name: `mikugg.emotions_groups.emotions.${emotion.id}`,
-            source: _source,
-          }
-        })
-      })
     })
-  ];
-
-  return validations.filter(validation => {
-    const sourcePath = `${config.IMG_PATH}/${validation.source}`;
-    if (!fs.existsSync(sourcePath)) {
-      return true;
-    } else {
-      return false;
-    }
-  }).map((_validation) => {
-    return `Not found ${_validation.name}: ${_validation.source}`;
-  });
-}
-
-async function installMikuCardFile(fileContent: string): Promise<{
-  success: boolean,
-  errors: string[],
-}> {
-  try {
-    const card = JSON.parse(fileContent) as MikuCard
-    const errors = validateMikuCard(card);
-    if (errors.length) {
+  );
+  const emotion_groups = await Promise.all(
+    mikugg.emotion_groups.map(async (emotion_group) => {
       return {
-        success: false,
-        errors,
+        ...emotion_group,
+        emotions: await Promise.all(
+          emotion_group.emotions.map(async (emotion) => {
+            return {
+              ...emotion,
+              source: await Promise.all(
+                emotion.source.map(async (source) => {
+                  return await extractImage(source);
+                })
+              ),
+            };
+          })
+        ),
       };
-    }
+    })
+  );
 
-    const sourceErrors = await validateSources(card);
-    if (sourceErrors.length) {
-      return {
-        success: false,
-        errors,
-      };
-    }
-
-    const hash = await Hash.of(fileContent);
-    const botPath = `${config.BOT_PATH}/${hash}`;
-    if (fs.existsSync(botPath)) {
-      throw 'Bot already exists';
-    }
-    fs.writeFileSync(botPath, fileContent);
-
-    // TODO: generate embeddings file for context switching
-
-    return {
-      success: true,
-      errors: []
-    }
-  } catch (e) {
-    console.error(e);
-    return {
-      success: false,
-      errors: [`${e}`]
-    }
-  }
+  return {
+    ...card,
+    data: {
+      ...card.data,
+      extensions: {
+        ...card.data.extensions,
+        mikugg: {
+          ...card.data.extensions.mikugg,
+          profile_pic,
+          backgrounds,
+          emotion_groups,
+        },
+      },
+    },
+  };
 }
-
 
 // Registers a bot configuration
 export default async function addBot(req: Request, res: Response) {
   try {
-    const file = req.file;
-    if (!file?.path) throw 'file not found';
+    if (!req.file?.path) throw 'file not found';
+    if (!req.file?.originalname.endsWith('.png')) throw 'Invalid file type, only .png is supported';
 
-    if (req.file?.filename.endsWith('.json')) {
-      const fileContent = file.buffer.toString('utf8');
-      await installMikuCardFile(fileContent);
-    } else {
-      const zip = new AdmZip(file.path);
-      let cardContent: string = '';
-      await Promise.all(zip.getEntries().map(async (entry) => {
-        if (entry.isDirectory) return;
-        if (entry.comment === 'Card') {
-          cardContent = entry.getData().toString('utf8');
-        } else if (entry.comment === 'Emotions Embeddings') {
-          // const data = entry.getData().toString('utf8');
-          // const hash = await Hash.of(data);
-          // assert(entry.name === hash, `Hash mismatch for Emotions Embeddings`);
-          // const botPath = `${config.EMBEDDINGS_PATH}/${hash}`;
-          // if (!fs.existsSync(botPath)) {
-          //   await fs.writeFileSync(botPath, data);
-          // }
-        } else {
-          const data = entry.getData().toString('base64');
-          const hash = await Hash.of(data);
-          assert(entry.name === hash, `Hash mismatch for ${entry.name}`);
-          const imgPath = `${config.IMG_PATH}/${hash}`;
-          if (!fs.existsSync(imgPath)) {
-            await fs.writeFileSync(imgPath, Buffer.from(data, 'base64'), 'binary');
-          }
-        }
-      }))
-      await installMikuCardFile(cardContent);
+    const buffer = readFileSync(req.file.path);
+    const mikuCard = (await extractCardFromBuffer(buffer)) as MikuCard;
+    
+    if(mikuCard?.spec !== 'chara_card_v2') throw 'Invalid file type, only chara_card_v2 is supported';
+    if(!mikuCard?.data?.extensions?.mikugg?.scenarios?.length) throw 'Invalid card: extension.mikugg.scenarios not found or is empty';
+    const errors = validateMikuCard(mikuCard);
+    if (errors.length) throw errors.join('\n');
+    const _extractedMikuCard = await extractMikuCardImages(mikuCard);
+    const _extractedMikuCardHash = await Hash.of(JSON.stringify(_extractedMikuCard));
+    const cardPath = `${config.BOT_PATH}/${mikuCard.data.name}_${_extractedMikuCardHash}_${Date.now()}.json`;
+    if (fs.existsSync(cardPath)) {
+      throw 'Bot already exists';
     }
+    fs.writeFileSync(cardPath, JSON.stringify(_extractedMikuCard), 'utf-8');
+
     res.redirect('/');
     res.end();
     
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).send(`
+      <h1>Failed to add bot</h1>
+      <p>${err}</p>
+      <a href="/">Go back</a>
+    `);
     return;
   }
   

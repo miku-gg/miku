@@ -389,6 +389,18 @@ importers:
       '@types/prop-types':
         specifier: ^15.7.5
         version: 15.7.5
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
+      ipfs-only-hash:
+        specifier: ^4.0.0
+        version: 4.0.0
+      png-chunk-text:
+        specifier: ^1.0.0
+        version: 1.0.0
+      png-chunks-extract:
+        specifier: ^1.0.0
+        version: 1.0.0
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1
