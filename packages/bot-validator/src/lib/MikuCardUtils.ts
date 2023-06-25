@@ -16,6 +16,7 @@ export const hashBase64URI = async (base64Content: string): Promise<string> => {
 import extract from 'png-chunks-extract'
 import text from 'png-chunk-text'
 import { Buffer } from 'buffer';
+import { MikuCard } from '..';
 
 async function getImageBuffer(file?: File) {
   if (!file) return
@@ -60,3 +61,64 @@ export async function extractCardData(file: File): Promise<object> {
   const buffer = await getImageBuffer(file);
   return extractCardFromBuffer(buffer);
 }
+
+export const extractMikuCardImages = async (card: MikuCard): Promise<{
+  images: Map<string, string>,
+  card: MikuCard
+}> => {
+  const { mikugg } = card.data.extensions;
+  const images = new Map<string, string>([]);
+
+  const profile_pic = await hashBase64URI(mikugg.profile_pic);
+  images.set(profile_pic, mikugg.profile_pic);
+  const backgrounds = await Promise.all(
+    mikugg.backgrounds.map(async (bg) => {
+      const bgHash = await hashBase64URI(bg.source);
+      images.set(bgHash, bg.source);
+      return {
+        ...bg,
+        source: bgHash,
+      };
+    })
+  );
+  const emotion_groups = await Promise.all(
+    mikugg.emotion_groups.map(async (emotion_group) => {
+      return {
+        ...emotion_group,
+        emotions: await Promise.all(
+          emotion_group.emotions.map(async (emotion) => {
+            return {
+              ...emotion,
+              source: await Promise.all(
+                emotion.source.map(async (source) => {
+                  const sourceHash = await hashBase64URI(source);
+                  images.set(sourceHash, source);
+                  return sourceHash;
+                })
+              ),
+            };
+          })
+        ),
+      };
+    })
+  );
+
+  return {
+    card: {
+      ...card,
+      data: {
+        ...card.data,
+        extensions: {
+          ...card.data.extensions,
+          mikugg: {
+            ...card.data.extensions.mikugg,
+            profile_pic,
+            backgrounds,
+            emotion_groups,
+          },
+        },
+      },
+    },
+    images
+  };
+};
