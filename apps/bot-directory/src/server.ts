@@ -31,13 +31,19 @@ app.get('/', (req, res) => {
     }
 
     /* read all json files */
-    files = await Promise.all(files.filter(x => x.endsWith('.json')).map(async (file) => {
-      const data = await fs.readFileSync(`${config.BOT_PATH}/${file}`, 'utf8');
+    files = (await Promise.all(files.map(async (file) => {
+      const data = fs.readFileSync(`${config.BOT_PATH}/${file}`, 'utf8');
       return {
         ...JSON.parse(data),
         hash: file
       };
-    }));
+    }))).filter(x => (
+      x?.spec === 'chara_card_v2' &&
+      x?.data?.extensions?.mikugg?.scenarios?.length &&
+      x?.data?.extensions?.mikugg?.profile_pic &&
+      x?.data?.extensions?.mikugg?.backgrounds?.length &&
+      x?.data?.extensions?.mikugg?.emotion_groups?.length 
+    ));
 
     res.render('index', {bots: files});
   });
@@ -60,5 +66,5 @@ app.get('/embeddings/:hash', getItem.bind(null, 'csv', 'embeddings'));
 
 app.listen(process.env.PORT || 8585, () => {
   console.log(`Bots server running on http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`);
-  // open(`http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`)
+  open(`http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`)
 })

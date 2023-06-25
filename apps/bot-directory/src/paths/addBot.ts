@@ -95,7 +95,7 @@ export default async function addBot(req: Request, res: Response) {
     if (errors.length) throw errors.join('\n');
     const _extractedMikuCard = await extractMikuCardImages(mikuCard);
     const _extractedMikuCardHash = await Hash.of(JSON.stringify(_extractedMikuCard));
-    const cardPath = `${config.BOT_PATH}/${mikuCard.data.name}_${_extractedMikuCardHash}_${Date.now()}.json`;
+    const cardPath = `${config.BOT_PATH}/${_extractedMikuCardHash}`;
     if (fs.existsSync(cardPath)) {
       throw 'Bot already exists';
     }
