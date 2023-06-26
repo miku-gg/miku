@@ -1,0 +1,47 @@
+@import '../variables';
+
+.TagAutocomplete {
+  & &__control {
+    width: 100%;
+    background: transparent;
+    box-sizing: border-box;
+    border-radius: 0.5rem;
+    border: 1px solid $color-1;
+    color: #fafafa;
+    padding: 0;
+    line-height: 1.25rem;
+    font-size: 0.875rem;
+
+    &:hover {
+      border-color: $color-1;
+    }
+
+    &:focus-within {
+      border-color: $purple-1;
+      box-shadow: 0 0 0 2px rgba($purple-1, 0.3);
+    }
+  }
+
+  & &__menu {
+    background-color: $color-1 !important;
+  }
+
+  & &__option {
+    cursor: pointer;
+    transition: all .2s ease-out;
+    &--is-focused {
+      background-color: $purple-1 !important;
+    }
+  }
+
+  & &__multi-value {
+    background-color: $purple-1;
+    
+    &__label {
+      color: white;
+    }
+  }
+  & &__input {
+    color: white !important;
+  }
+}

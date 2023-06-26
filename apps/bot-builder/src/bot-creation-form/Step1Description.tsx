@@ -5,15 +5,23 @@ import {
   Container,
   DragAndDropImages,
   Input,
+  TagAutocomplete,
   TextHeading,
 } from "@mikugg/ui-kit";
 import { checkImageDimensionsAndType } from "./libs/utils";
+
+const DEFAULT_TAGS = [
+  { value: 'Male' },
+  { value: 'Famale' },
+  { value: 'OC' },
+  { value: 'NSFW' },
+];
 
 const Step1Description: React.FC = () => {
   const { card, setCard } = useCharacterCreationForm();
 
   const handleV1CardInputChange = (event: {
-    target: { name: string; value: string };
+    target: { name: string; value: string|string[] };
   }) => {
     const { name, value } = event.target;
     setCard({
@@ -141,7 +149,6 @@ const Step1Description: React.FC = () => {
           className="step1Description__input"
         />
       </div>
-
       <div className="step1Description__formGroup">
         <Input
           isTextArea
@@ -204,6 +211,17 @@ const Step1Description: React.FC = () => {
           value={card.data.first_mes || ""}
           onChange={handleV1CardInputChange}
           className="step1Description__textarea"
+        />
+      </div>
+      <div className="step1Description__formGroup">
+        <TagAutocomplete
+          value={card.data.tags.map(_tag => ({
+            label: _tag,
+            value: _tag
+          }))}
+          name="tags"
+          onChange={handleV1CardInputChange}
+          tags={DEFAULT_TAGS}
         />
       </div>
     </Container>

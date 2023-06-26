@@ -102,3 +102,10 @@
     transform: translateY(2px);
   }
 }
+
+.animate-response--italic {
+  font-style: italic;
+  color: #c3c3c3;
+  font-family: 'Courier New', Courier, monospace;
+  /* font-size: .9em; */
+}

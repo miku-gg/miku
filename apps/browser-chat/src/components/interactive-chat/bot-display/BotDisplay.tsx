@@ -1,7 +1,9 @@
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import React, { useContext, useEffect, useState } from "react";
+import { TypeAnimation } from 'react-type-animation';
 import "./BotDisplay.css";
+import { v4 as uuidv4 } from 'uuid';
 
 import historyIcon from "../../../assets/icons/chat-history.png";
 import infoIcon from "../../../assets/icons/information.png";
@@ -88,6 +90,43 @@ const VITE_IMAGES_DIRECTORY_ENDPOINT =
   import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
   "http://localhost:8585/image";
 
+function AnimateResponse({ text }: { text: string }): JSX.Element {
+  const [parts, setParts] = useState<{content: string, isItalic: boolean, id: string}[]>([]);
+  const [partIndex, setPartIndex] = useState<number>(0);
+
+  useEffect(() => {
+    console.log(text);
+    const lines = text.split('\n');
+    const parts = lines.flatMap(line => line.split('*').map(((part, i) => ({
+      content: part,
+      isItalic: i % 2 === 1,
+      id: uuidv4()
+    })))).filter(_ => _.content);
+    
+    setParts(parts);
+    setPartIndex(0);
+  }, [text]);
+
+  return (
+    <>
+      {parts.filter((_, i) => i <= partIndex).map((part, i) => (
+        <TypeAnimation
+          key={`type-animation-${part.id}`}
+          cursor={false}
+          className={part.isItalic ? 'animate-response--italic' : 'animate-response'}
+          style={{ whiteSpace: 'pre-line' }}
+          sequence={[
+            part.content,
+            () => setPartIndex(index => Math.min(index + 1, parts.length - 1))
+          ]}
+          wrapper="span"
+          speed={60}
+        />
+      ))}
+    </>
+  );
+}
+  
 export const BotDisplay = () => {
   const { card, botHash, botConfig, botConfigSettings, setBotConfigSettings } = useBot();
   const [showHistory, setShowHistory] = useState<Boolean>(false);
@@ -360,15 +399,13 @@ export const BotDisplay = () => {
           }
         >
           <div className="response-container h-3/4 w-10/12 relative">
-            <div className="flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b text-sm from-slate-900/[.9] to-white-500/50 overflow-auto drop-shadow-2xl shadow-black">
+            <div className="response-container-text flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b text-sm from-slate-900/[.9] to-gray-500/50 overflow-auto drop-shadow-2xl shadow-black">
               {!response || loading ? (
                 <Loader />
               ) : (
-                <p className="text-md font-bold text-white text-left">
-                  {response?.text.split('\n').map((item, index) => (
-                    <p key={`p-response-${item}-${index}`}>{item}</p>
-                  )) || ""}
-                </p>
+                <div className="text-md font-bold text-gray-200 text-left">
+                  <AnimateResponse text={response?.text || ''} />
+                </div>
               )}
             </div>
             {!loading && responseIds.length > 1 ? (

@@ -14,6 +14,7 @@ import Tag from './components/Tag';
 import TextHeading from './components/TextHeading';
 import CheckBox from './components/CheckBox';
 import Tooltip from './components/Tooltip';
+import TagAutocomplete from './components/TagAutocomplete';
 
 export {
   Accordion,
@@ -32,4 +33,5 @@ export {
   TextHeading,
   Dropdown,
   CheckBox,
+  TagAutocomplete,
 };

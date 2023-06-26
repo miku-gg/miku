@@ -276,9 +276,15 @@ importers:
       react-toastify:
         specifier: ^9.1.1
         version: 9.1.1(react-dom@18.2.0)(react@18.2.0)
+      react-type-animation:
+        specifier: ^3.1.0
+        version: 3.1.0(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
       remove:
         specifier: ^0.1.5
         version: 0.1.5
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.0
     devDependencies:
       '@originjs/vite-plugin-commonjs':
         specifier: ^1.0.3
@@ -11611,6 +11617,18 @@ packages:
       '@babel/runtime': 7.21.5
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /react-type-animation@3.1.0(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Ju74SpUFpSINqlGU8UeFAF+AnAn0nZcc8MB0Ho6QvRkh8uDKkOzAiMD3l9xEmkbKXnSYsljfVgIDM/zwqEImpQ==}
+    peerDependencies:
+      prop-types: ^15.5.4
+      react: '>= 15.0.0'
+      react-dom: '>= 15.0.0'
+    dependencies:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
