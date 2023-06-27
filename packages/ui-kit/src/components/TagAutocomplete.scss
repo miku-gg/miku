@@ -1,25 +1,33 @@
 @import '../variables';
 
 .TagAutocomplete {
+  width: 100%;
+
   & &__control {
     width: 100%;
     background: transparent;
     box-sizing: border-box;
-    border-radius: 0.5rem;
-    border: 1px solid $color-1;
     color: #fafafa;
-    padding: 0;
-    line-height: 1.25rem;
-    font-size: 0.875rem;
+    border: 0;
 
     &:hover {
-      border-color: $color-1;
+      border: 0;
     }
 
     &:focus-within {
-      border-color: $purple-1;
-      box-shadow: 0 0 0 2px rgba($purple-1, 0.3);
+      border: 0 !important;
+      box-shadow: none;
+      padding: 0;
     }
+
+    &--is-focused {
+      border: 0;
+    }
+  }
+
+  & &__value-container {
+    padding: 0;
+    border: 0;
   }
 
   & &__menu {
@@ -28,7 +36,7 @@
 
   & &__option {
     cursor: pointer;
-    transition: all .2s ease-out;
+    transition: all 0.2s ease-out;
     &--is-focused {
       background-color: $purple-1 !important;
     }
@@ -36,7 +44,7 @@
 
   & &__multi-value {
     background-color: $purple-1;
-    
+
     &__label {
       color: white;
     }

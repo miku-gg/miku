@@ -149,16 +149,27 @@ export const PreviewScenario: React.FC<PreviewScenarioProps> = ({ card, scenario
   };
 
   return (
-    <ImageSlider
-      images={emotionGroup.emotions.map((emotion) => ({
-        source: emotion.source[0],
-        label: emotion.id,
-      }))}
-      backgroundImageSource={background}
-      selectedIndex={emotionIndex}
-      onChange={calculateUpdatedIndex}
-      fullWidth={fullWidth}
-    />
+    <>
+      <ImageSlider
+        images={emotionGroup.emotions.map((emotion) => ({
+          source: emotion.source[0],
+          label: emotion.id,
+        }))}
+        backgroundImageSource={background}
+        selectedIndex={emotionIndex}
+        onChange={calculateUpdatedIndex}
+        fullWidth={fullWidth}
+      />
+      <Carousel
+        items={emotionGroup.emotions.map((emotion) => ({
+          title: emotion.id,
+        }))}
+        selectedIndex={emotionIndex}
+        onClick={(index) => {
+          calculateUpdatedIndex(index - emotionIndex);
+        }}
+      />
+    </>
   );
 }
 

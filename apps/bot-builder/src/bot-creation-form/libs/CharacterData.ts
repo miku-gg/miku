@@ -80,7 +80,7 @@ export const validateCharacterData = ({ data: characterData }: MikuCard): Valida
   characterData.extensions.mikugg.emotion_groups.forEach((emotionGroup, groupIndex) => {
     const foundConfig = emotionTemplates.find((config) => config.id === emotionGroup.template);
     if (!foundConfig) {
-      errors.push({ field: `emotionGroups[${groupIndex}].emotionsHash`, message: 'Emotion group is not valid.' });
+      errors.push({ field: `emotionGroups[${groupIndex}].emotionsHash`, message: 'Emotion template is not valid.' });
     } else {
       const foundEmotions = emotionGroup.emotions.map((emotion) => emotion.id);
       const missingEmotions = foundConfig.emotionIds.filter((id) => !foundEmotions.includes(id));
@@ -93,6 +93,33 @@ export const validateCharacterData = ({ data: characterData }: MikuCard): Valida
       });
     }
   });
+
+  characterData.extensions.mikugg.scenarios.forEach((scenario) => {
+    if (!scenario.context) {
+      errors.push({
+        field: `scenario.${scenario.name}.context`,
+        message: `Scenario prompt context is empty`
+      });
+    }
+    if (!scenario.trigger_action) {
+      errors.push({
+        field: `scenario.${scenario.name}.action_text`,
+        message: `Scenario action text is empty`
+      });
+    }
+    if (!scenario.trigger_suggestion_similarity) {
+      errors.push({
+        field: `scenario.${scenario.name}.keywords`,
+        message: `Scenario keywords are empty`
+      })
+    }
+    if (!scenario.name) {
+      errors.push({
+        field: `scenario.${scenario.name}.name`,
+        message: `Scenario name is empty`
+      })
+    }
+  })
 
   return errors;
 };
@@ -122,6 +149,10 @@ export const validateStep = (step: number, mikuCard: MikuCard) => {
           error.field.startsWith("emotionGroups")
       );
     case 3:
+      return validationErrors.filter(
+        (error) =>
+          error.field.startsWith("scenario")
+      );
     default:
       return [];
   }

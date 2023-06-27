@@ -131,5 +131,5 @@ export const InfoIcon = () => {
         fill="currentColor"
       ></path>
     </svg>
-  )
-}
+  );
+};

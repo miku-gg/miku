@@ -220,6 +220,9 @@ const Step1Description: React.FC = () => {
             value: _tag
           }))}
           name="tags"
+          id="tags"
+          label="Tags"
+          description="Tags are used to help users find your character."
           onChange={handleV1CardInputChange}
           tags={DEFAULT_TAGS}
         />

@@ -57,7 +57,10 @@ const Carousel: React.FC<CarouselProps> = ({
       <button
         className="Carousel__leftScrollButton"
         onClick={() =>
-          onClick(selectedIndex === FIRST_INDEX ? lastIndex : selectedIndex - 1, true)
+          onClick(
+            selectedIndex === FIRST_INDEX ? lastIndex : selectedIndex - 1,
+            true
+          )
         }
       >
         <ArrowIcon />
@@ -99,7 +102,10 @@ const Carousel: React.FC<CarouselProps> = ({
       <button
         className="Carousel__rightScrollButton"
         onClick={() =>
-          onClick(selectedIndex === lastIndex ? FIRST_INDEX : selectedIndex + 1, true)
+          onClick(
+            selectedIndex === lastIndex ? FIRST_INDEX : selectedIndex + 1,
+            true
+          )
         }
       >
         <ArrowIcon />
