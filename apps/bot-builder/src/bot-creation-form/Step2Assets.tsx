@@ -53,7 +53,7 @@ interface EmotionGroup {
 
 const EmotionsForm: React.FC = () => {
   const { card, setCard } = useCharacterCreationForm();
-  const [selectedItemByIndex, setSelectedItemByIndex] = useState<number>(0);
+  const [selectedItemByIndex, setSelectedItemByIndex] = useState<number>(-1);
   const [expandedTemplateDropdown, setExpandedTemplateDropdown] =
     useState(false);
 

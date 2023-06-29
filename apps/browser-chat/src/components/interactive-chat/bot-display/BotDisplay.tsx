@@ -95,7 +95,6 @@ function AnimateResponse({ text }: { text: string }): JSX.Element {
   const [partIndex, setPartIndex] = useState<number>(0);
 
   useEffect(() => {
-    console.log(text);
     const lines = text.split('\n');
     const parts = lines.flatMap(line => line.split('*').map(((part, i) => ({
       content: part,
@@ -120,7 +119,7 @@ function AnimateResponse({ text }: { text: string }): JSX.Element {
             () => setPartIndex(index => Math.min(index + 1, parts.length - 1))
           ]}
           wrapper="span"
-          speed={60}
+          speed={70}
         />
       ))}
     </>

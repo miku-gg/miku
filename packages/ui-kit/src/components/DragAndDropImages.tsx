@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { DefaultImage, UploadIcon } from '../assets/svg';
-import './DragAndDropImages.scss';
 
+import 'react-lazy-load-image-component/src/effects/blur.css';
+import './DragAndDropImages.scss';
 interface DragAndDropImagesProps {
   className?: string;
   placeHolder: string;
@@ -27,6 +28,7 @@ const DragAndDropImages = ({
   const [dragOver, setDragOver] = useState<boolean>(false);
   const [dragFile, setDragFile] = useState<File>();
   const [sourceFile, setSourceFile] = useState<string>(previewImage);
+  const [loaded, setLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     setSourceFile(previewImage);
@@ -94,7 +96,7 @@ const DragAndDropImages = ({
                 muted={true}
               />
             ) : (
-              <img src={sourceFile} />
+              <LazyLoadImage effect="blur" src={sourceFile} />
             )}
           </div>
         )}

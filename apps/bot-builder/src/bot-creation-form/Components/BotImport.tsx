@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { BotConfig, BotConfigV1, BotConfigV2, MikuCard, TavernCardV2, extractCardData } from '@mikugg/bot-validator';
 import * as MikuExtensions from '@mikugg/extensions';
 import { Button, Tooltip } from '@mikugg/ui-kit';
@@ -461,16 +461,19 @@ const processMikuZip = async (file: File): Promise<MikuCard> => {
 
 const BotImport: React.FC = () => {
   const { setCard } = useCharacterCreationForm();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileLoad = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLoading(true);
     const file = event.target.files?.[0];
     try {
       if (file) {
         if (file.name.endsWith('.png')) {
           const _card = await processImage(file)
           setCard(_card);
+          setLoading(false);
         } else if (file.name.endsWith('.json')) {
           const reader = new FileReader();
           reader.onload = (e) => {
@@ -484,15 +487,19 @@ const BotImport: React.FC = () => {
               const _card = processJSON(loadedData)
               setCard(_card);
             }
+            setLoading(false);
           };
           reader.readAsText(file);
         } else if (file.name.endsWith('.miku')) {
           const _card = await processMikuZip(file);
+          console.log('loaded2');
           setCard(_card);
+          setLoading(false);
         }
       }
     } catch (e) {
       alert('Error loading file');
+      setLoading(false);
       console.error(e);
     }
 
@@ -511,8 +518,12 @@ const BotImport: React.FC = () => {
         data-tooltip-varaint="dark"
 
         >
-        <Button theme="transparent" onClick={importBot} iconSRC={loadIcon}>
-          Import
+        <Button theme="transparent" onClick={importBot} iconSRC={loadIcon} disabled={loading}>
+          {loading ? (
+            <div className="absolute left-2 top-[0.1em]">
+              <span className="loader"></span>
+            </div>
+          ) : 'Import'}
         </Button>
       </div>
       <Tooltip
