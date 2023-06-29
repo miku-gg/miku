@@ -371,7 +371,7 @@ const Step3Scenarios: React.FC = () => {
             <Input
               id="trigger_action"
               name="trigger_action"
-              placeHolder="{{user}} and {{char}} are at the classroom working on a project."
+              placeHolder="Go to the classroom"
               label="Action text"
               onChange={handleTextChange}
               value={selectedScenario.trigger_action}
@@ -444,6 +444,7 @@ const Step3Scenarios: React.FC = () => {
                     );
                   });
                   setCard(newCard);
+                  setSelectedScenarioIndex(0);
                 }}>
                   Delete scenario
                 </Button>

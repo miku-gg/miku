@@ -1,0 +1,47 @@
+@import "../styles/variables";
+
+.BackgroundSelector {
+  margin-bottom: 2em;
+
+  &__selectedImageContainer {
+    position: relative;
+  }
+
+  &__selectedImage {
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px;
+    margin: 1em 0;
+  }
+
+  &__removeImage {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: none;
+
+    svg {
+      transition: all 0.2s ease-out;
+      color: white;
+    }
+
+    &:hover {
+      svg {
+        color: $badge-expensive;
+      }
+    }
+
+    button {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  &__upload {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1em;
+  }
+}

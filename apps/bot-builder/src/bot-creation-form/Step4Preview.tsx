@@ -55,23 +55,23 @@ const Step4Preview: React.FC = () => {
         />
         <PreviewScenario card={card} scenarioId={card.data.extensions.mikugg.scenarios[selectedScenarioIndex].id} />
         <LicenseSelector
-        value={card.data.extensions.mikugg.license}
-        onChange={(value) => {
-          setCard({
-            ...card,
-            data: {
-              ...card.data,
-              extensions: {
-                ...card.data.extensions,
-                mikugg: {
-                  ...(card.data.extensions.mikugg || {}),
-                  license: value
+          value={card.data.extensions.mikugg.license}
+          onChange={(value) => {
+            setCard({
+              ...card,
+              data: {
+                ...card.data,
+                extensions: {
+                  ...card.data.extensions,
+                  mikugg: {
+                    ...(card.data.extensions.mikugg || {}),
+                    license: value
+                  }
                 }
               }
-            }
-          });
-        }}
-       />
+            });
+          }}
+        />
       </div>
     </Container>
   );

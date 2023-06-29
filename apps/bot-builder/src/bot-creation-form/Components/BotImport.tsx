@@ -518,7 +518,6 @@ const BotImport: React.FC = () => {
       <Tooltip
         id="bot-import-button"
         place="top"
-        
       />
       <input
         type="file"
