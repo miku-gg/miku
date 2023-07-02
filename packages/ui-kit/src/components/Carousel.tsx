@@ -86,13 +86,22 @@ const Carousel: React.FC<CarouselProps> = ({
                   index === selectedIndex ? 'selectedImage' : ''
                 }`}
               >
-                {item.contentImage && (
-                  <img
-                    src={item.contentImage}
-                    alt={item.title}
-                    className="Carousel__imageContent"
-                  />
-                )}
+                {item.contentImage &&
+                  (item.contentImage.indexOf('video/webm') !== -1 ? (
+                    <video
+                      src={item.contentImage}
+                      autoPlay={true}
+                      loop={true}
+                      muted={true}
+                      className="Carousel__imageContent"
+                    />
+                  ) : (
+                    <img
+                      src={item.contentImage}
+                      alt={item.title}
+                      className="Carousel__imageContent"
+                    />
+                  ))}
               </div>
             ) : null}
             {item.title}

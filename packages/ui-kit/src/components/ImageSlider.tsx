@@ -50,11 +50,21 @@ const ImageSlider = ({
               : undefined
           }
         >
-          <img
-            className="ImageSlider__selectedImage"
-            src={selectedImage.source}
-            alt={`img:${selectedImage.label}`}
-          />
+          {selectedImage.source.indexOf('video/webm') !== -1 ? (
+            <video
+              className="ImageSlider__selectedImage"
+              src={selectedImage.source}
+              autoPlay={true}
+              loop={true}
+              muted={true}
+            />
+          ) : (
+            <img
+              className="ImageSlider__selectedImage"
+              src={selectedImage.source}
+              alt={`img:${selectedImage.label}`}
+            />
+          )}
         </div>
 
         <button className="ImageSlider__nextButton" onClick={() => onChange(1)}>

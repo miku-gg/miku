@@ -4,6 +4,7 @@ import * as MikuExtensions from '@mikugg/extensions';
 import { Button, Tooltip } from '@mikugg/ui-kit';
 import { v4 as uuidv4 } from 'uuid';
 import JSZip from 'jszip';
+import { Buffer } from 'buffer';
 
 import { useCharacterCreationForm } from '../CharacterCreationFormContext';
 import loadIcon from "../assets/load.svg";
@@ -267,8 +268,24 @@ const extractZipContent = (file: File): Promise<{
           zipData.forEach((relativePath, file) => {
             if (!file.dir && relativePath.includes('images')) {
               promises.push(
-                file.async('base64').then((content) => {
-                  result.images[file.name.replace('images/', '')] = 'data:image/png;base64,'+ content;
+                file.async("binarystring").then(function (fileBinary) {
+                  const fileBuffer = Buffer.from(fileBinary, 'binary')
+                  const fileSignature: {[key: string]: string} = {
+                    '89504E47': 'image/png',
+                    '47494638': 'image/gif',
+                    'FFD8FFE0': 'image/jpeg',
+                    'FFD8FFE1': 'image/jpeg',
+                    'FFD8FFE2': 'image/jpeg',
+                    '1A45DFA3': 'video/webm',
+                  };
+
+                  const signature = fileBuffer.toString('hex', 0, 4).toUpperCase();
+                  let filetype = 'image/png';
+                  if (signature in fileSignature) {
+                    filetype = fileSignature[signature] || 'image/png';
+                  }
+                  console.log('filetype', filetype);
+                  result.images[file.name.replace('images/', '')] = `data:${filetype};base64,${fileBuffer.toString('base64')}`;
                 })
               );
             } else if (file.comment === 'Bot Config') {
@@ -427,7 +444,7 @@ const processMikuZip = async (file: File): Promise<MikuCard> => {
               trigger_suggestion_similarity: '',
               trigger_action: '',
               background: default_background_ids[0],
-              emotion_group: default_emotion_group_ids[0],
+              emotion_group: default_emotion_group_ids[index],
               voice: default_voice_id,
             })),
             emotion_groups: emotions.contexts.map((context, index) => ({

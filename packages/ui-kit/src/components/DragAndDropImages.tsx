@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { DefaultImage, UploadIcon } from '../assets/svg';
-
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import './DragAndDropImages.scss';
 interface DragAndDropImagesProps {
@@ -88,7 +87,7 @@ const DragAndDropImages = ({
           </div>
         ) : (
           <div className="dragAndDropImages__preview">
-            {dragFile?.type === 'video/webm' ? (
+            {sourceFile.indexOf('video/webm') !== -1 ? (
               <video
                 src={sourceFile}
                 autoPlay={true}

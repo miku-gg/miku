@@ -584,6 +584,9 @@ importers:
       react-lazy-load-image-component:
         specifier: ^1.6.0
         version: 1.6.0(react-dom@18.2.0)(react@18.2.0)
+      react-lazy-media:
+        specifier: ^0.3.1
+        version: 0.3.1(react-dom@18.2.0)(react@18.2.0)
       react-modal:
         specifier: ^3.16.1
         version: 3.16.1(react-dom@18.2.0)(react@18.2.0)
@@ -8710,6 +8713,10 @@ packages:
       side-channel: 1.0.4
     dev: true
 
+  /intersection-observer@0.7.0:
+    resolution: {integrity: sha512-Id0Fij0HsB/vKWGeBe9PxeY45ttRiBmhFyyt/geBdDHBYNctMRTE3dC1U3ujzz3lap+hVXlEcVaB56kZP/eEUg==}
+    dev: false
+
   /ip@2.0.0:
     resolution: {integrity: sha512-WKa+XuLG1A1R0UWhl2+1XQSi+fZWMsYKffMZTTYsiZaUD8k2yDAj5atimTUD2TZkyCkNEeYE5NhFZmupOGtjYQ==}
     dev: true
@@ -11546,6 +11553,20 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
+  /react-lazy-media@0.3.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-wQgMyoyO+FibSxuCQUiPlhvF+f2qRpSloPwGbY9RCmE40MoVANmffVOBUn3T2rakKQYY80higrHNW6fYsX4F4A==}
+    peerDependencies:
+      react: '>=16.0.0'
+      react-dom: '>=16.0.0'
+    dependencies:
+      classnames: 2.3.2
+      intersection-observer: 0.7.0
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      yall-js: 3.2.0
+    dev: false
+
   /react-lifecycles-compat@3.0.4:
     resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
     dev: false
@@ -13526,6 +13547,11 @@ packages:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
     dev: true
+
+  /yall-js@3.2.0:
+    resolution: {integrity: sha512-e62eb6pZdCs/YhKrgTYG6vlzIwNeqzA8j/jVjdLJLFaAHZVzWylSqe/LIHeMGcSExfDHtKeN8Dk6QMTLy17Bxg==}
+    requiresBuild: true
+    dev: false
 
   /yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}

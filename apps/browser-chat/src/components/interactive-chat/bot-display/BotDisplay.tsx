@@ -90,7 +90,9 @@ const VITE_IMAGES_DIRECTORY_ENDPOINT =
   import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
   "http://localhost:8585/image";
 
-function AnimateResponse({ text }: { text: string }): JSX.Element {
+const alreadyAnimated = new Set<string>();
+
+function AnimateResponse({ text, fast }: { text: string, fast: boolean }): JSX.Element {
   const [parts, setParts] = useState<{content: string, isItalic: boolean, id: string}[]>([]);
   const [partIndex, setPartIndex] = useState<number>(0);
 
@@ -119,7 +121,7 @@ function AnimateResponse({ text }: { text: string }): JSX.Element {
             () => setPartIndex(index => Math.min(index + 1, parts.length - 1))
           ]}
           wrapper="span"
-          speed={70}
+          speed={fast ? 99 : 70}
         />
       ))}
     </>
@@ -360,7 +362,11 @@ export const BotDisplay = () => {
               <button className="rounded-full" onClick={displayBotDetails}>
                 <img src={infoIcon} />
               </button>
-              <ScenarioSelector value={currentContext} onChange={updateContext} />
+              {
+                ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1) ? (
+                  <ScenarioSelector value={currentContext} onChange={updateContext} />
+                ) : null
+              }
             </div>
             <div className="flex gap-3">
               <button
@@ -403,7 +409,7 @@ export const BotDisplay = () => {
                 <Loader />
               ) : (
                 <div className="text-md font-bold text-gray-200 text-left">
-                  <AnimateResponse text={response?.text || ''} />
+                  <AnimateResponse text={response?.text || ''} fast={responseIndex > 0} />
                 </div>
               )}
             </div>
@@ -425,7 +431,7 @@ export const BotDisplay = () => {
                 </button>
               </div>
             ) : null}
-            {!loading && responseIndex === 0 ? (
+            {!loading && responseIds.length > 1 &&  responseIndex === 0 ? (
               <button
                 className="reload-button absolute top-[-2.5em] right-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
                 onClick={onRegenerateClick}
