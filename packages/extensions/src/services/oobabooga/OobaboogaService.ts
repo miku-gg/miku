@@ -36,6 +36,8 @@ export class OobaboogaService extends Miku.Services.Service {
   ): Promise<string> {
     const modelSettings = JSON.parse(input.settings);
     if (!modelSettings) return "";
+    const gptTokens = this.tokenizer.encode(input.prompt).bpe.length;
+    if (gptTokens > 1960) return "";
     let gradioEndpoint = this.gradioEndpoint;
     if (input.gradioEndpoint) gradioEndpoint = input.gradioEndpoint;
     const completion = await axios.post(
