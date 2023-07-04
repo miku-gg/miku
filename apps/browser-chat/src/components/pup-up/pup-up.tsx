@@ -29,7 +29,7 @@ export const PopUp = ({
       {isShowingPupUp == true ? (
         <div className="flex flex-col items-center justify-center absolute top-0 left-0 w-full h-full bg-gray-500/[.7] z-50">
           <div
-            className={`flex flex-col w-4/12 max-h-[90%] min-h-[90%] rounded-lg ${
+            className={`flex flex-col w-11/12 max-h-[90%] min-h-[90%] rounded-lg ${
               darkTheme ? "bg-[#272727]" : "bg-white"
             } p-2 ${
               className ? className : null
