@@ -45,7 +45,7 @@ export const mikuCardToBotConfig = (card: MikuCard): BotConfig => {
           "Anon"
         ],
         botSubject: card.data.name,
-        buildStrategySlug: "vicuna11",
+        buildStrategySlug: "alpaca",
         parts: {
           "persona": card.data.description,
           "attributes": parseAttributes(card.data.personality),

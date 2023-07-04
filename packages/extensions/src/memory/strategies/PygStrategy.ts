@@ -33,6 +33,10 @@ export class PygStrategy implements ContextPromptBuildStrategy {
   }
 
   getMemoryLinePrompt(memoryLine: MikuCore.Memory.MemoryLine, isBot: boolean): string {
-    return isBot ? `{{char}}: ${memoryLine.text}` : `{{user}}: ${memoryLine.text}`
+    return isBot ?
+      `{{char}}: ${memoryLine.text}` :
+        memoryLine.type === MikuCore.Commands.CommandType.CONTEXT ?
+        `${memoryLine.text}` :
+        `{{user}}: ${memoryLine.text}`
   }
 }

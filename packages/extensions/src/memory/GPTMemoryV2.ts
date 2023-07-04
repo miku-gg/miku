@@ -1,6 +1,5 @@
 
 import * as Strategies from './strategies';
-import { GPTShortTermMemory, GPTShortTermMemoryConfig } from './GPTMemory';
 import { replaceAll } from './strategies/RPBTStrategy';
 import * as MikuCore from '@mikugg/core';
 export * as Strategies from './strategies';
@@ -115,7 +114,7 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
     let memoryLinesPrompt = '';
 
     // Entire prompt under 2048 tokens
-    const MAX_PROMPT_TOKENS = 1900;
+    const MAX_PROMPT_TOKENS = 1800;
     do {
       memoryLinesPrompt = this.buildMemoryLinesPrompt(memorySize--);
     } while (
@@ -130,7 +129,6 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
 
     prompt = replaceAll(prompt, '{{char}}', this.promptParts.botSubject);
     prompt = replaceAll(prompt, '{{user}}', 'Anon');
-    prompt = replaceAll(prompt, 'Senpai', 'Anon');
 
     return prompt;
   }

@@ -26,6 +26,10 @@ export class SbfStrategy implements ContextPromptBuildStrategy {
   }
 
   getMemoryLinePrompt(memoryLine: MikuCore.Memory.MemoryLine, isBot: boolean): string {
-    return isBot ? `{{char}}: ${memoryLine.text}\n` : `{{user}}: ${memoryLine.text}\n`
+    return isBot ?
+      `{{char}}: ${memoryLine.text}` :
+        memoryLine.type === MikuCore.Commands.CommandType.CONTEXT ?
+        `${memoryLine.text}` :
+        `{{user}}: ${memoryLine.text}`
   }
 }
