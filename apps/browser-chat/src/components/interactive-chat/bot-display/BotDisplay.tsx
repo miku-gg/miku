@@ -207,7 +207,8 @@ export const BotDisplay = () => {
         // @ts-ignore
         bot.sendPrompt(
           `*${context.context_change_trigger}*`,
-          MikuCore.Commands.CommandType.DIALOG
+          MikuCore.Commands.CommandType.DIALOG,
+          bot.getMemory().getBotSubject()
         );
       }
     }

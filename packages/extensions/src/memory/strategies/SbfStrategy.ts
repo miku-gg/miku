@@ -1,4 +1,5 @@
 import { ContextPromptBuildStrategy, ContextPromptParts } from '../GPTMemoryV2';
+import * as MikuCore from '@mikugg/core';
 
 export class SbfStrategy implements ContextPromptBuildStrategy {
   buildContextPrompt(parts: ContextPromptParts): string {
@@ -18,5 +19,13 @@ export class SbfStrategy implements ContextPromptBuildStrategy {
 
   getBotSubject(parts: ContextPromptParts): string {
     return parts.botSubject;
+  }
+
+  getResponseAskLine(): string {
+    return '{{char}}: '
+  }
+
+  getMemoryLinePrompt(memoryLine: MikuCore.Memory.MemoryLine, isBot: boolean): string {
+    return isBot ? `{{char}}: ${memoryLine.text}\n` : `{{user}}: ${memoryLine.text}\n`
   }
 }

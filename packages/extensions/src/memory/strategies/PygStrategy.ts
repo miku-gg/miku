@@ -1,3 +1,4 @@
+import * as MikuCore from '@mikugg/core';
 import { ContextPromptBuildStrategy, ContextPromptParts } from '../GPTMemoryV2';
 
 export class PygStrategy implements ContextPromptBuildStrategy {
@@ -25,5 +26,13 @@ export class PygStrategy implements ContextPromptBuildStrategy {
 
   getBotSubject(parts: ContextPromptParts): string {
     return parts.botSubject;
+  }
+
+  getResponseAskLine(): string {
+    return '{{char}}: '
+  }
+
+  getMemoryLinePrompt(memoryLine: MikuCore.Memory.MemoryLine, isBot: boolean): string {
+    return isBot ? `{{char}}: ${memoryLine.text}` : `{{user}}: ${memoryLine.text}`
   }
 }
