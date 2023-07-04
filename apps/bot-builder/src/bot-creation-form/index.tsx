@@ -9,7 +9,6 @@ import { Button, TextHeading } from "@mikugg/ui-kit";
 import { MikuCard } from "@mikugg/bot-validator";
 
 import { validateStep } from "./libs/CharacterData";
-import { BUILDING_STEPS } from "./libs/bot-file-builder";
 import { downloadBlob } from "./libs/file-download";
 
 import Modal from "./Modal";
@@ -25,7 +24,7 @@ import nextIcon from "./assets/nextArrow.svg";
 import saveIcon from "./assets/save.svg";
 
 import "./styles/main.scss";
-import { downloadPng } from "./libs/encodePNG";
+import { downloadPng, BUILDING_STEPS } from "./libs/encodePNG";
 import BotImport from "./Components/BotImport";
 
 const save = (card: MikuCard) => {
@@ -64,8 +63,12 @@ const _CharacterCreationForm: React.FC = () => {
   };
 
   const handleBuildBot = async () => {
-    // await downloadBotFile(card, setBuildingStep);
-    await downloadPng(JSON.stringify(card), card.data.extensions.mikugg.profile_pic, card.data.name);
+    await downloadPng(
+      JSON.stringify(card),
+      card.data.extensions.mikugg.profile_pic,
+      card.data.name,
+      setBuildingStep
+    );
   };
 
   return (
@@ -120,21 +123,25 @@ const _CharacterCreationForm: React.FC = () => {
       </div>
       {buildingStep > BUILDING_STEPS.STEP_0_NOT_BUILDING && (
         <Modal
-          overlayClose={buildingStep === BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP}
+          overlayClose={buildingStep === BUILDING_STEPS.STEP_5_DONE}
           onClose={() => setBuildingStep(BUILDING_STEPS.STEP_0_NOT_BUILDING)}
         >
-          {buildingStep !== BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP && (
+          {buildingStep !== BUILDING_STEPS.STEP_5_DONE && (
             <div className="loading"></div>
           )}
           <div className="loading-text">
             {(function () {
               switch (buildingStep) {
-                case BUILDING_STEPS.STEP_1_GENERATING_EMBEDDINGS:
-                  return "Generating embeddings...";
-                case BUILDING_STEPS.STEP_2_GENERATING_ZIP:
-                  return "Generating .miku file...";
-                case BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP:
-                  return "Please download the .miku file";
+                case BUILDING_STEPS.STEP_1_COMBINE_IMAGE:
+                  return "Generating png image...";
+                case BUILDING_STEPS.STEP_2_GENERATING_CHUNKS:
+                  return "Generating chunks...";
+                case BUILDING_STEPS.STEP_3_ENCODING_CHUNKS:
+                  return "Encoding chunks in png...";
+                case BUILDING_STEPS.STEP_4_BUILDING_DOWNLOAD_FILE:
+                  return "Downloading png file...";
+                case BUILDING_STEPS.STEP_5_DONE:
+                  return "Bot builded successfully";
                 default:
                   return "Building bot...";
               }

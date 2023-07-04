@@ -14,22 +14,143 @@ export const hashBase64URI = async (base64Content: string): Promise<string> => {
 }
 
 import extract from 'png-chunks-extract'
-import text from 'png-chunk-text'
 import { Buffer } from 'buffer';
 import { MikuCard } from '..';
 
-async function getImageBuffer(file?: File) {
-  if (!file) return
-  const reader = new FileReader()
+function textDecode(data: any): {keyword: string, text: Buffer} {
+  if (data.data && data.name) {
+    data = data.data
+  }
+
+  let naming = true
+  let name = '';
+  const buffers = [];
+  let textChunk = '';
+
+  const CHUNK_SIZE = 10 * 1024 * 1024; // size of chunk in bytes
+
+  for (let i = 0; i < data.length; i++) {
+    const code = data[i]
+
+    if (naming) {
+      if (code) {
+        name += String.fromCharCode(code)
+      } else {
+        naming = false
+      }
+    } else {
+      if (code) {
+        textChunk += String.fromCharCode(code)
+      } else {
+        throw new Error('Invalid NULL character found. 0x00 character is not permitted in tEXt content')
+      }
+    }
+
+    // If the current text chunk has reached the maximum chunk size, or if this is the last iteration
+    if (textChunk.length >= CHUNK_SIZE || i === data.length - 1) {
+      // Decode the current text chunk and add it to the buffers array
+      buffers.push(Buffer.from(textChunk, 'base64'));
+      // Clear the current text chunk
+      textChunk = '';
+    }
+  }
+
+  // Concatenate all buffers into a single buffer
+  const textBuffer = Buffer.concat(buffers);
+
+  return {
+    keyword: name,
+    text: textBuffer
+  }
+}
+
+
+
+function textDecode2 (data: any) {
+  if (data.data && data.name) {
+    data = data.data
+  }
+
+  let naming = true
+  let text = ''
+  let name = ''
+
+  for (let i = 0; i < data.length; i++) {
+    const code = data[i]
+
+    if (naming) {
+      if (code) {
+        name += String.fromCharCode(code)
+      } else {
+        naming = false
+      }
+    } else {
+      if (code) {
+        text += String.fromCharCode(code)
+      } else {
+        throw new Error('Invalid NULL character found. 0x00 character is not permitted in tEXt content')
+      }
+    }
+  }
+
+  return {
+    keyword: name,
+    text: text
+  }
+}
+
+
+async function getImageBuffer(file: File) {
+  if (!file) return;
+  const chunkSize = 1024 * 1024; // 1MB chunks
+  let position = 0;
+  const buffers: Uint8Array[] | Buffer[] = [];
 
   return new Promise<Buffer>((resolve, reject) => {
-    reader.readAsArrayBuffer(file)
+    function readChunk() {
+      const reader = new FileReader();
 
-    reader.onload = (evt) => {
-      if (!evt.target?.result) return reject(new Error(`Failed to process image`))
-      resolve(Buffer.from(evt.target.result as ArrayBuffer))
+      if (position >= file.size) {
+        // all chunks have been read
+        resolve(Buffer.concat(buffers));
+        return;
+      }
+
+      const chunk = file.slice(position, position + chunkSize);
+      reader.readAsArrayBuffer(chunk);
+
+      reader.onload = (evt) => {
+        if (!evt.target?.result) return reject(new Error(`Failed to process image`));
+        buffers.push(Buffer.from(evt.target.result as ArrayBuffer));
+        position += chunkSize;
+        readChunk();
+      }
+
+      reader.onerror = (err) => {
+        reject(err);
+      };
     }
-  })
+
+    // start reading the first chunk
+    readChunk();
+  });
+}
+
+function readFile(file: File) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const result = event?.target?.result;
+      resolve(result);
+    };
+
+    reader.onerror = (event) => {
+      reject(new Error("File could not be read! Code " + event?.target?.error));
+    };
+
+    reader.readAsText(file, 'utf-8'); // Read the file content as a text string with utf-8 encoding
+  });
 }
 
 export async function extractCardFromBuffer(buffer?: any): Promise<object> {
@@ -39,7 +160,8 @@ export async function extractCardFromBuffer(buffer?: any): Promise<object> {
   }
   const textExtractions = extractions
     .filter((d: {name: string}) => d.name === 'tEXt')
-    .map((d: {data: any}) => text.decode(d.data))
+    .map((d: {data: any}) => textDecode(d.data))
+
 
   const [extracted] = textExtractions
   if (!extracted) {
@@ -48,14 +170,26 @@ export async function extractCardFromBuffer(buffer?: any): Promise<object> {
     )
   }
 
-  const data = Buffer.from(extracted.text, 'base64').toString('utf-8')
+  let fileContent = '';
+
+  if (typeof window !== 'undefined') {
+    const blob = new Blob([extracted.text], { type: 'text/plain' });
+    const file = new File([blob], 'testfile.json', { type: 'text/plain' });
+    fileContent = await readFile(file) as string;
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const fs = require('fs');
+    fs.writeFileSync('_temp/_temp_bot.json', extracted.text);
+    fileContent = fs.readFileSync('_temp/_temp_bot.json', 'utf-8');
+  }
 
   try {
-    return JSON.parse(data);
+    return JSON.parse(fileContent as string);
   } catch (ex: any) {
     throw new Error(`Failed parsing tavern data as JSON: ${ex.message}`)
   }
 }
+
 
 export async function extractCardData(file: File): Promise<object> {
   const buffer = await getImageBuffer(file);

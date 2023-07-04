@@ -28,6 +28,7 @@ import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
 import { BotSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
 import ScenarioSelector from "../scenario-selector/ScenarioSelector";
+import EmotionRenderer from "../../asset-renderer/EmotionRenderer";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -150,10 +151,6 @@ export const BotDisplay = () => {
     onUpdate,
   } = useContext(InteractiveResponsesContext);
   const [contextSuggestion, setContextSuggestion] = useState<string>("");
-  const [emotionImgIsLoading, setEmotionImgIsLoading] = useState(false);
-  const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
-  const [fileType, setFileType] = useState<string | null>(null);
-  const [blobUrl, setBlobUrl] = useState<string>("");
 
   let backgroundImage = card?.data.extensions.mikugg.backgrounds.find(bg => bg.id === card?.data.extensions.mikugg.scenarios.find(scenario => scenario.id === currentContext)?.background || '')?.source || '';
   let emotionImage = response?.emotion || prevResponse?.emotion || "";
@@ -183,33 +180,6 @@ export const BotDisplay = () => {
       emotionImage = openAIEmotionConfig?.props?.images?.neutral || "";
     }
   }
-
-  useEffect(() => {
-    async function fetchFile() {
-      try {
-        setEmotionImgIsLoading(true);
-        const response = await fetch(
-          `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${emotionImage}`
-        );
-        if (response.ok) {
-          const contentType = response.headers.get("Content-Type");
-          const data = await response.blob();
-          const newBlobUrl = URL.createObjectURL(data);
-          setBlobUrl(newBlobUrl);
-          setFileType(contentType);
-          setEmotionImgIsLoading(false);
-          setHasPlayedAudio(false);
-        } else {
-          console.error("Error fetching file:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error fetching file:", error);
-      }
-    }
-
-    fetchFile();
-    setEmotionImgIsLoading(false);
-  }, [emotionImage]);
 
   useEffect(() => {
     const bot = botFactory.getInstance();
@@ -320,37 +290,6 @@ export const BotDisplay = () => {
     }
   };
 
-  const renderEmotionElement = (): JSX.Element => {
-    if (fileType === "video/webm") {
-      return (
-        <video
-          className={`absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover ${
-            !emotionImgIsLoading ? "fade-in up-and-down" : ""
-          }`}
-          src={blobUrl}
-          loop
-          autoPlay
-          muted
-          onPlay={() => setHasPlayedAudio(true)}
-        />
-      );
-    } else {
-      return (
-        <img
-          className={`absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover ${
-            !emotionImgIsLoading ? "fade-in up-and-down" : ""
-          }`}
-          src={blobUrl}
-          alt="character"
-          onError={({ currentTarget }) => {
-            currentTarget.onerror = null;
-            currentTarget.src = "/default_character.png";
-          }}
-        />
-      );
-    }
-  };
-
   return (
     // MAIN CONTAINER
     <>
@@ -393,7 +332,11 @@ export const BotDisplay = () => {
               currentTarget.src = "/default_background.png";
             }}
           />
-          {renderEmotionElement()}
+          <EmotionRenderer
+            assetUrl={emotionImage}
+            upDownAnimation
+            className="absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover"
+          />
         </div>
         {/* RESPONSE CONTAINER */}
         <div

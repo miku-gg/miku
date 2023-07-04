@@ -284,7 +284,6 @@ const extractZipContent = (file: File): Promise<{
                   if (signature in fileSignature) {
                     filetype = fileSignature[signature] || 'image/png';
                   }
-                  console.log('filetype', filetype);
                   result.images[file.name.replace('images/', '')] = `data:${filetype};base64,${fileBuffer.toString('base64')}`;
                 })
               );
@@ -509,7 +508,6 @@ const BotImport: React.FC = () => {
           reader.readAsText(file);
         } else if (file.name.endsWith('.miku')) {
           const _card = await processMikuZip(file);
-          console.log('loaded2');
           setCard(_card);
           setLoading(false);
         }

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { MikuCard } from '@mikugg/bot-validator';
 import backgroundIcon from "../../../assets/icons/background.png";
 import './ScenarioSelector.css';
 import { useBot } from '../../../libs/botLoader';
+import EmotionRenderer from '../../asset-renderer/EmotionRenderer';
 
 
 const VITE_IMAGES_DIRECTORY_ENDPOINT =
@@ -56,7 +56,10 @@ export default function ScenarioSelector({ value, onChange}: ScenarioSelectorPro
             return (
               <button className="ScenarioSelector__item" key={`scenario-selector-${_scenario.id}-${index}`} onClick={handleItemClick.bind(null, _scenario.id)}>
                 <div className="ScenarioSelector__item-background" style={{ backgroundImage: `url(${VITE_IMAGES_DIRECTORY_ENDPOINT}/${_scenario.background})`}}/>
-                <img className="ScenarioSelector__item-emotion" src={`${VITE_IMAGES_DIRECTORY_ENDPOINT}/${_scenario.emotionImg}`} />
+                <EmotionRenderer
+                  className="ScenarioSelector__item-emotion"
+                  assetUrl={_scenario.emotionImg || ''}
+                />
                 <div className="ScenarioSelector__item-text">
                   {_scenario.trigger_action}
                 </div>
