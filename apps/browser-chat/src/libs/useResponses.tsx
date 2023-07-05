@@ -80,8 +80,12 @@ export const InteractiveResponsesContextProvider = ({
     if (botConfig && card) {
       const firstScenario = card?.data.extensions.mikugg.scenarios.find(scenario => card?.data.extensions.mikugg.start_scenario === scenario.id);
       const firstEmotionGroup = card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
-      let firstImage = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'neutral')?.source[0] : firstEmotionGroup?.emotions[0].source[0];
-      fillResponse('first', "text", card.data.first_mes);
+      let firstImage = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'happy')?.source[0] : firstEmotionGroup?.emotions[0].source[0];
+      let firstMessage = card?.data.first_mes || '';
+      firstMessage = MikuExtensions.Memory.Strategies.replaceAll(firstMessage, '{{char}}', card?.data.name || '');
+      firstMessage = MikuExtensions.Memory.Strategies.replaceAll(firstMessage, '{{user}}', 'Anon');
+
+      fillResponse('first', "text", firstMessage);
       fillResponse('first', "emotion", firstImage || '');
       fillResponse('first', "audio", '');
       setResponseIds(['first']);
