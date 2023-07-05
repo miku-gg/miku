@@ -15,6 +15,21 @@ const DEFAULT_TAGS = [
   { value: 'Famale' },
   { value: 'OC' },
   { value: 'NSFW' },
+  { value: 'RPG' },
+  { value: 'Anime' },
+  { value: 'Videogame' },
+  { value: 'Fantasy' },
+  { value: 'Action' },
+  { value: 'Tsundere' },
+  { value: 'Yandere' },
+  { value: 'Cute' },
+  { value: 'Horror' },
+  { value: 'Comedy' },
+  { value: 'History' },
+  { value: 'Work' },
+  { value: 'Movies & TV' },
+  { value: 'VTuber' },
+  { value: 'Realistic' }
 ];
 
 const Step1Description: React.FC = () => {
