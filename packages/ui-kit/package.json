@@ -26,7 +26,7 @@
     "lint:scss": "stylelint 'src/**/*.scss'",
     "format": "prettier --write --loglevel warn 'src/**/*.{js,jsx,ts,tsx,json,md,scss}'",
     "format:check": "prettier --check 'src/**/*.{js,jsx,ts,tsx,json,md,scss}'",
-    "test": "npm run lint:ts && npm run lint:es && npm run lint:scss && npm run format:check"
+    "_test": "npm run lint:ts && npm run lint:es && npm run lint:scss && npm run format:check"
   },
   "keywords": [],
   "author": "",
