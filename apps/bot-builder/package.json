@@ -52,6 +52,7 @@
     "@types/polycrc": "^0.1.0",
     "@types/prop-types": "^15.7.5",
     "@types/react": "^18.0.26",
+    "@types/uuid": "^9.0.1",
     "axios": "^1.2.4",
     "base-64": "^1.0.0",
     "buffer": "^6.0.3",

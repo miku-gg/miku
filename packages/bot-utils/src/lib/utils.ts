@@ -1,5 +1,5 @@
 import * as MikuExtensions from '@mikugg/extensions';
-import { MikuCard, EMOTION_GROUP_TEMPLATES } from "./MikuCardValidator";
+import { MikuCard } from "./MikuCardValidator";
 import { BotConfig } from "./BotConfigValidator";
 
 export function parseAttributes(s: string): [string, string][] {
