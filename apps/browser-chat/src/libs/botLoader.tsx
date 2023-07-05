@@ -269,7 +269,7 @@ export function useBot(): {
         await preLoadImages(res.card?.data.extensions?.mikugg?.backgrounds?.map(
           (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}`
         ) || []);
-        await preLoadImages(res.card?.data.extensions?.mikugg?.emotion_groups?.find(eg => eg.id === defaultEmotionGroupId)?.emotions?.filter((em, index) => em.id === 'neutral' || index === 0).map(
+        await preLoadImages(res.card?.data.extensions?.mikugg?.emotion_groups?.find(eg => eg.id === defaultEmotionGroupId)?.emotions?.filter((em, index) => em.id === 'happy' || index === 0).map(
           (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}`
         ) || []);
         
