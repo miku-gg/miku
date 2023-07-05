@@ -1,4 +1,4 @@
-import { BotConfig, MikuCard, mikuCardToBotConfig } from "@mikugg/bot-validator";
+import { BotConfig, MikuCard, mikuCardToBotConfig } from "@mikugg/bot-utils";
 import React, { useCallback, useContext, useState } from "react";
 import botFactory from './botFactory';
 import queryString from "query-string";

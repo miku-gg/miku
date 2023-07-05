@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { Modal, Button, Carousel, CheckBox, Container, ImageSlider, Input, TextHeading } from "@mikugg/ui-kit";
 import { useCharacterCreationForm } from "./CharacterCreationFormContext";
-import { MikuCard } from "@mikugg/bot-validator";
+import { MikuCard } from "@mikugg/bot-utils";
 import VoiceSelector from "./Components/VoiceSelector";
 import { BackgroundIcon, SlidesIcon } from "./assets/svg";
 

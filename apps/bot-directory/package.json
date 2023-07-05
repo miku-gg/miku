@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mikugg/bot-validator": "workspace:^0.5.0",
+    "@mikugg/bot-utils": "workspace:^0.5.0",
     "@mikugg/core": "^0.5.0",
     "@mikugg/extensions": "^0.5.0",
     "@types/body-parser": "^1.19.2",

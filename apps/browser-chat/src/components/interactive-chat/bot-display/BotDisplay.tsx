@@ -24,7 +24,7 @@ import { UnmuteIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
-import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
+import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-utils";
 import { BotSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
 import ScenarioSelector from "../scenario-selector/ScenarioSelector";

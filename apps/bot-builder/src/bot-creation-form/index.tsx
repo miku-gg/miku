@@ -6,7 +6,7 @@ import {
 } from "./CharacterCreationFormContext";
 
 import { Button, TextHeading } from "@mikugg/ui-kit";
-import { MikuCard } from "@mikugg/bot-validator";
+import { MikuCard } from "@mikugg/bot-utils";
 
 import { validateStep } from "./libs/CharacterData";
 import { downloadBlob } from "./libs/file-download";

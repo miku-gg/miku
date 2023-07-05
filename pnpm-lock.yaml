@@ -16,7 +16,7 @@ importers:
       '@ipld/dag-pb':
         specifier: ^4.0.2
         version: 4.0.2
-      '@mikugg/bot-validator':
+      '@mikugg/bot-utils':
         specifier: ^0.5.0
         version: link:../../packages/bot-validator
       '@mikugg/core':
@@ -149,7 +149,7 @@ importers:
 
   apps/bot-directory:
     dependencies:
-      '@mikugg/bot-validator':
+      '@mikugg/bot-utils':
         specifier: workspace:^0.5.0
         version: link:../../packages/bot-validator
       '@mikugg/core':
@@ -234,7 +234,7 @@ importers:
       '@heroicons/react':
         specifier: ^2.0.14
         version: 2.0.14(react@18.2.0)
-      '@mikugg/bot-validator':
+      '@mikugg/bot-utils':
         specifier: ^0.5.0
         version: link:../../packages/bot-validator
       '@mikugg/core':

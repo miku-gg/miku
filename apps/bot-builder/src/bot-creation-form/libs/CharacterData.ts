@@ -1,4 +1,4 @@
-import { MikuCard } from '@mikugg/bot-validator';
+import { MikuCard } from '@mikugg/bot-utils';
 import { emotionTemplates } from '../data/emotions';
 export { type EmotionTemplate, emotionTemplates } from '../data/emotions';
 export { voices } from '../data/voices';

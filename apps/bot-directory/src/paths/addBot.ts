@@ -1,7 +1,6 @@
 import fs, { readFileSync } from 'fs';
 import { Request, Response } from "express";
-import { MikuCard, extractCardFromBuffer, extractMikuCardImages, validateMikuCard } from "../../../../packages/bot-validator/dist";
-import { itemsEmbedder } from '@mikugg/bot-validator';
+import { MikuCard, extractCardFromBuffer, extractMikuCardImages, validateMikuCard, itemsEmbedder } from "@mikugg/bot-utils";
 import config from '../config';
 const Hash = require('ipfs-only-hash');
 

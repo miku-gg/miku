@@ -5,7 +5,6 @@ import {
   OpenAIMessage,
   OpenAIPromptCompleterServicePropTypes,
 } from "../services/openai/OpenAIPromptCompleterService";
-import { ShortTermMemory } from "@mikugg/core/dist/memory";
 import { ServicesNames } from "../services";
 import trim from "lodash.trim";
 
@@ -79,7 +78,7 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters
     return { text: result.replace(`${this.memory.getBotSubject()}: `, ``) };
   }
 
-  protected getChatMessages(memory: ShortTermMemory): OpenAIMessage[] {
+  protected getChatMessages(memory: Core.Memory.ShortTermMemory): OpenAIMessage[] {
     const basePrompt = memory.getContextPrompt();
     const memoryLines = [
       ...this.getInitiatorPromptAsMemories(memory),
@@ -117,7 +116,7 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters
   }
 
   private getInitiatorPromptAsMemories(
-    memory: ShortTermMemory
+    memory: Core.Memory.ShortTermMemory
   ): Core.Memory.MemoryLine[] {
     const initiatorPromptLines = memory.getInitiatorPrompt().split("\n");
     const subjects = memory.getSubjects() || [];

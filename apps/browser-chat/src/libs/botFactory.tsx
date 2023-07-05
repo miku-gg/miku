@@ -1,6 +1,6 @@
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
-import { BotConfig } from "@mikugg/bot-validator";
+import { BotConfig } from "@mikugg/bot-utils";
 import { toast } from "react-toastify";
 import { CustomEndpoints } from "./botLoader";
 

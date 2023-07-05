@@ -1,4 +1,4 @@
-import { MikuCard } from "@mikugg/bot-validator";
+import { MikuCard } from "@mikugg/bot-utils";
 import { downloadBlob, generateZipFile } from "./file-download";
 import { hashBase64URI } from "./utils";
 

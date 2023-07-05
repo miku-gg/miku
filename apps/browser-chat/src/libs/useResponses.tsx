@@ -3,7 +3,7 @@ import * as MikuExtensions from "@mikugg/extensions";
 import { BotReponse, fillResponse, responsesStore } from "./responsesStore";
 import { useBot } from "./botLoader";
 import botFactory from "./botFactory";
-import { BotConfig } from "@mikugg/bot-validator";
+import { BotConfig } from "@mikugg/bot-utils";
 
 const playAudio = (base64: string): void => {
   const snd = new Audio(base64);

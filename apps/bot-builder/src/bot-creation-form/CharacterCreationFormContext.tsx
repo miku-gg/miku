@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { MikuCard, EMPTY_MIKU_CARD } from '@mikugg/bot-validator';
+import { MikuCard, EMPTY_MIKU_CARD } from '@mikugg/bot-utils';
 
 
 interface CharacterCreationFormContextData {

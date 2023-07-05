@@ -1,11 +1,11 @@
 {
-  "name": "@mikugg/bot-validator",
+  "name": "@mikugg/bot-utils",
   "version": "0.5.0",
   "description": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/miku-gg/miku.git",
-    "directory": "packages/bot-validator"
+    "directory": "packages/bot-utils"
   },
   "publishConfig": {
     "access": "public",

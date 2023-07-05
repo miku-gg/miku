@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { BotConfig, BotConfigV1, BotConfigV2, MikuCard, TavernCardV2, extractCardData } from '@mikugg/bot-validator';
+import { BotConfig, BotConfigV1, BotConfigV2, MikuCard, TavernCardV2, extractCardData } from '@mikugg/bot-utils';
 import * as MikuExtensions from '@mikugg/extensions';
 import { Button, Tooltip } from '@mikugg/ui-kit';
 import { v4 as uuidv4 } from 'uuid';
