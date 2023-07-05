@@ -18,7 +18,7 @@ importers:
         version: 4.0.2
       '@mikugg/bot-utils':
         specifier: ^0.5.0
-        version: link:../../packages/bot-validator
+        version: link:../../packages/bot-utils
       '@mikugg/core':
         specifier: ^0.5.0
         version: link:../../packages/core
@@ -151,7 +151,7 @@ importers:
     dependencies:
       '@mikugg/bot-utils':
         specifier: workspace:^0.5.0
-        version: link:../../packages/bot-validator
+        version: link:../../packages/bot-utils
       '@mikugg/core':
         specifier: ^0.5.0
         version: link:../../packages/core
@@ -236,7 +236,7 @@ importers:
         version: 2.0.14(react@18.2.0)
       '@mikugg/bot-utils':
         specifier: ^0.5.0
-        version: link:../../packages/bot-validator
+        version: link:../../packages/bot-utils
       '@mikugg/core':
         specifier: ^0.5.0
         version: link:../../packages/core
@@ -387,7 +387,7 @@ importers:
         specifier: ^2.4.0
         version: 2.4.0
 
-  packages/bot-validator:
+  packages/bot-utils:
     dependencies:
       '@mikugg/core':
         specifier: ^0.5.0
