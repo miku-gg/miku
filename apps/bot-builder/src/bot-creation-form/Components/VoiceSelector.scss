@@ -1,0 +1,15 @@
+.VoiceSelector {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  align-items: center;
+  
+  .dropdown {
+    width: 200px;
+    font-size: .7rem;
+  }
+
+  audio {
+    width: 50px;
+  }
+}

@@ -91,3 +91,45 @@ export const DownArrow = () => {
     </svg>
   );
 };
+
+export const SquareCheckFilled = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512">
+      <path
+        d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
+export const SquareCheckEmpty = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512">
+      <path
+        d="M384 80c8.8 0 16 7.2 16 16V416c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V96c0-8.8 7.2-16 16-16H384zM64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
+export const InfoIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+    >
+      <path
+        d="M13 7.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-3 3.75a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v4.25h.75a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1 0-1.5h.75V12h-.75a.75.75 0 0 1-.75-.75Z"
+        fill="currentColor"
+      ></path>
+      <path
+        d="M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1ZM2.5 12a9.5 9.5 0 0 0 9.5 9.5 9.5 9.5 0 0 0 9.5-9.5A9.5 9.5 0 0 0 12 2.5 9.5 9.5 0 0 0 2.5 12Z"
+        fill="currentColor"
+      ></path>
+    </svg>
+  );
+};

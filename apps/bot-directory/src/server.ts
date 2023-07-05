@@ -1,7 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import buildBot from './paths/buildBot';
 import addBot from './paths/addBot';
 import deleteBot from './paths/deleteBot';
 import getItem from './paths/getItem';
@@ -31,20 +30,23 @@ app.get('/', (req, res) => {
     }
 
     /* read all json files */
-    files = await Promise.all(files.map(async (file) => {
-      const data = await fs.readFileSync(`${config.BOT_PATH}/${file}`, 'utf8');
+    files = (await Promise.all(files.map(async (file) => {
+      const data = fs.readFileSync(`${config.BOT_PATH}/${file}`, 'utf8');
       return {
         ...JSON.parse(data),
         hash: file
       };
-    }));
+    }))).filter(x => (
+      x?.spec === 'chara_card_v2' &&
+      x?.data?.extensions?.mikugg?.scenarios?.length &&
+      x?.data?.extensions?.mikugg?.profile_pic &&
+      x?.data?.extensions?.mikugg?.backgrounds?.length &&
+      x?.data?.extensions?.mikugg?.emotion_groups?.length 
+    ));
 
     res.render('index', {bots: files});
   });
 });
-
-app.get('/build', (req, res) => res.render('bot_form'));
-app.post('/build', upload.any(), buildBot);
 
 app.post('/bot',  upload.single("file"), addBot);
 app.post('/bot/delete/:hash', deleteBot);

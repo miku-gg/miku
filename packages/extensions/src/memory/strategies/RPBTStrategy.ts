@@ -1,4 +1,5 @@
 import { ContextPromptBuildStrategy, ContextPromptParts } from '../GPTMemoryV2';
+import * as MikuCore from '@mikugg/core';
 
 export const replaceAll = function (
   text: string,
@@ -54,5 +55,13 @@ export class RPBTStrategy implements ContextPromptBuildStrategy {
 
   getBotSubject(parts: ContextPromptParts): string {
     return `RPBT (${parts.botSubject})`;
+  }
+
+  getResponseAskLine(): string {
+    return 'RPBT ({{char}}): '
+  }
+
+  getMemoryLinePrompt(memoryLine: MikuCore.Memory.MemoryLine, isBot: boolean): string {
+    return isBot ? `'RPBT ({{char}}): ${memoryLine.text}\n` : `{{user}}: ${memoryLine.text}\n`
   }
 }

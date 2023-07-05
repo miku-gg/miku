@@ -5,6 +5,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-radius: 1rem;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 0.75rem;
 
   &__container {
     display: flex;
@@ -16,13 +20,15 @@
     width: 331px;
     height: 331px;
     border-radius: 1rem;
-    margin-bottom: 0.75rem;
     background-size: cover;
     background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
   }
 
   &__selectedImage {
-    width: 100%;
+    width: auto;
     height: 100%;
   }
 

@@ -23,9 +23,9 @@ const Tag = ({
   text,
   isSquircle,
   backgroundColor,
-  className="",
+  className = '',
   iconSRC,
-  iconPosition="left",
+  iconPosition = 'left',
 }: TagProps) => {
   return (
     <span

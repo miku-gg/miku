@@ -1,7 +1,9 @@
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import React, { useContext, useEffect, useState } from "react";
+import { TypeAnimation } from 'react-type-animation';
 import "./BotDisplay.css";
+import { v4 as uuidv4 } from 'uuid';
 
 import historyIcon from "../../../assets/icons/chat-history.png";
 import infoIcon from "../../../assets/icons/information.png";
@@ -22,9 +24,11 @@ import { UnmuteIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
-import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-validator";
+import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-utils";
 import { BotSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
+import ScenarioSelector from "../scenario-selector/ScenarioSelector";
+import EmotionRenderer from "../../asset-renderer/EmotionRenderer";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -87,8 +91,46 @@ const VITE_IMAGES_DIRECTORY_ENDPOINT =
   import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
   "http://localhost:8585/image";
 
+const alreadyAnimated = new Set<string>();
+
+function AnimateResponse({ text, fast }: { text: string, fast: boolean }): JSX.Element {
+  const [parts, setParts] = useState<{content: string, isItalic: boolean, id: string}[]>([]);
+  const [partIndex, setPartIndex] = useState<number>(0);
+
+  useEffect(() => {
+    const lines = text.split('\n');
+    const parts = lines.flatMap(line => line.split('*').map(((part, i) => ({
+      content: part,
+      isItalic: i % 2 === 1,
+      id: uuidv4()
+    })))).filter(_ => _.content);
+    
+    setParts(parts);
+    setPartIndex(0);
+  }, [text]);
+
+  return (
+    <>
+      {parts.filter((_, i) => i <= partIndex).map((part, i) => (
+        <TypeAnimation
+          key={`type-animation-${part.id}`}
+          cursor={false}
+          className={part.isItalic ? 'animate-response--italic' : 'animate-response'}
+          style={{ whiteSpace: 'pre-line' }}
+          sequence={[
+            part.content,
+            () => setPartIndex(index => Math.min(index + 1, parts.length - 1))
+          ]}
+          wrapper="span"
+          speed={fast ? 99 : 70}
+        />
+      ))}
+    </>
+  );
+}
+  
 export const BotDisplay = () => {
-  const { botHash, botConfig, botConfigSettings, setBotConfigSettings } = useBot();
+  const { card, botHash, botConfig, botConfigSettings, setBotConfigSettings } = useBot();
   const [showHistory, setShowHistory] = useState<Boolean>(false);
   const [handleBotDetailsInfo, setHandleBotDetailsInfo] =
     useState<boolean>(false);
@@ -109,16 +151,8 @@ export const BotDisplay = () => {
     onUpdate,
   } = useContext(InteractiveResponsesContext);
   const [contextSuggestion, setContextSuggestion] = useState<string>("");
-  const [emotionImgIsLoading, setEmotionImgIsLoading] = useState(false);
-  const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
-  const [fileType, setFileType] = useState<string | null>(null);
-  const [blobUrl, setBlobUrl] = useState<string>("");
 
-  let backgroundImage =
-    Number(botConfig?.configVersion || 1) > 1
-      ? ((botConfig as BotConfigV2)?.backgrounds || [{ source: "" }])[0]
-          .source || ""
-      : (botConfig as BotConfigV1)?.background_pic || "";
+  let backgroundImage = card?.data.extensions.mikugg.backgrounds.find(bg => bg.id === card?.data.extensions.mikugg.scenarios.find(scenario => scenario.id === currentContext)?.background || '')?.source || '';
   let emotionImage = response?.emotion || prevResponse?.emotion || "";
   if (!emotionImage) {
     const openAIEmotionConfig = botConfig?.outputListeners.find(
@@ -148,40 +182,13 @@ export const BotDisplay = () => {
   }
 
   useEffect(() => {
-    async function fetchFile() {
-      try {
-        setEmotionImgIsLoading(true);
-        const response = await fetch(
-          `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${emotionImage}`
-        );
-        if (response.ok) {
-          const contentType = response.headers.get("Content-Type");
-          const data = await response.blob();
-          const newBlobUrl = URL.createObjectURL(data);
-          setBlobUrl(newBlobUrl);
-          setFileType(contentType);
-          setEmotionImgIsLoading(false);
-          setHasPlayedAudio(false);
-        } else {
-          console.error("Error fetching file:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error fetching file:", error);
-      }
-    }
-
-    fetchFile();
-    setEmotionImgIsLoading(false);
-  }, [emotionImage]);
-
-  useEffect(() => {
     const bot = botFactory.getInstance();
     bot?.subscribeContextChangeSuggestion((contextId) => {
       setContextSuggestion(contextId);
     });
   }, [botHash]);
 
-  const updateContext = () => {
+  const updateContext = (_contextId: string) => {
     const bot = botFactory.getInstance();
     const sbertEmotionConfig = botConfig?.outputListeners.find(
       (listener) =>
@@ -192,15 +199,15 @@ export const BotDisplay = () => {
       const props =
         sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
       const context = props.contexts.find(
-        (context) => context.id === contextSuggestion
+        (context) => context.id === _contextId
       );
       if (context) {
-        bot.changeContext(contextSuggestion);
-        setCurrentContext(contextSuggestion);
+        bot.changeContext(_contextId);
+        setCurrentContext(_contextId);
         // @ts-ignore
         bot.sendPrompt(
-          `*I notice that ${context.context_change_trigger}*`,
-          MikuCore.Commands.CommandType.DIALOG
+          `*${context.context_change_trigger}*`,
+          MikuCore.Commands.CommandType.CONTEXT
         );
       }
     }
@@ -283,37 +290,6 @@ export const BotDisplay = () => {
     }
   };
 
-  const renderEmotionElement = (): JSX.Element => {
-    if (fileType === "video/webm") {
-      return (
-        <video
-          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${
-            !emotionImgIsLoading ? "fade-in up-and-down" : ""
-          }`}
-          src={blobUrl}
-          loop
-          autoPlay
-          muted
-          onPlay={() => setHasPlayedAudio(true)}
-        />
-      );
-    } else {
-      return (
-        <img
-          className={`absolute bottom-0 h-[80%] z-10 conversation-bot-image object-cover ${
-            !emotionImgIsLoading ? "fade-in up-and-down" : ""
-          }`}
-          src={blobUrl}
-          alt="character"
-          onError={({ currentTarget }) => {
-            currentTarget.onerror = null;
-            currentTarget.src = "/default_character.png";
-          }}
-        />
-      );
-    }
-  };
-
   return (
     // MAIN CONTAINER
     <>
@@ -325,7 +301,11 @@ export const BotDisplay = () => {
               <button className="rounded-full" onClick={displayBotDetails}>
                 <img src={infoIcon} />
               </button>
-              {/* <button className="rounded-full"><img src={backgroundIcon}/></button> */}
+              {
+                ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1) ? (
+                  <ScenarioSelector value={currentContext} onChange={updateContext} />
+                ) : null
+              }
             </div>
             <div className="flex gap-3">
               <button
@@ -352,7 +332,11 @@ export const BotDisplay = () => {
               currentTarget.src = "/default_background.png";
             }}
           />
-          {renderEmotionElement()}
+          <EmotionRenderer
+            assetUrl={emotionImage}
+            upDownAnimation
+            className="absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover"
+          />
         </div>
         {/* RESPONSE CONTAINER */}
         <div
@@ -363,13 +347,13 @@ export const BotDisplay = () => {
           }
         >
           <div className="response-container h-3/4 w-10/12 relative">
-            <div className="flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b from-slate-900/[.7] to-gray-500/50 rounded-md overflow-auto border-[4px] drop-shadow-2xl shadow-black">
+            <div className="response-container-text flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b text-sm from-slate-900/[.9] to-gray-500/50 overflow-auto drop-shadow-2xl shadow-black">
               {!response || loading ? (
                 <Loader />
               ) : (
-                <p className="text-md font-bold text-white ">
-                  {response?.text || ""}
-                </p>
+                <div className="text-md font-bold text-gray-200 text-left">
+                  <AnimateResponse text={response?.text || ''} fast={responseIndex > 0} />
+                </div>
               )}
             </div>
             {!loading && responseIds.length > 1 ? (
@@ -390,7 +374,7 @@ export const BotDisplay = () => {
                 </button>
               </div>
             ) : null}
-            {!loading && responseIndex === 0 ? (
+            {!loading && responseIds.length > 1 &&  responseIndex === 0 ? (
               <button
                 className="reload-button absolute top-[-2.5em] right-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
                 onClick={onRegenerateClick}
@@ -411,7 +395,7 @@ export const BotDisplay = () => {
               <Tooltip title="Randomize character outfit" placement="left">
                 <button
                   className="wand-button absolute bottom-4 right-4 inline-flex items-center gap-2 text-white rounded-md hover:text-white"
-                  onClick={updateContext}
+                  onClick={updateContext.bind(null, contextSuggestion)}
                 >
                   <Wand />
                 </button>

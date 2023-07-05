@@ -13,7 +13,7 @@
     "@emotion/styled": "^11.10.6",
     "@headlessui/react": "^1.7.9",
     "@heroicons/react": "^2.0.14",
-    "@mikugg/bot-validator": "^0.5.0",
+    "@mikugg/bot-utils": "^0.5.0",
     "@mikugg/core": "^0.5.0",
     "@mikugg/extensions": "^0.5.0",
     "@mui/material": "^5.11.10",
@@ -28,7 +28,9 @@
     "react-ga4": "^2.0.0",
     "react-json-view-2": "^1.23.2",
     "react-toastify": "^9.1.1",
-    "remove": "^0.1.5"
+    "react-type-animation": "^3.1.0",
+    "remove": "^0.1.5",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",

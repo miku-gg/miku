@@ -66,10 +66,10 @@ export class ChatBot {
 
           switch (command.type) {
             case Commands.CommandType.DIALOG:
-              this.outputListeners.dialogOutputListeners?.map((e) => {
+            case Commands.CommandType.CONTEXT:
+                this.outputListeners.dialogOutputListeners?.map((e) => {
                 e.sendOutput(output as OutputListeners.DialogOutputEnvironment, this.promptCompleter.memory)
               });
-            case Commands.CommandType.CONTEXT:
               this.outputListeners.contextOutputListeners?.map((e) => {
                 e.sendOutput(output as OutputListeners.ContextOutputEnvironment, this.promptCompleter.memory)
               });

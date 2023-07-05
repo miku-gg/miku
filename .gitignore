@@ -3,3 +3,4 @@ node_modules/
 .venv
 .npmrc
 apps/bot-directory/db/
+.DS_Store

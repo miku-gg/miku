@@ -9,8 +9,8 @@ import './AreYouSure.scss';
 interface AreYouSureProps {
   cancelButtonLabel?: string;
   className?: string;
-  closePopUpFunction: () => void;
-  confirmationFunction: () => void;
+  onClose: () => void;
+  onSubmit: () => void;
   confirmButtonLabel?: string;
   isShowingPupUp: boolean;
   modalMessage: string;
@@ -19,8 +19,8 @@ interface AreYouSureProps {
 const AreYouSure = ({
   cancelButtonLabel = 'Cancel',
   className = '',
-  closePopUpFunction,
-  confirmationFunction,
+  onClose,
+  onSubmit,
   confirmButtonLabel = 'Confirm',
   isShowingPupUp,
   modalMessage,
@@ -31,19 +31,16 @@ const AreYouSure = ({
         <div className="AreYouSure__background ">
           <div className={`AreYouSure__modal ${className}`}>
             <div className="AreYouSure__closeContainer">
-              <button
-                className="AreYouSure__closeButton"
-                onClick={closePopUpFunction}
-              >
+              <button className="AreYouSure__closeButton" onClick={onClose}>
                 <DashIcon />
               </button>
             </div>
             <TextHeading size="h2">{modalMessage}</TextHeading>
             <div className="AreYouSure__buttonsContainer">
-              <Button theme="gradient" onClick={confirmationFunction}>
+              <Button theme="gradient" onClick={onSubmit}>
                 {confirmButtonLabel}
               </Button>
-              <Button theme="transparent" onClick={closePopUpFunction}>
+              <Button theme="transparent" onClick={onClose}>
                 {cancelButtonLabel}
               </Button>
             </div>

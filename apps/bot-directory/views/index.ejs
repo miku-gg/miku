@@ -35,39 +35,24 @@
           <div class="w-60">
             <div class="ui card">
               <div class="image">
-                <img src="/image/<%= bot.profile_pic %>">
+                <img src="/image/<%= bot.data.extensions.mikugg.profile_pic %>">
               </div>
               <div class="content">
-                <a class="header" href="http://localhost:5173/?bot=<%= bot.hash%>" target="_blank"><%= bot.bot_name %></a>
-                <div class="meta">
-                  <% switch (bot.prompt_completer.props.model) {
-                    case 'pygmalion-6b':  %>
-                  <div class="bg-blue-700 rounded-md px-2 py-1 mt-1 inline-block">Pygmalion-6B</div>
-                  <% break;
-                    case 'text-davinci-003':  %>
-                    <div class="bg-green-700 rounded-md px-2 py-1 mt-1 inline-block">Davinci</div>
-                  <% break;
-                    case 'gpt-3.5-turbo':  %>
-                    <div class="bg-green-700 rounded-md px-2 py-1 mt-1 inline-block">GPT3.5-T</div>
-                  <% break;
-                    case 'llama-30b':  %>
-                    <div class="bg-amber-700 rounded-md px-2 py-1 mt-1 inline-block">LLaMA</div>
-                  <% break; }  %>
-                </div>
+                <a class="header" href="http://localhost:5173/?bot=<%= bot.hash%>" target="_blank"><%= bot.data.name %></a>
                 <div class="description h-12 overflow-auto">
-                  <%= bot.description || 'No description' %>
+                  <%= bot.data.extensions.mikugg.short_description || 'No description' %>
                 </div>
               </div>
               <div class="extra content">
                 <p>
-                  Version <%= bot.version %>
+                  Version <%= bot.data.character_version %>
                 </p>
                 <p>
-                  Author: <%= bot.author || 'Unknown' %>
+                  Author: <%= bot.data.creator || 'Unknown' %>
                 </p>
               </div>
               <div>
-                <form action="/bot/delete/<%= bot.hash %>" method="post" onsubmit="return confirm('Do you really want to delete <%= bot.bot_name %>?');">
+                <form action="/bot/delete/<%= bot.hash %>" method="post" onsubmit="return confirm('Do you really want to delete <%= bot.data.name %>?');">
                   <button type="submit" class="absolute text-red-600 right-2 bottom-4">
                     <i class="trash icon"></i>
                   </button>
@@ -81,7 +66,7 @@
         <form action="/bot" method="post" enctype="multipart/form-data" class="ui form">
           <label>
             <h3 class="ui header">Upload a bot</h3>
-            <input type="file" value="file" required accept=".miku" name="file" id="file"/>
+            <input type="file" value="file" required accept=".png" name="file" id="file"/>
           </label>
           <div class="mt-5">
             <button class="ui button" type="submit">Upload</button>

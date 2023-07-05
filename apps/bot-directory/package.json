@@ -5,13 +5,14 @@
   "description": "",
   "main": "src/server.ts",
   "scripts": {
-    "start": "nodemon ./src/server.ts",
+    "start": "ts-node ./src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@mikugg/bot-utils": "workspace:^0.5.0",
     "@mikugg/core": "^0.5.0",
     "@mikugg/extensions": "^0.5.0",
     "@types/body-parser": "^1.19.2",

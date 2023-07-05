@@ -1,4 +1,4 @@
-import { BotConfig } from "@mikugg/bot-validator";
+import { BotConfig, MikuCard, mikuCardToBotConfig } from "@mikugg/bot-utils";
 import React, { useCallback, useContext, useState } from "react";
 import botFactory from './botFactory';
 import queryString from "query-string";
@@ -11,14 +11,17 @@ const BOT_DIRECTORY_ENDPOINT = import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT || 'h
 export function loadBotConfig(botHash: string): Promise<{
   success: boolean,
   bot?: BotConfig,
+  card?: MikuCard,
   hash: string,
 }> {
   return fetch(`${BOT_DIRECTORY_ENDPOINT}/${botHash}`)
     .then((res) => res.json())
-    .then((bot) => {
+    .then((card: MikuCard) => {
+      const bot = mikuCardToBotConfig(card);
       return {
         success: true,
         bot,
+        card,
         hash: botHash,
       };
     }).catch((err) => {
@@ -26,6 +29,7 @@ export function loadBotConfig(botHash: string): Promise<{
       return {
         success: false,
         bot: undefined,
+        card: undefined,
         hash: botHash,
       };
     });
@@ -38,22 +42,26 @@ export function getBotHashFromUrl(): string {
 
 export const BotLoaderContext = React.createContext<{
   botHash: string,
+  card: MikuCard | undefined,
   botConfig: BotConfig | undefined,
   botConfigSettings: BotConfigSettings,
   loading: boolean,
   error: boolean,
   setBotHash: (bot: string) => void,
+  setCard: (card: MikuCard) => void,
   setBotConfig: (botConfig: BotConfig) => void,
   setBotConfigSettings: (botConfigSettings: BotConfigSettings) => void,
   setLoading: (loading: boolean) => void,
   setError: (error: boolean) => void,
 }>({
   botHash: '',
+  card: undefined,
   botConfig: undefined,
   botConfigSettings: DEFAULT_BOT_SETTINGS,
   loading: true,
   error: false,
   setBotHash: () => {},
+  setCard: () => {},
   setBotConfig: () => {},
   setBotConfigSettings: () => {},
   setLoading: () => {},
@@ -61,6 +69,7 @@ export const BotLoaderContext = React.createContext<{
 });
 
 export const BotLoaderProvider = ({ children }: {children: JSX.Element}): JSX.Element => {
+  const [card, setCard] = useState<MikuCard | undefined>(undefined);
   const [botHash, setBotHash] = useState<string>('');
   const [botConfig, setBotConfig] = useState<BotConfig | undefined>(undefined);
   const [botConfigSettings, setBotConfigSettings] = useState<BotConfigSettings>(DEFAULT_BOT_SETTINGS);
@@ -69,7 +78,8 @@ export const BotLoaderProvider = ({ children }: {children: JSX.Element}): JSX.El
 
   return (
     <BotLoaderContext.Provider value={{
-      botConfig, loading, error, botHash, setBotConfig, setLoading, setError, setBotHash, botConfigSettings, setBotConfigSettings
+      card, botConfig, loading, error, botHash, botConfigSettings,
+      setCard, setBotConfig, setLoading, setError, setBotHash, setBotConfigSettings
     }}>
       {children}
     </BotLoaderContext.Provider>
@@ -131,6 +141,7 @@ function setBotDataInURL(botData: BotData) {
 
 export function useBot(): {
   botHash: string,
+  card: MikuCard | undefined,
   botConfig: BotConfig | undefined,
   botConfigSettings: BotConfigSettings,
   setBotConfigSettings: (botConfigSettings: BotConfigSettings) => void,
@@ -139,7 +150,7 @@ export function useBot(): {
   setBotHash: (botHash: string) => void,
 } {
   const {
-    botConfig, setBotConfig, loading, setLoading, error, setError, botHash, setBotHash,
+    botConfig, setBotConfig, loading, setLoading, card, setCard, error, setError, botHash, setBotHash,
     botConfigSettings, setBotConfigSettings
   } = useContext(BotLoaderContext);
 
@@ -151,7 +162,7 @@ export function useBot(): {
     const isDifferentBot = getBotHashFromUrl() !== _hash;
     const memoryLines = botFactory.getInstance()?.getMemory().getMemory() || [];
     loadBotConfig(_hash).then((res) => {
-      if (res.success && res.bot) {
+      if (res.success && res.bot && res.card) {
         let decoratedConfig = res.bot;
 
         decoratedConfig = {
@@ -240,6 +251,7 @@ export function useBot(): {
           memory?.clearMemories();
           memoryLines.forEach(memoryLine => memory?.pushMemory(memoryLine));
         }
+        setCard(res.card);
         setBotConfig(res.bot);
         setBotHash(res.hash);
         setError(false);
@@ -259,6 +271,7 @@ export function useBot(): {
   }, [setBotConfigSettings, _botLoadCallback])
 
   return {
+    card,
     botHash,
     botConfig,
     botConfigSettings,

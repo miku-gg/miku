@@ -1,0 +1,48 @@
+{
+  "name": "@mikugg/bot-utils",
+  "version": "0.5.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miku-gg/miku.git",
+    "directory": "packages/bot-utils"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc --watch",
+    "lint": "eslint . --ext .ts",
+    "prepare": "npm run build"
+  },
+  "author": "",
+  "license": "AGPL-3.0",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "eslint": "^8.32.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@mikugg/core": "^0.5.0",
+    "@mikugg/extensions": "^0.5.0",
+    "@types/node": "^18.15.5",
+    "@types/prop-types": "^15.7.5",
+    "axios": "^1.2.4",
+    "buffer": "^6.0.3",
+    "form-data": "^4.0.0",
+    "ipfs-only-hash": "^4.0.0",
+    "png-chunk-text": "^1.0.0",
+    "png-chunks-extract": "^1.0.0",
+    "prop-types": "^15.8.1"
+  },
+  "gitHead": "2a1ced2ec5f6b6e6dbc3e12143d0a6a29abfe2f3"
+}

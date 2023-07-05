@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState } from "react";
-import { CharacterData } from "./libs/CharacterData";
+import { MikuCard, EMPTY_MIKU_CARD } from '@mikugg/bot-utils';
 
 
 interface CharacterCreationFormContextData {
-  characterData: CharacterData;
-  setCharacterData: React.Dispatch<React.SetStateAction<CharacterData>>;
+  card: MikuCard;
+  setCard: React.Dispatch<React.SetStateAction<MikuCard>>;
   currentStep: number;
   nextStep: () => void;
   prevStep: () => void;
@@ -24,24 +24,7 @@ const useCharacterCreationForm = () => {
 };
 
 const CharacterCreationFormProvider = ({ children }: {children: JSX.Element}): JSX.Element => {
-  const [characterData, setCharacterData] = useState<CharacterData>({
-    name: '',
-    version: '1',
-    avatar: '',
-    description: '',
-    shortDescription: '',
-    author: '',
-    backgroundImages: [],
-    scenario: '',
-    greeting: '',
-    sampleConversation: [''],
-    model: 'llama-30b',
-    voice: 'elevenlabs_tts.EXAVITQu4vr4xnSDxMaL',
-    attributes: [
-      { key: 'species', value: 'human' },
-    ],
-    emotionGroups: []
-  });
+  const [card, setCard] = useState<MikuCard>(EMPTY_MIKU_CARD);
   const [currentStep, setCurrentStep] = useState(1);
 
   const nextStep = () => setCurrentStep((prevStep) => prevStep + 1);
@@ -49,7 +32,7 @@ const CharacterCreationFormProvider = ({ children }: {children: JSX.Element}): J
 
   return (
     <CharacterCreationFormContext.Provider
-      value={{ characterData, setCharacterData, currentStep, nextStep, prevStep, setCurrentStep }}
+      value={{ card, setCard, currentStep, nextStep, prevStep, setCurrentStep }}
     >
       {children}
     </CharacterCreationFormContext.Provider>

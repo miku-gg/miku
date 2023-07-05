@@ -1,24 +1,28 @@
 import "./BotSummary.scss";
-import ModelTag, { ValidServices } from "./ModelTag";
 
 interface BotSummaryProps {
   image: string;
   title: string;
   description: string;
-  tags: ValidServices[];
+  tags: string[];
+  bytes: number;
 }
 
-const BotSummary = ({ image, title, description, tags }: BotSummaryProps) => {
+const BotSummary = ({ image, title, description, tags, bytes }: BotSummaryProps) => {
+  let size = '';
+  if (bytes < 1048576) {
+    size = `${(bytes / 1024).toFixed(2)} KB`;
+  } else if (bytes < 1073741824) {
+    size = `${(bytes / 1048576).toFixed(2)} MB`;
+  }
   return (
     <div className="SummaryInfo">
       <img className="SummaryInfo__Image" src={image} alt="SummaryInfo Image" />
       <div className="SummaryInfo__InfoContainer">
         <h1 className="SummaryInfo__Title">{title}</h1>
         <div className="SummaryInfo__Description scrollbar">{description}</div>
-        <div className="SummaryInfo__TagContainer">
-          {tags.map((model) => {
-            return <ModelTag key={model} modelName={model} />;
-          })}
+        <div>
+          Bundle size: ~{size}
         </div>
       </div>
     </div>

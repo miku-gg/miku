@@ -1,4 +1,6 @@
 import React from 'react';
+import Tooltip from './Tooltip';
+import { InfoIcon } from '../assets/svg';
 import './Input.scss';
 
 interface InputProps {
@@ -19,6 +21,8 @@ interface InputProps {
   onSubmit?: () => void;
   placeHolder?: string;
   value?: string;
+  description?: string;
+  children?: React.ReactNode;
 }
 
 const Input = ({
@@ -35,41 +39,66 @@ const Input = ({
   onSubmit,
   placeHolder,
   value,
+  description,
+  children,
 }: InputProps) => {
   return (
     <div className={`Input ${className}`}>
       {label && (
         <label htmlFor={id} className="Input__label">
           {label}
+          {description && (
+            <>
+              <div
+                className="Input__infoIcon"
+                data-tooltip-id={`input-tooltip-${id}`}
+                data-tooltip-content={description}
+                data-tooltip-varaint="dark"
+              >
+                <InfoIcon />
+              </div>
+              <Tooltip
+                id={`input-tooltip-${id}`}
+                place="right"
+                className="Input__tooltip"
+              />
+            </>
+          )}
         </label>
       )}
       <label htmlFor={id} className={`Input__container ${iconPosition}`}>
-        {icon ? (
-          <button onSubmit={onSubmit} className="Input__button">
-            <img src={icon} alt="search-icon" className="Input__icon" />
-          </button>
-        ) : null}
-
-        {isTextArea ? (
-          <textarea
-            className="Input__textArea scrollbar"
-            onChange={onChange}
-            value={value}
-            placeholder={placeHolder}
-            id={id}
-            name={name}
-          />
+        {children ? (
+          children
         ) : (
-          <input
-            type="text"
-            className="Input__field"
-            placeholder={placeHolder}
-            onChange={onChange}
-            value={value}
-            name={name}
-            maxLength={maxLength}
-            id={id}
-          />
+          <>
+            {icon ? (
+              <button onSubmit={onSubmit} className="Input__button">
+                <img src={icon} alt="search-icon" className="Input__icon" />
+              </button>
+            ) : null}
+
+            {isTextArea ? (
+              <textarea
+                className="Input__textArea scrollbar"
+                onChange={onChange}
+                value={value}
+                placeholder={placeHolder}
+                id={id}
+                name={name}
+              />
+            ) : (
+              <input
+                type="text"
+                className="Input__field"
+                placeholder={placeHolder}
+                onChange={onChange}
+                value={value}
+                name={name}
+                maxLength={maxLength}
+                id={id}
+              />
+            )}
+          </>
         )}
       </label>
       {errors && <p className="Input__error">{errors}</p>}

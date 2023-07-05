@@ -54,7 +54,7 @@ export class OobaboogaPromptCompleter extends Core.ChatPromptCompleters
 
     while (
       (isParsedResultSmall || !hasTextStop(result, memory.getSubjects())) &&
-      tries++ < 3
+      tries++ < 2
     ) {
       if (isParsedResultSmall) result = "";
       result += await this.service.query(

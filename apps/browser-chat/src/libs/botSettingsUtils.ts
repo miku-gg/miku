@@ -98,7 +98,7 @@ export type PromptCompleterEndpointConfig =
 };
 
 export const DEFAULT_OOBABOOGA_SETTINGS: OobaboogaSettings = {
-  temp: 0.5,
+  temp: 0.7,
   maxTokens: 60,
   topP: 0.9,
   topK: 0,
@@ -147,7 +147,9 @@ export enum PromptStrategy {
   WPP = 'wpp',
   SBF = 'sbf',
   RPBT = 'rpbt',
-  PYG = 'pyg'
+  PYG = 'pyg',
+  ALPACA = 'alpaca',
+  VICUNA11 = 'vicuna11'
 }
 
 export const PROMPT_STRATEGIES: {
@@ -169,6 +171,14 @@ export const PROMPT_STRATEGIES: {
   {
     value: PromptStrategy.RPBT,
     label: "RPBT (Roleplay Bot)"
+  },
+  {
+    value: PromptStrategy.ALPACA,
+    label: "Alpaca"
+  },
+  {
+    value: PromptStrategy.VICUNA11,
+    label: "Vicuna 1.1"
   },
 ];
 
@@ -229,7 +239,7 @@ export const DEFAULT_BOT_SETTINGS: BotConfigSettings = {
     type: PromptCompleterEndpointType.OOBABOOGA,
     genSettings: DEFAULT_OOBABOOGA_SETTINGS
   },
-  promptStrategy: PromptStrategy.SBF,
+  promptStrategy: PromptStrategy.ALPACA,
   speechToTextEndpoint: {
     enabled: true,
     type: STTEndpointType.WHISPER

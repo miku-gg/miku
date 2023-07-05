@@ -6,40 +6,42 @@ import {
 } from "./CharacterCreationFormContext";
 
 import { Button, TextHeading } from "@mikugg/ui-kit";
+import { MikuCard } from "@mikugg/bot-utils";
 
-import { CharacterData, validateStep } from "./libs/CharacterData";
-import { BUILDING_STEPS, downloadBotFile } from "./libs/bot-file-builder";
+import { validateStep } from "./libs/CharacterData";
 import { downloadBlob } from "./libs/file-download";
 
 import Modal from "./Modal";
-import Step1Description from "./Step1Description";
-import Step2ModelAndVoice from "./Step2ModelAndVoice";
-import Step3Expressions from "./Step3Expressions";
-import Step4Preview from "./Step4Preview";
 import TopBar from "./TopBar";
 
+import Step1Description from "./Step1Description";
+import Step3Scenarios from "./Step3Scenarios";
+import Step2Assets from "./Step2Assets";
+import Step4Preview from "./Step4Preview";
+
 import backIcon from "./assets/backArrow.svg";
-import loadIcon from "./assets/load.svg";
 import nextIcon from "./assets/nextArrow.svg";
 import saveIcon from "./assets/save.svg";
 
 import "./styles/main.scss";
+import { downloadPng, BUILDING_STEPS } from "./libs/encodePNG";
+import BotImport from "./Components/BotImport";
 
-const save = (characterData: CharacterData) => {
-  const characterDataJSON = JSON.stringify(characterData, null, 2);
-  const blob = new Blob([characterDataJSON], { type: "application/json" });
-  downloadBlob(blob, `character_${characterData.name}.json`);
+const save = (card: MikuCard) => {
+  const cardJSON = JSON.stringify(card, null, 2);
+  const blob = new Blob([cardJSON], { type: "application/json" });
+  downloadBlob(blob, `${card.data.name}.miku-temp.json`);
 };
 
 const _CharacterCreationForm: React.FC = () => {
-  const { characterData, setCharacterData, currentStep, nextStep, prevStep } =
+  const { card, setCard, currentStep, nextStep, prevStep } =
     useCharacterCreationForm();
   const [buildingStep, setBuildingStep] = useState<BUILDING_STEPS>(
     BUILDING_STEPS.STEP_0_NOT_BUILDING
   );
 
   const handleNext = () => {
-    const stepErrors = validateStep(currentStep, characterData);
+    const stepErrors = validateStep(currentStep, card);
 
     if (stepErrors.length > 0) {
       // Show an alert with the error messages
@@ -57,31 +59,16 @@ const _CharacterCreationForm: React.FC = () => {
 
   const handleSave = (event: React.MouseEvent) => {
     event.preventDefault();
-    save(characterData);
-  };
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileLoad = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const loadedData = JSON.parse(
-          e.target?.result as string
-        ) as CharacterData;
-        setCharacterData(loadedData);
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  const load = () => {
-    fileInputRef.current?.click();
+    save(card);
   };
 
   const handleBuildBot = async () => {
-    await downloadBotFile(characterData, setBuildingStep);
+    await downloadPng(
+      JSON.stringify(card),
+      card.data.extensions.mikugg.profile_pic,
+      card.data.name,
+      setBuildingStep
+    );
   };
 
   return (
@@ -91,16 +78,16 @@ const _CharacterCreationForm: React.FC = () => {
         <TopBar
           steps={[
             { label: "01", description: "Description" },
-            { label: "02", description: "Prompt completion model" },
-            { label: "03", description: "Emotions grup" },
+            { label: "02", description: "Assets" },
+            { label: "03", description: "Scenarios" },
             { label: "04", description: "Finished Character" },
           ]}
         />
       </div>
       <div className="characterCreationForm__stepsContainer">
         {currentStep === 1 && <Step1Description />}
-        {currentStep === 2 && <Step2ModelAndVoice />}
-        {currentStep === 3 && <Step3Expressions />}
+        {currentStep === 2 && <Step2Assets />}
+        {currentStep === 3 && <Step3Scenarios />}
         {currentStep === 4 && <Step4Preview />}
       </div>
       <div className="characterCreationForm__buttonsContainer">
@@ -108,17 +95,10 @@ const _CharacterCreationForm: React.FC = () => {
           <Button theme="transparent" onClick={handleSave} iconSRC={saveIcon}>
             Save
           </Button>
-          <Button theme="transparent" onClick={load} iconSRC={loadIcon}>
-            Load
-          </Button>
+          {
+            currentStep === 1 && <BotImport />
+          }
         </div>
-        <input
-          type="file"
-          accept="application/json"
-          style={{ display: "none" }}
-          ref={fileInputRef}
-          onChange={handleFileLoad}
-        />
         <div className="characterCreationForm__navigationButtons">
           {currentStep > 1 && (
             <Button iconSRC={backIcon} theme="transparent" onClick={handleBack}>
@@ -127,7 +107,7 @@ const _CharacterCreationForm: React.FC = () => {
           )}
           {currentStep === 4 ? (
             <Button theme="gradient" onClick={handleBuildBot}>
-              Built character
+              Build character
             </Button>
           ) : (
             <Button
@@ -143,21 +123,25 @@ const _CharacterCreationForm: React.FC = () => {
       </div>
       {buildingStep > BUILDING_STEPS.STEP_0_NOT_BUILDING && (
         <Modal
-          overlayClose={buildingStep === BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP}
+          overlayClose={buildingStep === BUILDING_STEPS.STEP_5_DONE}
           onClose={() => setBuildingStep(BUILDING_STEPS.STEP_0_NOT_BUILDING)}
         >
-          {buildingStep !== BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP && (
+          {buildingStep !== BUILDING_STEPS.STEP_5_DONE && (
             <div className="loading"></div>
           )}
           <div className="loading-text">
             {(function () {
               switch (buildingStep) {
-                case BUILDING_STEPS.STEP_1_GENERATING_EMBEDDINGS:
-                  return "Generating embeddings...";
-                case BUILDING_STEPS.STEP_2_GENERATING_ZIP:
-                  return "Generating .miku file...";
-                case BUILDING_STEPS.STEP_3_DOWNLOADING_ZIP:
-                  return "Please download the .miku file";
+                case BUILDING_STEPS.STEP_1_COMBINE_IMAGE:
+                  return "Generating png image...";
+                case BUILDING_STEPS.STEP_2_GENERATING_CHUNKS:
+                  return "Generating chunks...";
+                case BUILDING_STEPS.STEP_3_ENCODING_CHUNKS:
+                  return "Encoding chunks in png...";
+                case BUILDING_STEPS.STEP_4_BUILDING_DOWNLOAD_FILE:
+                  return "Downloading png file...";
+                case BUILDING_STEPS.STEP_5_DONE:
+                  return "Bot builded successfully";
                 default:
                   return "Building bot...";
               }

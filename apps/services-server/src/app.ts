@@ -88,7 +88,7 @@ if (PYGMALION_ENDPOINT) {
     serviceId: MikuExtensions.Services.ServicesNames.Pygmalion,
     billingEndpoint: '',
     addRoute
-  });  
+  });
 }
 
 if (OOBABOOGA_ENDPOINT) {
