@@ -7,6 +7,28 @@ import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 
 const BOT_DIRECTORY_ENDPOINT = import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT || 'http://localhost:8585/bot';
+const VITE_IMAGES_DIRECTORY_ENDPOINT =
+  import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
+  "http://localhost:8585/image";
+
+async function preLoadImages(imageUrls: string[]): Promise<void> {
+  return new Promise((resolve, reject) => {
+    let images: HTMLImageElement[] = [];
+    let imagesLoaded = 0;
+    for (var i = 0; i < imageUrls.length; i++) {
+      images[i] = new Image();
+      images[i].onload = function() {
+        imagesLoaded++;
+        if (imagesLoaded === imageUrls.length) resolve();
+      }
+      images[i].onerror = function() {
+        imagesLoaded++;
+        if (imagesLoaded === imageUrls.length) resolve();
+      }
+      images[i].src = imageUrls[i];
+    }
+  });
+}
 
 export function loadBotConfig(botHash: string): Promise<{
   success: boolean,
@@ -161,7 +183,7 @@ export function useBot(): {
     setBotHash(_hash);
     const isDifferentBot = getBotHashFromUrl() !== _hash;
     const memoryLines = botFactory.getInstance()?.getMemory().getMemory() || [];
-    loadBotConfig(_hash).then((res) => {
+    loadBotConfig(_hash).then(async (res) => {
       if (res.success && res.bot && res.card) {
         let decoratedConfig = res.bot;
 
@@ -241,6 +263,15 @@ export function useBot(): {
             }
           }
         }
+
+        // fetch first emotion and backgrounds
+        const defaultEmotionGroupId = res.card?.data.extensions?.mikugg.scenarios.find(sn => sn.id === res.card?.data.extensions.mikugg.start_scenario)?.emotion_group || '';
+        await preLoadImages(res.card?.data.extensions?.mikugg?.backgrounds?.map(
+          (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}`
+        ) || []);
+        await preLoadImages(res.card?.data.extensions?.mikugg?.emotion_groups?.find(eg => eg.id === defaultEmotionGroupId)?.emotions?.filter((em, index) => em.id === 'neutral' || index === 0).map(
+          (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}`
+        ) || []);
         
         setBotConfigSettings(_botData.settings);
         setBotDataInURL(_botData);
