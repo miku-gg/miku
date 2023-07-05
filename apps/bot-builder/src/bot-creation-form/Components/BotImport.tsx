@@ -491,21 +491,28 @@ const BotImport: React.FC = () => {
           setCard(_card);
           setLoading(false);
         } else if (file.name.endsWith('.json')) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const loadedData = JSON.parse(
-              e.target?.result as string
-            );
-            if (file.name.endsWith('.miku-temp.json')) {
-              const _card = loadedData as MikuCard
-              setCard(_card);
-            } else {
-              const _card = processJSON(loadedData)
-              setCard(_card);
-            }
-            setLoading(false);
-          };
-          reader.readAsText(file);
+          await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              try {
+                const loadedData = JSON.parse(
+                  e.target?.result as string
+                );
+                if (file.name.endsWith('.miku-temp.json')) {
+                  const _card = loadedData as MikuCard
+                  setCard(_card);
+                } else {
+                  const _card = processJSON(loadedData)
+                  setCard(_card);
+                  resolve(true);
+                }
+                setLoading(false);
+              } catch (e) {
+                reject(e);
+              }
+            };
+            reader.readAsText(file);
+          });
         } else if (file.name.endsWith('.miku')) {
           const _card = await processMikuZip(file);
           setCard(_card);
