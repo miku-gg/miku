@@ -17,7 +17,7 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2
       '@mikugg/bot-utils':
-        specifier: ^0.6.0
+        specifier: workspace:^
         version: link:../../packages/bot-utils
       '@mikugg/core':
         specifier: ^0.6.0
@@ -153,7 +153,7 @@ importers:
   apps/bot-directory:
     dependencies:
       '@mikugg/bot-utils':
-        specifier: workspace:^0.6.0
+        specifier: workspace:^
         version: link:../../packages/bot-utils
       '@mikugg/core':
         specifier: ^0.6.0
@@ -238,7 +238,7 @@ importers:
         specifier: ^2.0.14
         version: 2.0.14(react@18.2.0)
       '@mikugg/bot-utils':
-        specifier: ^0.6.0
+        specifier: workspace:^
         version: link:../../packages/bot-utils
       '@mikugg/core':
         specifier: ^0.6.0
