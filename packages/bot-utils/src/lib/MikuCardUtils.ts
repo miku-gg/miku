@@ -178,9 +178,19 @@ export async function extractCardFromBuffer(buffer?: any): Promise<object> {
     fileContent = await readFile(file) as string;
   } else {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const fs = require('fs');
-    fs.writeFileSync('_temp/_temp_bot.json', extracted.text);
-    fileContent = fs.readFileSync('_temp/_temp_bot.json', 'utf-8');
+    const stream = require('stream');
+    fileContent = await new Promise((resolve, reject) => {
+      const bufferStream = new stream.PassThrough();
+      let text = '';
+      bufferStream.end(extracted.text);    
+      bufferStream.on('data', (chunk: Buffer) => {
+        text += chunk.toString('utf8');
+      });
+      
+      bufferStream.on('end', () => {
+        resolve(text);
+      });
+    });
   }
 
   try {
