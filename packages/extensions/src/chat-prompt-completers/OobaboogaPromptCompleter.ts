@@ -53,7 +53,7 @@ export class OobaboogaPromptCompleter extends Core.ChatPromptCompleters
     let tries = 0;
 
     while (
-      (isParsedResultSmall || !hasTextStop(result, memory.getSubjects())) &&
+      (isParsedResultSmall) &&
       tries++ < 2
     ) {
       if (isParsedResultSmall) result = "";
