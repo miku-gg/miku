@@ -21,7 +21,7 @@ export default function ScenarioSelector({ value, onChange}: ScenarioSelectorPro
   if (!card) return null;
   const currentScenario = card.data.extensions.mikugg.scenarios.find(scenario => scenario.id === value);
   const childrenScenarios = card.data.extensions.mikugg.scenarios.filter(
-    scenario => currentScenario?.children_scenarios.length === 0 || currentScenario?.children_scenarios.includes(scenario.id)
+    scenario => currentScenario?.id !== scenario.id && (currentScenario?.children_scenarios.length === 0 || currentScenario?.children_scenarios.includes(scenario.id))
   ).map(scenario => {
     try {
       return {
