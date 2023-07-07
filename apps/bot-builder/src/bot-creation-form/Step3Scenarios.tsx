@@ -337,6 +337,9 @@ const Step3Scenarios: React.FC = () => {
                 newCard.data.extensions.mikugg.voices.push(voice);
               }
               newCard.data.extensions.mikugg.scenarios[selectedScenarioIndex].voice = voice.id;
+              newCard.data.extensions.mikugg.voices = newCard.data.extensions.mikugg.voices.filter((_voice) => {
+                return newCard.data.extensions.mikugg.scenarios.find((_scenario) => _scenario.voice === _voice.id);
+              });
               setCard(newCard);
           }}
           />
