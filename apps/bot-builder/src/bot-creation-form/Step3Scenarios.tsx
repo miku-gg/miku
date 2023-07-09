@@ -34,9 +34,9 @@ const BackgroundSelector: React.FC<{scenarioId: string}> = ({ scenarioId }) => {
             })
           )}
           selectedIndex={
-            card.data.extensions.mikugg.backgrounds.findIndex(
+            Math.max(card.data.extensions.mikugg.backgrounds.findIndex(
               (background) => background.id === scenario?.background
-            ) || 0
+            ), 0)
           }
           onClick={(index) => {
             const newCard: MikuCard = { ...card };
@@ -237,10 +237,10 @@ const Step3Scenarios: React.FC = () => {
                 return;
               }
               const emotion_group = card.data.extensions.mikugg.emotion_groups[0].id;
-              let voiceId = card.data.extensions.mikugg.voices[0].id;
+              let voiceId = card.data.extensions.mikugg.voices[0]?.id || '';
               let backgroundId = card.data.extensions.mikugg.backgrounds[0].id;
               if (card.data.extensions.mikugg.scenarios.length) {
-                voiceId = card.data.extensions.mikugg.scenarios[0].voice;
+                voiceId = card.data.extensions.mikugg.scenarios[0].voice || '';
                 backgroundId = card.data.extensions.mikugg.scenarios[0].background;
               }
               // add new scenario

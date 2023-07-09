@@ -29,12 +29,16 @@ const BackgroundsForm: React.FC = () => {
         setCard({
           ...card,
           data: {
-            ...card.data,          
+            ...card.data,
             extensions: {
               ...card.data.extensions,
               mikugg: {
                 ...(card.data.extensions.mikugg || {}),
-                backgrounds: images
+                backgrounds: images,
+                scenarios: card.data.extensions.mikugg?.scenarios?.map(_scenario => ({
+                  ..._scenario,
+                  background: card.data.extensions.mikugg?.backgrounds?.find(_background => _background.id === _scenario.background)?.id || (images.length ? images[0].id : '')
+                })) || []
               }
             }
           }

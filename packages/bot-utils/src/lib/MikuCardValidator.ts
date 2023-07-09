@@ -102,6 +102,7 @@ export type MikuCard = TavernCardV2 & {
 export const LICENSES = [
   'CC0',
   'CC BY',
+  'CC BY-SA',
   'CC BY-ND',
   'CC BY-NC',
   'CC BY-NC-SA',
@@ -160,7 +161,14 @@ export const EMPTY_MIKU_CARD: MikuCard = {
         ],
         "emotion_groups": [],
         "backgrounds": [],
-        "voices": []
+        "voices": [
+          {
+            id: 'azure_tts.en-GB-SoniaNeural',
+            provider: 'azure_tts',
+            provider_voice_id: 'en-GB-SoniaNeural',
+            provider_emotion: undefined
+          }
+        ]
       }
     }
   }
