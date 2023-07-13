@@ -1,5 +1,5 @@
 ---
-label: How to use
+label: How to interact
 icon: comment-discussion
 order: 1700
 ---

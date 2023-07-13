@@ -6,11 +6,6 @@ order: 1900
 
 The preferred way to run the project is to download the source code and run it locally. This way, you can customize the bot to your liking and you don't have to worry about the servers going offline.
 
-
-## Instructions
-
-[!embed](https://www.youtube.com/watch?v=zEiH9TqZjF8)
-
 ### Requirements
 You need to have `node v16+`, `python v3.10` and `git` installed on your machine. You can download them from the following links:
 
@@ -18,7 +13,7 @@ You need to have `node v16+`, `python v3.10` and `git` installed on your machine
 -   [Python](https://www.python.org/downloads/)
 -   [Git](https://git-scm.com/downloads)
 
-The project should work on Windows, Linux and MacOS. If you have any issues please report it in the github issues page.
+The project should work on *Windows*, *Linux* and *MacOS*. If you have any issues please report them in the github issues page.
 
 ### 1. Clone the source code
 

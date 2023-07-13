@@ -23,6 +23,10 @@ If you want use a custom endpoint, you can click on the burger menu on the top r
 
 In order to set up a custom endpoint, you can follow the [How to use the endpoints](/guides/how-to-endpoints) guide.
 
-!!!information What is *Prompt Stragety*?
-Prompt strategy is the method used to describe the conversation to the language model. Some models are more sentive to some strategies than others. You can try different strategies to see which one works best for your model. As a rule, `SBF` and `W++` work well for OpenAI, `Pygmalion style` works good for `Pygmalion 6b,7b and 13b`. `Alpaca` and`Vicuna 1.1` generally work well for `LLaMA` instruct models like WizardLM.
+!!! What is *Prompt Stragety*?
+Prompt strategy is the method used to describe the conversation to the language model. Some models are more sentive to some strategies than others. You can try different strategies to see which one works best for your model.
+
+* `SBF` and `W++` work well for OpenAI
+* `Pygmalion style` works good for `Pygmalion 6b,7b and 13b`
+* `Alpaca` and`Vicuna 1.1` generally work well for `LLaMA` instruct models like WizardLM.
 !!!

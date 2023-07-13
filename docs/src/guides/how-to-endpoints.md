@@ -1,5 +1,5 @@
 ---
-label: How to use the endpoints
+label: Get endpoints
 icon: cloud
 order: 1700
 ---
@@ -13,8 +13,6 @@ You need to have a LLM (large language model) service to use the bots. A LLM is 
 * [OpenAI](https://openai.com/). A paid service that provides censored LLMs. You need to have an API key to use it. The model that is compatible with MikuGG is `gpt3.5-turbo`. *Note: NSFW content is not allowed for this API because the model censors it. Unless you can bypass it with a jailbrak but that's up to your own risk.*
 
 * [Kobold AI](https://koboldai.com/). An open-source local server for LLMs. Compatible with Pygmalion 6B and uncensored. But it requires a GPU to run it.
-
-
 
 ### Get an ooobabooga API endpoint (for LLaMA models)
 First, download and install [text-generation-webui](https://github.com/oobabooga/text-generation-webui) and run a model.
@@ -48,7 +46,7 @@ https://rentry.org/ayumi_erp_rating
 https://www.youtube.com/watch?v=lb_lC4XFedU
 ```
 
-## Get a Kobold AI API endpoint (for Pygmalion 6B)
+### Get a Kobold AI API endpoint (for Pygmalion 6B)
 
 You have two options:
 - [Run Kobold AI locally](https://github.com/KoboldAI/KoboldAI-Client) (Requires a powerful GPU to run `Pygmalion6B`)
@@ -69,7 +67,7 @@ https://categories-gen-incoming-condos.trycloudflare.com/api
 ```
 
 
-# Get an OpenAI API key
+### Get an OpenAI API key
 To get an OpenAI Key. First create an account and the go to https://platform.openai.com/account/api-keys
 
 The click on create new API key and this should popup:

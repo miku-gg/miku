@@ -4,121 +4,112 @@ icon: package
 order: 1800
 ---
 
-### Creating a bot
+# Creating a bot
 
-!!!warning Deprecated Builder
-The current builder is deprecated. Please use https://build.miku.gg instead (or http://localhost:8586 locally).
+To create a bot, go to the [Bot builder](https://build.miku.gg) or to `http://localhost:8586/` if you are running it locally.
+
+## Step 1: Description
+
+![](/assets/bot_builder_1.png)
+
+On the first page, you have to complete the form for the bot creation.
+
+- **Character name**: The name of the bot
+- **Character version**: The version of the bot (use `1` as default)
+- **Author**: Your name, as a bot creator.
+- **Avatar**: Drag and drop a small image (no bigger than `512x512`) as the bot avatar
+- **Character short description**: A short description of the bot. Use only one sentence.
+- **Character complete description**: A complete description of the bot's personality and behaviour to be insterted in the prompt.
+- **Describe the Scenario**: Environment and world info about the bot. To be inserted in the prompt.
+- **Sample Conversations**: A list of sample conversations to be inserted in the prompt. The intent is to give the model some context about the bot's personality and behaviour. Separate each conversation with a line containing `<START>`
+- **Describe the Personality**: A list of attributes that describe the bot's personality. To be inserted in the prompt.
+- **Character Greeting**: The first message from the bot that triggres conversation starts.
+
+### Import Bots
+You can import bots in .png format that are already built, using the import button.
+You can also imports bots that are build for other frontends like [Agnai](https://agnai.chat), [RisuAI](https://risuai.xyz) or [SillyTavern](https://docs.sillytavern.app). Most of these frontends are intended primarily for text-only bots, so you will have to add the images for the bot to make it work well with miku.gg.
+
+Miku.gg uses the [spec_v2](https://github.com/malfoyslastname/character-card-spec-v2/blob/main/spec_v2.md) fortmat for the bots (embedded inside `.png` images) which is compatible with most frontends.
+
+!!! Try some examples
+It's recommended that you import some example bots that work well so you can see how are they formatted and properly build a good prompt for your bot.
+
+A great source for example bots is [Character hub](https://chub.ai)
 !!!
 
-To create a bot, go to your local `http://localhost:8585/` where the bot directory is. Then click on the `Build bot` button in the header.
+## Step 2: Assets
 
-![](/assets/create_bot_ui.png)
+Next, you'll have to add the images for the bot. Emotions and background images are required.
 
-There you have to complete the form for the bot creation.
+![](/assets/bot_builder_2_1.png)
 
-- **Bot Name**: The name of the bot
-- **Bot Version**: The version of the bot (use `1` as default)
-- **Author**: Your name, as a bot builder.
-- **Short Description**: A short description of the bot. Use only one sentence.
-- **Name that interacts with the bot**: Name of the character that interacts with the bot, it can be just `"You"`
-- **Context Prompt**: The prompt that describes the bot and the environment.
-- **Initiator Prompt**: The prompt that triggers the conversation start.
-- **Model**: The ML model that will be used to generate the bot responses.
-- **Voice**: The voice service that will be used  for the bot audio.
-- **Default TTS VoiceId**: The voice that will be used for the bot responses. (depends on the voice service chosen)
+Please make sure to use `16:9` or `16:10` format images for the backgrounds. You will use them later for scenarios.
 
-Next, you'll have to add the images for the bot. Profile, Emotions and background images are required.
+### Emotions groups
 
-![](/assets/create_bot_images.png)
+You can have different outfits for your character. For example, you can have a `casual` outfit and a `formal` outfit. You can add as many groups as you want.
 
-After having all of those. Click on the **Build Bot** button. And you will download a `.miku` that contains all the bot configuration.
+Additionally, you need to select the **Emotion Set** which is the group of emotions that will be used for each particular group.
 
-![](/assets/miku_file.png)
+* *Regular Emotions* are intended for most cases. They consist of 29 emotions, you can repeat the same image too if you don't have that many images.
+* *Lewd Emotions* are intended for NSFW outfits. They consist of 16 erotic-roleplay emotions.
 
-You can now use this file to load your bot or to share it with other people.
+!!!warning
+All the images you upload should have transparency because they will be placed on top of backgrounds. Also, the canvas size should fit the content for better results.
+!!!
 
-Next you'll learn how to load a bot.
+![](/assets/bot_builder_2_2.png)
 
-[!ref Load bots](/guides/bots/load-bots.md)
+You can drag and drop each image or click on select and choose the images from your computer. It will autofill the images with matching names to the emotion names; for example, `angry.png` will be used for the `angry` emotion.
 
+!!!success WebM and GIF support
+We are excited to announce that you can now use `.webm` and `.gif` images for the emotions. This is useful for adding animations to the emotions. Remember that they should have transparency.
+!!!
 
-### Bot config (reference)
+## Step 3: Scenarios
 
-ot you need to create a JSON file with a valid structure.
+Next, you'll have to add the scenarios for the bot. Scenarios are the backgrounds that will be used for the bot. You can add as many scenarios as you want.
 
-```ts
-{
-    "bot_name": string; // The name of the bot
-    "version": string; // The version of the bot
-    "description": string; // short description of the bot
-    "author": string; // The of the creator
-    "subject": string; // The name of the character that interacts with the bot
-    "profile_pic": string; // The preview picture of the bot
-    "background_pic": string; // The background of the bot chat
-    "short_term_memory": {
-        "service": 'gpt_short-memory', // The strategy that will be used to store the short term memory, currently "gpt_short-memory" is the only one available.
-        "props": {
-            "prompt_context": string; // The prompt that describes the bot and the environment
-            "prompt_initiator": string; // The prompt that triggers the conversation start
-            "language": 'en' | 'es'; // The language of the short term memory,
-            "subjects": string[]; // The list of character names that can interact with the bot. `subject` must be included in this list.
-            "botSubject": string; // the name of the bot for the chat/prompt completer
-      }
-    },
-    "prompt_completer": {
-        "service": 'openai_completer' | 'pygmalion_completer'; // The prompt completer that will be used to generate the bot responses 
-        "props": { // depends on the service used
-            "model": "text-davinci-003" // The model that will be used to generate the bot responses
-        }
-    },
-    "outputListeners": [ // list of services that will do stuff when the chat response arrives
-        {
-            "service": 'azure_tts' | 'elevenlabs_tts' | 'novelai_tts', // The voice that will be used to generate the bot responses
-            "props": { // depends on the service used
-                "voiceId": "en-US-AriaNeural" // The voice that will be used for the bot responses
-            }
-        },
-        {
-            "service": "openai_emotion-interpreter",  // For mapping the bot responses to emotion images
-            "props": {
-                "images": { // Hashes of the emotion images
-                    "angry": string;
-                    "sad": string;
-                    "happy": string;
-                    "disgusted": string;
-                    "begging": string;
-                    "scared": string;
-                    "excited": string;
-                    "hopeful": string;
-                    "longing": string;
-                    "proud": string;
-                    "neutral": string;
-                    "rage": string;
-                    "scorn": string;
-                    "blushed": string;
-                    "pleasure": string;
-                    "lustful": string;
-                    "shocked": string;
-                    "confused": string;
-                    "disappointed": string;
-                    "embarrassed": string;
-                    "guilt": string;
-                    "shy": string;
-                    "frustrated": string;
-                    "annoyed": string;
-                    "exhausted": string;
-                    "tired": string;
-                    "curious": string;
-                    "intrigued": string;
-                    "amused": string;
-                }
-            }
-        }
-    ]
-}
+![](/assets/bot_builder_3_1.png)
+
+Each scenario represents a different environment for the bot. For example, you can have a `bedroom` scenario and a `kitchen` scenario.
+
+#### Scenario prompt definitions
+Once you select a background and an emotion group, you need to defined other attributes.
+
+![](/assets/bot_builder_3_2.png)
+
+* *Make primary scenario* is for the scenario that will be used as the default scenario for the bot. It will be used when the bot is first loaded.
+
+* *Scenario name* is a short name for referencing the scenario. It will not be used in the prompt.
+
+* *Voice* is the voice that will be used for the bot. It's recommended to use Azure voices since it's the cheapest. You can also use ElevenLabs voices.
+
+* *Keywords* are a list of words that define the scenario. This will be used by the emotion interpreter to try to guess when it's appropiate to change to this scenario and suggest it to the user. *This is a work in progress feature.*
+
+* *Action text* is the text of the button that will be used to change to this scenario.
+
+* *Prompt context* [see below](#prompt-context).
+
+* *Children scenarios* are the list of scenarios that can be accessed from this scenario. For example, if you have a `bedroom` scenario, you can have a `kitchen` scenario as a child scenario.
+
+##### Prompt context
+When creating a scenario, you have to define the prompt for the scenario. The prompt is the text that will be used to give context about the new environment. For example, if you have a `bedroom` scenario, you can use the following prompt:
+
+```
+{{user}} are {{char}} in a bedroom. The walls are painted in a light blue color. They feel very comfortable.
 ```
 
-Here you have two examples of bot configs:
+## Step 4: Finished character
 
-* [Miku: OpenAI + Azure](https://github.com/miku-gg/miku/blob/master/apps/bot-directory/db/bots/QmdDSTD9QV1rTkHRYFtyAJWkYandNXnJeVmrr1xZ8effkS)
-* [Elaina: Pygmalion + 11Labs](https://github.com/miku-gg/miku/blob/master/apps/bot-directory/db/bots/QmXThSy6BjidXAeTr3nez9ikXsWh5xZgJZxLbbmcCimdAP)
+Here you can have a preview of the character before building it: its size and the scenarios.
+
+![](/assets/bot_builder_4.png)
+
+To build the bot, just click on the **Build Bot**. It takes quiete a while to build the bot depending on the amount of assets and the specs of your computer, so please be patient.
+
+When finished, it will generate a `.png` file with the bot. You can download it and install it in your bot db `https://localhost:8585` and, if you want to share it, you can upload it to the [Bot directory](https://bots.miku.gg).
+
+!!!warning Save before building!
+Remember to save the bot draft by clicking in **Save** before building it. Otherwise, you will lose all the progress if it fails.
+!!!
