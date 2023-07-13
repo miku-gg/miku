@@ -58,4 +58,18 @@ body {
     overflow: scroll;
     margin: 0 auto;
   }
+
+  &__titleContainer {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    a {
+      color: gray;
+      transition: all 0.2s ease-out;
+
+      &:hover {
+        color: lightgray;
+      }
+    }
+  }
 }

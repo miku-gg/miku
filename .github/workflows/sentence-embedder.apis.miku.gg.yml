@@ -1,9 +1,8 @@
 name: sentence-embedder.apis.miku.gg
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+    branches: [ master ]
     paths:
       - apps/embeddings-apis/sentence-embedder/**
       - .github/workflows/sentence-embedder.apis.miku.gg.yml
