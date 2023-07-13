@@ -8,16 +8,18 @@ order: 2000
 
 ![](/assets/llama-demo.png)
 
-You can interact with bots in the [Live demo](https://bots.miku.gg) for free using our LLaMA server. But the recommended way is to use your own endpoint.
+You can interact with bots in the [Live demo](https://bots.miku.gg) for free using our open LLaMa server. But the recommended way is to use your own endpoint.
 
 !!!warning Only for testing
 The live demo is only intended for testing purposes. The recommended way to run your own bot is to download the source code and run it locally.
 [!ref Run locally](/guides/run-local.md)
 !!!
 
-## Instruction
+## Instructions
 
 ![](/assets/live-settings.png)
+
+You can interact with bot right away by just clicking on them, it will use our default open endpoint which is using the `Chronos-Hermes 13b` model.
 
 If you want use a custom endpoint, you can click on the burger menu on the top right corner and select "Custom endpoint". Then, paste your endpoint URL in the text box. You can also set a custom OpenAI API key if you want to use `gpt3.5-turbo` for responses instead.
 
