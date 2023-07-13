@@ -6,20 +6,19 @@ order: 1900
 
 The preferred way to run the project is to download the source code and run it locally. This way, you can customize the bot to your liking and you don't have to worry about the servers going offline.
 
-!!!
-The following guide is linux-only. For Windows 10, [check this guide](https://rentry.org/ukim) (credits to some anon).
-!!!
-
 
 ## Instructions
 
 [!embed](https://www.youtube.com/watch?v=zEiH9TqZjF8)
 
 ### Requirements
-You need to have `node v16+` and `git` installed on your machine. You can download them from the following links:
+You need to have `node v16+`, `python v3.10` and `git` installed on your machine. You can download them from the following links:
 
 -   [Node.js](https://nodejs.org/en/download/)
+-   [Python](https://www.python.org/downloads/)
 -   [Git](https://git-scm.com/downloads)
+
+The project should work on Windows, Linux and MacOS. If you have any issues please report it in the github issues page.
 
 ### 1. Clone the source code
 
@@ -29,74 +28,43 @@ First, you need to clone the source code. You can do this by running the followi
 git clone https://github.com/miku-gg/miku.git
 ```
 
-### 2. Create the .env file
+### 2. Installing dependencies
 
-Next, you need to create an `.env` file. You can do this by running the following commands:
+Next, you need to run `make install` to install the dependencies. You can do this by running the following commands:
 
 ```bash
 cd miku
-cp .env.example .env
-gedit .env
+make install
 ```
 
-The `.env` file should look like this. Please replace the api key values with your own.
+This command will check the dependencies and install the required packages for `npm` and `pip`.
 
-```bash
-# browser-directory env
-VITE_SERVICES_ENDPOINT=http://localhost:8484
-VITE_BOT_DIRECTORY_ENDPOINT=http://localhost:8585/bot
-VITE_IMAGES_DIRECTORY_ENDPOINT=http://localhost:8585/image
+Next, you will be prompted for the environment variables
 
-# services-server env
-OPENAI_API_KEY=<OPENAI_API_KEY>
-ELEVENLABS_API_KEY=<ELEVENLABS_API_KEY>
-AZURE_API_KEY=<AZURE_API_KEY>
-PYGMALION_ENDPOINT=<KOBOLD_AI_API_ENDPOINT>
-EMOTIONS_ENDPOINT=http://localhost:8585/emotion
-SERVICES_PORT=8484
+* `OPENAI_API_KEY`, a valid API for querying OpenAI models
+* `KOBOLD_AI_API_ENDPOINT`, a valid API for querying Kobold AI models
+* `AZURE_API_KEY`, a valid API for querying Azure TTS models
+* `ELEVENLABS_API_KEY`, a valid API for querying ElevenLabs TTS models
+* `PYGMALION_ENDPOINT`, an endpoint URL for querying the KoboldAI prompt completer
+* `OOBABOOGA_ENDPOINT`, an endpoint URL for querying the text-generation-webui prompt completer. Should end in `/api`
 
-# bot-directory env
-BOT_DIRECTORY_PORT=8585
-```
-
-* For OpenAI bots you need provide `OPENAI_API_KEY`
-* For pymalion bots you need provide `KOBOLD_AI_API_ENDPOINT` (same as for *TavernAI*, see below how to get one)
-* For emotions you need provide `OPENAI_API_KEY` (another open source option will be added later)
-* For azure-tts voice you need provide `AZURE_API_KEY`
-* For azure-tts voice you need provide `ELEVENLABS_API_KEY`
+At least one of `OPENAI_API_KEY`, `PYGMALION_ENDPOINT` and `OOBABOOGA_ENDPOINT` must be provided for the bots to generate responses. You can take a look at the [How to use the endpoints](/guides/how-to-endpoints) guide for getting one of these values.
 
 ### 3. Run the project
 After setting up the `.env` file, you can run the project by running the following command:
 
 ```bash
-npm i -g pnpm
-pnpm i
-pnpm start
+make run
 ```
 
-This should set up three servers:
+This should run up 6 servers:
 ```
-http://localhost:5173 - the web app
-http://localhost:8484 - the services server
-http://localhost:8585 - the bot directory server
+http://localhost:5173 - the web app for interacting with the bots (NodeJS)
+http://localhost:8484 - the services server for querying the external services (NodeJS)
+http://localhost:8585 - the bot directory server for installing and listing bots (NodeJS)
+http://localhost:8586 - the bot builder server for creating and editing bots (NodeJS)
+http://localhost:8601 - the SBERT server for analyzing emotions (embeddings similarity) (Python)
+http://localhost:8600 - the SBERT server for embedding text (Python)
 ```
 
-## How to get a Kobold AI API endpoint (for Pygmalion)
-
-You have two options:
-- [Run Kobold AI locally](https://github.com/KoboldAI/KoboldAI-Client) (Requires a powerful GPU to run `Pygmalion6B`)
-- [Run Kobold AI on Google Colab](https://colab.research.google.com/github/KoboldAI/KoboldAI-Client/blob/main/colab/GPU.ipynb) (free tier for a limited time)
-
-If you choose to do use the Google Colab option (recommended one for noobs), make sure to select the "Pygmalion 6B" option in the dropdown menu.
-
-![](/assets/colab_select.png)
-
-After you have it running, copy the link in the output console and add `/api`.
-
-![](/assets/colab_output.png)
-
-In this example, the endpoint environment variable should be:
-
-```
-https://categories-gen-incoming-condos.trycloudflare.com/api
-```
+Your initial place should be `http://localhost:8585` to install the bots. It should open automatically in your default browser.

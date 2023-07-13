@@ -6,30 +6,23 @@ order: 2000
 
 # Live demo
 
-You can interact with bots by using the [text-generation-webui](https://github.com/oobabooga/text-generation-webui) locally.
+![](/assets/llama-demo.png)
 
-[https://bots.miku.gg](https://bots.miku.gg) your browser to go to the LLaMA demo.
+You can interact with bots in the [Live demo](https://bots.miku.gg) for free using our LLaMA server. But the recommended way is to use your own endpoint.
 
-## Instructions
-
-### 1. Expose a LLaMA model with a public API
-To run a LLaMA model, you need to expose it with a public API by `--public-api` option.
-
-For example, to run WizardLM-7B
-```bash
-python server.py --model wizardLM-7B-GPTQ-4bit-128g --wbits 4 --groupsize 128 --public-api
-```
-
-After running it, please copy the non-streaming public url from the terminal. For example, you will see the following message in the terminal:
-```bash
-Starting non-streaming server at public url https://together-budgets-optimize-distributor.trycloudflare.com/api
-```
-
-!!!warning
-If you find errors running the public-api, you can take a look this [github issue](https://github.com/oobabooga/text-generation-webui/issues/1524).
+!!!warning Only for testing
+The live demo is only intended for testing purposes. The recommended way to run your own bot is to download the source code and run it locally.
+[!ref Run locally](/guides/run-local.md)
 !!!
 
-### 2. Paste the API key in the demo
-Go to the [Live demo](https://bots.miku.gg) and paste your API key in the text box. Then, click on the bot you want to interact with.
+## Instruction
 
-![](/assets/llama-demo.png)
+![](/assets/live-settings.png)
+
+If you want use a custom endpoint, you can click on the burger menu on the top right corner and select "Custom endpoint". Then, paste your endpoint URL in the text box. You can also set a custom OpenAI API key if you want to use `gpt3.5-turbo` for responses instead.
+
+In order to set up a custom endpoint, you can follow the [How to use the endpoints](/guides/how-to-endpoints) guide.
+
+!!!information What is *Prompt Stragety*?
+Prompt strategy is the method used to describe the conversation to the language model. Some models are more sentive to some strategies than others. You can try different strategies to see which one works best for your model. As a rule, `SBF` and `W++` work well for OpenAI, `Pygmalion style` works good for `Pygmalion 6b,7b and 13b`. `Alpaca` and`Vicuna 1.1` generally work well for `LLaMA` instruct models like WizardLM.
+!!!
