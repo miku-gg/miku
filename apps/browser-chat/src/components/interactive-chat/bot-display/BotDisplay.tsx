@@ -29,6 +29,7 @@ import { BotSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
 import ScenarioSelector from "../scenario-selector/ScenarioSelector";
 import EmotionRenderer from "../../asset-renderer/EmotionRenderer";
+import ProgressiveImage from "react-progressive-graceful-image";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -290,6 +291,8 @@ export const BotDisplay = () => {
     }
   };
 
+  const backgroundImagePath = `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${backgroundImage}`;
+
   return (
     // MAIN CONTAINER
     <>
@@ -323,15 +326,18 @@ export const BotDisplay = () => {
               </button>
             </div>
           </div>
-          <img
-            className="h-full w-full z-0 rounded-xl conversation-background-image object-cover"
-            src={`${VITE_IMAGES_DIRECTORY_ENDPOINT}/${backgroundImage}`}
-            alt="background"
-            onError={({ currentTarget }) => {
-              currentTarget.onerror = null;
-              currentTarget.src = "/default_background.png";
-            }}
-          />
+          
+          <ProgressiveImage src={`${backgroundImagePath}_1080p`} placeholder={`${backgroundImagePath}_480p`}>
+            {(src) => <img
+              className="h-full w-full z-0 rounded-xl conversation-background-image object-cover"
+              src={`${src}`}
+              alt="background"
+              onError={({ currentTarget }) => {
+                currentTarget.onerror = null;
+                currentTarget.src = "/default_background.png";
+              }}
+            />}
+          </ProgressiveImage>
           <EmotionRenderer
             assetUrl={emotionImage}
             upDownAnimation

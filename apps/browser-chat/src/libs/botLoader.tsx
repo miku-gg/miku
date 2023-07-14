@@ -266,11 +266,12 @@ export function useBot(): {
 
         // fetch first emotion and backgrounds
         const defaultEmotionGroupId = res.card?.data.extensions?.mikugg.scenarios.find(sn => sn.id === res.card?.data.extensions.mikugg.start_scenario)?.emotion_group || '';
-        await preLoadImages(res.card?.data.extensions?.mikugg?.backgrounds?.map(
-          (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}`
+        const defaultBackgound = res.card?.data.extensions?.mikugg.scenarios.find(sn => sn.id === res.card?.data.extensions.mikugg.start_scenario)?.background || '';
+        await preLoadImages(res.card?.data.extensions?.mikugg?.backgrounds?.filter(bg => bg.id === defaultBackgound).map(
+          (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}_480p`
         ) || []);
         await preLoadImages(res.card?.data.extensions?.mikugg?.emotion_groups?.find(eg => eg.id === defaultEmotionGroupId)?.emotions?.filter((em, index) => em.id === 'happy' || index === 0).map(
-          (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}`
+          (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}_480p`
         ) || []);
         
         setBotConfigSettings(_botData.settings);

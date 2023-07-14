@@ -145,10 +145,10 @@ export const EMPTY_MIKU_CARD: MikuCard = {
         "language": "en",
         "profile_pic": "",
         "short_description": "",
-        "start_scenario": "",
+        "start_scenario": "default",
         "scenarios": [
           {
-            "id": "",
+            "id": "default",
             "name": "",
             "children_scenarios": [],
             "context": "",

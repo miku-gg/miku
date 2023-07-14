@@ -2,6 +2,7 @@ import fs, { readFileSync } from 'fs';
 import { Request, Response } from "express";
 import { MikuCard, extractCardFromBuffer, extractMikuCardImages, validateMikuCard, itemsEmbedder } from "@mikugg/bot-utils";
 import config from '../config';
+import { resizeImages } from '../libs/assetResize';
 const Hash = require('ipfs-only-hash');
 
 const sentenceEmbedderAPIEndpoint = 'http://localhost:8600';
@@ -52,6 +53,20 @@ export default async function addBot(req: Request, res: Response) {
     }
     fs.writeFileSync(cardPath, JSON.stringify(_extractedMikuCard), 'utf-8');
     await generateScenarioTriggerEmbeddings(_extractedMikuCardHash, _extractedMikuCard);
+    await resizeImages(
+      async (hash) => {
+        const imgPath = `${config.IMG_PATH}/${hash}`;
+        return fs.readFileSync(imgPath);
+      },
+      async (filename, buffer) => {
+        const imgPath = `${config.IMG_PATH}/${filename}`;
+        if (!fs.existsSync(imgPath)) {
+          fs.writeFileSync(imgPath, buffer);
+        }
+      },
+      Array.from(images.keys())
+    );
+
 
     res.redirect('/');
     res.end();

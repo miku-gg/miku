@@ -15,6 +15,7 @@ export default function EmotionRenderer({
     upDownAnimation?: boolean,
   }): JSX.Element {
   const [blobUrl, setBlobUrl] = useState<string>("");
+  const [blobUrl_LOW, setBlobUrl_LOW] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [hasPlayedAudio, setHasPlayedAudio] = useState<boolean>(false);
   const [fileType, setFileType] = useState<string | null>(null);
@@ -25,16 +26,25 @@ export default function EmotionRenderer({
       try {
         setLoading(true);
         const response = await fetch(
-          `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${assetUrl}`
+          `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${assetUrl}_480p`
         );
         if (response.ok) {
           const contentType = response.headers.get("Content-Type");
           const data = await response.blob();
           const newBlobUrl = URL.createObjectURL(data);
-          setBlobUrl(newBlobUrl);
+          setBlobUrl_LOW(newBlobUrl);
+          setBlobUrl('');
           setFileType(contentType);
           setLoading(false);
           setHasPlayedAudio(false);
+          const response2 = await fetch(
+            `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${assetUrl}_720p`
+          );
+          if (response2.ok) {
+            const data = await response2.blob();
+            const newBlobUrl = URL.createObjectURL(data);
+            setBlobUrl(newBlobUrl);
+          }
         } else {
           console.error("Error fetching file:", response.statusText);
         }
@@ -53,7 +63,7 @@ export default function EmotionRenderer({
         className={`${className} ${
           (!loading && upDownAnimation) ? "fade-in up-and-down" : ""
         }`}
-        src={blobUrl}
+        src={blobUrl || blobUrl_LOW}
         loop
         autoPlay
         muted
@@ -66,7 +76,7 @@ export default function EmotionRenderer({
         className={`${className} ${
           (!loading && upDownAnimation) ? "fade-in up-and-down" : ""
         }`}
-        src={blobUrl}
+        src={blobUrl || blobUrl_LOW}
         alt="character"
         onError={({ currentTarget }) => {
           currentTarget.onerror = null;
