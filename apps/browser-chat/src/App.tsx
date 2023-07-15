@@ -9,7 +9,7 @@ import BotLoadingModal from "./components/loading/BotLoadingModal";
 export const App = () => {
   return (
     <div
-      className="App flex w-screen h-screen p-10 max-lg:p-0 min-w-full text-center"
+      className="App flex w-screen h-screen p-5 max-lg:p-0 min-w-full text-center"
       style={{
         background:
           "linear-gradient(180deg, rgba(12,10,29,1) 0%, rgb(30 26 65) 100%)",

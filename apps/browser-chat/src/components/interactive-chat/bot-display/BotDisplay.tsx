@@ -292,140 +292,151 @@ export const BotDisplay = () => {
   };
 
   const backgroundImagePath = `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${backgroundImage}`;
+  const profileImagePath = `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${card?.data.extensions?.mikugg?.profile_pic}`;
 
   return (
     // MAIN CONTAINER
     <>
-      <div className="relative flex flex-col w-full h-full items-center">
-        {/* MAIN IMAGE */}
-        <div className="absolute flex flex-col justify-center items-center w-full h-full overflow-hidden bot-display-images-container rounded-xl">
-          <div className="flex items-center justify-between pt-3 px-3 absolute z-10 top-0 w-full">
-            <div className="flex gap-3">
-              <button className="rounded-full" onClick={displayBotDetails}>
-                <img src={infoIcon} />
-              </button>
-              {
-                ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1) ? (
-                  <ScenarioSelector value={currentContext} onChange={updateContext} />
-                ) : null
-              }
+      <div className="w-full h-full max-lg:w-full flex flex-col bot-display-images-container rounded-xl mb-4">
+        <div className="relative flex flex-col w-full h-full items-center">
+          <div className="w-full flex flex-row justify-between items-center p-3 bot-display-header rounded-xl z-10">
+            <div className="flex items-center gap-4 text-white">
+              <div className="w-8 h-8 bg-cover rounded-full" style={{backgroundImage: `url(${profileImagePath}_480p)`}} />
+              <div className="BotDisplay__header-name">{card?.data.name}</div>
+              <div className="inline-flex">
+                <button className="rounded-full" onClick={displayBotDetails}>
+                  <img src={infoIcon} />
+                </button>
+              </div>
+              <div className="inline-flex">
+                {
+                  ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1) ? (
+                    <ScenarioSelector value={currentContext} onChange={updateContext} />
+                  ) : null
+                }
+              </div>
             </div>
-            <div className="flex gap-3">
-              <button
-                className="rounded-full"
-                onClick={handleHistoryButtonClick}
-              >
-                <img src={historyIcon} />
-              </button>
-              {/* <button className="rounded-full"><img src={settingsIcon}/></button> */}
-              <button
-                className="rounded-full"
-                onClick={handleSettingsButtonClick}
-              >
-                <img src={settingsIcon} />
-              </button>
+            <div className="flex gap-4">
+              <div className="inline-flex">
+                <button
+                  className="rounded-full"
+                  onClick={handleHistoryButtonClick}
+                >
+                  <img src={historyIcon} />
+                </button>
+              </div>
+              <div className="inline-flex">
+                <button
+                  className="rounded-full"
+                  onClick={handleSettingsButtonClick}
+                >
+                  <img src={settingsIcon} />
+                </button>
+              </div>
             </div>
           </div>
-          
-          <ProgressiveImage src={`${backgroundImagePath}_1080p`} placeholder={`${backgroundImagePath}_480p`}>
-            {(src) => <img
-              className="h-full w-full z-0 rounded-xl conversation-background-image object-cover"
-              src={`${src}`}
-              alt="background"
-              onError={({ currentTarget }) => {
-                currentTarget.onerror = null;
-                currentTarget.src = "/default_background.png";
-              }}
-            />}
-          </ProgressiveImage>
-          <EmotionRenderer
-            assetUrl={emotionImage}
-            upDownAnimation
-            className="absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover"
-          />
-        </div>
-        {/* RESPONSE CONTAINER */}
-        <div
-          className={
-            !responseIds.length
-              ? "hidden"
-              : "absolute bottom-10 z-10 flex justify-center items-center w-full h-1/4"
-          }
-        >
-          <div className="response-container h-3/4 w-10/12 relative">
-            <div className="response-container-text flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b text-sm from-slate-900/[.9] to-gray-500/50 overflow-auto drop-shadow-2xl shadow-black">
-              {!response || loading ? (
-                <Loader />
-              ) : (
-                <div className="text-md font-bold text-gray-200 text-left">
-                  <AnimateResponse text={response?.text || ''} fast={responseIndex > 0} />
-                </div>
-              )}
-            </div>
-            {!loading && responseIds.length > 1 ? (
-              <div className="response-swiping absolute top-[-2em] left-2 inline-flex justify-between gap-4 bg-slate-900/80 p-2 text-white rounded-t-md">
-                <button
-                  className="text-gray-300 disabled:text-gray-500 hover:text-white transition-all"
-                  onClick={onLeftClick}
-                  disabled={responseIndex >= responseIds.length - 1}
-                >
-                  <LeftArrow />
-                </button>
-                <button
-                  className="text-gray-300 disabled:text-gray-500 hover:text-white transition-all"
-                  onClick={onRightClick}
-                  disabled={responseIndex <= 0}
-                >
-                  <RightArrow />
-                </button>
+          {/* MAIN IMAGE */}
+          <div className="absolute flex flex-col justify-center items-center w-full h-full overflow-hidden main-image-container rounded-xl">          
+            <ProgressiveImage src={`${backgroundImagePath}_1080p`} placeholder={`${backgroundImagePath}_480p`}>
+              {(src) => <img
+                className="h-full w-full z-0 rounded-xl conversation-background-image object-cover"
+                src={`${src}`}
+                alt="background"
+                onError={({ currentTarget }) => {
+                  currentTarget.onerror = null;
+                  currentTarget.src = "/default_background.png";
+                }}
+              />}
+            </ProgressiveImage>
+            <EmotionRenderer
+              assetUrl={emotionImage}
+              upDownAnimation
+              className="absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover"
+            />
+          </div>
+          {/* RESPONSE CONTAINER */}
+          <div
+            className={
+              !responseIds.length
+                ? "hidden"
+                : "absolute bottom-10 z-10 flex justify-center items-center w-full h-1/4"
+            }
+          >
+            <div className="response-container h-3/4 w-10/12 relative">
+              <div className="response-container-text flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b text-sm from-slate-900/[.9] to-gray-500/50 overflow-auto drop-shadow-2xl shadow-black">
+                {!response || loading ? (
+                  <Loader />
+                ) : (
+                  <div className="text-md font-bold text-gray-200 text-left">
+                    <AnimateResponse text={response?.text || ''} fast={responseIndex > 0} />
+                  </div>
+                )}
               </div>
-            ) : null}
-            {!loading && responseIds.length > 1 &&  responseIndex === 0 ? (
-              <button
-                className="reload-button absolute top-[-2.5em] right-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
-                onClick={onRegenerateClick}
-              >
-                <Dice />
-                Regenerate
-              </button>
-            ) : null}
-            {!loading && response?.audio ? (
-              <button
-                className="audio-button absolute bottom-3 left-3 inline-flex items-center gap-2 text-gray-400 rounded-md hover:text-white"
-                onClick={() => playAudio(response?.audio || "")}
-              >
-                <UnmuteIcon size={24} />
-              </button>
-            ) : null}
-            {!loading && contextSuggestion ? (
-              <Tooltip title="Randomize character outfit" placement="left">
-                <button
-                  className="wand-button absolute bottom-4 right-4 inline-flex items-center gap-2 text-white rounded-md hover:text-white"
-                  onClick={updateContext.bind(null, contextSuggestion)}
-                >
-                  <Wand />
-                </button>
-              </Tooltip>
-            ) : null}
-            {!loading &&
-            responsesGenerated.length > 1 &&
-            responseIndex === 0 ? (
-              <div className="reload-button absolute bottom-[-3.4em] right-[1em] flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-b-md text-xs max-w-[90%] overflow-auto">
-                {responsesGenerated.map((responseId, index) => (
+              {!loading && responseIds.length > 1 ? (
+                <div className="response-swiping absolute top-[-2em] left-2 inline-flex justify-between gap-4 bg-slate-900/80 p-2 text-white rounded-t-md">
                   <button
-                    className={`inline-flex transition-all items-center hover:text-white ${
-                      responseIds[0] === responseId
-                        ? "text-white"
-                        : "text-gray-400"
-                    }`}
-                    key={responseId}
-                    onClick={(event) => onOptionClick(responseId, event)}
+                    className="text-gray-300 disabled:text-gray-500 hover:text-white transition-all"
+                    onClick={onLeftClick}
+                    disabled={responseIndex >= responseIds.length - 1}
                   >
-                    <Dice />
+                    <LeftArrow />
                   </button>
-                ))}
-              </div>
-            ) : null}
+                  <button
+                    className="text-gray-300 disabled:text-gray-500 hover:text-white transition-all"
+                    onClick={onRightClick}
+                    disabled={responseIndex <= 0}
+                  >
+                    <RightArrow />
+                  </button>
+                </div>
+              ) : null}
+              {!loading && responseIds.length > 1 &&  responseIndex === 0 ? (
+                <button
+                  className="reload-button absolute top-[-2.5em] right-2 inline-flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-t-md"
+                  onClick={onRegenerateClick}
+                >
+                  <Dice />
+                  Regenerate
+                </button>
+              ) : null}
+              {!loading && response?.audio ? (
+                <button
+                  className="audio-button absolute bottom-3 left-3 inline-flex items-center gap-2 text-gray-400 rounded-md hover:text-white"
+                  onClick={() => playAudio(response?.audio || "")}
+                >
+                  <UnmuteIcon size={24} />
+                </button>
+              ) : null}
+              {!loading && contextSuggestion ? (
+                <Tooltip title="Randomize character outfit" placement="left">
+                  <button
+                    className="wand-button absolute bottom-4 right-4 inline-flex items-center gap-2 text-white rounded-md hover:text-white"
+                    onClick={updateContext.bind(null, contextSuggestion)}
+                  >
+                    <Wand />
+                  </button>
+                </Tooltip>
+              ) : null}
+              {!loading &&
+              responsesGenerated.length > 1 &&
+              responseIndex === 0 ? (
+                <div className="reload-button absolute bottom-[-3.4em] right-[1em] flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-b-md text-xs max-w-[90%] overflow-auto">
+                  {responsesGenerated.map((responseId, index) => (
+                    <button
+                      className={`inline-flex transition-all items-center hover:text-white ${
+                        responseIds[0] === responseId
+                          ? "text-white"
+                          : "text-gray-400"
+                      }`}
+                      key={responseId}
+                      onClick={(event) => onOptionClick(responseId, event)}
+                    >
+                      <Dice />
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
