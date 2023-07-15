@@ -1,7 +1,7 @@
 import { ContextPromptBuildStrategy, ContextPromptParts } from '../GPTMemoryV2';
 import * as MikuCore from '@mikugg/core';
 
-import { replaceAll } from './RPBTStrategy';
+import { replaceAll } from './utils';
 
 export class WppStrategy implements ContextPromptBuildStrategy {
   buildContextPrompt(parts: ContextPromptParts): string {

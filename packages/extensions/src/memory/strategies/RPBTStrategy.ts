@@ -1,23 +1,6 @@
-import { ContextPromptBuildStrategy, ContextPromptParts } from '../GPTMemoryV2';
 import * as MikuCore from '@mikugg/core';
-
-export const replaceAll = function (
-  text: string,
-  search: string | RegExp,
-  replacement: string
-): string {
-  // If the search parameter is a string, escape any special characters
-  const searchPattern =
-    typeof search === "string"
-      ? search.replace(/[.*+\-?^${}()|[\]\\]/g, "\\$&")
-      : search.source;
-
-  // Create a regular expression with the global flag
-  const regex = new RegExp(searchPattern, "g");
-
-  // Perform the replacement and return the result
-  return text.replace(regex, replacement);
-};
+import { ContextPromptBuildStrategy, ContextPromptParts } from '../GPTMemoryV2';
+import { replaceAll } from './utils';
 
 export class RPBTStrategy implements ContextPromptBuildStrategy {
   buildContextPrompt(parts: ContextPromptParts): string {

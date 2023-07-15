@@ -1,6 +1,5 @@
 
 import * as Strategies from './strategies';
-import { replaceAll } from './strategies/RPBTStrategy';
 import * as MikuCore from '@mikugg/core';
 export * as Strategies from './strategies';
 import GPT3Tokenizer from 'gpt3-tokenizer';
@@ -71,15 +70,19 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
 
   public override getContextPrompt(): string {
     let prompt = this.promptbuildStrategy.buildContextPrompt(this.promptParts);
-    prompt = replaceAll(prompt, '{{char}}', this.promptParts.botSubject);
-    prompt = replaceAll(prompt, '{{user}}', 'Anon');
+    prompt = Strategies.fillTextTemplate(prompt, {
+      bot: this.promptParts.botSubject,
+      user: 'Anon'
+    });
     return prompt;    
   }
 
   public override getInitiatorPrompt(): string {
     let prompt = this.promptbuildStrategy.buildInitiatorPrompt(this.promptParts);
-    prompt = replaceAll(prompt, '{{char}}', this.promptParts.botSubject);
-    prompt = replaceAll(prompt, '{{user}}', 'Anon');
+    prompt = Strategies.fillTextTemplate(prompt, {
+      bot: this.promptParts.botSubject,
+      user: 'Anon'
+    })
     return prompt;
   }
 
@@ -127,8 +130,10 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
     prompt += `\n${this.promptbuildStrategy.getResponseAskLine()}`;
     // for(let i = 0; i < 10; i++) prompt = prompt.replace(/\n\n/g, '\n');
 
-    prompt = replaceAll(prompt, '{{char}}', this.promptParts.botSubject);
-    prompt = replaceAll(prompt, '{{user}}', 'Anon');
+    prompt = Strategies.fillTextTemplate(prompt, {
+      bot: this.promptParts.botSubject,
+      user: 'Anon'
+    });
 
     return prompt;
   }

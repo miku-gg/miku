@@ -82,8 +82,10 @@ export const InteractiveResponsesContextProvider = ({
       const firstEmotionGroup = card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
       let firstImage = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'happy')?.source[0] : firstEmotionGroup?.emotions[0].source[0];
       let firstMessage = card?.data.first_mes || '';
-      firstMessage = MikuExtensions.Memory.Strategies.replaceAll(firstMessage, '{{char}}', card?.data.name || '');
-      firstMessage = MikuExtensions.Memory.Strategies.replaceAll(firstMessage, '{{user}}', 'Anon');
+      firstMessage = MikuExtensions.Memory.Strategies.fillTextTemplate(firstMessage, {
+        bot: card?.data.name || '',
+        user: 'Anon'
+      });
 
       fillResponse('first', "text", firstMessage);
       fillResponse('first', "emotion", firstImage || '');

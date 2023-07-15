@@ -1,3 +1,4 @@
+export * from './utils';
 export * from './RPBTStrategy';
 export * from './SbfStrategy';
 export * from './WppStrategy';
