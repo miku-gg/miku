@@ -1,0 +1,19 @@
+* {
+  box-sizing: border-box;
+}
+
+
+body {
+  background-color: #121a36;
+  font-family: "Poppins", "Roboto", sans-serif;
+  color: #fffef9;
+  padding: 0;
+  margin: 0;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  max-height: 100vh;
+  max-width: 852px;
+  margin: 0 auto;
+}
