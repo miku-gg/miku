@@ -35,19 +35,8 @@ export const validateCharacterData = ({ data: characterData }: MikuCard): Valida
     errors.push({ field: 'short_description', message: 'Character short description is required.' });
   }
 
-  if (!characterData.scenario || characterData.scenario.trim() === '') {
-    errors.push({ field: 'scenario', message: 'Scenario is required.' });
-  }
-
   if (!characterData.first_mes || characterData.first_mes.trim() === '') {
     errors.push({ field: 'first_mes', message: 'Greeting is required.' });
-  }
-  if (!characterData.mes_example.length || characterData.mes_example.trim() === '') {
-    errors.push({ field: `mes_example`, message: 'Sample conversation incomplete.' });
-  }
-
-  if (!characterData.personality || characterData.personality.trim() === '') {
-    errors.push({ field: 'personality', message: 'At least one attribute is required.' });
   }
 
   if (!characterData.extensions.mikugg.backgrounds || characterData.extensions.mikugg.backgrounds.length === 0) {
