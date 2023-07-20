@@ -108,6 +108,24 @@ export const validateCharacterData = ({ data: characterData }: MikuCard): Valida
         message: `Scenario name is empty`
       })
     }
+    if (!scenario.background || characterData.extensions.mikugg.backgrounds.findIndex((background) => background.id === scenario.background) === -1) {
+      errors.push({
+        field: `scenario.${scenario.name}.background`,
+        message: `Scenario ${scenario.name} background not found`
+      })
+    }
+    if (!scenario.emotion_group || characterData.extensions.mikugg.emotion_groups.findIndex((emotionGroup) => emotionGroup.id === scenario.emotion_group) === -1) {
+      errors.push({
+        field: `scenario.${scenario.name}.emotion_group`,
+        message: `Scenario ${scenario.name} emotion group not found`
+      })
+    }
+    if (!scenario.voice || characterData.extensions.mikugg.voices.findIndex((voice) => voice.id === scenario.voice) === -1) {
+      errors.push({
+        field: `scenario.${scenario.name}.voice`,
+        message: `Scenario ${scenario.name} voice not found`
+      });
+    }
   })
 
   return errors;

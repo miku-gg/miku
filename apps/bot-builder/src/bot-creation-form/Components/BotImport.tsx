@@ -205,7 +205,7 @@ const tavernCardV2ToMikuCard = (json: TavernCardV2): MikuCard => {
               id: 'azure_tts.en-GB-SoniaNeural',
               provider: 'azure_tts',
               provider_voice_id: 'en-GB-SoniaNeural',
-              provider_emotion: undefined
+              provider_emotion: 'sad'
             }
           ],
         },

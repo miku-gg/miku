@@ -8,7 +8,7 @@ export const voices: {
     label: "Sonia (Azure)",
     provider: 'azure_tts',
     provider_voice_id: 'en-GB-SoniaNeural',
-    provider_emotion: undefined
+    provider_emotion: 'sad'
   },
   {
     label: "Aria (Azure)",

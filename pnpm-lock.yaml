@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -424,7 +428,7 @@ importers:
         version: 4.9.5
       vite:
         specifier: ^4.0.0
-        version: 4.0.0(@types/node@18.15.5)(sass@1.59.3)
+        version: 4.0.0
       vite-plugin-plain-text:
         specifier: ^1.4.2
         version: 1.4.2
@@ -6393,7 +6397,7 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.19.6(@babel/core@7.21.8)
       magic-string: 0.27.0
       react-refresh: 0.14.0
-      vite: 4.0.0(@types/node@18.15.5)(sass@1.59.3)
+      vite: 4.0.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -14628,6 +14632,39 @@ packages:
       '@napi-rs/magic-string': 0.3.4
       fast-glob: 3.2.12
       minimatch: 6.2.0
+
+  /vite@4.0.0:
+    resolution: {integrity: sha512-ynad+4kYs8Jcnn8J7SacS9vAbk7eMy0xWg6E7bAhS1s79TK+D7tVFGXVZ55S7RNLRROU1rxoKlvZ/qjaB41DGA==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': '>= 14'
+      less: '*'
+      sass: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.16.17
+      postcss: 8.4.21
+      resolve: 1.22.2
+      rollup: 3.20.2
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
 
   /vite@4.0.0(@types/node@18.15.5)(sass@1.59.3):
     resolution: {integrity: sha512-ynad+4kYs8Jcnn8J7SacS9vAbk7eMy0xWg6E7bAhS1s79TK+D7tVFGXVZ55S7RNLRROU1rxoKlvZ/qjaB41DGA==}
