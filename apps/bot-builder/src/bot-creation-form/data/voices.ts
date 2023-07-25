@@ -29,6 +29,12 @@ export const voices: {
     provider_emotion: undefined
   },
   {
+    label: "Maisie (Azure)",
+    provider: 'azure_tts',
+    provider_voice_id: 'en-GB-MaisieNeural',
+    provider_emotion: undefined
+  },
+  {
     label: "Sara (Azure)",
     provider: 'azure_tts',
     provider_voice_id: 'en-US-SaraNeural',

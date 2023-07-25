@@ -1,7 +1,7 @@
 ---
 label: Create bots
 icon: package
-order: 1800
+order: 1600
 ---
 
 # Creating a bot
