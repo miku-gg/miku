@@ -11,6 +11,7 @@ import queryString from "query-string";
 import { IS_ALPHA_LIVE } from "../../loading/BotLoadingModal";
 import { botSettings } from "../bot-display/BotDisplay";
 import { useBot } from "../../../libs/botLoader";
+import { trackEvent } from "../../../libs/analytics";
 
 export function SmallSpinner(): JSX.Element {
   return (
@@ -21,11 +22,12 @@ export function SmallSpinner(): JSX.Element {
 }
 
 const lastCostId = { id: "" };
+let lastInteractionTime = Date.now();
 export const ChatInputBox = (): JSX.Element => {
   const [value, setValue] = useState<string>("");
   const [loadingCost, setLoadingCost] = useState<boolean>(false);
   const [cost, setCost] = useState<number>(0);
-  const { botConfigSettings } = useBot();
+  const { botConfigSettings, card } = useBot();
   const { responseIndex, loading, setResponsesGenerated } = useContext(
     InteractiveResponsesContext
   );
@@ -37,6 +39,11 @@ export const ChatInputBox = (): JSX.Element => {
     event.stopPropagation();
 
     if (value) {
+      trackEvent('bot_interact', {
+        bot: card?.data.name || 'unknown',
+        time: Date.now() - lastInteractionTime
+      })
+      lastInteractionTime = Date.now();
       const result = botFactory
         .getInstance()
         ?.sendPrompt(

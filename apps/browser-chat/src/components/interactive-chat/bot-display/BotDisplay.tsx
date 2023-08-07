@@ -30,6 +30,7 @@ import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
 import ScenarioSelector from "../scenario-selector/ScenarioSelector";
 import EmotionRenderer from "../../asset-renderer/EmotionRenderer";
 import ProgressiveImage from "react-progressive-graceful-image";
+import { trackEvent } from "../../../libs/analytics";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -234,6 +235,9 @@ export const BotDisplay = () => {
     const bot = botFactory.getInstance();
     const shortTermMemory = bot?.getMemory();
     const memoryLines = shortTermMemory?.getMemory();
+    trackEvent("bot_regenerate", {
+      bot: card?.data.name
+    })
     if (shortTermMemory && memoryLines && memoryLines.length >= 2) {
       shortTermMemory.clearMemories();
       memoryLines.forEach((line, index) => {

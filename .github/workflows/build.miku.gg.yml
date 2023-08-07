@@ -51,6 +51,8 @@ jobs:
           aws-region: us-west-2
       - name: Install
         run: npm i -g pnpm && pnpm install --no-frozen-lockfile && pnpm run build --scope=@mikugg/bot-builder
+        env:
+          VITE_GTM_ID: ${{ secrets.VITE_GTM_ID}}
       - name: Deploy to S3
         run: aws s3 sync apps/bot-builder/dist ${{ secrets.S3_BUCKET_BUILD }} --delete
       - name: Invalidate Cloudfront distribution

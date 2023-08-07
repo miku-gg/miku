@@ -25,7 +25,6 @@
     "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-ga4": "^2.0.0",
     "react-json-view-2": "^1.23.2",
     "react-progressive-graceful-image": "^0.7.0",
     "react-toastify": "^9.1.1",
