@@ -98,7 +98,7 @@
     &-list {
       display: flex;
       flex-wrap: wrap;
-      overflow: scroll;
+      overflow: auto;
       // height: 3rem;
       justify-content: flex-start;
       gap: 1rem;

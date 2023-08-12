@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { DefaultImage, UploadIcon } from '../assets/svg';
 import 'react-lazy-load-image-component/src/effects/blur.css';
@@ -7,11 +7,12 @@ interface DragAndDropImagesProps {
   className?: string;
   placeHolder: string;
   dragAreaLabel?: string;
-  onFileValidate?: (file: File) => boolean;
+  onFileValidate?: (file: File) => boolean | Promise<boolean>;
   errorMessage: string;
   handleChange?: (file: File) => void;
   previewImage?: string;
   size?: 'sm' | 'md' | 'lg';
+  placeHolderImage?: React.ReactNode;
 }
 
 const DragAndDropImages = ({
@@ -23,29 +24,18 @@ const DragAndDropImages = ({
   handleChange,
   previewImage = '',
   size = 'md',
+  placeHolderImage = <DefaultImage />,
 }: DragAndDropImagesProps) => {
   const [dragOver, setDragOver] = useState<boolean>(false);
-  const [dragFile, setDragFile] = useState<File>();
-  const [sourceFile, setSourceFile] = useState<string>(previewImage);
-  const [loaded, setLoaded] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null); // Create a ref for the file input
 
-  useEffect(() => {
-    setSourceFile(previewImage);
-  }, [previewImage]);
+  const handleClick = () => {
+    fileInputRef.current?.click(); // Trigger click event of file input when dropzone is clicked
+  };
 
   const handleDropZoneChange = async (file: File) => {
-    if (onFileValidate(file)) {
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
-
-        setSourceFile(base64);
-        setDragFile(file);
-        handleChange(file);
-      };
-
-      reader.readAsDataURL(file);
+    if (await onFileValidate(file)) {
+      handleChange(file);
     } else {
       alert(errorMessage);
     }
@@ -71,6 +61,15 @@ const DragAndDropImages = ({
 
   return (
     <div className={`dragAndDropImages ${className}`}>
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }} // Hide the file input
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          file && handleDropZoneChange(file);
+        }}
+      />
       <div
         className={`dragAndDropImages__dropzone ${size}Size ${
           dragOver ? 'dragOver' : ''
@@ -78,24 +77,25 @@ const DragAndDropImages = ({
         onDrop={onDrop}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
+        onClick={handleClick}
       >
-        {!dragFile && !sourceFile ? (
+        {!previewImage ? (
           <div className="dragAndDropImages__defaultImage">
-            <DefaultImage />
+            {placeHolderImage}
             <p className="maxSizeText">{placeHolder}</p>
             <UploadIcon />
           </div>
         ) : (
           <div className="dragAndDropImages__preview">
-            {sourceFile.indexOf('video/webm') !== -1 ? (
+            {previewImage.indexOf('video/webm') !== -1 ? (
               <video
-                src={sourceFile}
+                src={previewImage}
                 autoPlay={true}
                 loop={true}
                 muted={true}
               />
             ) : (
-              <LazyLoadImage effect="blur" src={sourceFile} />
+              <LazyLoadImage effect="blur" src={previewImage} />
             )}
           </div>
         )}

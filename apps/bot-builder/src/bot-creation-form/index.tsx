@@ -103,7 +103,7 @@ const _CharacterCreationForm: React.FC = () => {
           ]}
         />
       </div>
-      <div className="characterCreationForm__stepsContainer">
+      <div className="characterCreationForm__stepsContainer scrollbar">
         {currentStep === 1 && <Step1Description />}
         {currentStep === 2 && <Step2Assets />}
         {currentStep === 3 && <Step3Scenarios />}

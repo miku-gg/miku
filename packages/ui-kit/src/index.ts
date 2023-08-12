@@ -10,7 +10,7 @@ import Dropdown from './components/Dropdown';
 import ImageSlider from './components/ImageSlider';
 import Input from './components/Input';
 import Steps from './components/Steps';
-import Tag from './components/Tag';
+import Tag, { Colors } from './components/Tag';
 import TextHeading from './components/TextHeading';
 import CheckBox from './components/CheckBox';
 import Tooltip from './components/Tooltip';
@@ -36,4 +36,5 @@ export {
   CheckBox,
   TagAutocomplete,
   Icons,
+  Colors,
 };
