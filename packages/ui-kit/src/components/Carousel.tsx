@@ -14,6 +14,7 @@ interface CarouselProps {
   isImageCarousel?: boolean;
   onClick: (index: number, arrowClick?: boolean) => void;
   selectedIndex: number;
+  showArrowButtons?: boolean;
   size?: 'small' | 'medium' | 'large';
 }
 
@@ -24,6 +25,7 @@ const Carousel: React.FC<CarouselProps> = ({
   isImageCarousel,
   onClick,
   selectedIndex,
+  showArrowButtons = true,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const prevSelectedIndexRef = useRef<number>(selectedIndex);
@@ -55,7 +57,9 @@ const Carousel: React.FC<CarouselProps> = ({
   return (
     <div className={`Carousel ${modifierSizeClass} ${className}`}>
       <button
-        className="Carousel__leftScrollButton"
+        className={`Carousel__leftScrollButton ${
+          !showArrowButtons ? 'hidden' : ''
+        }`}
         onClick={() =>
           onClick(
             selectedIndex === FIRST_INDEX ? lastIndex : selectedIndex - 1,
@@ -109,7 +113,9 @@ const Carousel: React.FC<CarouselProps> = ({
         ))}
       </div>
       <button
-        className="Carousel__rightScrollButton"
+        className={`Carousel__rightScrollButton ${
+          !showArrowButtons ? 'hidden' : ''
+        }`}
         onClick={() =>
           onClick(
             selectedIndex === lastIndex ? FIRST_INDEX : selectedIndex + 1,

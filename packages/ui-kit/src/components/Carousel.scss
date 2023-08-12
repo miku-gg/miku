@@ -7,14 +7,17 @@
 
   &__leftScrollButton,
   &__rightScrollButton {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6c7293;
+
+    width: 2rem;
+    height: 2rem;
+
+    border-radius: 50%;
     border: unset;
+
+    color: #6c7293;
     background: transparent;
     cursor: pointer;
 
@@ -32,11 +35,14 @@
   &__itemContainer {
     display: flex;
     align-items: center;
-    padding: 1rem;
-    gap: 2rem;
+
     width: 100%;
     max-width: 100%;
+
+    padding: 1rem;
+    gap: 2rem;
     margin: 0 1rem;
+
     overflow-x: auto;
 
     &::-webkit-scrollbar {
@@ -51,15 +57,20 @@
   &__item {
     display: flex;
     flex-direction: column;
-    padding: 0;
     align-items: center;
+
+    padding: 0;
+
     font-weight: 600;
     font-size: 0.875rem;
     line-height: 1.5rem;
+
     background: transparent;
     color: $text-1;
     border: none;
+
     cursor: pointer;
+    white-space: nowrap;
 
     &:hover {
       text-decoration: underline;
@@ -124,5 +135,9 @@
     .imageContainer {
       gap: 1rem;
     }
+  }
+
+  & .hidden {
+    display: noen;
   }
 }
