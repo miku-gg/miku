@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo "Checking if Python is installed..."
-if ! command -v python3 &>/dev/null; then
-    echo "ERROR: Python is not installed."
+if ! command -v python3.10 &>/dev/null; then
+    echo "ERROR: Python 3.10 is not installed."
     echo "Please install Python from https://www.python.org/downloads/ and add it to your PATH."
     exit 1
 fi
@@ -43,6 +43,11 @@ if [ $? -ne 0 ]; then
     echo "ERROR: Failed to install dependencies."
     exit 1
 fi
+
+echo "Creating virtual environment..."
+python3.10 -m venv env
+echo "Activating virtual environment..."
+source env/bin/activate
 
 echo "Installing Python dependencies..."
 pip3 install -r apps/embeddings-apis/sentence-embedder/requirements.txt
