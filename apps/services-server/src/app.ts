@@ -16,6 +16,11 @@ const NOVELAI_API_KEY = process.env.NOVELAI_API_KEY || '';
 const PYGMALION_ENDPOINT = process.env.PYGMALION_ENDPOINT || '';
 const OOBABOOGA_ENDPOINT = process.env.OOBABOOGA_ENDPOINT || '';
 const EMOTIONS_ENDPOINT = process.env.EMOTIONS_ENDPOINT || '';
+const APHRODITE_ENDPOINT = process.env.APHRODITE_ENDPOINT || '';
+const APHRODITE_S3_BUCKET = process.env.APHRODITE_S3_BUCKET || '';
+const APHRODITE_S3_REGION = process.env.APHRODITE_S3_REGION || '';
+const APHRODITE_S3_ACCESS_KEY = process.env.APHRODITE_S3_ACCESS_KEY || '';
+const APHRODITE_S3_SECRET_KEY = process.env.APHRODITE_S3_SECRET_KEY || '';
 const SBERT_EMOTIONS_ENABLED = Number(process.env.SBERT_EMOTIONS_ENABLED || '0');
 const SBERT_SIMILARITY_API_URL = process.env.SBERT_SIMILARITY_API_URL || '';
 const SBERT_SIMILARITY_API_TOKEN = '';
@@ -130,6 +135,22 @@ if (SBERT_EMOTIONS_ENABLED) {
     sbertSimilarityAPIUrl: SBERT_SIMILARITY_API_URL,
     addRoute
   });
+}
+
+if (APHRODITE_ENDPOINT) {
+  new MikuExtensions.Services.AphroditePromptCompleterService({
+    serviceId: MikuExtensions.Services.ServicesNames.Aphrodite,
+    billingEndpoint: '',
+    addRoute,
+    s3Bucket: APHRODITE_S3_BUCKET,
+    s3Config: {
+      region: APHRODITE_S3_REGION,
+      credentials: {
+        accessKeyId: APHRODITE_S3_ACCESS_KEY,
+        secretAccessKey: APHRODITE_S3_SECRET_KEY
+      }
+    }
+  })
 }
 
 export default app;

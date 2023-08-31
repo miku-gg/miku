@@ -1,6 +1,6 @@
 import * as Miku from "@mikugg/core";
 import PropTypes, { InferProps } from "prop-types";
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import fs from 'fs';
 
 export const WhisperServicePropTypes = {
@@ -25,16 +25,16 @@ export class WhisperService extends Miku.Services.Service<string> {
   protected costPerRequest: number;
   protected apiKey: string;
   protected audioFilePath: string;
-  private openai: OpenAIApi;
+  private openai: OpenAI;
 
   constructor(config: WhisperServiceConfig) {
     super(config);
     this.apiKey = config.apiKey || '';
     this.costPerRequest = config.costPerRequest;
     this.audioFilePath = config.audioFilePath || '';
-    this.openai = new OpenAIApi(new Configuration({
+    this.openai = new OpenAI({
       apiKey: this.apiKey,
-    }));
+    });
   }
 
   protected override getPropTypes(): PropTypes.ValidationMap<any> {
@@ -58,12 +58,13 @@ export class WhisperService extends Miku.Services.Service<string> {
   
       let openai = this.openai;
       if (input.openai_key) {
-        openai = new OpenAIApi(new Configuration({
+        openai = new OpenAI({
           apiKey: input.openai_key,
-        }));
+        });
       }
       const stream = fs.createReadStream(filePath);
-      const resp = await openai.createTranscription(
+      const resp = await openai.audio.transcriptions.create(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         stream,
         "whisper-1",
@@ -76,12 +77,12 @@ export class WhisperService extends Miku.Services.Service<string> {
       try {
         fs.unlinkSync(filePath);
       } catch (e) {}
-    return resp?.data?.text || '';
+    return resp?.text || '';
     } catch (e) {
       try {
         fs.unlinkSync(filePath);
       } catch (e) {}
     return '';
     }
-  };
+  }
 }

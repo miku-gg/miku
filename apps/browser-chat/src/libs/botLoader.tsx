@@ -1,4 +1,4 @@
-import { BotConfig, MikuCard, mikuCardToBotConfig } from "@mikugg/bot-utils";
+import { BotConfig, EMPTY_MIKU_CARD, MikuCard, mikuCardToBotConfig } from "@mikugg/bot-utils";
 import React, { useCallback, useContext, useState } from "react";
 import botFactory from './botFactory';
 import queryString from "query-string";
@@ -6,10 +6,11 @@ import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, V
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 
-const BOT_DIRECTORY_ENDPOINT = import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT || 'http://localhost:8585/bot';
-const VITE_IMAGES_DIRECTORY_ENDPOINT =
-  import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
-  "http://localhost:8585/image";
+export interface BotLoaderProps {
+  assetLinkLoader: (asset: string, format?: string) => string;
+  servicesEndpoint: string;
+  mikuCardLoader: (botHash: string) => Promise<MikuCard>;
+}
 
 async function preLoadImages(imageUrls: string[]): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -30,14 +31,13 @@ async function preLoadImages(imageUrls: string[]): Promise<void> {
   });
 }
 
-export function loadBotConfig(botHash: string): Promise<{
+export function loadBotConfig(botHash: string, mikuCardLoader: (botHash: string) => Promise<MikuCard>): Promise<{
   success: boolean,
   bot?: BotConfig,
   card?: MikuCard,
   hash: string,
 }> {
-  return fetch(`${BOT_DIRECTORY_ENDPOINT}/${botHash}`)
-    .then((res) => res.json())
+  return mikuCardLoader(botHash)
     .then((card: MikuCard) => {
       const bot = mikuCardToBotConfig(card);
       return {
@@ -75,6 +75,9 @@ export const BotLoaderContext = React.createContext<{
   setBotConfigSettings: (botConfigSettings: BotConfigSettings) => void,
   setLoading: (loading: boolean) => void,
   setError: (error: boolean) => void,
+  assetLinkLoader: (asset: string, format?: string) => string;
+  servicesEndpoint: string;
+  mikuCardLoader: (botHash: string) => Promise<MikuCard>;
 }>({
   botHash: '',
   card: undefined,
@@ -88,9 +91,12 @@ export const BotLoaderContext = React.createContext<{
   setBotConfigSettings: () => {},
   setLoading: () => {},
   setError: () => {},
+  assetLinkLoader: () => '',
+  servicesEndpoint: '',
+  mikuCardLoader: async (botHash: string) => EMPTY_MIKU_CARD,
 });
 
-export const BotLoaderProvider = ({ children }: {children: JSX.Element}): JSX.Element => {
+export const BotLoaderProvider = (props: {children: JSX.Element} & BotLoaderProps): JSX.Element => {
   const [card, setCard] = useState<MikuCard | undefined>(undefined);
   const [botHash, setBotHash] = useState<string>('');
   const [botConfig, setBotConfig] = useState<BotConfig | undefined>(undefined);
@@ -101,9 +107,12 @@ export const BotLoaderProvider = ({ children }: {children: JSX.Element}): JSX.El
   return (
     <BotLoaderContext.Provider value={{
       card, botConfig, loading, error, botHash, botConfigSettings,
-      setCard, setBotConfig, setLoading, setError, setBotHash, setBotConfigSettings
+      setCard, setBotConfig, setLoading, setError, setBotHash, setBotConfigSettings,
+      mikuCardLoader: props.mikuCardLoader,
+      assetLinkLoader: props.assetLinkLoader,
+      servicesEndpoint: props.servicesEndpoint,
     }}>
-      {children}
+      {props.children}
     </BotLoaderContext.Provider>
   );
 };
@@ -122,7 +131,7 @@ export interface BotData {
   endpoints: CustomEndpoints
 }
 
-function getBotDataFromURL(): BotData {
+export function getBotDataFromURL(): BotData {
   const searchParams = queryString.parse(location.search);
   return {
     hash: String(searchParams['bot'] || '') || '',
@@ -170,10 +179,12 @@ export function useBot(): {
   loading: boolean,
   error: boolean,
   setBotHash: (botHash: string) => void,
+  assetLinkLoader: (asset: string, format?: string) => string,
+  servicesEndpoint: string,
 } {
   const {
     botConfig, setBotConfig, loading, setLoading, card, setCard, error, setError, botHash, setBotHash,
-    botConfigSettings, setBotConfigSettings
+    botConfigSettings, setBotConfigSettings, mikuCardLoader, assetLinkLoader, servicesEndpoint
   } = useContext(BotLoaderContext);
 
   // Get data from url params
@@ -183,10 +194,9 @@ export function useBot(): {
     setBotHash(_hash);
     const isDifferentBot = getBotHashFromUrl() !== _hash;
     const memoryLines = botFactory.getInstance()?.getMemory().getMemory() || [];
-    loadBotConfig(_hash).then(async (res) => {
+    loadBotConfig(_hash, mikuCardLoader).then(async (res) => {
       if (res.success && res.bot && res.card) {
         let decoratedConfig = res.bot;
-
         decoratedConfig = {
           ...res.bot,
           prompt_completer: {
@@ -196,6 +206,8 @@ export function useBot(): {
                   return MikuExtensions.Services.ServicesNames.OpenAI
                 case PromptCompleterEndpointType.KOBOLDAI:
                   return MikuExtensions.Services.ServicesNames.Pygmalion
+                case PromptCompleterEndpointType.APHRODITE:
+                  return MikuExtensions.Services.ServicesNames.Aphrodite
                 case PromptCompleterEndpointType.OOBABOOGA:
                 default:
                   return MikuExtensions.Services.ServicesNames.Oobabooga
@@ -218,12 +230,14 @@ export function useBot(): {
                       settings,
                       prompt: "",                  
                     }
+                  case PromptCompleterEndpointType.APHRODITE:
                   case PromptCompleterEndpointType.OOBABOOGA:
                   default:
                     return {
                       settings,
                       prompt: "",
-                      gradioEndpoint: "",                    
+                      gradioEndpoint: "",
+                      botHash: _hash,
                     }
                 }
               })()
@@ -268,16 +282,16 @@ export function useBot(): {
         const defaultEmotionGroupId = res.card?.data.extensions?.mikugg.scenarios.find(sn => sn.id === res.card?.data.extensions.mikugg.start_scenario)?.emotion_group || '';
         const defaultBackgound = res.card?.data.extensions?.mikugg.scenarios.find(sn => sn.id === res.card?.data.extensions.mikugg.start_scenario)?.background || '';
         await preLoadImages(res.card?.data.extensions?.mikugg?.backgrounds?.filter(bg => bg.id === defaultBackgound).map(
-          (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}_480p`
+          (asset) => assetLinkLoader(asset.source, '480p')
         ) || []);
         await preLoadImages(res.card?.data.extensions?.mikugg?.emotion_groups?.find(eg => eg.id === defaultEmotionGroupId)?.emotions?.filter((em, index) => em.id === 'happy' || index === 0).map(
-          (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}_480p`
+          (asset) => assetLinkLoader(asset.source[0], '480p')
         ) || []);
         
         setBotConfigSettings(_botData.settings);
         setBotDataInURL(_botData);
 
-        botFactory.updateInstance(decoratedConfig, _botData.endpoints);
+        botFactory.updateInstance(decoratedConfig, servicesEndpoint, _botData.endpoints);
         if (!isDifferentBot && memoryLines.length) {
           const memory = botFactory.getInstance()?.getMemory();
           memory?.clearMemories();
@@ -310,8 +324,10 @@ export function useBot(): {
     setBotConfigSettings: _setBotConfigSettings,
     loading,
     error,
-    setBotHash: (_hash?: string) => {
-      _botLoadCallback(_hash)
+    setBotHash: (_hash?: string, _botData?: BotData) => {
+      _botLoadCallback(_hash, _botData);
     },
+    assetLinkLoader,
+    servicesEndpoint
   };
 }

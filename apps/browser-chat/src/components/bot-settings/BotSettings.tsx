@@ -146,6 +146,15 @@ export const BotSettings: React.FC<{
                   }
                 })
                 break;
+            case PromptCompleterEndpointType.APHRODITE:
+                onBotConfigSettingsChange({
+                  ...botConfigSettings,
+                  promptCompleterEndpoint: {
+                    type: PromptCompleterEndpointType.APHRODITE,
+                    genSettings: {}
+                  }
+                })
+                break;
             }
           }}
         />

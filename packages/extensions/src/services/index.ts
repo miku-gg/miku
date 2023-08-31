@@ -2,6 +2,7 @@ export * from "./openai/OpenAIPromptCompleterService";
 export * from "./openai/OpenAIEmotionInterpreter";
 export * from "./pygmalion/PygmalionService";
 export * from "./oobabooga/OobaboogaService";
+export * from "./aphrodite/AphroditeService";
 export * from "./stt/WhisperService";
 export * from "./sbert/SBertEmotionInterpreterService";
 export * as TTS from "./tts";
@@ -18,5 +19,6 @@ export enum ServicesNames {
   OpenAIEmotionInterpreter = "openai_emotion-interpreter",
   SBertEmotionInterpreter = "sbert_emotion-interpreter",
   WhisperSTT = "whisper_stt",
+  Aphrodite = "aphrodite",
   None = "",
 }

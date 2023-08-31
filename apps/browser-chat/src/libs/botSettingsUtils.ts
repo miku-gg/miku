@@ -2,7 +2,7 @@ export enum PromptCompleterEndpointType {
   OOBABOOGA,
   KOBOLDAI,
   OPENAI,
-  EXLLAMA,
+  APHRODITE,
   CLAUDE
 }
 
@@ -21,6 +21,10 @@ export const PROMPT_COMPLETERS: {
   {
     value: PromptCompleterEndpointType.OPENAI,
     label: "Open AI"
+  },
+  {
+    value: PromptCompleterEndpointType.APHRODITE,
+    label: "Aphrodite"
   },
 ];
 
@@ -62,6 +66,13 @@ export type KoboldAIsettings = {
   order: number[];
 };
 
+export type AphroditeSettings = {
+  assetsUrl: string;
+  platformApiUrl: string;
+  signingKey: string;
+  chatId: string;
+};
+
 export const OPENAI_MODELS = [
   'gpt-3.5-turbo',
   'text-davinci-003'
@@ -89,12 +100,19 @@ export type PromptCompleterEndpointConfig =
   genSettings: OpenAISettings;
 } |
 {
-  type: PromptCompleterEndpointType.EXLLAMA,
-  genSettings: {}
+  type: PromptCompleterEndpointType.APHRODITE,
+  genSettings: AphroditeSettings
 } |
 {
   type: PromptCompleterEndpointType.CLAUDE,
   genSettings: {}
+};
+
+export const DEFAULT_APHRODITE_SETTINGS: AphroditeSettings = {
+  assetsUrl: '',
+  platformApiUrl: '',
+  signingKey: '',
+  chatId: '',
 };
 
 export const DEFAULT_OOBABOOGA_SETTINGS: OobaboogaSettings = {

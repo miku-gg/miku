@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
 import './EmotionRenderer.scss'
 
-const VITE_IMAGES_DIRECTORY_ENDPOINT =
-  import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
-  "http://localhost:8585/image";
-
 export default function EmotionRenderer({
     assetUrl,
     className = '',
     upDownAnimation = false,
+    assetLinkLoader,
   }: {
     assetUrl: string,
     className?: string,
     upDownAnimation?: boolean,
+    assetLinkLoader: (asset: string, format?: string) => string
   }): JSX.Element {
   const [blobUrl, setBlobUrl] = useState<string>("");
   const [blobUrl_LOW, setBlobUrl_LOW] = useState<string>("");
@@ -20,13 +18,12 @@ export default function EmotionRenderer({
   const [hasPlayedAudio, setHasPlayedAudio] = useState<boolean>(false);
   const [fileType, setFileType] = useState<string | null>(null);
 
-
   useEffect(() => {
     async function fetchFile() {
       try {
         setLoading(true);
         const response = await fetch(
-          `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${assetUrl}_480p`
+          assetLinkLoader(assetUrl, '480p')
         );
         if (response.ok) {
           const contentType = response.headers.get("Content-Type");
@@ -38,7 +35,7 @@ export default function EmotionRenderer({
           setLoading(false);
           setHasPlayedAudio(false);
           const response2 = await fetch(
-            `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${assetUrl}_720p`
+            assetLinkLoader(assetUrl, '720p')
           );
           if (response2.ok) {
             const data = await response2.blob();

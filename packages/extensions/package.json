@@ -37,6 +37,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.400.0",
     "@mikugg/core": "^0.6.0",
     "@types/axios": "^0.14.0",
     "@types/lodash.trim": "^4.5.7",
@@ -48,7 +49,7 @@
     "ipfs-only-hash": "^4.0.0",
     "llama-tokenizer-js": "^1.1.1",
     "lodash.trim": "^4.5.1",
-    "openai": "^3.2.1",
+    "openai": "^4.2.0",
     "prop-types": "^15.8.1"
   },
   "gitHead": "2a1ced2ec5f6b6e6dbc3e12143d0a6a29abfe2f3"
