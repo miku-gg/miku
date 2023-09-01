@@ -68,8 +68,7 @@ export type KoboldAIsettings = {
 
 export type AphroditeSettings = {
   assetsUrl: string;
-  platformApiUrl: string;
-  signingKey: string;
+  botId: string;
   chatId: string;
 };
 
@@ -110,8 +109,7 @@ export type PromptCompleterEndpointConfig =
 
 export const DEFAULT_APHRODITE_SETTINGS: AphroditeSettings = {
   assetsUrl: '',
-  platformApiUrl: '',
-  signingKey: '',
+  botId: '',
   chatId: '',
 };
 

@@ -5,9 +5,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { InteractiveChat } from "./components/interactive-chat/InteractiveChat";
 import { InteractiveResponsesContextProvider } from "./libs/useResponses";
 import BotLoadingModal from "./components/loading/BotLoadingModal";
-import { useBot, BotLoaderProvider, BotLoaderProps, getBotDataFromURL } from "./libs/botLoader";
+import { BotLoaderProvider, BotLoaderProps, getBotDataFromURL } from "./libs/botLoader";
 import { MikuCard } from "@mikugg/bot-utils";
 import { AphroditeSettings, PromptCompleterEndpointType } from './libs/botSettingsUtils';
+import plaformAPI from "./libs/platformAPI";
 
 export const BrowserChat = (props: BotLoaderProps): JSX.Element => {
   return (
@@ -37,14 +38,13 @@ export const BrowserChat = (props: BotLoaderProps): JSX.Element => {
   );
 }
 
-const getAphroditeConfig = () => {
+export const getAphroditeConfig = () => {
   const botData = getBotDataFromURL();
 
   if(botData.settings.promptCompleterEndpoint.type !== PromptCompleterEndpointType.APHRODITE) {
     return {
       enabled: false,
-      platformApiUrl: '',
-      signingKey: '',
+      botId: '',
       chatId: '',
       assetsUrl: '',
     }
@@ -54,8 +54,7 @@ const getAphroditeConfig = () => {
 
   return {
     enabled: true,
-    platformApiUrl: aphroditeConfig.platformApiUrl,
-    signingKey: aphroditeConfig.signingKey,
+    botId: aphroditeConfig.botId,
     chatId: aphroditeConfig.chatId,
     assetsUrl: aphroditeConfig.assetsUrl,
   };
@@ -65,8 +64,7 @@ export const App = () => {
   let fetchMikuCard = async (botHash: string): Promise<MikuCard> => {
     const aphrodite = getAphroditeConfig();
     if (aphrodite.enabled) {
-      return fetch(`${aphrodite.platformApiUrl}/bot/config/${botHash}`)
-        .then((res) => res.json() as Promise<MikuCard>)
+      return plaformAPI.getBotConfig(botHash).then((res) => res.data)
     } else {
       return fetch(`${import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT || 'http://localhost:8585/bot'}/${botHash}`)
         .then((res) => res.json() as Promise<MikuCard>)

@@ -5,6 +5,7 @@ import queryString from "query-string";
 import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, VoiceServiceType } from "./botSettingsUtils";
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
+import platformAPI from "./platformAPI";
 
 export interface BotLoaderProps {
   assetLinkLoader: (asset: string, format?: string) => string;
@@ -155,7 +156,7 @@ export function getBotDataFromURL(): BotData {
   }
 }
 
-function setBotDataInURL(botData: BotData) {
+export function setBotDataInURL(botData: BotData) {
   const { endpoints } = botData;
   const newSearchParams = {
     bot: botData.hash,
@@ -193,7 +194,7 @@ export function useBot(): {
     setLoading(true);
     setBotHash(_hash);
     const isDifferentBot = getBotHashFromUrl() !== _hash;
-    const memoryLines = botFactory.getInstance()?.getMemory().getMemory() || [];
+    let memoryLines = botFactory.getInstance()?.getMemory().getMemory() || [];
     loadBotConfig(_hash, mikuCardLoader).then(async (res) => {
       if (res.success && res.bot && res.card) {
         let decoratedConfig = res.bot;
@@ -292,6 +293,18 @@ export function useBot(): {
         setBotDataInURL(_botData);
 
         botFactory.updateInstance(decoratedConfig, servicesEndpoint, _botData.endpoints);
+        
+        if (
+          _botData.settings.promptCompleterEndpoint.type === PromptCompleterEndpointType.APHRODITE &&
+          _botData.settings.promptCompleterEndpoint.genSettings.chatId
+        ) {
+          const chat = await platformAPI.getChat(_botData.settings.promptCompleterEndpoint.genSettings.chatId);
+          memoryLines = chat.data.chatMessages.map((message) => ({
+            type: MikuCore.Commands.CommandType.DIALOG,
+            subject: message.isBot ? '{{bot}}' : '{{user}}',
+            text: message.text,
+          }));
+        }    
         if (!isDifferentBot && memoryLines.length) {
           const memory = botFactory.getInstance()?.getMemory();
           memory?.clearMemories();

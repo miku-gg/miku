@@ -2,7 +2,10 @@ import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import { BotConfig } from "@mikugg/bot-utils";
 import { toast } from "react-toastify";
-import { CustomEndpoints } from "./botLoader";
+import { CustomEndpoints, getBotDataFromURL, setBotDataInURL } from "./botLoader";
+import platformAPI from "./platformAPI";
+import { getAphroditeConfig } from "../App";
+import { AphroditeSettings, PromptCompleterEndpointType } from "./botSettingsUtils";
 
 const MOCK_PRIVATE_KEY =
   "2658e4257eaaf9f72295ce012fa8f8cc4a600cdaf4051884d2c02593c717c173";
@@ -147,12 +150,14 @@ class BotFactory {
   private getOutputListener({
     service,
     props,
+    memory,
     signer,
     servicesEndpoint,
     endpoints,
   }: {
     service: MikuExtensions.Services.ServicesNames;
     props: object;
+    memory: MikuCore.Memory.ShortTermMemory;
     signer: MikuCore.Services.ServiceQuerySigner;
     servicesEndpoint: string;
     endpoints?: CustomEndpoints;
@@ -185,6 +190,50 @@ class BotFactory {
               ...props,
             } as MikuExtensions.Services.SBertEmotionInterpreterProps,
           });
+          outputListener.subscribe(async (output) => {
+            const aphrodite = getAphroditeConfig();
+            if (aphrodite.enabled) {
+              const memoryLines = memory.getMemory();
+              let chatId = aphrodite.chatId;
+              if (!chatId) {
+                const chat = await platformAPI.createChat(aphrodite.botId);
+                chatId = chat.data.id;
+                window?.parent?.postMessage({ type: 'chatId', payload: chatId }, '*');
+                const botData = getBotDataFromURL();
+                setBotDataInURL({
+                  ...botData,
+                  settings: {
+                    ...botData.settings,
+                    promptCompleterEndpoint: {
+                      type: PromptCompleterEndpointType.APHRODITE,
+                      genSettings: {
+                        ...(botData.settings.promptCompleterEndpoint.genSettings as AphroditeSettings),
+                        chatId,
+                      }
+                    }
+                  }
+                })
+              }
+              const lastSentMessage = memoryLines[memoryLines.length - 2];
+              const firstMessage = {
+                text: lastSentMessage.text,
+                isBot: false,
+                emotionId: output.emotion,
+                sceneId: output.nextContextId,
+              };
+              const secondMessage = {
+                text: output.text,
+                isBot: true,
+                emotionId: output.emotion,
+                sceneId: output.nextContextId,
+              }
+              platformAPI.createChatMessages(
+                chatId,
+                firstMessage,
+                secondMessage
+              );
+            }
+          })
         break;
       case MikuExtensions.Services.ServicesNames.AzureTTS:
       case MikuExtensions.Services.ServicesNames.ElevenLabsTTS:
@@ -261,7 +310,7 @@ class BotFactory {
     const promptCompleter = this.getPromptCompleter({
       service: botConfig.prompt_completer.service,
       props: botConfig.prompt_completer.props,
-      memory: memory,
+      memory,
       signer: this.signer,
       servicesEndpoint,
       endpoints,
@@ -273,6 +322,7 @@ class BotFactory {
         return this.getOutputListener({
           service: outputListenerConfig.service,
           props: outputListenerConfig.props,
+          memory,
           signer: this.signer,
           servicesEndpoint,
         });

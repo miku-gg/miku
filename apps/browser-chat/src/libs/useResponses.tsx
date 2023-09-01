@@ -77,7 +77,9 @@ export const InteractiveResponsesContextProvider = ({
   };
 
   useEffect(() => {
-    if (botConfig && card) {
+    const bot = botFactory.getInstance();
+    console.log('memory', bot?.getMemory());
+    if (botConfig && card && bot) {
       const firstScenario = card?.data.extensions.mikugg.scenarios.find(scenario => card?.data.extensions.mikugg.start_scenario === scenario.id);
       const firstEmotionGroup = card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
       let firstImage = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'happy')?.source[0] : firstEmotionGroup?.emotions[0].source[0];
@@ -105,7 +107,6 @@ export const InteractiveResponsesContextProvider = ({
         setCurrentContext(props.start_context || "");
       }
     }
-    const bot = botFactory.getInstance();
     bot?.subscribePromptSent((command) => {
       fillResponse(command.commandId);
       setResponseIds((responseIds) => [command.commandId, ...responseIds]);
