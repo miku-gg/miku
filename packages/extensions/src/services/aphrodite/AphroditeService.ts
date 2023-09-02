@@ -55,7 +55,6 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
 
   constructor(config: AphroditePromptCompleterServiceConfig) {
     super(config);
-    console.log('Initiating aphrodite in', APHRODITE_ENDPOINT)
     this.openai = new OpenAI({
       baseURL: APHRODITE_ENDPOINT
     });
@@ -66,10 +65,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
   protected async computeInput(
     input: InferProps<typeof this.propTypesRequired>
   ): Promise<string> {
-    console.log('asking for completion', input);
     const prompt = await this.generatePrompt(input);
-    console.log('=========== PROMPT', prompt);
-    console.log('=============')
     const completion = await this.simpleCompletion(prompt);
     return completion;
   }
@@ -78,7 +74,6 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
     input: InferProps<typeof this.propTypesRequired>
   ): Promise<string> {
     const card = await this.botCardConnector.getBotCard(input.botHash);
-    console.log('card', card);
 
     const memory = new GPTShortTermMemoryV2({
       prompt_context: "",
@@ -113,16 +108,11 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
   protected async simpleCompletion(
     prompt: string
   ): Promise<string> {
-    console.log('QUERY APHRODITE', {
-      prompt,
-      ...REQUEST_CONFIG
-    });
     const response = await this.openai.completions.create({
       prompt,
       ...REQUEST_CONFIG
     });
     const choices = response?.choices || [];
-    console.log('reponses', response?.choices);
 
     return choices.length ? choices[0].text || "" : "";
   }

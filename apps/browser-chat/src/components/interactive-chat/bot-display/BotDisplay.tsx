@@ -31,6 +31,8 @@ import ScenarioSelector from "../scenario-selector/ScenarioSelector";
 import EmotionRenderer from "../../asset-renderer/EmotionRenderer";
 import ProgressiveImage from "react-progressive-graceful-image";
 import { trackEvent } from "../../../libs/analytics";
+import platformAPI from "../../../libs/platformAPI";
+import { getAphroditeConfig } from "../../../App";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -227,7 +229,7 @@ export const BotDisplay = () => {
     }
   };
 
-  const onRegenerateClick = (event: React.UIEvent) => {
+  const onRegenerateClick = async (event: React.UIEvent) => {
     const bot = botFactory.getInstance();
     const shortTermMemory = bot?.getMemory();
     const memoryLines = shortTermMemory?.getMemory();
@@ -243,6 +245,7 @@ export const BotDisplay = () => {
       });
 
       const lastMemoryLine = memoryLines[memoryLines.length - 2];
+      const lastResponse = memoryLines[memoryLines.length - 1];
 
       event.preventDefault();
       setResponseIds((_responseIds) => {
@@ -250,6 +253,13 @@ export const BotDisplay = () => {
         responseIds.shift();
         return responseIds;
       });
+      const aphrodite = getAphroditeConfig();
+
+      if (aphrodite.enabled && lastMemoryLine.id && lastResponse.id) {
+        await platformAPI.deleteChatMessage(aphrodite.chatId, lastResponse?.id || '');
+        await platformAPI.deleteChatMessage(aphrodite.chatId, lastMemoryLine?.id || '');
+      }
+
       const result = botFactory
         .getInstance()
         ?.sendPrompt(

@@ -227,11 +227,13 @@ class BotFactory {
                 emotionId: output.emotion,
                 sceneId: output.nextContextId,
               }
-              platformAPI.createChatMessages(
+              const results = await platformAPI.createChatMessages(
                 chatId,
                 firstMessage,
                 secondMessage
               );
+              memoryLines[memoryLines.length - 2].id = results?.data?.firstMessage?.id;
+              memoryLines[memoryLines.length - 1].id = results?.data?.secondMessage?.id;
             }
           })
         break;

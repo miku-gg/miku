@@ -6,6 +6,7 @@ import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, V
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import platformAPI from "./platformAPI";
+import { fillResponse } from "./responsesStore";
 
 export interface BotLoaderProps {
   assetLinkLoader: (asset: string, format?: string) => string;
@@ -300,11 +301,23 @@ export function useBot(): {
         ) {
           const chat = await platformAPI.getChat(_botData.settings.promptCompleterEndpoint.genSettings.chatId);
           memoryLines = chat.data.chatMessages.map((message) => ({
+            id: message.id,
             type: MikuCore.Commands.CommandType.DIALOG,
             subject: message.isBot ? '{{bot}}' : '{{user}}',
             text: message.text,
           }));
-        }    
+          if (chat.data.chatMessages.length) {
+            const lastMessage = chat.data.chatMessages[chat.data.chatMessages.length - 1];
+            const firstScenario = res.card?.data.extensions.mikugg.scenarios.find(_scenario => lastMessage.sceneId === _scenario.id);
+            const firstEmotionGroup = res.card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
+            let firstImage = firstEmotionGroup?.emotions?.find(emotion => emotion?.id === lastMessage.emotionId)?.source[0] || firstEmotionGroup?.emotions[0].source[0];
+
+            fillResponse(lastMessage.id, "text", lastMessage.text);
+            fillResponse(lastMessage.id, "emotion", firstImage);
+            fillResponse(lastMessage.id, "audio", '');
+            fillResponse(lastMessage.id, "scene", lastMessage.sceneId);
+          }
+        }
         if (!isDifferentBot && memoryLines.length) {
           const memory = botFactory.getInstance()?.getMemory();
           memory?.clearMemories();

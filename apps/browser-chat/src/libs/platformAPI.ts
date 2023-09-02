@@ -6,6 +6,16 @@ export interface APIResponse<T> {
   status: number;
 }
 
+export interface ChatMessage {
+  id: string,
+  text: string,
+  isBot: string,
+  emotionId: string,
+  sceneId: string,
+  createdAt: string,
+  updatedAt: string,
+}
+
 export interface Chat {
   id: string,
   userId: string,
@@ -16,15 +26,7 @@ export interface Chat {
     config: string,
     id: string,
   },
-  chatMessages: {
-    id: string,
-    text: string,
-    isBot: string,
-    emotionId: string,
-    sceneId: string,
-    createdAt: string,
-    updatedAt: string,
-  }[],
+  chatMessages: ChatMessage[],
 }
 
 export interface ChatMessageInput {
@@ -60,8 +62,19 @@ class PlatformAPIClient {
     return response;
   }
 
-  async createChatMessages(chatId: string, firstMessage: ChatMessageInput, secondMessage: ChatMessageInput): Promise<void> {
-    await this.client.post(`/chat/${chatId}/messages`, { firstMessage, secondMessage });
+  async createChatMessages(chatId: string, firstMessage: ChatMessageInput, secondMessage: ChatMessageInput): Promise<APIResponse<{
+    firstMessage: ChatMessage,
+    secondMessage: ChatMessage,
+  }>> {
+    return await this.client.post(`/chat/${chatId}/messages`, { firstMessage, secondMessage });
+  }
+
+  async editChatMessage(chatId: string, messageId: string, text: string): Promise<APIResponse<ChatMessage>> {
+    return await this.client.put(`/chat/${chatId}/message/${messageId}`, { text });
+  }
+
+  async deleteChatMessage(chatId: string, messageId: string): Promise<APIResponse<ChatMessage>> {
+    return await this.client.delete(`/chat/${chatId}/message/${messageId}`);
   }
 }
 

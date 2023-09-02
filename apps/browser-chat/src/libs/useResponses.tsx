@@ -78,21 +78,30 @@ export const InteractiveResponsesContextProvider = ({
 
   useEffect(() => {
     const bot = botFactory.getInstance();
-    console.log('memory', bot?.getMemory());
     if (botConfig && card && bot) {
-      const firstScenario = card?.data.extensions.mikugg.scenarios.find(scenario => card?.data.extensions.mikugg.start_scenario === scenario.id);
-      const firstEmotionGroup = card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
-      let firstImage = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'happy')?.source[0] : firstEmotionGroup?.emotions[0].source[0];
-      let firstMessage = card?.data.first_mes || '';
-      firstMessage = MikuExtensions.Memory.Strategies.fillTextTemplate(firstMessage, {
-        bot: card?.data.name || '',
-        user: 'Anon'
-      });
+      const memory = bot?.getMemory().getMemory() || [];
+      const lastMemoryLine = memory.length ? memory[memory.length - 1] : null;
 
-      fillResponse('first', "text", firstMessage);
-      fillResponse('first', "emotion", firstImage || '');
-      fillResponse('first', "audio", '');
-      setResponseIds(['first']);
+      if (lastMemoryLine?.id) {
+        setResponseIds([lastMemoryLine.id]);
+        const lastResponse = responsesStore.get(lastMemoryLine.id)
+        if (lastResponse?.scene) {
+          setCurrentContext(lastResponse.scene);
+        }
+      } else {
+        const firstScenario = card?.data.extensions.mikugg.scenarios.find(scenario => card?.data.extensions.mikugg.start_scenario === scenario.id);
+        const firstEmotionGroup = card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
+        let firstImage = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'happy')?.source[0] : firstEmotionGroup?.emotions[0].source[0];
+        let firstMessage = card?.data.first_mes || '';
+        firstMessage = MikuExtensions.Memory.Strategies.fillTextTemplate(firstMessage, {
+          bot: card?.data.name || '',
+          user: 'Anon'
+        });
+        fillResponse('first', "text", firstMessage);
+        fillResponse('first', "emotion", firstImage || '');
+        fillResponse('first', "audio", '');
+        setResponseIds(['first']);  
+      }
       setResponseIndex(0);
       onUpdate();
 

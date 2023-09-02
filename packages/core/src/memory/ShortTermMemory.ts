@@ -4,6 +4,7 @@ export interface MemoryLine {
   text: string;
   subject: string;
   type: Commands.CommandType;
+  id?: string;
 }
 
 /**

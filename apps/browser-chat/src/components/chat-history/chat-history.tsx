@@ -6,6 +6,8 @@ import { useBot } from "../../libs/botLoader";
 import { CheckIcon, PencilIcon } from "@primer/octicons-react";
 import "./chat-history.css";
 import trim from "lodash.trim";
+import platformAPI from "../../libs/platformAPI";
+import { getAphroditeConfig } from "../../App";
 
 export const HistoryManagementButtons = ({
   onLoad,
@@ -244,13 +246,20 @@ export const HistoryConsole = () => {
       setEditedIndex(-1);
       return;
     }
+    const aphrodite = getAphroditeConfig();
     if (!trim(editedText)) {
+      if (aphrodite.enabled && lines[editedIndex].id) {
+        platformAPI.deleteChatMessage(aphrodite.chatId, lines[editedIndex].id || '')
+      }
       lines.splice(editedIndex, 1);
     } else {
       lines[editedIndex] = {
         ...lines[editedIndex],
         text: editedText,
       };
+      if (aphrodite.enabled && lines[editedIndex].id) {
+        platformAPI.editChatMessage(aphrodite.chatId, lines[editedIndex].id || '', editedText)
+      }
     }
     memory?.clearMemories();
     lines.forEach((line) => {
