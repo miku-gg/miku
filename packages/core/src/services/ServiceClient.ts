@@ -47,6 +47,8 @@ export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
   }
 
   public async getQueryCost(input: ServiceInputProps): Promise<number> {
+    return 0;
+    // TODO: remove cost analysis for now
     if (this.serviceName != "") {
       try {
         const result = await axios.post<{ price: number }>(
@@ -57,6 +59,7 @@ export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
             },
           },
           {
+            withCredentials: true,
             headers: {
               "Content-Type": "application/json",
             },
@@ -104,6 +107,7 @@ export class ServiceClient<ServiceInputProps, ServiceOutputProps> {
           signature: await this.signer.signQuery(_query),
         },
         {
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
           },

@@ -262,7 +262,7 @@ export const DEFAULT_BOT_SETTINGS: BotConfigSettings = {
   },
   embeddingsService: EmbeddingsService.SBERT,
   voice: {
-    enabled: true,
+    enabled: false,
     readNonSpokenText: false,
     voiceService: {
       type: VoiceServiceType.AZURE_TTS,

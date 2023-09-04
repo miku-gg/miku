@@ -246,7 +246,6 @@ class BotFactory {
           {
             serviceEndpoint: `${servicesEndpoint}/${service}`,
             signer: signer,
-            readNonSpokenText: props['readNonSpokenText'],
             props: {
               ...props,
               apiKey,
@@ -260,7 +259,6 @@ class BotFactory {
           {
             serviceEndpoint: `${servicesEndpoint}/${service}`,
             signer: signer,
-            readNonSpokenText: props['readNonSpokenText'],
             props: {
               ...props,
               apiKey: String(endpoints?.novelai || "") || "",
@@ -274,7 +272,6 @@ class BotFactory {
           {
             serviceEndpoint: `${servicesEndpoint}/${service}`,
             signer: signer,
-            readNonSpokenText: props['readNonSpokenText'],
             props: {
               ...props,
               apiKey: "",
@@ -484,6 +481,7 @@ export default (function () {
       return botInstance;
     },
     updateInstance: (botConfig: BotConfig, servicesEndpoint: string, endpoints?: CustomEndpoints) => {
+      console.log('botConfig', botConfig);
       botInstance = botFactory.create(botConfig, servicesEndpoint, endpoints);
       return botInstance;
     },

@@ -2,7 +2,7 @@ import { BotConfig, EMPTY_MIKU_CARD, MikuCard, mikuCardToBotConfig } from "@miku
 import React, { useCallback, useContext, useState } from "react";
 import botFactory from './botFactory';
 import queryString from "query-string";
-import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, VoiceServiceType } from "./botSettingsUtils";
+import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, VoiceServiceType, VOICE_SERVICES } from "./botSettingsUtils";
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import platformAPI from "./platformAPI";
@@ -253,18 +253,25 @@ export function useBot(): {
             }
           }
         }
-        
-        if (_botData.settings.voice.voiceService.voiceId) {
-          const tts = decoratedConfig.outputListeners.find(listener => [
-            MikuExtensions.Services.ServicesNames.AzureTTS,
-            MikuExtensions.Services.ServicesNames.ElevenLabsTTS,
-            MikuExtensions.Services.ServicesNames.NovelAITTS,
-          ].includes(listener.service))
 
-          if (tts) {
+        const tts = decoratedConfig.outputListeners.find(listener => [
+          MikuExtensions.Services.ServicesNames.AzureTTS,
+          MikuExtensions.Services.ServicesNames.ElevenLabsTTS,
+          MikuExtensions.Services.ServicesNames.NovelAITTS,
+        ].includes(listener.service))
+
+        if (tts) {
+          tts.props = {
+            ...tts.props,
+            enabled: _botData.settings.voice.enabled,
+            readNonSpokenText: _botData.settings.voice.readNonSpokenText,
+          };
+
+          if (_botData.settings.voice.voiceService.voiceId) {
             tts.props = {
               voiceId: _botData.settings.voice.voiceService.voiceId,
               readNonSpokenText: _botData.settings.voice.readNonSpokenText,
+              enabled: _botData.settings.voice.enabled,
             };
             switch (_botData.settings.voice.voiceService.type) {
               case VoiceServiceType.AZURE_TTS:

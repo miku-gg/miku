@@ -151,7 +151,11 @@ export const BotSettings: React.FC<{
                   ...botConfigSettings,
                   promptCompleterEndpoint: {
                     type: PromptCompleterEndpointType.APHRODITE,
-                    genSettings: {}
+                    genSettings: {
+                      assetsUrl: '',
+                      botId: '',
+                      chatId: ''
+                    }
                   }
                 })
                 break;
