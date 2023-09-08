@@ -61,8 +61,9 @@ export const getAphroditeConfig = () => {
 }
 
 export const App = () => {
+  const aphrodite = getAphroditeConfig();
+
   let fetchMikuCard = async (botHash: string): Promise<MikuCard> => {
-    const aphrodite = getAphroditeConfig();
     if (aphrodite.enabled) {
       return plaformAPI.getBotConfig(botHash).then((res) => res.data)
     } else {
@@ -74,7 +75,6 @@ export const App = () => {
   let servicesEndpoint = import.meta.env.VITE_SERVICES_ENDPOINT || "http://localhost:8585";
 
   let assetLinkLoader = (asset: string, format?: string) => {
-    const aphrodite = getAphroditeConfig();
     if (aphrodite.enabled) {
       return `${aphrodite.assetsUrl}/${format ? `${format}_` : ''}${asset}`;
     } else {
@@ -88,7 +88,7 @@ export const App = () => {
       className="App flex w-screen h-screen p-5 max-lg:p-0 min-w-full text-center"
       style={{
         background:
-          "linear-gradient(180deg, rgba(12,10,29,1) 0%, rgb(30 26 65) 100%)",
+          aphrodite.enabled ? "transparent" : "linear-gradient(180deg, rgba(12,10,29,1) 0%, rgb(30 26 65) 100%)",
       }}
     >
       <BrowserChat

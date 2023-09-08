@@ -4,6 +4,8 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import multer from 'multer';
 import * as MikuExtensions from '@mikugg/extensions';
+import jwt from 'jsonwebtoken';
+import { IncomingHttpHeaders } from 'http2';
 
 // Load environment variables
 const path = require('path');
@@ -27,7 +29,10 @@ const SBERT_SIMILARITY_API_TOKEN = '';
 const AUDIO_FILE_PATH = '_temp';
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  credentials: true,
+  origin: ['http://localhost:5173', 'https://alpha.miku.gg', 'https://interactor.miku.gg']
+}));
 app.use(bodyParser.json());
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -42,8 +47,43 @@ app.post('/audio-upload', uploadAudio.single('file'), (req, res) => {
   res.status(200).send(req.file?.filename || '');
 });
 
+const verifyJWT = async (headers: IncomingHttpHeaders): Promise<'EXPIRED' | 'REGULAR' | 'PREMIUM'> => {
+  return new Promise((resolve) => {
+    const authCookie = headers.cookie?.split(';').find((cookie: string) => cookie.includes('Authentication'));
+    const bearerToken = authCookie?.split('=')[1] || '';
+
+    if (bearerToken) {
+      console.log(bearerToken);
+      jwt.verify(bearerToken, process.env.JWT_SECRET || '', (err, _decodedData) => {
+        const decodedData = _decodedData as jwt.JwtPayload;
+        console.log(err);
+        if (err) {
+          resolve('EXPIRED');
+        } else if ((decodedData.exp || 0) < Date.now() / 1000) {
+          resolve('EXPIRED');
+        } else {
+          resolve(decodedData.isPremium ? 'PREMIUM' : 'REGULAR');
+        }
+      });
+    } else {
+      resolve('EXPIRED');
+    }
+  });
+};
+
+
 const addRoute = (path: string, cb: (body: any) => Promise<{ status: number, response: any}>) => {
   app.post(path, async (req, res) => {
+    const jwt = await verifyJWT(req.headers);
+    console.log('path', path, jwt);
+    if (path === `/${MikuExtensions.Services.ServicesNames.Aphrodite}/query` && jwt === 'EXPIRED') {
+      res.status(401).send('Unauthorized');
+      return;
+    }
+    if (path === `/${MikuExtensions.Services.ServicesNames.AzureTTS}/query` && jwt !== 'PREMIUM') {
+      res.status(401).send('Unauthorized');
+      return;
+    }
     const result = await cb(req.body);
     res.status(result.status).send(result.response);
   });

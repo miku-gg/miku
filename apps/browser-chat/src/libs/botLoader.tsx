@@ -310,7 +310,7 @@ export function useBot(): {
           memoryLines = chat.data.chatMessages.map((message) => ({
             id: message.id,
             type: MikuCore.Commands.CommandType.DIALOG,
-            subject: message.isBot ? '{{bot}}' : '{{user}}',
+            subject: message.isBot ? decoratedConfig.bot_name : 'Anon',
             text: message.text,
           }));
           if (chat.data.chatMessages.length) {

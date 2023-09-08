@@ -33,6 +33,7 @@ import ProgressiveImage from "react-progressive-graceful-image";
 import { trackEvent } from "../../../libs/analytics";
 import platformAPI from "../../../libs/platformAPI";
 import { getAphroditeConfig } from "../../../App";
+import { PromptCompleterEndpointType } from "../../../libs/botSettingsUtils";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -311,11 +312,15 @@ export const BotDisplay = () => {
             <div className="flex items-center gap-4 text-white">
               <div className="w-8 h-8 bg-cover rounded-full" style={{backgroundImage: profileImage ? `url(${assetLinkLoader(profileImage, '480p')})` : ''}} />
               <div className="BotDisplay__header-name">{card?.data.name}</div>
-              <div className="inline-flex">
-                <button className="rounded-full" onClick={displayBotDetails}>
-                  <img src={infoIcon} />
-                </button>
-              </div>
+              {
+                botConfigSettings.promptCompleterEndpoint.type !== PromptCompleterEndpointType.APHRODITE ? (
+                  <div className="inline-flex">
+                    <button className="rounded-full" onClick={displayBotDetails}>
+                      <img src={infoIcon} />
+                    </button>
+                  </div>
+                ) : null
+              }
               <div className="inline-flex">
                 {
                   ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1) ? (
@@ -333,14 +338,16 @@ export const BotDisplay = () => {
                   <img src={historyIcon} />
                 </button>
               </div>
-              <div className="inline-flex">
-                <button
-                  className="rounded-full"
-                  onClick={handleSettingsButtonClick}
-                >
-                  <img src={settingsIcon} />
-                </button>
-              </div>
+              {botConfigSettings.promptCompleterEndpoint.type !== PromptCompleterEndpointType.APHRODITE ? (
+                <div className="inline-flex">
+                  <button
+                    className="rounded-full"
+                    onClick={handleSettingsButtonClick}
+                  >
+                    <img src={settingsIcon} />
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
           {/* MAIN IMAGE */}

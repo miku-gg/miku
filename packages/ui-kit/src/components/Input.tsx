@@ -19,8 +19,10 @@ interface InputProps {
     >
   ) => void;
   onSubmit?: () => void;
+  onBlur?: (event?: React.FocusEvent<any>) => void;
   placeHolder?: string;
   value?: string;
+  password?: boolean;
   description?: string;
   children?: React.ReactNode;
 }
@@ -36,10 +38,12 @@ const Input = ({
   maxLength,
   name,
   onChange,
+  onBlur,
   onSubmit,
   placeHolder,
   value,
   description,
+  password,
   children,
 }: InputProps) => {
   return (
@@ -81,6 +85,7 @@ const Input = ({
               <textarea
                 className="Input__textArea scrollbar"
                 onChange={onChange}
+                onBlur={onBlur}
                 value={value}
                 placeholder={placeHolder}
                 id={id}
@@ -88,10 +93,11 @@ const Input = ({
               />
             ) : (
               <input
-                type="text"
+                type={password ? 'password' : 'text'}
                 className="Input__field"
                 placeholder={placeHolder}
                 onChange={onChange}
+                onBlur={onBlur}
                 value={value}
                 name={name}
                 maxLength={maxLength}
