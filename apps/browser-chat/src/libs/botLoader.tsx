@@ -131,6 +131,7 @@ export interface BotData {
   hash: string
   settings: BotConfigSettings
   endpoints: CustomEndpoints
+  disabled: boolean
 }
 
 export function getBotDataFromURL(): BotData {
@@ -146,6 +147,7 @@ export function getBotDataFromURL(): BotData {
         return DEFAULT_BOT_SETTINGS;
       }
     })(),
+    disabled: searchParams['disabled'] === 'true',
     endpoints: {
       oobabooga: String(searchParams['oobabooga'] || '') || '',
       openai: String(searchParams['openai'] || '') || '',
@@ -158,11 +160,13 @@ export function getBotDataFromURL(): BotData {
 }
 
 export function setBotDataInURL(botData: BotData) {
-  const { endpoints } = botData;
+  const { endpoints, disabled } = botData;
   const newSearchParams = {
     bot: botData.hash,
     settings: MikuCore.Services.encode(JSON.stringify(botData.settings)),
   };
+
+  if (disabled) newSearchParams['disabled'] = 'true';
   
   for (const key in endpoints) {
     if (endpoints[key]) newSearchParams[key] = endpoints[key]

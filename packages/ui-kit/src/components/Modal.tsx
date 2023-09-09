@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactModal from 'react-modal';
 import './Modal.scss';
 
@@ -23,6 +23,7 @@ export default function Modal(props: ModalProps): JSX.Element {
       className="Modal"
       overlayClassName="Modal__overlay"
       contentLabel="Modal"
+      ariaHideApp={false}
     >
       <div className="Modal__content">
         <div className="Modal__header">

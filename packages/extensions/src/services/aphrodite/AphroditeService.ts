@@ -6,15 +6,14 @@ import { GPTShortTermMemoryV2  } from "../../memory/GPTMemoryV2";
 import BotCardConnector, { parseAttributes, parseExampleMessages } from "./BotCardConnector";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 
-const APHRODITE_ENDPOINT = "http://localhost:8000/v1";
-const REQUEST_CONFIG = {
-  model: 'EleutherAI/pythia-70m',
-  temperature: 0.7,
-  max_tokens: 100,
-  top_p: 0.1,
-  frequency_penalty: 1.18,
-  presence_penalty: 0,
-  stop: ["</s>", "<|", "\n#", "\n*{{user}} ", "\n\n\n"],
+export interface AphroditeConfig {
+  model: string;
+  temperature: number;
+  max_tokens: number;
+  top_p: number;
+  frequency_penalty: number;
+  presence_penalty: number;
+  stop: string[];
 }
 
 const AphroditeMessagePropType = {
@@ -35,12 +34,15 @@ export const AphroditePromptCompleterServicePropTypes = {
 export interface AphroditePromptCompleterServiceConfig extends Miku.Services.ServiceConfig {
   s3Bucket: string;
   s3Config: S3ClientConfig;
+  aphroditeEndpoint: string;
+  aphoditeConfig: AphroditeConfig
 }
 
 export class AphroditePromptCompleterService extends Miku.Services.Service {
   private tokenizer: GPT3Tokenizer;
   private openai: OpenAI;
   private botCardConnector: BotCardConnector;
+  private aphroditeConfig: AphroditeConfig;
   protected defaultProps: InferProps<
     typeof AphroditePromptCompleterServicePropTypes
   > = {
@@ -56,8 +58,9 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
   constructor(config: AphroditePromptCompleterServiceConfig) {
     super(config);
     this.openai = new OpenAI({
-      baseURL: APHRODITE_ENDPOINT
+      baseURL: config.aphroditeEndpoint,
     });
+    this.aphroditeConfig = config.aphoditeConfig;
     this.tokenizer = new GPT3Tokenizer({ type: "gpt3" });
     this.botCardConnector = new BotCardConnector(config.s3Bucket, config.s3Config);
   }
@@ -110,7 +113,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
   ): Promise<string> {
     const response = await this.openai.completions.create({
       prompt,
-      ...REQUEST_CONFIG
+      ...this.aphroditeConfig
     });
     const choices = response?.choices || [];
 

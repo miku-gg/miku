@@ -323,7 +323,7 @@ export const BotDisplay = () => {
               }
               <div className="inline-flex">
                 {
-                  ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1) ? (
+                  ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1 && responsesGenerated.length) ? (
                     <ScenarioSelector value={currentContext} onChange={updateContext} />
                   ) : null
                 }

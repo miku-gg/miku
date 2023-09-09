@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useState } from "react";
 import { toast } from "react-toastify";
 import * as MikuCore from "@mikugg/core";
+import * as MikuExtensions from "@mikugg/extensions";
 import botFactory from "../../libs/botFactory";
 import { useBot } from "../../libs/botLoader";
 import { CheckIcon, PencilIcon } from "@primer/octicons-react";
@@ -269,6 +270,8 @@ export const HistoryConsole = () => {
     forceUpdate();
   };
 
+  const showBasePrompt = !getAphroditeConfig().enabled;
+
   return (
     <div className="flex flex-col-reverse scrollbar h-full p-2.5 gap-3 overflow-y-scroll w-full font-mono text-sm text-white bg-[#323232] rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-{#323232} border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500">
       {/* HISTORY CURRENT CHAT */}
@@ -285,20 +288,24 @@ export const HistoryConsole = () => {
         onEditedSubmit={updateMemoryLine}
       />
       {/* HISTORY CONTEXT */}
-      <div className="text-left w-full h-fi text-slate-400">
-        {history
-          ?.getContextPrompt()
-          .split("\n")
-          .map((text, i) => (
-            <p key={`basePrompt_${i}`}>{text}</p>
-          ))}
-        {history
-          ?.getInitiatorPrompt()
-          .split("\n")
-          .map((text, i) => (
-            <p key={`basePrompt_${i}`}>{text}</p>
-          ))}
-      </div>
+      {
+        showBasePrompt ? (
+          <div className="text-left w-full h-fi text-slate-400">
+            {history
+              ?.getContextPrompt()
+              .split("\n")
+              .map((text, i) => (
+                <p key={`basePrompt_${i}`}>{text}</p>
+              ))}
+            {history
+              ?.getInitiatorPrompt()
+              .split("\n")
+              .map((text, i) => (
+                <p key={`basePrompt_${i}`}>{text}</p>
+              ))}
+          </div>
+        ) : null
+      }
     </div>
   );
 };

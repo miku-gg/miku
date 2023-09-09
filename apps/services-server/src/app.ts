@@ -189,7 +189,17 @@ if (APHRODITE_ENDPOINT) {
         accessKeyId: APHRODITE_S3_ACCESS_KEY,
         secretAccessKey: APHRODITE_S3_SECRET_KEY
       }
-    }
+    },
+    aphroditeEndpoint: APHRODITE_ENDPOINT,
+    aphoditeConfig: {
+      model: './models/kuchiki-l2-7b',
+      temperature: 0.7,
+      max_tokens: 100,
+      top_p: 0.1,
+      frequency_penalty: 1.18,
+      presence_penalty: 0,
+      stop: ["</s>", "<|", "\n#", "\n*{{user}} ", "\n\n\n"],
+    },
   })
 }
 

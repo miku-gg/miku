@@ -481,7 +481,6 @@ export default (function () {
       return botInstance;
     },
     updateInstance: (botConfig: BotConfig, servicesEndpoint: string, endpoints?: CustomEndpoints) => {
-      console.log('botConfig', botConfig);
       botInstance = botFactory.create(botConfig, servicesEndpoint, endpoints);
       return botInstance;
     },
