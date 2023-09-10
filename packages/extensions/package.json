@@ -1,6 +1,6 @@
 {
   "name": "@mikugg/extensions",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "",
   "repository": {
     "type": "git",
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.400.0",
-    "@mikugg/core": "^0.6.0",
+    "@mikugg/core": "^0.7.0",
     "@types/axios": "^0.14.0",
     "@types/lodash.trim": "^4.5.7",
     "@types/node": "^18.11.18",
