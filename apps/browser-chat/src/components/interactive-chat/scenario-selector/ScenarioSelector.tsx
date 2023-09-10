@@ -4,18 +4,13 @@ import './ScenarioSelector.css';
 import { useBot } from '../../../libs/botLoader';
 import EmotionRenderer from '../../asset-renderer/EmotionRenderer';
 
-
-const VITE_IMAGES_DIRECTORY_ENDPOINT =
-  import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
-  "http://localhost:8585/image";
-
 interface ScenarioSelectorProps {
   value: string
   onChange: (value: string) => void
 }
 
 export default function ScenarioSelector({ value, onChange}: ScenarioSelectorProps): JSX.Element | null {
-  const { card } = useBot();
+  const { card, assetLinkLoader } = useBot();
   const [expanded, setExpended] = useState<boolean>(false);
 
   if (!card) return null;
@@ -55,11 +50,14 @@ export default function ScenarioSelector({ value, onChange}: ScenarioSelectorPro
           {childrenScenarios.map((_scenario, index) => {
             return (
               <button className="ScenarioSelector__item" key={`scenario-selector-${_scenario.id}-${index}`} onClick={handleItemClick.bind(null, _scenario.id)}>
-                <div className="ScenarioSelector__item-background" style={{ backgroundImage: `url(${VITE_IMAGES_DIRECTORY_ENDPOINT}/${_scenario.background})`}}/>
-                <EmotionRenderer
-                  className="ScenarioSelector__item-emotion"
-                  assetUrl={_scenario.emotionImg || ''}
-                />
+                <div className="ScenarioSelector__item-background" style={{ backgroundImage: `url(${assetLinkLoader(_scenario.background)})`}}/>
+                {_scenario.emotionImg ? (
+                  <EmotionRenderer
+                    className="ScenarioSelector__item-emotion"
+                    assetLinkLoader={assetLinkLoader}
+                    assetUrl={_scenario.emotionImg}
+                  />
+                ) : null}
                 <div className="ScenarioSelector__item-text">
                   {_scenario.trigger_action}
                 </div>

@@ -5,6 +5,10 @@
   display: flex;
   align-items: center;
 
+  .hidden {
+    display: none;
+  }
+
   &__leftScrollButton,
   &__rightScrollButton {
     display: flex;
@@ -15,7 +19,7 @@
     height: 2rem;
 
     border-radius: 50%;
-    border: unset;
+  border: unset;
 
     color: #6c7293;
     background: transparent;

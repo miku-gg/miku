@@ -91,10 +91,11 @@ export abstract class Service<Output = string> {
       throw "Invalid signature";
     }
     PropTypes.checkPropTypes(this.propTypes, input, "props", this.serviceId);
-    const price = await this.calculatePrice(input);
-    if (price > (requestBody.query.tokenLimit || 0)) {
-      throw "Not enough tokens";
-    }
+    // const price = await this.calculatePrice(input);
+    
+    // if (price > (requestBody.query.tokenLimit || 0)) {
+    //   throw "Not enough tokens";
+    // }
 
     return this.computeInput(input);
   }

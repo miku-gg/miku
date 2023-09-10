@@ -18,6 +18,7 @@
     "@mikugg/extensions": "^0.6.3",
     "@mui/material": "^5.11.10",
     "@primer/octicons-react": "^17.12.0",
+    "axios": "^1.2.4",
     "extendable-media-recorder": "^7.1.6",
     "extendable-media-recorder-wav-encoder": "^7.0.84",
     "lodash.debounce": "^4.0.8",

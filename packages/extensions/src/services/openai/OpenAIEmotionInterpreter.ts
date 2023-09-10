@@ -1,5 +1,5 @@
 import * as  Core from '@mikugg/core';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import PropTypes, { InferProps } from 'prop-types';
 import GPT3Tokenizer from 'gpt3-tokenizer';
 import cosineSimilarity from 'compute-cosine-similarity';
@@ -141,7 +141,7 @@ export class OpenAIEmotionInterpreter extends Core.Services.Service<EmotionInter
   private apiKey: string;
   private emotionConfigsEndpoint: string;
   private tokenizer: GPT3Tokenizer;
-  private openai: OpenAIApi;
+  private openai: OpenAI;
   private loadedEmotionConfigs: Map<string, OpenAIEmotionConfig> = new Map();
   private defaultConfigHash: string;
 
@@ -150,9 +150,9 @@ export class OpenAIEmotionInterpreter extends Core.Services.Service<EmotionInter
     this.apiKey = config.apiKey || '';
     this.emotionConfigsEndpoint = config.emotionConfigsEndpoint || '';
     this.tokenizer = new GPT3Tokenizer({ type: 'gpt3' })
-    this.openai = new OpenAIApi(new Configuration({
+    this.openai = new OpenAI({
       apiKey: this.apiKey,
-    }));
+    });
     this.defaultConfigHash = config.defaultConfigHash;
   }
 
@@ -163,15 +163,15 @@ export class OpenAIEmotionInterpreter extends Core.Services.Service<EmotionInter
   async computeInput(input: InferProps<typeof EmotionInterpreterPropTypes>): Promise<EmotionInterpreterOutput> {
     let openai = this.openai;
     if (input.openai_key) {
-      openai = new OpenAIApi(new Configuration({
+      openai = new OpenAI({
         apiKey: input.openai_key,
-      }));
+      });
     }
     const [embeddingInput, emotionConfig] = await Promise.all([
-      openai.createEmbedding({
+      openai.embeddings.create({
         model: 'text-embedding-ada-002',
-        input: [input.prompt],
-      }).then(result => result.data.data[0].embedding).catch(() => []),
+        input: input.prompt || '',
+      }).then(result => result.data[0].embedding).catch(() => []),
       this.getEmotionConfig(input.emotionConfigHash || this.defaultConfigHash)
     ]);
 

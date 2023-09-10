@@ -8,7 +8,6 @@ type TTSServiceProps = InferProps<typeof TTSServicePropTypes>;
 
 export interface TTSOutputListenerParams {
   serviceEndpoint: string;
-  readNonSpokenText: boolean;
   props: TTSServiceProps;
   signer: Core.Services.ServiceQuerySigner;
 }
@@ -20,7 +19,6 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<
   protected service: Core.Services.ServiceClient<TTSServiceProps, string>;
   protected props: TTSServiceProps;
   protected serviceName: string;
-  protected readNonSpokenText: boolean;
 
   constructor(params: TTSOutputListenerParams, serviceName: ServicesNames) {
     super();
@@ -31,14 +29,13 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<
       serviceName
     );
     this.serviceName = serviceName;
-    this.readNonSpokenText = params.readNonSpokenText;
   }
 
   protected override async handleOutput(
     output: Core.OutputListeners.DialogOutputEnvironment
   ): Promise<string> {
-    if (this.serviceName != "") {      
-      const prompt = this.readNonSpokenText
+    if (this.props.enabled && this.serviceName != "") {      
+      const prompt = this.props.readNonSpokenText
       ? output.text
       : this.cleanText(output.text);
       return this.service.query(

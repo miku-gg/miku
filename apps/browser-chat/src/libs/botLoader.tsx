@@ -1,15 +1,18 @@
-import { BotConfig, MikuCard, mikuCardToBotConfig } from "@mikugg/bot-utils";
+import { BotConfig, EMPTY_MIKU_CARD, MikuCard, mikuCardToBotConfig } from "@mikugg/bot-utils";
 import React, { useCallback, useContext, useState } from "react";
 import botFactory from './botFactory';
 import queryString from "query-string";
-import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, VoiceServiceType } from "./botSettingsUtils";
+import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, VoiceServiceType, VOICE_SERVICES } from "./botSettingsUtils";
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
+import platformAPI from "./platformAPI";
+import { fillResponse } from "./responsesStore";
 
-const BOT_DIRECTORY_ENDPOINT = import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT || 'http://localhost:8585/bot';
-const VITE_IMAGES_DIRECTORY_ENDPOINT =
-  import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
-  "http://localhost:8585/image";
+export interface BotLoaderProps {
+  assetLinkLoader: (asset: string, format?: string) => string;
+  servicesEndpoint: string;
+  mikuCardLoader: (botHash: string) => Promise<MikuCard>;
+}
 
 async function preLoadImages(imageUrls: string[]): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -30,14 +33,13 @@ async function preLoadImages(imageUrls: string[]): Promise<void> {
   });
 }
 
-export function loadBotConfig(botHash: string): Promise<{
+export function loadBotConfig(botHash: string, mikuCardLoader: (botHash: string) => Promise<MikuCard>): Promise<{
   success: boolean,
   bot?: BotConfig,
   card?: MikuCard,
   hash: string,
 }> {
-  return fetch(`${BOT_DIRECTORY_ENDPOINT}/${botHash}`)
-    .then((res) => res.json())
+  return mikuCardLoader(botHash)
     .then((card: MikuCard) => {
       const bot = mikuCardToBotConfig(card);
       return {
@@ -75,6 +77,9 @@ export const BotLoaderContext = React.createContext<{
   setBotConfigSettings: (botConfigSettings: BotConfigSettings) => void,
   setLoading: (loading: boolean) => void,
   setError: (error: boolean) => void,
+  assetLinkLoader: (asset: string, format?: string) => string;
+  servicesEndpoint: string;
+  mikuCardLoader: (botHash: string) => Promise<MikuCard>;
 }>({
   botHash: '',
   card: undefined,
@@ -88,9 +93,12 @@ export const BotLoaderContext = React.createContext<{
   setBotConfigSettings: () => {},
   setLoading: () => {},
   setError: () => {},
+  assetLinkLoader: () => '',
+  servicesEndpoint: '',
+  mikuCardLoader: async (botHash: string) => EMPTY_MIKU_CARD,
 });
 
-export const BotLoaderProvider = ({ children }: {children: JSX.Element}): JSX.Element => {
+export const BotLoaderProvider = (props: {children: JSX.Element} & BotLoaderProps): JSX.Element => {
   const [card, setCard] = useState<MikuCard | undefined>(undefined);
   const [botHash, setBotHash] = useState<string>('');
   const [botConfig, setBotConfig] = useState<BotConfig | undefined>(undefined);
@@ -101,9 +109,12 @@ export const BotLoaderProvider = ({ children }: {children: JSX.Element}): JSX.El
   return (
     <BotLoaderContext.Provider value={{
       card, botConfig, loading, error, botHash, botConfigSettings,
-      setCard, setBotConfig, setLoading, setError, setBotHash, setBotConfigSettings
+      setCard, setBotConfig, setLoading, setError, setBotHash, setBotConfigSettings,
+      mikuCardLoader: props.mikuCardLoader,
+      assetLinkLoader: props.assetLinkLoader,
+      servicesEndpoint: props.servicesEndpoint,
     }}>
-      {children}
+      {props.children}
     </BotLoaderContext.Provider>
   );
 };
@@ -120,9 +131,10 @@ export interface BotData {
   hash: string
   settings: BotConfigSettings
   endpoints: CustomEndpoints
+  disabled: boolean
 }
 
-function getBotDataFromURL(): BotData {
+export function getBotDataFromURL(): BotData {
   const searchParams = queryString.parse(location.search);
   return {
     hash: String(searchParams['bot'] || '') || '',
@@ -135,6 +147,7 @@ function getBotDataFromURL(): BotData {
         return DEFAULT_BOT_SETTINGS;
       }
     })(),
+    disabled: searchParams['disabled'] === 'true',
     endpoints: {
       oobabooga: String(searchParams['oobabooga'] || '') || '',
       openai: String(searchParams['openai'] || '') || '',
@@ -146,12 +159,14 @@ function getBotDataFromURL(): BotData {
   }
 }
 
-function setBotDataInURL(botData: BotData) {
-  const { endpoints } = botData;
+export function setBotDataInURL(botData: BotData) {
+  const { endpoints, disabled } = botData;
   const newSearchParams = {
     bot: botData.hash,
     settings: MikuCore.Services.encode(JSON.stringify(botData.settings)),
   };
+
+  if (disabled) newSearchParams['disabled'] = 'true';
   
   for (const key in endpoints) {
     if (endpoints[key]) newSearchParams[key] = endpoints[key]
@@ -170,10 +185,12 @@ export function useBot(): {
   loading: boolean,
   error: boolean,
   setBotHash: (botHash: string) => void,
+  assetLinkLoader: (asset: string, format?: string) => string,
+  servicesEndpoint: string,
 } {
   const {
     botConfig, setBotConfig, loading, setLoading, card, setCard, error, setError, botHash, setBotHash,
-    botConfigSettings, setBotConfigSettings
+    botConfigSettings, setBotConfigSettings, mikuCardLoader, assetLinkLoader, servicesEndpoint
   } = useContext(BotLoaderContext);
 
   // Get data from url params
@@ -182,11 +199,10 @@ export function useBot(): {
     setLoading(true);
     setBotHash(_hash);
     const isDifferentBot = getBotHashFromUrl() !== _hash;
-    const memoryLines = botFactory.getInstance()?.getMemory().getMemory() || [];
-    loadBotConfig(_hash).then(async (res) => {
+    let memoryLines = botFactory.getInstance()?.getMemory().getMemory() || [];
+    loadBotConfig(_hash, mikuCardLoader).then(async (res) => {
       if (res.success && res.bot && res.card) {
         let decoratedConfig = res.bot;
-
         decoratedConfig = {
           ...res.bot,
           prompt_completer: {
@@ -196,6 +212,8 @@ export function useBot(): {
                   return MikuExtensions.Services.ServicesNames.OpenAI
                 case PromptCompleterEndpointType.KOBOLDAI:
                   return MikuExtensions.Services.ServicesNames.Pygmalion
+                case PromptCompleterEndpointType.APHRODITE:
+                  return MikuExtensions.Services.ServicesNames.Aphrodite
                 case PromptCompleterEndpointType.OOBABOOGA:
                 default:
                   return MikuExtensions.Services.ServicesNames.Oobabooga
@@ -218,12 +236,14 @@ export function useBot(): {
                       settings,
                       prompt: "",                  
                     }
+                  case PromptCompleterEndpointType.APHRODITE:
                   case PromptCompleterEndpointType.OOBABOOGA:
                   default:
                     return {
                       settings,
                       prompt: "",
-                      gradioEndpoint: "",                    
+                      gradioEndpoint: "",
+                      botHash: _hash,
                     }
                 }
               })()
@@ -237,18 +257,25 @@ export function useBot(): {
             }
           }
         }
-        
-        if (_botData.settings.voice.voiceService.voiceId) {
-          const tts = decoratedConfig.outputListeners.find(listener => [
-            MikuExtensions.Services.ServicesNames.AzureTTS,
-            MikuExtensions.Services.ServicesNames.ElevenLabsTTS,
-            MikuExtensions.Services.ServicesNames.NovelAITTS,
-          ].includes(listener.service))
 
-          if (tts) {
+        const tts = decoratedConfig.outputListeners.find(listener => [
+          MikuExtensions.Services.ServicesNames.AzureTTS,
+          MikuExtensions.Services.ServicesNames.ElevenLabsTTS,
+          MikuExtensions.Services.ServicesNames.NovelAITTS,
+        ].includes(listener.service))
+
+        if (tts) {
+          tts.props = {
+            ...tts.props,
+            enabled: _botData.settings.voice.enabled,
+            readNonSpokenText: _botData.settings.voice.readNonSpokenText,
+          };
+
+          if (_botData.settings.voice.voiceService.voiceId) {
             tts.props = {
               voiceId: _botData.settings.voice.voiceService.voiceId,
               readNonSpokenText: _botData.settings.voice.readNonSpokenText,
+              enabled: _botData.settings.voice.enabled,
             };
             switch (_botData.settings.voice.voiceService.type) {
               case VoiceServiceType.AZURE_TTS:
@@ -268,16 +295,40 @@ export function useBot(): {
         const defaultEmotionGroupId = res.card?.data.extensions?.mikugg.scenarios.find(sn => sn.id === res.card?.data.extensions.mikugg.start_scenario)?.emotion_group || '';
         const defaultBackgound = res.card?.data.extensions?.mikugg.scenarios.find(sn => sn.id === res.card?.data.extensions.mikugg.start_scenario)?.background || '';
         await preLoadImages(res.card?.data.extensions?.mikugg?.backgrounds?.filter(bg => bg.id === defaultBackgound).map(
-          (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}_480p`
+          (asset) => assetLinkLoader(asset.source, '480p')
         ) || []);
         await preLoadImages(res.card?.data.extensions?.mikugg?.emotion_groups?.find(eg => eg.id === defaultEmotionGroupId)?.emotions?.filter((em, index) => em.id === 'happy' || index === 0).map(
-          (asset) => `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${asset.source}_480p`
+          (asset) => assetLinkLoader(asset.source[0], '480p')
         ) || []);
         
         setBotConfigSettings(_botData.settings);
         setBotDataInURL(_botData);
 
-        botFactory.updateInstance(decoratedConfig, _botData.endpoints);
+        botFactory.updateInstance(decoratedConfig, servicesEndpoint, _botData.endpoints);
+        
+        if (
+          _botData.settings.promptCompleterEndpoint.type === PromptCompleterEndpointType.APHRODITE &&
+          _botData.settings.promptCompleterEndpoint.genSettings.chatId
+        ) {
+          const chat = await platformAPI.getChat(_botData.settings.promptCompleterEndpoint.genSettings.chatId);
+          memoryLines = chat.data.chatMessages.map((message) => ({
+            id: message.id,
+            type: MikuCore.Commands.CommandType.DIALOG,
+            subject: message.isBot ? decoratedConfig.bot_name : 'Anon',
+            text: message.text,
+          }));
+          if (chat.data.chatMessages.length) {
+            const lastMessage = chat.data.chatMessages[chat.data.chatMessages.length - 1];
+            const firstScenario = res.card?.data.extensions.mikugg.scenarios.find(_scenario => lastMessage.sceneId === _scenario.id);
+            const firstEmotionGroup = res.card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
+            let firstImage = firstEmotionGroup?.emotions?.find(emotion => emotion?.id === lastMessage.emotionId)?.source[0] || firstEmotionGroup?.emotions[0].source[0];
+
+            fillResponse(lastMessage.id, "text", lastMessage.text);
+            fillResponse(lastMessage.id, "emotion", firstImage);
+            fillResponse(lastMessage.id, "audio", '');
+            fillResponse(lastMessage.id, "scene", lastMessage.sceneId);
+          }
+        }
         if (!isDifferentBot && memoryLines.length) {
           const memory = botFactory.getInstance()?.getMemory();
           memory?.clearMemories();
@@ -310,8 +361,10 @@ export function useBot(): {
     setBotConfigSettings: _setBotConfigSettings,
     loading,
     error,
-    setBotHash: (_hash?: string) => {
-      _botLoadCallback(_hash)
+    setBotHash: (_hash?: string, _botData?: BotData) => {
+      _botLoadCallback(_hash, _botData);
     },
+    assetLinkLoader,
+    servicesEndpoint
   };
 }

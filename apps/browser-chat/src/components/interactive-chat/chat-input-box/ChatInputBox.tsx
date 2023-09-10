@@ -10,8 +10,9 @@ import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import queryString from "query-string";
 import { IS_ALPHA_LIVE } from "../../loading/BotLoadingModal";
 import { botSettings } from "../bot-display/BotDisplay";
-import { useBot } from "../../../libs/botLoader";
+import { getBotDataFromURL, useBot } from "../../../libs/botLoader";
 import { trackEvent } from "../../../libs/analytics";
+import { toast } from "react-toastify";
 
 export function SmallSpinner(): JSX.Element {
   return (
@@ -39,10 +40,19 @@ export const ChatInputBox = (): JSX.Element => {
     event.stopPropagation();
 
     if (value) {
+      const {disabled: shouldPreventSubmit} = getBotDataFromURL();
       trackEvent('bot_interact', {
         bot: card?.data.name || 'unknown',
-        time: Date.now() - lastInteractionTime
-      })
+        time: Date.now() - lastInteractionTime,
+        prevented: shouldPreventSubmit,
+      });
+      if (shouldPreventSubmit) {
+        window?.parent?.postMessage({
+          type: 'prevented',
+        }, '*');
+        toast.warn('Please sign in to interact.', {position: 'top-center', style: {marginTop: '2em'}});
+        return;
+      }
       lastInteractionTime = Date.now();
       const result = botFactory
         .getInstance()

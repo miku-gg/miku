@@ -87,7 +87,8 @@ const DragAndDropImages = ({
           </div>
         ) : (
           <div className="dragAndDropImages__preview">
-            {previewImage.indexOf('video/webm') !== -1 ? (
+            {previewImage.indexOf('video/webm') !== -1 ||
+            previewImage.endsWith('.webm') ? (
               <video
                 src={previewImage}
                 autoPlay={true}

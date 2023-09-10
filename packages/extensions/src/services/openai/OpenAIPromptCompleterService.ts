@@ -1,5 +1,5 @@
 import * as Miku from "@mikugg/core";
-import { Configuration, CreateCompletionResponse, OpenAIApi } from "openai";
+import OpenAI from "openai";
 import PropTypes, { InferProps } from "prop-types";
 import GPT3Tokenizer from "gpt3-tokenizer";
 
@@ -30,7 +30,7 @@ export const OpenAIPromptCompleterServicePropTypes = {
 
 export class OpenAIPromptCompleterService extends Miku.Services.Service {
   private tokenizer: GPT3Tokenizer;
-  private openai: OpenAIApi;
+  private openai: OpenAI;
   protected defaultProps: InferProps<
     typeof OpenAIPromptCompleterServicePropTypes
   > = {
@@ -47,11 +47,10 @@ export class OpenAIPromptCompleterService extends Miku.Services.Service {
 
   constructor(config: OpenAIPromptCompleterServiceConfig) {
     super(config);
-    this.openai = new OpenAIApi(
-      new Configuration({
-        apiKey: config.apiKey,
-      })
-    );
+    this.openai = new OpenAI({
+      apiKey: config.apiKey,
+      baseURL: 'http://localhost:8000/v1'
+    });
     this.tokenizer = new GPT3Tokenizer({ type: "gpt3" });
   }
 
@@ -61,15 +60,14 @@ export class OpenAIPromptCompleterService extends Miku.Services.Service {
     let openai = this.openai;
 
     if (input.openai_key) {
-      openai = new OpenAIApi(
-        new Configuration({
-          apiKey: input.openai_key,
-        })
-      );
+      openai = new OpenAI({
+        apiKey: input.openai_key,
+        baseURL: 'http://localhost:8000/v1'
+      });
     }
 
     const completion = OpenAIChatModels.includes(
-      JSON.parse(input.settings).oaiModel
+      'EleutherAI/pythia-70m'
     )
       ? await this.chatCompletion(openai, input)
       : await this.simpleCompletion(openai, input);
@@ -78,31 +76,31 @@ export class OpenAIPromptCompleterService extends Miku.Services.Service {
   }
 
   protected async simpleCompletion(
-    openai: OpenAIApi,
+    openai: OpenAI,
     input: InferProps<typeof this.propTypesRequired>
   ): Promise<string> {
     const modelSettings = JSON.parse(input.settings);
-    const response = await openai.createCompletion({
-      model: modelSettings.oaiModel,
+    const response = await openai.completions.create({
+      model: 'EleutherAI/pythia-70m',
       temperature: modelSettings.temp,
-      max_tokens: modelSettings.maxTokens,
+      max_tokens: 100,
       top_p: modelSettings.topP,
       frequency_penalty: modelSettings.frequencyPenalty,
       presence_penalty: modelSettings.presencePenalty,
       prompt: input.prompt,
       stop: input.stop.length ? input.stop : undefined,
     });
-    const choices = response?.data?.choices || [];
+    const choices = response?.choices || [];
 
     return choices.length ? choices[0].text || "" : "";
   }
 
   protected async chatCompletion(
-    openai: OpenAIApi,
+    openai: OpenAI,
     input: InferProps<typeof this.propTypesRequired>
   ): Promise<string> {
     const modelSettings = JSON.parse(input.settings);
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: modelSettings.oaiModel,
       temperature: modelSettings.temp,
       max_tokens: modelSettings.maxTokens,
@@ -112,7 +110,7 @@ export class OpenAIPromptCompleterService extends Miku.Services.Service {
       messages: input.messages,
       stop: input.stop.length ? input.stop : undefined, // this makes all the models return empty msg idk y
     });
-    const choices = response?.data?.choices || [];
+    const choices = response?.choices || [];
     const completion = choices.length ? choices[0].message?.content || "" : "";
 
     return completion.replace(/"+/g, '"');

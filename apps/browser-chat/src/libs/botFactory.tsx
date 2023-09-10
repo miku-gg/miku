@@ -2,14 +2,13 @@ import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import { BotConfig } from "@mikugg/bot-utils";
 import { toast } from "react-toastify";
-import { CustomEndpoints } from "./botLoader";
+import { CustomEndpoints, getBotDataFromURL, setBotDataInURL } from "./botLoader";
+import platformAPI from "./platformAPI";
+import { getAphroditeConfig } from "../App";
+import { AphroditeSettings, PromptCompleterEndpointType } from "./botSettingsUtils";
 
 const MOCK_PRIVATE_KEY =
   "2658e4257eaaf9f72295ce012fa8f8cc4a600cdaf4051884d2c02593c717c173";
-
-interface BotFactoryConfig {
-  servicesEndpoint: string;
-}
 
 interface BotInstanceInterface {
   subscribeContextChangeSuggestion(cb: (contextId: string) => void): void;
@@ -40,11 +39,9 @@ interface BotInstanceInterface {
 }
 
 class BotFactory {
-  private config: BotFactoryConfig;
   private signer: MikuCore.Services.ServiceQuerySigner;
 
-  constructor(config: BotFactoryConfig) {
-    this.config = config;
+  constructor() {
     this.signer = new MikuCore.Services.ServiceQuerySigner(MOCK_PRIVATE_KEY);
   }
 
@@ -84,13 +81,15 @@ class BotFactory {
     props,
     memory,
     signer,
+    servicesEndpoint,
     endpoints,
   }: {
     service: MikuExtensions.Services.ServicesNames;
     props: object;
     memory: MikuCore.Memory.ShortTermMemory;
     signer: MikuCore.Services.ServiceQuerySigner;
-    endpoints?: CustomEndpoints
+    servicesEndpoint: string;
+    endpoints?: CustomEndpoints;
   }): MikuCore.ChatPromptCompleters.ChatPromptCompleter {
     let chatPromptCompleter: MikuCore.ChatPromptCompleters.ChatPromptCompleter | null =
       null;
@@ -101,7 +100,7 @@ class BotFactory {
       case MikuExtensions.Services.ServicesNames.OpenAI:
         chatPromptCompleter =
           new MikuExtensions.ChatPromptCompleters.OpenAIPromptCompleter({
-            serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+            serviceEndpoint: `${servicesEndpoint}/${service}`,
             props: {
               ...props,
               openai_key: String(endpoints?.openai || "") || "",
@@ -113,7 +112,7 @@ class BotFactory {
       case MikuExtensions.Services.ServicesNames.Pygmalion:
         chatPromptCompleter =
           new MikuExtensions.ChatPromptCompleters.PygmalionPromptCompleter({
-            serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+            serviceEndpoint: `${servicesEndpoint}/${service}`,
             props: props,
             signer: signer,
             memory: memory,
@@ -122,10 +121,21 @@ class BotFactory {
       case MikuExtensions.Services.ServicesNames.Oobabooga:
         chatPromptCompleter =
           new MikuExtensions.ChatPromptCompleters.OobaboogaPromptCompleter({
-            serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+            serviceEndpoint: `${servicesEndpoint}/${service}`,
             props: {
               ...props,
               gradioEndpoint: String(endpoints?.oobabooga || "") || "",
+            },
+            signer: signer,
+            memory: memory,
+          });
+          break;
+      case MikuExtensions.Services.ServicesNames.Aphrodite:
+        chatPromptCompleter =
+          new MikuExtensions.ChatPromptCompleters.AphroditePromptCompleter({
+            serviceEndpoint: `${servicesEndpoint}/${service}`,
+            props: {
+              ...props,
             },
             signer: signer,
             memory: memory,
@@ -141,12 +151,16 @@ class BotFactory {
   private getOutputListener({
     service,
     props,
+    memory,
     signer,
+    servicesEndpoint,
     endpoints,
   }: {
     service: MikuExtensions.Services.ServicesNames;
     props: object;
+    memory: MikuCore.Memory.ShortTermMemory;
     signer: MikuCore.Services.ServiceQuerySigner;
+    servicesEndpoint: string;
     endpoints?: CustomEndpoints;
   }): MikuCore.OutputListeners.OutputListener<
     MikuCore.OutputListeners.OutputEnvironment,
@@ -160,7 +174,7 @@ class BotFactory {
     switch (service) {
       case MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter:
         outputListener = new MikuExtensions.OutputListeners.EmotionRenderer({
-          serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+          serviceEndpoint: `${servicesEndpoint}/${service}`,
           signer: signer,
           props: {
             ...props,
@@ -171,12 +185,58 @@ class BotFactory {
       case MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter:
         outputListener =
           new MikuExtensions.OutputListeners.SBertEmotionRenderer({
-            serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+            serviceEndpoint: `${servicesEndpoint}/${service}`,
             signer: signer,
             props: {
               ...props,
             } as MikuExtensions.Services.SBertEmotionInterpreterProps,
           });
+          outputListener.subscribe(async (output) => {
+            const aphrodite = getAphroditeConfig();
+            if (aphrodite.enabled) {
+              const memoryLines = memory.getMemory();
+              let chatId = aphrodite.chatId;
+              if (!chatId) {
+                const chat = await platformAPI.createChat(aphrodite.botId);
+                chatId = chat.data.id;
+                window?.parent?.postMessage({ type: 'chatId', payload: chatId }, '*');
+                const botData = getBotDataFromURL();
+                setBotDataInURL({
+                  ...botData,
+                  settings: {
+                    ...botData.settings,
+                    promptCompleterEndpoint: {
+                      type: PromptCompleterEndpointType.APHRODITE,
+                      genSettings: {
+                        ...(botData.settings.promptCompleterEndpoint.genSettings as AphroditeSettings),
+                        chatId,
+                      }
+                    }
+                  }
+                })
+              }
+              const lastSentMessage = memoryLines[memoryLines.length - 2];
+              const firstMessage = {
+                text: lastSentMessage.text,
+                isBot: false,
+                emotionId: output.emotion,
+                sceneId: output.nextContextId,
+              };
+              const secondMessage = {
+                text: output.text,
+                isBot: true,
+                emotionId: output.emotion,
+                sceneId: output.nextContextId,
+              }
+              const results = await platformAPI.createChatMessages(
+                chatId,
+                firstMessage,
+                secondMessage
+              );
+              memoryLines[memoryLines.length - 2].id = results?.data?.firstMessage?.id;
+              memoryLines[memoryLines.length - 1].id = results?.data?.secondMessage?.id;
+            }
+          })
         break;
       case MikuExtensions.Services.ServicesNames.AzureTTS:
       case MikuExtensions.Services.ServicesNames.ElevenLabsTTS:
@@ -185,9 +245,8 @@ class BotFactory {
         apiKey = apiKey ? String(apiKey || "") : "";
         outputListener = new MikuExtensions.OutputListeners.TTSOutputListener(
           {
-            serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+            serviceEndpoint: `${servicesEndpoint}/${service}`,
             signer: signer,
-            readNonSpokenText: props['readNonSpokenText'],
             props: {
               ...props,
               apiKey,
@@ -199,9 +258,8 @@ class BotFactory {
       case MikuExtensions.Services.ServicesNames.NovelAITTS:
         outputListener = new MikuExtensions.OutputListeners.TTSOutputListener(
           {
-            serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+            serviceEndpoint: `${servicesEndpoint}/${service}`,
             signer: signer,
-            readNonSpokenText: props['readNonSpokenText'],
             props: {
               ...props,
               apiKey: String(endpoints?.novelai || "") || "",
@@ -213,9 +271,8 @@ class BotFactory {
       case MikuExtensions.Services.ServicesNames.None:
         outputListener = new MikuExtensions.OutputListeners.TTSOutputListener(
           {
-            serviceEndpoint: `${this.config.servicesEndpoint}/${service}`,
+            serviceEndpoint: `${servicesEndpoint}/${service}`,
             signer: signer,
-            readNonSpokenText: props['readNonSpokenText'],
             props: {
               ...props,
               apiKey: "",
@@ -241,10 +298,10 @@ class BotFactory {
     return outputListener;
   }
 
-  public create(botConfig: BotConfig, endpoints?: CustomEndpoints): BotInstanceInterface {
+  public create(botConfig: BotConfig, servicesEndpoint: string, endpoints?: CustomEndpoints): BotInstanceInterface {
     const whisper = new MikuExtensions.CommandGenerators.WhisperServiceClient(
-      `${this.config.servicesEndpoint}/audio-upload`,
-      `${this.config.servicesEndpoint}/${MikuExtensions.Services.ServicesNames.WhisperSTT}`,
+      `${servicesEndpoint}/audio-upload`,
+      `${servicesEndpoint}/${MikuExtensions.Services.ServicesNames.WhisperSTT}`,
       this.signer,
       endpoints?.openai || ''
     );
@@ -253,8 +310,9 @@ class BotFactory {
     const promptCompleter = this.getPromptCompleter({
       service: botConfig.prompt_completer.service,
       props: botConfig.prompt_completer.props,
-      memory: memory,
+      memory,
       signer: this.signer,
+      servicesEndpoint,
       endpoints,
     });
     let outputListenerConfigs = botConfig.outputListeners;
@@ -264,7 +322,9 @@ class BotFactory {
         return this.getOutputListener({
           service: outputListenerConfig.service,
           props: outputListenerConfig.props,
+          memory,
           signer: this.signer,
+          servicesEndpoint,
         });
       }
     );
@@ -282,6 +342,7 @@ class BotFactory {
       getBotConfig(): BotConfig {
         return botConfig;
       },
+
       subscribeContextChangeSuggestion(
         cb: (contextId: string) => void
       ): boolean {
@@ -411,12 +472,7 @@ class BotFactory {
   }
 }
 
-const VITE_SERVICES_ENDPOINT =
-  import.meta.env.VITE_SERVICES_ENDPOINT || "http://localhost:8484";
-
-const botFactory = new BotFactory({
-  servicesEndpoint: VITE_SERVICES_ENDPOINT,
-});
+const botFactory = new BotFactory();
 
 export default (function () {
   let botInstance: BotInstanceInterface | null = null;
@@ -425,8 +481,8 @@ export default (function () {
     getInstance: (): BotInstanceInterface | null => {
       return botInstance;
     },
-    updateInstance: (botConfig: BotConfig, endpoints?: CustomEndpoints) => {
-      botInstance = botFactory.create(botConfig, endpoints);
+    updateInstance: (botConfig: BotConfig, servicesEndpoint: string, endpoints?: CustomEndpoints) => {
+      botInstance = botFactory.create(botConfig, servicesEndpoint, endpoints);
       return botInstance;
     },
   };

@@ -31,6 +31,9 @@ import ScenarioSelector from "../scenario-selector/ScenarioSelector";
 import EmotionRenderer from "../../asset-renderer/EmotionRenderer";
 import ProgressiveImage from "react-progressive-graceful-image";
 import { trackEvent } from "../../../libs/analytics";
+import platformAPI from "../../../libs/platformAPI";
+import { getAphroditeConfig } from "../../../App";
+import { PromptCompleterEndpointType } from "../../../libs/botSettingsUtils";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -79,7 +82,6 @@ export type GenSettings = {
 
 export let botSettings: BotSettings = {
   promptStrategy: "",
-
   sttModel: "Whisper",
   voiceGeneration: true,
   promptService: "llama",
@@ -88,10 +90,6 @@ export let botSettings: BotSettings = {
   readNonSpokenText: false,
   oldVoiceService: "",
 };
-
-const VITE_IMAGES_DIRECTORY_ENDPOINT =
-  import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT ||
-  "http://localhost:8585/image";
 
 const alreadyAnimated = new Set<string>();
 
@@ -132,7 +130,7 @@ function AnimateResponse({ text, fast }: { text: string, fast: boolean }): JSX.E
 }
   
 export const BotDisplay = () => {
-  const { card, botHash, botConfig, botConfigSettings, setBotConfigSettings } = useBot();
+  const { card, botHash, botConfig, botConfigSettings, setBotConfigSettings, assetLinkLoader } = useBot();
   const [showHistory, setShowHistory] = useState<Boolean>(false);
   const [handleBotDetailsInfo, setHandleBotDetailsInfo] =
     useState<boolean>(false);
@@ -231,7 +229,7 @@ export const BotDisplay = () => {
     }
   };
 
-  const onRegenerateClick = (event: React.UIEvent) => {
+  const onRegenerateClick = async (event: React.UIEvent) => {
     const bot = botFactory.getInstance();
     const shortTermMemory = bot?.getMemory();
     const memoryLines = shortTermMemory?.getMemory();
@@ -247,6 +245,7 @@ export const BotDisplay = () => {
       });
 
       const lastMemoryLine = memoryLines[memoryLines.length - 2];
+      const lastResponse = memoryLines[memoryLines.length - 1];
 
       event.preventDefault();
       setResponseIds((_responseIds) => {
@@ -254,6 +253,13 @@ export const BotDisplay = () => {
         responseIds.shift();
         return responseIds;
       });
+      const aphrodite = getAphroditeConfig();
+
+      if (aphrodite.enabled && lastMemoryLine.id && lastResponse.id) {
+        await platformAPI.deleteChatMessage(aphrodite.chatId, lastResponse?.id || '');
+        await platformAPI.deleteChatMessage(aphrodite.chatId, lastMemoryLine?.id || '');
+      }
+
       const result = botFactory
         .getInstance()
         ?.sendPrompt(
@@ -295,8 +301,7 @@ export const BotDisplay = () => {
     }
   };
 
-  const backgroundImagePath = `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${backgroundImage}`;
-  const profileImagePath = `${VITE_IMAGES_DIRECTORY_ENDPOINT}/${card?.data.extensions?.mikugg?.profile_pic}`;
+  const profileImage = card?.data.extensions?.mikugg?.profile_pic || '';
 
   return (
     // MAIN CONTAINER
@@ -305,16 +310,20 @@ export const BotDisplay = () => {
         <div className="relative flex flex-col w-full h-full items-center">
           <div className="w-full flex flex-row justify-between items-center p-3 bot-display-header rounded-xl z-10">
             <div className="flex items-center gap-4 text-white">
-              <div className="w-8 h-8 bg-cover rounded-full" style={{backgroundImage: `url(${profileImagePath}_480p)`}} />
+              <div className="w-8 h-8 bg-cover rounded-full" style={{backgroundImage: profileImage ? `url(${assetLinkLoader(profileImage, '480p')})` : ''}} />
               <div className="BotDisplay__header-name">{card?.data.name}</div>
-              <div className="inline-flex">
-                <button className="rounded-full" onClick={displayBotDetails}>
-                  <img src={infoIcon} />
-                </button>
-              </div>
+              {
+                botConfigSettings.promptCompleterEndpoint.type !== PromptCompleterEndpointType.APHRODITE ? (
+                  <div className="inline-flex">
+                    <button className="rounded-full" onClick={displayBotDetails}>
+                      <img src={infoIcon} />
+                    </button>
+                  </div>
+                ) : null
+              }
               <div className="inline-flex">
                 {
-                  ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1) ? (
+                  ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1 && responsesGenerated.length) ? (
                     <ScenarioSelector value={currentContext} onChange={updateContext} />
                   ) : null
                 }
@@ -329,19 +338,21 @@ export const BotDisplay = () => {
                   <img src={historyIcon} />
                 </button>
               </div>
-              <div className="inline-flex">
-                <button
-                  className="rounded-full"
-                  onClick={handleSettingsButtonClick}
-                >
-                  <img src={settingsIcon} />
-                </button>
-              </div>
+              {botConfigSettings.promptCompleterEndpoint.type !== PromptCompleterEndpointType.APHRODITE ? (
+                <div className="inline-flex">
+                  <button
+                    className="rounded-full"
+                    onClick={handleSettingsButtonClick}
+                  >
+                    <img src={settingsIcon} />
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
           {/* MAIN IMAGE */}
           <div className="absolute flex flex-col justify-center items-center w-full h-full overflow-hidden main-image-container rounded-xl">          
-            <ProgressiveImage src={`${backgroundImagePath}_1080p`} placeholder={`${backgroundImagePath}_480p`}>
+            <ProgressiveImage src={backgroundImage ? assetLinkLoader(backgroundImage) : ''} placeholder={backgroundImage ? assetLinkLoader(backgroundImage, '480p') : ''}>
               {(src) => <img
                 className="h-full w-full z-0 rounded-xl conversation-background-image object-cover"
                 src={`${src}`}
@@ -352,11 +363,14 @@ export const BotDisplay = () => {
                 }}
               />}
             </ProgressiveImage>
-            <EmotionRenderer
-              assetUrl={emotionImage}
-              upDownAnimation
-              className="absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover"
-            />
+            {emotionImage ? (
+              <EmotionRenderer
+                assetLinkLoader={assetLinkLoader}
+                assetUrl={emotionImage}
+                upDownAnimation
+                className="absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover"
+              />
+            ) : null}
           </div>
           {/* RESPONSE CONTAINER */}
           <div

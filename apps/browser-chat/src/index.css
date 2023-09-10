@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: rgb(12, 10, 29);
-}
-
 .App .scrollbar::-webkit-scrollbar {
   width: 0.3em;
 }

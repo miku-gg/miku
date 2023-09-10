@@ -7,6 +7,8 @@ export const TTSServicePropTypes = {
   emotion: PropTypes.string,
   prompt: PropTypes.string,
   voiceId: PropTypes.string,
+  readNonSpokenText: PropTypes.bool,
+  enabled: PropTypes.bool,
 };
 
 export interface TTSServiceConfig extends Miku.Services.ServiceConfig {

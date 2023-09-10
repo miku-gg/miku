@@ -1,11 +1,14 @@
 import { useEffect, useReducer, useState } from "react";
 import { toast } from "react-toastify";
 import * as MikuCore from "@mikugg/core";
+import * as MikuExtensions from "@mikugg/extensions";
 import botFactory from "../../libs/botFactory";
 import { useBot } from "../../libs/botLoader";
 import { CheckIcon, PencilIcon } from "@primer/octicons-react";
 import "./chat-history.css";
 import trim from "lodash.trim";
+import platformAPI from "../../libs/platformAPI";
+import { getAphroditeConfig } from "../../App";
 
 export const HistoryManagementButtons = ({
   onLoad,
@@ -244,13 +247,20 @@ export const HistoryConsole = () => {
       setEditedIndex(-1);
       return;
     }
+    const aphrodite = getAphroditeConfig();
     if (!trim(editedText)) {
+      if (aphrodite.enabled && lines[editedIndex].id) {
+        platformAPI.deleteChatMessage(aphrodite.chatId, lines[editedIndex].id || '')
+      }
       lines.splice(editedIndex, 1);
     } else {
       lines[editedIndex] = {
         ...lines[editedIndex],
         text: editedText,
       };
+      if (aphrodite.enabled && lines[editedIndex].id) {
+        platformAPI.editChatMessage(aphrodite.chatId, lines[editedIndex].id || '', editedText)
+      }
     }
     memory?.clearMemories();
     lines.forEach((line) => {
@@ -259,6 +269,8 @@ export const HistoryConsole = () => {
     setEditedIndex(-1);
     forceUpdate();
   };
+
+  const showBasePrompt = !getAphroditeConfig().enabled;
 
   return (
     <div className="flex flex-col-reverse scrollbar h-full p-2.5 gap-3 overflow-y-scroll w-full font-mono text-sm text-white bg-[#323232] rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-{#323232} border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500">
@@ -276,20 +288,24 @@ export const HistoryConsole = () => {
         onEditedSubmit={updateMemoryLine}
       />
       {/* HISTORY CONTEXT */}
-      <div className="text-left w-full h-fi text-slate-400">
-        {history
-          ?.getContextPrompt()
-          .split("\n")
-          .map((text, i) => (
-            <p key={`basePrompt_${i}`}>{text}</p>
-          ))}
-        {history
-          ?.getInitiatorPrompt()
-          .split("\n")
-          .map((text, i) => (
-            <p key={`basePrompt_${i}`}>{text}</p>
-          ))}
-      </div>
+      {
+        showBasePrompt ? (
+          <div className="text-left w-full h-fi text-slate-400">
+            {history
+              ?.getContextPrompt()
+              .split("\n")
+              .map((text, i) => (
+                <p key={`basePrompt_${i}`}>{text}</p>
+              ))}
+            {history
+              ?.getInitiatorPrompt()
+              .split("\n")
+              .map((text, i) => (
+                <p key={`basePrompt_${i}`}>{text}</p>
+              ))}
+          </div>
+        ) : null
+      }
     </div>
   );
 };
