@@ -24,13 +24,13 @@ importers:
         specifier: workspace:^
         version: link:../../packages/bot-utils
       '@mikugg/core':
-        specifier: ^0.6.0
+        specifier: ^0.7.0
         version: link:../../packages/core
       '@mikugg/extensions':
-        specifier: ^0.6.3
+        specifier: ^0.7.0
         version: link:../../packages/extensions
       '@mikugg/ui-kit':
-        specifier: ^0.6.3
+        specifier: ^0.7.0
         version: link:../../packages/ui-kit
       '@types/axios':
         specifier: ^0.14.0
@@ -160,10 +160,10 @@ importers:
         specifier: workspace:^
         version: link:../../packages/bot-utils
       '@mikugg/core':
-        specifier: ^0.6.0
+        specifier: ^0.7.0
         version: link:../../packages/core
       '@mikugg/extensions':
-        specifier: ^0.6.3
+        specifier: ^0.7.0
         version: link:../../packages/extensions
       '@types/body-parser':
         specifier: ^1.19.2
@@ -239,7 +239,7 @@ importers:
         specifier: workspace:^
         version: link:../../packages/bot-utils
       '@mikugg/ui-kit':
-        specifier: workspace:^0.6.3
+        specifier: workspace:^0.7.0
         version: link:../../packages/ui-kit
       buffer:
         specifier: ^6.0.3
@@ -339,10 +339,10 @@ importers:
         specifier: workspace:^
         version: link:../../packages/bot-utils
       '@mikugg/core':
-        specifier: ^0.6.0
+        specifier: ^0.7.0
         version: link:../../packages/core
       '@mikugg/extensions':
-        specifier: ^0.6.3
+        specifier: ^0.7.0
         version: link:../../packages/extensions
       '@mui/material':
         specifier: ^5.11.10
@@ -436,7 +436,7 @@ importers:
   apps/services-server:
     dependencies:
       '@mikugg/extensions':
-        specifier: ^0.6.3
+        specifier: ^0.7.0
         version: link:../../packages/extensions
       '@types/body-parser':
         specifier: ^1.19.2
@@ -494,10 +494,10 @@ importers:
   packages/bot-utils:
     dependencies:
       '@mikugg/core':
-        specifier: ^0.6.0
+        specifier: ^0.7.0
         version: link:../core
       '@mikugg/extensions':
-        specifier: ^0.6.3
+        specifier: ^0.7.0
         version: link:../extensions
       '@types/node':
         specifier: ^18.15.5
@@ -613,7 +613,7 @@ importers:
         specifier: ^3.400.0
         version: 3.400.0
       '@mikugg/core':
-        specifier: ^0.6.0
+        specifier: ^0.7.0
         version: link:../core
       '@types/axios':
         specifier: ^0.14.0
