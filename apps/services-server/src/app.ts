@@ -22,10 +22,7 @@ const SBERT_SIMILARITY_API_TOKEN = '';
 const AUDIO_FILE_PATH = '_temp';
 
 const app = express();
-app.use(cors({
-  credentials: true,
-  origin: ['http://localhost:5173', 'https://alpha.miku.gg', 'https://interactor.miku.gg']
-}));
+app.use(cors());
 app.use(bodyParser.json());
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
