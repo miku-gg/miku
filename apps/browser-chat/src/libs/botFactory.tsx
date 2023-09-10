@@ -129,6 +129,7 @@ class BotFactory {
             signer: signer,
             memory: memory,
           });
+          break;
       case MikuExtensions.Services.ServicesNames.Aphrodite:
         chatPromptCompleter =
           new MikuExtensions.ChatPromptCompleters.AphroditePromptCompleter({
