@@ -1,4 +1,5 @@
 import { MikuCard } from '@mikugg/extensions';
+import { DEFAULT_MUSIC } from '..';
 export { MikuCard, TavernCardV2 } from '@mikugg/extensions';
 
 export const LICENSES = [
@@ -94,11 +95,13 @@ export function validateMikuCard(card: MikuCard): string[] {
   const backgrounds = new Map<string, typeof mikugg.backgrounds[0]>();
   const emotion_groups = new Map<string, typeof mikugg.emotion_groups[0]>();
   const voices = new Map<string, typeof mikugg.voices[0]>();
+  const sounds = new Map<string, { id: string, name: string, source: string }>();
 
   mikugg.scenarios.forEach(scenario => scenarios.set(scenario.id, scenario));
   mikugg.backgrounds.forEach(background => backgrounds.set(background.id, background));
   mikugg.emotion_groups.forEach(emotion_group => emotion_groups.set(emotion_group.id, emotion_group));
   mikugg.voices.forEach(voice => voices.set(voice.id, voice));
+  mikugg.sounds?.forEach(sound => sounds.set(sound.id, sound));
   
   // check start scenario
   if (!scenarios.has(mikugg.start_scenario))
@@ -116,7 +119,11 @@ export function validateMikuCard(card: MikuCard): string[] {
     for (const child_scenario of scenario.children_scenarios)
       if (!scenarios.has(child_scenario))
         errors.push(`${scenario.id}: ${child_scenario} not found in children_scenarios`);
-  }
+
+    if (!sounds.has(scenario.music || '') && !DEFAULT_MUSIC.includes(scenario.music || '')) {
+      errors.push(`${scenario.id}: ${scenario.music} not found in mikugg.sounds`)
+    }
+   }
 
   // check license
   if (!LICENSES.includes(mikugg.license))
@@ -128,6 +135,12 @@ export function validateMikuCard(card: MikuCard): string[] {
       errors.push(`${emotion_group.id}: Invalid emotion group template ${emotion_group.template}`)
     } else {
       const emotions_ids = new Map<string, string[]>(emotion_group.emotions.map(emotion => [emotion.id, emotion.source]));
+
+      // check each emotion has valid or null sound
+      for (const emotion of emotion_group.emotions) {
+        if (emotion.sound && !sounds.has(emotion.sound))
+          errors.push(`${emotion_group.id}: ${emotion.id}: ${emotion.sound} not found in mikugg.sounds`)
+      }
 
       // eslint-disable-next-line
       // @ts-ignore

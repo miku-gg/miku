@@ -75,10 +75,15 @@ export const App = () => {
   let servicesEndpoint = import.meta.env.VITE_SERVICES_ENDPOINT || "http://localhost:8585";
 
   let assetLinkLoader = (asset: string, format?: string) => {
+    let endpoint = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT;
+    if (format === 'audio') {
+      endpoint = import.meta.env.VITE_AUDIO_DIRECTORY_ENDPOINT;
+      format = '';
+    }
     if (aphrodite.enabled) {
       return `${aphrodite.assetsUrl}/${format ? `${format}_` : ''}${asset}`;
     } else {
-      let assetsEndpoint = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT || "http://localhost:8585/image";
+      let assetsEndpoint = endpoint || "http://localhost:8585/image";
       return `${assetsEndpoint}/${asset}${format ? `_${format}` : ''}`;
     }
   }

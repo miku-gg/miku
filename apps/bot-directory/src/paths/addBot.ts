@@ -1,6 +1,6 @@
 import fs, { readFileSync } from 'fs';
 import { Request, Response } from "express";
-import { MikuCard, extractCardFromBuffer, extractMikuCardImages, validateMikuCard, itemsEmbedder } from "@mikugg/bot-utils";
+import { MikuCard, extractCardFromBuffer, validateMikuCard, itemsEmbedder, extractMikuCardAssets } from "@mikugg/bot-utils";
 import config from '../config';
 import { resizeImages } from '../libs/assetResize';
 const Hash = require('ipfs-only-hash');
@@ -29,6 +29,16 @@ const addImage = async (hash: string, base64URL: string): Promise<string> => {
   return hash;
 }
 
+// hashes the image, store is it IMG_PATH and returns the hash
+const addAudio = async (hash: string, base64URL: string): Promise<string> => {
+  const imgPath = `${config.AUDIO_PATH}/${hash}`;
+  if (!fs.existsSync(imgPath)) {
+    const imgBuffer = Buffer.from(base64URL.split(',')[1], 'base64');
+    fs.writeFileSync(imgPath, imgBuffer);
+  }
+  return hash;
+}
+
 // Registers a bot configuration
 export default async function addBot(req: Request, res: Response) {
   try {
@@ -42,9 +52,12 @@ export default async function addBot(req: Request, res: Response) {
     if(!mikuCard?.data?.extensions?.mikugg?.scenarios?.length) throw 'Invalid card: extension.mikugg.scenarios not found or is empty';
     const errors = validateMikuCard(mikuCard);
     if (errors.length) throw errors.join('\n');
-    const {card: _extractedMikuCard, images } = await extractMikuCardImages(mikuCard);
+    const {card: _extractedMikuCard, images, audios } = await extractMikuCardAssets(mikuCard);
     for (const [key, value] of images.entries()) {
       await addImage(key, value);
+    }
+    for (const [key, value] of audios.entries()) {
+      await addAudio(key, value)
     }
     const _extractedMikuCardHash = await Hash.of(JSON.stringify(_extractedMikuCard));
     const cardPath = `${config.BOT_PATH}/${_extractedMikuCardHash}`;

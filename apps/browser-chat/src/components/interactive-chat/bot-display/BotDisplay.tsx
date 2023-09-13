@@ -34,6 +34,7 @@ import { trackEvent } from "../../../libs/analytics";
 import platformAPI from "../../../libs/platformAPI";
 import { getAphroditeConfig } from "../../../App";
 import { PromptCompleterEndpointType } from "../../../libs/botSettingsUtils";
+import MusicPlayer from "../../music/MusicPlayer";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -151,8 +152,10 @@ export const BotDisplay = () => {
     onUpdate,
   } = useContext(InteractiveResponsesContext);
   const [contextSuggestion, setContextSuggestion] = useState<string>("");
+  const scenario = card?.data.extensions.mikugg.scenarios.find(scenario => scenario.id === currentContext);
+  const music = card?.data?.extensions?.mikugg?.sounds?.find(sound => sound.id === scenario?.music)?.source || ''
 
-  let backgroundImage = card?.data.extensions.mikugg.backgrounds.find(bg => bg.id === card?.data.extensions.mikugg.scenarios.find(scenario => scenario.id === currentContext)?.background || '')?.source || '';
+  let backgroundImage = card?.data.extensions.mikugg.backgrounds.find(bg => bg.id === scenario?.background || '')?.source || '';
   let emotionImage = response?.emotion || prevResponse?.emotion || "";
   if (!emotionImage) {
     const openAIEmotionConfig = botConfig?.outputListeners.find(
@@ -330,6 +333,13 @@ export const BotDisplay = () => {
               </div>
             </div>
             <div className="flex gap-4">
+              {
+                music ? (
+                  <MusicPlayer
+                    src={assetLinkLoader(music, 'audio')}
+                  />
+                ) : null
+              }
               <div className="inline-flex">
                 <button
                   className="rounded-full"
