@@ -65,7 +65,7 @@ const Dropdown = ({
         <DownArrow />
       </div>
       {expanded && (
-        <div className="dropdown__list" role="listbox">
+        <div className="dropdown__list scrollbar" role="listbox">
           {items.map((item, index) => (
             <div
               key={index}

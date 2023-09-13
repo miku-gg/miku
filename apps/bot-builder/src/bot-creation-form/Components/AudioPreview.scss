@@ -1,0 +1,16 @@
+.AudioPreview {
+  audio {
+    display: none;
+  }
+
+  &__play-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

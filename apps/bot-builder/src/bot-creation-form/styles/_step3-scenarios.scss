@@ -17,6 +17,13 @@
     }
   }
 
+  &__scenario-music {
+    margin-top: 20px;
+    background-color: $background-1;
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+
   &__start-and-voice {
     display: flex;
     justify-content: space-between;
