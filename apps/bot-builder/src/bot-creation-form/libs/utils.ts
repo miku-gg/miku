@@ -13,6 +13,6 @@ export const hashBase64URI = async (base64Content: string): Promise<string> => {
   return hashBase64(base64Content.split(',')[1]);
 }
 
-export const checkImageDimensionsAndType = (file: File, types = ['image/png']): boolean => {
+export const checkFileType = (file: File, types = ['image/png']): boolean => {
   return types.includes(file.type);
 }
