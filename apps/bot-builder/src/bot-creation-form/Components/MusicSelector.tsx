@@ -3,7 +3,7 @@ import './MusicSelector.scss';
 import { Button, Modal } from '@mikugg/ui-kit';
 import { useState } from 'react';
 
-export const ASSETS_ENDPOINT = import.meta.env.VITE_AUDIO_DIRECTORY_ENDPOINT || 'http://localhost:8585/audio';
+export const ASSETS_ENDPOINT = import.meta.env.VITE_AUDIO_DIRECTORY_ENDPOINT || 'https://assets.miku.gg/audio';
 
 interface Music {
   name: string;
