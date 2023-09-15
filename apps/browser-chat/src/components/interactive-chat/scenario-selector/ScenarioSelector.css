@@ -1,5 +1,6 @@
 .ScenarioSelector {
   position: relative;
+  display: inline-flex;
 }
 
 .ScenarioSelector__trigger {
@@ -16,7 +17,7 @@
 
 .ScenarioSelector__list-container {
   position: absolute;
-  display: hidden;
+  display: none;
   left: 0;
   top: 28px;
   border-radius: 4px;

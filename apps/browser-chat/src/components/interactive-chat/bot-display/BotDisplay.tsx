@@ -378,7 +378,7 @@ export const BotDisplay = () => {
                 assetLinkLoader={assetLinkLoader}
                 assetUrl={emotionImage}
                 upDownAnimation
-                className="absolute bottom-0 h-[80%] z-1 conversation-bot-image object-cover"
+                className="absolute bottom-0 h-[90%] z-1 conversation-bot-image object-cover"
               />
             ) : null}
           </div>

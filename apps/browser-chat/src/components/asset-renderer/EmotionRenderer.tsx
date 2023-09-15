@@ -22,9 +22,14 @@ export default function EmotionRenderer({
     async function fetchFile() {
       try {
         setLoading(true);
-        const response = await fetch(
+        let response = await fetch(
           assetLinkLoader(assetUrl, '480p')
         );
+        if (!response.ok) {
+          response = await fetch(
+            assetLinkLoader(assetUrl)
+          )
+        }
         if (response.ok) {
           const contentType = response.headers.get("Content-Type");
           const data = await response.blob();

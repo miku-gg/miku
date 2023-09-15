@@ -7,7 +7,7 @@ export interface SBertEmotionRendererParams {
   props: SBertEmotionInterpreterProps;
 }
 
-export type SBertEmotionRendererOutput = Core.OutputListeners.DialogOutputEnvironment & {emotion: string, imgHash: string, nextContextId: string, shouldContextChange: boolean};
+export type SBertEmotionRendererOutput = Core.OutputListeners.DialogOutputEnvironment & {emotion: string, imgHash: string, nextContextId: string, shouldContextChange: boolean, audio?: string};
 
 
 export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SBertEmotionRendererOutput> {
@@ -48,6 +48,7 @@ export class SBertEmotionRenderer extends Core.OutputListeners.SimpleListener<SB
         shouldContextChange: result.shouldContextChange,
         nextContextId: result.nextContextId,
         emotion: emotion.id,
+        audio: emotion.audio || '',
         imgHash: emotion.hashes[0] || ''
       }
     } catch (e) {

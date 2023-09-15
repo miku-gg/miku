@@ -9,7 +9,7 @@ interface MusicPlayerProps {
 const MusicPlayer: React.FC<MusicPlayerProps> = ({ src }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState<boolean>(false);
-  const [volume, setVolume] = useState<number>(1);
+  const [volume, setVolume] = useState<number>(0.2);
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -32,6 +32,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ src }) => {
 
   useEffect(() => {
     if (audioRef.current) {
+      audioRef.current.volume = volume;
       audioRef.current.play().catch((error) => {
         console.error("Autoplay error:", error);
         setPlaying(false);

@@ -372,7 +372,7 @@ const Step3Scenarios: React.FC = () => {
               label="Prompt context"
               onChange={handleTextChange}
               value={selectedScenario.context}
-              maxLength={256}
+              isTextArea
             />
           </div>
           <div>
