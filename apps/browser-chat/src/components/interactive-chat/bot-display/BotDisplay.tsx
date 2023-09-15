@@ -490,9 +490,11 @@ export const BotDisplay = () => {
           Conversation History
         </p>
         <ChatHistory />
-        <div className="w-full flex justify-center gap-7 pb-3 flex-wrap red-500 text-red-500">
-          <HistoryManagementButtons onLoad={() => onUpdate()} />
-        </div>
+        {botConfigSettings.promptCompleterEndpoint.type !== PromptCompleterEndpointType.APHRODITE ? (
+          <div className="w-full flex justify-center gap-7 pb-3 flex-wrap red-500 text-red-500">
+            <HistoryManagementButtons onLoad={() => onUpdate()} />
+          </div>
+        ) : null}
       </PopUp>
       <PopUp
         closePopUpFunction={() => setHandleBotDetailsInfo(false)}
