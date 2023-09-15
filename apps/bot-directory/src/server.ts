@@ -54,6 +54,12 @@ app.get('/bot/:hash', getItem.bind(null, 'json', 'bots'));
 app.post('/image', multer().array('files'), addImage);
 app.get('/image/:hash', getItem.bind(null, 'image', 'imgs'));
 
+app.use('/audio', (req, res, next) => {
+  res.setHeader('Content-Type', 'audio/mpeg'); // MIME type for MP3
+  next();
+});
+app.use('/audio', express.static(config.AUDIO_PATH));
+
 app.post('/emotion', multer().single('file'), addEmotion);
 app.get('/emotion/:hash', getItem.bind(null, 'json', 'emotions'));
 

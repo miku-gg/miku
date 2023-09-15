@@ -206,15 +206,18 @@ export async function extractCardData(file: File): Promise<object> {
   return extractCardFromBuffer(buffer);
 }
 
-export const extractMikuCardImages = async (card: MikuCard): Promise<{
+export const extractMikuCardAssets = async (card: MikuCard): Promise<{
   images: Map<string, string>,
+  audios: Map<string, string>,
   card: MikuCard
 }> => {
   const { mikugg } = card.data.extensions;
   const images = new Map<string, string>([]);
+  const audios = new Map<string, string>([]);
 
   const profile_pic = await hashBase64URI(mikugg.profile_pic);
   images.set(profile_pic, mikugg.profile_pic);
+
   const backgrounds = await Promise.all(
     mikugg.backgrounds.map(async (bg) => {
       const bgHash = await hashBase64URI(bg.source);
@@ -225,6 +228,7 @@ export const extractMikuCardImages = async (card: MikuCard): Promise<{
       };
     })
   );
+
   const emotion_groups = await Promise.all(
     mikugg.emotion_groups.map(async (emotion_group) => {
       return {
@@ -247,6 +251,17 @@ export const extractMikuCardImages = async (card: MikuCard): Promise<{
     })
   );
 
+  const sounds = await Promise.all(
+    mikugg.sounds?.map(async (sound) => {
+      const soundHash = await hashBase64URI(sound.source);
+      audios.set(soundHash, sound.source);
+      return {
+        ...sound,
+        source: soundHash,
+      }
+    }) || []
+  );
+
   return {
     card: {
       ...card,
@@ -259,10 +274,12 @@ export const extractMikuCardImages = async (card: MikuCard): Promise<{
             profile_pic,
             backgrounds,
             emotion_groups,
+            sounds,
           },
         },
       },
     },
-    images
+    images,
+    audios
   };
 };

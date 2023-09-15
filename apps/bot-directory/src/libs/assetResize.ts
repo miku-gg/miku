@@ -22,8 +22,16 @@ export const resizeImages = async function (
   filenames: string[]
 ): Promise<void> {
   for (const filename of filenames) {
-    let fileBuffer = await readFunction(filename);
-    const metadata = await sharp(fileBuffer).metadata();
+    let fileBuffer;
+    let metadata;
+
+    try {
+      fileBuffer = await readFunction(filename);
+      metadata = await sharp(fileBuffer).metadata();    
+    } catch (e) {
+      console.error(`Error reading ${filename}: ${e}`);
+      continue;
+    }
 
     if (!['png', 'jpeg', 'gif'].includes(metadata.format as string)) {
       console.error(`${filename} is not a PNG, JPG or GIF image.`);

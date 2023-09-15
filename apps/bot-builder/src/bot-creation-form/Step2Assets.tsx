@@ -13,11 +13,12 @@ import {
   TextHeading,
 } from "@mikugg/ui-kit";
 
-import { checkImageDimensionsAndType } from "./libs/utils";
+import { checkFileType } from "./libs/utils";
 
 import { v4 as uuidv4 } from 'uuid';
 import { emotionTemplates } from "./data/emotions";
 import BackgroundSelector from "./Components/BackgroundSelector";
+import AudioPreview from "./Components/AudioPreview";
 
 const BackgroundsForm: React.FC = () => {
   const { card, setCard } = useCharacterCreationForm();
@@ -182,7 +183,8 @@ const EmotionsForm: React.FC = () => {
   const handleImageChange = async (
     file: File,
     groupIndex: number,
-    emotionId: string
+    emotionId: string,
+    isAudio?: boolean,
   ) => {
     if (file && card.data.extensions.mikugg.emotion_groups) {
       const reader = new FileReader();
@@ -190,6 +192,7 @@ const EmotionsForm: React.FC = () => {
       reader.onloadend = () => {
         const base64 = reader.result as string;
         const newGroups = [...card.data.extensions.mikugg.emotion_groups];
+        const sounds = [...(card.data.extensions.mikugg.sounds || [])];
         const emotionTemplate = emotionTemplates.find(
           (template) => template.id === newGroups[groupIndex].template
         );
@@ -202,13 +205,28 @@ const EmotionsForm: React.FC = () => {
         const emotions = newGroups[groupIndex].emotions || [];
         const emotionIndex = emotions.findIndex((img) => img.id === emotionId);
 
-        if (emotionIndex >= 0) {
-          emotions[emotionIndex].source = [base64];
+        if (isAudio) {
+          if (emotionIndex >= 0) {
+            let sound = sounds.find(sound => sound.source === base64);
+            if (!sound) {
+              sound = {
+                id: uuidv4(),
+                name: file.name,
+                source: base64,
+              };
+              sounds.push(sound);
+            }
+            emotions[emotionIndex].sound = sound.id;
+          }
         } else {
-          emotions.push({
-            id: emotionId,
-            source: [base64]
-          });
+          if (emotionIndex >= 0) {
+            emotions[emotionIndex].source = [base64];
+          } else {
+            emotions.push({
+              id: emotionId,
+              source: [base64]
+            });
+          }
         }
 
         newGroups[groupIndex].emotions = emotions;
@@ -222,6 +240,7 @@ const EmotionsForm: React.FC = () => {
               mikugg: {
                 ...(card.data.extensions.mikugg || {}),
                 emotion_groups: newGroups,
+                sounds,
               }
             }
           }
@@ -231,7 +250,6 @@ const EmotionsForm: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-
   const handleMultipleImageChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     groupIndex: number
@@ -262,25 +280,36 @@ const EmotionsForm: React.FC = () => {
             (img) => img.id === emotionId
           );
 
+          const previewSound = card.data.extensions.mikugg?.sounds?.find(sound => sound.id === PreviewImage?.sound);
+
           return (
-            <DragAndDropImages
-              key={`emotion_${emotionId}_group_${group.template}_${groupIndex}`}
-              size="sm"
-              dragAreaLabel={emotionId}
-              handleChange={(file) =>
-                handleImageChange(file, groupIndex, emotionId)
+            <div className="step2Assets__emotionPreview" key={`emotion_${emotionId}_group_${group.template}_${groupIndex}`}>
+              <DragAndDropImages
+                size="sm"
+                dragAreaLabel={emotionId}
+                handleChange={(file) => {
+                  handleImageChange(file, groupIndex, emotionId, file.type === 'audio/mpeg')
+                }}
+                previewImage={PreviewImage?.source[0]}
+                placeHolder="(1024x1024)"
+                errorMessage="Please upload PNG, GIF or WEBM."
+                onFileValidate={(file) =>
+                  checkFileType(file, [
+                    "image/png",
+                    "image/gif",
+                    "video/webm",
+                    "audio/mpeg",
+                  ])
+                }
+              />
+              {
+                previewSound ? (
+                  <div className="step2Assets__audioPreview">
+                    <AudioPreview src={previewSound.source} />
+                  </div>
+                ) : null
               }
-              previewImage={PreviewImage?.source[0]}
-              placeHolder="(1024x1024)"
-              errorMessage="Please upload PNG, GIF or WEBM."
-              onFileValidate={(file) =>
-                checkImageDimensionsAndType(file, [
-                  "image/png",
-                  "image/gif",
-                  "video/webm",
-                ])
-              }
-            />
+            </div>
           );
         });
       };

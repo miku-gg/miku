@@ -86,6 +86,7 @@ export const mikuCardToBotConfig = (card: MikuCard): BotConfig => {
               "emotion_embeddings": emotionTemplates.get(emotion_group?.template as EmotionTemplateSlug) || "",
               "emotion_images": emotion_group?.emotions.map(emotion => ({
                 id: emotion.id,
+                audio: emotion.sound,
                 hashes: emotion.source
               })),
             }

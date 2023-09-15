@@ -107,5 +107,12 @@
 
   .step2Assets__emotionPreview {
     max-width: 100%;
+    position: relative;
+  }
+
+  .step2Assets__audioPreview {
+    position: absolute;
+    top: 10px;
+    right: 10px;
   }
 }

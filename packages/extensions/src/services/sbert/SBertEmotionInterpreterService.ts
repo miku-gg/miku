@@ -17,6 +17,7 @@ const EmotionContextPropTypes = {
   context_change_trigger: PropTypes.string.isRequired,
   emotion_images: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string.isRequired,
+    audio: PropTypes.string,
     hashes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
   }).isRequired).isRequired,
 };

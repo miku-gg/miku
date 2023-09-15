@@ -6,6 +6,7 @@ import { useCharacterCreationForm } from "./CharacterCreationFormContext";
 import { MikuCard } from "@mikugg/bot-utils";
 import VoiceSelector from "./Components/VoiceSelector";
 import { BackgroundIcon, SlidesIcon } from "./assets/svg";
+import MusicSelector, { ASSETS_ENDPOINT } from "./Components/MusicSelector";
 
 const BackgroundSelector: React.FC<{scenarioId: string}> = ({ scenarioId }) => {
   const { card, setCard } = useCharacterCreationForm();
@@ -199,6 +200,10 @@ const Step3Scenarios: React.FC = () => {
     title: 'New',
   });
 
+  const music = selectedScenario.music ? card.data.extensions.mikugg.sounds?.find(
+    (music) => music.id === selectedScenario.music
+  ) || {name: selectedScenario.music, source: `${ASSETS_ENDPOINT}/${selectedScenario.music}`} : { name: '', source: '' };
+
   const handleTextChange = (event: {target: {name: string, value: string}}) => {
     const { name, value } = event.target;
     const newCard = {
@@ -367,7 +372,7 @@ const Step3Scenarios: React.FC = () => {
               label="Prompt context"
               onChange={handleTextChange}
               value={selectedScenario.context}
-              maxLength={256}
+              isTextArea
             />
           </div>
           <div>
@@ -390,6 +395,44 @@ const Step3Scenarios: React.FC = () => {
               maxLength={256}
             />
           </div>
+        </div>
+        <div className="step3Scenarios__scenario-music">
+          <MusicSelector selectedMusic={music} onChange={(_music, isDefault) => {
+            const newCard = { ...card };
+            if (isDefault) {
+              newCard.data.extensions.mikugg.scenarios[selectedScenarioIndex].music = _music.name;
+            } else if (_music.source) {
+              let sound: {
+                id: string;
+                name: string;
+                source: string;
+              } | null = newCard.data.extensions.mikugg.sounds?.find((_sound) => _sound.name === _music.name) || null;
+
+              if (!sound) {
+                sound = {
+                  id: uuidv4(),
+                  name: _music.name,
+                  source: _music.source,
+                };
+              }
+
+              newCard.data.extensions.mikugg.sounds = [...(newCard.data.extensions.mikugg.sounds || []), sound];
+              newCard.data.extensions.mikugg.scenarios[selectedScenarioIndex].music = sound.id;
+            } else {
+              newCard.data.extensions.mikugg.scenarios[selectedScenarioIndex].music = '';
+            }
+
+            newCard.data.extensions.mikugg.sounds = newCard.data.extensions.mikugg.sounds?.filter((_music) => {
+              return (
+                newCard.data.extensions.mikugg.scenarios.find((_scenario) => _scenario.music === _music.id) ||
+                newCard.data.extensions.mikugg.emotion_groups.find(
+                  (_emotion_group) => _emotion_group.emotions.find((_emotion) => _emotion.sound === _music.id)
+                )
+              );
+            });
+
+            setCard(newCard);
+          }} />
         </div>
         {
           scenarios.length > 1 ? (

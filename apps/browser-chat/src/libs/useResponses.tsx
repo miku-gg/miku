@@ -59,7 +59,7 @@ export const InteractiveResponsesContextProvider = ({
   const [isAudioSubscribed, setIsAudioSubscribed] = useState<boolean>(false);
   const [currentContext, setCurrentContext] = useState<string>("");
   const [_, onUpdate] = useReducer((x) => x + 1, 0);
-  let { botConfig, card } = useBot();
+  let { botConfig, card, assetLinkLoader } = useBot();
   const [botNumber, setBotNumber] = useState<number>(0);
 
   let response: BotReponse | null = null;
@@ -91,7 +91,10 @@ export const InteractiveResponsesContextProvider = ({
       } else {
         const firstScenario = card?.data.extensions.mikugg.scenarios.find(scenario => card?.data.extensions.mikugg.start_scenario === scenario.id);
         const firstEmotionGroup = card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
-        let firstImage = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'happy')?.source[0] : firstEmotionGroup?.emotions[0].source[0];
+        let firstEmotion = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'happy') : firstEmotionGroup?.emotions[0];
+        let firstImage = firstEmotion?.source[0];
+        let firstSoundId = firstEmotion?.sound;
+        let firstSound = card?.data.extensions.mikugg.sounds?.find(sound => sound.id === firstSoundId)?.source;
         let firstMessage = card?.data.first_mes || '';
         firstMessage = MikuExtensions.Memory.Strategies.fillTextTemplate(firstMessage, {
           bot: card?.data.name || '',
@@ -99,7 +102,10 @@ export const InteractiveResponsesContextProvider = ({
         });
         fillResponse('first', "text", firstMessage);
         fillResponse('first', "emotion", firstImage || '');
-        fillResponse('first', "audio", '');
+        fillResponse('first', "audio", firstSound);
+        if (firstSound) {
+          playAudio(assetLinkLoader(firstSound, 'audio'));
+        }
         setResponseIds(['first']);  
       }
       setResponseIndex(0);
@@ -127,6 +133,12 @@ export const InteractiveResponsesContextProvider = ({
       fillResponse(output.commandId, "text", output.text);
       fillResponse(output.commandId, "emotion", output.imgHash);
       onUpdate();
+
+
+      const audio = card?.data.extensions.mikugg.sounds?.find(sound => sound.id === output.audio)
+      if (audio?.source) {
+        playAudio(assetLinkLoader(audio.source, 'audio'));
+      }
     });
 
     bot?.subscribePromptSentError((commandId) => {

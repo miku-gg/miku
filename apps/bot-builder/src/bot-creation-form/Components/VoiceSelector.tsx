@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Dropdown } from "@mikugg/ui-kit";
 import { voices } from "../data/voices";
 import "./VoiceSelector.scss";
+import AudioPreview from "./AudioPreview";
 
 interface Voice {
   id: string
@@ -50,13 +51,7 @@ const VoiceSelector: React.FC<{voice: Voice, onChange: (voice: Voice) => void}> 
           )
         }
       />
-      <audio
-        src={`/voices/${voice.id}.mp3`}
-        controls
-        className="VoiceSelector__voicePreview"
-      >
-        Your browser does not support the audio element.
-      </audio>
+      <AudioPreview src={`/voices/${voice.id}.mp3`} />
     </div>
   );
 }

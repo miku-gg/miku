@@ -22,8 +22,13 @@ const SBERT_SIMILARITY_API_TOKEN = '';
 const AUDIO_FILE_PATH = '_temp';
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(bodyParser.json());
+// allow options on every requests
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, `${AUDIO_FILE_PATH}/`)

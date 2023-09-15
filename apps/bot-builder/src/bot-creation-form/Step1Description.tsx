@@ -8,7 +8,7 @@ import {
   TagAutocomplete,
   TextHeading,
 } from "@mikugg/ui-kit";
-import { checkImageDimensionsAndType } from "./libs/utils";
+import { checkFileType } from "./libs/utils";
 
 const DEFAULT_TAGS = [
   { value: 'Male' },
@@ -133,7 +133,7 @@ const Step1Description: React.FC = () => {
           previewImage={card.data.extensions.mikugg.profile_pic}
           placeHolder="(256x256)"
           onFileValidate={(file) =>
-            checkImageDimensionsAndType(file, ["image/png", "image/jpeg"])
+            checkFileType(file, ["image/png", "image/jpeg"])
           }
           errorMessage="Please upload an avatar with dimensions of 256x256 pixels."
         />
