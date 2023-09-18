@@ -39,10 +39,10 @@ const Carousel: React.FC<CarouselProps> = ({
       containerRef.current
     ) {
       const itemElements =
-        containerRef.current.querySelectorAll('.Carousel__item');
-      const selectedItemElement = itemElements[selectedIndex] as HTMLElement;
+        containerRef.current?.querySelectorAll('.Carousel__item');
+      const selectedItemElement = itemElements[selectedIndex];
 
-      selectedItemElement.scrollIntoView({
+      selectedItemElement?.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
         inline: 'center',

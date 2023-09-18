@@ -15,22 +15,15 @@ const DEFAULT_MUSIC_ITEM: Music[] = DEFAULT_MUSIC.sort().map(_name => ({
   source: `${ASSETS_ENDPOINT}/${_name}`,
 }));
 
-const stopAllAudio = (skip?: HTMLAudioElement) => {
-  document.querySelectorAll('audio').forEach((audio) => {
-    if (audio !== skip) {
-      audio.pause();
-    }
-  });
-}
-
 const MusicSelector = ({selectedMusic, onChange}: {
   selectedMusic: Music,
   onChange: (music: Music, isDefault: boolean) => void
 }): JSX.Element => {
   const [expanded, setExpanded] = useState<boolean>(false);
+  const [currentPlaying, setCurrentPlaying] = useState<string>('');
 
-  const handlePlay = (e: React.SyntheticEvent<HTMLAudioElement>) => {
-    stopAllAudio(e.nativeEvent.target as HTMLAudioElement);
+  const handlePlay = (source: string) => {
+    setCurrentPlaying(source);
   };
 
   return (
@@ -60,7 +53,7 @@ const MusicSelector = ({selectedMusic, onChange}: {
         opened={expanded}
         onCloseModal={() => {
           setExpanded(false);
-          stopAllAudio();
+          setCurrentPlaying('');
         }}
         shouldCloseOnOverlayClick>
           <div className="MusicSelector__defaults-selector">
@@ -73,17 +66,18 @@ const MusicSelector = ({selectedMusic, onChange}: {
                   <div className="MusicSelector__default-name">
                     {music.name}
                   </div>
-                  <div className="MusicSelector__default-source">
-                    {music.source ? <audio src={music.source} preload="none" className="MusicSelector__player" controls onPlay={handlePlay} /> : null}
-                  </div>
+                  <Button theme='transparent' onClick={() => {
+                    handlePlay(music.source);
+                  }}>Play</Button>
                   <Button theme='transparent' onClick={() => {
                     onChange(music, true);
                     setExpanded(false);
-                    stopAllAudio();
+                    setCurrentPlaying('');
                   }}>Select</Button>
                 </div>
               ))}
             </div>
+            {currentPlaying ? <audio src={currentPlaying} className="MusicSelector__player" controls autoPlay /> : null}
             <div className="MusicSelector__custom">
               <div className="MusicSelector__custom-title">
                 Custom music from file
@@ -100,7 +94,7 @@ const MusicSelector = ({selectedMusic, onChange}: {
                         source: result,
                       }, false);
                       setExpanded(false);
-                      stopAllAudio();
+                      setCurrentPlaying('');
                     };
                     reader.readAsDataURL(file);
                   }
