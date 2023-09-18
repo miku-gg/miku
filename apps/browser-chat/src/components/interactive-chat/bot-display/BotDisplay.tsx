@@ -153,7 +153,7 @@ export const BotDisplay = () => {
   } = useContext(InteractiveResponsesContext);
   const [contextSuggestion, setContextSuggestion] = useState<string>("");
   const scenario = card?.data.extensions.mikugg.scenarios.find(scenario => scenario.id === currentContext);
-  const music = card?.data?.extensions?.mikugg?.sounds?.find(sound => sound.id === scenario?.music)?.source || ''
+  const music = card?.data?.extensions?.mikugg?.sounds?.find(sound => sound.id === scenario?.music)?.source || scenario?.music || '';
 
   let backgroundImage = card?.data.extensions.mikugg.backgrounds.find(bg => bg.id === scenario?.background || '')?.source || '';
   let emotionImage = response?.emotion || prevResponse?.emotion || "";
