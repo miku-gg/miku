@@ -49,11 +49,11 @@ export class OobaboogaPromptCompleter extends Core.ChatPromptCompleters
   ): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
     const prompt = memory.buildMemoryPrompt();
     let result = "";
-    let isParsedResultSmall = false;
+    let isParsedResultSmall = true;
     let tries = 0;
 
     while (
-      (isParsedResultSmall || !hasTextStop(result, memory.getSubjects())) &&
+      (isParsedResultSmall && !hasTextStop(result, memory.getSubjects())) &&
       tries++ < 2
     ) {
       if (isParsedResultSmall) result = "";
