@@ -120,7 +120,7 @@ export function validateMikuCard(card: MikuCard): string[] {
       if (!scenarios.has(child_scenario))
         errors.push(`${scenario.id}: ${child_scenario} not found in children_scenarios`);
 
-    if (!sounds.has(scenario.music || '') && !DEFAULT_MUSIC.includes(scenario.music || '')) {
+    if (scenario.music && !sounds.has(scenario.music || '') && !DEFAULT_MUSIC.includes(scenario.music || '')) {
       errors.push(`${scenario.id}: ${scenario.music} not found in mikugg.sounds`)
     }
    }
