@@ -47,11 +47,11 @@ export class AphroditePromptCompleter extends Core.ChatPromptCompleters
     memory: Core.Memory.ShortTermMemory
   ): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
     let result = "";
-    let isParsedResultSmall = true;
+    let isParsedResultSmall = false;
     let tries = 0;
 
     while (
-      (isParsedResultSmall && !hasTextStop(result, memory.getSubjects())) &&
+      (isParsedResultSmall || !hasTextStop(result, memory.getSubjects())) &&
       tries++ < 2
     ) {
       if (isParsedResultSmall) result = "";
