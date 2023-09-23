@@ -526,7 +526,7 @@ export const BotDisplay = () => {
         className="gap-2 justify-between"
         darkTheme
       >
-        <p className="ml-4 text-start text-2xl text-white">Setings</p>
+        <p className="ml-4 text-start text-2xl text-white">Advanced Settings</p>
         <BotSettings botConfigSettings={botConfigSettings} onBotConfigSettingsChange={setBotConfigSettings} />
         <div className="w-full flex justify-center gap-2 flex-wrap red-500 text-red-500">
           <BotSettingsFooter botConfigSettings={botConfigSettings} onBotConfigSettingsChange={setBotConfigSettings} />

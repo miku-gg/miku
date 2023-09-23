@@ -20,18 +20,23 @@
   margin: 15px 0;
   align-items: center;
   border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .SettingsModal__text-speed p,
 .SettingsModal__text-font-size p,
 .SettingsModal__voice-speed p {
   flex: 1;
+  text-wrap: nowrap;
+
 }
 
 .SettingsModal__text-speed .slider-container,
 .SettingsModal__text-font-size .slider-container,
 .SettingsModal__voice-speed .slider-container {
-  flex: 2
+  flex: 2;
+  min-width: 200px;
 }
 
 .SettingsModal__voice {
@@ -52,11 +57,14 @@
   justify-content: flex-end;
   margin: 15px 0;
   flex: 1;
+  text-wrap: nowrap;
 }
 
 .SettingsModal__voice-header {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .SettingsModal__voice-header-title {
@@ -68,10 +76,13 @@
   justify-content: space-between;
   margin: 10px 0;
   align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .SettingsModal__voice-id p {
   flex: 2;
+  text-wrap: nowrap;
 }
 
 .SettingsModal__voice-id-input {
@@ -79,6 +90,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  min-width: 200px;
 }
 
 .SettingsModal__voice-id-input .dropdown__list {
@@ -91,6 +103,8 @@
   margin: 15px 0;
   align-items: center;
   border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .SettingsModal__voice-id-listen {
