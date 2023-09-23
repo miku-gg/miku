@@ -3,10 +3,12 @@ import * as MikuExtensions from "@mikugg/extensions";
 import { BotReponse, fillResponse, responsesStore } from "./responsesStore";
 import { useBot } from "./botLoader";
 import botFactory from "./botFactory";
-import { BotConfig } from "@mikugg/bot-utils";
 
-const playAudio = (base64: string): void => {
-  const snd = new Audio(base64);
+const snd = new Audio();
+
+const playAudio = (base64: string, speed = 1): void => {
+  snd.src = base64;
+  snd.playbackRate = speed;
   snd.play();
 };
 
@@ -26,9 +28,8 @@ export const InteractiveResponsesContext = createContext<{
   response: BotReponse | null;
   prevResponse: BotReponse | null;
   loading: boolean;
-  playAudio: (base64: string) => void;
+  playAudio: (base64: string, speed?: number) => void;
   onUpdate: () => void;
-  updateBotConfig: (bc: BotConfig) => void;
 }>({
   responseIds: [],
   responseIndex: 0,
@@ -45,7 +46,6 @@ export const InteractiveResponsesContext = createContext<{
   loading: false,
   playAudio: () => {},
   onUpdate: () => {},
-  updateBotConfig: () => {},
 });
 
 export const InteractiveResponsesContextProvider = ({
@@ -59,8 +59,7 @@ export const InteractiveResponsesContextProvider = ({
   const [isAudioSubscribed, setIsAudioSubscribed] = useState<boolean>(false);
   const [currentContext, setCurrentContext] = useState<string>("");
   const [_, onUpdate] = useReducer((x) => x + 1, 0);
-  let { botConfig, card, assetLinkLoader } = useBot();
-  const [botNumber, setBotNumber] = useState<number>(0);
+  let { botConfig, card, assetLinkLoader, botConfigSettings } = useBot();
 
   let response: BotReponse | null = null;
   let prevResponse: BotReponse | null = null;
@@ -71,22 +70,20 @@ export const InteractiveResponsesContextProvider = ({
     }
   }
 
-  const updateBotConfig = (bc: BotConfig) => {
-    botConfig = bc; // this doesn't trigger the useEFfect below for some reason so i have a number too
-    setBotNumber(botNumber + 1);
-  };
-
   useEffect(() => {
     const bot = botFactory.getInstance();
     if (botConfig && card && bot) {
       const memory = bot?.getMemory().getMemory() || [];
-      const lastMemoryLine = memory.length ? memory[memory.length - 1] : null;
 
-      if (lastMemoryLine?.id) {
-        setResponseIds([lastMemoryLine.id]);
-        const lastResponse = responsesStore.get(lastMemoryLine.id)
-        if (lastResponse?.scene) {
-          setCurrentContext(lastResponse.scene);
+      if (memory.length) {
+        const ids = memory.map(line => line.id || '').filter(id => id).reverse();
+        const lastId = ids.length ? ids[ids.length - 1] : null;
+        setResponseIds([...ids, 'first']);
+        if (lastId) {
+          const lastResponse = responsesStore.get(lastId)
+          if (lastResponse?.scene) {
+            setCurrentContext(lastResponse.scene);
+          }  
         }
       } else {
         const firstScenario = card?.data.extensions.mikugg.scenarios.find(scenario => card?.data.extensions.mikugg.start_scenario === scenario.id);
@@ -98,13 +95,13 @@ export const InteractiveResponsesContextProvider = ({
         let firstMessage = card?.data.first_mes || '';
         firstMessage = MikuExtensions.Memory.Strategies.fillTextTemplate(firstMessage, {
           bot: card?.data.name || '',
-          user: 'Anon'
+          user: botConfigSettings.text.name
         });
         fillResponse('first', "text", firstMessage);
         fillResponse('first', "emotion", firstImage || '');
         fillResponse('first', "audio", firstSound);
         if (firstSound) {
-          playAudio(assetLinkLoader(firstSound, 'audio'));
+          playAudio(assetLinkLoader(firstSound, 'audio'), botConfigSettings.voice.speed);
         }
         setResponseIds(['first']);  
       }
@@ -137,7 +134,7 @@ export const InteractiveResponsesContextProvider = ({
 
       const audio = card?.data.extensions.mikugg.sounds?.find(sound => sound.id === output.audio)
       if (audio?.source) {
-        playAudio(assetLinkLoader(audio.source, 'audio'));
+        playAudio(assetLinkLoader(audio.source, 'audio'), botConfigSettings.voice.speed);
       }
     });
 
@@ -153,14 +150,14 @@ export const InteractiveResponsesContextProvider = ({
       fillResponse(output.commandId, "audio", base64);
       onUpdate();
       if (base64) {
-        playAudio(base64);
+        playAudio(base64, botConfigSettings.voice.speed);
       }
     });
 
     if (audioSubscribed) {
       setIsAudioSubscribed(true);
     }
-  }, [card, botConfig, botNumber]);
+  }, [card, botConfig, botConfigSettings.voice.speed, botConfigSettings.text.name]);
 
   const loading =
     response?.loadingText ||
@@ -186,7 +183,6 @@ export const InteractiveResponsesContextProvider = ({
         onUpdate,
         currentContext,
         setCurrentContext,
-        updateBotConfig,
       }}
     >
       {children}

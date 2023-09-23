@@ -68,8 +68,8 @@ export const mikuCardToBotConfig = (card: MikuCard): BotConfig => {
         // @ts-ignore
         "service": voice?.provider || MikuExtensions.Services.ServicesNames.AzureTTS,
         "props": {
-          "voiceId": voice?.provider_voice_id  || "en-US-AriaNeural",
-          "emotion": voice?.provider_emotion || "neutral",
+          "voiceId": "en-US-JaneNeural",
+          "emotion": "neutral",
         }
       },
       {

@@ -1,0 +1,70 @@
+@import '../variables';
+.slider-container {
+  width: 100%;
+}
+
+.horizontal-slider {
+  width: 100%;
+  height: 6px;
+  background: #E0E0E0;
+}
+
+.track {
+  height: 100%;
+  transition: right 0.2s ease-out;
+  
+  &-0 {
+    // background: #9747ff;
+    // background linear gradient
+    background: linear-gradient(90deg, #9747ff 0%, #b280f5 100%);
+  }
+  
+  &-1 {
+    background: #9747ff2A;
+  }
+}
+
+.thumb {
+  width: 14px;
+  height: 14px;
+  background-color: #9747ff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0px 0px 6px 1px #9747ff;
+  top: -4px;
+  
+  transition: left 0.3s, box-shadow 0.3s, transform 0.3s; // Adding a transition for position, shadow, and scale changes
+  &:active {
+    transform: scale(1.1); // Slightly scale up the thumb on active/drag
+    // box-shadow: 0 0 0 5px #fff; // Adjust the shadow a bit when active
+  }
+}
+
+.label-container {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 15px;
+  position: relative;
+  padding-right: 10px;
+
+  .label {
+    font-size: .8rem;
+    cursor: pointer;
+    // flex: 1;
+    user-select: none;
+
+    &.active {
+      font-weight: bold;
+    }
+
+    &:last-child {
+      position: absolute;
+      right: 0px;
+    }
+
+    &:first-child {
+      position: absolute;
+      left: 0px;
+    }
+  }
+}

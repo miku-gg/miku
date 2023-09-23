@@ -103,6 +103,7 @@ export abstract class ChatPromptCompleter {
         type: Commands.CommandType.DIALOG,
         text: output.text,
         subject: this.memory.getBotSubject(),
+        id: command.commandId,
       });
       return output;
     } catch (error) {

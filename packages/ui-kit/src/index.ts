@@ -12,9 +12,11 @@ import Input from './components/Input';
 import Steps from './components/Steps';
 import Tag, { Colors } from './components/Tag';
 import TextHeading from './components/TextHeading';
+import TextEditable from './components/TextEditable';
 import CheckBox from './components/CheckBox';
 import Tooltip from './components/Tooltip';
 import TagAutocomplete from './components/TagAutocomplete';
+import Slider from './components/Slider';
 import * as Icons from './assets/svg';
 
 export {
@@ -33,8 +35,10 @@ export {
   Tag,
   TextHeading,
   Dropdown,
+  TextEditable,
   CheckBox,
   TagAutocomplete,
   Icons,
   Colors,
+  Slider,
 };

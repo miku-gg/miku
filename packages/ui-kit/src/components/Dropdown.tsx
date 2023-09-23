@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { DownArrow } from '../assets/svg';
 
@@ -8,22 +8,23 @@ interface Item {
   content?: React.ReactNode;
   description?: string;
   name: string;
+  value?: string;
 }
 
 interface DropdownProps {
   className?: string;
-  expanded: boolean;
+  expanded?: boolean;
   flavor?: 'default' | 'white';
   items: Item[];
   onChange: (index: number) => void;
-  onToggle: (expanded: boolean) => void;
+  onToggle?: (expanded: boolean) => void;
   placeholder?: string;
   selectedIndex: number;
 }
 
 const Dropdown = ({
   className = '',
-  expanded = false,
+  expanded,
   flavor = 'default',
   items,
   onChange,
@@ -31,13 +32,18 @@ const Dropdown = ({
   placeholder = 'Select an item...',
   selectedIndex = -1,
 }: DropdownProps) => {
+  const [_expanded, setExpanded] = useState<boolean>(false);
+  const isExpanded = expanded === undefined ? _expanded : expanded;
+
   const handleItemClick = (newSelectedIndex: number) => {
     onChange && onChange(newSelectedIndex);
     onToggle && onToggle(false);
+    setExpanded(false);
   };
 
   const handleToggleClick = () => {
-    onToggle && onToggle(!expanded);
+    onToggle && onToggle(!isExpanded);
+    setExpanded(!isExpanded);
   };
 
   const selectedItem = items[selectedIndex];
@@ -48,7 +54,7 @@ const Dropdown = ({
         className="dropdown__selected"
         onClick={handleToggleClick}
         aria-haspopup="listbox"
-        aria-expanded={expanded}
+        aria-expanded={isExpanded}
       >
         {selectedItem ? (
           <>
@@ -64,7 +70,7 @@ const Dropdown = ({
         )}
         <DownArrow />
       </div>
-      {expanded && (
+      {isExpanded && (
         <div className="dropdown__list scrollbar" role="listbox">
           {items.map((item, index) => (
             <div

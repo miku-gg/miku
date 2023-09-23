@@ -115,7 +115,7 @@ export const DEFAULT_APHRODITE_SETTINGS: AphroditeSettings = {
 
 export const DEFAULT_OOBABOOGA_SETTINGS: OobaboogaSettings = {
   temp: 0.7,
-  maxTokens: 100,
+  maxTokens: 200,
   topP: 0.9,
   topK: 0,
   typicalP: 1,
@@ -131,14 +131,14 @@ export const DEFAULT_OOBABOOGA_SETTINGS: OobaboogaSettings = {
   earlyStopping: false,
   addBosToken: true,
   banEosToken: false,
-  truncateLength: 2048,
+  truncateLength: 4096,
   stoppingStrings: "\nAnon:",
   skipSpecialTokens: true,
 };
 
 export const DEFAULT_KOBOLDAI_SETTINGS: KoboldAIsettings = {
   maxContextLength: 4096,
-  maxTokens: 60,
+  maxTokens: 200,
   temp: 0.6,
   topP: 0.9,
   topK: 40,
@@ -240,12 +240,19 @@ export interface BotConfigSettings {
   }
   promptStrategy: PromptStrategy
   embeddingsService: EmbeddingsService
+  text: {
+    name: string
+    speed: number
+    fontSize: number
+  }
   voice: {
     enabled: boolean
+    speed: number
     readNonSpokenText: boolean
     voiceService: {
       type: VoiceServiceType
       voiceId: string
+      emotion?: string
     }
   },
 }
@@ -261,12 +268,19 @@ export const DEFAULT_BOT_SETTINGS: BotConfigSettings = {
     type: STTEndpointType.WHISPER
   },
   embeddingsService: EmbeddingsService.SBERT,
+  text: {
+    name: 'Anon',
+    speed: 80,
+    fontSize: 1
+  },
   voice: {
     enabled: false,
+    speed: 1,
     readNonSpokenText: false,
     voiceService: {
       type: VoiceServiceType.AZURE_TTS,
-      voiceId: ''
+      voiceId: 'en-US-SaraNeural',
+      emotion: 'whispering'
     }
   }
 };
