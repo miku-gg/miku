@@ -7,6 +7,7 @@ import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import platformAPI from "./platformAPI";
 import { fillResponse } from "./responsesStore";
+import debounce from "lodash.debounce";
 
 export interface BotLoaderProps {
   assetLinkLoader: (asset: string, format?: string) => string;
@@ -141,7 +142,30 @@ export function getBotDataFromURL(): BotData {
     settings: (function (): BotConfigSettings {
       try {
         const jsonString = MikuCore.Services.decode(String(searchParams['settings'] || '') || '');
-        return JSON.parse(jsonString) as BotConfigSettings;
+        const settings = JSON.parse(jsonString) as BotConfigSettings;
+        const voiceProps = settings.voice?.voiceService?.voiceId ? {
+          voiceId: settings.voice?.voiceService?.voiceId,
+          emotion: settings.voice?.voiceService?.emotion
+        } : {
+          voiceId: DEFAULT_BOT_SETTINGS.voice.voiceService.voiceId,
+          emotion: DEFAULT_BOT_SETTINGS.voice.voiceService.emotion,
+        }
+        return {
+          ...settings,
+          text: {
+            ...DEFAULT_BOT_SETTINGS.text,
+            ...(settings.text || {}),
+          },
+          voice: {
+            ...DEFAULT_BOT_SETTINGS.voice,
+            ...(settings.voice || {}),
+            voiceService: {
+              ...DEFAULT_BOT_SETTINGS.voice.voiceService,
+              ...(settings.voice?.voiceService || {}),
+              ...voiceProps
+            }
+          }
+        }
       } catch (e) {
         console.warn('Unable to load settings.')
         return DEFAULT_BOT_SETTINGS;
@@ -196,7 +220,6 @@ export function useBot(): {
   // Get data from url params
 
   const _botLoadCallback = useCallback((_hash: string = getBotHashFromUrl(), _botData: BotData = getBotDataFromURL()) =>{
-    setLoading(true);
     setBotHash(_hash);
     const isDifferentBot = getBotHashFromUrl() !== _hash;
     let memoryLines = botFactory.getInstance()?.getMemory().getMemory() || [];
@@ -205,6 +228,7 @@ export function useBot(): {
         let decoratedConfig = res.bot;
         decoratedConfig = {
           ...res.bot,
+          subject: _botData.settings.text.name,
           prompt_completer: {
             service: (function (): MikuExtensions.Services.ServicesNames {
               switch (_botData.settings.promptCompleterEndpoint.type) {
@@ -244,6 +268,7 @@ export function useBot(): {
                       prompt: "",
                       gradioEndpoint: "",
                       botHash: _hash,
+                      userName: _botData.settings.text.name,
                     }
                 }
               })()
@@ -253,7 +278,8 @@ export function useBot(): {
             ...res.bot.short_term_memory,
             props: {
               ...res.bot.short_term_memory.props,
-              buildStrategySlug: _botData.settings.promptStrategy
+              buildStrategySlug: _botData.settings.promptStrategy,
+              subjects: [_botData.settings.text.name],
             }
           }
         }
@@ -314,7 +340,7 @@ export function useBot(): {
           memoryLines = chat.data.chatMessages.map((message) => ({
             id: message.id,
             type: MikuCore.Commands.CommandType.DIALOG,
-            subject: message.isBot ? decoratedConfig.bot_name : 'Anon',
+            subject: message.isBot ? decoratedConfig.bot_name : _botData.settings.text.name,
             text: message.text,
           }));
           if (chat.data.chatMessages.length) {
@@ -352,16 +378,18 @@ export function useBot(): {
     };
     _botLoadCallback(newBotData.hash, newBotData);
   }, [setBotConfigSettings, _botLoadCallback])
+  
 
   return {
     card,
     botHash,
     botConfig,
     botConfigSettings,
-    setBotConfigSettings: _setBotConfigSettings,
+    setBotConfigSettings: debounce(_setBotConfigSettings, 200),
     loading,
     error,
     setBotHash: (_hash?: string, _botData?: BotData) => {
+      setLoading(true);
       _botLoadCallback(_hash, _botData);
     },
     assetLinkLoader,

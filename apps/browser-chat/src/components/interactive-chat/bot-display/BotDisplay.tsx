@@ -20,11 +20,11 @@ import {
 import { BotDetails } from "../../bot-details/BotDetails";
 import "./BotDisplay.css";
 import { LeftArrow, RightArrow, Dice, Wand } from "../../../assets/icons/svg";
-import { UnmuteIcon } from "@primer/octicons-react";
+import { GearIcon, HistoryIcon, SlidersIcon, UnmuteIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
-import { BotConfigV1, BotConfigV2 } from "@mikugg/bot-utils";
+import { Slider, Input, Modal, TextEditable } from "@mikugg/ui-kit";
 import { BotSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
 import ScenarioSelector from "../scenario-selector/ScenarioSelector";
@@ -35,6 +35,7 @@ import platformAPI from "../../../libs/platformAPI";
 import { getAphroditeConfig } from "../../../App";
 import { PromptCompleterEndpointType } from "../../../libs/botSettingsUtils";
 import MusicPlayer from "../../music/MusicPlayer";
+import SettingsModal, { SettingsState } from "../../settings/SettingsModal";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -94,7 +95,9 @@ export let botSettings: BotSettings = {
 
 const alreadyAnimated = new Set<string>();
 
-function AnimateResponse({ text, fast }: { text: string, fast: boolean }): JSX.Element {
+
+type Speed = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89 | 90 | 91 | 92 | 93 | 94 | 95 | 96 | 97 | 98 | 99;
+function AnimateResponse({ text, speed }: { text: string, speed: number }): JSX.Element {
   const [parts, setParts] = useState<{content: string, isItalic: boolean, id: string}[]>([]);
   const [partIndex, setPartIndex] = useState<number>(0);
 
@@ -123,7 +126,7 @@ function AnimateResponse({ text, fast }: { text: string, fast: boolean }): JSX.E
             () => setPartIndex(index => Math.min(index + 1, parts.length - 1))
           ]}
           wrapper="span"
-          speed={fast ? 99 : 70}
+          speed={speed as Speed}
         />
       ))}
     </>
@@ -133,9 +136,15 @@ function AnimateResponse({ text, fast }: { text: string, fast: boolean }): JSX.E
 export const BotDisplay = () => {
   const { card, botHash, botConfig, botConfigSettings, setBotConfigSettings, assetLinkLoader } = useBot();
   const [showHistory, setShowHistory] = useState<Boolean>(false);
+  let responseFontSize = [
+    "text-sm",
+    "text-base",
+    "text-lg"
+  ][botConfigSettings.text.fontSize];
   const [handleBotDetailsInfo, setHandleBotDetailsInfo] =
     useState<boolean>(false);
-  const [showBotSettings, setShowBotSettings] = useState<boolean>(false);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState<boolean>(false);
   const {
     responseIds,
     setResponseIds,
@@ -218,7 +227,8 @@ export const BotDisplay = () => {
 
   const handleHistoryButtonClick = () => setShowHistory(true);
   const displayBotDetails = () => setHandleBotDetailsInfo(true);
-  const handleSettingsButtonClick = () => setShowBotSettings(true);
+  const handleSettingsButtonClick = () => setShowSettings(true);
+  const handleAdvancedSettingsButtonClick = () => setShowAdvancedSettings(true);
 
   const onRightClick = (event: React.UIEvent) => {
     if (responseIndex > 0 && responseIds.length > 0) {
@@ -299,6 +309,7 @@ export const BotDisplay = () => {
           text,
           type: MikuCore.Commands.CommandType.DIALOG,
           subject: shortTermMemory.getBotSubject(),
+          id: responseId,
         });
       }
     }
@@ -332,7 +343,7 @@ export const BotDisplay = () => {
                 }
               </div>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4 text-white">
               {
                 music ? (
                   <MusicPlayer
@@ -340,21 +351,29 @@ export const BotDisplay = () => {
                   />
                 ) : null
               }
-              <div className="inline-flex">
+              <div className="inline-flex transition-colors hover:text-[#A78BFA]">
                 <button
                   className="rounded-full"
                   onClick={handleHistoryButtonClick}
                 >
-                  <img src={historyIcon} />
+                  <HistoryIcon size={24} />
+                </button>
+              </div>
+              <div className="inline-flex transition-colors hover:text-[#A78BFA]">
+                <button
+                  className="rounded-full"
+                  onClick={handleSettingsButtonClick}
+                >
+                  <GearIcon size={24} />
                 </button>
               </div>
               {botConfigSettings.promptCompleterEndpoint.type !== PromptCompleterEndpointType.APHRODITE ? (
-                <div className="inline-flex">
+                <div className="inline-flex transition-colors hover:text-[#A78BFA]">
                   <button
                     className="rounded-full"
-                    onClick={handleSettingsButtonClick}
+                    onClick={handleAdvancedSettingsButtonClick}
                   >
-                    <img src={settingsIcon} />
+                    <SlidersIcon size={24} />
                   </button>
                 </div>
               ) : null}
@@ -395,8 +414,8 @@ export const BotDisplay = () => {
                 {!response || loading ? (
                   <Loader />
                 ) : (
-                  <div className="text-md font-bold text-gray-200 text-left">
-                    <AnimateResponse text={response?.text || ''} fast={responseIndex > 0} />
+                  <div className={`font-bold text-gray-200 text-left ${responseFontSize}`}>
+                    <AnimateResponse text={response?.text || ''} speed={botConfigSettings.text.speed} />
                   </div>
                 )}
               </div>
@@ -430,7 +449,7 @@ export const BotDisplay = () => {
               {!loading && response?.audio ? (
                 <button
                   className="audio-button absolute bottom-3 left-3 inline-flex items-center gap-2 text-gray-400 rounded-md hover:text-white"
-                  onClick={() => playAudio(response?.audio || "")}
+                  onClick={() => playAudio(response?.audio || "", botConfigSettings.voice.speed)}
                 >
                   <UnmuteIcon size={24} />
                 </button>
@@ -468,13 +487,46 @@ export const BotDisplay = () => {
           </div>
         </div>
       </div>
+      <SettingsModal
+        value={{
+          name: botConfigSettings.text.name,
+          textSpeed: botConfigSettings.text.speed,
+          textFontSize: botConfigSettings.text.fontSize,
+          voiceEnabled: botConfigSettings.voice.enabled,
+          voiceId: botConfigSettings.voice.voiceService.voiceId,
+          voiceEmotion: botConfigSettings.voice.voiceService.emotion,
+          voiceSpeed: botConfigSettings.voice.speed,
+        }}
+        onChange={(value) => {
+          setBotConfigSettings({
+            ...botConfigSettings,
+            text: {
+              ...botConfigSettings.text,
+              name: value.name,
+              speed: value.textSpeed,
+              fontSize: value.textFontSize,
+            },
+            voice: {
+              ...botConfigSettings.voice,
+              enabled: value.voiceEnabled,
+              voiceService: {
+                ...botConfigSettings.voice.voiceService,
+                emotion: value.voiceEmotion,
+                voiceId: value.voiceId,
+              },
+              speed: value.voiceSpeed,
+            },
+          })
+        }}
+        opened={showSettings}
+        onClose={() => setShowSettings(false)} />
       <PopUp
-        closePopUpFunction={() => setShowBotSettings(false)}
-        isShowingPupUp={showBotSettings}
+        closePopUpFunction={() => setShowAdvancedSettings(false)}
+        isShowingPupUp={showAdvancedSettings}
         className="gap-2 justify-between"
         darkTheme
       >
-        <p className="ml-4 text-start text-2xl text-white">Setings</p>
+        <p className="ml-4 text-start text-2xl text-white">Advanced Settings</p>
         <BotSettings botConfigSettings={botConfigSettings} onBotConfigSettingsChange={setBotConfigSettings} />
         <div className="w-full flex justify-center gap-2 flex-wrap red-500 text-red-500">
           <BotSettingsFooter botConfigSettings={botConfigSettings} onBotConfigSettingsChange={setBotConfigSettings} />

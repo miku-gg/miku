@@ -72,7 +72,7 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
     let prompt = this.promptbuildStrategy.buildContextPrompt(this.promptParts);
     prompt = Strategies.fillTextTemplate(prompt, {
       bot: this.promptParts.botSubject,
-      user: 'Anon'
+      user: this.subjects.length ? this.subjects[0] : 'Anon'
     });
     return prompt;    
   }
@@ -81,7 +81,7 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
     let prompt = this.promptbuildStrategy.buildInitiatorPrompt(this.promptParts);
     prompt = Strategies.fillTextTemplate(prompt, {
       bot: this.promptParts.botSubject,
-      user: 'Anon'
+      user: this.subjects.length ? this.subjects[0] : 'Anon'
     })
     return prompt;
   }
@@ -132,7 +132,7 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
 
     prompt = Strategies.fillTextTemplate(prompt, {
       bot: this.promptParts.botSubject,
-      user: 'Anon'
+      user: this.subjects.length ? this.subjects[0] : 'Anon'
     });
 
     return prompt;

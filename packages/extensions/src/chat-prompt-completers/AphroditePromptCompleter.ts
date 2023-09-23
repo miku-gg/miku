@@ -58,7 +58,6 @@ export class AphroditePromptCompleter extends Core.ChatPromptCompleters
       result += await this.service.query(
         {
           ...this.getProps(),
-          userName: 'Anon',
           messages: this.getChatMessages(memory)
         },
         await this.getCost('')

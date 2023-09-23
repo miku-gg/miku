@@ -3,21 +3,23 @@ import Tooltip from './Tooltip';
 import { InfoIcon } from '../assets/svg';
 import './Input.scss';
 
-interface InputProps {
+export interface InputProps {
   className?: string;
   errors?: string;
   icon?: string;
   iconPosition?: 'left' | 'right' | '';
   id?: string;
   isTextArea?: boolean;
+  disabled?: boolean;
   label?: string;
   maxLength?: number;
   name?: string;
-  onChange?: (
-    event: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => void;
+  onChange?: (event: {
+    target: {
+      name: string;
+      value: string;
+    };
+  }) => void;
   onSubmit?: () => void;
   onBlur?: (event?: React.FocusEvent<any>) => void;
   placeHolder?: string;
@@ -34,6 +36,7 @@ const Input = ({
   iconPosition = '',
   id,
   isTextArea = false,
+  disabled = false,
   label,
   maxLength,
   name,
@@ -86,6 +89,7 @@ const Input = ({
                 className="Input__textArea scrollbar"
                 onChange={onChange}
                 onBlur={onBlur}
+                disabled={disabled}
                 value={value}
                 placeholder={placeHolder}
                 id={id}
@@ -98,6 +102,7 @@ const Input = ({
                 placeholder={placeHolder}
                 onChange={onChange}
                 onBlur={onBlur}
+                disabled={disabled}
                 value={value}
                 name={name}
                 maxLength={maxLength}
