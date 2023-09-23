@@ -338,22 +338,21 @@ export function useBot(): {
         ) {
           const chat = await platformAPI.getChat(_botData.settings.promptCompleterEndpoint.genSettings.chatId);
           memoryLines = chat.data.chatMessages.map((message) => ({
-            id: message.id,
+            id: message.isBot ? message.id : undefined,
             type: MikuCore.Commands.CommandType.DIALOG,
             subject: message.isBot ? decoratedConfig.bot_name : _botData.settings.text.name,
             text: message.text,
           }));
-          if (chat.data.chatMessages.length) {
-            const lastMessage = chat.data.chatMessages[chat.data.chatMessages.length - 1];
-            const firstScenario = res.card?.data.extensions.mikugg.scenarios.find(_scenario => lastMessage.sceneId === _scenario.id);
+          chat.data.chatMessages.filter(message => message.isBot).map((message) => {
+            const firstScenario = res.card?.data.extensions.mikugg.scenarios.find(_scenario => message.sceneId === _scenario.id);
             const firstEmotionGroup = res.card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
-            let firstImage = firstEmotionGroup?.emotions?.find(emotion => emotion?.id === lastMessage.emotionId)?.source[0] || firstEmotionGroup?.emotions[0].source[0];
+            let firstImage = firstEmotionGroup?.emotions?.find(emotion => emotion?.id === message.emotionId)?.source[0] || firstEmotionGroup?.emotions[0].source[0];
 
-            fillResponse(lastMessage.id, "text", lastMessage.text);
-            fillResponse(lastMessage.id, "emotion", firstImage);
-            fillResponse(lastMessage.id, "audio", '');
-            fillResponse(lastMessage.id, "scene", lastMessage.sceneId);
-          }
+            fillResponse(message.id, "text", message.text);
+            fillResponse(message.id, "emotion", firstImage);
+            fillResponse(message.id, "audio", '');
+            fillResponse(message.id, "scene", message.sceneId);
+          });
         }
         if (!isDifferentBot && memoryLines.length) {
           const memory = botFactory.getInstance()?.getMemory();

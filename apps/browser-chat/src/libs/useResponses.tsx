@@ -75,6 +75,20 @@ export const InteractiveResponsesContextProvider = ({
     if (botConfig && card && bot) {
       const memory = bot?.getMemory().getMemory() || [];
 
+      const firstScenario = card?.data.extensions.mikugg.scenarios.find(scenario => card?.data.extensions.mikugg.start_scenario === scenario.id);
+      const firstEmotionGroup = card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
+      let firstEmotion = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'happy') : firstEmotionGroup?.emotions[0];
+      let firstImage = firstEmotion?.source[0];
+      let firstMessage = card?.data.first_mes || '';
+      firstMessage = MikuExtensions.Memory.Strategies.fillTextTemplate(firstMessage, {
+        bot: card?.data.name || '',
+        user: botConfigSettings.text.name
+      });
+
+      fillResponse('first', "text", firstMessage);
+      fillResponse('first', "emotion", firstImage || '');
+      fillResponse('first', "audio", '');
+
       if (memory.length) {
         const ids = memory.map(line => line.id || '').filter(id => id).reverse();
         const lastId = ids.length ? ids[ids.length - 1] : null;
@@ -86,20 +100,8 @@ export const InteractiveResponsesContextProvider = ({
           }  
         }
       } else {
-        const firstScenario = card?.data.extensions.mikugg.scenarios.find(scenario => card?.data.extensions.mikugg.start_scenario === scenario.id);
-        const firstEmotionGroup = card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
-        let firstEmotion = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'happy') : firstEmotionGroup?.emotions[0];
-        let firstImage = firstEmotion?.source[0];
         let firstSoundId = firstEmotion?.sound;
         let firstSound = card?.data.extensions.mikugg.sounds?.find(sound => sound.id === firstSoundId)?.source;
-        let firstMessage = card?.data.first_mes || '';
-        firstMessage = MikuExtensions.Memory.Strategies.fillTextTemplate(firstMessage, {
-          bot: card?.data.name || '',
-          user: botConfigSettings.text.name
-        });
-        fillResponse('first', "text", firstMessage);
-        fillResponse('first', "emotion", firstImage || '');
-        fillResponse('first', "audio", firstSound);
         if (firstSound) {
           playAudio(assetLinkLoader(firstSound, 'audio'), botConfigSettings.voice.speed);
         }

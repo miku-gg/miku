@@ -72,8 +72,15 @@ export const voices: {
 ]
 
 const SettingsModal = (props: SettingsModalProps): JSX.Element => {
-  const settings = props.value;
-  const setSettings = props.onChange;
+  const [settings, _setRawSettings] = useState<SettingsState>(props.value);
+  const setSettings = (_settings: SettingsState) => {
+    _setRawSettings(_settings);
+    props.onChange(_settings);
+  };
+
+  useEffect(() => {
+    _setRawSettings(props.value);
+  }, [props.value]);
   return (
     <Modal opened={props.opened} onCloseModal={props.onClose} shouldCloseOnOverlayClick>
       <div className="SettingsModal scrollbar">
