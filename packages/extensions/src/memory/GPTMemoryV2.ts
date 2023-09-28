@@ -116,8 +116,8 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
     let memorySize = this.memorySize;
     let memoryLinesPrompt = '';
 
-    // Entire prompt under 2048 tokens
-    const MAX_PROMPT_TOKENS = 1800;
+    // Entire prompt under 4096 tokens
+    const MAX_PROMPT_TOKENS = 3600;
     do {
       memoryLinesPrompt = this.buildMemoryLinesPrompt(memorySize--);
     } while (
