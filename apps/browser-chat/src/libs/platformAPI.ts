@@ -38,6 +38,7 @@ export interface ChatMessageInput {
 
 class PlatformAPIClient {
   private readonly client: AxiosInstance;
+  private lastMessageId: string | null = null;
 
   constructor(token?: string) {
     this.client = axios.create({ baseURL: import.meta.env.VITE_PLATFORM_API || '', withCredentials: true });
@@ -54,6 +55,9 @@ class PlatformAPIClient {
 
   async getChat(chatId: string): Promise<APIResponse<Chat>> {
     const response: AxiosResponse<Chat> = await this.client.get(`/chat/${chatId}`);
+    if (response.data.chatMessages.length) {
+      this.lastMessageId = response.data.chatMessages[response.data.chatMessages.length - 1].id;
+    }
     return response;
   }
 
@@ -66,7 +70,9 @@ class PlatformAPIClient {
     firstMessage: ChatMessage,
     secondMessage: ChatMessage,
   }>> {
-    return await this.client.post(`/chat/${chatId}/messages`, { firstMessage, secondMessage });
+    const response = await this.client.post(`/chat/${chatId}/messages`, { firstMessage, secondMessage });
+    this.lastMessageId = response.data.secondMessage.id;
+    return response;
   }
 
   async editChatMessage(chatId: string, messageId: string, text: string): Promise<APIResponse<ChatMessage>> {
@@ -75,6 +81,10 @@ class PlatformAPIClient {
 
   async deleteChatMessage(chatId: string, messageId: string): Promise<APIResponse<ChatMessage>> {
     return await this.client.delete(`/chat/${chatId}/message/${messageId}`);
+  }
+
+  getLastMessageId(): string | null {
+    return this.lastMessageId;
   }
 }
 

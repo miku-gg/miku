@@ -258,7 +258,6 @@ export const BotDisplay = () => {
       });
 
       const lastMemoryLine = memoryLines[memoryLines.length - 2];
-      const lastResponse = memoryLines[memoryLines.length - 1];
 
       event.preventDefault();
       setResponseIds((_responseIds) => {
@@ -268,9 +267,12 @@ export const BotDisplay = () => {
       });
       const aphrodite = getAphroditeConfig();
 
-      if (aphrodite.enabled && lastMemoryLine.id && lastResponse.id) {
-        await platformAPI.deleteChatMessage(aphrodite.chatId, lastResponse?.id || '');
-        await platformAPI.deleteChatMessage(aphrodite.chatId, lastMemoryLine?.id || '');
+      if (aphrodite.enabled && lastMemoryLine.id) {
+        const lastCommandId = platformAPI.getLastMessageId();
+        if (lastCommandId) {
+          platformAPI.deleteChatMessage(aphrodite.chatId, lastCommandId || '');
+          platformAPI.deleteChatMessage(aphrodite.chatId, lastMemoryLine?.id || '');  
+        }
       }
 
       const result = botFactory
@@ -300,10 +302,10 @@ export const BotDisplay = () => {
     const text = responsesStore.get(responseId)?.text;
     const aphrodite = getAphroditeConfig();
     if (aphrodite.enabled && memoryLines?.length) {
+      const lastCommandId = platformAPI.getLastMessageId();
       const newresponse = responsesStore.get(responseId);
-      const lastMemoryLine = memoryLines[memoryLines.length - 1];
-      if (lastMemoryLine?.id) {
-        platformAPI.editChatMessage(aphrodite.chatId, lastMemoryLine.id, newresponse?.text || '');
+      if (lastCommandId) {
+        platformAPI.editChatMessage(aphrodite.chatId, lastCommandId, newresponse?.text || '');
       }
     }
 
