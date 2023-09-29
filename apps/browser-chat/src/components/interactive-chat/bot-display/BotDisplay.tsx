@@ -156,10 +156,9 @@ export const BotDisplay = () => {
     response,
     prevResponse,
     playAudio,
-    currentContext,
-    setCurrentContext,
     onUpdate,
   } = useContext(InteractiveResponsesContext);
+  const currentContext = loading ? (prevResponse?.scene || response?.scene) : (response?.scene || card?.data.extensions.mikugg.start_scenario || '');
   const [contextSuggestion, setContextSuggestion] = useState<string>("");
   const scenario = card?.data.extensions.mikugg.scenarios.find(scenario => scenario.id === currentContext);
   const music = card?.data?.extensions?.mikugg?.sounds?.find(sound => sound.id === scenario?.music)?.source || scenario?.music || '';
@@ -215,12 +214,13 @@ export const BotDisplay = () => {
       );
       if (context) {
         bot.changeContext(_contextId);
-        setCurrentContext(_contextId);
         // @ts-ignore
-        bot.sendPrompt(
+        const result = bot.sendPrompt(
           `*${context.context_change_trigger}*`,
           MikuCore.Commands.CommandType.CONTEXT
         );
+        setResponsesGenerated(result ? [result.commandId] : []);
+
       }
     }
   };
@@ -288,7 +288,7 @@ export const BotDisplay = () => {
     }
   };
 
-  const onOptionClick = (responseId: string, event: React.UIEvent) => {
+  const onOptionClick = async (responseId: string, event: React.UIEvent) => {
     setResponseIds((_ids) => {
       const ids = [..._ids];
       ids.shift();
@@ -296,6 +296,17 @@ export const BotDisplay = () => {
     });
     const shortTermMemory = botFactory.getInstance()?.getMemory();
     const memoryLines = shortTermMemory?.getMemory();
+
+    const text = responsesStore.get(responseId)?.text;
+    const aphrodite = getAphroditeConfig();
+    if (aphrodite.enabled && memoryLines?.length) {
+      const newresponse = responsesStore.get(responseId);
+      const lastMemoryLine = memoryLines[memoryLines.length - 1];
+      if (lastMemoryLine?.id) {
+        platformAPI.editChatMessage(aphrodite.chatId, lastMemoryLine.id, newresponse?.text || '');
+      }
+    }
+
     if (shortTermMemory && memoryLines && memoryLines.length >= 2) {
       shortTermMemory.clearMemories();
       memoryLines.forEach((line, index) => {
@@ -303,7 +314,6 @@ export const BotDisplay = () => {
           shortTermMemory.pushMemory(line);
         }
       });
-      const text = responsesStore.get(responseId)?.text;
       if (text) {
         shortTermMemory.pushMemory({
           text,
@@ -337,8 +347,8 @@ export const BotDisplay = () => {
               }
               <div className="inline-flex">
                 {
-                  ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1 && responsesGenerated.length) ? (
-                    <ScenarioSelector value={currentContext} onChange={updateContext} />
+                  ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1 && (responsesGenerated.length || currentContext !== card?.data.extensions.mikugg.start_scenario)) ? (
+                    <ScenarioSelector value={currentContext || ''} onChange={updateContext} />
                   ) : null
                 }
               </div>

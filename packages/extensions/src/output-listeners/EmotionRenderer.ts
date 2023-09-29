@@ -8,7 +8,7 @@ export interface EmotionRendererParams {
   props: InferProps<typeof EmotionInterpreterPropTypes>;
 }
 
-export type EmotionRendererOutput = Core.OutputListeners.DialogOutputEnvironment & {emotion: string, imgHash: string, audio?: string};
+export type EmotionRendererOutput = Core.OutputListeners.DialogOutputEnvironment & {emotion: string, imgHash: string, audio?: string, nextContextId?: string};
 
 export class EmotionRenderer extends Core.OutputListeners.SimpleListener<EmotionRendererOutput> {
   private props: InferProps<typeof EmotionInterpreterPropTypes>

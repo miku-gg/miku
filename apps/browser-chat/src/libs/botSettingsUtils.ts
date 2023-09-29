@@ -115,7 +115,7 @@ export const DEFAULT_APHRODITE_SETTINGS: AphroditeSettings = {
 
 export const DEFAULT_OOBABOOGA_SETTINGS: OobaboogaSettings = {
   temp: 0.7,
-  maxTokens: 200,
+  maxTokens: 100,
   topP: 0.9,
   topK: 0,
   typicalP: 1,

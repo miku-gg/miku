@@ -338,12 +338,12 @@ export function useBot(): {
         ) {
           const chat = await platformAPI.getChat(_botData.settings.promptCompleterEndpoint.genSettings.chatId);
           memoryLines = chat.data.chatMessages.map((message) => ({
-            id: message.isBot ? message.id : undefined,
+            id: message.id,
             type: MikuCore.Commands.CommandType.DIALOG,
             subject: message.isBot ? decoratedConfig.bot_name : _botData.settings.text.name,
             text: message.text,
           }));
-          chat.data.chatMessages.filter(message => message.isBot).map((message) => {
+          const sceneIds = chat.data.chatMessages.filter(message => message.isBot).map((message) => {
             const firstScenario = res.card?.data.extensions.mikugg.scenarios.find(_scenario => message.sceneId === _scenario.id);
             const firstEmotionGroup = res.card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
             let firstImage = firstEmotionGroup?.emotions?.find(emotion => emotion?.id === message.emotionId)?.source[0] || firstEmotionGroup?.emotions[0].source[0];
@@ -352,7 +352,15 @@ export function useBot(): {
             fillResponse(message.id, "emotion", firstImage);
             fillResponse(message.id, "audio", '');
             fillResponse(message.id, "scene", message.sceneId);
+
+            return message.sceneId;
           });
+          const lastId = sceneIds.length ? sceneIds[sceneIds.length - 1] : null;
+          const emotionInterpreter = decoratedConfig.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter);
+          if (emotionInterpreter) {
+            const bot = botFactory.getInstance();
+            bot?.changeContext(lastId || res.card.data.extensions.mikugg.start_scenario)
+          }
         }
         if (!isDifferentBot && memoryLines.length) {
           const memory = botFactory.getInstance()?.getMemory();

@@ -23,8 +23,6 @@ export const InteractiveResponsesContext = createContext<{
   setResponsesGenerated: StateSetter<string[]>;
   isAudioSubscribed: boolean;
   setIsAudioSubscribed: StateSetter<boolean>;
-  currentContext: string;
-  setCurrentContext: StateSetter<string>;
   response: BotReponse | null;
   prevResponse: BotReponse | null;
   loading: boolean;
@@ -39,8 +37,6 @@ export const InteractiveResponsesContext = createContext<{
   setResponsesGenerated: () => {},
   isAudioSubscribed: false,
   setIsAudioSubscribed: () => {},
-  currentContext: "",
-  setCurrentContext: () => {},
   response: null,
   prevResponse: null,
   loading: false,
@@ -57,7 +53,6 @@ export const InteractiveResponsesContextProvider = ({
   const [responseIndex, setResponseIndex] = useState<number>(0);
   const [responsesGenerated, setResponsesGenerated] = useState<string[]>([]);
   const [isAudioSubscribed, setIsAudioSubscribed] = useState<boolean>(false);
-  const [currentContext, setCurrentContext] = useState<string>("");
   const [_, onUpdate] = useReducer((x) => x + 1, 0);
   let { botConfig, card, assetLinkLoader, botConfigSettings } = useBot();
 
@@ -88,17 +83,11 @@ export const InteractiveResponsesContextProvider = ({
       fillResponse('first', "text", firstMessage);
       fillResponse('first', "emotion", firstImage || '');
       fillResponse('first', "audio", '');
+      fillResponse('first', "scene", firstScenario?.id || '');
 
       if (memory.length) {
-        const ids = memory.map(line => line.id || '').filter(id => id).reverse();
-        const lastId = ids.length ? ids[ids.length - 1] : null;
+        const ids = memory.filter(line => line.subject === card?.data.name).map(line => line.id || '').filter(id => id).reverse();
         setResponseIds([...ids, 'first']);
-        if (lastId) {
-          const lastResponse = responsesStore.get(lastId)
-          if (lastResponse?.scene) {
-            setCurrentContext(lastResponse.scene);
-          }  
-        }
       } else {
         let firstSoundId = firstEmotion?.sound;
         let firstSound = card?.data.extensions.mikugg.sounds?.find(sound => sound.id === firstSoundId)?.source;
@@ -118,7 +107,6 @@ export const InteractiveResponsesContextProvider = ({
       if (sbertEmotionConfig) {
         const props =
           sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
-        setCurrentContext(props.start_context || "");
       }
     }
     bot?.subscribePromptSent((command) => {
@@ -131,6 +119,7 @@ export const InteractiveResponsesContextProvider = ({
     bot?.subscribeDialog((output) => {
       fillResponse(output.commandId, "text", output.text);
       fillResponse(output.commandId, "emotion", output.imgHash);
+      fillResponse(output.commandId, "scene", output.nextContextId);
       onUpdate();
 
 
@@ -183,8 +172,6 @@ export const InteractiveResponsesContextProvider = ({
         loading,
         playAudio,
         onUpdate,
-        currentContext,
-        setCurrentContext,
       }}
     >
       {children}
