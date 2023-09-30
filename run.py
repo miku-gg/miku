@@ -20,19 +20,24 @@ def main():
     if os.path.exists(browser_chat_vite_cache):
         shutil.rmtree(browser_chat_vite_cache)
 
+    # Check for --no-services flag
+    pnpm_command = [pnpm_path, "start:no-services"] if "--no-services" in sys.argv else [pnpm_path, "start"]
+
     # Start the pnpm servers
-    pnpm_process = subprocess.Popen([pnpm_path, "start"])
+    pnpm_process = subprocess.Popen(pnpm_command)
 
-    # Start the Python servers
-    os.chdir("apps/embeddings-apis/sentence-embedder")
-    sentence_embedder_process = subprocess.Popen([sys.executable, "app.py"])
-    os.chdir("../similarity-search")
-    similarity_search_process = subprocess.Popen([sys.executable, "app.py"])
+    # If --no-services flag is not set, start the Python servers
+    if "--no-services" not in sys.argv:
+        os.chdir("apps/embeddings-apis/sentence-embedder")
+        sentence_embedder_process = subprocess.Popen([sys.executable, "app.py"])
+        os.chdir("../similarity-search")
+        similarity_search_process = subprocess.Popen([sys.executable, "app.py"])
+        # Wait for the Python processes to finish
+        sentence_embedder_process.wait()
+        similarity_search_process.wait()
 
-    # Wait for the processes to finish
+    # Wait for the pnpm process to finish
     pnpm_process.wait()
-    sentence_embedder_process.wait()
-    similarity_search_process.wait()
 
 if __name__ == "__main__":
     main()

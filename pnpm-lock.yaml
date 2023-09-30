@@ -500,10 +500,10 @@ importers:
   packages/bot-utils:
     dependencies:
       '@mikugg/core':
-        specifier: ^0.7.0
+        specifier: ^0.7.3
         version: link:../core
       '@mikugg/extensions':
-        specifier: ^0.7.1
+        specifier: ^0.7.3
         version: link:../extensions
       '@types/node':
         specifier: ^18.15.5
@@ -619,7 +619,7 @@ importers:
         specifier: ^3.400.0
         version: 3.400.0
       '@mikugg/core':
-        specifier: ^0.7.0
+        specifier: ^0.7.3
         version: link:../core
       '@types/axios':
         specifier: ^0.14.0
