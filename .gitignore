@@ -4,3 +4,4 @@ node_modules/
 .npmrc
 apps/bot-directory/db/
 .DS_Store
+env/

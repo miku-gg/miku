@@ -4,7 +4,7 @@ This is the Mikugg project, which includes multiple applications and services. T
 
 ## Prerequisites
 
-- Python 3.9: Download and install from [https://www.python.org/downloads/](https://www.python.org/downloads/)
+- Python 3.10: Download and install from [https://www.python.org/downloads/](https://www.python.org/downloads/)
 - Node.js: Download and install from [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 - Pip: Download and install from [https://pip.pypa.io/en/stable/installation/](https://pip.pypa.io/en/stable/installation/)
 

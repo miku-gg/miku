@@ -1,7 +1,7 @@
 @echo off
 echo Checking if Python is installed...
-python --version >nul 2>&1 || (
-    echo ERROR: Python is not installed.
+python3.10 --version >nul 2>&1 || (
+    echo ERROR: Python 3.10 is not installed.
     echo Please install Python from https://www.python.org/downloads/ and add it to your PATH.
     echo Press any key to exit.
     pause >nul
@@ -39,6 +39,11 @@ if errorlevel 1 (
     pause >nul
     exit /b 1
 )
+
+echo Creating python virtual environment...
+call python3.10 -m venv env
+echo Activating python virtual environment...
+call .\env\Scripts\activate
 
 echo Installing Python dependencies...
 call pip install -r apps/embeddings-apis/sentence-embedder/requirements.txt

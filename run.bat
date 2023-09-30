@@ -1,6 +1,6 @@
 @echo off
-python --version >nul 2>&1 || (
-    echo Python is not installed. Please install Python from https://www.python.org/downloads/ and add it to your PATH.
+.\env\bin\python3 --version >nul 2>&1 || (
+    echo Python3.10 virtual environment is not installed. Please install the application from install.sh
     exit /b 1
 )
 call npm --version >nul 2>&1 || (
@@ -9,4 +9,4 @@ call npm --version >nul 2>&1 || (
 )
 
 echo Starting servers...
-call python run.py
+call .\env\bin\python3 run.py
