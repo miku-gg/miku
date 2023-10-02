@@ -1,19 +1,41 @@
 import * as Miku from "@mikugg/core";
-import OpenAI from "openai";
 import PropTypes, { InferProps } from "prop-types";
 import GPT3Tokenizer from "gpt3-tokenizer";
+import axios from "axios";
 import { GPTShortTermMemoryV2  } from "../../memory/GPTMemoryV2";
 import BotCardConnector, { parseAttributes, parseExampleMessages } from "./BotCardConnector";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 
 export interface AphroditeConfig {
-  model: string;
-  temperature: number;
-  max_tokens: number;
-  top_p: number;
-  frequency_penalty: number;
-  presence_penalty: number;
-  stop: string[];
+  max_new_tokens: number,
+  do_sample: boolean,
+  temperature: number,
+  top_p: number,
+  typical_p: number,
+  repetition_penalty: number,
+  repetition_penalty_range: number,
+  encoder_repetition_penalty: number,
+  top_k: number,
+  min_length: number,
+  no_repeat_ngram_size: number,
+  num_beams: number,
+  penalty_alpha: number,
+  length_penalty: number,
+  early_stopping: boolean,
+  seed: number,
+  add_bos_token: boolean,
+  stopping_strings: string[],
+  truncation_length: number,
+  ban_eos_token: boolean,
+  skip_special_tokens: boolean,
+  top_a: number,
+  tfs: number,
+  epsilon_cutoff: number,
+  eta_cutoff: number,
+  mirostat_mode: number,
+  mirostat_tau: number,
+  mirostat_eta: number,
+  use_mancer: boolean
 }
 
 const AphroditeMessagePropType = {
@@ -35,13 +57,15 @@ export interface AphroditePromptCompleterServiceConfig extends Miku.Services.Ser
   s3Bucket: string;
   s3Config: S3ClientConfig;
   aphroditeEndpoint: string;
+  aphroditeApiKey: string;
   aphoditeConfig: AphroditeConfig
 }
 
 export class AphroditePromptCompleterService extends Miku.Services.Service {
   private tokenizer: GPT3Tokenizer;
-  private openai: OpenAI;
   private botCardConnector: BotCardConnector;
+  private aphroditeEndpoint: string;
+  private aphroditeApiKey: string;
   private aphroditeConfig: AphroditeConfig;
   protected defaultProps: InferProps<
     typeof AphroditePromptCompleterServicePropTypes
@@ -57,9 +81,8 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
 
   constructor(config: AphroditePromptCompleterServiceConfig) {
     super(config);
-    this.openai = new OpenAI({
-      baseURL: config.aphroditeEndpoint,
-    });
+    this.aphroditeEndpoint = config.aphroditeEndpoint;
+    this.aphroditeApiKey = config.aphroditeApiKey;
     this.aphroditeConfig = config.aphoditeConfig;
     this.tokenizer = new GPT3Tokenizer({ type: "gpt3" });
     this.botCardConnector = new BotCardConnector(config.s3Bucket, config.s3Config);
@@ -69,7 +92,9 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
     input: InferProps<typeof this.propTypesRequired>
   ): Promise<string> {
     const prompt = await this.generatePrompt(input);
-    const completion = await this.simpleCompletion(prompt);
+    const gptTokens = this.tokenizer.encode(input.prompt).bpe.length;
+    if (gptTokens > 3800) return "";
+    const completion = await this.simpleCompletion(prompt, input.userName);
     return completion;
   }
 
@@ -109,24 +134,34 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
   }
 
   protected async simpleCompletion(
-    prompt: string
+    prompt: string,
+    userName: string
   ): Promise<string> {
-    const response = await this.openai.completions.create({
-      prompt,
-      ...this.aphroditeConfig
-    });
-    const choices = response?.choices || [];
-
-    return choices.length ? choices[0].text || "" : "";
+    const completion = await axios.post(
+      `${this.aphroditeEndpoint}/v1/generate`,
+      {
+        ...this.aphroditeConfig,
+        stopping_strings: [
+          ...this.aphroditeConfig.stopping_strings,
+          `\n${userName}:`,
+          `\n*${userName} `,
+        ],
+        prompt,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": this.aphroditeApiKey,
+        },
+      }
+    );
+    const result = completion?.data?.results?.length ? completion?.data?.results[0].text : '';
+    return result || '';
   }
 
   protected async calculatePrice(
     input: InferProps<typeof this.propTypesRequired>
   ): Promise<number> {
-    const modelSettings = JSON.parse(input.settings);
-    const gptTokens = this.tokenizer.encode(input.prompt).bpe.length;
-    return (
-      gptTokens + (modelSettings.maxTokens * Math.max(1, input.best_of) || 0)
-    );
+    return 0;
   }
 }

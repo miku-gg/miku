@@ -70,6 +70,7 @@ export class OobaboogaService extends Miku.Services.Service {
       {
         headers: {
           "Content-Type": "application/json",
+          "X-API-KEY": 'EMPTY',
         },
       }
     );

@@ -47,34 +47,23 @@ export class AphroditePromptCompleter extends Core.ChatPromptCompleters
     memory: Core.Memory.ShortTermMemory
   ): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
     let result = "";
-    let isParsedResultSmall = false;
-    let tries = 0;
+    result = await this.service.query(
+      {
+        ...this.getProps(),
+        messages: this.getChatMessages(memory)
+      },
+      0
+    );
 
-    while (
-      (isParsedResultSmall || !hasTextStop(result, memory.getSubjects())) &&
-      tries++ < 2
-    ) {
-      if (isParsedResultSmall) result = "";
-      result += await this.service.query(
-        {
-          ...this.getProps(),
-          messages: this.getChatMessages(memory)
-        },
-        await this.getCost('')
-      );
-
-      const resultParsed = parsePygmalionResponse(
-        result,
-        memory.getBotSubject(),
-        memory.getSubjects()
-      );
-      isParsedResultSmall = resultParsed.length < 4;
-      if (hasTextStop(result, memory.getSubjects()) && !isParsedResultSmall) {
-        result = resultParsed;
-        break;
-      }
+    const resultParsed = parsePygmalionResponse(
+      result,
+      memory.getBotSubject(),
+      memory.getSubjects()
+    );
+    if (hasTextStop(result, memory.getSubjects())) {
       result = resultParsed;
     }
+    result = resultParsed;
 
     return { text: result };
   }

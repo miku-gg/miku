@@ -23,7 +23,7 @@ export const parsePygmalionResponse = (
   const botSubject: string = _botSubject;
   const hasStop = hasTextStop(text, _subjects);
   const removeLineGroups = (text: string): string => {
-    return text.replace(/\n\n/g, "\n");
+    return text.replace(/\n\n\n/g, "\n");
   };
   const removeLastLineBreak = (text: string): string => {
     return text[text.length - 1] === "\n"
@@ -48,11 +48,6 @@ export const parsePygmalionResponse = (
   } else {
     text = trim(text);
     text = removeLastLineBreak(text);
-    const firstLineBreak = text.lastIndexOf("\n");
-    text = text.substring(
-      0,
-      firstLineBreak !== -1 ? firstLineBreak : text.length
-    );
   }
 
   text = trim(text);

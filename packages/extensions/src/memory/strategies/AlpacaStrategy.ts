@@ -27,14 +27,14 @@ export class AlpacaStrategy implements ContextPromptBuildStrategy {
   buildInitiatorPrompt(parts: ContextPromptParts): string {
     const { greeting, scenario } = parts;
     let prompt = '\nThen the roleplay chat between {{user}} and {{char}} begins.\n\n';
-    prompt += "### Response\n";
-    prompt += `${scenario}\n`;
+    prompt += "### Response (2 paragraphs, engaging, natural, authentic, descriptive, creative):\n";
+    prompt += scenario ? `${scenario}\n` : '';
     prompt += greeting + '\n';
     return prompt;
   }
 
   getResponseAskLine(): string {
-    return '### Response (one paragraph, engaging, natural, authentic, descriptive, creative):\n{{char}}: ';
+    return '### Response (2 paragraphs, engaging, natural, authentic, descriptive, creative):\n{{char}}: ';
   }
 
   getBotSubject(parts: ContextPromptParts): string {
