@@ -6,6 +6,9 @@ import { CustomEndpoints, getBotDataFromURL, setBotDataInURL } from "./botLoader
 import platformAPI from "./platformAPI";
 import { getAphroditeConfig } from "../App";
 import { AphroditeSettings, PromptCompleterEndpointType } from "./botSettingsUtils";
+import { ChatMessageInput, newChat, updateChat } from "./postMessage";
+import { v4 as uuidv4 } from 'uuid';
+import { responsesStore } from "./responsesStore";
 
 const MOCK_PRIVATE_KEY =
   "2658e4257eaaf9f72295ce012fa8f8cc4a600cdaf4051884d2c02593c717c173";
@@ -195,11 +198,28 @@ class BotFactory {
             const aphrodite = getAphroditeConfig();
             if (aphrodite.enabled) {
               const memoryLines = memory.getMemory();
+              const lastSentMessage = memoryLines[memoryLines.length - 2];
+              const firstMessage: ChatMessageInput = {
+                text: lastSentMessage.text,
+                isBot: false,
+                emotionId: output.emotion,
+                sceneId: output.nextContextId,
+                audioId: '',
+              };
+              const secondMessage: ChatMessageInput = {
+                text: output.text,
+                isBot: true,
+                emotionId: output.emotion,
+                sceneId: output.nextContextId,
+                audioId: '',
+              }
               let chatId = aphrodite.chatId;
               if (!chatId) {
-                const chat = await platformAPI.createChat(aphrodite.botId);
-                chatId = chat.data.id;
-                window?.parent?.postMessage({ type: 'chatId', payload: chatId }, '*');
+                chatId = uuidv4();
+                newChat(aphrodite.botId, chatId, [
+                  firstMessage,
+                  secondMessage
+                ]);
                 const botData = getBotDataFromURL();
                 setBotDataInURL({
                   ...botData,
@@ -214,27 +234,25 @@ class BotFactory {
                     }
                   }
                 })
+              } else {
+                updateChat(chatId, [
+                  ...memoryLines.slice(0, memoryLines.length - 2).map((line) => {
+                    const response = responsesStore.get(line.id || '');
+                    return {
+                      id: line.id,
+                      text: line.text,
+                      subject: line.subject,
+                      type: line.type,
+                      emotionId: response?.emotion || '',
+                      isBot: !!response,
+                      sceneId: response?.scene || '',
+                      audioId: response?.audio || '',
+                    };
+                  }),
+                  firstMessage,
+                  secondMessage
+                ], true);
               }
-              const lastSentMessage = memoryLines[memoryLines.length - 2];
-              const firstMessage = {
-                text: lastSentMessage.text,
-                isBot: false,
-                emotionId: output.emotion,
-                sceneId: output.nextContextId,
-              };
-              const secondMessage = {
-                text: output.text,
-                isBot: true,
-                emotionId: output.emotion,
-                sceneId: output.nextContextId,
-              }
-              const results = await platformAPI.createChatMessages(
-                chatId,
-                firstMessage,
-                secondMessage
-              );
-              memoryLines[memoryLines.length - 2].id = results?.data?.firstMessage?.id;
-              memoryLines[memoryLines.length - 1].id = results?.data?.secondMessage?.id;
             }
           })
         break;

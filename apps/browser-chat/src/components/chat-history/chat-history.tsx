@@ -9,6 +9,8 @@ import "./chat-history.css";
 import trim from "lodash.trim";
 import platformAPI from "../../libs/platformAPI";
 import { getAphroditeConfig } from "../../App";
+import { updateChat } from "../../libs/postMessage";
+import { responsesStore } from "../../libs/responsesStore";
 
 export const HistoryManagementButtons = ({
   onLoad,
@@ -249,23 +251,32 @@ export const HistoryConsole = () => {
     }
     const aphrodite = getAphroditeConfig();
     if (!trim(editedText)) {
-      if (aphrodite.enabled && lines[editedIndex].id) {
-        platformAPI.deleteChatMessage(aphrodite.chatId, lines[editedIndex].id || '')
-      }
       lines.splice(editedIndex, 1);
     } else {
       lines[editedIndex] = {
         ...lines[editedIndex],
         text: editedText,
       };
-      if (aphrodite.enabled && lines[editedIndex].id) {
-        platformAPI.editChatMessage(aphrodite.chatId, lines[editedIndex].id || '', editedText)
-      }
     }
     memory?.clearMemories();
     lines.forEach((line) => {
       memory?.pushMemory(line);
     });
+    if (aphrodite.enabled) {
+      updateChat(aphrodite.chatId, lines.map((line) => {
+        const response = responsesStore.get(line.id || '');
+        return {
+          id: line.id,
+          text: line.text,
+          subject: line.subject,
+          type: line.type,
+          emotionId: response?.emotion || '',
+          isBot: !!response,
+          sceneId: response?.scene || '',
+          audioId: response?.audio || '',
+        };
+      }), false)
+    }
     setEditedIndex(-1);
     forceUpdate();
   };
