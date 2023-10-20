@@ -36,6 +36,7 @@ import { getAphroditeConfig } from "../../../App";
 import { PromptCompleterEndpointType } from "../../../libs/botSettingsUtils";
 import MusicPlayer from "../../music/MusicPlayer";
 import SettingsModal, { SettingsState } from "../../settings/SettingsModal";
+import { updateChat } from "../../../libs/postMessage";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -265,15 +266,6 @@ export const BotDisplay = () => {
         responseIds.shift();
         return responseIds;
       });
-      const aphrodite = getAphroditeConfig();
-
-      if (aphrodite.enabled && lastMemoryLine.id) {
-        const lastCommandId = platformAPI.getLastMessageId();
-        if (lastCommandId) {
-          platformAPI.deleteChatMessage(aphrodite.chatId, lastCommandId || '');
-          platformAPI.deleteChatMessage(aphrodite.chatId, lastMemoryLine?.id || '');  
-        }
-      }
 
       const result = botFactory
         .getInstance()
@@ -300,14 +292,6 @@ export const BotDisplay = () => {
     const memoryLines = shortTermMemory?.getMemory();
 
     const text = responsesStore.get(responseId)?.text;
-    const aphrodite = getAphroditeConfig();
-    if (aphrodite.enabled && memoryLines?.length) {
-      const lastCommandId = platformAPI.getLastMessageId();
-      const newresponse = responsesStore.get(responseId);
-      if (lastCommandId) {
-        platformAPI.editChatMessage(aphrodite.chatId, lastCommandId, newresponse?.text || '');
-      }
-    }
 
     if (shortTermMemory && memoryLines && memoryLines.length >= 2) {
       shortTermMemory.clearMemories();
@@ -324,6 +308,23 @@ export const BotDisplay = () => {
           id: responseId,
         });
       }
+    }
+    const aphrodite = getAphroditeConfig();
+    const updatedMemoryLines = shortTermMemory?.getMemory();
+    if (aphrodite.enabled && updatedMemoryLines?.length) {
+      updateChat(aphrodite.chatId, updatedMemoryLines.map((line) => {
+        const response = responsesStore.get(line.id || '');
+        return {
+          id: line.id,
+          text: line.text,
+          subject: line.subject,
+          type: line.type,
+          emotionId: response?.emotion || '',
+          isBot: !!response,
+          sceneId: response?.scene || '',
+          audioId: response?.audio || '',
+        };
+      }), false)
     }
   };
 

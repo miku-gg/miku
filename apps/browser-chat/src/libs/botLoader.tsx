@@ -8,6 +8,7 @@ import * as MikuExtensions from "@mikugg/extensions";
 import platformAPI from "./platformAPI";
 import { fillResponse } from "./responsesStore";
 import debounce from "lodash.debounce";
+import { getChat } from "./postMessage";
 
 export interface BotLoaderProps {
   assetLinkLoader: (asset: string, format?: string) => string;
@@ -336,14 +337,14 @@ export function useBot(): {
           _botData.settings.promptCompleterEndpoint.type === PromptCompleterEndpointType.APHRODITE &&
           _botData.settings.promptCompleterEndpoint.genSettings.chatId
         ) {
-          const chat = await platformAPI.getChat(_botData.settings.promptCompleterEndpoint.genSettings.chatId);
-          memoryLines = chat.data.chatMessages.map((message) => ({
+          const narration = await getChat();
+          memoryLines = narration.narrationMessages.map((message) => ({
             id: message.id,
             type: MikuCore.Commands.CommandType.DIALOG,
             subject: message.isBot ? decoratedConfig.bot_name : _botData.settings.text.name,
             text: message.text,
           }));
-          const botMessages = chat.data.chatMessages.filter(message => message.isBot).map((message) => {
+          const botMessages = narration.narrationMessages.filter(message => message.isBot).map((message) => {
             const firstScenario = res.card?.data.extensions.mikugg.scenarios.find(_scenario => message.sceneId === _scenario.id);
             const firstEmotionGroup = res.card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
             let firstImage = firstEmotionGroup?.emotions?.find(emotion => emotion?.id === message.emotionId)?.source[0] || firstEmotionGroup?.emotions[0].source[0];

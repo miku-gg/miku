@@ -417,6 +417,9 @@ importers:
       '@types/react-toastify':
         specifier: ^4.1.0
         version: 4.1.0(react-dom@18.2.0)(react@18.2.0)
+      '@types/uuid':
+        specifier: ^9.0.1
+        version: 9.0.1
       '@vitejs/plugin-react':
         specifier: ^3.0.0
         version: 3.1.0(vite@4.0.0)
@@ -503,7 +506,7 @@ importers:
         specifier: ^0.7.3
         version: link:../core
       '@mikugg/extensions':
-        specifier: ^0.7.3
+        specifier: ^0.7.4
         version: link:../extensions
       '@types/node':
         specifier: ^18.15.5
@@ -7064,7 +7067,6 @@ packages:
 
   /@types/uuid@9.0.1:
     resolution: {integrity: sha512-rFT3ak0/2trgvp4yYZo5iKFEPsET7vKydKF+VRCxlQ9bpheehyAJH89dAkaLEq/j/RZXJIqcgsmPJKUP1Z28HA==}
-    dev: false
 
   /@types/yargs-parser@21.0.0:
     resolution: {integrity: sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==}
