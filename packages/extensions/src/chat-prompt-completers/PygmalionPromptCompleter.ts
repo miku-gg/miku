@@ -5,7 +5,7 @@ import { PygmalionServicePropTypes, ServicesNames } from "../services";
 
 const buildTextStops = (_subjects: string[]): string[] => {
   const subjects: string[] = _subjects.map((subject) => `${subject}:`);
-  return ["<|endoftext|>", "<START>", "USER:", "###", ...subjects];
+  return ["<|endoftext|>", "<START>", "USER:", "\n\n\n", "###", ...subjects];
 };
 
 export const hasTextStop = (text: string, _subjects: string[]): boolean => {
@@ -22,38 +22,46 @@ export const parsePygmalionResponse = (
 ): string => {
   const botSubject: string = _botSubject;
   const hasStop = hasTextStop(text, _subjects);
-  const removeLineGroups = (text: string): string => {
-    return text.replace(/\n\n\n/g, "\n");
-  };
   const removeLastLineBreak = (text: string): string => {
     return text[text.length - 1] === "\n"
       ? text.substring(0, text.length - 1)
       : text;
   };
+  const hasEvenQuotes = (text: string): boolean => {
+    const amountOfQuotes = text.split('"').length - 1;
+    const amountOfAsterisks = text.split("*").length - 1;
+    return amountOfQuotes % 2 === 0 && amountOfAsterisks % 2 === 0;
+  }
+
   text = text.split(`${botSubject}:`).join("");
   text = trim(text);
-  text = removeLineGroups(text);
   if (hasStop) {
     const stops = buildTextStops(_subjects);
-    text = text.substring(
-      0,
-      stops.reduce((prev, cur) => {
-        const subjectTextIndex = text.indexOf(cur);
-        return subjectTextIndex === -1
-          ? prev
-          : Math.min(prev, subjectTextIndex);
-      }, text.length)
-    );
-    text = removeLastLineBreak(text);
+    const firstStopIndex = stops.reduce((prev, cur) => {
+      const subjectTextIndex = text.indexOf(cur);
+      return subjectTextIndex === -1
+        ? prev
+        : Math.min(prev, subjectTextIndex);
+    }, text.length);
+    if (firstStopIndex !== text.length) {
+      text = text.substring(0, firstStopIndex);
+      text = removeLastLineBreak(text);
+    }
   } else {
     text = trim(text);
     text = removeLastLineBreak(text);
   }
 
   text = trim(text);
-  while (text.startsWith("!") || text.startsWith("?")) text = text.substring(1);
+  while (
+    text.length > 0 &&
+    (![".", "*", '"', "!", "?"].includes(text[text.length - 1]) || !hasEvenQuotes(text))
+  ) {
+    text = text.substring(0, text.length - 1);
+  }
 
   text = trim(text);
+  text = trim(text, '\n');
   return text;
 };
 
