@@ -3,6 +3,7 @@ import { TTSServicePropTypes } from "../services/tts/TTSService";
 import { InferProps } from "prop-types";
 import { ServicesNames } from "../services";
 import trim from "lodash.trim";
+import { replaceAll } from "../memory/strategies";
 
 type TTSServiceProps = InferProps<typeof TTSServicePropTypes>;
 
@@ -62,7 +63,7 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<
 
   private cleanText(text: string) {
     // sanitize text
-    text = text.replace(/\*(.*?)\*/g, "($1)");
+    text = replaceAll(text, /\*(.*?)\*/g, "($1)");
     text = trim(text);
     if (text.startsWith('"') && text.endsWith('"'))
       text = text.substring(1, text.length - 1);
