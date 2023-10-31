@@ -15,7 +15,7 @@ export interface TTSOutputListenerParams {
 
 export function cleanTTSText(text: string) {
   // sanitize text
-  text = replaceAll(text, /\*(.*?)\*/g, "($1)");
+  // text = replaceAll(text, /\*(.*?)\*/g, "($1)");
   text = trim(text);
   if (text.startsWith('"') && text.endsWith('"'))
     text = text.substring(1, text.length - 1);
