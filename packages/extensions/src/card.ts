@@ -49,6 +49,8 @@ export type TavernCardV2 = {
     creator: string
     character_version: string
     extensions: Record<string, any>
+
+    character_book?: CharacterBook
   }
 }
 

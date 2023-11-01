@@ -235,7 +235,16 @@ const processImage = async (file: File): Promise<MikuCard> => {
   }
   const mikuCard: MikuCard = processJSON(_json);
   if (!mikuCard.data.extensions.mikugg.profile_pic) {
-    mikuCard.data.extensions.mikugg.profile_pic = URL.createObjectURL(file);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      mikuCard.data.extensions.mikugg.profile_pic = reader.result as string;
+    }
+    await new Promise(resolve => {
+      reader.onloadend = () => {
+        resolve(true);
+      }
+    });
   }
   return mikuCard;
 }
