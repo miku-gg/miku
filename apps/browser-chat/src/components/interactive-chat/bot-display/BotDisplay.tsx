@@ -20,7 +20,7 @@ import {
 import { BotDetails } from "../../bot-details/BotDetails";
 import "./BotDisplay.css";
 import { LeftArrow, RightArrow, Dice, Wand } from "../../../assets/icons/svg";
-import { GearIcon, HistoryIcon, SlidersIcon, UnmuteIcon } from "@primer/octicons-react";
+import { GearIcon, HistoryIcon, SlidersIcon, UnmuteIcon, ScreenFullIcon, ScreenNormalIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
@@ -37,6 +37,7 @@ import { PromptCompleterEndpointType } from "../../../libs/botSettingsUtils";
 import MusicPlayer from "../../music/MusicPlayer";
 import SettingsModal, { SettingsState } from "../../settings/SettingsModal";
 import { updateChat } from "../../../libs/postMessage";
+import { ChatInputBox } from "../chat-input-box/ChatInputBox";
 
 export type BotSettings = {
   promptStrategy: string;
@@ -136,6 +137,7 @@ function AnimateResponse({ text, speed }: { text: string, speed: number }): JSX.
   
 export const BotDisplay = () => {
   const { card, botHash, botConfig, botConfigSettings, setBotConfigSettings, assetLinkLoader } = useBot();
+  const [fullscreen, setFullscreen] = useState<boolean>(!!document.fullscreenElement);
   const [showHistory, setShowHistory] = useState<Boolean>(false);
   let responseFontSize = [
     "text-sm",
@@ -333,7 +335,7 @@ export const BotDisplay = () => {
   return (
     // MAIN CONTAINER
     <>
-      <div className="w-full h-full max-lg:w-full flex flex-col bot-display-images-container rounded-xl mb-4">
+      <div className="w-full h-full max-lg:w-full flex flex-col bot-display-images-container rounded-xl">
         <div className="relative flex flex-col w-full h-full items-center">
           <div className="w-full flex flex-row justify-between items-center p-3 bot-display-header rounded-xl z-10">
             <div className="flex items-center gap-4 text-white">
@@ -364,6 +366,26 @@ export const BotDisplay = () => {
                   />
                 ) : null
               }
+              <div className="inline-flex transition-colors hover:text-[#A78BFA]">
+                <button
+                  className="rounded-full"
+                  onClick={() => {
+                    if (document.fullscreenElement) {
+                      document.exitFullscreen();
+                      setFullscreen(false);
+                    } else {
+                      document.documentElement.requestFullscreen();
+                      setFullscreen(true);
+                    }
+                  }}
+                >
+                  {fullscreen ? (
+                    <ScreenNormalIcon size={24}/>
+                  ) : (
+                    <ScreenFullIcon size={24} />
+                  )}
+                </button>
+              </div>
               <div className="inline-flex transition-colors hover:text-[#A78BFA]">
                 <button
                   className="rounded-full"
@@ -419,11 +441,11 @@ export const BotDisplay = () => {
             className={
               !responseIds.length
                 ? "hidden"
-                : "absolute bottom-10 z-10 flex justify-center items-center w-full h-1/4"
+                : "absolute bottom-14 z-10 flex justify-center items-center w-full h-1/4"
             }
           >
-            <div className="response-container h-3/4 w-10/12 relative">
-              <div className="response-container-text flex justify-left px-8 py-4 items-start scrollbar w-full h-full bg-gradient-to-b text-sm from-slate-900/[.9] to-gray-500/50 overflow-auto drop-shadow-2xl shadow-black">
+            <div className="response-container h-3/4 w-9/12 relative">
+              <div className="response-container-text flex justify-left px-8 py-4 items-start scrollbar w-full h-full text-sm bg-slate-900/[.7] backdrop-blur-md overflow-auto drop-shadow-2xl shadow-black">
                 {!response || loading ? (
                   <Loader />
                 ) : (
@@ -432,6 +454,7 @@ export const BotDisplay = () => {
                   </div>
                 )}
               </div>
+              <ChatInputBox />
               {!loading && responseIds.length > 1 ? (
                 <div className="response-swiping absolute top-[-2em] left-2 inline-flex justify-between gap-4 bg-slate-900/80 p-2 text-white rounded-t-md">
                   <button
@@ -480,7 +503,7 @@ export const BotDisplay = () => {
               {!loading &&
               responsesGenerated.length > 1 &&
               responseIndex === 0 ? (
-                <div className="reload-button absolute bottom-[-3.4em] right-[1em] flex items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-b-md text-xs max-w-[90%] overflow-auto">
+                <div className="reload-button absolute top-0 right-[-3.3em] flex flex-col items-center gap-2 bg-slate-900/80 p-2 drop-shadow-2xl shadow-black text-white rounded-r-md text-xs max-w-[90%] overflow-auto">
                   {responsesGenerated.map((responseId, index) => (
                     <button
                       className={`inline-flex transition-all items-center hover:text-white ${
