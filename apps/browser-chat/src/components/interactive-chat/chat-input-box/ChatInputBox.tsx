@@ -92,15 +92,16 @@ export const ChatInputBox = (): JSX.Element => {
   const searchParams = queryString.parse(location.search);
 
   return (
-    <div className="flex items-end w-full max-lg:pb-5 max-lg:px-5">
-      <div className="flex flex-col justify-between w-full rounded-lg max-sm:rounded-none gap-3">
+    <div className="flex items-end w-full bg-slate-900/[.9]">
+      <div className="flex flex-row justify-between w-full max-sm:rounded-none">
         <form
           onSubmit={onFormSubmit}
           onClick={() =>
             document.getElementById("input-user-textarea")?.focus()
           }
           aria-disabled={disabled}
-          className="flex justify-between w-full placeholder:italic overflow-x-clip gap-2 relative border border-[#7957D2] pb-10 rounded-md outline-none button-transparent aria-disabled:shadow-none aria-disabled:blur-[1px]"
+          className="flex justify-between w-full placeholder:italic overflow-x-clip gap-2 relative border border-[#7957D2] outline-none button-transparent aria-disabled:shadow-none aria-disabled:blur-[1px]"
+          style={{borderRadius: 0}}
         >
           <textarea
             id="input-user-textarea"
@@ -117,13 +118,14 @@ export const ChatInputBox = (): JSX.Element => {
                 onFormSubmit(e);
               }
             }}
-            className="w-full bg-transparent outline-none border-none text-md p-3 resize-none scrollbar max-lg:h-12 aria-disabled:caret-transparent"
+            className="w-full bg-transparent outline-none border-none text-md p-3 pr-16 resize-none scrollbar aria-disabled:caret-transparent"
             name="input-user-textarea"
             autoComplete="off"
+            rows={1}
             placeholder="Type a message..."
           />
-          {searchParams["openai"] || !IS_ALPHA_LIVE ? (
-            <div className="absolute right-10 bottom-[0.4em]">
+          {/* {searchParams["openai"] || !IS_ALPHA_LIVE ? (
+            <div className="absolute right-10 top-[0.4em]">
               <Microphone
                 onInputText={(text: string) =>
                   setValue((_text) => (_text ? _text + " " + text : text))
@@ -131,29 +133,13 @@ export const ChatInputBox = (): JSX.Element => {
                 disabled={disabled}
               />
             </div>
-          ) : null}
+          ) : null} */}
           <button
-            className="absolute right-3 bottom-3 text-violet-400 hover:text-violet-300 transition-all disabled:hover:text-violet-400"
+            className="absolute right-3 top-4 text-violet-400 hover:text-violet-300 transition-all disabled:hover:text-violet-400"
             disabled={disabled}
           >
             <PaperPlane />
           </button>
-          <div className="absolute bottom-2 left-3 flex items-center">
-            <Tooltip
-              title="Amount of credits interaction would consume."
-              placement="right"
-              disableHoverListener={disabled}
-            >
-              <div className="inline-flex items-left rounded-full text-center text-sm justify-between text-violet-400 font-mono select-none">
-                <div className={loadingCost ? "text-violet-300" : ""}>
-                  {cost}
-                </div>
-                <div className="h-4 relative">
-                  {loadingCost ? <SmallSpinner /> : null}
-                </div>
-              </div>
-            </Tooltip>
-          </div>
         </form>
       </div>
     </div>
