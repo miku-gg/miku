@@ -81,7 +81,7 @@ export const App = () => {
       format = '';
     }
     if (aphrodite.enabled) {
-      return `${aphrodite.assetsUrl}/${format ? `${format}_` : ''}${asset}`;
+      return `${aphrodite.assetsUrl}/${(format && format !== '720p') ? `${format}_` : ''}${asset}`;
     } else {
       let assetsEndpoint = endpoint || "http://localhost:8585/image";
       return `${assetsEndpoint}/${asset}${format ? `_${format}` : ''}`;
