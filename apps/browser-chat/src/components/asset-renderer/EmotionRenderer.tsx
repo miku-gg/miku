@@ -1,5 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import './EmotionRenderer.scss'
+
+const assets = new Map<string, {
+  url: string,
+  fileType: string | null
+}>();
 
 export default function EmotionRenderer({
     assetUrl,
@@ -12,52 +17,60 @@ export default function EmotionRenderer({
     upDownAnimation?: boolean,
     assetLinkLoader: (asset: string, format?: string) => string
   }): JSX.Element {
-  const [blobUrl, setBlobUrl] = useState<string>("");
-  const [blobUrl_LOW, setBlobUrl_LOW] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
-  const [hasPlayedAudio, setHasPlayedAudio] = useState<boolean>(false);
-  const [fileType, setFileType] = useState<string | null>(null);
+  const [currentAsset, setCurrentAsset] = useState<{url: string, fileType: string | null}>({
+    url: '',
+    fileType: null
+  });
+  const assetVersion = useRef(0); // To keep track of asset versions
+
 
   useEffect(() => {
-    async function fetchFile() {
-      try {
-        setLoading(true);
-        let response = await fetch(
-          assetLinkLoader(assetUrl, '480p')
-        );
-        if (!response.ok) {
-          response = await fetch(
-            assetLinkLoader(assetUrl)
-          )
+    const currentVersion = ++assetVersion.current;
+    const controller = new AbortController();
+    async function fetchAndSetAsset(url: string, quality: '480p' | '720p') {
+      const response = await fetch(assetLinkLoader(url, quality));
+      if (response.ok && response.status === 200) {
+        const contentType = response.headers.get("Content-Type");
+        const data = await response.blob();
+        const newBlobUrl = URL.createObjectURL(data);
+        assets.set(url, {
+          fileType: contentType,
+          url: newBlobUrl,
+        });
+        if (currentVersion !== assetVersion.current) {
+          return;
         }
-        if (response.ok) {
-          const contentType = response.headers.get("Content-Type");
-          const data = await response.blob();
-          const newBlobUrl = URL.createObjectURL(data);
-          setBlobUrl_LOW(newBlobUrl);
-          setBlobUrl('');
-          setFileType(contentType);
-          setLoading(false);
-          setHasPlayedAudio(false);
-          const response2 = await fetch(
-            assetLinkLoader(assetUrl, '720p')
-          );
-          if (response2.ok) {
-            const data = await response2.blob();
-            const newBlobUrl = URL.createObjectURL(data);
-            setBlobUrl(newBlobUrl);
-          }
-        } else {
-          console.error("Error fetching file:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error fetching file:", error);
+        setCurrentAsset({ fileType: contentType, url: newBlobUrl });
       }
     }
 
-    fetchFile();
-    setLoading(false);
-  }, [assetUrl]);
+    async function fetchAssets() {
+      setLoading(true);
+
+      await fetchAndSetAsset(assetUrl, '480p');
+
+      fetchAndSetAsset(assetUrl, '720p').then(() => {
+        setLoading(false);
+      });
+    }
+
+    // Fetch assets only if they haven't been fetched before or if assetUrl changes.
+    if (!assets.has(assetUrl)) {
+      fetchAssets();
+    } else {
+      // If we already have the asset, use it and don't show the loading state.
+      setCurrentAsset(assets.get(assetUrl) || { url: '', fileType: null });
+      setLoading(false);
+    }
+
+    return () => {
+      controller.abort(); // Cancel the fetch operation if the component unmounts or the assetUrl changes
+    };
+  }, [assetUrl, assetLinkLoader]);
+
+
+  const { url: blobUrl, fileType } = currentAsset;
 
   if (fileType === "video/webm") {
     return (
@@ -65,11 +78,10 @@ export default function EmotionRenderer({
         className={`${className} ${
           (!loading && upDownAnimation) ? "fade-in up-and-down" : ""
         }`}
-        src={blobUrl || blobUrl_LOW}
+        src={blobUrl}
         loop
         autoPlay
         muted
-        onPlay={() => setHasPlayedAudio(true)}
       />
     );
   } else {
@@ -78,7 +90,7 @@ export default function EmotionRenderer({
         className={`${className} ${
           (!loading && upDownAnimation) ? "fade-in up-and-down" : ""
         }`}
-        src={blobUrl || blobUrl_LOW}
+        src={blobUrl}
         alt="character"
         onError={({ currentTarget }) => {
           currentTarget.onerror = null;

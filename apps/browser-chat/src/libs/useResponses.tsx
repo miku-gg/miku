@@ -73,7 +73,6 @@ export const InteractiveResponsesContextProvider = ({
       const firstScenario = card?.data.extensions.mikugg.scenarios.find(scenario => card?.data.extensions.mikugg.start_scenario === scenario.id);
       const firstEmotionGroup = card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
       let firstEmotion = firstEmotionGroup?.template === 'base-emotions' ? firstEmotionGroup.emotions?.find(emotion => emotion?.id === 'happy') : firstEmotionGroup?.emotions[0];
-      let firstImage = firstEmotion?.source[0];
       let firstMessage = card?.data.first_mes || '';
       firstMessage = MikuExtensions.Memory.Strategies.fillTextTemplate(firstMessage, {
         bot: card?.data.name || '',
@@ -81,7 +80,7 @@ export const InteractiveResponsesContextProvider = ({
       });
 
       fillResponse('first', "text", firstMessage);
-      fillResponse('first', "emotion", firstImage || '');
+      fillResponse('first', "emotion", firstEmotion?.id || '');
       fillResponse('first', "audio", '');
       fillResponse('first', "scene", firstScenario?.id || '');
 
@@ -118,7 +117,7 @@ export const InteractiveResponsesContextProvider = ({
 
     bot?.subscribeDialog((output) => {
       fillResponse(output.commandId, "text", output.text);
-      fillResponse(output.commandId, "emotion", output.imgHash);
+      fillResponse(output.commandId, "emotion", output.emotion);
       fillResponse(output.commandId, "scene", output.nextContextId);
       onUpdate();
 

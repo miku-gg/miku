@@ -167,7 +167,8 @@ export const BotDisplay = () => {
   const music = card?.data?.extensions?.mikugg?.sounds?.find(sound => sound.id === scenario?.music)?.source || scenario?.music || '';
 
   let backgroundImage = card?.data.extensions.mikugg.backgrounds.find(bg => bg.id === scenario?.background || '')?.source || '';
-  let emotionImage = response?.emotion || prevResponse?.emotion || "";
+  const emotionId = response?.emotion || prevResponse?.emotion || "";
+  let emotionImage = card?.data.extensions.mikugg.emotion_groups.find(eg => eg.id === scenario?.emotion_group || '')?.emotions.find(emotion => emotion.id === emotionId)?.source[0] || '';
   if (!emotionImage) {
     const openAIEmotionConfig = botConfig?.outputListeners.find(
       (listener: { service: string }) =>
@@ -223,7 +224,6 @@ export const BotDisplay = () => {
           MikuCore.Commands.CommandType.CONTEXT
         );
         setResponsesGenerated(result ? [result.commandId] : []);
-
       }
     }
   };

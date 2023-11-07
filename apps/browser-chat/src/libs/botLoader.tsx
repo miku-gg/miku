@@ -347,10 +347,10 @@ export function useBot(): {
           const botMessages = narration.narrationMessages.filter(message => message.isBot).map((message) => {
             const firstScenario = res.card?.data.extensions.mikugg.scenarios.find(_scenario => message.sceneId === _scenario.id);
             const firstEmotionGroup = res.card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
-            let firstImage = firstEmotionGroup?.emotions?.find(emotion => emotion?.id === message.emotionId)?.source[0] || firstEmotionGroup?.emotions[0].source[0];
+            const firstEmotion = firstEmotionGroup?.emotions?.find(emotion => emotion?.id === message.emotionId) || firstEmotionGroup?.emotions[0];
 
             fillResponse(message.id, "text", message.text);
-            fillResponse(message.id, "emotion", firstImage);
+            fillResponse(message.id, "emotion", firstEmotion?.id || '');
             fillResponse(message.id, "audio", '');
             fillResponse(message.id, "scene", message.sceneId);
 
