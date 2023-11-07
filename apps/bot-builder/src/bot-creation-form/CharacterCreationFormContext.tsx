@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { MikuCard, EMPTY_MIKU_CARD } from '@mikugg/bot-utils';
 
 
@@ -30,9 +30,17 @@ const CharacterCreationFormProvider = ({ children }: {children: JSX.Element}): J
   const nextStep = () => setCurrentStep((prevStep) => prevStep + 1);
   const prevStep = () => setCurrentStep((prevStep) => prevStep - 1);
 
+  // This is a hack to prevent the user from accidentally leaving the page
+  const _setCard = (...args: Parameters<typeof setCard>) => {
+    if (!window.onbeforeunload) {
+      window.onbeforeunload = () => true;
+    }
+    return setCard(...args);
+  }
+
   return (
     <CharacterCreationFormContext.Provider
-      value={{ card, setCard, currentStep, nextStep, prevStep, setCurrentStep }}
+      value={{ card, setCard: _setCard, currentStep, nextStep, prevStep, setCurrentStep }}
     >
       {children}
     </CharacterCreationFormContext.Provider>
