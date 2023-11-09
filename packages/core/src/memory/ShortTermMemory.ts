@@ -28,7 +28,6 @@ export interface MemoryPromptConfig {
  * It is used by the ChatPromptCompleter to build the prompt.
  */
 export abstract class ShortTermMemory {
-  public memorySize: number;
   protected memory: MemoryLine[] = [];
   protected contextPrompt: string;
   protected initiatorPrompt: string;
@@ -43,13 +42,10 @@ export abstract class ShortTermMemory {
       subjects,
       botSubject,
     }: MemoryPromptConfig,
-    memorySize = 30,
-    selectedResponseIndex = 0
   ) {
     this.contextPrompt = prompt_context;
     this.initiatorPrompt = prompt_initiator;
     this.basePrompt = prompt_context + prompt_initiator;
-    this.memorySize = memorySize;
     this.subjects = subjects;
     this.botSubject = botSubject;
   }
@@ -57,7 +53,7 @@ export abstract class ShortTermMemory {
   public abstract pushMemory(memory: MemoryLine): void;
   public abstract clearMemories(): void;
   public abstract getMemory(): MemoryLine[];
-  public abstract buildMemoryPrompt(): string;
+  public abstract buildMemoryPrompt(maxTokens: number): string;
   public abstract buildMemoryLinesPrompt(memorySize?: number): string;
   public abstract getContextPrompt(): string;
   public abstract getInitiatorPrompt(): string;

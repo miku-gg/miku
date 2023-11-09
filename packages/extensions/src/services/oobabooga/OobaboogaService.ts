@@ -1,7 +1,7 @@
 import * as Miku from "@mikugg/core";
 import PropTypes, { InferProps } from "prop-types";
-import GPT3Tokenizer from "gpt3-tokenizer";
 import axios from "axios";
+import { TokenizerType, tokenCount } from "../../tokenizers/Tokenizers";
 
 export interface OobaboogaServiceConfig extends Miku.Services.ServiceConfig {
   gradioEndpoint: string;
@@ -13,8 +13,30 @@ export const OobaboogaServicePropTypes = {
   gradioEndpoint: PropTypes.string,
 };
 
+export type OobaboogaSettings = {
+  temp: number;
+  maxTokens: number;
+  topP: number;
+  topK: number;
+  typicalP: number;
+  repetitionPenalty: number;
+  encoderRepitionPenalty: number;
+  noRepeatNgramSize: number;
+  minLength: number;
+  doSample: boolean;
+  seed: number;
+  penaltyAlpha: number;
+  numBeams: number;
+  lengthPenalty: number;
+  earlyStopping: boolean;
+  addBosToken: boolean;
+  banEosToken: boolean;
+  truncateLength: number;
+  stoppingStrings: string;
+  skipSpecialTokens: boolean;
+};
+
 export class OobaboogaService extends Miku.Services.Service {
-  private tokenizer: GPT3Tokenizer;
   private gradioEndpoint: string;
   protected defaultProps: InferProps<typeof OobaboogaServicePropTypes> = {
     prompt: "",
@@ -28,16 +50,17 @@ export class OobaboogaService extends Miku.Services.Service {
   constructor(config: OobaboogaServiceConfig) {
     super(config);
     this.gradioEndpoint = config.gradioEndpoint;
-    this.tokenizer = new GPT3Tokenizer({ type: "gpt3" });
   }
 
   protected async computeInput(
-    input: InferProps<typeof this.propTypesRequired>
+    input: InferProps<typeof OobaboogaServicePropTypes>
   ): Promise<string> {
-    const modelSettings = JSON.parse(input.settings);
+    const modelSettings: OobaboogaSettings = JSON.parse(input.settings || '{}');
     if (!modelSettings) return "";
-    const gptTokens = this.tokenizer.encode(input.prompt).bpe.length;
-    if (gptTokens > 3800) return "";
+    const tokens = tokenCount(input.prompt || '', TokenizerType.LLAMA);
+    const maxTokens = Math.min(modelSettings.maxTokens || 100, modelSettings.truncateLength - tokens)
+    if (maxTokens <= 0) return "";
+
     let gradioEndpoint = this.gradioEndpoint;
     if (input.gradioEndpoint) gradioEndpoint = input.gradioEndpoint;
     const completion = await axios.post(
@@ -86,8 +109,8 @@ export class OobaboogaService extends Miku.Services.Service {
     input: InferProps<typeof this.propTypesRequired>
   ): Promise<number> {
     const modelSettings = JSON.parse(input.settings);
-    const gptTokens = this.tokenizer.encode(input.prompt).bpe.length;
-    return gptTokens + (modelSettings.maxTokens || 0);
+    const tokens = tokenCount(input.prompt, TokenizerType.LLAMA);
+    return tokens + (modelSettings.maxTokens || 0);
   }
 }
 

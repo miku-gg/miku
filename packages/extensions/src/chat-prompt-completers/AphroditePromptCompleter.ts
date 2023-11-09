@@ -73,7 +73,7 @@ export class AphroditePromptCompleter extends Core.ChatPromptCompleters
     const memoryLines = [
       ...memory.getMemory(),
     ];
-    const memorySize = this.memory.memorySize;
+    const memorySize = 100;
     return [
       // { role: "system", content: basePrompt },
       ...memoryLines

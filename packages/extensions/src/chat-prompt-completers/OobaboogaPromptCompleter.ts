@@ -1,6 +1,6 @@
 import * as Core from "@mikugg/core";
 import { InferProps } from "prop-types";
-import { OobaboogaServicePropTypes, ServicesNames } from "../services";
+import { OobaboogaServicePropTypes, OobaboogaSettings, ServicesNames } from "../services";
 import {
   hasTextStop,
   parsePygmalionResponse,
@@ -47,14 +47,15 @@ export class OobaboogaPromptCompleter extends Core.ChatPromptCompleters
   protected async completePrompt(
     memory: Core.Memory.ShortTermMemory
   ): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
-    const prompt = memory.buildMemoryPrompt();
+    const settings: OobaboogaSettings = JSON.parse(this.props.settings || '{}');
+    const prompt = memory.buildMemoryPrompt(settings.truncateLength - settings.maxTokens);
     let result = "";
     let isParsedResultSmall = false;
     let tries = 0;
 
     while (
       (isParsedResultSmall || !hasTextStop(result, memory.getSubjects())) &&
-      tries++ < 2
+      tries++ < 1
     ) {
       if (isParsedResultSmall) result = "";
       result += await this.service.query(

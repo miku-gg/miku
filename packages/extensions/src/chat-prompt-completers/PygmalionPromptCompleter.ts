@@ -1,7 +1,7 @@
 import * as Core from "@mikugg/core";
 import { InferProps } from "prop-types";
 import trim from "lodash.trim";
-import { PygmalionServicePropTypes, ServicesNames } from "../services";
+import { KoboldAIsettings, PygmalionServicePropTypes, ServicesNames } from "../services";
 
 const buildTextStops = (_subjects: string[]): string[] => {
   const subjects: string[] = _subjects.map((subject) => `${subject}:`);
@@ -108,7 +108,8 @@ export class PygmalionPromptCompleter extends Core.ChatPromptCompleters
   protected async completePrompt(
     memory: Core.Memory.ShortTermMemory
   ): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
-    const prompt = memory.buildMemoryPrompt();
+    const settings: KoboldAIsettings = JSON.parse(this.props.settings || '{}');
+    const prompt = memory.buildMemoryPrompt(settings.maxContextLength - settings.maxTokens);
     let result = "";
     let isParsedResultSmall = false;
     let tries = 0;

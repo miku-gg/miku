@@ -1,11 +1,26 @@
 import * as Miku from "@mikugg/core";
 import PropTypes, { InferProps } from "prop-types";
-import GPT3Tokenizer from "gpt3-tokenizer";
+import tokenizer, { LLaMATokenizer } from '../../tokenizers/LLaMATokenizer';
 import axios from "axios";
 
 export interface PygmalionServiceConfig extends Miku.Services.ServiceConfig {
   koboldEndpoint: string;
 }
+
+export type KoboldAIsettings = {
+  maxContextLength: number;
+  maxTokens: number;
+  temp: number;
+  topP: number;
+  topK: number;
+  topA: number;
+  tailFreeSampling: number;
+  typicalP: number;
+  repetitionPenalty: number;
+  repetitionPenaltyRange: number;
+  repetitionPenaltySlope: number;
+  order: number[];
+};
 
 export const PygmalionServicePropTypes = {
   settings: PropTypes.string,
@@ -13,7 +28,7 @@ export const PygmalionServicePropTypes = {
 };
 
 export class PygmalionService extends Miku.Services.Service {
-  private tokenizer: GPT3Tokenizer;
+  private tokenizer: LLaMATokenizer;
   private koboldEndpoint: string;
   protected defaultProps: InferProps<typeof PygmalionServicePropTypes> = {
     settings: "",
@@ -27,13 +42,13 @@ export class PygmalionService extends Miku.Services.Service {
   constructor(config: PygmalionServiceConfig) {
     super(config);
     this.koboldEndpoint = config.koboldEndpoint;
-    this.tokenizer = new GPT3Tokenizer({ type: "gpt3" });
+    this.tokenizer = tokenizer;
   }
 
   protected async computeInput(
     input: InferProps<typeof this.propTypesRequired>
   ): Promise<string> {
-    const modelSettings = JSON.parse(input.settings);
+    const modelSettings: KoboldAIsettings = JSON.parse(input.settings);
     if (!modelSettings) return "";
     const completion = await axios.post<{ results: { text: string }[] }>(
       `${this.koboldEndpoint}/v1/generate`,
@@ -71,7 +86,7 @@ export class PygmalionService extends Miku.Services.Service {
     input: InferProps<typeof this.propTypesRequired>
   ): Promise<number> {
     const modelSettings = JSON.parse(input.settings);
-    const gptTokens = this.tokenizer.encode(input.prompt).bpe.length;
+    const gptTokens = this.tokenizer.encode(input.prompt).length;
     return gptTokens + (modelSettings.maxTokens || 0);
   }
 }

@@ -16,7 +16,7 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
       prompt_initiator: prompt_initiator,
       subjects,
       botSubject
-    }, memorySize);
+    });
     
   }
 
@@ -32,7 +32,7 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
     this.memory = [];
   }
 
-  public buildMemoryLinesPrompt(memorySize = this.memorySize): string {
+  public buildMemoryLinesPrompt(memorySize = 25): string {
     let prompt = this.getInitiatorPrompt();
     for (let i = Math.max(this.memory.length - memorySize, 0); i < this.memory.length; i++) {
       const memoryText = this.memory[i].text.replace(/\n\n/g, '\n').replace(/\n/g, ' ');
@@ -50,7 +50,7 @@ export class GPTShortTermMemory extends MikuCore.Memory.ShortTermMemory {
 
   public buildMemoryPrompt() {
     let prompt = this.getContextPrompt();
-    let memorySize = this.memorySize;
+    let memorySize = 25;
     let memoryLinesPrompt = '';
 
     // Entire prompt under 2048 tokens

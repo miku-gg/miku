@@ -1,10 +1,8 @@
 
+import { TokenizerType, tokenCount } from '../tokenizers/Tokenizers';
 import * as Strategies from './strategies';
 import * as MikuCore from '@mikugg/core';
 export * as Strategies from './strategies';
-import GPT3Tokenizer from 'gpt3-tokenizer';
-
-const tokenizer = new GPT3Tokenizer({ type: 'gpt3' });
 
 export interface ContextPromptParts {
   persona: string
@@ -27,6 +25,7 @@ export interface GPTShortTermMemoryV2Config extends MikuCore.Memory.MemoryPrompt
   language: MikuCore.ChatPromptCompleters.Language;
   parts: ContextPromptParts;
   buildStrategySlug: Strategies.StrategySlug;
+  tokenizerType?: TokenizerType;
 }
 
 function getStrategyFromSlug(slug: Strategies.StrategySlug): ContextPromptBuildStrategy {
@@ -49,19 +48,20 @@ function getStrategyFromSlug(slug: Strategies.StrategySlug): ContextPromptBuildS
 }
 
 export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
-  
   private promptbuildStrategy: ContextPromptBuildStrategy;
   private promptParts: ContextPromptParts;
+  private tokenizerType: TokenizerType;
 
-  constructor(config: GPTShortTermMemoryV2Config, memorySize = 25) {
+  constructor(config: GPTShortTermMemoryV2Config) {
     super({
       prompt_context: config.prompt_context,
       prompt_initiator: config.prompt_initiator,
       subjects: config.subjects,
       botSubject: config.botSubject
-    }, memorySize);
+    });
     this.promptParts = config.parts;
     this.promptbuildStrategy = getStrategyFromSlug(config.buildStrategySlug);
+    this.tokenizerType = config.tokenizerType || TokenizerType.LLAMA;
   }
 
   public setPromptBuildStrategy(slug: Strategies.StrategySlug) {
@@ -69,21 +69,13 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
   }
 
   public override getContextPrompt(): string {
-    let prompt = this.promptbuildStrategy.buildContextPrompt(this.promptParts);
-    prompt = Strategies.fillTextTemplate(prompt, {
-      bot: this.promptParts.botSubject,
-      user: this.subjects.length ? this.subjects[0] : 'Anon'
-    });
-    return prompt;    
+    const prompt = this.promptbuildStrategy.buildContextPrompt(this.promptParts);
+    return this.fillText(prompt);    
   }
 
   public override getInitiatorPrompt(): string {
-    let prompt = this.promptbuildStrategy.buildInitiatorPrompt(this.promptParts);
-    prompt = Strategies.fillTextTemplate(prompt, {
-      bot: this.promptParts.botSubject,
-      user: this.subjects.length ? this.subjects[0] : 'Anon'
-    })
-    return prompt;
+    const prompt = this.promptbuildStrategy.buildInitiatorPrompt(this.promptParts);
+    return this.fillText(prompt);
   }
 
   public override getBotSubject(): string {
@@ -102,7 +94,7 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
     this.memory = [];
   }
 
-  public buildMemoryLinesPrompt(memorySize = this.memorySize): string {
+  public buildMemoryLinesPrompt(memorySize: number): string {
     let prompt = this.getInitiatorPrompt();
     for (let i = Math.max(this.memory.length - memorySize, 0); i < this.memory.length; i++) {
       prompt += '\n';
@@ -111,30 +103,40 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
     return prompt;
   }
 
-  public buildMemoryPrompt() {
-    let prompt = this.getContextPrompt();
-    let memorySize = this.memorySize;
+  public buildMemoryPrompt(maxTokens: number): string {
+    const contextPrompt = this.fillText(this.getContextPrompt());
+    const askResponsePrompt = this.fillText(`\n${this.promptbuildStrategy.getResponseAskLine()}`);
     let memoryLinesPrompt = '';
 
-    // Entire prompt under 4096 tokens
-    const MAX_PROMPT_TOKENS = 3600;
-    do {
-      memoryLinesPrompt = this.buildMemoryLinesPrompt(memorySize--);
-    } while (
-      memorySize &&
-      memoryLinesPrompt.length > this.getInitiatorPrompt().length &&
-      tokenizer.encode(prompt + memoryLinesPrompt).bpe.length > MAX_PROMPT_TOKENS
-    );
+    const allMemoryLines: MikuCore.Memory.MemoryLine[] = [
+      {
+        subject: this.getBotSubject(),
+        text: this.getInitiatorPrompt(),
+        type: MikuCore.Commands.CommandType.DIALOG
+      },
+      ...this.memory
+    ];
 
-    prompt += memoryLinesPrompt;
-    prompt += `\n${this.promptbuildStrategy.getResponseAskLine()}`;
-    // for(let i = 0; i < 10; i++) prompt = prompt.replace(/\n\n/g, '\n');
+    // build memory lines prompt from last to maxTokens
+    for (let i = allMemoryLines.length - 1; i >= 0; i--) {
+      let memoryLineResult = '\n' + this.promptbuildStrategy.getMemoryLinePrompt(allMemoryLines[i], allMemoryLines[i].subject === this.getBotSubject());
+      
+      memoryLineResult = this.fillText(memoryLineResult)
 
-    prompt = Strategies.fillTextTemplate(prompt, {
+      if (tokenCount(contextPrompt + memoryLineResult + memoryLinesPrompt + askResponsePrompt, this.tokenizerType) > maxTokens) {
+        break;
+      } else {
+        memoryLinesPrompt = memoryLineResult + memoryLinesPrompt;
+      }
+    }
+
+    return contextPrompt + memoryLinesPrompt + askResponsePrompt;
+  }
+
+  public fillText(text: string): string {
+    return Strategies.fillTextTemplate(text, {
       bot: this.promptParts.botSubject,
       user: this.subjects.length ? this.subjects[0] : 'Anon'
     });
-
-    return prompt;
   }
 }
