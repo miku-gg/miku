@@ -96,6 +96,13 @@ describe("PygmalionPromptCompleter", () => {
       const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
       expect(actualOutput).toEqual(expectedOutput);
     });
+    
+    test('should remove if finished with a letter', () => {
+      const inputText = ` Meow, mistress... Meow... meow... meow..." She sobs brokenly between each word. "Me-me-meow..."`;
+      const expectedOutput = `Meow, mistress... Meow... meow... meow..." She sobs brokenly between each word. "Me-me-meow..."`;
+      const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
+      expect(actualOutput).toEqual(expectedOutput);
+    });
 
     test('should remove until it finish with a special char', () => {
       const testCases = [

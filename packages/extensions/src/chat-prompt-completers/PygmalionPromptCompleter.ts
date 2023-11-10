@@ -27,11 +27,6 @@ export const parsePygmalionResponse = (
       ? text.substring(0, text.length - 1)
       : text;
   };
-  const hasEvenQuotes = (text: string): boolean => {
-    const amountOfQuotes = text.split('"').length - 1;
-    const amountOfAsterisks = text.split("*").length - 1;
-    return amountOfQuotes % 2 === 0 && amountOfAsterisks % 2 === 0;
-  }
 
   text = text.split(`${botSubject}:`).join("");
   text = trim(text);
@@ -53,11 +48,23 @@ export const parsePygmalionResponse = (
   }
 
   text = trim(text);
-  while (
-    text.length > 0 &&
-    (![".", "*", '"', "!", "?"].includes(text[text.length - 1]) || !hasEvenQuotes(text))
-  ) {
-    text = text.substring(0, text.length - 1);
+  let _text = text;
+  // remove last a special char is present [".", "*", '"', "!", "?"]
+  for (let i = 0; i < text.length; i++) {
+    const char = text[text.length - 1 - i];
+    if (![".", "*", '"', "!", "?"].includes(char)) {
+      _text = _text.substring(0, _text.length - 1);
+    } else {
+      break;
+    }
+  }
+  if (_text.length > 2) {
+    text = _text;
+    const lastChar = text[text.length - 1];
+    const prevLastChar = text[text.length - 2];
+    if (["*", '"'].includes(lastChar) && ["\n", " "].includes(prevLastChar)) {
+      text = text.substring(0, text.length - 1);
+    }
   }
 
   text = trim(text);
