@@ -47,7 +47,6 @@
     "compute-cosine-similarity": "^1.0.0",
     "gpt3-tokenizer": "^1.1.5",
     "ipfs-only-hash": "^4.0.0",
-    "llama-tokenizer-js": "^1.1.1",
     "lodash.trim": "^4.5.1",
     "openai": "^4.2.0",
     "prop-types": "^15.8.1"

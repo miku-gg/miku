@@ -35,7 +35,6 @@ interface BotInstanceInterface {
     type: number,
     subject?: string
   ): { wait: Promise<void[]>; commandId: string };
-  getCurrentPrompt(): string;
   getMemory(): MikuCore.Memory.ShortTermMemory;
   getBotConfig(): BotConfig;
   computeCost(prompt: string): Promise<number>;
@@ -57,11 +56,6 @@ class BotFactory {
   }): MikuCore.Memory.ShortTermMemory {
     let memory: MikuCore.Memory.ShortTermMemory | null = null;
     switch (service) {
-      case MikuExtensions.Services.ServicesNames.GPTShortTermMemory:
-        memory = new MikuExtensions.Memory.GPTShortTermMemory(
-          props as MikuExtensions.Memory.GPTShortTermMemoryConfig
-        );
-        break;
       case MikuExtensions.Services.ServicesNames.GPTShortTermMemoryV2:
         // const _props = ;
         // const strategySlugFromURL = String(searchParams["strategy"] || "");
@@ -467,10 +461,6 @@ class BotFactory {
           }),
           commandId,
         };
-      },
-
-      getCurrentPrompt() {
-        return memory.buildMemoryPrompt();
       },
 
       getMemory() {

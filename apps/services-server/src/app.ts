@@ -137,4 +137,67 @@ if (SBERT_EMOTIONS_ENABLED) {
   });
 }
 
+const APHRODITE_ENDPOINT = process.env.APHRODITE_ENDPOINT || '';
+const APHRODITE_S3_BUCKET = process.env.APHRODITE_S3_BUCKET || '';
+const APHRODITE_S3_REGION = process.env.APHRODITE_S3_REGION || '';
+const APHRODITE_S3_ACCESS_KEY = process.env.APHRODITE_S3_ACCESS_KEY || '';
+const APHRODITE_S3_SECRET_KEY = process.env.APHRODITE_S3_SECRET_KEY || '';
+
+if (APHRODITE_ENDPOINT) {
+  new MikuExtensions.Services.AphroditePromptCompleterService({
+    serviceId: MikuExtensions.Services.ServicesNames.Aphrodite,
+    billingEndpoint: '',
+    addRoute,
+    s3Bucket: APHRODITE_S3_BUCKET,
+    s3Config: {
+      region: APHRODITE_S3_REGION,
+      credentials: {
+        accessKeyId: APHRODITE_S3_ACCESS_KEY,
+        secretAccessKey: APHRODITE_S3_SECRET_KEY
+      }
+    },
+    aphroditeEndpoint: APHRODITE_ENDPOINT,
+    aphroditeApiKey: 'EMPTY',
+    aphoditeConfig: {
+      max_new_tokens: 300,
+      do_sample: true,
+      temperature: 0.7,
+      top_p: 0.1,
+      typical_p: 1,
+      repetition_penalty: 1.18,
+      repetition_penalty_range: 0,
+      encoder_repetition_penalty: 1,
+      top_k: 40,
+      min_length: 200,
+      no_repeat_ngram_size: 0,
+      num_beams: 1,
+      penalty_alpha: 0,
+      length_penalty: 1,
+      early_stopping: false,
+      seed: -1,
+      add_bos_token: true,
+      stopping_strings: [
+        '\n### Instruction:',
+        '\n' +
+          '### Response (2 paragraphs, engaging, natural, authentic, descriptive, creative):',
+        '</s>',
+        '<|',
+        '\n#',
+        '\n\n\n'
+      ],
+      truncation_length: 4096,
+      ban_eos_token: false,
+      skip_special_tokens: true,
+      top_a: 0,
+      tfs: 1,
+      epsilon_cutoff: 0,
+      eta_cutoff: 0,
+      mirostat_mode: 0,
+      mirostat_tau: 5,
+      mirostat_eta: 0.1,
+      use_mancer: true
+    },
+  })
+}
+
 export default app;

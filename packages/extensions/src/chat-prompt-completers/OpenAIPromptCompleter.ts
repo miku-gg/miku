@@ -57,7 +57,7 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters
   protected async completePrompt(
     memory: Core.Memory.ShortTermMemory
   ): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
-    const prompt = memory.buildMemoryPrompt();
+    const prompt = memory.buildMemoryPrompt(4096);
     const props = this.getProps();
     const stop = OpenAIChatModels.includes(
       props.settings ? JSON.parse(props.settings).oaiModel : ""
@@ -84,7 +84,7 @@ export class OpenAIPromptCompleter extends Core.ChatPromptCompleters
       ...this.getInitiatorPromptAsMemories(memory),
       ...memory.getMemory(),
     ];
-    const memorySize = this.memory.memorySize;
+    const memorySize = 25;
     return [
       { role: "system", content: basePrompt },
       ...memoryLines
