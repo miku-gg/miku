@@ -125,7 +125,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
     input.messages?.forEach((message) => {
       memory.pushMemory({
         text: message?.content || '',
-        subject: message?.role || '',
+        subject: message?.role == 'user' ? (input.userName || 'Anon') : card.data.name,
         type: message?.role === 'system' ? Miku.Commands.CommandType.CONTEXT : Miku.Commands.CommandType.DIALOG
       });
     })
