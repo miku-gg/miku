@@ -5,6 +5,7 @@ export * from "./oobabooga/OobaboogaService";
 export * from "./aphrodite/AphroditeService";
 export * from "./stt/WhisperService";
 export * from "./sbert/SBertEmotionInterpreterService";
+export * from "./guidence/EmotionGuidanceService";
 export * as TTS from "./tts";
 
 export enum ServicesNames {
@@ -20,5 +21,6 @@ export enum ServicesNames {
   SBertEmotionInterpreter = "sbert_emotion-interpreter",
   WhisperSTT = "whisper_stt",
   Aphrodite = "aphrodite",
+  EmotionGuidance = "emotion_guidance",
   None = "",
 }

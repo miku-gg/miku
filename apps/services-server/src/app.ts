@@ -127,22 +127,12 @@ if (OPENAI_API_KEY) {
   });
 }
 
-if (SBERT_EMOTIONS_ENABLED) {
-  new MikuExtensions.Services.SBertEmotionInterpreterService({
-    serviceId: MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter,
-    billingEndpoint: '',
-    sbertSimilarityAPIToken: SBERT_SIMILARITY_API_TOKEN,
-    sbertSimilarityAPIUrl: SBERT_SIMILARITY_API_URL,
-    addRoute
-  });
-}
-
 const APHRODITE_ENDPOINT = process.env.APHRODITE_ENDPOINT || '';
 const APHRODITE_S3_BUCKET = process.env.APHRODITE_S3_BUCKET || '';
 const APHRODITE_S3_REGION = process.env.APHRODITE_S3_REGION || '';
 const APHRODITE_S3_ACCESS_KEY = process.env.APHRODITE_S3_ACCESS_KEY || '';
 const APHRODITE_S3_SECRET_KEY = process.env.APHRODITE_S3_SECRET_KEY || '';
-
+/*
 if (APHRODITE_ENDPOINT) {
   new MikuExtensions.Services.AphroditePromptCompleterService({
     serviceId: MikuExtensions.Services.ServicesNames.Aphrodite,
@@ -157,7 +147,7 @@ if (APHRODITE_ENDPOINT) {
       }
     },
     aphroditeEndpoint: APHRODITE_ENDPOINT,
-    aphroditeApiKey: 'EMPTY',
+    aphroditeApiKey: 'sk-EMPTY',
     aphoditeConfig: {
       max_new_tokens: 300,
       do_sample: true,
@@ -198,6 +188,24 @@ if (APHRODITE_ENDPOINT) {
       use_mancer: true
     },
   })
+}
+*/
+if (APHRODITE_ENDPOINT) {
+  new MikuExtensions.Services.EmotionGuidanceService({
+    addRoute,
+    serviceId: MikuExtensions.Services.ServicesNames.EmotionGuidance,
+    billingEndpoint: '',
+    aphroditeApiKey: 'sk-EMPTY',
+    aphroditeEndpoint: APHRODITE_ENDPOINT,
+  })
+} else if (SBERT_EMOTIONS_ENABLED) {
+  new MikuExtensions.Services.SBertEmotionInterpreterService({
+    serviceId: MikuExtensions.Services.ServicesNames.EmotionGuidance,
+    billingEndpoint: '',
+    sbertSimilarityAPIToken: SBERT_SIMILARITY_API_TOKEN,
+    sbertSimilarityAPIUrl: SBERT_SIMILARITY_API_URL,
+    addRoute
+  });
 }
 
 export default app;

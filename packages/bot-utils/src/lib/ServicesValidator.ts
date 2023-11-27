@@ -55,11 +55,6 @@ servicesValidator.addService(
 );
 
 servicesValidator.addService(
-  MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter,
-  MikuExtensions.Services.SBertEmotionInterpreterPropTypes
-);
-
-servicesValidator.addService(
   MikuExtensions.Services.ServicesNames.GPTShortTermMemory,
   {
     "prompt_context": PropTypes.string,

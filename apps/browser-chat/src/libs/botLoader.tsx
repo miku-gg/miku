@@ -357,7 +357,7 @@ export function useBot(): {
             return message;
           });
           const lastBotMessage = botMessages.length ? botMessages[botMessages.length - 1] : null;
-          const emotionInterpreter = decoratedConfig.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter);
+          const emotionInterpreter = decoratedConfig.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.EmotionGuidance);
           if (emotionInterpreter) {
             const bot = botFactory.getInstance();
             bot?.changeContext(lastBotMessage?.sceneId || res.card.data.extensions.mikugg.start_scenario)

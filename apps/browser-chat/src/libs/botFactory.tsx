@@ -14,10 +14,9 @@ const MOCK_PRIVATE_KEY =
   "2658e4257eaaf9f72295ce012fa8f8cc4a600cdaf4051884d2c02593c717c173";
 
 interface BotInstanceInterface {
-  subscribeContextChangeSuggestion(cb: (contextId: string) => void): void;
-  changeContext(contextId: string): boolean;
+  changeScenario(scenarioId: string): boolean;
   subscribeDialog(
-    cb: (output: MikuExtensions.OutputListeners.EmotionRendererOutput) => void
+    cb: (output: MikuExtensions.OutputListeners.EmotionOutput) => void
   ): void;
   subscribeAudio(
     cb: (
@@ -169,26 +168,21 @@ class BotFactory {
     > | null = null;
 
     switch (service) {
-      case MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter:
-        outputListener = new MikuExtensions.OutputListeners.EmotionRenderer({
-          serviceEndpoint: `${servicesEndpoint}/${service}`,
-          signer: signer,
-          props: {
-            ...props,
-            openai_key: String(endpoints?.openai || "") || "",
-          } as MikuExtensions.Services.EmotionInterpreterProps,
-        });
-        break;
-      case MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter:
+      case MikuExtensions.Services.ServicesNames.EmotionGuidance:
+        // @ts-ignore
+        const scneario = props.scenarios.find((scenario: any) => scenario.id === props.start_scenario);
+        const emotionImages = scneario?.emotion_images || [];
         outputListener =
-          new MikuExtensions.OutputListeners.SBertEmotionRenderer({
-            serviceEndpoint: `${servicesEndpoint}/${service}`,
+          new MikuExtensions.OutputListeners.EmotionOutputListener({
+            serviceEndpoint: `${servicesEndpoint}/${MikuExtensions.Services.ServicesNames.EmotionGuidance}`,
             signer: signer,
-            props: {
-              ...props,
-            } as MikuExtensions.Services.SBertEmotionInterpreterProps,
+            scene: {
+              id: scneario.id,
+              emotionGroupId: scneario.template,
+              emotions: emotionImages.map(({ id, hashes}) => ({ id, hash: hashes[0]}))
+            }
           });
-          outputListener.subscribe(async (output) => {
+          outputListener.subscribe(async (output: { text: string, emotion: string, audio?: string}) => {
             const aphrodite = getAphroditeConfig();
             if (aphrodite.enabled) {
               const memoryLines = memory.getMemory();
@@ -197,14 +191,14 @@ class BotFactory {
                 text: lastSentMessage.text,
                 isBot: false,
                 emotionId: output.emotion,
-                sceneId: output.nextContextId,
+                sceneId: props['start_scenario'],
                 audioId: '',
               };
               const secondMessage: ChatMessageInput = {
                 text: output.text,
                 isBot: true,
                 emotionId: output.emotion,
-                sceneId: output.nextContextId,
+                sceneId: props['start_scenario'],
                 audioId: '',
               }
               let chatId = aphrodite.chatId;
@@ -355,53 +349,35 @@ class BotFactory {
         return botConfig;
       },
 
-      subscribeContextChangeSuggestion(
-        cb: (contextId: string) => void
-      ): boolean {
+      changeScenario(scenarioId: string): boolean {
         const listener = dialogOutputListeners.find(
           (listener) =>
-            listener instanceof
-            MikuExtensions.OutputListeners.SBertEmotionRenderer
-        ) as MikuExtensions.OutputListeners.SBertEmotionRenderer;
-        listener?.subscribe(function (
-          output: MikuExtensions.OutputListeners.SBertEmotionRendererOutput
-        ) {
-          if (!output.shouldContextChange) return;
-          if (output.nextContextId !== listener.getCurrentContextId()) {
-            cb(output.nextContextId);
-          } else {
-            const contextId = listener.contextIds.find(
-              (contextId) => contextId !== listener.getCurrentContextId()
-            );
-            cb(contextId || output.nextContextId);
-          }
-        });
-        return !!listener;
-      },
-
-      changeContext(contextId: string): boolean {
-        const listener = dialogOutputListeners.find(
-          (listener) =>
-            listener instanceof
-            MikuExtensions.OutputListeners.SBertEmotionRenderer
-        );
+            listener instanceof MikuExtensions.OutputListeners.EmotionOutputListener
+        ) as MikuExtensions.OutputListeners.EmotionOutputListener;
         if (!listener) return false;
-        (
-          listener as MikuExtensions.OutputListeners.SBertEmotionRenderer
-        ).setContextId(contextId);
+        const listenerConfig = botConfig.outputListeners.find(
+          (listenerConfig) => listenerConfig.service === MikuExtensions.Services.ServicesNames.EmotionGuidance
+        );
+        // @ts-ignore
+        const scenario = listenerConfig?.props.scenarios.find((scenario: any) => scenario.id === scenarioId);
+        const emotionImages = scenario?.emotion_images || [];
+
+        listener.setScene({
+          id: scenarioId,
+          emotionGroupId: scenario.template,
+          emotions: emotionImages.map(({ id, hashes}) => ({ id, hash: hashes[0]}))
+        });
         return true;
       },
 
       subscribeDialog(
         cb: (
-          output: MikuExtensions.OutputListeners.EmotionRendererOutput
+          output: MikuExtensions.OutputListeners.EmotionOutput
         ) => void
       ): boolean {
         const listener = dialogOutputListeners.find(
           (listener) =>
-            listener instanceof
-              MikuExtensions.OutputListeners.SBertEmotionRenderer ||
-            listener instanceof MikuExtensions.OutputListeners.EmotionRenderer
+            listener instanceof MikuExtensions.OutputListeners.EmotionOutputListener
         );
         listener?.subscribe(cb);
         return !!listener;

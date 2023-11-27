@@ -9,7 +9,6 @@ export abstract class AbstractTokenizer {
 
 export class LLaMATokenizer extends AbstractTokenizer {
   override encodeString(str: string, add_bos_token?: boolean, add_preceding_space?: boolean, log_performance?: boolean): number[] {
-    console.log('ENCODING HERE!')
     if (str.endsWith(this.getEOS())) {
       str = str.substring(0, str.length - this.getEOS().length);
       return [
