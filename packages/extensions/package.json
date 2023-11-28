@@ -49,7 +49,7 @@
     "gpt3-tokenizer": "^1.1.5",
     "ipfs-only-hash": "^4.0.0",
     "lodash.trim": "^4.5.1",
-    "openai": "^4.2.0",
+    "openai": "^4.19.0",
     "prop-types": "^15.8.1"
   },
   "gitHead": "2a1ced2ec5f6b6e6dbc3e12143d0a6a29abfe2f3"

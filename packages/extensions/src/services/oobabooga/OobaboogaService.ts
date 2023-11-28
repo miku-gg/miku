@@ -2,6 +2,7 @@ import * as Miku from "@mikugg/core";
 import PropTypes, { InferProps } from "prop-types";
 import axios from "axios";
 import { TokenizerType, tokenCount } from "../../tokenizers/Tokenizers";
+import { AphroditeConfig } from "..";
 
 export interface OobaboogaServiceConfig extends Miku.Services.ServiceConfig {
   gradioEndpoint: string;
@@ -63,46 +64,40 @@ export class OobaboogaService extends Miku.Services.Service {
 
     let gradioEndpoint = this.gradioEndpoint;
     if (input.gradioEndpoint) gradioEndpoint = input.gradioEndpoint;
+    const completionConfig: AphroditeConfig = {
+      n: 1,
+      max_tokens: modelSettings.maxTokens,
+      temperature: modelSettings.temp,
+      top_p: modelSettings.topP,
+      typical_p: modelSettings.typicalP,
+      repetition_penalty: modelSettings.repetitionPenalty,
+      top_k: modelSettings.topK,
+      presence_penalty: modelSettings.penaltyAlpha,
+      length_penalty: modelSettings.lengthPenalty,
+      early_stopping: modelSettings.earlyStopping,
+      truncation_length: modelSettings.truncateLength,
+      skip_special_tokens: modelSettings.skipSpecialTokens,
+      stop: modelSettings.stoppingStrings
+        ? modelSettings.stoppingStrings.split(",")
+        : [],
+    }
     const completion = await axios.post(
-      `${gradioEndpoint}/v1/generate`,
+      `${gradioEndpoint}/v1/completions`,
       {
+        ...completionConfig,
         prompt: input.prompt,
-        max_new_tokens: modelSettings.maxTokens,
-        do_sample: modelSettings.doSample,
-        temperature: modelSettings.temp,
-        top_p: modelSettings.topP,
-        typical_p: modelSettings.typicalP,
-        repetition_penalty: modelSettings.repetitionPenalty,
-        encoder_repetition_penalty: modelSettings.encoderRepitionPenalty,
-        top_k: modelSettings.topK,
-        min_length: modelSettings.minLength,
-        no_repeat_ngram_size: modelSettings.noRepeatNgramSize,
-        num_beams: modelSettings.numBeams,
-        penalty_alpha: modelSettings.penaltyAlpha,
-        length_penalty: modelSettings.lengthPenalty,
-        early_stopping: modelSettings.earlyStopping,
-        seed: modelSettings.seed,
-        add_bos_token: modelSettings.addBosToken,
-        truncation_length: modelSettings.truncateLength,
-        ban_eos_token: modelSettings.banEosToken,
-        skip_special_tokens: modelSettings.skipSpecialTokens,
-        stopping_strings: modelSettings.stoppingStrings
-          ? modelSettings.stoppingStrings.split(",")
-          : [],
       },
       {
         headers: {
           "Content-Type": "application/json",
-          "X-API-KEY": 'EMPTY',
+          "X-API-KEY": 'sk-EMPTY',
         },
       }
     );
 
-    const result = completion?.data?.results?.length ? completion?.data?.results[0] : {text: ''};
-
-    return (
-      (result.text || '').replace(input.prompt, "") || ""
-    );
+    const choices = completion?.data?.choices || [];
+    const result = choices.length ? choices[0].text || "" : "";
+    return result || '';
   }
 
   protected async calculatePrice(
