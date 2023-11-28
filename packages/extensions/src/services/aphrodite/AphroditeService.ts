@@ -286,7 +286,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
     const prompt = await this.generatePrompt(input);
     const tokens = tokenCount(prompt, TokenizerType.LLAMA);
     if (
-      Math.min(this.aphroditeConfig.max_tokens, this.aphroditeConfig.max_tokens - tokens) <= 0
+      Math.min(this.aphroditeConfig.max_tokens, this.aphroditeConfig.truncation_length - tokens) <= 0
     ) return "";
     const completion = await this.simpleCompletion(prompt, input.userName || 'Anon');
     return completion;
@@ -332,7 +332,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
     userName: string
   ): Promise<string> {
     const completion = await axios.post(
-      `${this.aphroditeEndpoint}/v1/completions`,
+      `${this.aphroditeEndpoint}/completions`,
       {
         ...this.aphroditeConfig,
         stop: [

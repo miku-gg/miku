@@ -110,7 +110,7 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
 
     const allMemoryLines: MikuCore.Memory.MemoryLine[] = [
       {
-        subject: this.getBotSubject(),
+        subject: '',
         text: this.getInitiatorPrompt(),
         type: MikuCore.Commands.CommandType.DIALOG
       },
@@ -119,7 +119,7 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
 
     // build memory lines prompt from last to maxTokens
     for (let i = allMemoryLines.length - 1; i >= 0; i--) {
-      let memoryLineResult = '\n' + this.promptbuildStrategy.getMemoryLinePrompt(allMemoryLines[i], allMemoryLines[i].subject === this.getBotSubject());
+      let memoryLineResult = i > 0 ? '\n' + this.promptbuildStrategy.getMemoryLinePrompt(allMemoryLines[i], allMemoryLines[i].subject === this.getBotSubject()) : allMemoryLines[i].text;
       
       memoryLineResult = this.fillText(memoryLineResult)
 

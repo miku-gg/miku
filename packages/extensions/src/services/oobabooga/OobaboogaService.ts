@@ -82,7 +82,7 @@ export class OobaboogaService extends Miku.Services.Service {
         : [],
     }
     const completion = await axios.post(
-      `${gradioEndpoint}/v1/completions`,
+      `${gradioEndpoint}/completions`,
       {
         ...completionConfig,
         prompt: input.prompt,
