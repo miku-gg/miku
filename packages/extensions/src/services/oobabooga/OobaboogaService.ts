@@ -85,6 +85,7 @@ export class OobaboogaService extends Miku.Services.Service {
       `${gradioEndpoint}/completions`,
       {
         ...completionConfig,
+        model: 'default',
         prompt: input.prompt,
       },
       {

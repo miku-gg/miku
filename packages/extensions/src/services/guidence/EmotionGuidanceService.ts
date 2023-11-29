@@ -21,7 +21,7 @@ const EXAMPLE_TEMPLATE = `### Instruction:
 {{text}}
 
 ### Response:
-{{emotion}}
+ {{emotion}}
 `
 
 export const EmotionGuidanceServicePropTypes = {
@@ -89,9 +89,9 @@ export class EmotionGuidanceService extends Miku.Services.Service<string> {
       ['emotions_string', emotions.join(', ')],
       ['examples', examples],
       ['query', query],
-      ['emotions', emotions],
+      ['emotions', emotions.map(e => ' ' + e)],
     ]));
-    return result.get('answer') || emotions[0];
+    return (result.get('answer') || emotions[0]).trim();
   }
 
   protected async calculatePrice(

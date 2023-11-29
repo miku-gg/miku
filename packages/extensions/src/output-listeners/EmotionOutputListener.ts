@@ -65,6 +65,7 @@ export class EmotionOutputListener extends Core.OutputListeners.SimpleListener<E
       hash: string,
     }[]
   };
+  private history: {text: string, emotion: string}[] = []
 
   constructor(params: EmotionGuidanceRendererParams) {
     super();
@@ -87,16 +88,21 @@ export class EmotionOutputListener extends Core.OutputListeners.SimpleListener<E
     this.scene = scene;
   }
 
-  protected override async handleOutput(output: Core.OutputListeners.DialogOutputEnvironment, memory: Core.Memory.ShortTermMemory): Promise<EmotionOutput> {
+  protected override async handleOutput(output: Core.OutputListeners.DialogOutputEnvironment): Promise<EmotionOutput> {
     const emotionGroup = EMOTION_GROUPS.find((group) => group.id === this.scene.emotionGroupId);
     try {
       if (!emotionGroup) throw new Error(`Emotion group ${this.scene.emotionGroupId} not found`);
-      
+      const examplesFromHistory = this.history.filter((item) => emotionGroup.emotions.includes(item.emotion));
+  
       const resultEmotion = await this.service.query({
         emotions: emotionGroup.emotions,
-        messages: emotionGroup.examples,
+        messages: [
+          ...emotionGroup.examples,
+          ...examplesFromHistory
+        ].reverse().slice(0, 5),
         query: output.text,
       }, await this.getCost());
+      this.history.push({text: output.text, emotion: resultEmotion});
 
       const resultHash = this.scene.emotions.find((emotion) => emotion.id === resultEmotion)?.hash || '';
 
