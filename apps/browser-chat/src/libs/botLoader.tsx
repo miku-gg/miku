@@ -360,7 +360,7 @@ export function useBot(): {
           const emotionInterpreter = decoratedConfig.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.EmotionGuidance);
           if (emotionInterpreter) {
             const bot = botFactory.getInstance();
-            bot?.changeContext(lastBotMessage?.sceneId || res.card.data.extensions.mikugg.start_scenario)
+            bot?.changeScenario(lastBotMessage?.sceneId || res.card.data.extensions.mikugg.start_scenario)
           }
         }
         if (!isDifferentBot && memoryLines.length) {
