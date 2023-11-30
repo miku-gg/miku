@@ -161,66 +161,47 @@ export const BotDisplay = () => {
     playAudio,
     onUpdate,
   } = useContext(InteractiveResponsesContext);
-  const currentContext = loading ? (prevResponse?.scene || response?.scene) : (response?.scene || card?.data.extensions.mikugg.start_scenario || '');
-  const [contextSuggestion, setContextSuggestion] = useState<string>("");
-  const scenario = card?.data.extensions.mikugg.scenarios.find(scenario => scenario.id === currentContext);
+  const currentScenarioId = loading ? (prevResponse?.scene || response?.scene) : (response?.scene || card?.data.extensions.mikugg.start_scenario || '');
+  const scenario = card?.data.extensions.mikugg.scenarios.find(scenario => scenario.id === currentScenarioId);
   const music = card?.data?.extensions?.mikugg?.sounds?.find(sound => sound.id === scenario?.music)?.source || scenario?.music || '';
 
   let backgroundImage = card?.data.extensions.mikugg.backgrounds.find(bg => bg.id === scenario?.background || '')?.source || '';
   const emotionId = response?.emotion || prevResponse?.emotion || "";
   let emotionImage = card?.data.extensions.mikugg.emotion_groups.find(eg => eg.id === scenario?.emotion_group || '')?.emotions.find(emotion => emotion.id === emotionId)?.source[0] || '';
   if (!emotionImage) {
-    const openAIEmotionConfig = botConfig?.outputListeners.find(
+    const emotionConfig = botConfig?.outputListeners.find(
       (listener: { service: string }) =>
         listener.service ===
-        MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter
+        MikuExtensions.Services.ServicesNames.EmotionGuidance
     );
-    const sbertEmotionConfig = botConfig?.outputListeners.find(
-      (listener: { service: string }) =>
-        listener.service ===
-        MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter
-    );
-    if (sbertEmotionConfig) {
-      const props =
-        sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
-      const images =
-        props.contexts.find((context) => context.id === currentContext)
+    if (emotionConfig) {
+      const props = emotionConfig.props;
+      // @ts-ignore
+      const images = props.scenarios.find((scenario) => scenario.id === currentScenarioId)
           ?.emotion_images || [];
       const imageCandidates = images.find(
         (image) => image.id === "neutral"
       )?.hashes;
       emotionImage = imageCandidates ? imageCandidates[0] : "";
-    } else {
-      // @ts-ignore
-      emotionImage = openAIEmotionConfig?.props?.images?.neutral || "";
     }
   }
 
-  useEffect(() => {
+  const updateScenario = (_scenarioId: string) => {
     const bot = botFactory.getInstance();
-    bot?.subscribeContextChangeSuggestion((contextId) => {
-      setContextSuggestion(contextId);
-    });
-  }, [botHash]);
-
-  const updateContext = (_contextId: string) => {
-    const bot = botFactory.getInstance();
-    const sbertEmotionConfig = botConfig?.outputListeners.find(
-      (listener) =>
-        listener.service ===
-        MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter
+    const emotionConfig = botConfig?.outputListeners.find(
+      (listener) => listener.service === MikuExtensions.Services.ServicesNames.EmotionGuidance
     );
-    if (bot && sbertEmotionConfig) {
-      const props =
-        sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
-      const context = props.contexts.find(
-        (context) => context.id === _contextId
+    if (bot && emotionConfig) {
+      const props = emotionConfig.props;
+      // @ts-ignore
+      const scenario = props.scenarios.find(
+        (scenario) => scenario.id === _scenarioId
       );
-      if (context) {
-        bot.changeContext(_contextId);
+      if (scenario) {
+        bot.changeScenario(_scenarioId);
         // @ts-ignore
         const result = bot.sendPrompt(
-          `*${context.context_change_trigger}*`,
+          `*${scenario.context}*`,
           MikuCore.Commands.CommandType.CONTEXT
         );
         setResponsesGenerated(result ? [result.commandId] : []);
@@ -352,8 +333,8 @@ export const BotDisplay = () => {
               }
               <div className="inline-flex">
                 {
-                  ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1 && (responsesGenerated.length || currentContext !== card?.data.extensions.mikugg.start_scenario)) ? (
-                    <ScenarioSelector value={currentContext || ''} onChange={updateContext} />
+                  ((card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1 && (responsesGenerated.length || currentScenarioId !== card?.data.extensions.mikugg.start_scenario)) ? (
+                    <ScenarioSelector value={currentScenarioId || ''} onChange={updateScenario} />
                   ) : null
                 }
               </div>
@@ -490,7 +471,7 @@ export const BotDisplay = () => {
                   <UnmuteIcon size={24} />
                 </button>
               ) : null}
-              {!loading && contextSuggestion ? (
+              {/* {!loading && contextSuggestion ? (
                 <Tooltip title="Randomize character outfit" placement="left">
                   <button
                     className="wand-button absolute bottom-4 right-4 inline-flex items-center gap-2 text-white rounded-md hover:text-white"
@@ -499,7 +480,7 @@ export const BotDisplay = () => {
                     <Wand />
                   </button>
                 </Tooltip>
-              ) : null}
+              ) : null} */}
               {!loading &&
               responsesGenerated.length > 1 &&
               responseIndex === 0 ? (

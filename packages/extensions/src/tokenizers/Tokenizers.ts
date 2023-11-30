@@ -1,9 +1,9 @@
 // Import external tokenizer libraries
 import _GPT3Tokenizer from "gpt3-tokenizer";
-import _llamaTokenizer from "./LLaMATokenizer";
+import * as Guidance from "@mikugg/guidance";
 
 const gptTokenizer = new _GPT3Tokenizer({ type: 'gpt3' });
-const llamaTokenizer = _llamaTokenizer;
+const llamaTokenizer = new Guidance.Tokenizer.LLaMATokenizer();
 
 abstract class Tokenizer {
   abstract tokenCount(text: string): number;
@@ -17,7 +17,7 @@ class GPT3Tokenizer extends Tokenizer {
 
 class LLaMATokenizer extends Tokenizer {
   tokenCount(text: string): number {
-    return llamaTokenizer.encode(text).length;
+    return llamaTokenizer.encodeString(text).length;
   }
 }
 

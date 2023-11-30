@@ -409,7 +409,7 @@ const processMikuZip = async (file: File): Promise<MikuCard> => {
   } else {
     const config = zipContent.config as BotConfigV2;
     const memory = config.short_term_memory.props as MikuExtensions.Memory.GPTShortTermMemoryV2Config;
-    const emotions = config.outputListeners.find(item => item.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter)?.props as MikuExtensions.Services.SBertEmotionInterpreterProps || {};
+    const emotions = config.outputListeners.find(item => item.service === MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter)?.props as any || {};
     const voice = config.outputListeners.find(item => (
       item.service === MikuExtensions.Services.ServicesNames.AzureTTS ||
       item.service === MikuExtensions.Services.ServicesNames.ElevenLabsTTS ||

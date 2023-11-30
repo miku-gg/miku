@@ -16,12 +16,6 @@ export function parseExampleMessages(s: string): string[] {
 const emotionTemplateSlugs = ['base-emotions', 'lewd-emotions'] as const;
 export type EmotionTemplateSlug = (typeof emotionTemplateSlugs)[number];
 
-const emotionTemplates = new Map<EmotionTemplateSlug, string>([
-  ['base-emotions', 'Qmdr5ooTdADLFZA6dCvTE28neq1S7aQwZyma7266weGJZV'],
-  ['lewd-emotions', 'QmPNrWHqQJK4Uj1ZsBMTUT6RAPrVRTF6ngdydm8cQZe71C'],
-]);
-
-
 export const mikuCardToBotConfig = (card: MikuCard): BotConfig => {
   const { mikugg } = card.data.extensions;
   const scenario = mikugg.scenarios.find(_scneario => _scneario.id === mikugg.start_scenario); 
@@ -73,17 +67,15 @@ export const mikuCardToBotConfig = (card: MikuCard): BotConfig => {
         }
       },
       {
-        "service": MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter,
+        "service": MikuExtensions.Services.ServicesNames.EmotionGuidance,
         "props": {
-          "model": "all-MiniLM-L6-v2",
-          "start_context": mikugg.start_scenario,
-          "context_base_description_embeddings": "",
-          "contexts": mikugg.scenarios.map((scenario) => {
+          "start_scenario": mikugg.start_scenario,
+          "scenarios": mikugg.scenarios.map((scenario) => {
             const emotion_group = mikugg.emotion_groups.find(_emotion_group => _emotion_group.id === scenario?.emotion_group);
             return {
               id: scenario.id,
-              "context_change_trigger": scenario.context,
-              "emotion_embeddings": emotionTemplates.get(emotion_group?.template as EmotionTemplateSlug) || "",
+              "context": scenario.context,
+              "template": emotion_group?.template as EmotionTemplateSlug,
               "emotion_images": emotion_group?.emotions.map(emotion => ({
                 id: emotion.id,
                 audio: emotion.sound,

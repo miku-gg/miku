@@ -38,7 +38,7 @@ export class AlpacaStrategy implements ContextPromptBuildStrategy {
   }
 
   getResponseAskLine(): string {
-    return '### Response (2 paragraphs, engaging, natural, authentic, descriptive, creative):\n{{char}}: ';
+    return '### Response (2 paragraphs, engaging, natural, authentic, descriptive, creative):\n{{char}}:';
   }
 
   getBotSubject(parts: ContextPromptParts): string {

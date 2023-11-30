@@ -1,6 +1,6 @@
 import * as Miku from "@mikugg/core";
 import PropTypes, { InferProps } from "prop-types";
-import tokenizer, { LLaMATokenizer } from '../../tokenizers/LLaMATokenizer';
+import { tokenCount, TokenizerType } from '../../tokenizers/Tokenizers';
 import axios from "axios";
 
 export interface PygmalionServiceConfig extends Miku.Services.ServiceConfig {
@@ -28,7 +28,6 @@ export const PygmalionServicePropTypes = {
 };
 
 export class PygmalionService extends Miku.Services.Service {
-  private tokenizer: LLaMATokenizer;
   private koboldEndpoint: string;
   protected defaultProps: InferProps<typeof PygmalionServicePropTypes> = {
     settings: "",
@@ -42,7 +41,6 @@ export class PygmalionService extends Miku.Services.Service {
   constructor(config: PygmalionServiceConfig) {
     super(config);
     this.koboldEndpoint = config.koboldEndpoint;
-    this.tokenizer = tokenizer;
   }
 
   protected async computeInput(
@@ -86,7 +84,7 @@ export class PygmalionService extends Miku.Services.Service {
     input: InferProps<typeof this.propTypesRequired>
   ): Promise<number> {
     const modelSettings = JSON.parse(input.settings);
-    const gptTokens = this.tokenizer.encode(input.prompt).length;
+    const gptTokens = tokenCount(TokenizerType.LLAMA, input.prompt);
     return gptTokens + (modelSettings.maxTokens || 0);
   }
 }

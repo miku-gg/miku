@@ -97,16 +97,6 @@ export const InteractiveResponsesContextProvider = ({
       }
       setResponseIndex(0);
       onUpdate();
-
-      const sbertEmotionConfig = botConfig?.outputListeners.find(
-        (listener) =>
-          listener.service ===
-          MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter
-      );
-      if (sbertEmotionConfig) {
-        const props =
-          sbertEmotionConfig.props as MikuExtensions.Services.SBertEmotionInterpreterProps;
-      }
     }
     bot?.subscribePromptSent((command) => {
       fillResponse(command.commandId);
@@ -118,7 +108,7 @@ export const InteractiveResponsesContextProvider = ({
     bot?.subscribeDialog((output) => {
       fillResponse(output.commandId, "text", output.text);
       fillResponse(output.commandId, "emotion", output.emotion);
-      fillResponse(output.commandId, "scene", output.nextContextId);
+      fillResponse(output.commandId, "scene", output.sceneId);
       onUpdate();
 
 

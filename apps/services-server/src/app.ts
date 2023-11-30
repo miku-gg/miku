@@ -99,6 +99,7 @@ if (PYGMALION_ENDPOINT) {
 if (OOBABOOGA_ENDPOINT) {
   new MikuExtensions.Services.OobaboogaService({
     gradioEndpoint: OOBABOOGA_ENDPOINT,
+    apiKey: '',
     serviceId: MikuExtensions.Services.ServicesNames.Oobabooga,
     billingEndpoint: '',
     addRoute
@@ -127,22 +128,12 @@ if (OPENAI_API_KEY) {
   });
 }
 
-if (SBERT_EMOTIONS_ENABLED) {
-  new MikuExtensions.Services.SBertEmotionInterpreterService({
-    serviceId: MikuExtensions.Services.ServicesNames.SBertEmotionInterpreter,
-    billingEndpoint: '',
-    sbertSimilarityAPIToken: SBERT_SIMILARITY_API_TOKEN,
-    sbertSimilarityAPIUrl: SBERT_SIMILARITY_API_URL,
-    addRoute
-  });
-}
-
 const APHRODITE_ENDPOINT = process.env.APHRODITE_ENDPOINT || '';
 const APHRODITE_S3_BUCKET = process.env.APHRODITE_S3_BUCKET || '';
 const APHRODITE_S3_REGION = process.env.APHRODITE_S3_REGION || '';
 const APHRODITE_S3_ACCESS_KEY = process.env.APHRODITE_S3_ACCESS_KEY || '';
 const APHRODITE_S3_SECRET_KEY = process.env.APHRODITE_S3_SECRET_KEY || '';
-
+/*
 if (APHRODITE_ENDPOINT) {
   new MikuExtensions.Services.AphroditePromptCompleterService({
     serviceId: MikuExtensions.Services.ServicesNames.Aphrodite,
@@ -157,26 +148,30 @@ if (APHRODITE_ENDPOINT) {
       }
     },
     aphroditeEndpoint: APHRODITE_ENDPOINT,
-    aphroditeApiKey: 'EMPTY',
+    aphroditeApiKey: '',
     aphoditeConfig: {
-      max_new_tokens: 300,
-      do_sample: true,
-      temperature: 0.7,
-      top_p: 0.1,
+      truncation_length: 4096,
+      max_tokens: 300,
+      n: 1,
+      best_of: 1,
+      presence_penalty: 0.0,
+      frequency_penalty: 0.0,
+      repetition_penalty: 1.17,
+      temperature: 1.31,
+      top_p: 0.14,
+      top_k: 49,
+      top_a: 0.52,
+      tfs: 1,
+      eta_cutoff: 10.42,
+      epsilon_cutoff: 1.49,
       typical_p: 1,
-      repetition_penalty: 1.18,
-      repetition_penalty_range: 0,
-      encoder_repetition_penalty: 1,
-      top_k: 40,
-      min_length: 200,
-      no_repeat_ngram_size: 0,
-      num_beams: 1,
-      penalty_alpha: 0,
-      length_penalty: 1,
+      mirostat_mode: 0,
+      mirostat_tau: 5.0,
+      mirostat_eta: 0.1,
+      use_beam_search: false,
+      length_penalty: 1.0,
       early_stopping: false,
-      seed: -1,
-      add_bos_token: true,
-      stopping_strings: [
+      stop: [
         '\n### Instruction:',
         '\n' +
           '### Response (2 paragraphs, engaging, natural, authentic, descriptive, creative):',
@@ -185,19 +180,30 @@ if (APHRODITE_ENDPOINT) {
         '\n#',
         '\n\n\n'
       ],
-      truncation_length: 4096,
-      ban_eos_token: false,
+      ignore_eos: false,
+      custom_token_bans: [],
       skip_special_tokens: true,
-      top_a: 0,
-      tfs: 1,
-      epsilon_cutoff: 0,
-      eta_cutoff: 0,
-      mirostat_mode: 0,
-      mirostat_tau: 5,
-      mirostat_eta: 0.1,
-      use_mancer: true
+      spaces_between_special_tokens: true,
     },
   })
+}
+*/
+if (APHRODITE_ENDPOINT) {
+  new MikuExtensions.Services.EmotionGuidanceService({
+    addRoute,
+    serviceId: MikuExtensions.Services.ServicesNames.EmotionGuidance,
+    billingEndpoint: '',
+    aphroditeApiKey: 'sk-EMPTY',
+    aphroditeEndpoint: APHRODITE_ENDPOINT,
+  })
+} else if (SBERT_EMOTIONS_ENABLED) {
+  new MikuExtensions.Services.SBertEmotionInterpreterService({
+    serviceId: MikuExtensions.Services.ServicesNames.EmotionGuidance,
+    billingEndpoint: '',
+    sbertSimilarityAPIToken: SBERT_SIMILARITY_API_TOKEN,
+    sbertSimilarityAPIUrl: SBERT_SIMILARITY_API_URL,
+    addRoute
+  });
 }
 
 export default app;
