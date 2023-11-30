@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.400.0",
-    "@mikugg/core": "^0.8.0",
+    "@mikugg/core": "workspace:^",
     "@mikugg/guidance": "workspace:*",
     "@types/axios": "^0.14.0",
     "@types/lodash.trim": "^4.5.7",

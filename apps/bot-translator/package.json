@@ -15,7 +15,7 @@
   "dependencies": {
     "@aws-crypto/crc32": "^4.0.0",
     "@mikugg/bot-utils": "workspace:^",
-    "@mikugg/ui-kit": "workspace:^0.7.0",
+    "@mikugg/ui-kit": "workspace:^",
     "buffer": "^6.0.3",
     "openai": "^3.2.1",
     "png-chunk-text": "^1.0.0",
