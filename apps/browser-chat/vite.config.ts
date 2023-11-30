@@ -13,11 +13,11 @@ export default defineConfig({
     'setImmediate': 'setTimeout.bind(null)',
   },
   optimizeDeps: {
-    include: ["@mikugg/core", "@mikugg/extensions", "@mikugg/bot-utils"],
+    include: ["@mikugg/core", "@mikugg/extensions", "@mikugg/bot-utils", "@mikugg/guidance"],
   },
   build: {
     commonjsOptions: {
-      include: [/core/, /extensions/, /bot-utils/, /node_modules/],
+      include: [/core/, /extensions/, /bot-utils/, /guidance/, /node_modules/],
     },
   },
   resolve: {
