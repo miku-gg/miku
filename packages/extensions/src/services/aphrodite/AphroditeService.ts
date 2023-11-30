@@ -346,7 +346,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
       {
         headers: {
           "Content-Type": "application/json",
-          "X-API-KEY": this.aphroditeApiKey,
+          "Authorization": 'Bearer ' + this.aphroditeApiKey,
         },
       }
     );

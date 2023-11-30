@@ -99,6 +99,7 @@ if (PYGMALION_ENDPOINT) {
 if (OOBABOOGA_ENDPOINT) {
   new MikuExtensions.Services.OobaboogaService({
     gradioEndpoint: OOBABOOGA_ENDPOINT,
+    apiKey: '',
     serviceId: MikuExtensions.Services.ServicesNames.Oobabooga,
     billingEndpoint: '',
     addRoute
@@ -132,7 +133,7 @@ const APHRODITE_S3_BUCKET = process.env.APHRODITE_S3_BUCKET || '';
 const APHRODITE_S3_REGION = process.env.APHRODITE_S3_REGION || '';
 const APHRODITE_S3_ACCESS_KEY = process.env.APHRODITE_S3_ACCESS_KEY || '';
 const APHRODITE_S3_SECRET_KEY = process.env.APHRODITE_S3_SECRET_KEY || '';
-
+/*
 if (APHRODITE_ENDPOINT) {
   new MikuExtensions.Services.AphroditePromptCompleterService({
     serviceId: MikuExtensions.Services.ServicesNames.Aphrodite,
@@ -147,7 +148,7 @@ if (APHRODITE_ENDPOINT) {
       }
     },
     aphroditeEndpoint: APHRODITE_ENDPOINT,
-    aphroditeApiKey: 'sk-EMPTY',
+    aphroditeApiKey: '',
     aphoditeConfig: {
       truncation_length: 4096,
       max_tokens: 300,
@@ -186,7 +187,7 @@ if (APHRODITE_ENDPOINT) {
     },
   })
 }
-
+*/
 if (APHRODITE_ENDPOINT) {
   new MikuExtensions.Services.EmotionGuidanceService({
     addRoute,

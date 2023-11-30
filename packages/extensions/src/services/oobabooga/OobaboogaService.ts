@@ -6,6 +6,7 @@ import { AphroditeConfig } from "..";
 
 export interface OobaboogaServiceConfig extends Miku.Services.ServiceConfig {
   gradioEndpoint: string;
+  apiKey: string;
 }
 
 export const OobaboogaServicePropTypes = {
@@ -39,6 +40,7 @@ export type OobaboogaSettings = {
 
 export class OobaboogaService extends Miku.Services.Service {
   private gradioEndpoint: string;
+  private apiKey: string;
   protected defaultProps: InferProps<typeof OobaboogaServicePropTypes> = {
     prompt: "",
     gradioEndpoint: "",
@@ -51,6 +53,7 @@ export class OobaboogaService extends Miku.Services.Service {
   constructor(config: OobaboogaServiceConfig) {
     super(config);
     this.gradioEndpoint = config.gradioEndpoint;
+    this.apiKey = config.apiKey || '';
   }
 
   protected async computeInput(
@@ -63,7 +66,11 @@ export class OobaboogaService extends Miku.Services.Service {
     if (maxTokens <= 0) return "";
 
     let gradioEndpoint = this.gradioEndpoint;
-    if (input.gradioEndpoint) gradioEndpoint = input.gradioEndpoint;
+    let apiKey = this.apiKey;
+    if (input.gradioEndpoint) {
+      gradioEndpoint = input.gradioEndpoint;
+      apiKey = '';
+    }
     const completionConfig: AphroditeConfig = {
       n: 1,
       max_tokens: modelSettings.maxTokens,
@@ -91,7 +98,7 @@ export class OobaboogaService extends Miku.Services.Service {
       {
         headers: {
           "Content-Type": "application/json",
-          "X-API-KEY": 'sk-EMPTY',
+          "Authorization": 'Bearer ' + apiKey,
         },
       }
     );
