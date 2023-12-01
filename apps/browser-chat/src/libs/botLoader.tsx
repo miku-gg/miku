@@ -6,7 +6,7 @@ import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, V
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import platformAPI from "./platformAPI";
-import { fillResponse } from "./responsesStore";
+import { fillResponse, responsesStore } from "./responsesStore";
 import debounce from "lodash.debounce";
 import { getChat } from "./postMessage";
 
@@ -136,8 +136,10 @@ export interface BotData {
   disabled: boolean
 }
 
+let searchString = location.search;
+
 export function getBotDataFromURL(): BotData {
-  const searchParams = queryString.parse(location.search);
+  const searchParams = queryString.parse(searchString);
   return {
     hash: String(searchParams['bot'] || '') || '',
     settings: (function (): BotConfigSettings {
@@ -199,6 +201,7 @@ export function setBotDataInURL(botData: BotData) {
 
   const newSearchString = queryString.stringify(newSearchParams);
   window.history.replaceState({}, 'bot', `/?${newSearchString}`);
+  searchString = newSearchString;
 }
 
 export function useBot(): {
@@ -220,7 +223,8 @@ export function useBot(): {
 
   // Get data from url params
 
-  const _botLoadCallback = useCallback((_hash: string = getBotHashFromUrl(), _botData: BotData = getBotDataFromURL()) =>{
+  const _botLoadCallback = useCallback((_hash: string = getBotHashFromUrl(), __botData?: BotData) =>{
+    const _botData = __botData || getBotDataFromURL();
     setBotHash(_hash);
     const isDifferentBot = getBotHashFromUrl() !== _hash;
     let memoryLines = botFactory.getInstance()?.getMemory().getMemory() || [];
@@ -336,7 +340,8 @@ export function useBot(): {
         
         if (
           _botData.settings.promptCompleterEndpoint.type === PromptCompleterEndpointType.APHRODITE &&
-          _botData.settings.promptCompleterEndpoint.genSettings.chatId
+          _botData.settings.promptCompleterEndpoint.genSettings.chatId &&
+          !memoryLines.length
         ) {
           const narration = await getChat();
           memoryLines = narration.narrationMessages.map((message) => ({
@@ -345,7 +350,7 @@ export function useBot(): {
             subject: message.isBot ? decoratedConfig.bot_name : _botData.settings.text.name,
             text: message.text,
           }));
-          const botMessages = narration.narrationMessages.filter(message => message.isBot).map((message) => {
+          narration.narrationMessages.filter(message => message.isBot).map((message) => {
             const firstScenario = res.card?.data.extensions.mikugg.scenarios.find(_scenario => message.sceneId === _scenario.id);
             const firstEmotionGroup = res.card?.data.extensions.mikugg.emotion_groups.find(emotion_group => firstScenario?.emotion_group === emotion_group.id);
             const firstEmotion = firstEmotionGroup?.emotions?.find(emotion => emotion?.id === message.emotionId) || firstEmotionGroup?.emotions[0];
@@ -357,12 +362,13 @@ export function useBot(): {
 
             return message;
           });
-          const lastBotMessage = botMessages.length ? botMessages[botMessages.length - 1] : null;
-          const emotionInterpreter = decoratedConfig.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.EmotionGuidance);
-          if (emotionInterpreter) {
-            const bot = botFactory.getInstance();
-            bot?.changeScenario(lastBotMessage?.sceneId || res.card.data.extensions.mikugg.start_scenario)
-          }
+        }
+        const lastBotMessage = memoryLines.length ? memoryLines[memoryLines.length - 1] : null;
+        const emotionInterpreter = decoratedConfig.outputListeners.find(listener => listener.service === MikuExtensions.Services.ServicesNames.EmotionGuidance);
+        const lastSceneId = responsesStore.get(lastBotMessage?.id || '')?.scene
+        if (emotionInterpreter && lastSceneId) {
+          const bot = botFactory.getInstance();
+          bot?.changeScenario(lastSceneId || res.card.data.extensions.mikugg.start_scenario)
         }
         if (!isDifferentBot && memoryLines.length) {
           const memory = botFactory.getInstance()?.getMemory();
@@ -381,9 +387,22 @@ export function useBot(): {
   }, [setBotConfig, setError, setLoading, setBotHash]);
 
   const _setBotConfigSettings = useCallback((_botConfigSettings: BotConfigSettings) => {
+    const _botData = getBotDataFromURL();
     const newBotData = {
-      ...getBotDataFromURL(),
-      settings: _botConfigSettings,
+      ..._botData,
+      settings: {
+        ..._botData.settings,
+        ..._botConfigSettings,
+        promptCompleterEndpoint: {
+          ..._botData.settings.promptCompleterEndpoint,
+          ..._botConfigSettings.promptCompleterEndpoint.genSettings,
+          genSettings: {
+            ..._botData.settings.promptCompleterEndpoint.genSettings,
+            ..._botConfigSettings.promptCompleterEndpoint.genSettings,
+            chatId: _botData.settings.promptCompleterEndpoint.genSettings['chatId'],
+          }
+        }
+      } as BotConfigSettings,
     };
     _botLoadCallback(newBotData.hash, newBotData);
   }, [setBotConfigSettings, _botLoadCallback])
