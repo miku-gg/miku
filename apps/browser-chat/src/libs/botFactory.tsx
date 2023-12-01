@@ -182,7 +182,7 @@ class BotFactory {
               emotions: emotionImages.map(({ id, hashes}) => ({ id, hash: hashes[0]}))
             }
           });
-          outputListener.subscribe(async (output: { text: string, emotion: string, audio?: string}) => {
+          outputListener.subscribe(async (output: MikuExtensions.OutputListeners.EmotionOutput) => {
             const aphrodite = getAphroditeConfig();
             if (aphrodite.enabled) {
               const memoryLines = memory.getMemory();
@@ -191,14 +191,14 @@ class BotFactory {
                 text: lastSentMessage.text,
                 isBot: false,
                 emotionId: output.emotion,
-                sceneId: props['start_scenario'],
+                sceneId: output.sceneId,
                 audioId: '',
               };
               const secondMessage: ChatMessageInput = {
                 text: output.text,
                 isBot: true,
                 emotionId: output.emotion,
-                sceneId: props['start_scenario'],
+                sceneId: output.sceneId,
                 audioId: '',
               }
               let chatId = aphrodite.chatId;
