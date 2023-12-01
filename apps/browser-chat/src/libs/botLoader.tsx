@@ -301,6 +301,7 @@ export function useBot(): {
           if (_botData.settings.voice.voiceService.voiceId) {
             tts.props = {
               voiceId: _botData.settings.voice.voiceService.voiceId,
+              emotion: _botData.settings.voice.voiceService.emotion,
               readNonSpokenText: _botData.settings.voice.readNonSpokenText,
               enabled: _botData.settings.voice.enabled,
             };
