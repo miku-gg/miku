@@ -70,6 +70,7 @@ export type AphroditeSettings = {
   assetsUrl: string;
   botId: string;
   chatId: string;
+  model?: string;
 };
 
 export const OPENAI_MODELS = [

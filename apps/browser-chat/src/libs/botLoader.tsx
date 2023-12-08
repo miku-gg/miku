@@ -273,6 +273,8 @@ export function useBot(): {
                       prompt: "",
                       gradioEndpoint: "",
                       botHash: _hash,
+                      // @ts-ignore
+                      model: _botData.settings.promptCompleterEndpoint.genSettings.model || '',
                       userName: _botData.settings.text.name,
                     }
                 }

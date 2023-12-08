@@ -105,3 +105,35 @@
   font-family: 'Courier New', Courier, monospace;
   /* font-size: .9em; */
 }
+
+.brain-icon {
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+  color: #1b1f3a;
+}
+
+.brain-activated .brain-icon {
+  color: #fafafa;
+  animation: neon2 .5s ease-in-out infinite alternate;
+}
+
+.brain-icon:hover {
+  animation: neon1 .3s ease-in-out infinite alternate;
+}
+
+@keyframes neon1 {
+  from {
+    filter: drop-shadow(0 0 2px #cd5fea);
+  }
+  to {
+    filter: drop-shadow(0 0 10px #9b47b3);
+  }
+}
+@keyframes neon2 {
+  from {
+    filter: drop-shadow(0 0 5px white);
+  }
+  to {
+    filter: drop-shadow(0 0 8px white);
+  }
+}

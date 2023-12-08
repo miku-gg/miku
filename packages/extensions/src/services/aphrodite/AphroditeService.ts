@@ -239,6 +239,7 @@ export type AphroditeMessage = PropTypes.InferProps<typeof AphroditeMessagePropT
 export const AphroditePromptCompleterServicePropTypes = {
   botHash: PropTypes.string,
   userName: PropTypes.string,
+  model: PropTypes.string,
   messages: PropTypes.arrayOf(
     PropTypes.shape(AphroditeMessagePropType)
   ),
@@ -247,6 +248,7 @@ export const AphroditePromptCompleterServicePropTypes = {
 export interface AphroditePromptCompleterServiceConfig extends Miku.Services.ServiceConfig {
   s3Bucket: string;
   s3Config: S3ClientConfig;
+  aphroditeEndpointSmart?: string;
   aphroditeEndpoint: string;
   aphroditeApiKey: string;
   aphoditeConfig: AphroditeConfig
@@ -255,6 +257,7 @@ export interface AphroditePromptCompleterServiceConfig extends Miku.Services.Ser
 export class AphroditePromptCompleterService extends Miku.Services.Service {
   private botCardConnector: BotCardConnector;
   private aphroditeEndpoint: string;
+  private aphroditeEndpointSmart: string;
   private aphroditeApiKey: string;
   private aphroditeConfig: AphroditeConfig;
   protected defaultProps: InferProps<
@@ -272,6 +275,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
   constructor(config: AphroditePromptCompleterServiceConfig) {
     super(config);
     this.aphroditeEndpoint = config.aphroditeEndpoint;
+    this.aphroditeEndpointSmart = config.aphroditeEndpointSmart || '';
     this.aphroditeApiKey = config.aphroditeApiKey;
     this.aphroditeConfig = {
       ...DEFAULT_APHRODITE_CONFIG,
@@ -283,17 +287,19 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
   protected async computeInput(
     input: InferProps<typeof AphroditePromptCompleterServicePropTypes>
   ): Promise<string> {
-    const prompt = await this.generatePrompt(input);
+    const isSmart = !!this.aphroditeEndpointSmart && input.model === 'smart';
+    const prompt = await this.generatePrompt(input, isSmart);
     const tokens = tokenCount(prompt, TokenizerType.LLAMA);
     if (
       Math.min(this.aphroditeConfig.max_tokens, this.aphroditeConfig.truncation_length - tokens) <= 0
     ) return "";
-    const completion = await this.simpleCompletion(prompt, input.userName || 'Anon');
+    const completion = await this.simpleCompletion(prompt, input.userName || 'Anon', isSmart);
     return completion;
   }
 
   protected async generatePrompt(
-    input: InferProps<typeof AphroditePromptCompleterServicePropTypes>
+    input: InferProps<typeof AphroditePromptCompleterServicePropTypes>,
+    isSmart: boolean
   ): Promise<string> {
     const card = await this.botCardConnector.getBotCard(input.botHash || '');
 
@@ -305,7 +311,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
         input.userName || ''
       ],
       botSubject: card.data.name,
-      buildStrategySlug: "alpaca",
+      buildStrategySlug: isSmart ? 'vicuna11' : 'alpaca',
       parts: {
         "persona": card.data.description,
         "attributes": parseAttributes(card.data.personality),
@@ -329,10 +335,11 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
 
   protected async simpleCompletion(
     prompt: string,
-    userName: string
+    userName: string,
+    isSmart: boolean,
   ): Promise<string> {
     const completion = await axios.post(
-      `${this.aphroditeEndpoint}/completions`,
+      `${isSmart ? this.aphroditeEndpointSmart : this.aphroditeEndpoint}/completions`,
       {
         ...this.aphroditeConfig,
         stop: [

@@ -19,7 +19,7 @@ import {
 } from "../../chat-history/chat-history";
 import { BotDetails } from "../../bot-details/BotDetails";
 import "./BotDisplay.css";
-import { LeftArrow, RightArrow, Dice, Wand } from "../../../assets/icons/svg";
+import { LeftArrow, RightArrow, Dice, Wand, Brain } from "../../../assets/icons/svg";
 import { GearIcon, HistoryIcon, SlidersIcon, UnmuteIcon, ScreenFullIcon, ScreenNormalIcon } from "@primer/octicons-react";
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
@@ -33,7 +33,7 @@ import ProgressiveImage from "react-progressive-graceful-image";
 import { trackEvent } from "../../../libs/analytics";
 import platformAPI from "../../../libs/platformAPI";
 import { getAphroditeConfig } from "../../../App";
-import { PromptCompleterEndpointType } from "../../../libs/botSettingsUtils";
+import { AphroditeSettings, PromptCompleterEndpointType } from "../../../libs/botSettingsUtils";
 import MusicPlayer from "../../music/MusicPlayer";
 import SettingsModal, { SettingsState } from "../../settings/SettingsModal";
 import { updateChat } from "../../../libs/postMessage";
@@ -209,6 +209,24 @@ export const BotDisplay = () => {
     }
   };
 
+  const promptCompleterSettings = botConfigSettings.promptCompleterEndpoint.genSettings as AphroditeSettings;
+  const aphrodite = getAphroditeConfig();
+  const isSmart = aphrodite.enabled && promptCompleterSettings.model === 'smart';
+
+  const toggleBrain = () => {
+    setBotConfigSettings({
+      ...botConfigSettings,
+      promptCompleterEndpoint: {
+        ...botConfigSettings.promptCompleterEndpoint,
+        type: PromptCompleterEndpointType.APHRODITE,
+        genSettings: {
+          ...promptCompleterSettings,
+          model: isSmart ? 'normal' : 'smart',
+        }
+      }
+    })
+  }
+
   const handleHistoryButtonClick = () => setShowHistory(true);
   const displayBotDetails = () => setHandleBotDetailsInfo(true);
   const handleSettingsButtonClick = () => setShowSettings(true);
@@ -340,6 +358,15 @@ export const BotDisplay = () => {
               </div>
             </div>
             <div className="flex gap-4 text-white">
+            {aphrodite.enabled ? (
+                <div className={`inline-flex ${isSmart ? 'brain-activated' : ''}`}>
+                  <Tooltip title={isSmart ? 'Deactivate 70B' : 'Activate 70B model. Free for a limited time.'} placement="left">
+                    <button onClick={toggleBrain}>
+                      <Brain />
+                    </button>
+                  </Tooltip>
+                </div>
+              ) : null}
               {
                 music ? (
                   <MusicPlayer
