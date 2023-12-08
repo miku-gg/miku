@@ -288,7 +288,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
     input: InferProps<typeof AphroditePromptCompleterServicePropTypes>
   ): Promise<string> {
     const isSmart = !!this.aphroditeEndpointSmart && input.model === 'smart';
-    const prompt = await this.generatePrompt(input, isSmart);
+    const prompt = await this.generatePrompt(input);
     const tokens = tokenCount(prompt, TokenizerType.LLAMA);
     if (
       Math.min(this.aphroditeConfig.max_tokens, this.aphroditeConfig.truncation_length - tokens) <= 0
@@ -298,8 +298,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
   }
 
   protected async generatePrompt(
-    input: InferProps<typeof AphroditePromptCompleterServicePropTypes>,
-    isSmart: boolean
+    input: InferProps<typeof AphroditePromptCompleterServicePropTypes>
   ): Promise<string> {
     const card = await this.botCardConnector.getBotCard(input.botHash || '');
 
@@ -311,7 +310,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
         input.userName || ''
       ],
       botSubject: card.data.name,
-      buildStrategySlug: isSmart ? 'vicuna11' : 'alpaca',
+      buildStrategySlug: 'alpaca',
       parts: {
         "persona": card.data.description,
         "attributes": parseAttributes(card.data.personality),
