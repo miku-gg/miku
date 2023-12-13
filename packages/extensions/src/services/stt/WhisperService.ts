@@ -9,19 +9,16 @@ export const WhisperServicePropTypes = {
   file: PropTypes.string,
   model: PropTypes.string,
 };
+export type WhisperServiceInput = InferProps<typeof WhisperServicePropTypes>;
+export type WhisperServiceOutput = string;
 
-export interface WhisperServiceConfig extends Miku.Services.ServiceConfig {
+export interface WhisperServiceConfig extends Miku.Services.ServiceConfig<WhisperServiceInput, string> {
   costPerRequest: number;
   apiKey?: string;
   audioFilePath?: string;
 }
 
-export class WhisperService extends Miku.Services.Service<string> {
-  protected defaultProps: InferProps<typeof WhisperServicePropTypes>  = {
-    openai_key: '',
-    language: 'en',
-    model: 'whisper-1'
-  };
+export class WhisperService extends Miku.Services.Service<WhisperServiceInput, string> {
   protected costPerRequest: number;
   protected apiKey: string;
   protected audioFilePath: string;
@@ -37,15 +34,7 @@ export class WhisperService extends Miku.Services.Service<string> {
     });
   }
 
-  protected override getPropTypes(): PropTypes.ValidationMap<any> {
-    return WhisperServicePropTypes;
-  }
-
-  protected override async calculatePrice(input: PropTypes.InferProps<PropTypes.ValidationMap<any>>): Promise<number> {
-    return this.costPerRequest;
-  }
-
-  protected async computeInput(input: InferProps<typeof WhisperServicePropTypes>): Promise<string> {
+  protected async computeInput(input: WhisperServiceInput): Promise<string> {
     const filePath = this.audioFilePath + '/' + input.file;
     try {
       const [_filename, _fileextension] = input.file?.split('.') || ['',''];
@@ -84,5 +73,21 @@ export class WhisperService extends Miku.Services.Service<string> {
       } catch (e) {}
     return '';
     }
+  }
+
+  protected override getDefaultInput(): WhisperServiceInput {
+    return {
+      openai_key: '',
+      language: 'en',
+      model: 'whisper-1'
+    };
+  }
+
+  protected override getDefaultOutput(): string {
+    return '';
+  }
+
+  protected override validateInput(input: WhisperServiceInput): void {
+    PropTypes.checkPropTypes(WhisperServicePropTypes, input, 'input', 'WhisperService');
   }
 }

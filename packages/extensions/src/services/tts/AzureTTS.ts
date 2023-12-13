@@ -2,6 +2,8 @@ import axios from "axios";
 import {
   TTSService,
   TTSServiceConfig,
+  TTSServiceInput,
+  TTSServiceOutput,
   TTSServicePropTypes,
 } from "./TTSService";
 import { InferProps } from "prop-types";
@@ -29,9 +31,9 @@ export class AzureTTSService extends TTSService {
   }
 
   protected override async computeInput(
-    input: InferProps<typeof TTSServicePropTypes>,
+    input: TTSServiceInput,
     tries = 0
-  ): Promise<string> {
+  ): Promise<TTSServiceOutput> {
     const speakingStyle = input.emotion || "default";
     const langExpression =
       {

@@ -1,16 +1,12 @@
 import * as Core from "@mikugg/core";
-import { TTSServicePropTypes } from "../services/tts/TTSService";
-import { InferProps } from "prop-types";
+import { TTSServiceInput, TTSServiceOutput } from "../services/tts/TTSService";
 import { ServicesNames } from "../services";
 import trim from "lodash.trim";
 import { replaceAll } from "../memory/strategies";
 
-type TTSServiceProps = InferProps<typeof TTSServicePropTypes>;
-
 export interface TTSOutputListenerParams {
   serviceEndpoint: string;
-  props: TTSServiceProps;
-  signer: Core.Services.ServiceQuerySigner;
+  props: TTSServiceInput;
 }
 
 export function cleanTTSText(text: string) {
@@ -66,16 +62,15 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<
   Core.OutputListeners.DialogOutputEnvironment,
   string
 > {
-  protected service: Core.Services.ServiceClient<TTSServiceProps, string>;
-  protected props: TTSServiceProps;
+  protected service: Core.Services.ServiceClient<TTSServiceInput, TTSServiceOutput>;
+  protected props: TTSServiceInput;
   protected serviceName: string;
 
   constructor(params: TTSOutputListenerParams, serviceName: ServicesNames) {
     super();
     this.props = params.props;
-    this.service = new Core.Services.ServiceClient<TTSServiceProps, string>(
+    this.service = new Core.Services.ServiceClient<TTSServiceInput, TTSServiceOutput>(
       params.serviceEndpoint,
-      params.signer,
       serviceName
     );
     this.serviceName = serviceName;
@@ -92,22 +87,15 @@ export class TTSOutputListener extends Core.OutputListeners.OutputListener<
         {
           ...this.props,
           prompt,
-        },
-        await this.service.getQueryCost(this.props)
+        }
       );
     } else {
       return "";
     }
   }
 
-  protected getResultOnError(
-    output: Core.OutputListeners.DialogOutputEnvironment
-  ): string {
+  protected getResultOnError(): string {
     return "";
-  }
-
-  public override async getCost(): Promise<number> {
-    return this.service.getQueryCost(this.props);
   }
 
   private cleanText(text: string) {

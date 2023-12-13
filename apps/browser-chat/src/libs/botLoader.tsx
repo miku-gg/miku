@@ -235,19 +235,7 @@ export function useBot(): {
           ...res.bot,
           subject: _botData.settings.text.name,
           prompt_completer: {
-            service: (function (): MikuExtensions.Services.ServicesNames {
-              switch (_botData.settings.promptCompleterEndpoint.type) {
-                case PromptCompleterEndpointType.OPENAI:
-                  return MikuExtensions.Services.ServicesNames.OpenAI
-                case PromptCompleterEndpointType.KOBOLDAI:
-                  return MikuExtensions.Services.ServicesNames.Pygmalion
-                case PromptCompleterEndpointType.APHRODITE:
-                  return MikuExtensions.Services.ServicesNames.Aphrodite
-                case PromptCompleterEndpointType.OOBABOOGA:
-                default:
-                  return MikuExtensions.Services.ServicesNames.Oobabooga
-              }
-            })(),
+            service: MikuExtensions.Services.ServicesNames.Aphrodite,
             props: {
               ...(function (): object {
                 const settings = JSON.stringify(_botData.settings.promptCompleterEndpoint.genSettings);

@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import { parsePygmalionResponse } from '../PygmalionPromptCompleter';
+import { parseLLMResponse } from '../AphroditePromptCompleter';
 
 
 const testCasesToParse = [
@@ -26,59 +26,59 @@ const testCasesToParse = [
 ];
 
 
-describe("PygmalionPromptCompleter", () => {
+describe("AphroditePromptCompleter", () => {
   test("Example cases should work", () => {
     testCasesToParse.forEach(([input, output]) => {
-      expect(parsePygmalionResponse(input, 'Elaina', ['You'])).toEqual(output);
+      expect(parseLLMResponse(input, 'Elaina', ['You'])).toEqual(output);
     })
   });
 
   test('should remove botSubject prefix', () => {
     const inputText = 'BotSubject: This is a test message.';
     const expectedOutput = 'This is a test message.';
-    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', []);
+    const actualOutput = parseLLMResponse(inputText, 'BotSubject', []);
     expect(actualOutput).toEqual(expectedOutput);
   });
 
   test('should remove text after any stop', () => {
     const inputText = 'BotSubject: This is a test message. SubjectA: This should be removed.';
     const expectedOutput = 'This is a test message.';
-    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', ['SubjectA']);
+    const actualOutput = parseLLMResponse(inputText, 'BotSubject', ['SubjectA']);
     expect(actualOutput).toEqual(expectedOutput);
   });
 
   test('should remove 3 consecutive line breaks', () => {
     const inputText = 'BotSubject: This is a test message.\n\n\nAnother line.';
     const expectedOutput = 'This is a test message.';
-    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', []);
+    const actualOutput = parseLLMResponse(inputText, 'BotSubject', []);
     expect(actualOutput).toEqual(expectedOutput);
   });
 
   test('should work with consecutive line breaks', () => {
     const inputText = ' This is a test message.\n\nAnother line.';
     const expectedOutput = 'This is a test message.\n\nAnother line.';
-    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', []);
+    const actualOutput = parseLLMResponse(inputText, 'BotSubject', []);
     expect(actualOutput).toEqual(expectedOutput);
   });
 
   test('should remove leading and trailing whitespace', () => {
     const inputText = '  BotSubject: This is a test message.  ';
     const expectedOutput = 'This is a test message.';
-    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', []);
+    const actualOutput = parseLLMResponse(inputText, 'BotSubject', []);
     expect(actualOutput).toEqual(expectedOutput);
   });
 
   test('should remove leading exclamation and question marks', () => {
     const inputText = 'BotSubject: This is a test message.';
     const expectedOutput = 'This is a test message.';
-    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', []);
+    const actualOutput = parseLLMResponse(inputText, 'BotSubject', []);
     expect(actualOutput).toEqual(expectedOutput);
   });
 
   test('should handle complex input', () => {
     const inputText = '  BotSubject: This is a test message.\n\nSubjectA: This should be removed.\nSubjectB: Also remove this.  ';
     const expectedOutput = 'This is a test message.';
-    const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
+    const actualOutput = parseLLMResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
     expect(actualOutput).toEqual(expectedOutput);
   });
 
@@ -86,21 +86,21 @@ describe("PygmalionPromptCompleter", () => {
     test('should remove if finished with a number', () => {
       const inputText = ' This is a test message.\n\nThis is part 2. This is part 3';
       const expectedOutput = 'This is a test message.\n\nThis is part 2.';
-      const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
+      const actualOutput = parseLLMResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
       expect(actualOutput).toEqual(expectedOutput);
     });
 
     test('should remove if finished with a letter', () => {
       const inputText = ' This is a test message.\n\nThis is part a. This is part b';
       const expectedOutput = 'This is a test message.\n\nThis is part a.';
-      const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
+      const actualOutput = parseLLMResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
       expect(actualOutput).toEqual(expectedOutput);
     });
     
     test('should remove if finished with a letter', () => {
       const inputText = ` Meow, mistress... Meow... meow... meow..." She sobs brokenly between each word. "Me-me-meow..."`;
       const expectedOutput = `Meow, mistress... Meow... meow... meow..." She sobs brokenly between each word. "Me-me-meow..."`;
-      const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
+      const actualOutput = parseLLMResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
       expect(actualOutput).toEqual(expectedOutput);
     });
 
@@ -124,7 +124,7 @@ describe("PygmalionPromptCompleter", () => {
         ]
       ]
       for (const [inputText, expectedOutput] of testCases) {
-        const actualOutput = parsePygmalionResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
+        const actualOutput = parseLLMResponse(inputText, 'BotSubject', ['SubjectA', 'SubjectB']);
         expect(actualOutput).toEqual(expectedOutput);
       }
     });

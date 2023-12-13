@@ -2,9 +2,9 @@ import axios from "axios";
 import {
   TTSService,
   TTSServiceConfig,
-  TTSServicePropTypes,
+  TTSServiceInput,
+  TTSServiceOutput,
 } from "./TTSService";
-import { InferProps } from "prop-types";
 
 export class ElevenLabsService extends TTSService {
   constructor(config: TTSServiceConfig) {
@@ -16,8 +16,8 @@ export class ElevenLabsService extends TTSService {
   }
 
   protected override async computeInput(
-    input: InferProps<typeof TTSServicePropTypes>
-  ): Promise<string> {
+    input: TTSServiceInput
+  ): Promise<TTSServiceOutput> {
     const requestUrl = `${this.apiEndpoint}/${input.voiceId}`;
     return axios
       .post<ArrayBuffer>(

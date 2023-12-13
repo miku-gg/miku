@@ -1,10 +1,10 @@
-import axios, { ParamsSerializerOptions } from "axios";
+import axios from "axios";
 import {
   TTSService,
   TTSServiceConfig,
-  TTSServicePropTypes,
+  TTSServiceInput,
+  TTSServiceOutput,
 } from "./TTSService";
-import { InferProps } from "prop-types";
 
 export class NovelAITTSService extends TTSService {
   constructor(config: TTSServiceConfig) {
@@ -14,10 +14,7 @@ export class NovelAITTSService extends TTSService {
     });
   }
 
-  protected override async computeInput(
-    input: InferProps<typeof TTSServicePropTypes>,
-    tries = 0
-  ): Promise<string> {
+  protected override async computeInput(input: TTSServiceInput): Promise<TTSServiceOutput> {
     const voiceSeed = input.voiceId || "Anananan"; // default unisex voice seed
     return axios<ArrayBuffer>({
       url: this.apiEndpoint,

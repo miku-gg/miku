@@ -13,12 +13,6 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const AZURE_API_KEY = process.env.AZURE_API_KEY || '';
 const NOVELAI_API_KEY = process.env.NOVELAI_API_KEY || '';
-const PYGMALION_ENDPOINT = process.env.PYGMALION_ENDPOINT || '';
-const OOBABOOGA_ENDPOINT = process.env.OOBABOOGA_ENDPOINT || '';
-const EMOTIONS_ENDPOINT = process.env.EMOTIONS_ENDPOINT || '';
-const SBERT_EMOTIONS_ENABLED = Number(process.env.SBERT_EMOTIONS_ENABLED || '0');
-const SBERT_SIMILARITY_API_URL = process.env.SBERT_SIMILARITY_API_URL || '';
-const SBERT_SIMILARITY_API_TOKEN = '';
 const AUDIO_FILE_PATH = '_temp';
 
 const app = express();
@@ -49,21 +43,12 @@ const addRoute = (path: string, cb: (body: any) => Promise<{ status: number, res
   });
 };
 
-if (OPENAI_API_KEY) {
-  new MikuExtensions.Services.OpenAIPromptCompleterService({
-    apiKey: OPENAI_API_KEY,
-    serviceId: MikuExtensions.Services.ServicesNames.OpenAI,
-    billingEndpoint: '',
-    addRoute
-  });  
-}
 
 if (ELEVENLABS_API_KEY) {
   new MikuExtensions.Services.TTS.ElevenLabsService({
     apiKey: ELEVENLABS_API_KEY,
     costPerRequest: 50,
     serviceId: MikuExtensions.Services.ServicesNames.ElevenLabsTTS,
-    billingEndpoint: '',
     addRoute
   });  
 }
@@ -72,7 +57,6 @@ if (AZURE_API_KEY) {
     apiKey: AZURE_API_KEY,
     costPerRequest: 10,
     serviceId: MikuExtensions.Services.ServicesNames.AzureTTS,
-    billingEndpoint: '',
     addRoute
   });  
 }
@@ -81,40 +65,9 @@ if (NOVELAI_API_KEY) {
   new MikuExtensions.Services.TTS.NovelAITTSService({
     apiKey: NOVELAI_API_KEY,
     costPerRequest: 10, 
-    billingEndpoint: '',
     serviceId: MikuExtensions.Services.ServicesNames.NovelAITTS,
     addRoute
   });
-}
-
-if (PYGMALION_ENDPOINT) {
-  new MikuExtensions.Services.PygmalionService({
-    koboldEndpoint: PYGMALION_ENDPOINT,
-    serviceId: MikuExtensions.Services.ServicesNames.Pygmalion,
-    billingEndpoint: '',
-    addRoute
-  });
-}
-
-if (OOBABOOGA_ENDPOINT) {
-  new MikuExtensions.Services.OobaboogaService({
-    gradioEndpoint: OOBABOOGA_ENDPOINT,
-    apiKey: '',
-    serviceId: MikuExtensions.Services.ServicesNames.Oobabooga,
-    billingEndpoint: '',
-    addRoute
-  });  
-}
-
-if (EMOTIONS_ENDPOINT && OPENAI_API_KEY) {
-  new MikuExtensions.Services.OpenAIEmotionInterpreter({
-    apiKey: OPENAI_API_KEY,
-    emotionConfigsEndpoint: EMOTIONS_ENDPOINT, 
-    defaultConfigHash: 'QmWLtYCXoDXEjw2nuXfkoXv9T7J8umcnF6CyyRjtFuW1UE',
-    serviceId: MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter,
-    billingEndpoint: '',
-    addRoute
-  });  
 }
 
 if (OPENAI_API_KEY) {
@@ -122,7 +75,6 @@ if (OPENAI_API_KEY) {
     apiKey: OPENAI_API_KEY,
     serviceId: MikuExtensions.Services.ServicesNames.WhisperSTT,
     audioFilePath: AUDIO_FILE_PATH,
-    billingEndpoint: '',
     costPerRequest: 0,
     addRoute
   });
@@ -133,11 +85,10 @@ const APHRODITE_S3_BUCKET = process.env.APHRODITE_S3_BUCKET || '';
 const APHRODITE_S3_REGION = process.env.APHRODITE_S3_REGION || '';
 const APHRODITE_S3_ACCESS_KEY = process.env.APHRODITE_S3_ACCESS_KEY || '';
 const APHRODITE_S3_SECRET_KEY = process.env.APHRODITE_S3_SECRET_KEY || '';
-/*
+
 if (APHRODITE_ENDPOINT) {
   new MikuExtensions.Services.AphroditePromptCompleterService({
     serviceId: MikuExtensions.Services.ServicesNames.Aphrodite,
-    billingEndpoint: '',
     addRoute,
     s3Bucket: APHRODITE_S3_BUCKET,
     s3Config: {
@@ -187,23 +138,14 @@ if (APHRODITE_ENDPOINT) {
     },
   })
 }
-*/
+
 if (APHRODITE_ENDPOINT) {
   new MikuExtensions.Services.EmotionGuidanceService({
     addRoute,
     serviceId: MikuExtensions.Services.ServicesNames.EmotionGuidance,
-    billingEndpoint: '',
     aphroditeApiKey: 'sk-EMPTY',
     aphroditeEndpoint: APHRODITE_ENDPOINT,
   })
-} else if (SBERT_EMOTIONS_ENABLED) {
-  new MikuExtensions.Services.SBertEmotionInterpreterService({
-    serviceId: MikuExtensions.Services.ServicesNames.EmotionGuidance,
-    billingEndpoint: '',
-    sbertSimilarityAPIToken: SBERT_SIMILARITY_API_TOKEN,
-    sbertSimilarityAPIUrl: SBERT_SIMILARITY_API_URL,
-    addRoute
-  });
 }
 
 export default app;

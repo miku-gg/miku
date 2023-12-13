@@ -1,4 +1,0 @@
-.venv
-build
-_temp/*
-!_temp/.gitkeep

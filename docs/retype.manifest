@@ -1,0 +1,240 @@
+{
+  "version": "3.0.3",
+  "created": "2023-12-13T02:17:40Z",
+  "files": [
+    {
+      "path": ".nojekyll"
+    },
+    {
+      "path": "404.html"
+    },
+    {
+      "path": "architecture/index.html"
+    },
+    {
+      "path": "assets/add_bot_response.png"
+    },
+    {
+      "path": "assets/add_bot_url.png"
+    },
+    {
+      "path": "assets/add_bot.png"
+    },
+    {
+      "path": "assets/bot_builder_1.png"
+    },
+    {
+      "path": "assets/bot_builder_2_1.png"
+    },
+    {
+      "path": "assets/bot_builder_2_2.png"
+    },
+    {
+      "path": "assets/bot_builder_3_1.png"
+    },
+    {
+      "path": "assets/bot_builder_3_2.png"
+    },
+    {
+      "path": "assets/bot_builder_4.png"
+    },
+    {
+      "path": "assets/bot_directory.png"
+    },
+    {
+      "path": "assets/chat_input.png"
+    },
+    {
+      "path": "assets/colab_output.png"
+    },
+    {
+      "path": "assets/colab_select.png"
+    },
+    {
+      "path": "assets/colab-badge.svg"
+    },
+    {
+      "path": "assets/create_bot_images.png"
+    },
+    {
+      "path": "assets/create_bot_ui.png"
+    },
+    {
+      "path": "assets/demokey.png"
+    },
+    {
+      "path": "assets/demoselect.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_1.jpg"
+    },
+    {
+      "path": "assets/emotion_tutorial_2_1.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_2.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_3.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_4_1.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_4.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_5_1.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_5_2.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_5_3.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_6.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_7_1.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_7_2.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_7_3.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_7_4_pose1.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_7_4_pose2.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_7_4_pose3.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_7_4_pose4.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_8_1.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_8_2.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_8_3.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_8_4.png"
+    },
+    {
+      "path": "assets/emotion_tutorial_9.png"
+    },
+    {
+      "path": "assets/favicon.ico"
+    },
+    {
+      "path": "assets/image-upload.png"
+    },
+    {
+      "path": "assets/keyexposure.png"
+    },
+    {
+      "path": "assets/live-settings.png"
+    },
+    {
+      "path": "assets/llama-demo.png"
+    },
+    {
+      "path": "assets/logo.png"
+    },
+    {
+      "path": "assets/miku_file.png"
+    },
+    {
+      "path": "assets/openai_key.png"
+    },
+    {
+      "path": "assets/openai.png"
+    },
+    {
+      "path": "assets/overview.png"
+    },
+    {
+      "path": "assets/save_load.png"
+    },
+    {
+      "path": "assets/select_bot.png"
+    },
+    {
+      "path": "guides/bots/create-bot-emotions/index.html"
+    },
+    {
+      "path": "guides/bots/create-bots/index.html"
+    },
+    {
+      "path": "guides/bots/load-bots/index.html"
+    },
+    {
+      "path": "guides/how-to-endpoints/index.html"
+    },
+    {
+      "path": "guides/how-to-interact/index.html"
+    },
+    {
+      "path": "guides/run-live/index.html"
+    },
+    {
+      "path": "guides/run-local/index.html"
+    },
+    {
+      "path": "index.html"
+    },
+    {
+      "path": "resources/css/retype.css"
+    },
+    {
+      "path": "resources/fonts/Inter-italic-latin-var.woff2"
+    },
+    {
+      "path": "resources/fonts/Inter-roman-latin-var.woff2"
+    },
+    {
+      "path": "resources/js/config.js"
+    },
+    {
+      "path": "resources/js/lunr.js"
+    },
+    {
+      "path": "resources/js/prism.js"
+    },
+    {
+      "path": "resources/js/retype.js"
+    },
+    {
+      "path": "resources/js/search.json"
+    },
+    {
+      "path": "resources/lunr.js.LICENSE.txt"
+    },
+    {
+      "path": "resources/mermaid.js.LICENSE.txt"
+    },
+    {
+      "path": "resources/prism.js.LICENSE.txt"
+    },
+    {
+      "path": "resources/retype.js.LICENSE.txt"
+    },
+    {
+      "path": "resources/retype.LICENSE.txt"
+    },
+    {
+      "path": "robots.txt"
+    },
+    {
+      "path": "sitemap.xml.gz"
+    }
+  ]
+}

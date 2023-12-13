@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      dotenv:
+        specifier: ^16.0.3
+        version: 16.0.3
       lerna:
         specifier: ^6.4.1
         version: 6.4.1
@@ -7865,7 +7868,7 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.19.6(@babel/core@7.21.8)
       magic-string: 0.27.0
       react-refresh: 0.14.0
-      vite: 4.0.0(@types/node@20.10.1)
+      vite: 4.0.0(@types/node@18.15.5)(sass@1.59.3)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9596,7 +9599,6 @@ packages:
   /dotenv@16.0.3:
     resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
     engines: {node: '>=12'}
-    dev: false
 
   /duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
