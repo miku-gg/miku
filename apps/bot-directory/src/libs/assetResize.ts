@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 
-type ReadFunction = (filename: string) => Promise<Buffer>;
+type ReadFunction = (filename: string) => Promise<Buffer | null>;
 type WriteFunction = (filename: string, data: Buffer) => Promise<void>;
 
 interface Dimensions {
@@ -9,11 +9,11 @@ interface Dimensions {
   maxBytes: number;
 }
 
-const sizes: { [suffix: string]: Dimensions } = {
-  '_4k': { width: 3840, height: 2160, maxBytes: 300 * 1024 },
-  '_1080p': { width: 1920, height: 1080, maxBytes: 150 * 1024 },
-  '_720p': { width: 1280, height: 720, maxBytes: 100 * 1024 },
-  '_480p': { width: 854, height: 480, maxBytes: 50 * 1024 }
+const sizes: { [prefix: string]: Dimensions } = {
+  '4k_': { width: 3840, height: 2160, maxBytes: 300 * 1024 },
+  '1080p_': { width: 1920, height: 1080, maxBytes: 150 * 1024 },
+  '720p_': { width: 1280, height: 720, maxBytes: 100 * 1024 },
+  '480p_': { width: 854, height: 480, maxBytes: 50 * 1024 }
 }
 
 export const resizeImages = async function (
@@ -27,6 +27,10 @@ export const resizeImages = async function (
 
     try {
       fileBuffer = await readFunction(filename);
+      if (!fileBuffer) {
+        console.error(`${filename} not found.`);
+        continue;
+      }
       metadata = await sharp(fileBuffer).metadata();    
     } catch (e) {
       console.error(`Error reading ${filename}: ${e}`);
@@ -41,10 +45,10 @@ export const resizeImages = async function (
     // Reduce the resolution of the original image to 4K first
     let image = sharp(fileBuffer);
 
-    if (Number(metadata.width) > sizes['_4k'].width || Number(metadata.height) > sizes['_4k'].height) {
+    if (Number(metadata.width) > sizes['4k_'].width || Number(metadata.height) > sizes['4k_'].height) {
       image = image.resize({
-        width: sizes['_4k'].width,
-        height: sizes['_4k'].height,
+        width: sizes['4k_'].width,
+        height: sizes['4k_'].height,
         fit: 'inside',
         withoutEnlargement: true,
       })
@@ -53,7 +57,7 @@ export const resizeImages = async function (
     fileBuffer = await image.toBuffer();
 
     // Check the file size to determine the necessary quality reduction
-    const quality = Math.ceil(Math.max(10, 100 - ((fileBuffer.length / sizes['_4k'].maxBytes) * 10)));
+    const quality = Math.ceil(Math.max(10, 100 - ((fileBuffer.length / sizes['4k_'].maxBytes) * 10)));
 
     if (metadata.format === 'jpeg') {
       fileBuffer = await sharp(fileBuffer).jpeg({ quality }).toBuffer();
@@ -62,7 +66,7 @@ export const resizeImages = async function (
     }
 
     // Resize the 4K image to the smaller sizes
-    for (const [suffix, size] of Object.entries(sizes)) {
+    for (const [prefix, size] of Object.entries(sizes)) {
       image = sharp(fileBuffer).resize({
         width: size.width,
         height: size.height,
@@ -70,7 +74,7 @@ export const resizeImages = async function (
         withoutEnlargement: true,
       });
 
-      const newFilename = `${filename}${suffix}`;
+      const newFilename = `${prefix}${filename}`;
       await writeFunction(newFilename, await image.toBuffer());
     }
   }

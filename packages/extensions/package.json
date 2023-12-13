@@ -45,7 +45,6 @@
     "@types/node": "^18.11.18",
     "@types/prop-types": "^15.7.5",
     "axios": "^1.2.4",
-    "compute-cosine-similarity": "^1.0.0",
     "gpt3-tokenizer": "^1.1.5",
     "ipfs-only-hash": "^4.0.0",
     "lodash.trim": "^4.5.1",

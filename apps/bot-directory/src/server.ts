@@ -6,11 +6,10 @@ import deleteBot from './paths/deleteBot';
 import getItem from './paths/getItem';
 import addImage from './paths/addImage';
 import multer from 'multer';
-import addEmotion from './paths/addEmotion';
-import addEmbedding from './paths/addEmbedding';
 import fs from 'fs';
 import config from './config';
 import open from 'open';
+import s3ServerDecorator from './s3server';
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env')});
 
@@ -21,6 +20,7 @@ app.set('view engine', 'ejs');
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 const upload = multer({ dest: '_temp' });
+
 
 app.get('/', (req, res) => {
   fs.readdir(config.BOT_PATH, async (err, files) => {
@@ -54,17 +54,7 @@ app.get('/bot/:hash', getItem.bind(null, 'json', 'bots'));
 app.post('/image', multer().array('files'), addImage);
 app.get('/image/:hash', getItem.bind(null, 'image', 'imgs'));
 
-app.use('/audio', (req, res, next) => {
-  res.setHeader('Content-Type', 'audio/mpeg'); // MIME type for MP3
-  next();
-});
-app.use('/audio', express.static(config.AUDIO_PATH));
-
-app.post('/emotion', multer().single('file'), addEmotion);
-app.get('/emotion/:hash', getItem.bind(null, 'json', 'emotions'));
-
-app.post('/embeddings', multer().single('file'), addEmbedding);
-app.get('/embeddings/:hash', getItem.bind(null, 'csv', 'embeddings'));
+s3ServerDecorator(app);
 
 app.listen(process.env.PORT || 8585, () => {
   console.log(`Bots server running on http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`);
