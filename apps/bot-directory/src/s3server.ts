@@ -38,7 +38,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 export default function s3ServerDecorator(app: Express): void{
   // for each bucket
   for (const bucket of Object.values(BUCKET)) {
-    console.log(`/s3/${bucket}/:key`);
     app.put(`/s3/${bucket}/:key`, upload.single('file'), async (req, res) => {
         if (!req.file) {
             return res.status(400).send('No file uploaded.');

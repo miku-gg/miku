@@ -93,7 +93,7 @@ if (APHRODITE_ENDPOINT) {
     serviceId: MikuExtensions.Services.ServicesNames.Aphrodite,
     addRoute,
     botCardConnector: new MikuExtensions.Utils.BotCardConnector(APHRODITE_S3_BUCKET,{
-      endpoint: APHRODITE_S3_ENDPOINT,
+      endpoint: APHRODITE_S3_ENDPOINT || undefined,
       region: APHRODITE_S3_REGION,
       credentials: {
         accessKeyId: APHRODITE_S3_ACCESS_KEY,
