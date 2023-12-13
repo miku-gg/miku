@@ -208,8 +208,11 @@ export function getBotDataFromURL(): BotData {
 
 export function setBotDataInURL(botData: BotData) {
   const { endpoints, disabled } = botData;
+  const searchParams = queryString.parse(searchString);
+
   const newSearchParams = {
     bot: botData.hash,
+    config: searchParams['config'],
     settings: MikuCore.Services.encode(JSON.stringify(botData.settings)),
   };
 
