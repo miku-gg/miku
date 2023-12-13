@@ -5,10 +5,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { InteractiveChat } from "./components/interactive-chat/InteractiveChat";
 import { InteractiveResponsesContextProvider } from "./libs/useResponses";
 import BotLoadingModal from "./components/loading/BotLoadingModal";
-import { BotLoaderProvider, BotLoaderProps, getBotDataFromURL } from "./libs/botLoader";
-import { MikuCard } from "@mikugg/bot-utils";
-import { AphroditeSettings, PromptCompleterEndpointType } from './libs/botSettingsUtils';
-import plaformAPI from "./libs/platformAPI";
+import { BotLoaderProvider, BotLoaderProps, getConfigFromURL } from "./libs/botLoader";
+import { EMPTY_MIKU_CARD, MikuCard } from "@mikugg/bot-utils";
+import axios from "axios";
 
 export const BrowserChat = (props: BotLoaderProps): JSX.Element => {
   return (
@@ -38,54 +37,27 @@ export const BrowserChat = (props: BotLoaderProps): JSX.Element => {
   );
 }
 
-export const getAphroditeConfig = () => {
-  const botData = getBotDataFromURL();
-
-  if(botData.settings.promptCompleterEndpoint.type !== PromptCompleterEndpointType.APHRODITE) {
-    return {
-      enabled: false,
-      botId: '',
-      chatId: '',
-      assetsUrl: '',
-    }
-  }
-
-  const aphroditeConfig = (botData.settings.promptCompleterEndpoint.genSettings as AphroditeSettings)
-
-  return {
-    enabled: true,
-    botId: aphroditeConfig.botId,
-    chatId: aphroditeConfig.chatId,
-    assetsUrl: aphroditeConfig.assetsUrl,
-  };
-}
-
 export const App = () => {
-  const aphrodite = getAphroditeConfig();
+  const config = getConfigFromURL();
 
   let fetchMikuCard = async (botHash: string): Promise<MikuCard> => {
-    if (aphrodite.enabled) {
-      return plaformAPI.getBotConfig(botHash).then((res) => res.data)
-    } else {
-      return fetch(`${import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT || 'http://localhost:8585/bot'}/${botHash}`)
-        .then((res) => res.json() as Promise<MikuCard>)
-    }
-  };
-
-  let servicesEndpoint = import.meta.env.VITE_SERVICES_ENDPOINT || "http://localhost:8585";
+    return axios.get<MikuCard>(`${config.botDirectoryEndpoint}/${botHash}`, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    }).then((res) => res.data).catch((err) => {
+      console.log(err);
+      return EMPTY_MIKU_CARD;
+    });
+  }
 
   let assetLinkLoader = (asset: string, format?: string) => {
-    let endpoint = import.meta.env.VITE_IMAGES_DIRECTORY_ENDPOINT;
     if (format === 'audio') {
-      endpoint = import.meta.env.VITE_AUDIO_DIRECTORY_ENDPOINT;
       format = '';
     }
-    if (aphrodite.enabled) {
-      return `${aphrodite.assetsUrl}/${(format && format !== '720p') ? `${format}_` : ''}${asset}`;
-    } else {
-      let assetsEndpoint = endpoint || "http://localhost:8585/image";
-      return `${assetsEndpoint}/${asset}${format && format !== '720p' ? `_${format}` : ''}`;
-    }
+    return `${config.assetDirectoryEndpoint}/${(format && format !== '720p') ? `${format}_` : ''}${asset}`;
   }
 
   return (
@@ -93,12 +65,12 @@ export const App = () => {
       className="App flex w-screen h-screen p-5 max-lg:p-0 min-w-full text-center"
       style={{
         background:
-          aphrodite.enabled ? "transparent" : "linear-gradient(180deg, rgba(12,10,29,1) 0%, rgb(30 26 65) 100%)",
+          config.productionMode ? "transparent" : "linear-gradient(180deg, rgba(12,10,29,1) 0%, rgb(30 26 65) 100%)",
       }}
     >
       <BrowserChat
         assetLinkLoader={assetLinkLoader}
-        servicesEndpoint={servicesEndpoint}
+        servicesEndpoint={config.servicesEndpoint}
         mikuCardLoader={fetchMikuCard}
       />
     </div>

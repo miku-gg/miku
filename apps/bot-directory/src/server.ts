@@ -8,7 +8,7 @@ import fs from 'fs';
 import config from './config';
 import open from 'open';
 import s3ServerDecorator, { BUCKET, getS3File } from './s3server';
-import { MikuCard } from '@mikugg/extensions';
+import { EMPTY_MIKU_CARD, MikuCard } from '@mikugg/bot-utils';
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env')});
 
@@ -50,6 +50,31 @@ app.get('/', (req, res) => {
 
 app.post('/bot',  upload.single("file"), addBot);
 app.post('/bot/delete/:hash', deleteBot);
+
+app.get(`/bot/config/:hash`, (req, res) => {
+  const file = getS3File(BUCKET.BOTS, req.params.hash);
+  if (file) {
+    const configFile = file.toString('utf-8');
+    const completeCard = JSON.parse(configFile) as MikuCard;
+    const card: MikuCard = {
+      ...EMPTY_MIKU_CARD,
+      data: {
+        ...EMPTY_MIKU_CARD.data,
+        first_mes: completeCard.data.first_mes,
+        name: completeCard.data.name,
+        extensions: {
+          mikugg: completeCard.data.extensions.mikugg,
+        },
+      },
+    };
+    res.setHeader('Access-Control-Allow-Origin', process.env.INTERACTOR_ENDPOINT || 'http://localhost:5173');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.send(card);
+  } else {
+    res.status(404).send('File not found.');
+  }
+});
+
 
 s3ServerDecorator(app);
 

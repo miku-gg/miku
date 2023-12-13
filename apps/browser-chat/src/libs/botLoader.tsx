@@ -5,7 +5,6 @@ import queryString from "query-string";
 import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, VoiceServiceType, VOICE_SERVICES } from "./botSettingsUtils";
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
-import platformAPI from "./platformAPI";
 import { fillResponse, responsesStore } from "./responsesStore";
 import debounce from "lodash.debounce";
 import { getChat } from "./postMessage";
@@ -137,6 +136,27 @@ export interface BotData {
 }
 
 let searchString = location.search;
+
+export function getConfigFromURL(): {
+  productionMode: boolean,
+  assetDirectoryEndpoint: string,
+  botDirectoryEndpoint: string,
+  servicesEndpoint: string,
+  chatId: string,
+  botId: string,
+} {
+  const searchParams = queryString.parse(searchString);
+  const jsonString = searchParams['config'] ? MikuCore.Services.decode(String(searchParams['config'] || '')) : '{}';
+  const config = JSON.parse(jsonString) as object;
+  return {
+    productionMode: config.hasOwnProperty('productionMode') ? config['productionMode'] : false,
+    assetDirectoryEndpoint: config.hasOwnProperty('assetDirectoryEndpoint') ? config['assetDirectoryEndpoint'] : import.meta.env.VITE_ASSETS_DIRECTORY_ENDPOINT,
+    botDirectoryEndpoint: config.hasOwnProperty('botDirectoryEndpoint') ? config['botDirectoryEndpoint'] : import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT,
+    servicesEndpoint: config.hasOwnProperty('servicesEndpoint') ? config['servicesEndpoint'] : import.meta.env.VITE_SERVICES_ENDPOINT,
+    chatId: String(searchParams['chatId'] || '') || '',
+    botId: String(searchParams['botId'] || '') || String(searchParams['bot'] || '') || '',
+  }
+}
 
 export function getBotDataFromURL(): BotData {
   const searchParams = queryString.parse(searchString);

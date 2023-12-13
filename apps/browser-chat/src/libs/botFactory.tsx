@@ -2,8 +2,7 @@ import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import { BotConfig } from "@mikugg/bot-utils";
 import { toast } from "react-toastify";
-import { CustomEndpoints, getBotDataFromURL, setBotDataInURL } from "./botLoader";
-import { getAphroditeConfig } from "../App";
+import { CustomEndpoints, getBotDataFromURL, getConfigFromURL, setBotDataInURL } from "./botLoader";
 import { AphroditeSettings, PromptCompleterEndpointType } from "./botSettingsUtils";
 import { ChatMessageInput, newChat, updateChat } from "./postMessage";
 import { v4 as uuidv4 } from 'uuid';
@@ -138,8 +137,8 @@ class BotFactory {
             }
           });
           outputListener.subscribe(async (output: MikuExtensions.OutputListeners.EmotionOutput) => {
-            const aphrodite = getAphroditeConfig();
-            if (aphrodite.enabled) {
+            const config = getConfigFromURL();
+            if (config.productionMode) {
               const memoryLines = memory.getMemory();
               const lastSentMessage = memoryLines[memoryLines.length - 2];
               const firstMessage: ChatMessageInput = {
@@ -156,10 +155,10 @@ class BotFactory {
                 sceneId: output.sceneId,
                 audioId: '',
               }
-              let chatId = aphrodite.chatId;
+              let chatId = config.chatId;
               if (!chatId) {
                 chatId = uuidv4();
-                newChat(aphrodite.botId, chatId, [
+                newChat(config.botId, chatId, [
                   firstMessage,
                   secondMessage
                 ]);

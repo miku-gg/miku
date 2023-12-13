@@ -14,7 +14,7 @@ async function main() {
     for (const line of envExampleLines) {
         const trimmedLine = line.trim();
         if (trimmedLine.includes('=')) {
-            const [keyName, defaultValue = ''] = trimmedLine.split('=', 1);
+            const [keyName, defaultValue = ''] = trimmedLine.split('=');
             let currentValue = process.env[keyName];
 
             if (currentValue === undefined && defaultValue.includes('<') && defaultValue.includes('>')) {

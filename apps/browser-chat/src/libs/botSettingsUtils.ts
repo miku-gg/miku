@@ -70,6 +70,7 @@ export type AphroditeSettings = {
   assetsUrl: string;
   botId: string;
   chatId: string;
+  botDirectoryEndpoint?: string;
   model?: string;
 };
 

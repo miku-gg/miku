@@ -4,7 +4,7 @@ import {
   GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
-import { MikuCard } from '../../card';
+import { MikuCard } from '../card';
 
 function streamToString(stream: Readable): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -15,7 +15,7 @@ function streamToString(stream: Readable): Promise<string> {
   });
 }
 
-export default class BotCardConnector {
+export class BotCardConnector {
   private s3Bucket: string;
   private client
 

@@ -11,7 +11,7 @@ import settingsIcon from "../../../assets/icons/settings.png";
 
 import { Loader } from "../../loading/Loader";
 import botFactory from "../../../libs/botFactory";
-import { useBot } from "../../../libs/botLoader";
+import { getConfigFromURL, useBot } from "../../../libs/botLoader";
 import { PopUp } from "../../pup-up/pup-up";
 import {
   ChatHistory,
@@ -24,18 +24,15 @@ import { GearIcon, HistoryIcon, SlidersIcon, UnmuteIcon, ScreenFullIcon, ScreenN
 import { InteractiveResponsesContext } from "../../../libs/useResponses";
 import { responsesStore } from "../../../libs/responsesStore";
 import { Tooltip } from "@mui/material";
-import { Slider, Input, Modal, TextEditable } from "@mikugg/ui-kit";
 import { BotSettings } from "../../bot-settings/BotSettings";
 import { BotSettingsFooter } from "../../bot-settings/BotSettingsFooter";
 import ScenarioSelector from "../scenario-selector/ScenarioSelector";
 import EmotionRenderer from "../../asset-renderer/EmotionRenderer";
 import ProgressiveImage from "react-progressive-graceful-image";
 import { trackEvent } from "../../../libs/analytics";
-import platformAPI from "../../../libs/platformAPI";
-import { getAphroditeConfig } from "../../../App";
 import { AphroditeSettings, PromptCompleterEndpointType } from "../../../libs/botSettingsUtils";
 import MusicPlayer from "../../music/MusicPlayer";
-import SettingsModal, { SettingsState } from "../../settings/SettingsModal";
+import SettingsModal from "../../settings/SettingsModal";
 import { updateChat } from "../../../libs/postMessage";
 import { ChatInputBox } from "../chat-input-box/ChatInputBox";
 
@@ -210,8 +207,8 @@ export const BotDisplay = () => {
   };
 
   const promptCompleterSettings = botConfigSettings.promptCompleterEndpoint.genSettings as AphroditeSettings;
-  const aphrodite = getAphroditeConfig();
-  const isSmart = aphrodite.enabled && promptCompleterSettings.model === 'smart';
+  const config = getConfigFromURL();
+  const isSmart = config.productionMode && promptCompleterSettings.model === 'smart';
 
   const toggleBrain = () => {
     setBotConfigSettings({
@@ -310,10 +307,10 @@ export const BotDisplay = () => {
         });
       }
     }
-    const aphrodite = getAphroditeConfig();
+    const config = getConfigFromURL();
     const updatedMemoryLines = shortTermMemory?.getMemory();
-    if (aphrodite.enabled && updatedMemoryLines?.length) {
-      updateChat(aphrodite.chatId, updatedMemoryLines.map((line) => {
+    if (config.productionMode && updatedMemoryLines?.length) {
+      updateChat(config.chatId, updatedMemoryLines.map((line) => {
         const response = responsesStore.get(line.id || '');
         return {
           id: line.id,
@@ -358,7 +355,7 @@ export const BotDisplay = () => {
               </div>
             </div>
             <div className="flex gap-4 text-white">
-            {aphrodite.enabled ? (
+            {config.productionMode ? (
                 <div className={`inline-flex ${isSmart ? 'brain-activated' : ''}`}>
                   <Tooltip title={isSmart ? 'Deactivate 70B' : 'Activate 70B model. Free for a limited time.'} placement="left">
                     <button onClick={toggleBrain}>

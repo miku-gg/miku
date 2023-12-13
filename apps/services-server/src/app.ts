@@ -80,26 +80,28 @@ if (OPENAI_API_KEY) {
   });
 }
 
-const APHRODITE_ENDPOINT = process.env.APHRODITE_ENDPOINT || '';
+const APHRODITE_ENDPOINT = process.env.APHRODITE_ENDPOINT || undefined;
+const APHRODITE_KEY = process.env.APHRODITE_KEY || '';
+const APHRODITE_S3_ENDPOINT = process.env.APHRODITE_S3_ENDPOINT || '';
 const APHRODITE_S3_BUCKET = process.env.APHRODITE_S3_BUCKET || '';
-const APHRODITE_S3_REGION = process.env.APHRODITE_S3_REGION || '';
-const APHRODITE_S3_ACCESS_KEY = process.env.APHRODITE_S3_ACCESS_KEY || '';
-const APHRODITE_S3_SECRET_KEY = process.env.APHRODITE_S3_SECRET_KEY || '';
+const APHRODITE_S3_REGION = process.env.APHRODITE_S3_REGION || 'local';
+const APHRODITE_S3_ACCESS_KEY = process.env.APHRODITE_S3_ACCESS_KEY || 'dummy';
+const APHRODITE_S3_SECRET_KEY = process.env.APHRODITE_S3_SECRET_KEY || 'dummy';
 
 if (APHRODITE_ENDPOINT) {
   new MikuExtensions.Services.AphroditePromptCompleterService({
     serviceId: MikuExtensions.Services.ServicesNames.Aphrodite,
     addRoute,
-    s3Bucket: APHRODITE_S3_BUCKET,
-    s3Config: {
+    botCardConnector: new MikuExtensions.Utils.BotCardConnector(APHRODITE_S3_BUCKET,{
+      endpoint: APHRODITE_S3_ENDPOINT,
       region: APHRODITE_S3_REGION,
       credentials: {
         accessKeyId: APHRODITE_S3_ACCESS_KEY,
         secretAccessKey: APHRODITE_S3_SECRET_KEY
       }
-    },
+    }),
     aphroditeEndpoint: APHRODITE_ENDPOINT,
-    aphroditeApiKey: '',
+    aphroditeApiKey: APHRODITE_KEY,
     aphoditeConfig: {
       truncation_length: 4096,
       max_tokens: 300,
@@ -143,7 +145,7 @@ if (APHRODITE_ENDPOINT) {
   new MikuExtensions.Services.EmotionGuidanceService({
     addRoute,
     serviceId: MikuExtensions.Services.ServicesNames.EmotionGuidance,
-    aphroditeApiKey: 'sk-EMPTY',
+    aphroditeApiKey: APHRODITE_KEY,
     aphroditeEndpoint: APHRODITE_ENDPOINT,
   })
 }

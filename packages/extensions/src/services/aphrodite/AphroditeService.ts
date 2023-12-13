@@ -3,8 +3,7 @@ import PropTypes, { InferProps } from "prop-types";
 import { tokenCount, TokenizerType } from '../../tokenizers/Tokenizers';
 import axios from "axios";
 import { GPTShortTermMemoryV2  } from "../../memory/GPTMemoryV2";
-import BotCardConnector, { parseAttributes, parseExampleMessages } from "./BotCardConnector";
-import { S3ClientConfig } from "@aws-sdk/client-s3";
+import { BotCardConnector,  parseAttributes, parseExampleMessages } from "../../utils";
 
 export interface AphroditeConfig {
   /**
@@ -249,12 +248,11 @@ export type AphroditeServiceInput = InferProps<typeof AphroditePromptCompleterSe
 export type AphroditeServiceOutput = string;
 
 export interface AphroditePromptCompleterServiceConfig extends Miku.Services.ServiceConfig<AphroditeServiceInput, AphroditeServiceOutput> {
-  s3Bucket: string;
-  s3Config: S3ClientConfig;
   aphroditeEndpointSmart?: string;
   aphroditeEndpoint: string;
   aphroditeApiKey: string;
   aphoditeConfig: AphroditeConfig
+  botCardConnector: BotCardConnector;
 }
 
 export class AphroditePromptCompleterService extends Miku.Services.Service<AphroditeServiceInput, AphroditeServiceOutput> {
@@ -273,7 +271,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service<Aphro
       ...DEFAULT_APHRODITE_CONFIG,
       ...config.aphoditeConfig
     };
-    this.botCardConnector = new BotCardConnector(config.s3Bucket, config.s3Config);
+    this.botCardConnector = config.botCardConnector;
   }
 
   protected async computeInput(
