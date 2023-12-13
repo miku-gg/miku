@@ -3,13 +3,12 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import addBot from './paths/addBot';
 import deleteBot from './paths/deleteBot';
-import getItem from './paths/getItem';
-import addImage from './paths/addImage';
 import multer from 'multer';
 import fs from 'fs';
 import config from './config';
 import open from 'open';
-import s3ServerDecorator from './s3server';
+import s3ServerDecorator, { BUCKET, getS3File } from './s3server';
+import { MikuCard } from '@mikugg/extensions';
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env')});
 
@@ -23,17 +22,18 @@ const upload = multer({ dest: '_temp' });
 
 
 app.get('/', (req, res) => {
-  fs.readdir(config.BOT_PATH, async (err, files) => {
+  fs.readdir(config.BOT_PATH, async (err, _files) => {
     if (err) {
       res.status(500).send(err);
       return;
     }
 
     /* read all json files */
-    files = (await Promise.all(files.map(async (file) => {
-      const data = fs.readFileSync(`${config.BOT_PATH}/${file}`, 'utf8');
+    const files = (await Promise.all(_files.map(async (file) => {
+      const data = JSON.parse(getS3File(BUCKET.BOTS, file)?.toString('utf-8') || '{}') as MikuCard;
+      
       return {
-        ...JSON.parse(data),
+        ...data,
         hash: file
       };
     }))).filter(x => (
@@ -50,9 +50,6 @@ app.get('/', (req, res) => {
 
 app.post('/bot',  upload.single("file"), addBot);
 app.post('/bot/delete/:hash', deleteBot);
-app.get('/bot/:hash', getItem.bind(null, 'json', 'bots'));
-app.post('/image', multer().array('files'), addImage);
-app.get('/image/:hash', getItem.bind(null, 'image', 'imgs'));
 
 s3ServerDecorator(app);
 

@@ -35,7 +35,7 @@
           <div class="w-60">
             <div class="ui card">
               <div class="image">
-                <img src="/image/<%= bot.data.extensions.mikugg.profile_pic %>">
+                <img src="/s3/assets/<%= bot.data.extensions.mikugg.profile_pic %>" width="200px" height="200px" style="object-fit: cover;">
               </div>
               <div class="content">
                 <a class="header" href="http://localhost:5173/?bot=<%= bot.hash%>" target="_blank"><%= bot.data.name %></a>
@@ -52,7 +52,7 @@
                 </p>
               </div>
               <div>
-                <form action="/bot/delete/<%= bot.hash %>" method="post" onsubmit="return confirm('Do you really want to delete <%= bot.data.name %>?');">
+                <form action="/bot/delete/<%= bot.hash %>" method="POST" onsubmit="return confirm('Do you really want to delete <%= bot.data.name %>?');">
                   <button type="submit" class="absolute text-red-600 right-2 bottom-4">
                     <i class="trash icon"></i>
                   </button>
