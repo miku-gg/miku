@@ -32,8 +32,6 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@ethersproject/wallet": "^5.7.0",
-    "@keenondrums/singleton": "^1.0.0",
     "@types/axios": "^0.14.0",
     "@types/base-64": "^1.0.0",
     "@types/node": "^18.11.18",

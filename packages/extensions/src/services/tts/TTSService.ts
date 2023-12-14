@@ -10,21 +10,16 @@ export const TTSServicePropTypes = {
   readNonSpokenText: PropTypes.bool,
   enabled: PropTypes.bool,
 };
+export type TTSServiceInput = InferProps<typeof TTSServicePropTypes>;
+export type TTSServiceOutput = string;
 
-export interface TTSServiceConfig extends Miku.Services.ServiceConfig {
+export interface TTSServiceConfig extends Miku.Services.ServiceConfig<TTSServiceInput, TTSServiceOutput> {
   costPerRequest: number;
   apiKey?: string;
   apiEndpoint?: string;
 }
 
-export abstract class TTSService extends Miku.Services.Service {
-  protected defaultProps: InferProps<typeof TTSServicePropTypes> = {
-    apiKey: "",
-    language: "en",
-    emotion: "default",
-    prompt: "",
-    voiceId: "",
-  };
+export abstract class TTSService extends Miku.Services.Service<TTSServiceInput, TTSServiceOutput> {
   protected costPerRequest: number;
   protected apiKey: string;
   protected apiEndpoint: string;
@@ -36,13 +31,21 @@ export abstract class TTSService extends Miku.Services.Service {
     this.costPerRequest = config.costPerRequest;
   }
 
-  protected override getPropTypes(): PropTypes.ValidationMap<any> {
-    return TTSServicePropTypes;
+  protected override getDefaultInput(): TTSServiceInput {
+    return {
+      apiKey: "",
+      language: "en",
+      emotion: "default",
+      prompt: "",
+      voiceId: "",
+    };
   }
 
-  protected override async calculatePrice(
-    input: PropTypes.InferProps<PropTypes.ValidationMap<any>>
-  ): Promise<number> {
-    return this.costPerRequest;
+  protected override getDefaultOutput(): TTSServiceOutput {
+    return "";
+  }
+
+  protected override validateInput(input: TTSServiceInput): void {
+    PropTypes.checkPropTypes(TTSServicePropTypes, input, "input", "TTSService");
   }
 }

@@ -24,15 +24,6 @@ class ServicesValidator {
 
 const servicesValidator = new ServicesValidator();
 
-servicesValidator.addService(
-  MikuExtensions.Services.ServicesNames.OpenAI,
-  MikuExtensions.Services.OpenAIPromptCompleterServicePropTypes
-);
-
-servicesValidator.addService(
-  MikuExtensions.Services.ServicesNames.Pygmalion,
-  MikuExtensions.Services.PygmalionServicePropTypes
-);
 
 servicesValidator.addService(
   MikuExtensions.Services.ServicesNames.AzureTTS,
@@ -47,11 +38,6 @@ servicesValidator.addService(
 servicesValidator.addService(
   MikuExtensions.Services.ServicesNames.NovelAITTS,
   MikuExtensions.Services.TTS.TTSServicePropTypes
-);
-
-servicesValidator.addService(
-  MikuExtensions.Services.ServicesNames.OpenAIEmotionInterpreter,
-  MikuExtensions.Services.EmotionInterpreterPropTypes
 );
 
 servicesValidator.addService(

@@ -23,9 +23,7 @@ jobs:
         env:
           VITE_SERVICES_ENDPOINT: ${{ secrets.VITE_SERVICES_ENDPOINT }}
           VITE_BOT_DIRECTORY_ENDPOINT: ${{ secrets.VITE_BOT_DIRECTORY_ENDPOINT }}
-          VITE_IMAGES_DIRECTORY_ENDPOINT: ${{ secrets.VITE_IMAGES_DIRECTORY_ENDPOINT }}
-          VITE_AUDIO_DIRECTORY_ENDPOINT: ${{ secrets.VITE_AUDIO_DIRECTORY_ENDPOINT }}
-          VITE_PLATFORM_API: ${{ secrets.VITE_PLATFORM_API_PROD }}
+          VITE_ASSETS_DIRECTORY_ENDPOINT: ${{ secrets.VITE_ASSETS_DIRECOTRY_ENDPOINT }}
           VITE_GTM_ID: ${{ secrets.VITE_GTM_ID}}
       - name: Deploy to S3
         run: aws s3 sync apps/browser-chat/dist ${{ secrets.S3_BUCKET_INTERACTOR }} --delete

@@ -70,7 +70,8 @@ export abstract class ChatPromptCompleter {
    * @abstract
    */
   protected abstract completePrompt(
-    memory: ShortTermMemory
+    memory: ShortTermMemory,
+    command?: Commands.Command
   ): Promise<ChatPromptResponse>;
 
   /**
@@ -96,7 +97,8 @@ export abstract class ChatPromptCompleter {
 
     try {
       const promptResult = await this.completePrompt(
-        this.memory
+        this.memory,
+        command
       );
       const output = await this.handleCompletionOutput(promptResult, command);
       this.memory.pushMemory({

@@ -74,7 +74,10 @@ export class TemplateProcessor {
           }
 
           // Add all options to trie
-          options.forEach(option => trie.addPrefix(this.tokenizer.encodeString(prompt + option + this.tokenizer.getEOS())));
+          options.forEach(option => {
+            const prefix = this.tokenizer.encodeString(prompt + option + this.tokenizer.getEOS());
+            trie.addPrefix(prefix);
+          });
 
           let currentPrefixPrompt = prompt;
           do {

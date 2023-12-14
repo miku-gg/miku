@@ -3,8 +3,7 @@ import PropTypes, { InferProps } from "prop-types";
 import { tokenCount, TokenizerType } from '../../tokenizers/Tokenizers';
 import axios from "axios";
 import { GPTShortTermMemoryV2  } from "../../memory/GPTMemoryV2";
-import BotCardConnector, { parseAttributes, parseExampleMessages } from "./BotCardConnector";
-import { S3ClientConfig } from "@aws-sdk/client-s3";
+import { BotCardConnector,  parseAttributes, parseExampleMessages } from "../../utils";
 
 export interface AphroditeConfig {
   /**
@@ -180,11 +179,6 @@ export interface AphroditeConfig {
   prompt_logprobs?: number;
 
   /**
-   * List of token IDs to ban from generating.
-   */
-  custom_token_bans?: number[];
-
-  /**
    * Whether to skip special tokens in the output. Defaults to true.
    */
   skip_special_tokens?: boolean;
@@ -223,7 +217,6 @@ export const DEFAULT_APHRODITE_CONFIG: AphroditeConfig = {
   stop: [],
   ignore_eos: false,
   max_tokens: 100,
-  custom_token_bans: [],
   skip_special_tokens: true,
   spaces_between_special_tokens: true,
   truncation_length: 4096,
@@ -240,37 +233,29 @@ export const AphroditePromptCompleterServicePropTypes = {
   botHash: PropTypes.string,
   userName: PropTypes.string,
   model: PropTypes.string,
+  ask: PropTypes.string,
   messages: PropTypes.arrayOf(
     PropTypes.shape(AphroditeMessagePropType)
   ),
 };
 
-export interface AphroditePromptCompleterServiceConfig extends Miku.Services.ServiceConfig {
-  s3Bucket: string;
-  s3Config: S3ClientConfig;
+export type AphroditeServiceInput = InferProps<typeof AphroditePromptCompleterServicePropTypes>;
+export type AphroditeServiceOutput = string;
+
+export interface AphroditePromptCompleterServiceConfig extends Miku.Services.ServiceConfig<AphroditeServiceInput, AphroditeServiceOutput> {
   aphroditeEndpointSmart?: string;
   aphroditeEndpoint: string;
   aphroditeApiKey: string;
   aphoditeConfig: AphroditeConfig
+  botCardConnector: BotCardConnector;
 }
 
-export class AphroditePromptCompleterService extends Miku.Services.Service {
+export class AphroditePromptCompleterService extends Miku.Services.Service<AphroditeServiceInput, AphroditeServiceOutput> {
   private botCardConnector: BotCardConnector;
   private aphroditeEndpoint: string;
   private aphroditeEndpointSmart: string;
   private aphroditeApiKey: string;
   private aphroditeConfig: AphroditeConfig;
-  protected defaultProps: InferProps<
-    typeof AphroditePromptCompleterServicePropTypes
-  > = {
-    userName: 'Anon',
-    botHash: '',
-    messages: [],
-  };
-
-  protected getPropTypes(): PropTypes.ValidationMap<any> {
-    return AphroditePromptCompleterServicePropTypes;
-  }
 
   constructor(config: AphroditePromptCompleterServiceConfig) {
     super(config);
@@ -281,12 +266,12 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
       ...DEFAULT_APHRODITE_CONFIG,
       ...config.aphoditeConfig
     };
-    this.botCardConnector = new BotCardConnector(config.s3Bucket, config.s3Config);
+    this.botCardConnector = config.botCardConnector;
   }
 
   protected async computeInput(
-    input: InferProps<typeof AphroditePromptCompleterServicePropTypes>
-  ): Promise<string> {
+    input: AphroditeServiceInput
+  ): Promise<AphroditeServiceOutput> {
     const isSmart = !!this.aphroditeEndpointSmart && input.model === 'smart';
     const prompt = await this.generatePrompt(input);
     const tokens = tokenCount(prompt, TokenizerType.LLAMA);
@@ -298,8 +283,8 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
   }
 
   protected async generatePrompt(
-    input: InferProps<typeof AphroditePromptCompleterServicePropTypes>
-  ): Promise<string> {
+    input: AphroditeServiceInput
+  ): Promise<AphroditeServiceOutput> {
     const card = await this.botCardConnector.getBotCard(input.botHash || '');
 
     const memory = new GPTShortTermMemoryV2({
@@ -329,7 +314,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
       });
     })
 
-    return memory.buildMemoryPrompt(this.aphroditeConfig.truncation_length - this.aphroditeConfig.max_tokens);
+    return memory.buildMemoryPrompt(this.aphroditeConfig.truncation_length - this.aphroditeConfig.max_tokens, input.ask || '');
   }
 
   protected async simpleCompletion(
@@ -362,9 +347,24 @@ export class AphroditePromptCompleterService extends Miku.Services.Service {
     return result || '';
   }
 
-  protected async calculatePrice(
-    input: InferProps<typeof AphroditePromptCompleterServicePropTypes>
-  ): Promise<number> {
-    return 0;
+  protected override getDefaultInput(): AphroditeServiceInput {
+    return {
+      userName: 'Anon',
+      botHash: '',
+      messages: [],
+    };
+  }
+
+  protected override getDefaultOutput(): AphroditeServiceOutput {
+    return "";
+  }
+
+  protected override validateInput(input: AphroditeServiceInput): void {
+    PropTypes.checkPropTypes(
+      AphroditePromptCompleterServicePropTypes,
+      input,
+      'input',
+      'AphroditePromptCompleterService'
+    );
   }
 }

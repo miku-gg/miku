@@ -2,9 +2,7 @@ import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
 import { BotConfig } from "@mikugg/bot-utils";
 import { toast } from "react-toastify";
-import { CustomEndpoints, getBotDataFromURL, setBotDataInURL } from "./botLoader";
-import platformAPI from "./platformAPI";
-import { getAphroditeConfig } from "../App";
+import { CustomEndpoints, getBotDataFromURL, getConfigFromURL, setBotDataInURL } from "./botLoader";
 import { AphroditeSettings, PromptCompleterEndpointType } from "./botSettingsUtils";
 import { ChatMessageInput, newChat, updateChat } from "./postMessage";
 import { v4 as uuidv4 } from 'uuid';
@@ -40,11 +38,6 @@ interface BotInstanceInterface {
 }
 
 class BotFactory {
-  private signer: MikuCore.Services.ServiceQuerySigner;
-
-  constructor() {
-    this.signer = new MikuCore.Services.ServiceQuerySigner(MOCK_PRIVATE_KEY);
-  }
 
   private getMemory({
     service,
@@ -76,14 +69,12 @@ class BotFactory {
     service,
     props,
     memory,
-    signer,
     servicesEndpoint,
     endpoints,
   }: {
     service: MikuExtensions.Services.ServicesNames;
     props: object;
     memory: MikuCore.Memory.ShortTermMemory;
-    signer: MikuCore.Services.ServiceQuerySigner;
     servicesEndpoint: string;
     endpoints?: CustomEndpoints;
   }): MikuCore.ChatPromptCompleters.ChatPromptCompleter {
@@ -93,39 +84,6 @@ class BotFactory {
     // for alpha demo
 
     switch (service) {
-      case MikuExtensions.Services.ServicesNames.OpenAI:
-        chatPromptCompleter =
-          new MikuExtensions.ChatPromptCompleters.OpenAIPromptCompleter({
-            serviceEndpoint: `${servicesEndpoint}/${service}`,
-            props: {
-              ...props,
-              openai_key: String(endpoints?.openai || "") || "",
-            },
-            signer: signer,
-            memory: memory,
-          });
-        break;
-      case MikuExtensions.Services.ServicesNames.Pygmalion:
-        chatPromptCompleter =
-          new MikuExtensions.ChatPromptCompleters.PygmalionPromptCompleter({
-            serviceEndpoint: `${servicesEndpoint}/${service}`,
-            props: props,
-            signer: signer,
-            memory: memory,
-          });
-        break;
-      case MikuExtensions.Services.ServicesNames.Oobabooga:
-        chatPromptCompleter =
-          new MikuExtensions.ChatPromptCompleters.OobaboogaPromptCompleter({
-            serviceEndpoint: `${servicesEndpoint}/${service}`,
-            props: {
-              ...props,
-              gradioEndpoint: String(endpoints?.oobabooga || "") || "",
-            },
-            signer: signer,
-            memory: memory,
-          });
-          break;
       case MikuExtensions.Services.ServicesNames.Aphrodite:
         chatPromptCompleter =
           new MikuExtensions.ChatPromptCompleters.AphroditePromptCompleter({
@@ -133,7 +91,6 @@ class BotFactory {
             props: {
               ...props,
             },
-            signer: signer,
             memory: memory,
           });
         break;
@@ -148,14 +105,12 @@ class BotFactory {
     service,
     props,
     memory,
-    signer,
     servicesEndpoint,
     endpoints,
   }: {
     service: MikuExtensions.Services.ServicesNames;
     props: object;
     memory: MikuCore.Memory.ShortTermMemory;
-    signer: MikuCore.Services.ServiceQuerySigner;
     servicesEndpoint: string;
     endpoints?: CustomEndpoints;
   }): MikuCore.OutputListeners.OutputListener<
@@ -175,7 +130,6 @@ class BotFactory {
         outputListener =
           new MikuExtensions.OutputListeners.EmotionOutputListener({
             serviceEndpoint: `${servicesEndpoint}/${MikuExtensions.Services.ServicesNames.EmotionGuidance}`,
-            signer: signer,
             scene: {
               id: scneario.id,
               emotionGroupId: scneario.template,
@@ -183,8 +137,8 @@ class BotFactory {
             }
           });
           outputListener.subscribe(async (output: MikuExtensions.OutputListeners.EmotionOutput) => {
-            const aphrodite = getAphroditeConfig();
-            if (aphrodite.enabled) {
+            const config = getConfigFromURL();
+            if (config.productionMode) {
               const memoryLines = memory.getMemory();
               const lastSentMessage = memoryLines[memoryLines.length - 2];
               const firstMessage: ChatMessageInput = {
@@ -201,10 +155,10 @@ class BotFactory {
                 sceneId: output.sceneId,
                 audioId: '',
               }
-              let chatId = aphrodite.chatId;
+              let chatId = config.chatId;
               if (!chatId) {
                 chatId = uuidv4();
-                newChat(aphrodite.botId, chatId, [
+                newChat(config.botId, chatId, [
                   firstMessage,
                   secondMessage
                 ]);
@@ -252,7 +206,6 @@ class BotFactory {
         outputListener = new MikuExtensions.OutputListeners.TTSOutputListener(
           {
             serviceEndpoint: `${servicesEndpoint}/${service}`,
-            signer: signer,
             props: {
               ...props,
               apiKey,
@@ -265,7 +218,6 @@ class BotFactory {
         outputListener = new MikuExtensions.OutputListeners.TTSOutputListener(
           {
             serviceEndpoint: `${servicesEndpoint}/${service}`,
-            signer: signer,
             props: {
               ...props,
               apiKey: String(endpoints?.novelai || "") || "",
@@ -278,7 +230,6 @@ class BotFactory {
         outputListener = new MikuExtensions.OutputListeners.TTSOutputListener(
           {
             serviceEndpoint: `${servicesEndpoint}/${service}`,
-            signer: signer,
             props: {
               ...props,
               apiKey: "",
@@ -308,7 +259,6 @@ class BotFactory {
     const whisper = new MikuExtensions.CommandGenerators.WhisperServiceClient(
       `${servicesEndpoint}/audio-upload`,
       `${servicesEndpoint}/${MikuExtensions.Services.ServicesNames.WhisperSTT}`,
-      this.signer,
       endpoints?.openai || ''
     );
     const textWriter = new MikuCore.CommandGenerators.TextCommandGenerator();
@@ -317,7 +267,6 @@ class BotFactory {
       service: botConfig.prompt_completer.service,
       props: botConfig.prompt_completer.props,
       memory,
-      signer: this.signer,
       servicesEndpoint,
       endpoints,
     });
@@ -329,7 +278,6 @@ class BotFactory {
           service: outputListenerConfig.service,
           props: outputListenerConfig.props,
           memory,
-          signer: this.signer,
           servicesEndpoint,
         });
       }

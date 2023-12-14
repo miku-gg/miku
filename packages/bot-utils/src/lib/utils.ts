@@ -51,10 +51,8 @@ export const mikuCardToBotConfig = (card: MikuCard): BotConfig => {
       }
     },
     "prompt_completer": {
-      "service": MikuExtensions.Services.ServicesNames.Oobabooga,
-      "props": {
-        "model": "llama-30b"
-      }
+      "service": MikuExtensions.Services.ServicesNames.Aphrodite,
+      "props": {}
     },
     "outputListeners": [
       {

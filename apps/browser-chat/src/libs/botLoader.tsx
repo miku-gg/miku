@@ -5,7 +5,6 @@ import queryString from "query-string";
 import { BotConfigSettings, DEFAULT_BOT_SETTINGS, PromptCompleterEndpointType, VoiceServiceType, VOICE_SERVICES } from "./botSettingsUtils";
 import * as MikuCore from "@mikugg/core";
 import * as MikuExtensions from "@mikugg/extensions";
-import platformAPI from "./platformAPI";
 import { fillResponse, responsesStore } from "./responsesStore";
 import debounce from "lodash.debounce";
 import { getChat } from "./postMessage";
@@ -138,6 +137,27 @@ export interface BotData {
 
 let searchString = location.search;
 
+export function getConfigFromURL(): {
+  productionMode: boolean,
+  assetDirectoryEndpoint: string,
+  botDirectoryEndpoint: string,
+  servicesEndpoint: string,
+  chatId: string,
+  botId: string,
+} {
+  const searchParams = queryString.parse(searchString);
+  const jsonString = searchParams['config'] ? MikuCore.Services.decode(String(searchParams['config'] || '')) : '{}';
+  const config = JSON.parse(jsonString) as object;
+  return {
+    productionMode: config.hasOwnProperty('productionMode') ? config['productionMode'] : false,
+    assetDirectoryEndpoint: config.hasOwnProperty('assetDirectoryEndpoint') ? config['assetDirectoryEndpoint'] : import.meta.env.VITE_ASSETS_DIRECTORY_ENDPOINT,
+    botDirectoryEndpoint: config.hasOwnProperty('botDirectoryEndpoint') ? config['botDirectoryEndpoint'] : import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT,
+    servicesEndpoint: config.hasOwnProperty('servicesEndpoint') ? config['servicesEndpoint'] : import.meta.env.VITE_SERVICES_ENDPOINT,
+    chatId: config.hasOwnProperty('chatId') ? config['chatId'] : String(searchParams['chatId'] || '') || String(searchParams['chat'] || '') || '',
+    botId: config.hasOwnProperty('botId') ? config['botId'] : String(searchParams['botId'] || '') || String(searchParams['bot'] || '') || '',
+  }
+}
+
 export function getBotDataFromURL(): BotData {
   const searchParams = queryString.parse(searchString);
   return {
@@ -188,8 +208,11 @@ export function getBotDataFromURL(): BotData {
 
 export function setBotDataInURL(botData: BotData) {
   const { endpoints, disabled } = botData;
+  const searchParams = queryString.parse(searchString);
+
   const newSearchParams = {
     bot: botData.hash,
+    config: searchParams['config'],
     settings: MikuCore.Services.encode(JSON.stringify(botData.settings)),
   };
 
@@ -235,19 +258,7 @@ export function useBot(): {
           ...res.bot,
           subject: _botData.settings.text.name,
           prompt_completer: {
-            service: (function (): MikuExtensions.Services.ServicesNames {
-              switch (_botData.settings.promptCompleterEndpoint.type) {
-                case PromptCompleterEndpointType.OPENAI:
-                  return MikuExtensions.Services.ServicesNames.OpenAI
-                case PromptCompleterEndpointType.KOBOLDAI:
-                  return MikuExtensions.Services.ServicesNames.Pygmalion
-                case PromptCompleterEndpointType.APHRODITE:
-                  return MikuExtensions.Services.ServicesNames.Aphrodite
-                case PromptCompleterEndpointType.OOBABOOGA:
-                default:
-                  return MikuExtensions.Services.ServicesNames.Oobabooga
-              }
-            })(),
+            service: MikuExtensions.Services.ServicesNames.Aphrodite,
             props: {
               ...(function (): object {
                 const settings = JSON.stringify(_botData.settings.promptCompleterEndpoint.genSettings);
