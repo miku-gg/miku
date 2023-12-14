@@ -9,7 +9,6 @@ import * as MikuExtensions from '@mikugg/extensions';
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env')});
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || '';
 const AZURE_API_KEY = process.env.AZURE_API_KEY || '';
 const NOVELAI_API_KEY = process.env.NOVELAI_API_KEY || '';
@@ -70,38 +69,28 @@ if (NOVELAI_API_KEY) {
   });
 }
 
-if (OPENAI_API_KEY) {
-  new MikuExtensions.Services.WhisperService({
-    apiKey: OPENAI_API_KEY,
-    serviceId: MikuExtensions.Services.ServicesNames.WhisperSTT,
-    audioFilePath: AUDIO_FILE_PATH,
-    costPerRequest: 0,
-    addRoute
-  });
-}
+const OPENAI_ENDPOINT = process.env.OPENAI_ENDPOINT || undefined;
+const OPENAI_KEY = process.env.OPENAI_KEY || '';
+const S3_ENDPOINT = process.env.S3_ENDPOINT || '';
+const S3_BUCKET = process.env.S3_BUCKET || '';
+const S3_REGION = process.env.S3_REGION || 'local';
+const S3_ACCESS_KEY = process.env.S3_ACCESS_KEY || 'dummy';
+const S3_SECRET_KEY = process.env.S3_SECRET_KEY || 'dummy';
 
-const APHRODITE_ENDPOINT = process.env.APHRODITE_ENDPOINT || undefined;
-const APHRODITE_KEY = process.env.APHRODITE_KEY || '';
-const APHRODITE_S3_ENDPOINT = process.env.APHRODITE_S3_ENDPOINT || '';
-const APHRODITE_S3_BUCKET = process.env.APHRODITE_S3_BUCKET || '';
-const APHRODITE_S3_REGION = process.env.APHRODITE_S3_REGION || 'local';
-const APHRODITE_S3_ACCESS_KEY = process.env.APHRODITE_S3_ACCESS_KEY || 'dummy';
-const APHRODITE_S3_SECRET_KEY = process.env.APHRODITE_S3_SECRET_KEY || 'dummy';
-
-if (APHRODITE_ENDPOINT) {
+if (OPENAI_ENDPOINT) {
   new MikuExtensions.Services.AphroditePromptCompleterService({
     serviceId: MikuExtensions.Services.ServicesNames.Aphrodite,
     addRoute,
-    botCardConnector: new MikuExtensions.Utils.BotCardConnector(APHRODITE_S3_BUCKET,{
-      endpoint: APHRODITE_S3_ENDPOINT || undefined,
-      region: APHRODITE_S3_REGION,
+    botCardConnector: new MikuExtensions.Utils.BotCardConnector(S3_BUCKET,{
+      endpoint: S3_ENDPOINT || undefined,
+      region: S3_REGION,
       credentials: {
-        accessKeyId: APHRODITE_S3_ACCESS_KEY,
-        secretAccessKey: APHRODITE_S3_SECRET_KEY
+        accessKeyId: S3_ACCESS_KEY,
+        secretAccessKey: S3_SECRET_KEY
       }
     }),
-    aphroditeEndpoint: APHRODITE_ENDPOINT,
-    aphroditeApiKey: APHRODITE_KEY,
+    aphroditeEndpoint: OPENAI_ENDPOINT,
+    aphroditeApiKey: OPENAI_KEY,
     aphoditeConfig: {
       truncation_length: 4096,
       max_tokens: 300,
@@ -140,12 +129,12 @@ if (APHRODITE_ENDPOINT) {
   })
 }
 
-if (APHRODITE_ENDPOINT) {
+if (OPENAI_ENDPOINT) {
   new MikuExtensions.Services.EmotionGuidanceService({
     addRoute,
     serviceId: MikuExtensions.Services.ServicesNames.EmotionGuidance,
-    aphroditeApiKey: APHRODITE_KEY,
-    aphroditeEndpoint: APHRODITE_ENDPOINT,
+    aphroditeApiKey: OPENAI_KEY,
+    aphroditeEndpoint: OPENAI_ENDPOINT,
   })
 }
 

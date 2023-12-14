@@ -13,15 +13,17 @@ MikuGG is a generative visual novel platform. This is the open source interactor
 > **Note**
 > On windows, Make sure to add  Node.js to your system's **PATH**.
 
-### Aphrodite setup
+### LLM endpoint setup
 
-We only support the [Aphrodite](https://github.com/PygmalionAI/aphrodite-engine) with an OpenAI API endpoint.
+We only support the OpenAI-like APIs
 
-You need to run a large language model using the Aphrodite engine. You can follow the [quickstart](https://github.com/PygmalionAI/aphrodite-engine#quickstart)
+- [Aphrodite](https://github.com/PygmalionAI/aphrodite-engine#quickstart) with an OpenAI API endpoint.
+- [text-generation-webui](https://github.com/oobabooga/text-generation-webui/?tab=readme-ov-file#how-to-install) with exposed api.
 
 **Recommended models**
 We recommend using GPTQ quants to get the best possible model with the less GPU power. The more parameters (7B, 13B, etc..), the better the model will be (in this examples). But it will require more GPU power. It only supports NVIDIA cards.
 > This are recommendations based on December 2023.
+> Also, You can use oobabooga to run llama.cpp models without GPU.
 
 - RTX 1660, 2060, RTX 3050, 3060
   - 7B models
@@ -47,8 +49,14 @@ We recommend using GPTQ quants to get the best possible model with the less GPU 
     - [TheBloke/Euryale-1.3-L2-70B-GPTQ](https://huggingface.co/TheBloke/Euryale-1.3-L2-70B-GPTQ)
 
 ```bash
-# Example command
+# Example with Aphrodite
 python -m aphrodite.endpoints.openai.api_server --model TheBloke/MythoMax-L2-13B-GPTQ -q gptq --api-keys sk-EMPTY
+# Endpoint will be http://localhost:2242/v1
+
+# Example with text-generation-webui
+./start_linux.sh --api
+# Then, load the model
+# Endpoint will be http://localhost:5000/v1
 ```
 
 ## Installation
