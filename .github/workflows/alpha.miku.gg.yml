@@ -36,6 +36,7 @@ jobs:
         run: npm i -g pnpm && pnpm install --no-frozen-lockfile && pnpm test && pnpm run build --scope=@mikugg/browser-chat
 
   deploy_job:
+    if: false
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Deploy Job
