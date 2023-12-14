@@ -179,11 +179,6 @@ export interface AphroditeConfig {
   prompt_logprobs?: number;
 
   /**
-   * List of token IDs to ban from generating.
-   */
-  custom_token_bans?: number[];
-
-  /**
    * Whether to skip special tokens in the output. Defaults to true.
    */
   skip_special_tokens?: boolean;
@@ -222,7 +217,6 @@ export const DEFAULT_APHRODITE_CONFIG: AphroditeConfig = {
   stop: [],
   ignore_eos: false,
   max_tokens: 100,
-  custom_token_bans: [],
   skip_special_tokens: true,
   spaces_between_special_tokens: true,
   truncation_length: 4096,

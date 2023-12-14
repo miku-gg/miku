@@ -134,7 +134,6 @@ if (APHRODITE_ENDPOINT) {
         '\n\n\n'
       ],
       ignore_eos: false,
-      custom_token_bans: [],
       skip_special_tokens: true,
       spaces_between_special_tokens: true,
     },
