@@ -103,9 +103,9 @@ export class GPTShortTermMemoryV2 extends MikuCore.Memory.ShortTermMemory {
     return prompt;
   }
 
-  public buildMemoryPrompt(maxTokens: number): string {
+  public buildMemoryPrompt(maxTokens: number, ask?: string): string {
     const contextPrompt = this.fillText(this.getContextPrompt());
-    const askResponsePrompt = this.fillText(`\n${this.promptbuildStrategy.getResponseAskLine()}`);
+    const askResponsePrompt = ask || this.fillText(`\n${this.promptbuildStrategy.getResponseAskLine()}`);
     let memoryLinesPrompt = '';
 
     const allMemoryLines: MikuCore.Memory.MemoryLine[] = [

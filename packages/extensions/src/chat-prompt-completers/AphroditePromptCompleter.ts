@@ -1,6 +1,7 @@
 import * as Core from "@mikugg/core";
 import trim from "lodash.trim";
 import { AphroditeServiceInput, AphroditeServiceOutput, ServicesNames, AphroditeMessage } from "../services";
+import { emotionTemplates } from "../utils/emotions";
 
 const buildTextStops = (_subjects: string[]): string[] => {
   const subjects: string[] = _subjects.map((subject) => `${subject}:`);
@@ -81,6 +82,7 @@ export class AphroditePromptCompleter extends Core.ChatPromptCompleters
   .ChatPromptCompleter {
   private props: AphroditeServiceInput;
   private service: Core.Services.ServiceClient<AphroditeServiceInput, AphroditeServiceOutput>;
+  private swipes: Map<string, number> = new Map();
 
   constructor(params: AphroditeParams) {
     super(params);
@@ -100,11 +102,30 @@ export class AphroditePromptCompleter extends Core.ChatPromptCompleters
   protected async completePrompt(
     memory: Core.Memory.ShortTermMemory
   ): Promise<Core.ChatPromptCompleters.ChatPromptResponse> {
+    let ask = '';
+    const messages = this.getChatMessages(memory);
+    if(messages.length) {
+      const lastMessage = messages[messages.length - 1].content || '';
+      let swipe = this.swipes.get(lastMessage);
+      if (swipe) {
+        this.swipes.set(lastMessage, swipe + 1);
+      } else {
+        this.swipes.set(lastMessage, 1);
+      }
+      swipe = this.swipes.get(lastMessage);
+      if (swipe && swipe > 1) {
+        const emotionIds = emotionTemplates[0].emotionIds;
+        // select random emotion Id
+        const emotionId = emotionIds[Math.floor(Math.random() * emotionIds.length)];
+        ask = `\n### Response (Emotion=${emotionId}):`;
+      }
+    }
     let result = "";
     result = await this.service.query(
       {
         ...this.props,
-        messages: this.getChatMessages(memory)
+        ask,
+        messages
       }
     );
 

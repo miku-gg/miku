@@ -239,6 +239,7 @@ export const AphroditePromptCompleterServicePropTypes = {
   botHash: PropTypes.string,
   userName: PropTypes.string,
   model: PropTypes.string,
+  ask: PropTypes.string,
   messages: PropTypes.arrayOf(
     PropTypes.shape(AphroditeMessagePropType)
   ),
@@ -319,7 +320,7 @@ export class AphroditePromptCompleterService extends Miku.Services.Service<Aphro
       });
     })
 
-    return memory.buildMemoryPrompt(this.aphroditeConfig.truncation_length - this.aphroditeConfig.max_tokens);
+    return memory.buildMemoryPrompt(this.aphroditeConfig.truncation_length - this.aphroditeConfig.max_tokens, input.ask || '');
   }
 
   protected async simpleCompletion(
