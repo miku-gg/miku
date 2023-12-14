@@ -153,8 +153,8 @@ export function getConfigFromURL(): {
     assetDirectoryEndpoint: config.hasOwnProperty('assetDirectoryEndpoint') ? config['assetDirectoryEndpoint'] : import.meta.env.VITE_ASSETS_DIRECTORY_ENDPOINT,
     botDirectoryEndpoint: config.hasOwnProperty('botDirectoryEndpoint') ? config['botDirectoryEndpoint'] : import.meta.env.VITE_BOT_DIRECTORY_ENDPOINT,
     servicesEndpoint: config.hasOwnProperty('servicesEndpoint') ? config['servicesEndpoint'] : import.meta.env.VITE_SERVICES_ENDPOINT,
-    chatId: String(searchParams['chatId'] || '') || '',
-    botId: String(searchParams['botId'] || '') || String(searchParams['bot'] || '') || '',
+    chatId: config.hasOwnProperty('chatId') ? config['chatId'] : String(searchParams['chatId'] || '') || String(searchParams['chat'] || '') || '',
+    botId: config.hasOwnProperty('botId') ? config['botId'] : String(searchParams['botId'] || '') || String(searchParams['bot'] || '') || '',
   }
 }
 
