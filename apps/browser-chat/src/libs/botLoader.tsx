@@ -208,11 +208,14 @@ export function getBotDataFromURL(): BotData {
 
 export function setBotDataInURL(botData: BotData) {
   const { endpoints, disabled } = botData;
-  const searchParams = queryString.parse(searchString);
+  const config = getConfigFromURL();
+
+  // @ts-ignore
+  config.chatId = botData.settings.promptCompleterEndpoint.genSettings?.chatId || config.chatId;
 
   const newSearchParams = {
     bot: botData.hash,
-    config: searchParams['config'],
+    config: MikuCore.Services.encode(JSON.stringify(config)),
     settings: MikuCore.Services.encode(JSON.stringify(botData.settings)),
   };
 
