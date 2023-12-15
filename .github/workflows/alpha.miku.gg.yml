@@ -58,5 +58,7 @@ jobs:
           VITE_GTM_ID: ${{ secrets.VITE_GTM_ID}}
       - name: Deploy to S3
         run: aws s3 sync apps/browser-chat/dist ${{ secrets.S3_BUCKET_ALPHA }} --delete
+      - name: Set Cache-Control
+        run: aws s3 cp apps/browser-chat/dist/index.html ${{ secrets.S3_BUCKET_ALPHA }}/index.html --metadata-directive REPLACE --cache-control max-age=0
       - name: Invalidate Cloudfront distribution
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_DISTRIBUTION_ALPHA }} --paths "/*"

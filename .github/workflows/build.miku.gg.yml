@@ -56,5 +56,7 @@ jobs:
           VITE_AUDIO_DIRECTORY_ENDPOINT: ${{ secrets.VITE_AUDIO_DIRECTORY_ENDPOINT}}
       - name: Deploy to S3
         run: aws s3 sync apps/bot-builder/dist ${{ secrets.S3_BUCKET_BUILD }} --delete
+      - name: Set Cache-Control
+        run: aws s3 cp apps/bot-builder/dist/index.html ${{ secrets.S3_BUCKET_BUILD }}/index.html --metadata-directive REPLACE --cache-control max-age=0
       - name: Invalidate Cloudfront distribution
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_DISTRIBUTION_BUILD }} --paths "/*"
