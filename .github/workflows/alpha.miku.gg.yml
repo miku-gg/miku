@@ -36,7 +36,6 @@ jobs:
         run: npm i -g pnpm && pnpm install --no-frozen-lockfile && pnpm test && pnpm run build --scope=@mikugg/browser-chat
 
   deploy_job:
-    if: false
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Deploy Job
@@ -55,7 +54,7 @@ jobs:
         env:
           VITE_SERVICES_ENDPOINT: ${{ secrets.VITE_SERVICES_ENDPOINT }}
           VITE_BOT_DIRECTORY_ENDPOINT: ${{ secrets.VITE_BOT_DIRECTORY_ENDPOINT }}
-          VITE_ASSETS_DIRECTORY_ENDPOINT: ${{ secrets.VITE_ASSETS_DIRECOTRY_ENDPOINT }}
+          VITE_ASSETS_DIRECTORY_ENDPOINT: ${{ secrets.VITE_ASSETS_DIRECTORY_ENDPOINT }}
           VITE_GTM_ID: ${{ secrets.VITE_GTM_ID}}
       - name: Deploy to S3
         run: aws s3 sync apps/browser-chat/dist ${{ secrets.S3_BUCKET_ALPHA }} --delete
