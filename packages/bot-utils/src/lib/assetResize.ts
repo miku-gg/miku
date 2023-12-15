@@ -42,8 +42,8 @@ export const resizeImage = async function (
 ): Promise<void> {
   const metadata = await sharp(fileBuffer).metadata();
 
-  if (!['png', 'jpeg', 'gif'].includes(metadata.format as string)) {
-    console.error(`${filename} is not a PNG, JPG or GIF image.`);
+  if (!['png', 'jpeg', 'gif', 'webp'].includes(metadata.format as string)) {
+    console.error(`${filename} is not a PNG, WEBP, JPG or GIF image.`);
     return;
   }
 

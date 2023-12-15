@@ -17,6 +17,7 @@ const addAsset = async (hash: string, base64URL: string, upload: (bucket: BUCKET
   const dataType = base64URL.split(',')[0]
   // add extension to the path
   if (dataType.includes('png')) assetKey += '.png';
+  else if (dataType.includes('webp')) assetKey += '.webp';
   else if (dataType.includes('jpg')) assetKey += '.jpg';
   else if (dataType.includes('jpeg')) assetKey += '.jpeg';
   else if (dataType.includes('gif')) assetKey += '.gif';
