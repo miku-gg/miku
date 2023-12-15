@@ -407,16 +407,6 @@ export const BotDisplay = () => {
                   <GearIcon size={24} />
                 </button>
               </div>
-              {botConfigSettings.promptCompleterEndpoint.type !== PromptCompleterEndpointType.APHRODITE ? (
-                <div className="inline-flex transition-colors hover:text-[#A78BFA]">
-                  <button
-                    className="rounded-full"
-                    onClick={handleAdvancedSettingsButtonClick}
-                  >
-                    <SlidersIcon size={24} />
-                  </button>
-                </div>
-              ) : null}
             </div>
           </div>
           {/* MAIN IMAGE */}
