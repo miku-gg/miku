@@ -83,7 +83,12 @@ export async function* mikuCardUploader(
 
   if (callbacks.sharp) {
     const sharp = callbacks.sharp as (buffer: Buffer) => ISharp;
-    const resizeImagePromises = Array.from(newImages.keys()).map((hash) => resizeImage(
+    const resizeImagePromises = Array.from(newImages.keys()).filter(hash => (
+      hash.includes('.png') ||
+      hash.includes('.jpg') ||
+      hash.includes('.jpeg') ||
+      hash.includes('.webp')
+    )).map((hash) => resizeImage(
       sharp,
       (filename: string, data: Buffer) => callbacks.upload(BUCKET.ASSETS, filename, data),
       hash,

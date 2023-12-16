@@ -49,6 +49,7 @@ export default function s3ServerDecorator(app: Express): void{
     app.get(`/s3/${bucket}/:key`, (req, res) => {
         const file = getS3File(bucket, req.params.key);
         if (file) {
+            if (req.params.key.endsWith('.webm')) res.contentType('video/webm');
             res.send(file);
         } else {
             res.status(404).send('File not found.');
