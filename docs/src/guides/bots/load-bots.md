@@ -10,9 +10,9 @@ Once you have a bot config created by you or someone else, you can load it to th
 
 To load a bot, go to your local `https://localhost:8585/` where the bot directory is.
 
-![](/assets/bot_directory.png)
+![](/assets/local_bot_directory.png)
 
-To load a bot, select the `.png` file of you download or created. and then click on **"Upload"**
+To load a bot, select the `.json` file of you download or created. and then click on **"Upload"**
 
 And that's it! You can now click on the bot name to start using it.
 
