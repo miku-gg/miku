@@ -1,45 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import { Provider } from 'react-redux'
-import { store } from './store';
+import { ToastContainer } from 'react-toastify'
+import { store } from './state/store'
+import { NovelState } from './state/novelSlice'
+import { NarrationState } from './state/narrationSlice'
+import NovelLoader from './components/interactor/NovelLoader'
+import 'react-toastify/dist/ReactToastify.css'
 import './App.scss'
 
 export interface AppProps {
-  defaultSettings: any;
-  onSettingsChange: (settings: any) => void;
-  retriveAsset: (asset: string, size: number) => Promise<string>;
-  retriveNovel: () => Promise<any>;
-  retriveNarration: () => Promise<any>;
+  // defaultSettings: any
+  // onSettingsChange: (settings: any) => void
+  // retriveAsset: (asset: string, size: number) => Promise<string>
+  retriveNovelAndNarration: () => Promise<{
+    novel: NovelState
+    narration: NarrationState
+  }>
 }
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function App(props: AppProps) {
   return (
     <Provider store={store}>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="App">
+        {/* eslint-disable-next-line */}
+        {/*@ts-ignore */}
+        <ToastContainer theme="dark" position="bottom-right" />
+        <div>
+          <NovelLoader
+            retriveNovelAndNarration={props.retriveNovelAndNarration}
+          />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </Provider>
   )
 }
 
-export default App;
+export default App
