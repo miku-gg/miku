@@ -1,17 +1,18 @@
 import { RootState } from './store'
-import { NovelScene } from './novelSlice'
+import { NovelCharacters, NovelScene } from './novelSlice'
 import { NarrationResponse } from './narrationSlice'
+import { createSelector } from '@reduxjs/toolkit'
 
 export const selectLastLoadedResponse = (
   state: RootState
-): NarrationResponse => {
+): NarrationResponse | undefined => {
   const { currentResponseId } = state.narration
   const response = state.narration.responses[currentResponseId]
   if (response?.fetching && response?.parentInteractionId) {
     const interaction =
       state.narration.interactions[response.parentInteractionId]
-    const selectedResponse = interaction.responsesId.find(
-      (id) => !state.narration.responses[id].selected
+    const selectedResponse = interaction?.responsesId.find(
+      (id) => !state.narration.responses[id]?.selected
     )
     return state.narration.responses[selectedResponse || '']
   } else {
@@ -21,7 +22,7 @@ export const selectLastLoadedResponse = (
 
 export const selectSceneFromResponse = (
   state: RootState,
-  response: NarrationResponse
+  response: NarrationResponse | undefined
 ): NovelScene | undefined => {
   const interactionId = response?.parentInteractionId || ''
   if (interactionId) {
@@ -44,28 +45,32 @@ export const selectCurrentScene = (
   return selectSceneFromResponse(state, response)
 }
 
-export const selectLastLoadedCharacters = (
-  state: RootState
-): {
-  id: string
-  text: string
-  image?: string
-}[] => {
-  const response = selectLastLoadedResponse(state)
-  const scene = selectSceneFromResponse(state, response)
-
-  return (
-    scene?.roles.map(({ role, characterId }) => {
-      const outfit = state.novel.characters[characterId].roles[role]
-      const emotionSlug = response.characters[role].emotion
-      const emotion = state.novel.characters[characterId].outfits[
-        outfit
-      ].emotions.find((_emotion) => _emotion.id === emotionSlug)
-      return {
-        id: characterId,
-        text: response.characters[role].text,
-        image: emotion?.source[0],
-      }
-    }) || []
-  )
-}
+export const selectLastLoadedCharacters = createSelector(
+  [
+    selectLastLoadedResponse,
+    (state: RootState) =>
+      selectSceneFromResponse(state, selectLastLoadedResponse(state)),
+    (state: RootState) => state.novel.characters,
+  ],
+  (
+    response?: NarrationResponse,
+    scene?: NovelScene,
+    characters: NovelCharacters = {}
+  ) => {
+    // Your logic here
+    return (
+      scene?.roles.map(({ role, characterId }) => {
+        const outfitSlug = characters[characterId]?.roles[role] || ''
+        const emotionSlug = response?.characters[role]?.emotion
+        const emotion = characters[characterId]?.outfits[
+          outfitSlug
+        ]?.emotions?.find((_emotion) => _emotion.id === emotionSlug)
+        return {
+          id: characterId || '',
+          text: response?.characters[role]?.text || '',
+          image: emotion?.source[0],
+        }
+      }) || []
+    )
+  }
+)

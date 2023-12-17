@@ -2,26 +2,21 @@ import { Modal } from '@mikugg/ui-kit'
 import { Loader } from '../common/Loader'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { useEffect } from 'react'
-import { NovelState, setNovel } from '../../state/novelSlice'
-import { NarrationState, setNarration } from '../../state/narrationSlice'
+import { setNovel } from '../../state/novelSlice'
+import { setNarration } from '../../state/narrationSlice'
 import './NovelLoader.scss'
+import { useAppContext } from '../../App'
 
-const NovelLoader = ({
-  retriveNovelAndNarration,
-}: {
-  retriveNovelAndNarration: () => Promise<{
-    novel: NovelState
-    narration: NarrationState
-  }>
-}): JSX.Element => {
+const NovelLoader = (): JSX.Element => {
+  const { novelLoader } = useAppContext()
   const novelFetching = useAppSelector((state) => state.novel.fetching)
   const dispatch = useAppDispatch()
   useEffect(() => {
-    retriveNovelAndNarration().then(({ novel, narration }) => {
+    novelLoader().then(({ novel, narration }) => {
       dispatch(setNovel(novel))
       dispatch(setNarration(narration))
     })
-  }, [dispatch, retriveNovelAndNarration])
+  }, [dispatch, novelLoader])
 
   return (
     <Modal opened={novelFetching}>

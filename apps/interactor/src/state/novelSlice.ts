@@ -11,31 +11,37 @@ export interface NovelScene {
   }[]
   children: string[]
 }
-export interface NovelState {
-  fetching: boolean
-  characters: {
-    [id: string]: {
-      id: string
-      name: string
-      profile_pic: string
-      outfits: {
-        [outfit: string]: {
-          id: string
-          name: string
-          template: string
-          emotions: {
-            id: string
-            source: string[]
-            sound?: string
-          }[]
+
+export interface NovelCharacters {
+  [id: string]:
+    | {
+        id: string
+        name: string
+        profile_pic: string
+        outfits: {
+          [outfit: string]:
+            | {
+                id: string
+                name: string
+                template: string
+                emotions: {
+                  id: string
+                  source: string[]
+                  sound?: string
+                }[]
+              }
+            | undefined
+        }
+        /** Role to outfit mapping */
+        roles: {
+          [role: string]: string | undefined
         }
       }
-      /** Role to outfit mapping */
-      roles: {
-        [role: string]: string
-      }
-    }
-  }
+    | undefined
+}
+export interface NovelState {
+  fetching: boolean
+  characters: NovelCharacters
   scenes: NovelScene[]
   startSceneId: string
 }

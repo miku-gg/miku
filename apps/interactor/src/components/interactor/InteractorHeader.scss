@@ -24,4 +24,11 @@
     gap: 1rem;
     color: white;
   }
+
+  &__profile_pic {
+    width: 2rem;
+    height: 2rem;
+    background-size: cover;
+    border-radius: 50%;
+  }
 }

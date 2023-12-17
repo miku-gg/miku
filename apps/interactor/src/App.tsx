@@ -1,36 +1,52 @@
+import { createContext, useContext } from 'react'
 import { Provider } from 'react-redux'
 import { ToastContainer } from 'react-toastify'
 import { store } from './state/store'
 import { NovelState } from './state/novelSlice'
 import { NarrationState } from './state/narrationSlice'
 import NovelLoader from './components/interactor/NovelLoader'
+import Interactor from './components/interactor/Interactor'
+import 'normalize.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './App.scss'
-import 'normalize.css'
-import Interactor from './components/interactor/Interactor'
 
 export interface AppProps {
-  // defaultSettings: any
-  // onSettingsChange: (settings: any) => void
-  // retriveAsset: (asset: string, size: number) => Promise<string>
   novelLoader: () => Promise<{
     novel: NovelState
     narration: NarrationState
   }>
-  // assetLoader: (asset: string, lowres?: boolean) => Promise<string>
   assetLinkLoader: (asset: string, lowres?: boolean) => string
 }
 
+const AppContext = createContext<AppProps>({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  assetLinkLoader: (_asset: string, _lowres?: boolean) => '',
+  novelLoader: () =>
+    Promise.resolve({
+      novel: {} as NovelState,
+      narration: {} as NarrationState,
+    }),
+})
+
+export const useAppContext = () => useContext(AppContext)
+
 function App(props: AppProps) {
+  const contextValue = {
+    assetLinkLoader: props.assetLinkLoader,
+    novelLoader: props.novelLoader,
+  }
+
   return (
     <Provider store={store}>
-      <div className="App">
-        {/* eslint-disable-next-line */}
-        {/*@ts-ignore */}
-        <ToastContainer theme="dark" position="bottom-right" />
-        <Interactor assetLinkLoader={props.assetLinkLoader} />
-        <NovelLoader retriveNovelAndNarration={props.novelLoader} />
-      </div>
+      <AppContext.Provider value={contextValue}>
+        <div className="App">
+          {/* eslint-disable-next-line */}
+          {/*@ts-ignore */}
+          <ToastContainer theme="dark" position="bottom-right" />
+          <Interactor />
+          <NovelLoader />
+        </div>
+      </AppContext.Provider>
     </Provider>
   )
 }

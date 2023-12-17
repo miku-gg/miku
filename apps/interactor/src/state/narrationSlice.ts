@@ -15,12 +15,14 @@ export interface NarrationResponse {
   parentInteractionId: string | null
   suggestedScenes: string[]
   characters: {
-    [role: string]: {
-      emotion: string
-      audio: string
-      pose: string
-      text: string
-    }
+    [role: string]:
+      | {
+          emotion: string
+          audio: string
+          pose: string
+          text: string
+        }
+      | undefined
   }
   childrenInteractions: {
     interactionId: string
@@ -37,10 +39,10 @@ export interface NarrationState {
     suggestions: string[]
   }
   interactions: {
-    [id: string]: NarrationInteraction
+    [id: string]: NarrationInteraction | undefined
   }
   responses: {
-    [id: string]: NarrationResponse
+    [id: string]: NarrationResponse | undefined
   }
 }
 

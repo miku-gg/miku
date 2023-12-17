@@ -1,87 +1,40 @@
+import { useAppContext } from '../../App'
+import { useAppSelector } from '../../state/store'
+import { FaInfoCircle } from 'react-icons/fa'
 import './InteractorHeader.scss'
 
 const InteractorHeader = () => {
+  const { assetLinkLoader } = useAppContext()
+  const firstCharacter = useAppSelector(
+    (state) => Object.values(state.novel.characters)[0]
+  )
+
+  if (!firstCharacter) {
+    return null
+  }
+
   return (
     <div className="InteractorHeader">
       <div className="InteractorHeader__left">
         <div
-          className="w-8 h-8 bg-cover rounded-full"
+          className="InteractorHeader__profile_pic"
           style={{
-            backgroundImage: profileImage
-              ? `url(${assetLinkLoader(profileImage, '480p')})`
+            backgroundImage: firstCharacter.profile_pic
+              ? `url(${assetLinkLoader(firstCharacter.profile_pic, true)})`
               : '',
           }}
         />
-        <div className="BotDisplay__header-name">{card?.data.name}</div>
-        {botConfigSettings.promptCompleterEndpoint.type !==
-        PromptCompleterEndpointType.APHRODITE ? (
-          <div className="inline-flex">
-            <button className="rounded-full" onClick={displayBotDetails}>
-              <img src={infoIcon} />
-            </button>
-          </div>
-        ) : null}
+        <div className="InteractorHeader__header-name">
+          {firstCharacter.name}
+        </div>
         <div className="inline-flex">
-          {(card?.data?.extensions?.mikugg?.scenarios?.length || 0) > 1 &&
-          (responsesGenerated.length ||
-            currentScenarioId !==
-              card?.data.extensions.mikugg.start_scenario) ? (
-            <ScenarioSelector
-              value={currentScenarioId || ''}
-              onChange={updateScenario}
-            />
-          ) : null}
+          <button className="rounded-full">
+            <FaInfoCircle />
+          </button>
         </div>
+        <div className="inline-flex">scneario selector</div>
       </div>
-      <div className="InteractorHeader__right">
-        {config.productionMode ? (
-          <div className={`inline-flex ${isSmart ? 'brain-activated' : ''}`}>
-            <Tooltip
-              title={
-                isSmart
-                  ? 'Deactivate 70B'
-                  : 'Activate 70B model. Free for a limited time.'
-              }
-              placement="left"
-            >
-              <button onClick={toggleBrain}>
-                <Brain />
-              </button>
-            </Tooltip>
-          </div>
-        ) : null}
-        {music ? <MusicPlayer src={assetLinkLoader(music, 'audio')} /> : null}
-        <div className="inline-flex transition-colors hover:text-[#A78BFA]">
-          <button
-            className="rounded-full"
-            onClick={() => {
-              if (document.fullscreenElement) {
-                document.exitFullscreen()
-                setFullscreen(false)
-              } else {
-                document.documentElement.requestFullscreen()
-                setFullscreen(true)
-              }
-            }}
-          >
-            {fullscreen ? (
-              <ScreenNormalIcon size={24} />
-            ) : (
-              <ScreenFullIcon size={24} />
-            )}
-          </button>
-        </div>
-        <div className="inline-flex transition-colors hover:text-[#A78BFA]">
-          <button className="rounded-full" onClick={handleHistoryButtonClick}>
-            <HistoryIcon size={24} />
-          </button>
-        </div>
-        <div className="inline-flex transition-colors hover:text-[#A78BFA]">
-          <button className="rounded-full" onClick={handleSettingsButtonClick}>
-            <GearIcon size={24} />
-          </button>
-        </div>
-      </div>
+      <div className="InteractorHeader__right"></div>
     </div>
   )
 }

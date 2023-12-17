@@ -6,13 +6,11 @@ import {
   selectLastLoadedCharacters,
 } from '../../state/selectors'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
+import { useAppContext } from '../../App'
+import InteractorHeader from './InteractorHeader'
 
-const Interactor = ({
-  assetLinkLoader,
-}: {
-  assetLinkLoader: (asset: string, lowres?: boolean) => string
-}) => {
-  // Include your component logic here
+const Interactor = () => {
+  const { assetLinkLoader } = useAppContext()
   const scene = useAppSelector(selectCurrentScene)
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
 
@@ -23,6 +21,7 @@ const Interactor = ({
   return (
     <div className="Interactor">
       <div className="Interactor__content">
+        <InteractorHeader />
         <div className="Interactor__main-image-container">
           <ProgressiveImage
             src={scene.background ? assetLinkLoader(scene.background) : ''}
