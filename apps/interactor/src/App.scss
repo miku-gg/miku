@@ -1,4 +1,3 @@
-@import 'normalize.css';
 @import './_variables.scss';
 @import './fonts.scss';
 
@@ -47,4 +46,24 @@
 .App .scrollbar {
   scrollbar-color: rgb(167 139 250) transparent;
   scrollbar-width: auto;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+button,
+a {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  text-decoration: none;
+}
+
+@media not all and (min-width: 1024px) {
+  .App {
+    padding: 0px;
+  }
 }

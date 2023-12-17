@@ -1,5 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
+export interface NovelScene {
+  id: string
+  prompt: string
+  background: string
+  music: string
+  roles: {
+    characterId: string
+    role: string
+  }[]
+  children: string[]
+}
 export interface NovelState {
   fetching: boolean
   characters: {
@@ -25,23 +36,15 @@ export interface NovelState {
       }
     }
   }
-  scenes: {
-    id: string
-    prompt: string
-    background: string
-    music: string
-    roles: {
-      characterId: string
-      role: string
-    }[]
-    children: string[]
-  }[]
+  scenes: NovelScene[]
+  startSceneId: string
 }
 
 const initialState: NovelState = {
   fetching: true,
   characters: {},
   scenes: [],
+  startSceneId: '',
 }
 
 const novelSlice = createSlice({

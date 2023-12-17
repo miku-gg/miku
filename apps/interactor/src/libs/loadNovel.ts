@@ -4,19 +4,21 @@ import { NovelState } from '../state/novelSlice'
 import { NarrationState } from '../state/narrationSlice'
 import { v4 as randomUUID } from 'uuid'
 
-const ASSETS_ENDPOINT = 'https://assets.miku.gg'
-const CARD_ENDPOINT = 'https://mikugg-configs-public.s3.us-east-2.amazonaws.com'
-const CARD_ID = 'QmeKmUKQyeSkqPT7yaMpKKUBRkExYZfZQpgDjSTYCG8TmC.json'
-
-export async function loadNovelFromSingleCard(
-  cardId: string = CARD_ID
-): Promise<{
+export async function loadNovelFromSingleCard({
+  cardId,
+  cardEndpoint,
+  assetsEndpoint,
+}: {
+  cardId: string
+  cardEndpoint: string
+  assetsEndpoint: string
+}): Promise<{
   novel: NovelState
   narration: NarrationState
 }> {
   try {
     const { data: card } = await axios.get<MikuCard>(
-      `${CARD_ENDPOINT}/${cardId}`
+      `${cardEndpoint}/${cardId}`
     )
     const { mikugg } = card.data.extensions
     const assets = new Set<string>()
@@ -85,9 +87,7 @@ export async function loadNovelFromSingleCard(
 
     // await all assets load dummy fetch
     await Promise.all(
-      Array.from(assets).map((asset) =>
-        axios.get(`${ASSETS_ENDPOINT}/${asset}`)
-      )
+      Array.from(assets).map((asset) => axios.get(`${assetsEndpoint}/${asset}`))
     )
 
     return {
@@ -106,11 +106,11 @@ export async function loadNovelFromSingleCard(
           },
         },
         scenes,
+        startSceneId: mikugg.start_scenario,
       },
       narration: {
         fetching: false,
-        currentResponseId: cardId,
-        currentSceneId: mikugg.start_scenario,
+        currentResponseId: mikugg.start_scenario,
         id: randomUUID(),
         input: {
           text: '',
@@ -120,8 +120,9 @@ export async function loadNovelFromSingleCard(
         responses: {
           [mikugg.start_scenario]: {
             id: cardId,
+            parentInteractionId: null,
             characters: {
-              [cardId]: {
+              [mikugg.start_scenario]: {
                 audio: '',
                 text: card.data.first_mes,
                 emotion: firstEmotion?.id || 'happy',

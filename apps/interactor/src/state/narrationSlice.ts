@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface Interaction {
+export interface NarrationInteraction {
   id: string
   parentResponseId: string | null
   query: string
@@ -8,10 +8,11 @@ interface Interaction {
   responsesId: string[]
 }
 
-interface Response {
+export interface NarrationResponse {
   id: string
   selected: boolean
   fetching: boolean
+  parentInteractionId: string | null
   suggestedScenes: string[]
   characters: {
     [role: string]: {
@@ -30,24 +31,22 @@ interface Response {
 export interface NarrationState {
   id: string
   fetching: boolean
-  currentSceneId: string
   currentResponseId: string
   input: {
     text: string
     suggestions: string[]
   }
   interactions: {
-    [id: string]: Interaction
+    [id: string]: NarrationInteraction
   }
   responses: {
-    [id: string]: Response
+    [id: string]: NarrationResponse
   }
 }
 
 const initialState: NarrationState = {
   id: '',
   fetching: true,
-  currentSceneId: '',
   currentResponseId: '',
   input: {
     text: '',

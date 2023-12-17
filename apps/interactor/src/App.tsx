@@ -6,15 +6,19 @@ import { NarrationState } from './state/narrationSlice'
 import NovelLoader from './components/interactor/NovelLoader'
 import 'react-toastify/dist/ReactToastify.css'
 import './App.scss'
+import 'normalize.css'
+import Interactor from './components/interactor/Interactor'
 
 export interface AppProps {
   // defaultSettings: any
   // onSettingsChange: (settings: any) => void
   // retriveAsset: (asset: string, size: number) => Promise<string>
-  retriveNovelAndNarration: () => Promise<{
+  novelLoader: () => Promise<{
     novel: NovelState
     narration: NarrationState
   }>
+  // assetLoader: (asset: string, lowres?: boolean) => Promise<string>
+  assetLinkLoader: (asset: string, lowres?: boolean) => string
 }
 
 function App(props: AppProps) {
@@ -24,11 +28,8 @@ function App(props: AppProps) {
         {/* eslint-disable-next-line */}
         {/*@ts-ignore */}
         <ToastContainer theme="dark" position="bottom-right" />
-        <div>
-          <NovelLoader
-            retriveNovelAndNarration={props.retriveNovelAndNarration}
-          />
-        </div>
+        <Interactor assetLinkLoader={props.assetLinkLoader} />
+        <NovelLoader retriveNovelAndNarration={props.novelLoader} />
       </div>
     </Provider>
   )
