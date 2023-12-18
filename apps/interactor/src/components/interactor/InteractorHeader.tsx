@@ -1,13 +1,12 @@
 import { useAppContext } from '../../App'
 import { useAppSelector } from '../../state/store'
-import { BsFillInfoCircleFill } from 'react-icons/bs'
 import { GiBrain } from 'react-icons/gi'
 import { BsMusicNoteBeamed } from 'react-icons/bs'
 import { FaExpand } from 'react-icons/fa6'
 import { GrHistory } from 'react-icons/gr'
 import { SlSettings } from 'react-icons/sl'
 import './InteractorHeader.scss'
-import ScenarioSelector from '../scenarios/ScenarioSelector'
+import SceneSelector from '../scenarios/SceneSelector'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
@@ -33,27 +32,24 @@ const InteractorHeader = () => {
         <div className="InteractorHeader__header-name">
           {firstCharacter.name}
         </div>
-        <button className="InteractorHeader__header-info">
-          <BsFillInfoCircleFill />
-        </button>
         <div className="InteractorHeader__scenario-selector">
-          <ScenarioSelector />
+          <SceneSelector />
         </div>
-      </div>
-      <div className="InteractorHeader__right">
-        <button className="InteractorHeader__brain">
-          <GiBrain />
-        </button>
-        <button className="InteractorHeader__music">
-          <BsMusicNoteBeamed />
-        </button>
-        <button className="InteractorHeader__full-screen">
-          <FaExpand />
-        </button>
-        <button className="InteractorHeader__history">
+        <button className="InteractorHeader__history icon-button">
           <GrHistory />
         </button>
-        <button className="InteractorHeader__settings">
+      </div>
+      <div className="InteractorHeader__right">
+        <button className="InteractorHeader__brain icon-button">
+          <GiBrain />
+        </button>
+        <button className="InteractorHeader__music icon-button">
+          <BsMusicNoteBeamed />
+        </button>
+        <button className="InteractorHeader__full-screen icon-button">
+          <FaExpand />
+        </button>
+        <button className="InteractorHeader__settings icon-button">
           <SlSettings />
         </button>
       </div>

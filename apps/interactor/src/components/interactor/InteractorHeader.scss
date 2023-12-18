@@ -26,17 +26,17 @@
     color: white;
     font-size: 1.5rem;
     width: 12rem;
+  }
 
-    button {
-      color: white;
-      transition: all 0.2s ease-out;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
+  .icon-button {
+    color: white;
+    transition: all 0.2s ease-out;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
 
-      &:hover {
-        color: #a78bfa;
-      }
+    &:hover {
+      color: #a78bfa;
     }
   }
 

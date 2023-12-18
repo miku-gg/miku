@@ -38,7 +38,7 @@ export async function loadNovelFromSingleCard({
       return {
         id: scenario.id,
         prompt: scenario.context,
-        name: scenario.name,
+        name: scenario.trigger_action,
         background,
         music,
         roles: [
@@ -116,6 +116,7 @@ export async function loadNovelFromSingleCard({
         input: {
           text: '',
           suggestions: [],
+          disabled: false,
         },
         interactions: {},
         responses: {

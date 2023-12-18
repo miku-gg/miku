@@ -84,11 +84,6 @@ const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text }) => {
       className="TextFormatter scrollbar"
       ref={textFormatterDiv}
       onScroll={(event) => {
-        console.log(
-          (textFormatterDiv.current?.scrollTop || 0) +
-            (textFormatterDiv.current?.clientHeight || 0),
-          textFormatterDiv.current?.scrollHeight
-        )
         if (
           (textFormatterDiv.current?.scrollTop || 0) +
             (textFormatterDiv.current?.clientHeight || 0) <
@@ -96,9 +91,6 @@ const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text }) => {
         ) {
           setUserScrolled(true)
         }
-      }}
-      onMouseDown={() => {
-        console.log('mouse down')
       }}
     >
       {elements}

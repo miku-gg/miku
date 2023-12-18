@@ -1,63 +1,47 @@
 import { useState } from 'react'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
-import { AiFillPicture } from 'react-icons/ai'
-import './ScenarioSelector.scss'
+import { BiCameraMovie } from 'react-icons/bi'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import {
-  selectAvailableScenes,
-  selectCurrentScene,
-} from '../../state/selectors'
+import { selectAvailableScenes } from '../../state/selectors'
 import { useAppContext } from '../../App'
 import { interactionStart } from '../../state/narrationSlice'
+import './SceneSelector.scss'
 
-export default function ScenarioSelector(): JSX.Element | null {
+export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
   const scenes = useAppSelector(selectAvailableScenes)
-  const currentScene = useAppSelector(selectCurrentScene)
   const { assetLinkLoader } = useAppContext()
   const [expanded, setExpended] = useState<boolean>(false)
 
-  const handleItemClick = (scenarioId: string) => {
+  const handleItemClick = (id: string, prompt: string) => {
     setExpended(false)
-    console.log('handleItemClick', scenarioId)
+    dispatch(interactionStart({ sceneId: id, text: prompt }))
   }
 
-  // if (!scenes?.length) return null
+  if (!scenes?.length) return null
 
   return (
     <div
-      className={`ScenarioSelector ${
-        expanded ? 'ScenarioSelector--expanded' : ''
-      }`}
+      className={`SceneSelector ${expanded ? 'SceneSelector--expanded' : ''}`}
       onClick={setExpended.bind(null, !expanded)}
     >
-      <button
-        className="ScenarioSelector__trigger"
-        onClick={() =>
-          dispatch(
-            interactionStart({
-              sceneId: currentScene?.id || '',
-              text: '*Change of scene*',
-            })
-          )
-        }
-      >
-        <AiFillPicture />
+      <button className="SceneSelector__trigger icon-button">
+        <BiCameraMovie />
       </button>
       <div
-        className="ScenarioSelector__list-container"
+        className="SceneSelector__list-container"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="ScenarioSelector__list">
+        <div className="SceneSelector__list">
           {scenes.map((scene, index) => {
             return (
               <button
-                className="ScenarioSelector__item"
-                key={`scenario-selector-${scene.id}-${index}`}
-                onClick={handleItemClick.bind(null, scene.id)}
+                className="SceneSelector__item"
+                key={`scene-selector-${scene.id}-${index}`}
+                onClick={handleItemClick.bind(null, scene.id, scene.prompt)}
               >
                 <div
-                  className="ScenarioSelector__item-background"
+                  className="SceneSelector__item-background"
                   style={{
                     backgroundImage: `url(${assetLinkLoader(
                       scene.background,
@@ -67,12 +51,12 @@ export default function ScenarioSelector(): JSX.Element | null {
                 />
                 {scene.emotion ? (
                   <EmotionRenderer
-                    className="ScenarioSelector__item-emotion"
+                    className="SceneSelector__item-emotion"
                     assetLinkLoader={assetLinkLoader}
                     assetUrl={scene.emotion}
                   />
                 ) : null}
-                <div className="ScenarioSelector__item-text">{scene.name}</div>
+                <div className="SceneSelector__item-text">{scene.name}</div>
               </button>
             )
           })}

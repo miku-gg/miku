@@ -77,38 +77,6 @@ export const selectLastLoadedCharacters = createSelector(
     )
   }
 )
-/*
-export const selectAvailableScenes = (
-  state: RootState
-): {
-  id: string
-  name: string
-  prompt: string
-  background: string
-  music: string
-  emotion: string
-}[] => {
-  const { scenes, characters } = state.novel
-  const currentScene = selectCurrentScene(state)
-
-  return scenes
-    .filter((scene) => currentScene?.children.includes(scene.id))
-    .map((scene) => {
-      const firstCharacter = characters[scene.roles[0]?.characterId]
-      const emotionImage =
-        firstCharacter?.outfits[
-          firstCharacter?.roles[scene.roles[0]?.role] || ''
-        ]?.emotions[0].source[0] || ''
-      return {
-        id: scene.id,
-        name: scene.name,
-        prompt: scene.prompt,
-        background: scene.background,
-        music: scene.music,
-        emotion: emotionImage,
-      }
-    })
-}*/
 
 export const selectAvailableScenes = createSelector(
   [
@@ -135,5 +103,18 @@ export const selectAvailableScenes = createSelector(
           emotion: emotionImage,
         }
       })
+  }
+)
+
+export const selectCurrentSwipeResponses = createSelector(
+  [
+    (state: RootState) => state.narration.interactions,
+    (state: RootState) => state.narration.responses,
+    (state: RootState) => state.narration.currentResponseId,
+  ],
+  (interactions, responses, currentResponseId) => {
+    const interaction =
+      interactions[responses[currentResponseId]?.parentInteractionId || '']
+    return interaction?.responsesId.map((id) => responses[id])
   }
 )

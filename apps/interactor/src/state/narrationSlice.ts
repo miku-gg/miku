@@ -151,6 +151,50 @@ const narrationSlice = createSlice({
         state.input.disabled = false
       }
     },
+    regenerationStart(state) {
+      const currentInteraction =
+        state.interactions[
+          state.responses[state.currentResponseId]?.parentInteractionId || ''
+        ]
+      if (!currentInteraction) return state
+      const response: NarrationResponse = {
+        id: randomUUID(),
+        characters: {},
+        childrenInteractions: [],
+        fetching: true,
+        parentInteractionId: currentInteraction.id,
+        selected: true,
+        suggestedScenes: [],
+      }
+      currentInteraction.responsesId.forEach((responseId) => {
+        const response = state.responses[responseId]
+        if (response) {
+          response.selected = false
+        }
+      })
+      currentInteraction.responsesId.push(response.id)
+      state.responses[response.id] = response
+
+      state.input.disabled = true
+      state.currentResponseId = response.id
+    },
+    swipeResponse(state, action: PayloadAction<string>) {
+      const response = state.responses[action.payload]
+      if (response) {
+        const interaction =
+          state.interactions[response.parentInteractionId || '']
+        if (interaction) {
+          interaction.responsesId.forEach((responseId) => {
+            const response = state.responses[responseId]
+            if (response) {
+              response.selected = false
+            }
+          })
+        }
+        response.selected = true
+        state.currentResponseId = response.id
+      }
+    },
   },
 })
 
@@ -160,6 +204,8 @@ export const {
   interactionFailure,
   interactionStart,
   interactionSuccess,
+  regenerationStart,
+  swipeResponse,
 } = narrationSlice.actions
 
 export default narrationSlice.reducer

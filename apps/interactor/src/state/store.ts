@@ -3,7 +3,10 @@ import { configureStore } from '@reduxjs/toolkit'
 import settings from './settingsSlice'
 import narration from './narrationSlice'
 import novel from './novelSlice'
-import { interactionListenerMiddleware } from './listeners'
+import {
+  interactionListenerMiddleware,
+  regenerationListenerMiddleware,
+} from './listeners'
 
 export const store = configureStore({
   reducer: {
@@ -12,7 +15,10 @@ export const store = configureStore({
     novel,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(interactionListenerMiddleware.middleware),
+    getDefaultMiddleware().prepend([
+      interactionListenerMiddleware.middleware,
+      regenerationListenerMiddleware.middleware,
+    ]),
 })
 
 export type RootState = ReturnType<typeof store.getState>
