@@ -1,7 +1,13 @@
 import { useAppContext } from '../../App'
 import { useAppSelector } from '../../state/store'
-import { FaInfoCircle } from 'react-icons/fa'
+import { BsFillInfoCircleFill } from 'react-icons/bs'
+import { GiBrain } from 'react-icons/gi'
+import { BsMusicNoteBeamed } from 'react-icons/bs'
+import { FaExpand } from 'react-icons/fa6'
+import { GrHistory } from 'react-icons/gr'
+import { SlSettings } from 'react-icons/sl'
 import './InteractorHeader.scss'
+import ScenarioSelector from '../scenarios/ScenarioSelector'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
@@ -27,14 +33,30 @@ const InteractorHeader = () => {
         <div className="InteractorHeader__header-name">
           {firstCharacter.name}
         </div>
-        <div className="inline-flex">
-          <button className="rounded-full">
-            <FaInfoCircle />
-          </button>
+        <button className="InteractorHeader__header-info">
+          <BsFillInfoCircleFill />
+        </button>
+        <div className="InteractorHeader__scenario-selector">
+          <ScenarioSelector />
         </div>
-        <div className="inline-flex">scneario selector</div>
       </div>
-      <div className="InteractorHeader__right"></div>
+      <div className="InteractorHeader__right">
+        <button className="InteractorHeader__brain">
+          <GiBrain />
+        </button>
+        <button className="InteractorHeader__music">
+          <BsMusicNoteBeamed />
+        </button>
+        <button className="InteractorHeader__full-screen">
+          <FaExpand />
+        </button>
+        <button className="InteractorHeader__history">
+          <GrHistory />
+        </button>
+        <button className="InteractorHeader__settings">
+          <SlSettings />
+        </button>
+      </div>
     </div>
   )
 }

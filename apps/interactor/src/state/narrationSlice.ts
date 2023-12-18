@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { v4 as randomUUID } from 'uuid'
 
 export interface NarrationInteraction {
   id: string
@@ -37,6 +38,7 @@ export interface NarrationState {
   input: {
     text: string
     suggestions: string[]
+    disabled: boolean
   }
   interactions: {
     [id: string]: NarrationInteraction | undefined
@@ -53,6 +55,7 @@ const initialState: NarrationState = {
   input: {
     text: '',
     suggestions: [],
+    disabled: false,
   },
   interactions: {},
   responses: {},
@@ -62,25 +65,101 @@ const narrationSlice = createSlice({
   name: 'narration',
   initialState,
   reducers: {
-    setFetching(state, action: PayloadAction<boolean>) {
-      state.fetching = action.payload
-    },
     setNarration(_state, action: PayloadAction<NarrationState>) {
       return action.payload
     },
-    setInteractions(
-      state,
-      action: PayloadAction<NarrationState['interactions']>
-    ) {
-      state.interactions = action.payload
+    setInputText(state, action: PayloadAction<string>) {
+      state.input.text = action.payload
     },
-    setResponses(state, action: PayloadAction<NarrationState['responses']>) {
-      state.responses = action.payload
+    interactionStart(
+      state,
+      action: PayloadAction<{
+        text: string
+        sceneId: string
+      }>
+    ) {
+      const { text, sceneId } = action.payload
+      state.input.text = ''
+      const newInteractionId = randomUUID()
+      const response: NarrationResponse = {
+        id: randomUUID(),
+        characters: {},
+        childrenInteractions: [],
+        fetching: true,
+        parentInteractionId: newInteractionId,
+        selected: true,
+        suggestedScenes: [],
+      }
+      const interaction: NarrationInteraction = {
+        id: newInteractionId,
+        parentResponseId: state.currentResponseId,
+        query: text,
+        sceneId,
+        responsesId: [response.id],
+      }
+      const currentResponse = state.responses[state.currentResponseId]
+      currentResponse?.childrenInteractions.forEach((child) => {
+        child.selected = false
+      })
+      currentResponse?.childrenInteractions.push({
+        interactionId: newInteractionId,
+        selected: true,
+      })
+      state.interactions[newInteractionId] = interaction
+      state.responses[response.id] = response
+      state.currentResponseId = response.id
+      state.input.disabled = true
+    },
+    interactionFailure(state) {
+      state.input.disabled = false
+      const response = state.responses[state.currentResponseId]
+      if (!response?.fetching) return state
+      const interaction =
+        state.interactions[response?.parentInteractionId || '']
+      state.currentResponseId = interaction?.parentResponseId || ''
+      const currentResponse = state.responses[state.currentResponseId]
+      if (currentResponse) {
+        currentResponse.childrenInteractions =
+          currentResponse.childrenInteractions.filter(
+            (child) => child.interactionId === response?.parentInteractionId
+          )
+        if (currentResponse.childrenInteractions.length) {
+          currentResponse.childrenInteractions[0].selected = true
+        }
+      }
+      delete state.responses[response?.id || '']
+      delete state.interactions[interaction?.id || '']
+    },
+    interactionSuccess(
+      state,
+      action: PayloadAction<{
+        completed: boolean
+        characters: NarrationResponse['characters']
+        suggestedScenes: string[]
+      }>
+    ) {
+      const { characters, suggestedScenes } = action.payload
+      const response = state.responses[state.currentResponseId]
+      if (response) {
+        response.childrenInteractions = []
+        response.characters = characters
+        response.suggestedScenes = suggestedScenes
+        response.fetching = false
+        response.selected = true
+      }
+      if (action.payload.completed) {
+        state.input.disabled = false
+      }
     },
   },
 })
 
-export const { setFetching, setNarration, setInteractions, setResponses } =
-  narrationSlice.actions
+export const {
+  setNarration,
+  setInputText,
+  interactionFailure,
+  interactionStart,
+  interactionSuccess,
+} = narrationSlice.actions
 
 export default narrationSlice.reducer

@@ -6,8 +6,9 @@
   align-items: center;
   padding: 0.75rem;
   border-radius: 0.75rem;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
   z-index: 10;
-  padding: 5px;
 
   &__left {
     display: flex;
@@ -21,8 +22,22 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
     color: white;
+    font-size: 1.5rem;
+    width: 12rem;
+
+    button {
+      color: white;
+      transition: all 0.2s ease-out;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+
+      &:hover {
+        color: #a78bfa;
+      }
+    }
   }
 
   &__profile_pic {
@@ -30,5 +45,46 @@
     height: 2rem;
     background-size: cover;
     border-radius: 50%;
+  }
+
+  &__brain {
+    font-size: 2rem;
+    transition: all 0.2s ease-out;
+    cursor: pointer;
+    color: #1b1f3a !important;
+
+    &:hover {
+      animation: neon1 0.3s ease-in-out infinite alternate;
+    }
+  }
+
+  &__header-info {
+    color: white;
+    transition: all 0.2s ease-out;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.5rem;
+
+    &:hover {
+      color: #a78bfa;
+    }
+  }
+}
+
+@keyframes neon1 {
+  from {
+    filter: drop-shadow(0 0 2px #cd5fea);
+  }
+  to {
+    filter: drop-shadow(0 0 10px #9b47b3);
+  }
+}
+@keyframes neon2 {
+  from {
+    filter: drop-shadow(0 0 5px white);
+  }
+  to {
+    filter: drop-shadow(0 0 8px white);
   }
 }

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { MikuCard } from '@mikugg/bot-utils'
-import { NovelState } from '../state/novelSlice'
+import { NovelCharacterOutfit, NovelState } from '../state/novelSlice'
 import { NarrationState } from '../state/narrationSlice'
 import { v4 as randomUUID } from 'uuid'
 
@@ -38,6 +38,7 @@ export async function loadNovelFromSingleCard({
       return {
         id: scenario.id,
         prompt: scenario.context,
+        name: scenario.name,
         background,
         music,
         roles: [
@@ -66,7 +67,7 @@ export async function loadNovelFromSingleCard({
         }),
       }
       return outfits
-    }, {} as NovelState['characters'][string]['outfits'])
+    }, {} as { [outfit: string]: NovelCharacterOutfit | undefined })
 
     const firstScenario = mikugg.scenarios.find(
       (scenario) => scenario.id === mikugg.start_scenario
@@ -102,7 +103,7 @@ export async function loadNovelFromSingleCard({
             roles: mikugg.scenarios.reduce((roles, scenario) => {
               roles[scenario.id] = scenario.emotion_group
               return roles
-            }, {} as NovelState['characters'][string]['roles']),
+            }, {} as { [role: string]: string | undefined }),
           },
         },
         scenes,

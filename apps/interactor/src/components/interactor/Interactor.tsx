@@ -8,6 +8,7 @@ import {
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { useAppContext } from '../../App'
 import InteractorHeader from './InteractorHeader'
+import ChatBox from '../chat-box/ChatBox'
 
 const Interactor = () => {
   const { assetLinkLoader } = useAppContext()
@@ -56,6 +57,7 @@ const Interactor = () => {
             )
           })}
         </div>
+        <ChatBox />
       </div>
     </div>
   )

@@ -1,0 +1,48 @@
+@import '../../variables';
+
+.ResponseBox {
+  background: linear-gradient(to top, rgba(#171717, 0.9), rgba(#171717, 0.2));
+  // background: #171717;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 1.5rem;
+  width: 75%;
+  height: 75%;
+  bottom: 70px;
+  z-index: 1;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  // text space between letters
+  // letter-spacing: 0.1rem;
+  // border-radius: 10px;
+  text-shadow: 1.41px 1.41px black, 2px 0 black, 1.41px -1.41px black,
+    0 -2px black, -1.41px -1.41px black, -2px 0 black, -1.41px 1.41px black,
+    0 2px black;
+  // overflow: auto;
+
+  // background: radial-gradient(
+  //   circle,
+  //   rgba(#171717, 0.9) 0%,
+  //   rgba(#171717, 0) 100%
+  // );
+  // padding: 1.5rem 20%;
+  // width: 100%;
+
+  em {
+    font-style: italic;
+    color: lightgray;
+  }
+  em,
+  p,
+  q {
+    display: inline;
+  }
+
+  p {
+    color: rgba(225, 138, 36, 1);
+  }
+
+  q {
+    color: rgba(225, 138, 36, 1);
+  }
+}

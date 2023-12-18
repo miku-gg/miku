@@ -1,8 +1,9 @@
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import settings from './settingsSlice'
 import narration from './narrationSlice'
 import novel from './novelSlice'
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import { interactionListenerMiddleware } from './listeners'
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,8 @@ export const store = configureStore({
     narration,
     novel,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().prepend(interactionListenerMiddleware.middleware),
 })
 
 export type RootState = ReturnType<typeof store.getState>
