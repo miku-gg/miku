@@ -8,27 +8,55 @@ order: 1700
 
 You need to have a LLM (large language model) service to use the bots. A LLM is a machine learning model that is able to predict and generate the bot responses. You can use the following services:
 
-* [text-generation-webui](https://github.com/oobabooga/text-generation-webui). An open-source local server for LLMs, also known as **oobabooga**. This is the recommended option, as it's compatible with the LLaMA-based models. They can be run using a GPU or CPU (but it's slower).
+- [Aphrodite](https://github.com/PygmalionAI/aphrodite-engine). The most modern and update open-source local server for LLMs written with parallelization in mind. This is the recommended option, as it's compatiable with most local models and the fastest engine.
 
-* [OpenAI](https://openai.com/). A paid service that provides censored LLMs. You need to have an API key to use it. The model that is compatible with MikuGG is `gpt3.5-turbo`. *Note: NSFW content is not allowed for this API because the model censors it. Unless you can bypass it with a jailbrak but that's up to your own risk.*
+- [TabbyAPI](https://github.com/theroyallab/tabbyAPI). An open-source local server for LLMs with native exllama support, if you cannot use Aphrodite it is reccomended to use this.
 
-* [Kobold AI](https://koboldai.com/). An open-source local server for LLMs. Compatible with Pygmalion 6B and uncensored. But it requires a GPU to run it.
+- [text-generation-webui](https://github.com/oobabooga/text-generation-webui). An open-source local server for LLMs, also known as **oobabooga**. It has been around for awhile and is compatible with most open source model. They can be run using a GPU or CPU (but it's slower).
 
-### Get an ooobabooga API endpoint (for LLaMA models)
+### Get an Aphrodite endpoint
+
+First, download and install [Aphrodite](https://github.com/PygmalionAI/aphrodite-engine) and run a model.
+To run a local model, you can use cloudflared to publish your API by downloading it from [here](https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64) and doing `./cloudflare-linux-amd64 tunnel --url localhost:<YOUR PORT HERE>`. You might have to give execution permission to the file by doing `chmod +x cloudflared-linux-amd64`.
+
+For example, to run a model like `ludis/tsukasa-120b-qlora-gptq`
+
+```
+./runtime.sh python -m aphrodite.endpoints.openai.api_server --port <YOUR PORT HERE> --model ludis/tsukasa-120b-qlora-gptq -q gptq --dtype float16 --api-keys <YOUR_API_PASSWORD_HERE> -gmu 0.88 -tp 2
+```
+
+If you're using multiple GPUs (`-tp` set to a value >1) you might get a speed boost from setting the affinity of Aphrodite's ray processes to a higher value with this command.
+
+```
+cpuid=0 ; for pid in $(ps xo '%p %c' | grep ray:: | awk '{print $1;}') ; do taskset -cp $cpuid $pid ; cpuid=$(($cpuid + 1)) ; done
+```
+
+### Get a TabbyAPI endpoint
+
+First, download and install [TabbyAPI](https://github.com/theroyallab/tabbyAPI) and run a model.
+To use the API with miku, you might need to use cloudflared to publish the API endpoint, follow the same instructions for using cloudflared with Aphrodite.
+
+TabbyAPI uses YAML configs for loading models, you should read their documentation for how load a model.
+
+### Get an ooobabooga API endpoint
+
 First, download and install [text-generation-webui](https://github.com/oobabooga/text-generation-webui) and run a model.
-To run a LLaMA model, you need to expose it with a public API by `--public-api` option.
+To use your oobabooga api endpoint with miku, you might need to expose it with a public API by `--public-api` option.
 
 For example, to run a model like `WizardLM-7B`
+
 ```bash
 python server.py --model wizardLM-7B-GPTQ-4bit-128g --wbits 4 --groupsize 128 --public-api
 ```
 
 After running it, please copy the non-streaming public url from the terminal. For example, you will see the following message in the terminal:
+
 ```bash
 Starting non-streaming server at public url https://together-budgets-optimize-distributor.trycloudflare.com/api
 ```
 
 If you're running everything locally. Please use the `--api` flag only. For example:
+
 ```bash
 python server.py --model wizardLM-7B-GPTQ-4bit-128g --wbits 4 --groupsize 128 --api
 ```
@@ -45,31 +73,3 @@ https://rentry.org/lmg-resources#quick-rundown-on-large-language-models
 https://rentry.org/ayumi_erp_rating
 https://www.youtube.com/watch?v=lb_lC4XFedU
 ```
-
-### Get a Kobold AI API endpoint (for Pygmalion 6B)
-
-You have two options:
-- [Run Kobold AI locally](https://github.com/KoboldAI/KoboldAI-Client) (Requires a powerful GPU to run `Pygmalion6B`)
-- [Run Kobold AI on Google Colab](https://colab.research.google.com/github/KoboldAI/KoboldAI-Client/blob/main/colab/GPU.ipynb) (free tier for a limited time)
-
-If you choose to do use the Google Colab option (recommended one for noobs), make sure to select the "Pygmalion 6B" option in the dropdown menu.
-
-![](/assets/colab_select.png)
-
-After you have it running, copy the link in the output console and add `/api`.
-
-![](/assets/colab_output.png)
-
-In this example, the endpoint environment variable should be:
-
-```
-https://categories-gen-incoming-condos.trycloudflare.com/api
-```
-
-
-### Get an OpenAI API key
-To get an OpenAI Key. First create an account and the go to https://platform.openai.com/account/api-keys
-
-The click on create new API key and this should popup:
-
-![](/assets/openai_key.png)
