@@ -35,7 +35,8 @@ This command will check the dependencies and install the required packages for `
 
 Next, you will be prompted for the environment variables
 
-* `OPENAI_API_KEY`, the password for Aphrodite/Whichever OAI endpoint you're using.
+* `OPENAI_ENDPOINT`, the OAI-like endpoint (Aphrodite/Ooba/Tabby)
+* `OPENAI_KEY`, the password for the OAI-like endpoint (Aphrodite/Ooba/Tabby)
 * `AZURE_API_KEY`, a valid API for querying Azure TTS models
 * `ELEVENLABS_API_KEY`, a valid API for querying ElevenLabs TTS models
 
