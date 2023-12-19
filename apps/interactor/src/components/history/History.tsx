@@ -145,23 +145,30 @@ const HistoryModal = (): ReactElement => {
 
   return (
     <div className="History__modal">
+      {/* eslint-disable-next-line */}
+      {/* @ts-ignore */}
       <ReactFlow
         nodes={nodes}
         edges={edges}
         defaultViewport={{
-          zoom: 2,
-          x: -startPos.x * 2 + 110,
-          y: -startPos.y * 2 + 500,
+          zoom: 1.5,
+          x:
+            -startPos.x * 1.5 +
+            (document.body.clientWidth * 0.8) / 2 -
+            200 / 1.5,
+          y: -startPos.y * 1.5 + document.body.clientHeight * 0.8 - 80,
         }}
         attributionPosition="bottom-left"
         draggable={false}
+        /* eslint-disable-next-line */
+        /* @ts-ignore */
         nodeTypes={nodeTypes}
         onNodeClick={(event, node) => {
           if (narration.responses[node.id]) {
             dispatch(swipeResponse(node.id))
           }
         }}
-      ></ReactFlow>
+      />
     </div>
   )
 }
@@ -182,6 +189,8 @@ const History = (): JSX.Element => {
         title="History"
         onCloseModal={() => dispatch(setHistoryModal(false))}
         shouldCloseOnOverlayClick={false}
+        overlayClassName="History__modal-overlay"
+        className="History__modal-container"
       >
         <HistoryModal />
       </Modal>

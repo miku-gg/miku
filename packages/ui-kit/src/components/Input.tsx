@@ -26,7 +26,7 @@ export interface InputProps {
   value?: string;
   password?: boolean;
   description?: string;
-  children?: React.ReactNode;
+  children?: React.ReactElement;
 }
 
 const Input = ({

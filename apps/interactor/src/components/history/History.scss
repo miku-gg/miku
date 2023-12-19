@@ -72,8 +72,23 @@
 
 .History {
   &__modal {
-    width: 600px;
-    height: 600px;
-    // background: #171717;
+    width: 100%;
+    height: 80vh;
+    background: #171717;
+  }
+
+  &__modal-container {
+    width: 90%;
+    max-width: initial;
+    z-index: 3;
+    top: 5vh;
+
+    @media screen and (max-width: 800px) {
+      width: 100%;
+    }
+
+    @media screen and (max-height: 800px) {
+      top: 2vh;
+    }
   }
 }

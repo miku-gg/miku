@@ -33,7 +33,7 @@ const TagAutocomplete = ({
   name,
   value,
   onChange,
-}: TagAutocompleteProps): JSX.Element => {
+}: TagAutocompleteProps): React.ReactElement => {
   const options = tags.map((tag) => ({
     color: tag.color || '#6c7293',
     label: tag.value,
@@ -42,24 +42,27 @@ const TagAutocomplete = ({
 
   return (
     <Input label={label} description={description} id={id} name={name}>
-      <ReactSelect
-        defaultValue={[]}
-        isMulti
-        value={value}
-        onChange={(value) => {
-          onChange({
-            target: {
-              name,
-              value: value.map((_tag) => _tag.value),
-            },
-          });
-        }}
-        menuPlacement="top"
-        options={options}
-        name={name}
-        className="TagAutocomplete"
-        classNamePrefix="TagAutocomplete"
-      />
+      {
+        // @ts-ignore
+        <ReactSelect
+          defaultValue={[]}
+          isMulti
+          value={value}
+          onChange={(value) => {
+            onChange({
+              target: {
+                name,
+                value: value.map((_tag) => _tag.value),
+              },
+            });
+          }}
+          menuPlacement="top"
+          options={options}
+          name={name}
+          className="TagAutocomplete"
+          classNamePrefix="TagAutocomplete"
+        />
+      }
     </Input>
   );
 };

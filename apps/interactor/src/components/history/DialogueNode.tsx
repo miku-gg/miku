@@ -21,6 +21,8 @@ export default memo(
           'DialogueNode--response': !data.isUser,
         })}
       >
+        {/* eslint-disable-next-line */}
+        {/* @ts-ignore */}
         <Handle
           type="target"
           position={Position.Top}
@@ -34,6 +36,8 @@ export default memo(
           ))}
         </div>
         <div className="DialogueNode__text scrollbar">{data.text}</div>
+        {/* eslint-disable-next-line */}
+        {/* @ts-ignore */}
         <Handle
           type="source"
           position={Position.Bottom}
