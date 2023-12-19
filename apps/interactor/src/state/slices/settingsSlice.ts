@@ -39,6 +39,10 @@ const initialState: SettingsState = {
     settings: false,
     about: false,
     history: false,
+    edit: {
+      opened: false,
+      id: '',
+    },
   },
 }
 
@@ -85,6 +89,12 @@ export const settingSlice = createSlice({
     setHistoryModal: (state, action: PayloadAction<boolean>) => {
       state.modals.history = action.payload
     },
+    setEditModal: (
+      state,
+      action: PayloadAction<{ opened: boolean; id: string }>
+    ) => {
+      state.modals.edit = action.payload
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -109,6 +119,7 @@ export const {
   setSettingsModal,
   setAboutModal,
   setHistoryModal,
+  setEditModal,
 } = settingSlice.actions
 
 export default settingSlice.reducer

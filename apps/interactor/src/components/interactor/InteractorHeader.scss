@@ -38,6 +38,10 @@
     &:hover {
       color: #a78bfa;
     }
+
+    &:focus {
+      outline: none;
+    }
   }
 
   &__profile_pic {

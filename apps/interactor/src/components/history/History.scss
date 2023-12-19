@@ -14,7 +14,7 @@
       height: 20px;
       border-radius: 100%;
       position: absolute;
-      right: -10px;
+      left: -10px;
       top: -10px;
     }
 
@@ -33,6 +33,25 @@
       color: gray;
     }
 
+    &__edit-btn {
+      position: absolute;
+      right: 1px;
+      top: -16px;
+      opacity: 0;
+      transition: all 0.2s ease-out;
+      color: gray;
+
+      &:hover {
+        color: white;
+      }
+    }
+
+    &:hover {
+      .DialogueNode__edit-btn {
+        opacity: 1;
+      }
+    }
+
     &--highlighted {
       .DialogueNode__text {
         // border: 1px solid $secondary-color;
@@ -46,14 +65,23 @@
         // border: 1px solid $secondary-color;
         background-color: rgba($secondary-color, 0.5);
       }
+
+      .DialogueNode__edit-btn {
+        opacity: 1;
+        color: #a1a1a1;
+
+        &:hover {
+          color: white;
+        }
+      }
     }
 
     &--response {
       cursor: pointer;
 
       .DialogueNode__avatar {
-        left: -10px;
-        top: -10px;
+        // left: -10px;
+        // top: -10px;
       }
 
       &:hover {
@@ -71,6 +99,8 @@
 }
 
 .History {
+  display: inline-flex;
+
   &__modal {
     width: 100%;
     height: 80vh;
@@ -118,5 +148,36 @@
     @media screen and (max-height: 800px) {
       top: 2vh;
     }
+  }
+
+  &__trigger {
+    font-size: 1.2rem;
+  }
+}
+
+.NodeEditor {
+  margin-top: 1rem;
+
+  &__textarea {
+    font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+    background-color: #171717;
+    color: lightgray;
+    padding: 0.5rem;
+    border: 1px solid rgba($secondary-color, 0.3);
+    border-radius: 6px;
+    height: 18em;
+
+    &:focus {
+      outline: none;
+      border: 1px solid $secondary-color;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
   }
 }

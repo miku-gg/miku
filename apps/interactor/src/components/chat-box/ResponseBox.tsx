@@ -5,6 +5,7 @@ import {
   selectLastLoadedResponse,
 } from '../../state/selectors'
 import { FaDice } from 'react-icons/fa'
+import { FaPencil } from 'react-icons/fa6'
 import { IoIosBookmarks } from 'react-icons/io'
 
 import { useAppDispatch, useAppSelector } from '../../state/store'
@@ -14,6 +15,7 @@ import {
   swipeResponse,
 } from '../../state/slices/narrationSlice'
 import './ResponseBox.scss'
+import { setEditModal } from '../../state/slices/settingsSlice'
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
@@ -23,8 +25,19 @@ const ResponseBox = (): JSX.Element | null => {
   const swipes = useAppSelector(selectCurrentSwipeResponses)
   const { disabled } = useAppSelector((state) => state.narration.input)
 
-  const onRegenerateClick = () => {
+  const handleRegenerateClick = () => {
     dispatch(regenerationStart())
+  }
+
+  const handleEditClick = () => {
+    if (lastReponse) {
+      dispatch(
+        setEditModal({
+          opened: true,
+          id: lastReponse?.id,
+        })
+      )
+    }
   }
 
   useEffect(() => {
@@ -43,9 +56,18 @@ const ResponseBox = (): JSX.Element | null => {
         <TextFormatter text={lastCharacters[0].text} />
       </div>
       {!disabled && lastReponse?.parentInteractionId ? (
-        <button className="ResponseBox__regenerate" onClick={onRegenerateClick}>
+        <button
+          className="ResponseBox__regenerate"
+          onClick={handleRegenerateClick}
+        >
           <FaDice />
           Regenerate
+        </button>
+      ) : null}
+      {!disabled ? (
+        <button className="ResponseBox__edit" onClick={handleEditClick}>
+          <FaPencil />
+          Edit
         </button>
       ) : null}
       {(swipes?.length || 0) > 1 ? (

@@ -6,10 +6,8 @@
   position: relative;
 
   &:hover {
-    .ResponseBox__regenerate {
-      opacity: 1;
-    }
-
+    .ResponseBox__regenerate,
+    .ResponseBox__edit,
     .ResponseBox__swipes {
       opacity: 1;
     }
@@ -62,7 +60,8 @@
     }
   }
 
-  &__regenerate {
+  &__regenerate,
+  &__edit {
     opacity: 0;
     transition: all 0.2s ease-in;
     position: absolute;
@@ -92,6 +91,10 @@
     &:hover {
       background: rgba(#171717, 1);
     }
+  }
+
+  &__edit {
+    right: 9rem;
   }
 
   &__swipes {

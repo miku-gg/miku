@@ -145,6 +145,10 @@ export interface SettingsState {
     settings: boolean
     about: boolean
     history: boolean
+    edit: {
+      opened: boolean
+      id: string
+    }
   }
 }
 

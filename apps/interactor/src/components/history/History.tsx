@@ -4,9 +4,10 @@ import { BiCloudUpload, BiCloudDownload } from 'react-icons/bi'
 import { FaTimes } from 'react-icons/fa'
 import { ReactElement } from 'react'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import { setHistoryModal } from '../../state/slices/settingsSlice'
+import { setEditModal, setHistoryModal } from '../../state/slices/settingsSlice'
 import ReactFlow, { Position, Node, Edge } from 'reactflow'
 import DialogueNode from './DialogueNode'
+import { NodeEditor } from './NodeEditor'
 import {
   NarrationResponse,
   swipeResponse,
@@ -252,17 +253,20 @@ const HistoryModal = (): ReactElement => {
 
 const History = (): JSX.Element => {
   const dispatch = useAppDispatch()
-  const opened = useAppSelector((state) => state.settings.modals.history)
+  const historyOpened = useAppSelector((state) => state.settings.modals.history)
+  const { opened: editOpened, id: editId } = useAppSelector(
+    (state) => state.settings.modals.edit
+  )
   return (
     <div className="History">
       <button
-        className="History__trigger"
+        className="History__trigger icon-button"
         onClick={() => dispatch(setHistoryModal(true))}
       >
         <GrHistory />
       </button>
       <Modal
-        opened={opened}
+        opened={historyOpened}
         title="History"
         onCloseModal={() => dispatch(setHistoryModal(false))}
         shouldCloseOnOverlayClick
@@ -271,6 +275,19 @@ const History = (): JSX.Element => {
       >
         <HistoryModal />
         <HistoryActions />
+      </Modal>
+      <Modal opened={editOpened} title="Edit">
+        <NodeEditor
+          id={editId}
+          onClose={() =>
+            dispatch(
+              setEditModal({
+                opened: false,
+                id: '',
+              })
+            )
+          }
+        />
       </Modal>
     </div>
   )

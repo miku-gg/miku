@@ -159,6 +159,39 @@ const narrationSlice = createSlice({
         state.currentResponseId = response.id
       }
     },
+    updateResponse(
+      state,
+      action: PayloadAction<{
+        id: string
+        text: string
+        role: string
+        emotion: string
+      }>
+    ) {
+      const { id, text, role, emotion } = action.payload
+      const response = state.responses[id]
+      if (response && response.characters[role]) {
+        const charResponse = response.characters[role]
+
+        if (charResponse) {
+          charResponse.emotion = emotion
+          charResponse.text = text
+        }
+      }
+    },
+    updateInteraction(
+      state,
+      action: PayloadAction<{
+        id: string
+        text: string
+      }>
+    ) {
+      const { id, text } = action.payload
+      const interaction = state.interactions[id]
+      if (interaction) {
+        interaction.query = text
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -177,6 +210,8 @@ export const {
   interactionSuccess,
   regenerationStart,
   swipeResponse,
+  updateResponse,
+  updateInteraction,
 } = narrationSlice.actions
 
 export default narrationSlice.reducer
