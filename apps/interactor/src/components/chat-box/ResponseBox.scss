@@ -6,8 +6,7 @@
   position: relative;
 
   &:hover {
-    .ResponseBox__regenerate,
-    .ResponseBox__edit,
+    .ResponseBox__actions,
     .ResponseBox__swipes {
       opacity: 1;
     }
@@ -60,19 +59,24 @@
     }
   }
 
-  &__regenerate,
-  &__edit {
+  &__actions {
     opacity: 0;
-    transition: all 0.2s ease-in;
+    transition: all 0.2s ease-out;
     position: absolute;
-    top: -2.25em;
+    top: -2.2em;
     right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  &__regenerate,
+  &__voice,
+  &__edit {
+    transition: all 0.2s ease-out;
     display: inline-flex;
     align-items: center;
-    gap: 2;
     background: rgba(#171717, 0.8);
     padding: 0.5rem;
-    padding-bottom: 0.3rem;
     border-radius: 0.25rem;
     // box-shadow: 0 0 6px 0 white;
     cursor: pointer;
@@ -93,21 +97,16 @@
     }
   }
 
-  &__edit {
-    right: 9rem;
-  }
-
   &__swipes {
     transition: all 0.2s ease-in;
     position: absolute;
-    top: -2.25em;
+    top: -2.4em;
     left: 1rem;
     display: inline-flex;
     align-items: center;
-    gap: 2;
     background: rgba(#171717, 0.8);
     padding: 0.5rem;
-    padding-bottom: 0;
+    padding-bottom: 0.15rem;
     border-radius: 0.25rem;
     // box-shadow: 0 0 6px 0 white;
     color: white;
@@ -145,5 +144,24 @@
     &:hover {
       color: lightgray;
     }
+  }
+}
+
+@media screen and (max-width: 590px) {
+  .ResponseBox__actions span {
+    display: none;
+  }
+  .ResponseBox__actions {
+    right: 0.2rem;
+  }
+
+  .ResponseBox__swipes {
+    left: 0.2rem;
+  }
+}
+
+@media screen and (max-width: 820px) {
+  .ResponseBox {
+    width: 100%;
   }
 }

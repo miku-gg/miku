@@ -6,6 +6,7 @@ import {
 } from '../../state/selectors'
 import { FaDice } from 'react-icons/fa'
 import { FaPencil } from 'react-icons/fa6'
+import { MdRecordVoiceOver } from 'react-icons/md'
 import { IoIosBookmarks } from 'react-icons/io'
 
 import { useAppDispatch, useAppSelector } from '../../state/store'
@@ -55,22 +56,32 @@ const ResponseBox = (): JSX.Element | null => {
       <div className="ResponseBox__text" ref={responseDiv}>
         <TextFormatter text={lastCharacters[0].text} />
       </div>
-      {!disabled && lastReponse?.parentInteractionId ? (
-        <button
-          className="ResponseBox__regenerate"
-          onClick={handleRegenerateClick}
-        >
-          <FaDice />
-          Regenerate
-        </button>
-      ) : null}
-      {!disabled ? (
-        <button className="ResponseBox__edit" onClick={handleEditClick}>
-          <FaPencil />
-          Edit
-        </button>
-      ) : null}
-      {(swipes?.length || 0) > 1 ? (
+      <div className="ResponseBox__actions">
+        {!disabled ? (
+          <button className="ResponseBox__voice" onClick={handleEditClick}>
+            <MdRecordVoiceOver />
+            <span>Listen</span>
+          </button>
+        ) : null}
+        {!disabled &&
+        lastReponse?.parentInteractionId &&
+        (swipes?.length || 0) < 8 ? (
+          <button
+            className="ResponseBox__regenerate"
+            onClick={handleRegenerateClick}
+          >
+            <FaDice />
+            <span>Regenerate</span>
+          </button>
+        ) : null}
+        {!disabled ? (
+          <button className="ResponseBox__edit" onClick={handleEditClick}>
+            <FaPencil />
+            <span>Edit</span>
+          </button>
+        ) : null}
+      </div>
+      {!disabled && (swipes?.length || 0) > 1 ? (
         <div className="ResponseBox__swipes">
           {swipes?.map((swipe) => {
             if (!swipe?.id) return null
