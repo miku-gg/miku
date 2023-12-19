@@ -1,0 +1,83 @@
+@import '../../variables';
+
+.react-flow__node-dialogueNode {
+  font-size: 12px;
+  background: transparent;
+  border-radius: 5px;
+  text-align: center;
+  position: relative;
+  border: transparent;
+
+  .DialogueNode {
+    &__avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 100%;
+      position: absolute;
+      right: -10px;
+      top: -10px;
+    }
+
+    &__text {
+      width: 200px;
+      height: 40px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      text-align: left;
+      padding: 5px 10px;
+      font-size: 0.4rem;
+      transition: all 0.2s ease-out;
+      border: 1px solid #555;
+      border-radius: 6px;
+      background-color: rgba(darkgray, 0.2);
+      color: gray;
+    }
+
+    &--highlighted {
+      .DialogueNode__text {
+        // border: 1px solid $secondary-color;
+        background-color: rgba($secondary-color, 0.2);
+        color: white;
+      }
+    }
+
+    &--last-response {
+      .DialogueNode__text {
+        // border: 1px solid $secondary-color;
+        background-color: rgba($secondary-color, 0.5);
+      }
+
+      .react-flow__handle-bottom {
+        display: none;
+      }
+    }
+
+    &--response {
+      cursor: pointer;
+
+      .DialogueNode__avatar {
+        left: -10px;
+        top: -10px;
+      }
+
+      &:hover {
+        .DialogueNode__text {
+          border: 1px solid $secondary-color;
+          background-color: rgba($secondary-color, 0.2);
+        }
+      }
+    }
+  }
+}
+
+.react-flow__attribution {
+  display: none;
+}
+
+.History {
+  &__modal {
+    width: 600px;
+    height: 600px;
+    // background: #171717;
+  }
+}

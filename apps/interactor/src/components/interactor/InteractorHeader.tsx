@@ -3,10 +3,10 @@ import { useAppSelector } from '../../state/store'
 import { GiBrain } from 'react-icons/gi'
 import { BsMusicNoteBeamed } from 'react-icons/bs'
 import { FaExpand } from 'react-icons/fa6'
-import { GrHistory } from 'react-icons/gr'
 import { SlSettings } from 'react-icons/sl'
 import './InteractorHeader.scss'
 import SceneSelector from '../scenarios/SceneSelector'
+import History from '../history/History'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
@@ -35,9 +35,9 @@ const InteractorHeader = () => {
         <div className="InteractorHeader__scenario-selector">
           <SceneSelector />
         </div>
-        <button className="InteractorHeader__history icon-button">
-          <GrHistory />
-        </button>
+        <div className="InteractorHeader__history">
+          <History />
+        </div>
       </div>
       <div className="InteractorHeader__right">
         <button className="InteractorHeader__brain icon-button">

@@ -111,7 +111,7 @@ export async function loadNovelFromSingleCard({
       },
       narration: {
         fetching: false,
-        currentResponseId: mikugg.start_scenario,
+        currentResponseId: cardId,
         id: randomUUID(),
         input: {
           text: '',
@@ -120,7 +120,7 @@ export async function loadNovelFromSingleCard({
         },
         interactions: {},
         responses: {
-          [mikugg.start_scenario]: {
+          [cardId]: {
             id: cardId,
             parentInteractionId: null,
             characters: {
