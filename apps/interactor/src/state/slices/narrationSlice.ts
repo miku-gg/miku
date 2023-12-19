@@ -160,6 +160,13 @@ const narrationSlice = createSlice({
       }
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase('global/replaceState', (_state, action) => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      return action.payload.narration
+    })
+  },
 })
 
 export const {

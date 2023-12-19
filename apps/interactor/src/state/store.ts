@@ -8,6 +8,7 @@ import {
   interactionListenerMiddleware,
   regenerationListenerMiddleware,
 } from './listeners'
+import { stateReplacementMiddleware } from './slices/replaceState'
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     getDefaultMiddleware().prepend([
       interactionListenerMiddleware.middleware,
       regenerationListenerMiddleware.middleware,
+      stateReplacementMiddleware,
     ]),
 })
 

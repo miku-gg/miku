@@ -94,6 +94,8 @@ export async function loadNovelFromSingleCard({
     return {
       novel: {
         fetching: false,
+        title: card.data.name,
+        description: mikugg.short_description,
         characters: {
           [cardId]: {
             id: cardId,

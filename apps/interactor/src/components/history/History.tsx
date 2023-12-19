@@ -1,23 +1,97 @@
-import { Modal } from '@mikugg/ui-kit'
+import { Modal, Tooltip } from '@mikugg/ui-kit'
 import { GrHistory } from 'react-icons/gr'
+import { BiCloudUpload, BiCloudDownload } from 'react-icons/bi'
+import { FaTimes } from 'react-icons/fa'
+import { ReactElement } from 'react'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { setHistoryModal } from '../../state/slices/settingsSlice'
-import './History.scss'
-import { ReactElement } from 'react'
 import ReactFlow, { Position, Node, Edge } from 'reactflow'
 import DialogueNode from './DialogueNode'
-
-import 'reactflow/dist/style.css'
 import {
   NarrationResponse,
   swipeResponse,
 } from '../../state/slices/narrationSlice'
 import { DialogueNodeData, setAllNodesPosition } from './utils'
+import { replaceState } from '../../state/slices/replaceState'
+import { toast } from 'react-toastify'
 
+import './History.scss'
+import 'reactflow/dist/style.css'
+
+const HistoryActions = () => {
+  const dispatch = useAppDispatch()
+  const state = useAppSelector((state) => state)
+
+  const handleSave = () => {
+    const clonedState = JSON.parse(JSON.stringify(state))
+    clonedState.settings.modals.history = false
+    const json = JSON.stringify(clonedState)
+    const blob = new Blob([json], { type: 'application/json' })
+    const a = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    a.href = url
+    a.download = `${clonedState.novel.title}_history_${Date.now()}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleLoad = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) {
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const stateJsonString = reader.result as string
+        dispatch(replaceState(JSON.parse(stateJsonString)))
+      } catch (e) {
+        toast.error('Error reading history file')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  return (
+    <div className="History__actions">
+      <Tooltip id="history-actions-tooltip" place="bottom" />
+      <label
+        className="icon-button"
+        data-tooltip-id="history-actions-tooltip"
+        data-tooltip-content="Load narration history"
+      >
+        <input
+          id="load-history-input"
+          className="hidden"
+          type="file"
+          accept="application/json"
+          onChange={handleLoad}
+        />
+        <BiCloudUpload />
+      </label>
+      <button
+        className="icon-button"
+        data-tooltip-id="history-actions-tooltip"
+        data-tooltip-content="Download narration history"
+        onClick={handleSave}
+      >
+        <BiCloudDownload />
+      </button>
+      <button
+        className="icon-button"
+        onClick={() => dispatch(setHistoryModal(false))}
+      >
+        <FaTimes />
+      </button>
+    </div>
+  )
+}
 const nodeTypes = {
   dialogueNode: DialogueNode,
 }
-
 const HistoryModal = (): ReactElement => {
   const dispatch = useAppDispatch()
   const narration = useAppSelector((state) => state.narration)
@@ -191,11 +265,12 @@ const History = (): JSX.Element => {
         opened={opened}
         title="History"
         onCloseModal={() => dispatch(setHistoryModal(false))}
-        shouldCloseOnOverlayClick={false}
+        shouldCloseOnOverlayClick
         overlayClassName="History__modal-overlay"
         className="History__modal-container"
       >
         <HistoryModal />
+        <HistoryActions />
       </Modal>
     </div>
   )

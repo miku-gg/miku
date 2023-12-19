@@ -87,6 +87,8 @@ export interface NovelCharacters {
 }
 export interface NovelState {
   fetching: boolean
+  title: string
+  description: string
   characters: NovelCharacters
   scenes: NovelScene[]
   startSceneId: string
@@ -149,7 +151,7 @@ export interface SettingsState {
 export const VersionId = 'v1'
 
 export interface State {
-  version: typeof VersionId
+  version: string
   settings: SettingsState
   narration: NarrationState
   novel: NovelState
