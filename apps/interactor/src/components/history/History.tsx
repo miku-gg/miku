@@ -1,14 +1,17 @@
 import { Modal } from '@mikugg/ui-kit'
 import { GrHistory } from 'react-icons/gr'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import { setHistoryModal } from '../../state/settingsSlice'
+import { setHistoryModal } from '../../state/slices/settingsSlice'
 import './History.scss'
 import { ReactElement } from 'react'
 import ReactFlow, { Position, Node, Edge } from 'reactflow'
 import DialogueNode from './DialogueNode'
 
 import 'reactflow/dist/style.css'
-import { NarrationResponse, swipeResponse } from '../../state/narrationSlice'
+import {
+  NarrationResponse,
+  swipeResponse,
+} from '../../state/slices/narrationSlice'
 import { DialogueNodeData, setAllNodesPosition } from './utils'
 
 const nodeTypes = {

@@ -1,50 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Voices } from '../utils/voices'
+import {
+  Voices,
+  ModelType,
+  FontSize,
+  Speed,
+  SettingsState,
+} from '../versioning'
 
-export enum ModelType {
-  Default = 'default',
-  Smart = 'smart',
-}
-
-export enum FontSize {
-  Small = 'small',
-  Medium = 'medium',
-  Large = 'large',
-}
-
-export enum Speed {
-  Slow = 'slow',
-  Normal = 'normal',
-  Fast = 'fast',
-  Presto = 'presto',
-}
-
-export interface SettingsState {
-  model: ModelType
-  user: {
-    name: string
-    isPremium: boolean
-  }
-  text: {
-    speed: Speed
-    fontSize: FontSize
-    autoContinue: boolean
-  }
-  voice: {
-    enabled: boolean
-    speed: Speed
-    voiceId: Voices
-  }
-  music: {
-    enabled: boolean
-    volume: number
-  }
-  modals: {
-    settings: boolean
-    about: boolean
-    history: boolean
-  }
-}
+export type {
+  Voices,
+  ModelType,
+  FontSize,
+  Speed,
+  SettingsState,
+} from '../versioning'
 
 const initialState: SettingsState = {
   model: ModelType.Default,

@@ -1,6 +1,6 @@
 import { RootState } from './store'
-import { NovelCharacters, NovelScene } from './novelSlice'
-import { NarrationResponse } from './narrationSlice'
+import { NovelCharacters, NovelScene } from './slices/novelSlice'
+import { NarrationResponse } from './slices/narrationSlice'
 import { createSelector } from '@reduxjs/toolkit'
 
 export const selectLastLoadedResponse = (

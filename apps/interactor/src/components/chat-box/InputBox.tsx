@@ -1,4 +1,7 @@
-import { interactionStart, setInputText } from '../../state/narrationSlice'
+import {
+  interactionStart,
+  setInputText,
+} from '../../state/slices/narrationSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { FaPaperPlane } from 'react-icons/fa'
 import { selectCurrentScene } from '../../state/selectors'

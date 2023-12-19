@@ -1,52 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { v4 as randomUUID } from 'uuid'
+import {
+  NarrationState,
+  NarrationInteraction,
+  NarrationResponse,
+} from '../versioning'
 
-export interface NarrationInteraction {
-  id: string
-  parentResponseId: string | null
-  query: string
-  sceneId: string
-  responsesId: string[]
-}
-
-export interface NarrationResponse {
-  id: string
-  selected: boolean
-  fetching: boolean
-  parentInteractionId: string | null
-  suggestedScenes: string[]
-  characters: {
-    [role: string]:
-      | {
-          emotion: string
-          audio: string
-          pose: string
-          text: string
-        }
-      | undefined
-  }
-  childrenInteractions: {
-    interactionId: string
-    selected: boolean
-  }[]
-}
-
-export interface NarrationState {
-  id: string
-  fetching: boolean
-  currentResponseId: string
-  input: {
-    text: string
-    suggestions: string[]
-    disabled: boolean
-  }
-  interactions: {
-    [id: string]: NarrationInteraction | undefined
-  }
-  responses: {
-    [id: string]: NarrationResponse | undefined
-  }
-}
+export type {
+  NarrationState,
+  NarrationInteraction,
+  NarrationResponse,
+} from '../versioning'
 
 const initialState: NarrationState = {
   id: '',

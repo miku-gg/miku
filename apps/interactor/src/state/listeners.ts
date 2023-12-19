@@ -5,7 +5,7 @@ import {
   interactionFailure,
   interactionSuccess,
   regenerationStart,
-} from './narrationSlice'
+} from './slices/narrationSlice'
 import { RootState } from './store'
 import { selectCurrentScene } from './selectors'
 

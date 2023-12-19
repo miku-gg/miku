@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { MikuCard } from '@mikugg/bot-utils'
-import { NovelCharacterOutfit, NovelState } from '../state/novelSlice'
-import { NarrationState } from '../state/narrationSlice'
+import { NovelCharacterOutfit, NovelState } from '../state/slices/novelSlice'
+import { NarrationState } from '../state/slices/narrationSlice'
 import { v4 as randomUUID } from 'uuid'
 
 export async function loadNovelFromSingleCard({

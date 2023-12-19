@@ -9,7 +9,10 @@ import { IoIosBookmarks } from 'react-icons/io'
 
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import TextFormatter from '../common/TextFormatter'
-import { regenerationStart, swipeResponse } from '../../state/narrationSlice'
+import {
+  regenerationStart,
+  swipeResponse,
+} from '../../state/slices/narrationSlice'
 import './ResponseBox.scss'
 
 const ResponseBox = (): JSX.Element | null => {

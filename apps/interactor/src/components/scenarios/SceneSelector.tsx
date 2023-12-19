@@ -4,7 +4,7 @@ import { BiCameraMovie } from 'react-icons/bi'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { selectAvailableScenes } from '../../state/selectors'
 import { useAppContext } from '../../App'
-import { interactionStart } from '../../state/narrationSlice'
+import { interactionStart } from '../../state/slices/narrationSlice'
 import './SceneSelector.scss'
 
 export default function SceneSelector(): JSX.Element | null {

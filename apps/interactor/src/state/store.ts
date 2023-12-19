@@ -1,8 +1,9 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
-import settings from './settingsSlice'
-import narration from './narrationSlice'
-import novel from './novelSlice'
+import settings from './slices/settingsSlice'
+import narration from './slices/narrationSlice'
+import novel from './slices/novelSlice'
+import version from './slices/versionSlice'
 import {
   interactionListenerMiddleware,
   regenerationListenerMiddleware,
@@ -13,6 +14,7 @@ export const store = configureStore({
     settings,
     narration,
     novel,
+    version,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend([
