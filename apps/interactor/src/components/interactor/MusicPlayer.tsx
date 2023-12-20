@@ -92,7 +92,7 @@ const MusicPlayer: React.FC = () => {
         onPause={() => dispatch(setMusicEnabled(false))}
         onPlay={() => dispatch(setMusicEnabled(true))}
       />
-      <button onClick={togglePlay} className="MusicPlayer__icon">
+      <button onClick={togglePlay} className="MusicPlayer__icon icon-button">
         {volume ? <Music /> : <MusicNegated />}
       </button>
       <div className="MusicPlayer__range">

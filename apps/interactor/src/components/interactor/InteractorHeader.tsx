@@ -1,13 +1,12 @@
 import { useAppContext } from '../../App'
 import { useAppSelector } from '../../state/store'
 import { GiBrain } from 'react-icons/gi'
-import { BsMusicNoteBeamed } from 'react-icons/bs'
-import { FaExpand } from 'react-icons/fa6'
 import { SlSettings } from 'react-icons/sl'
-import './InteractorHeader.scss'
 import SceneSelector from '../scenarios/SceneSelector'
 import History from '../history/History'
 import MusicPlayer from './MusicPlayer'
+import ScreenSizer from './ScreenSizer'
+import './InteractorHeader.scss'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
@@ -44,12 +43,8 @@ const InteractorHeader = () => {
         <button className="InteractorHeader__brain icon-button">
           <GiBrain />
         </button>
-        <button className="InteractorHeader__music icon-button">
-          <MusicPlayer />
-        </button>
-        <button className="InteractorHeader__full-screen icon-button">
-          <FaExpand />
-        </button>
+        <MusicPlayer />
+        <ScreenSizer />
         <button className="InteractorHeader__settings icon-button">
           <SlSettings />
         </button>
