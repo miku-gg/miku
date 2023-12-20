@@ -4,4 +4,13 @@
   overflow: auto;
   overflow-x: visible;
   padding: 0 0.1rem;
+  font-size: 1.1rem;
+
+  &--small {
+    font-size: 0.9rem;
+  }
+
+  &--large {
+    font-size: 1.4rem;
+  }
 }

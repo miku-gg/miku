@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import './TextFormatter.scss'
+import { useAppSelector } from '../../state/store'
+import { FontSize, Speed } from '../../state/versioning'
+import classNames from 'classnames'
 
 interface TextFormatterProps {
   text: string
 }
 
 const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text }) => {
+  const fontSize = useAppSelector((state) => state.settings.text.fontSize)
   const textFormatterDiv = React.useRef<HTMLDivElement>(null)
   const [userScrolled, setUserScrolled] = useState(false)
   const elements: JSX.Element[] = []
@@ -81,7 +85,11 @@ const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text }) => {
 
   return (
     <div
-      className="TextFormatter scrollbar"
+      className={classNames({
+        'TextFormatter scrollbar': true,
+        [`TextFormatter--small`]: FontSize.Small === fontSize,
+        [`TextFormatter--large`]: FontSize.Large === fontSize,
+      })}
       ref={textFormatterDiv}
       onScroll={(event) => {
         if (
@@ -98,9 +106,17 @@ const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text }) => {
   )
 }
 
+const SpeedToMs = new Map<Speed, number>([
+  [Speed.Presto, 2],
+  [Speed.Fast, 10],
+  [Speed.Normal, 20],
+  [Speed.Slow, 30],
+])
+
 const TextFormatter: React.FC<TextFormatterProps> = ({ text }) => {
   const [displayedText, setDisplayedText] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
+  const speed = useAppSelector((state) => state.settings.text.speed)
 
   useEffect(() => {
     if (!text.startsWith(displayedText)) {
@@ -114,11 +130,11 @@ const TextFormatter: React.FC<TextFormatterProps> = ({ text }) => {
       const timer = setTimeout(() => {
         setDisplayedText((prevText) => prevText + text[currentIndex])
         setCurrentIndex(currentIndex + 1)
-      }, 10) // Set typing speed here
+      }, SpeedToMs.get(speed)) // Set typing speed here
 
       return () => clearTimeout(timer)
     }
-  }, [currentIndex, text])
+  }, [currentIndex, text, speed])
 
   return <TextFormatterStatic text={displayedText} />
 }
