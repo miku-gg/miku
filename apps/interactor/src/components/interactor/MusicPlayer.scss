@@ -1,0 +1,75 @@
+/* Custom audio player */
+.MusicPlayer {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  border-radius: 4px;
+  position: relative;
+
+  &__icon {
+    color: white;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease-out;
+  }
+
+  &__range {
+    position: absolute;
+    opacity: 0;
+    right: 0px;
+    bottom: -20px;
+    transition: all 0.2s ease-out;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  &:hover {
+    .MusicPlayer__icon {
+      color: rgb(167 139 250);
+    }
+
+    .MusicPlayer__range {
+      opacity: 1;
+      pointer-events: initial;
+      user-select: initial;
+    }
+  }
+
+  input[type='range'] {
+    background-color: transparent;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 3px;
+    background-color: #7957d2;
+    border-radius: 2px;
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 12px;
+    width: 12px;
+    background-color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -4.5px;
+  }
+
+  input[type='range']::-moz-range-track {
+    height: 3px;
+    background-color: #7957d2;
+    border-radius: 2px;
+  }
+
+  input[type='range']::-moz-range-thumb {
+    height: 12px;
+    width: 12px;
+    background-color: white;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+}

@@ -7,6 +7,7 @@ import { SlSettings } from 'react-icons/sl'
 import './InteractorHeader.scss'
 import SceneSelector from '../scenarios/SceneSelector'
 import History from '../history/History'
+import MusicPlayer from './MusicPlayer'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
@@ -44,7 +45,7 @@ const InteractorHeader = () => {
           <GiBrain />
         </button>
         <button className="InteractorHeader__music icon-button">
-          <BsMusicNoteBeamed />
+          <MusicPlayer />
         </button>
         <button className="InteractorHeader__full-screen icon-button">
           <FaExpand />

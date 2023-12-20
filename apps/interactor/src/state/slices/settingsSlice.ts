@@ -33,7 +33,7 @@ const initialState: SettingsState = {
   },
   music: {
     enabled: false,
-    volume: 1,
+    volume: 0.2,
   },
   modals: {
     settings: false,
