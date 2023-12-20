@@ -6,7 +6,7 @@ import {
   selectLastLoadedCharacters,
 } from '../../state/selectors'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
-import { useAppContext } from '../../App'
+import { useAppContext } from '../../App.context'
 import InteractorHeader from './InteractorHeader'
 import ChatBox from '../chat-box/ChatBox'
 

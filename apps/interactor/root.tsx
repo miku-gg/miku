@@ -11,6 +11,7 @@ const CARD_ID = 'QmazP5PBizTwGkUDr4snayYkuczwVXXAH4zMQ1m6KDGABZ.json'
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App
+      isProduction
       novelLoader={() =>
         loadNovelFromSingleCard({
           cardId: CARD_ID,

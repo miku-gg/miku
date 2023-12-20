@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { setNovel } from '../../state/slices/novelSlice'
 import { setNarration } from '../../state/slices/narrationSlice'
 import './NovelLoader.scss'
-import { useAppContext } from '../../App'
+import { useAppContext } from '../../App.context'
 
 const NovelLoader = (): JSX.Element => {
   const { novelLoader } = useAppContext()

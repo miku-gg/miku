@@ -1,44 +1,23 @@
-import { createContext, useContext } from 'react'
 import { Provider } from 'react-redux'
 import { ToastContainer } from 'react-toastify'
 import { store } from './state/store'
-import { NovelState } from './state/slices/novelSlice'
-import { NarrationState } from './state/slices/narrationSlice'
 import NovelLoader from './components/novel-loader/NovelLoader'
 import Interactor from './components/interactor/Interactor'
 import 'normalize.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './App.scss'
-
-export interface AppProps {
-  novelLoader: () => Promise<{
-    novel: NovelState
-    narration: NarrationState
-  }>
-  assetLinkLoader: (asset: string, lowres?: boolean) => string
-}
-
-const AppContext = createContext<AppProps>({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  assetLinkLoader: (_asset: string, _lowres?: boolean) => '',
-  novelLoader: () =>
-    Promise.resolve({
-      novel: {} as NovelState,
-      narration: {} as NarrationState,
-    }),
-})
-
-export const useAppContext = () => useContext(AppContext)
+import { AppProvider, AppProps } from './App.context'
 
 function App(props: AppProps) {
   const contextValue = {
+    isProduction: props.isProduction,
     assetLinkLoader: props.assetLinkLoader,
     novelLoader: props.novelLoader,
   }
 
   return (
     <Provider store={store}>
-      <AppContext.Provider value={contextValue}>
+      <AppProvider value={contextValue}>
         <div className="App">
           {/* eslint-disable-next-line */}
           {/*@ts-ignore */}
@@ -46,7 +25,7 @@ function App(props: AppProps) {
           <Interactor />
           <NovelLoader />
         </div>
-      </AppContext.Provider>
+      </AppProvider>
     </Provider>
   )
 }

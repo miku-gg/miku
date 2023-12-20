@@ -3,7 +3,7 @@ import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { BiCameraMovie } from 'react-icons/bi'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { selectAvailableScenes } from '../../state/selectors'
-import { useAppContext } from '../../App'
+import { useAppContext } from '../../App.context'
 import { interactionStart } from '../../state/slices/narrationSlice'
 import './SceneSelector.scss'
 

@@ -1,0 +1,53 @@
+@import '../../variables';
+
+.ModelSelector {
+  display: inline-flex;
+  font-size: 1rem;
+
+  &__icon.icon-button {
+    transition: all 0.2s ease-out;
+    cursor: pointer;
+    color: $background-color-darker;
+    font-size: 2rem;
+    filter: drop-shadow(0 0 1px #cd5fea);
+
+    &:hover {
+      animation: neon1 0.3s ease-in-out infinite alternate;
+      color: $background-color-darker;
+    }
+  }
+
+  &--activated {
+    .ModelSelector__icon.icon-button {
+      color: #fafafa;
+      animation: neon2 0.5s ease-in-out infinite alternate;
+    }
+  }
+
+  &--disabled {
+    .ModelSelector__icon.icon-button {
+      cursor: default;
+
+      &:hover {
+        animation: none;
+      }
+    }
+  }
+}
+
+@keyframes neon1 {
+  from {
+    filter: drop-shadow(0 0 2px #cd5fea);
+  }
+  to {
+    filter: drop-shadow(0 0 10px #9b47b3);
+  }
+}
+@keyframes neon2 {
+  from {
+    filter: drop-shadow(0 0 5px white);
+  }
+  to {
+    filter: drop-shadow(0 0 8px white);
+  }
+}

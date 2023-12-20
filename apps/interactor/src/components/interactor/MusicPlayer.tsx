@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import './MusicPlayer.scss'
-import { useAppContext } from '../../App'
+import { useAppContext } from '../../App.context'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { selectCurrentScene } from '../../state/selectors'
 import {

@@ -1,5 +1,5 @@
 // SELECTED TYPE: v1
-export { VersionId, ModelType, FontSize, Speed, Voices } from './v1'
+export { VersionId, ModelType, FontSize, Speed, Voices } from './v1.state'
 export type {
   State,
   SettingsState,
@@ -10,4 +10,4 @@ export type {
   NovelScene,
   NarrationInteraction,
   NarrationResponse,
-} from './v1'
+} from './v1.state'
