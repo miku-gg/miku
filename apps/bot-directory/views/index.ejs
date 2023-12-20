@@ -43,6 +43,30 @@
       color: white;
       background-color: #9747ff;
     }
+
+    .blocker {
+      background-color: #000;
+      opacity: 30%;
+      height: 100%;
+      width: 100%;
+      left: 0;
+      top: 0;
+      margin: 0;
+      position: absolute;
+      z-index: 2;
+    }
+
+    .upload-modal-close {
+      color: #888888;
+    }
+
+    .upload-modal {
+      position: absolute;
+      z-index: 3;
+      top:35%;  
+      left:30%;
+      background-color: #1a202c;
+    }
   </style>
 </head>
 
@@ -88,13 +112,21 @@
       <% }); %>
     </div>
 
-    <div class="mt-10 px-8 w-5/12">
+    <div class="blocker invisible">
+    </div>
+
+    <div class="upload-modal px-8 pt-6 pb-4 w-5/12 invisible">
       <form action="/bot" method="post" enctype="multipart/form-data" class="ui form">
         <label>
-          <h3 class="ui header">Upload a bot</h3>
+          <div class="flex">
+            <h3 class="ui header">Upload a bot</h3>
+            <button class="pb-8 ml-auto" onclick="toggle_open_modal(false)">
+              <i class="upload-modal-close close icon"></i>
+            </button>
+          </div>
           <input type="file" value="file" required accept=".json" name="file" id="file" />
         </label>
-        <div class="mt-5">
+        <div class="mt-6">
           <button class="ui button" type="submit">Upload</button>
         </div>
       </form>
@@ -145,6 +177,20 @@
       } else {
         $(".nsfw-bot").removeClass("visible");
         $(".nsfw-bot").addClass("invisible");
+      }
+    }
+
+    function toggle_open_modal(open) {
+      if (open) {
+        $(".upload-modal").removeClass("invisible");
+        $(".upload-modal").addClass("visible");
+        $(".blocker").removeClass("invisible");
+        $(".blocker").addClass("visible");
+      } else {
+        $(".upload-modal").removeClass("visible");
+        $(".upload-modal").addClass("invisible");
+        $(".blocker").removeClass("visible");
+        $(".blocker").addClass("invisible");
       }
     }
 
