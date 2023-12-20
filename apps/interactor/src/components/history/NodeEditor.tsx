@@ -5,7 +5,8 @@ import {
 } from '../../state/slices/narrationSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { NarrationInteraction, NarrationResponse } from '../../state/versioning'
-import { Button } from '@mikugg/ui-kit'
+import { Button, Dropdown } from '@mikugg/ui-kit'
+import { selectSceneFromResponse } from '../../state/selectors'
 
 const TextEditor = ({
   text,
@@ -64,6 +65,17 @@ const ResponseEditor = ({
   const dispatch = useAppDispatch()
   const charResponse = Object.values(response.characters)[0]
   const role = Object.keys(response.characters)[0]
+  const scene = useAppSelector((state) =>
+    selectSceneFromResponse(state, response)
+  )
+  const characters = useAppSelector((state) => state.novel.characters)
+  const character =
+    characters[
+      scene?.roles.find((_role) => _role.role === role)?.characterId || ''
+    ]
+  const emotions =
+    character?.outfits[character?.roles[role] || '']?.emotions || []
+  const [_emotion, _setEmotion] = useState(charResponse?.emotion || '')
 
   if (!charResponse || !role) return null
 
@@ -72,7 +84,7 @@ const ResponseEditor = ({
       updateResponse({
         id: response.id,
         role,
-        emotion: charResponse.emotion,
+        emotion: _emotion,
         text,
       })
     )
@@ -80,11 +92,21 @@ const ResponseEditor = ({
   }
 
   return (
-    <TextEditor
-      text={charResponse.text}
-      onChange={handleChange}
-      onCancel={onClose}
-    />
+    <>
+      <TextEditor
+        text={charResponse.text}
+        onChange={handleChange}
+        onCancel={onClose}
+      />
+      <Dropdown
+        items={emotions.map((emotion) => ({
+          name: emotion.id,
+          value: emotion.id,
+        }))}
+        selectedIndex={emotions.findIndex((emotion) => emotion.id === _emotion)}
+        onChange={(index) => _setEmotion(emotions[index].id)}
+      />
+    </>
   )
 }
 

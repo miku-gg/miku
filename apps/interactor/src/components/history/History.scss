@@ -153,6 +153,10 @@
   &__trigger {
     font-size: 1.2rem;
   }
+
+  &__edit-modal {
+    overflow: visible;
+  }
 }
 
 .NodeEditor {
@@ -179,5 +183,11 @@
     justify-content: flex-end;
     gap: 1rem;
     margin-top: 1rem;
+  }
+
+  .dropdown {
+    position: absolute;
+    bottom: 13px;
+    width: 200px;
   }
 }

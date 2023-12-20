@@ -276,7 +276,7 @@ const History = (): JSX.Element => {
         <HistoryModal />
         <HistoryActions />
       </Modal>
-      <Modal opened={editOpened} title="Edit">
+      <Modal opened={editOpened} title="Edit" className="History__edit-modal">
         <NodeEditor
           id={editId}
           onClose={() =>
