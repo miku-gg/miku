@@ -2,7 +2,8 @@
 
 .ResponseBox {
   width: 75%;
-  height: 78%;
+  height: 100%;
+  min-height: 168px;
   position: relative;
 
   &:hover {
