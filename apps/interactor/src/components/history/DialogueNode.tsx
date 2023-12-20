@@ -6,6 +6,7 @@ import { DialogueNodeData } from './utils'
 import { FaPencil } from 'react-icons/fa6'
 import { useAppDispatch } from '../../state/store'
 import { setEditModal } from '../../state/slices/settingsSlice'
+import { useFillTextTemplate } from '../../libs/hooks'
 
 export default memo(({ data }: { data: DialogueNodeData }) => {
   const dispatch = useAppDispatch()
@@ -19,6 +20,8 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
       })
     )
   }
+  const displayText = useFillTextTemplate(data.text)
+
   return (
     <div
       className={classNames({
@@ -45,7 +48,7 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
       <button className="DialogueNode__edit-btn" onClick={handleEdit}>
         <FaPencil />
       </button>
-      <div className="DialogueNode__text scrollbar">{data.text}</div>
+      <div className="DialogueNode__text scrollbar">{displayText}</div>
       {/* eslint-disable-next-line */}
       {/* @ts-ignore */}
       <Handle

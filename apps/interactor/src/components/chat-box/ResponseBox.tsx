@@ -17,6 +17,7 @@ import {
 } from '../../state/slices/narrationSlice'
 import './ResponseBox.scss'
 import { setEditModal } from '../../state/slices/settingsSlice'
+import { useFillTextTemplate } from '../../libs/hooks'
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
@@ -25,6 +26,7 @@ const ResponseBox = (): JSX.Element | null => {
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
   const swipes = useAppSelector(selectCurrentSwipeResponses)
   const { disabled } = useAppSelector((state) => state.narration.input)
+  const displayText = useFillTextTemplate(lastCharacters[0].text)
 
   const handleRegenerateClick = () => {
     dispatch(regenerationStart())
@@ -54,7 +56,7 @@ const ResponseBox = (): JSX.Element | null => {
   return (
     <div className="ResponseBox">
       <div className="ResponseBox__text" ref={responseDiv}>
-        <TextFormatter text={lastCharacters[0].text} />
+        <TextFormatter text={displayText} />
       </div>
       <div className="ResponseBox__actions">
         {!disabled ? (
