@@ -42,7 +42,11 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
       />
       <div className="DialogueNode__avatars">
         {data.avatars.map((avatar) => (
-          <img className="DialogueNode__avatar" src={avatar} />
+          <img
+            className="DialogueNode__avatar"
+            src={avatar}
+            key={`avatar-${data.id}-${avatar}`}
+          />
         ))}
       </div>
       <button className="DialogueNode__edit-btn" onClick={handleEdit}>
