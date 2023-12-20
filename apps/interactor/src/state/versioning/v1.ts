@@ -100,16 +100,16 @@ export enum ModelType {
 }
 
 export enum FontSize {
-  Small = 'small',
-  Medium = 'medium',
-  Large = 'large',
+  Small = 0,
+  Medium = 1,
+  Large = 2,
 }
 
 export enum Speed {
-  Slow = 'slow',
-  Normal = 'normal',
-  Fast = 'fast',
-  Presto = 'presto',
+  Slow = 0,
+  Normal = 1,
+  Fast = 2,
+  Presto = 3,
 }
 export enum Voices {
   Sara = 'azure_tts.en-US-SaraNeural',
@@ -133,7 +133,7 @@ export interface SettingsState {
     autoContinue: boolean
   }
   voice: {
-    enabled: boolean
+    autoplay: boolean
     speed: Speed
     voiceId: Voices
   }

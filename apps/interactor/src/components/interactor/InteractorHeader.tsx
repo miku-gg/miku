@@ -1,12 +1,12 @@
 import { useAppContext } from '../../App'
 import { useAppSelector } from '../../state/store'
 import { GiBrain } from 'react-icons/gi'
-import { SlSettings } from 'react-icons/sl'
 import SceneSelector from '../scenarios/SceneSelector'
 import History from '../history/History'
 import MusicPlayer from './MusicPlayer'
 import ScreenSizer from './ScreenSizer'
 import './InteractorHeader.scss'
+import Settings from './Settings'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
@@ -32,12 +32,8 @@ const InteractorHeader = () => {
         <div className="InteractorHeader__header-name">
           {firstCharacter.name}
         </div>
-        <div className="InteractorHeader__scenario-selector">
-          <SceneSelector />
-        </div>
-        <div className="InteractorHeader__history">
-          <History />
-        </div>
+        <SceneSelector />
+        <History />
       </div>
       <div className="InteractorHeader__right">
         <button className="InteractorHeader__brain icon-button">
@@ -45,9 +41,7 @@ const InteractorHeader = () => {
         </button>
         <MusicPlayer />
         <ScreenSizer />
-        <button className="InteractorHeader__settings icon-button">
-          <SlSettings />
-        </button>
+        <Settings />
       </div>
     </div>
   )

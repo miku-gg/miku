@@ -7,13 +7,9 @@ import {
   SettingsState,
 } from '../versioning'
 
-export type {
-  Voices,
-  ModelType,
-  FontSize,
-  Speed,
-  SettingsState,
-} from '../versioning'
+export { Voices, ModelType, FontSize, Speed } from '../versioning'
+
+export type { SettingsState } from '../versioning'
 
 const initialState: SettingsState = {
   model: ModelType.Default,
@@ -23,11 +19,11 @@ const initialState: SettingsState = {
   },
   text: {
     speed: Speed.Normal,
-    fontSize: FontSize.Small,
+    fontSize: FontSize.Medium,
     autoContinue: false,
   },
   voice: {
-    enabled: false,
+    autoplay: false,
     speed: Speed.Normal,
     voiceId: Voices.SaraWhispering,
   },
@@ -65,8 +61,8 @@ export const settingSlice = createSlice({
     setAutoContinue: (state, action: PayloadAction<boolean>) => {
       state.text.autoContinue = action.payload
     },
-    setVoiceEnabled: (state, action: PayloadAction<boolean>) => {
-      state.voice.enabled = action.payload
+    setVoiceAutoplay: (state, action: PayloadAction<boolean>) => {
+      state.voice.autoplay = action.payload
     },
     setVoiceSpeed: (state, action: PayloadAction<Speed>) => {
       state.voice.speed = action.payload
@@ -111,7 +107,7 @@ export const {
   setFontSize,
   setSpeed,
   setAutoContinue,
-  setVoiceEnabled,
+  setVoiceAutoplay,
   setVoiceSpeed,
   setVoiceId,
   setMusicEnabled,
