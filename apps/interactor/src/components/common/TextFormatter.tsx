@@ -8,7 +8,7 @@ interface TextFormatterProps {
   text: string
 }
 
-const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text }) => {
+export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text }) => {
   const fontSize = useAppSelector((state) => state.settings.text.fontSize)
   const textFormatterDiv = React.useRef<HTMLDivElement>(null)
   const [userScrolled, setUserScrolled] = useState(false)

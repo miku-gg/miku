@@ -10,7 +10,7 @@ import { MdRecordVoiceOver } from 'react-icons/md'
 import { IoIosBookmarks } from 'react-icons/io'
 
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import TextFormatter from '../common/TextFormatter'
+import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
 import {
   regenerationStart,
   swipeResponse,
@@ -23,6 +23,11 @@ const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
   const responseDiv = useRef<HTMLDivElement>(null)
   const lastReponse = useAppSelector(selectLastLoadedResponse)
+  const isLastResponseFetching = useAppSelector(
+    (state) =>
+      state.narration.responses[state.narration.currentResponseId]?.fetching ||
+      false
+  )
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
   const swipes = useAppSelector(selectCurrentSwipeResponses)
   const { disabled } = useAppSelector((state) => state.narration.input)
@@ -56,7 +61,11 @@ const ResponseBox = (): JSX.Element | null => {
   return (
     <div className="ResponseBox">
       <div className="ResponseBox__text" ref={responseDiv}>
-        <TextFormatter text={displayText} />
+        {isLastResponseFetching ? (
+          <TextFormatterStatic text="*Typing...*" />
+        ) : (
+          <TextFormatter text={displayText} />
+        )}
       </div>
       <div className="ResponseBox__actions">
         {!disabled ? (

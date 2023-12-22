@@ -3,20 +3,22 @@
   "version": "0.3.0",
   "private": true,
   "description": "",
-  "main": "src/server.ts",
+  "main": "src/server2.ts",
   "scripts": {
-    "start": "nodemon ./src/server.ts"
+    "start": "nodemon ./src/server2.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@mikugg/extensions": "workspace:^",
+    "@mikugg/guidance": "workspace:^",
     "@types/body-parser": "^1.19.2",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/multer": "^1.4.7",
     "@types/node": "^18.11.18",
+    "axios": "^1.2.4",
     "body-parser": "^1.20.1",
     "colors": "^1.4.0",
     "cors": "^2.8.5",

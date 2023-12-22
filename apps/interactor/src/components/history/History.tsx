@@ -219,8 +219,6 @@ const HistoryModal = (): ReactElement => {
     ]
   })()
 
-  console.log('startPos', startPos)
-
   return (
     <div className="History__modal">
       {/* eslint-disable-next-line */}

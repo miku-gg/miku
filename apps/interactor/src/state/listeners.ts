@@ -1,5 +1,5 @@
 import { Dispatch, createListenerMiddleware } from '@reduxjs/toolkit'
-import mockStream, { ResponseState } from './reader.mock'
+import { ResponseState } from './reader.mock'
 import {
   interactionStart,
   interactionFailure,
@@ -8,24 +8,32 @@ import {
 } from './slices/narrationSlice'
 import { RootState } from './store'
 import { selectCurrentScene } from './selectors'
+import servicesClient, { ModelType } from '../libs/servicesClient'
 
-const interactionEffect = async (sceneId: string, dispatch: Dispatch) => {
+const interactionEffect = async (
+  {
+    sceneId,
+    text,
+  }: {
+    sceneId: string
+    text: string
+  },
+  dispatch: Dispatch
+) => {
   try {
-    const reader = mockStream().getReader()
-    const decoder = new TextDecoder('utf-8')
-    let currentResponseState: ResponseState = {
-      emotion: '',
+    const currentResponseState: ResponseState = {
+      emotion: 'angry',
       text: '',
     }
+    const stream = servicesClient.textCompletion({
+      template: `Anon: ${text}\nAqua:{{GEN text max_tokens=100}}`,
+      model: ModelType.RP,
+      variables: {},
+    })
 
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-
-      const jsonString = decoder.decode(value)
-      currentResponseState = JSON.parse(jsonString)
-
+    for await (const result of stream) {
+      currentResponseState.text =
+        result.get('text') || currentResponseState.text
       dispatch(
         interactionSuccess({
           completed: false,
@@ -40,11 +48,8 @@ const interactionEffect = async (sceneId: string, dispatch: Dispatch) => {
           suggestedScenes: [],
         })
       )
-
-      console.log(currentResponseState) // Logs the current state; replaces the old one
     }
 
-    console.log('Final response state:', currentResponseState)
     dispatch(
       interactionSuccess({
         completed: true,
@@ -69,7 +74,13 @@ export const interactionListenerMiddleware = createListenerMiddleware()
 interactionListenerMiddleware.startListening({
   actionCreator: interactionStart,
   effect: async (action, listenerApi) => {
-    await interactionEffect(action.payload.sceneId, listenerApi.dispatch)
+    await interactionEffect(
+      {
+        sceneId: action.payload.sceneId,
+        text: action.payload.text,
+      },
+      listenerApi.dispatch
+    )
   },
 })
 
@@ -77,9 +88,20 @@ export const regenerationListenerMiddleware = createListenerMiddleware()
 
 regenerationListenerMiddleware.startListening({
   actionCreator: regenerationStart,
-  effect: async (_action, listenerApi) => {
+  effect: async (action, listenerApi) => {
     const state = listenerApi.getState() as RootState
     const sceneId = selectCurrentScene(state)?.id || ''
-    await interactionEffect(sceneId, listenerApi.dispatch)
+    const parentInteractionId =
+      state.narration.responses[state.narration.currentResponseId]
+        ?.parentInteractionId || ''
+    const parentQuery =
+      state.narration.interactions[parentInteractionId]?.query || ''
+    await interactionEffect(
+      {
+        sceneId,
+        text: parentQuery,
+      },
+      listenerApi.dispatch
+    )
   },
 })
