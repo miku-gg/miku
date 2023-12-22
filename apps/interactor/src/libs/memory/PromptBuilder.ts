@@ -58,8 +58,8 @@ class PromptBuilder {
   public completeResponse(
     response: NarrationResponse,
     variables: Map<string, string>
-  ): void {
-    this.strategy.completeResponse(response, variables)
+  ): NarrationResponse {
+    return this.strategy.completeResponse(response, variables)
   }
 
   public setStrategy(strategy: Strategies.StrategySlug) {

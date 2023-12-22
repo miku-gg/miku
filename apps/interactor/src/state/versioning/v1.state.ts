@@ -18,7 +18,6 @@ export interface NarrationResponse {
     [role: string]:
       | {
           emotion: string
-          audio: string
           pose: string
           text: string
         }

@@ -17,7 +17,7 @@ export abstract class AbstractPromptStrategy {
   public abstract completeResponse(
     response: NarrationResponse,
     variables: Map<string, string>
-  ): void
+  ): NarrationResponse
 
   protected getCharacterSpecs(card: MikuCard): {
     persona: string

@@ -14,8 +14,15 @@ export default function SceneSelector(): JSX.Element | null {
   const [expanded, setExpended] = useState<boolean>(false)
 
   const handleItemClick = (id: string, prompt: string) => {
+    const scene = scenes.find((s) => s.id === id)
     setExpended(false)
-    dispatch(interactionStart({ sceneId: id, text: prompt }))
+    dispatch(
+      interactionStart({
+        sceneId: id,
+        text: prompt,
+        roles: scene?.roles.map((r) => r.role) || [],
+      })
+    )
   }
 
   if (!scenes?.length) return null

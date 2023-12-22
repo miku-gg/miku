@@ -63,7 +63,6 @@ export const selectLastLoadedCharacters = createSelector(
     scene?: NovelScene,
     characters: NovelCharacters = {}
   ) => {
-    // Your logic here
     return (
       scene?.roles.map(({ role, characterId }) => {
         const outfitSlug = characters[characterId]?.roles[role] || ''
@@ -75,6 +74,7 @@ export const selectLastLoadedCharacters = createSelector(
           id: characterId || '',
           text: response?.characters[role]?.text || '',
           image: emotion?.source[0],
+          emotion: emotionSlug,
         }
       }) || []
     )
@@ -104,6 +104,7 @@ export const selectAvailableScenes = createSelector(
           background: scene.background,
           music: scene.music,
           emotion: emotionImage,
+          roles: scene.roles,
         }
       })
   }

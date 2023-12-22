@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import {
+  selectCurrentScene,
   selectCurrentSwipeResponses,
   selectLastLoadedCharacters,
   selectLastLoadedResponse,
@@ -28,13 +29,38 @@ const ResponseBox = (): JSX.Element | null => {
       state.narration.responses[state.narration.currentResponseId]?.fetching ||
       false
   )
+  const scene = useAppSelector(selectCurrentScene)
+  const characters = useAppSelector((state) => state.novel.characters)
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
   const swipes = useAppSelector(selectCurrentSwipeResponses)
   const { disabled } = useAppSelector((state) => state.narration.input)
   const displayText = useFillTextTemplate(lastCharacters[0].text)
 
   const handleRegenerateClick = () => {
-    dispatch(regenerationStart())
+    dispatch(
+      regenerationStart(
+        (scene?.roles || []).map((r) => {
+          const character = characters[r.characterId]
+          const chracterOutfitId = character?.roles[r.role] || ''
+          const outfit = character?.outfits[chracterOutfitId]
+          const randomIndex = Math.floor(
+            Math.random() * (outfit?.emotions?.length || 0)
+          )
+          const randomEmotion = outfit?.emotions[randomIndex]
+          if (randomEmotion) {
+            return {
+              role: r.role,
+              emotion: randomEmotion.id || '',
+            }
+          }
+
+          return {
+            role: r.role,
+            emotion: '',
+          }
+        })
+      )
+    )
   }
 
   const handleEditClick = () => {

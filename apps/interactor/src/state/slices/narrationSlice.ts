@@ -41,6 +41,7 @@ const narrationSlice = createSlice({
       action: PayloadAction<{
         text: string
         sceneId: string
+        roles: string[]
       }>
     ) {
       const { text, sceneId } = action.payload
@@ -48,7 +49,14 @@ const narrationSlice = createSlice({
       const newInteractionId = randomUUID()
       const response: NarrationResponse = {
         id: randomUUID(),
-        characters: {},
+        characters: action.payload.roles.reduce((acc, roleId) => {
+          acc[roleId] = {
+            text: '',
+            emotion: '',
+            pose: '',
+          }
+          return acc
+        }, {} as NarrationResponse['characters']),
         childrenInteractions: [],
         fetching: true,
         parentInteractionId: newInteractionId,
@@ -117,10 +125,10 @@ const narrationSlice = createSlice({
       action: PayloadAction<{
         completed: boolean
         characters: NarrationResponse['characters']
-        suggestedScenes: string[]
+        suggestedScenes?: string[]
       }>
     ) {
-      const { characters, suggestedScenes } = action.payload
+      const { characters, suggestedScenes = [] } = action.payload
       const response = state.responses[state.currentResponseId]
       if (response) {
         response.childrenInteractions = []
@@ -133,7 +141,10 @@ const narrationSlice = createSlice({
         state.input.disabled = false
       }
     },
-    regenerationStart(state) {
+    regenerationStart(
+      state,
+      action: PayloadAction<{ role: string; emotion: string }[]>
+    ) {
       const currentInteraction =
         state.interactions[
           state.responses[state.currentResponseId]?.parentInteractionId || ''
@@ -141,7 +152,14 @@ const narrationSlice = createSlice({
       if (!currentInteraction) return state
       const response: NarrationResponse = {
         id: randomUUID(),
-        characters: {},
+        characters: action.payload.reduce((acc, role) => {
+          acc[role.role] = {
+            text: '',
+            emotion: role.emotion,
+            pose: '',
+          }
+          return acc
+        }, {} as NarrationResponse['characters']),
         childrenInteractions: [],
         fetching: true,
         parentInteractionId: currentInteraction.id,

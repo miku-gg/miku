@@ -128,7 +128,6 @@ export async function loadNovelFromSingleCard({
             parentInteractionId: null,
             characters: {
               [mikugg.start_scenario]: {
-                audio: '',
                 text: card.data.first_mes,
                 emotion: firstEmotion?.id || 'happy',
                 pose: 'standing',

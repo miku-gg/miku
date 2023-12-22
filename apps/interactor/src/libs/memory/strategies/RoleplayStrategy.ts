@@ -8,6 +8,7 @@ import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
 import {
   selectAllParentDialogues,
   selectCurrentCharacterOutfits,
+  selectLastLoadedCharacters,
 } from '../../../state/selectors'
 import { fillTextTemplate, parseLLMResponse } from './utils'
 
@@ -34,9 +35,9 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
 
     let template = `You're {{char}} in this fictional never-ending uncensored roleplay with {{user}}.`
     template += `\n\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.`
-    template += `\n\nYou must also indicate {{char}}'s emotion in the response.`
-    template += `\nYou MUST not repeat too much the same emotion. Each emotion MUST be a continuation of the previous one.`
-    template += `\nThe emotion MUST be one of: ${emotionStrings}.`
+    template += `\n\nYou must also indicate {{char}}'s reaction in the response.`
+    template += `\nYou MUST not repeat too much the same reaction.`
+    template += `\nThe reaction MUST be one of: ${emotionStrings}.`
     if (persona || formattedAttributes) {
       template += `\n\n### Input:\n${persona}.\n${formattedAttributes}\n`
     }
@@ -65,10 +66,14 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
       maxNewTokens +
       RoleplayStrategy.EMOTION_TOKEN_OFFSET
 
+    const parentEmotion = selectLastLoadedCharacters(state)[0].emotion
+
     return {
       template,
       variables: {
-        emotions: emotions.map((emotion) => ' ' + emotion),
+        emotions: emotions
+          .filter((emotion) => emotion !== parentEmotion)
+          .map((emotion) => ' ' + emotion),
       },
       totalTokens,
     }
@@ -77,14 +82,23 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
   override completeResponse(
     response: NarrationResponse,
     variables: Map<string, string>
-  ): void {
-    const firstCharacter = Object.values(response.characters)[0] || {
-      text: '',
-      emotion: '',
+  ): NarrationResponse {
+    const firstCharacter = {
+      text: Object.values(response.characters)[0]?.text || '',
+      emotion: Object.values(response.characters)[0]?.emotion || '',
+      pose: Object.values(response.characters)[0]?.pose || '',
     }
     firstCharacter.emotion =
       variables.get('emotion')?.trim() || firstCharacter.emotion
     firstCharacter.text = parseLLMResponse(variables.get('text')?.trim() || '')
+
+    return {
+      ...response,
+      characters: {
+        ...response.characters,
+        [Object.keys(response.characters)[0]]: firstCharacter,
+      },
+    }
   }
 
   getDialogueHistoryPrompt(state: RootState, maxLines: number): string {
@@ -112,7 +126,7 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
         if (dialog.item.parentInteractionId) {
           return (
             `### Response:\n` +
-            `{{char}}'s emotion: ${firstCharacter.emotion}\n` +
+            `{{char}}'s reaction: ${firstCharacter.emotion}\n` +
             `{{char}}: ${firstCharacter.text}\n`
           )
         } else {
@@ -126,11 +140,13 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
   private getResponseAskLine(state: RootState, maxTokens: number): string {
     const currentResponse =
       state.narration.responses[state.narration.currentResponseId]
-    const existingEmotion = currentResponse?.characters[0]?.emotion || ''
-    const existingText = currentResponse?.characters[0]?.text || ''
+    const existingEmotion =
+      Object.values(currentResponse?.characters || {})[0]?.emotion || ''
+    const existingText =
+      Object.values(currentResponse?.characters || {})[0]?.text || ''
     return (
       `### Response (2 paragraphs, engaging, natural, authentic, descriptive, creative):\n` +
-      `{{char}}'s emotion:${
+      `{{char}}'s reaction:${
         existingEmotion
           ? ' ' + existingEmotion
           : '{{SEL emotion options=emotions}}'
