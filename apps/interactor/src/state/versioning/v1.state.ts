@@ -1,3 +1,5 @@
+import { EmotionTemplateSlug, MikuCard } from '@mikugg/bot-utils'
+
 export interface NarrationInteraction {
   id: string
   parentResponseId: string | null
@@ -61,7 +63,7 @@ export interface NovelScene {
 export interface NovelCharacterOutfit {
   id: string
   name: string
-  template: string
+  template: EmotionTemplateSlug
   emotions: {
     id: string
     source: string[]
@@ -75,6 +77,7 @@ export interface NovelCharacters {
         id: string
         name: string
         profile_pic: string
+        card: MikuCard
         outfits: {
           [outfit: string]: NovelCharacterOutfit | undefined
         }

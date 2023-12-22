@@ -1,6 +1,9 @@
 import { RootState } from './store'
 import { NovelCharacters, NovelScene } from './slices/novelSlice'
-import { NarrationResponse } from './slices/narrationSlice'
+import {
+  NarrationInteraction,
+  NarrationResponse,
+} from './slices/narrationSlice'
 import { createSelector } from '@reduxjs/toolkit'
 
 export const selectLastLoadedResponse = (
@@ -116,5 +119,65 @@ export const selectCurrentSwipeResponses = createSelector(
     const interaction =
       interactions[responses[currentResponseId]?.parentInteractionId || '']
     return interaction?.responsesId.map((id) => responses[id])
+  }
+)
+
+export const selectAllParentDialogues = createSelector(
+  [
+    (state: RootState) => state.narration.interactions,
+    (state: RootState) => state.narration.responses,
+    (state: RootState) => state.narration.currentResponseId,
+  ],
+  (interactions, responses, currentResponseId) => {
+    let responseIdPointer = currentResponseId
+    const dialogues: (
+      | { type: 'response'; item: NarrationResponse }
+      | { type: 'interaction'; item: NarrationInteraction }
+    )[] = []
+    while (responseIdPointer) {
+      const response = responses[responseIdPointer]
+      if (response) {
+        if (!response.fetching)
+          dialogues.push({ type: 'response', item: response })
+        if (response?.parentInteractionId) {
+          const interaction = interactions[response?.parentInteractionId]
+          if (interaction) {
+            dialogues.push({ type: 'interaction', item: interaction })
+            responseIdPointer = interaction?.parentResponseId || ''
+          } else {
+            break
+          }
+        } else {
+          break
+        }
+      } else {
+        break
+      }
+    }
+    return dialogues
+  }
+)
+
+export const selectCurrentCharacterOutfits = createSelector(
+  [
+    (state: RootState) => state.novel.characters,
+    selectCurrentScene,
+    selectLastLoadedResponse,
+  ],
+  (characters, scene) => {
+    return (
+      scene?.roles
+        .map((role) => {
+          const characterOutfitId =
+            characters[role.characterId]?.roles[role.role] || ''
+          const characterOutfit =
+            characters[role.characterId]?.outfits[characterOutfitId]
+          return {
+            name: characters[role.characterId]?.name,
+            outfit: characterOutfit,
+          }
+        })
+        .filter((outfit) => outfit.outfit) || []
+    )
   }
 )

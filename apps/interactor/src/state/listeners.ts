@@ -1,46 +1,64 @@
 import { Dispatch, createListenerMiddleware } from '@reduxjs/toolkit'
-import { ResponseState } from './reader.mock'
 import {
   interactionStart,
   interactionFailure,
   interactionSuccess,
   regenerationStart,
+  NarrationResponse,
 } from './slices/narrationSlice'
 import { RootState } from './store'
 import { selectCurrentScene } from './selectors'
 import servicesClient, { ModelType } from '../libs/servicesClient'
+import PromptBuilder from '../libs/memory/PromptBuilder'
 
 const interactionEffect = async (
   {
     sceneId,
-    text,
-  }: {
+  }: // text,
+  {
     sceneId: string
     text: string
   },
-  dispatch: Dispatch
+  dispatch: Dispatch,
+  state: RootState
 ) => {
   try {
-    const currentResponseState: ResponseState = {
-      emotion: 'angry',
-      text: '',
+    const promptBuilder = new PromptBuilder({
+      maxNewTokens: 200,
+      strategy: 'roleplay',
+      trucationLength: 4096,
+    })
+    const currentResponseState: NarrationResponse = {
+      id: '',
+      selected: false,
+      fetching: false,
+      parentInteractionId: null,
+      suggestedScenes: [],
+      characters: {
+        ['default']: {
+          emotion: '',
+          audio: '',
+          pose: '',
+          text: '',
+        },
+      },
+      childrenInteractions: [],
     }
+    const completionQuery = promptBuilder.buildPrompt(state)
     const stream = servicesClient.textCompletion({
-      template: `Anon: ${text}\nAqua:{{GEN text max_tokens=100}}`,
+      ...completionQuery,
       model: ModelType.RP,
-      variables: {},
     })
 
     for await (const result of stream) {
-      currentResponseState.text =
-        result.get('text') || currentResponseState.text
+      promptBuilder.completeResponse(currentResponseState, result)
       dispatch(
         interactionSuccess({
           completed: false,
           characters: {
             [sceneId]: {
-              emotion: currentResponseState.emotion,
-              text: currentResponseState.text,
+              emotion: currentResponseState.characters.default?.emotion || '',
+              text: currentResponseState.characters.default?.text || '',
               audio: '',
               pose: 'standing',
             },
@@ -55,8 +73,8 @@ const interactionEffect = async (
         completed: true,
         characters: {
           [sceneId]: {
-            emotion: currentResponseState.emotion,
-            text: currentResponseState.text,
+            emotion: currentResponseState.characters.default?.emotion || '',
+            text: currentResponseState.characters.default?.text || '',
             audio: '',
             pose: 'standing',
           },
@@ -79,7 +97,8 @@ interactionListenerMiddleware.startListening({
         sceneId: action.payload.sceneId,
         text: action.payload.text,
       },
-      listenerApi.dispatch
+      listenerApi.dispatch,
+      listenerApi.getState() as RootState
     )
   },
 })
@@ -101,7 +120,8 @@ regenerationListenerMiddleware.startListening({
         sceneId,
         text: parentQuery,
       },
-      listenerApi.dispatch
+      listenerApi.dispatch,
+      state
     )
   },
 })

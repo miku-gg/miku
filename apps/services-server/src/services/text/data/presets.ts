@@ -1,4 +1,4 @@
-import { AphroditeConfig } from "@mikugg/extensions/dist/services";
+import { OpenAIAphroditeConfig } from "../lib/aphroditeTokenGenerator";
 
 export enum PresetType {
   DIVINE_INTELECT = "DIVINE_INTELECT",
@@ -7,12 +7,10 @@ export enum PresetType {
 
 //truncation_length: 4096,
 
-export const presets = new Map<PresetType, AphroditeConfig>([
+export const presets = new Map<PresetType, OpenAIAphroditeConfig>([
   [
     PresetType.DIVINE_INTELECT,
     {
-      truncation_length: 0,
-      max_tokens: 0,
       n: 1,
       best_of: 1,
       presence_penalty: 0.0,
@@ -41,8 +39,6 @@ export const presets = new Map<PresetType, AphroditeConfig>([
   [
     PresetType.LLAMA_PRECISE,
     {
-      truncation_length: 0,
-      max_tokens: 0,
       n: 1,
       best_of: 1,
       presence_penalty: 0.0,

@@ -20,7 +20,11 @@ const templateProcessors = new Map<
         apiKey: "sk-EMPTY",
         baseURL: "http://localhost:2242/v1",
         model: "default",
-        ...presets.get(PresetType.DIVINE_INTELECT),
+        defaultConfig: {
+          ...presets.get(PresetType.DIVINE_INTELECT),
+          max_tokens: 200,
+          truncation_length: 4096,
+        },
       })
     ),
   ],
@@ -32,14 +36,17 @@ const templateProcessors = new Map<
         apiKey: "sk-EMPTY",
         baseURL: "http://localhost:2242/v1",
         model: "default",
-        ...presets.get(PresetType.DIVINE_INTELECT),
+        defaultConfig: {
+          ...presets.get(PresetType.DIVINE_INTELECT),
+          max_tokens: 200,
+          truncation_length: 8192,
+        },
       })
     ),
   ],
 ]);
 
 export default async (req: Request<string>, res: Response) => {
-  res.setHeader("Content-Type", "application/json");
   const guidanceQuery: GuidanceQuery = req.body;
   validateGuidanceQuery(guidanceQuery);
   const stream = templateProcessors
@@ -51,6 +58,7 @@ export default async (req: Request<string>, res: Response) => {
   if (!stream) {
     throw { message: "Error completing guidance.", status: 500 };
   }
+  res.setHeader("Content-Type", "application/json");
   for await (const result of stream) {
     const keys = Array.from(result.keys());
     const values = Array.from(result.values());

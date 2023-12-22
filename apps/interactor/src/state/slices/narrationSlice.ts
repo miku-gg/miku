@@ -5,6 +5,7 @@ import {
   NarrationInteraction,
   NarrationResponse,
 } from '../versioning'
+import { toast } from 'react-toastify'
 
 export type {
   NarrationState,
@@ -78,21 +79,38 @@ const narrationSlice = createSlice({
       state.input.disabled = false
       const response = state.responses[state.currentResponseId]
       if (!response?.fetching) return state
+      toast.error('Error querying the AI')
       const interaction =
         state.interactions[response?.parentInteractionId || '']
-      state.currentResponseId = interaction?.parentResponseId || ''
-      const currentResponse = state.responses[state.currentResponseId]
-      if (currentResponse) {
-        currentResponse.childrenInteractions =
-          currentResponse.childrenInteractions.filter(
-            (child) => child.interactionId === response?.parentInteractionId
-          )
-        if (currentResponse.childrenInteractions.length) {
-          currentResponse.childrenInteractions[0].selected = true
+      const reponsesId = interaction?.responsesId
+      if (interaction) {
+        interaction.responsesId =
+          reponsesId?.filter((responseId) => responseId !== response?.id) || []
+
+        if (interaction.responsesId.length) {
+          const newResponseId = interaction.responsesId[0]
+          const newResponse = state.responses[newResponseId]
+          if (newResponse) {
+            newResponse.selected = true
+            state.currentResponseId = newResponseId
+          }
+          delete state.responses[response?.id || '']
+        } else {
+          state.currentResponseId = interaction?.parentResponseId || ''
+          const currentResponse = state.responses[state.currentResponseId]
+          if (currentResponse) {
+            currentResponse.childrenInteractions =
+              currentResponse.childrenInteractions.filter(
+                (child) => child.interactionId !== response?.parentInteractionId
+              )
+            if (currentResponse.childrenInteractions.length) {
+              currentResponse.childrenInteractions[0].selected = true
+            }
+          }
+          delete state.responses[response?.id || '']
+          delete state.interactions[interaction?.id || '']
         }
       }
-      delete state.responses[response?.id || '']
-      delete state.interactions[interaction?.id || '']
     },
     interactionSuccess(
       state,

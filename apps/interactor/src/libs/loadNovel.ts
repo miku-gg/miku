@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { MikuCard } from '@mikugg/bot-utils'
+import { EmotionTemplateSlug, MikuCard } from '@mikugg/bot-utils'
 import { NovelCharacterOutfit, NovelState } from '../state/slices/novelSlice'
 import { NarrationState } from '../state/slices/narrationSlice'
 import { v4 as randomUUID } from 'uuid'
@@ -54,7 +54,7 @@ export async function loadNovelFromSingleCard({
       outfits[emotion_group.id] = {
         id: emotion_group.id,
         name: emotion_group.name,
-        template: emotion_group.template,
+        template: emotion_group.template as EmotionTemplateSlug,
         emotions: emotion_group.emotions.map((emotion) => {
           const sound =
             mikugg.sounds?.find((sound) => sound.id === emotion.sound)
@@ -100,6 +100,7 @@ export async function loadNovelFromSingleCard({
           [cardId]: {
             id: cardId,
             name: card.data.name,
+            card: card,
             profile_pic: mikugg.profile_pic,
             outfits,
             roles: mikugg.scenarios.reduce((roles, scenario) => {

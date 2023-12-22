@@ -13,12 +13,10 @@ function getLastJsonObject(jsonString: string): Record<string, string> {
     try {
       return JSON.parse(matches[matches.length - 1])
     } catch (error) {
-      console.error('Error parsing JSON:', error)
-      return {}
+      throw 'Error parsing JSON:'
     }
   } else {
-    console.error('No JSON objects found')
-    return {}
+    throw 'No JSON objects found'
   }
 }
 
@@ -68,7 +66,7 @@ class ServicesClient {
         }
       }
     } catch (error) {
-      console.error('Error fetching data:', error)
+      throw 'Error fetching data:' + error
     }
   }
 }

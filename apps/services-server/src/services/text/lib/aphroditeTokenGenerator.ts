@@ -271,6 +271,7 @@ export class OpenAIAphroditeTokenGenerator extends Guidance.TokenGenerator
         stream: false,
         logprobs: 10,
         max_tokens: 1,
+        logit_bias,
       },
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
@@ -325,6 +326,10 @@ export class OpenAIAphroditeTokenGenerator extends Guidance.TokenGenerator
         ...this.defaultConfig,
         model: this.model,
         ...options,
+        stop: [
+          ...(this.defaultConfig?.stop || []),
+          ...(options.stop ? options.stop.split(",") : []),
+        ],
         prompt,
         stream: true,
       },

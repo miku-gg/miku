@@ -25,9 +25,13 @@ app.post("/text", async (req: Request<string>, res: Response) => {
   try {
     await textHandler(req, res);
   } catch (error) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    res.status(error.status || 500).send(error.message);
+    try {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      res.status(error.status || 500).send(error.message);
+    } catch (_error) {
+      res.end();
+    }
   }
 });
 
