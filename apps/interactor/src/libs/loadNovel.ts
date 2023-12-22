@@ -29,6 +29,7 @@ export async function loadNovelFromSingleCard({
           ?.source || ''
       const music =
         mikugg.sounds?.find((sound) => sound.id === scenario.music)?.source ||
+        scenario.music ||
         ''
 
       if (background) assets.add(background)

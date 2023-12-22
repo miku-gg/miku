@@ -151,7 +151,7 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
           ? ' ' + existingEmotion
           : '{{SEL emotion options=emotions}}'
       }\n` +
-      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=\\n{{char}}:,\\n{{user}}:}}`
+      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=\n{{char}}:,\n{{user}}:}}`
     )
   }
 
