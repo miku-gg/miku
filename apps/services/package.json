@@ -1,9 +1,9 @@
 {
-  "name": "services-server",
+  "name": "@mikugg/services",
   "version": "0.3.0",
   "private": true,
   "description": "",
-  "main": "src/server2.ts",
+  "main": "src/server.ts",
   "scripts": {
     "start": "nodemon ./src/server.ts"
   },

@@ -5,7 +5,7 @@
     "bootstrap": "npx lerna bootstrap --include-dependencies",
     "docs": "lerna run start --scope=@mikugg/docs",
     "start": "lerna run start --parallel --ignore @mikugg/docs",
-    "start:no-services": "lerna run start --parallel --ignore @mikugg/docs --ignore services-server",
+    "start:no-services": "lerna run start --parallel --ignore @mikugg/docs --ignore @mikugg/services",
     "test": "lerna run test --scope=@mikugg/extensions --scope=@mikugg/ui-kit",
     "pull": "git reset --hard HEAD && git pull origin master && pnpm install",
     "build": "npx lerna run build"
