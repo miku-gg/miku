@@ -1,0 +1,18 @@
+input: .
+output: .retype
+url: # Add your website address here
+favicon: "docs/src/assets/favicon.ico"
+branding:
+  title: miku.gg
+  label: &2120851276 Docs
+  logo: "docs/src/assets/logo.png"
+  logoDark: "docs/src/assets/logo.png"
+links:
+- text: Docs
+  link: /docs
+- text: Github
+  link: "https://github.com/miku-gg/miku"
+- text: Discord
+  link: "https://discord.gg/3XPdpUdGgV"
+footer:
+  copyright: "&copy; Copyright {{ year }}. [miku.gg](https://miku.gg) All rights reserved."

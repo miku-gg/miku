@@ -1,117 +1,201 @@
 <html>
-  <head>
-    <link rel="stylesheet" href="/public/semantic.min.css">
-    <link rel="stylesheet" href="/public/form.min.css">
-    <link rel="icon" href="/public/favicon.ico" type="image/x-icon">
-    <script src="/public/tailwind.js"></script>
-    <title>Bot directory | Miku</title>
-    <style>
-      .ui.inverted.form  .field textarea,
-      .ui.inverted.form  .dropdown,
-      .ui.inverted.form  .dropdown .item,
-      .ui.inverted.form  .field input {
-        background-color: #484848;
-        color: #fff;
-      }
-      .ui.menu.inverted .item.disabled {
-        color: #fff !important;
-      }
-      .ui.card.inverted {
-        background-color: #484848;
-      }
-      .ui.card.inverted .content .header,
-      .ui.card.inverted .content .meta,
-      .ui.card.inverted .content .description,
-      .ui.card.inverted .extra.content {
-        color: white;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="ui basic segment">
-     <%- include('header', {active: '/'}); %>
-      <div class="flex gap-6 flex-wrap">
-        <% bots.forEach(function(bot){ %>
-          <div class="w-60">
-            <div class="ui card">
-              <div class="image">
-                <img src="/s3/assets/<%= bot.data.extensions.mikugg.profile_pic %>" width="200px" height="200px" style="object-fit: cover;">
-              </div>
-              <div class="content">
-                <a class="header" href="http://localhost:5173/?bot=<%= bot.hash%>" target="_blank"><%= bot.data.name %></a>
-                <div class="description h-12 overflow-auto">
-                  <%= bot.data.extensions.mikugg.short_description || 'No description' %>
-                </div>
-              </div>
-              <div class="extra content">
-                <p>
-                  Version <%= bot.data.character_version %>
-                </p>
-                <p>
-                  Author: <%= bot.data.creator || 'Unknown' %>
-                </p>
-              </div>
-              <div>
-                <form action="/bot/delete/<%= bot.hash %>" method="POST" onsubmit="return confirm('Do you really want to delete <%= bot.data.name %>?');">
-                  <button type="submit" class="absolute text-red-600 right-2 bottom-4">
-                    <i class="trash icon"></i>
-                  </button>
-                </form>
-              </div>
+
+<head>
+  <link rel="stylesheet" href="/public/semantic.min.css">
+  <link rel="stylesheet" href="/public/form.min.css">
+  <link rel="icon" href="/public/favicon.ico" type="image/x-icon">
+  <script src="/public/tailwind.js"></script>
+  <title>Bot directory | Miku</title>
+  <style>
+    .ui.inverted.form .field textarea,
+    .ui.inverted.form .dropdown,
+    .ui.inverted.form .dropdown .item,
+    .ui.inverted.form .field input {
+      background-color: #1a202c;
+      color: #fff;
+    }
+
+    .ui.menu.inverted .item.disabled {
+      color: #fff !important;
+    }
+
+    .ui.card.inverted {
+      background-color: #1a202c;
+    }
+
+    .ui.card.inverted .content .header,
+    .ui.card.inverted .content .meta,
+    .ui.card.inverted .content .description,
+    .ui.card.inverted .extra.content {
+      color: white;
+    }
+
+    .nsfw {
+      position: absolute;
+      z-index: 1;
+      color: white;
+      background-color: #FF4E67;
+    }
+
+    .scenarios-box {
+      position: absolute;
+      z-index: 1;
+      color: white;
+      background-color: #9747ff;
+    }
+
+    .blocker {
+      background-color: #000;
+      opacity: 50%;
+      height: 100%;
+      width: 100%;
+      left: 0;
+      top: 0;
+      margin: 0;
+      position: absolute;
+      z-index: 2;
+    }
+
+    .upload-modal-close {
+      color: #888888;
+    }
+
+    .upload-modal {
+      position: absolute;
+      z-index: 3;
+      top: 35%;
+      left: 30%;
+      background-color: #1b1c1d;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="basic segment">
+    <%- include('header', {active: '/'}); %>
+    <div class="flex px-8 py-2 gap-6 flex-wrap">
+      <% bots.forEach(function(bot){ %>
+      <div class="w-60 <%= bot.data.tags.includes("NSFW") ? 'nsfw-bot invisible' : '' %>">
+        <div class="ui card">
+          <%if (bot.data.tags.includes("NSFW")) { %>
+          <span class="nsfw w-18 rounded-lg p-1">NSFW</span>
+          <% } %>
+          <%if (bot.data.extensions.mikugg.scenarios.length > 1) { %>
+          <span class="scenarios-box w-18 rounded-lg p-1 right-0"><%= bot.data.extensions.mikugg.scenarios.length %> scenes</span>
+          <% } %>
+          <div class="image">
+            <img src="/s3/assets/<%= bot.data.extensions.mikugg.profile_pic %>" style="object-fit: scale-down; width: 200px; height: 200px;">
+          </div>
+          <div class="content">
+            <a class="header" href="http://localhost:5173/?bot=<%= bot.hash%>" target="_blank"><%= bot.data.name %></a>
+            <div class="description h-12 overflow-auto">
+              <%= bot.data.extensions.mikugg.short_description || 'No description' %>
             </div>
           </div>
-        <% }); %>
-      </div>
-      <div class="mt-10 w-5/12">
-        <form action="/bot" method="post" enctype="multipart/form-data" class="ui form">
-          <label>
-            <h3 class="ui header">Upload a bot</h3>
-            <input type="file" value="file" required accept=".json" name="file" id="file"/>
-          </label>
-          <div class="mt-5">
-            <button class="ui button" type="submit">Upload</button>
+          <div class="extra content">
+            <p>
+              Version <%= bot.data.character_version %>
+            </p>
+            <p>
+              Author: <%= bot.data.creator || 'Unknown' %>
+            </p>
           </div>
-        </form>
+          <div>
+            <form action="/bot/delete/<%= bot.hash %>" method="POST" onsubmit="return confirm('Do you really want to delete <%= bot.data.name %>?');">
+              <button type="submit" class="absolute text-red-600 right-2 bottom-4">
+                <i class="trash icon"></i>
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
+      <% }); %>
     </div>
 
-    <!-- LIBS -->
-    <script
-      src="https://code.jquery.com/jquery-3.6.4.min.js"
-      integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
-      crossorigin="anonymous"></script>
-    <script src="/public/semantic.min.js"></script>
-    <script src="/public/form.min.js"></script>
-    <script>
-      
-      $(document).ready(function() {
-        $('.dropdown').dropdown();
+    <div class="blocker invisible">
+    </div>
 
-        // toggle button formatting
-        $(".ui.checkbox").checkbox();
+    <div class="upload-modal px-8 pt-6 pb-4 w-5/12 invisible">
+      <form action="/bot" method="post" enctype="multipart/form-data" class="ui form">
+        <label>
+          <div class="flex">
+            <h3 class="ui header">Upload a bot</h3>
+            <button class="pb-8 ml-auto" onclick="toggle_open_modal(false)">
+              <i class="upload-modal-close close icon"></i>
+            </button>
+          </div>
+          <input type="file" value="file" required accept=".json" name="file" id="file" />
+        </label>
+        <div class="mt-6">
+          <button class="ui button" type="submit">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-        // listen for changes to dark mode toggle buttons
-        $(".dark_mode_toggle:checkbox").on("change", function() {
-          change_theme($(this).is(":checked"));
-        });
+  <!-- LIBS -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+  <script src="/public/semantic.min.js"></script>
+  <script src="/public/form.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('.dropdown').dropdown();
+
+      // toggle button formatting
+      $(".ui.checkbox").checkbox();
+
+      // listen for changes to dark mode toggle buttons
+      $(".dark_mode_toggle:checkbox").on("change", function() {
+        change_theme($(this).is(":checked"));
       });
 
-      function change_theme(dark_mode) {
-        if (dark_mode) {
-          // for contrast with child segments
-          $("body").css("background-color", "#121212");
-          // most Semantic UI elements have the "ui" class
-          // useful to skip over elements with some class, such as "ignore_dark_mode"
-          $(".ui").not(".ignore_dark_mode").addClass("inverted");
-          // change the state of all dark mode toggle buttons
-          $(".dark_mode_toggle:checkbox").prop("checked", true);
-        } else {
-          $("body").css("background-color", "");
-          $(".inverted").not(".ignore_dark_mode").removeClass("inverted");
-          $(".dark_mode_toggle:checkbox").prop("checked", false);
-        }
+      $(".nsfw_toggle:checkbox").on("change", function() {
+        toggle_nsfw($(this).is(":checked"));
+      });
+    });
+
+    function change_theme(dark_mode) {
+      if (dark_mode) {
+        // for contrast with child segments
+        $("body").css("background-color", "#282c34");
+        // most Semantic UI elements have the "ui" class
+        // useful to skip over elements with some class, such as "ignore_dark_mode"
+        $(".ui").not(".ignore_dark_mode").addClass("inverted");
+        // change the state of all dark mode toggle buttons
+        $(".dark_mode_toggle:checkbox").prop("checked", true);
+      } else {
+        $("body").css("background-color", "");
+        $(".inverted").not(".ignore_dark_mode").removeClass("inverted");
+        $(".dark_mode_toggle:checkbox").prop("checked", false);
       }
-      change_theme(true);
-    </script>
-  </body>
+    }
+
+    function toggle_nsfw(nsfw) {
+      if (nsfw) {
+        $(".nsfw-bot").removeClass("invisible");
+        $(".nsfw-bot").addClass("visible");
+      } else {
+        $(".nsfw-bot").removeClass("visible");
+        $(".nsfw-bot").addClass("invisible");
+      }
+    }
+
+    function toggle_open_modal(open) {
+      if (open) {
+        $(".upload-modal").removeClass("invisible");
+        $(".upload-modal").addClass("visible");
+        $(".blocker").removeClass("invisible");
+        $(".blocker").addClass("visible");
+      } else {
+        $(".upload-modal").removeClass("visible");
+        $(".upload-modal").addClass("invisible");
+        $(".blocker").removeClass("visible");
+        $(".blocker").addClass("invisible");
+      }
+    }
+
+    change_theme(true);
+  </script>
+</body>
+
 </html>

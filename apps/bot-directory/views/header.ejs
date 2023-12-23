@@ -1,14 +1,21 @@
-<div class="ui stackable menu">
+<div class="ui stackable menu py-8">
   <div class="item header">
     <img src="/public/logo.png" />
   </div>
   <a class="item <%= active === '/' ? 'active' : '' %> " href="/">My Bots</a>
   <a class="item" href="http://localhost:8586" target="_blank">Bot Builder</a>
+  <button onclick="toggle_open_modal(true)" class="item">
+    Upload Bot
+  </button>
   <a class="item" href="http://bots.miku.gg/" target="_blank">Bot Database</a>
   <div class="item right" style="display: flex; justify-content: right;">
+    <div class="ui checkbox" style="margin-left: 5px;">
+      <input type="checkbox" tabindex="0" class="nsfw_toggle hidden">
+    </div>
+    <p class="pr-6">Include NSFW</p>
     <i class="sun icon"></i>
     <div class="ui toggle checkbox" style="margin-left: 5px;">
-      <input type="checkbox" tabindex="0" class="dark_mode_toggle hidden">
+      <input type="checkbox" tabindex="1" class="dark_mode_toggle hidden">
     </div>
     <i class="moon icon"></i>
   </div>
