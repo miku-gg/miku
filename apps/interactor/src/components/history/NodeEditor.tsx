@@ -77,7 +77,7 @@ const ResponseEditor = ({
     character?.outfits[character?.roles[role] || '']?.emotions || []
   const [_emotion, _setEmotion] = useState(charResponse?.emotion || '')
 
-  if (!charResponse || !role) return null
+  if (!charResponse || !character) return null
 
   const handleChange = (text: string) => {
     dispatch(

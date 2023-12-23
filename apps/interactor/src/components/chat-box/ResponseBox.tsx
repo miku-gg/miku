@@ -7,11 +7,11 @@ import {
 } from '../../state/selectors'
 import { FaDice } from 'react-icons/fa'
 import { FaPencil } from 'react-icons/fa6'
-import { MdRecordVoiceOver } from 'react-icons/md'
 import { IoIosBookmarks } from 'react-icons/io'
 
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
+import TTSPlayer from './TTSPlayer'
 import {
   regenerationStart,
   swipeResponse,
@@ -94,12 +94,7 @@ const ResponseBox = (): JSX.Element | null => {
         )}
       </div>
       <div className="ResponseBox__actions">
-        {!disabled ? (
-          <button className="ResponseBox__voice" onClick={handleEditClick}>
-            <MdRecordVoiceOver />
-            <span>Listen</span>
-          </button>
-        ) : null}
+        {!disabled ? <TTSPlayer /> : null}
         {!disabled &&
         lastReponse?.parentInteractionId &&
         (swipes?.length || 0) < 8 ? (

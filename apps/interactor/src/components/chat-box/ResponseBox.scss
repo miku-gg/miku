@@ -98,6 +98,17 @@
     }
   }
 
+  &__voice:disabled {
+    color: gray;
+    cursor: default;
+    background-color: rgba(#171717, 0.8);
+
+    &:hover {
+      color: gray;
+      background-color: rgba(#171717, 0.8);
+    }
+  }
+
   &__swipes {
     transition: all 0.2s ease-in;
     position: absolute;

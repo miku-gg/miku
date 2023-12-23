@@ -6,7 +6,7 @@ import './root.scss'
 
 const ASSETS_ENDPOINT = 'https://assets.miku.gg'
 const CARD_ENDPOINT = 'https://mikugg-configs-public.s3.us-east-2.amazonaws.com'
-const CARD_ID = 'QmeiLs3Wg5tgkHxyURQc29KbxdhmzCci3QXMCXzsGDkqqS.json'
+const CARD_ID = 'QmNTiMDQKh2ZhNzujupeGjWBFGC3WfcNHHNvDNXsC9rPBF.json'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

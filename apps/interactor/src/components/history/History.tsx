@@ -274,7 +274,13 @@ const History = (): JSX.Element => {
         <HistoryModal />
         <HistoryActions />
       </Modal>
-      <Modal opened={editOpened} title="Edit" className="History__edit-modal">
+      <Modal
+        opened={editOpened}
+        title="Edit"
+        className="History__edit-modal"
+        shouldCloseOnOverlayClick
+        onCloseModal={() => dispatch(setEditModal({ opened: false, id: '' }))}
+      >
         <NodeEditor
           id={editId}
           onClose={() =>

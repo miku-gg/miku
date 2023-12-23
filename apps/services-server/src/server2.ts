@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import textHandler from "./services/text";
+import audioHandler from "./services/audio";
 
 const AZURE_API_KEY = process.env.AZURE_API_KEY || "";
 const AUDIO_FILE_PATH = "_temp";
@@ -24,6 +25,20 @@ app.use(bodyParser.json());
 app.post("/text", async (req: Request<string>, res: Response) => {
   try {
     await textHandler(req, res);
+  } catch (error) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      res.status(error.status || 500).send(error.message);
+    } catch (_error) {
+      res.end();
+    }
+  }
+});
+
+app.post("/audio", async (req: Request<string>, res: Response) => {
+  try {
+    await audioHandler(req, res);
   } catch (error) {
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
