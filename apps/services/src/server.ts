@@ -52,6 +52,10 @@ app.post("/audio", async (req: Request<string>, res: Response) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.status(200).send("Miku Services");
+});
+
 // Start the Express server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
