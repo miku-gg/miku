@@ -8,6 +8,21 @@ import {
   validateGuidanceQuery,
 } from "./lib/queryValidation";
 
+const APHRODITE_API_KEY = process.env.APHRODITE_API_KEY || '';
+const APHRODITE_API_URL = process.env.APHRODITE_API_URL || 'http://localhost:2242/v1';
+const APHRODITE_API_MODEL = process.env.APHRODITE_API_MODEL || 'default';
+const APHRODITE_API_PRESET = (process.env.APHRODITE_API_PRESET as PresetType) || PresetType.DIVINE_INTELECT;
+const APHRODITE_API_MAX_TOKENS = Number(process.env.APHRODITE_API_MAX_TOKENS || 0) || 200;
+const APHRODITE_API_TRUNCATION_LENGTH = Number(process.env.APHRODITE_API_TRUNCATION_LENGTH || 0) || 4096;
+
+const APHRODITE_SMART_API_KEY = process.env.APHRODITE_SMART_API_KEY || APHRODITE_API_KEY;
+const APHRODITE_SMART_API_URL = process.env.APHRODITE_SMART_API_URL || APHRODITE_API_URL;
+const APHRODITE_SMART_API_MODEL = process.env.APHRODITE_SMART_API_MODEL || APHRODITE_API_MODEL;
+const APHRODITE_SMART_API_PRESET = (process.env.APHRODITE_SMART_API_PRESET as PresetType) || APHRODITE_API_PRESET;
+const APHRODITE_SMART_API_MAX_TOKENS = Number(process.env.APHRODITE_SMART_API_MAX_TOKENS || 0) || APHRODITE_API_MAX_TOKENS;
+const APHRODITE_SMART_API_TRUNCATION_LENGTH = Number(process.env.APHRODITE_SMART_API_TRUNCATION_LENGTH || 0) || APHRODITE_API_TRUNCATION_LENGTH;
+
+
 const templateProcessors = new Map<
   ModelType,
   Guidance.Template.TemplateProcessor
@@ -17,13 +32,13 @@ const templateProcessors = new Map<
     new Guidance.Template.TemplateProcessor(
       new Guidance.Tokenizer.LLaMATokenizer(),
       new OpenAIAphroditeTokenGenerator({
-        apiKey: "sk-EMPTY",
-        baseURL: "http://localhost:2242/v1",
-        model: "default",
+        apiKey: APHRODITE_API_KEY,
+        baseURL: APHRODITE_API_URL,
+        model: APHRODITE_API_MODEL,
         defaultConfig: {
-          ...presets.get(PresetType.DIVINE_INTELECT),
-          max_tokens: 200,
-          truncation_length: 4096,
+          ...presets.get(APHRODITE_API_PRESET),
+          max_tokens: APHRODITE_API_MAX_TOKENS,
+          truncation_length: APHRODITE_API_TRUNCATION_LENGTH,
         },
       })
     ),
@@ -33,13 +48,13 @@ const templateProcessors = new Map<
     new Guidance.Template.TemplateProcessor(
       new Guidance.Tokenizer.LLaMATokenizer(),
       new OpenAIAphroditeTokenGenerator({
-        apiKey: "sk-EMPTY",
-        baseURL: "http://localhost:2242/v1",
-        model: "default",
+        apiKey: APHRODITE_SMART_API_KEY,
+        baseURL: APHRODITE_SMART_API_URL,
+        model: APHRODITE_SMART_API_MODEL,
         defaultConfig: {
-          ...presets.get(PresetType.DIVINE_INTELECT),
-          max_tokens: 200,
-          truncation_length: 8192,
+          ...presets.get(APHRODITE_SMART_API_PRESET),
+          max_tokens: APHRODITE_SMART_API_MAX_TOKENS,
+          truncation_length: APHRODITE_SMART_API_TRUNCATION_LENGTH,
         },
       })
     ),

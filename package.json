@@ -4,10 +4,10 @@
   "scripts": {
     "bootstrap": "npx lerna bootstrap --include-dependencies",
     "docs": "lerna run start --scope=@mikugg/docs",
-    "start": "rm -rf apps/interactor/node_modules/.vite && cp .env apps/interactor/ && lerna run start --parallel --ignore @mikugg/docs",
-    "start:no-services": "rm -rf apps/interactor/node_modules/.vite && cp .env apps/interactor/ && lerna run start --parallel --ignore @mikugg/docs --ignore services-server",
+    "start": "lerna run start --parallel --ignore @mikugg/docs",
+    "start:no-services": "lerna run start --parallel --ignore @mikugg/docs --ignore services-server",
     "test": "lerna run test --scope=@mikugg/extensions --scope=@mikugg/ui-kit",
-    "pull": "git reset --hard HEAD && git pull origin master && pnpm install && rm -rf apps/interactor/node_modules/.vite",
+    "pull": "git reset --hard HEAD && git pull origin master && pnpm install",
     "build": "npx lerna run build"
   },
   "workspaces": [

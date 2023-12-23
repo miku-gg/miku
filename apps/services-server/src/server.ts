@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import textHandler from "./services/text";
 import audioHandler from "./services/audio";
+import jwtPermissionMiddleware from "./lib/verifyJWT";
 
 const PORT = process.env.SERVICES_PORT || 8484;
 
@@ -18,6 +19,10 @@ app.use(
   })
 );
 app.use(bodyParser.json());
+
+if (process.env.JWT_SECRET) {
+  app.use(jwtPermissionMiddleware);
+}
 
 app.post("/text", async (req: Request<string>, res: Response) => {
   try {

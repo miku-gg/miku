@@ -9,7 +9,6 @@ fi
 echo "Node.js is installed."
 
 echo "Installing Node.js dependencies..."
-rm -rf apps/interactor/node_modules/.vite || true
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     if ! command -v brew &>/dev/null; then

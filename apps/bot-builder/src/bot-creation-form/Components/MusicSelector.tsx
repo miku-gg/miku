@@ -4,7 +4,7 @@ import { Button, Modal } from "@mikugg/ui-kit";
 import { useState } from "react";
 
 export const ASSETS_ENDPOINT =
-  import.meta.env.VITE_ASSETS_DIRECTORY_ENDPOINT || "https://assets.miku.gg";
+  import.meta.env.VITE_ASSETS_ENDPOINT || "https://assets.miku.gg";
 
 interface Music {
   name: string;
