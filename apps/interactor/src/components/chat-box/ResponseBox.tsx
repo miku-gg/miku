@@ -19,9 +19,11 @@ import {
 import './ResponseBox.scss'
 import { setEditModal } from '../../state/slices/settingsSlice'
 import { useFillTextTemplate } from '../../libs/hooks'
+import { useAppContext } from '../../App.context'
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
+  const { servicesEndpoint, isInteractionDisabled } = useAppContext()
   const responseDiv = useRef<HTMLDivElement>(null)
   const lastReponse = useAppSelector(selectLastLoadedResponse)
   const isLastResponseFetching = useAppSelector(
@@ -38,8 +40,9 @@ const ResponseBox = (): JSX.Element | null => {
 
   const handleRegenerateClick = () => {
     dispatch(
-      regenerationStart(
-        (scene?.roles || []).map((r) => {
+      regenerationStart({
+        servicesEndpoint,
+        roles: (scene?.roles || []).map((r) => {
           const character = characters[r.characterId]
           const chracterOutfitId = character?.roles[r.role] || ''
           const outfit = character?.outfits[chracterOutfitId]
@@ -58,8 +61,8 @@ const ResponseBox = (): JSX.Element | null => {
             role: r.role,
             emotion: '',
           }
-        })
-      )
+        }),
+      })
     )
   }
 
@@ -106,7 +109,7 @@ const ResponseBox = (): JSX.Element | null => {
             <span>Regenerate</span>
           </button>
         ) : null}
-        {!disabled ? (
+        {!disabled && !isInteractionDisabled ? (
           <button className="ResponseBox__edit" onClick={handleEditClick}>
             <FaPencil />
             <span>Edit</span>

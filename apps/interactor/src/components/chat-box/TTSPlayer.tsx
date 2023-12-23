@@ -6,8 +6,10 @@ import { MdRecordVoiceOver } from 'react-icons/md'
 import { Tooltip } from '@mikugg/ui-kit'
 import classNames from 'classnames'
 import { Speed } from '../../state/versioning'
+import { useAppContext } from '../../App.context'
 
 const TTSPlayer2: React.FC = () => {
+  const { servicesEndpoint, isProduction } = useAppContext()
   const voiceId = useAppSelector((state) => state.settings.voice.voiceId)
   const audioRef = useRef<HTMLAudioElement>(null)
   const sourceBufferRef = useRef<SourceBuffer | null>(null)
@@ -26,7 +28,12 @@ const TTSPlayer2: React.FC = () => {
   )
   const isPremium = useAppSelector((state) => state.settings.user.isPremium)
   const nextText =
-    (!disabled && !isFirstMessage && isPremium && lastCharacterText) || ''
+    (!disabled &&
+      !isFirstMessage &&
+      isPremium &&
+      isProduction &&
+      lastCharacterText) ||
+    ''
 
   useEffect(() => {
     if (!window.MediaSource) {
@@ -62,7 +69,7 @@ const TTSPlayer2: React.FC = () => {
         const [_provider, _voiceId, speakingStyle = 'default'] =
           voiceId.split('.')
 
-        const response = await fetch('http://localhost:8484/audio', {
+        const response = await fetch(`${servicesEndpoint}/audio`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -120,6 +127,8 @@ const TTSPlayer2: React.FC = () => {
       queueRef.current = []
     }
   }, [voiceId, nextText]) // Add text as a dependency
+
+  if (!isProduction) return null
 
   return (
     <>

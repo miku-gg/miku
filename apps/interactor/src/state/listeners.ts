@@ -7,10 +7,14 @@ import {
   NarrationResponse,
 } from './slices/narrationSlice'
 import { RootState } from './store'
-import servicesClient, { ModelType } from '../libs/servicesClient'
+import textCompletion, { ModelType } from '../libs/textCompletion'
 import PromptBuilder from '../libs/memory/PromptBuilder'
 
-const interactionEffect = async (dispatch: Dispatch, state: RootState) => {
+const interactionEffect = async (
+  dispatch: Dispatch,
+  state: RootState,
+  servicesEndpoint: string
+) => {
   try {
     const promptBuilder = new PromptBuilder({
       maxNewTokens: 200,
@@ -20,9 +24,10 @@ const interactionEffect = async (dispatch: Dispatch, state: RootState) => {
     let currentResponseState: NarrationResponse =
       state.narration.responses[state.narration.currentResponseId]!
     const completionQuery = promptBuilder.buildPrompt(state)
-    const stream = servicesClient.textCompletion({
+    const stream = textCompletion({
       ...completionQuery,
       model: ModelType.RP,
+      serviceBaseUrl: servicesEndpoint,
     })
 
     for await (const result of stream) {
@@ -57,7 +62,8 @@ interactionListenerMiddleware.startListening({
   effect: async (action, listenerApi) => {
     await interactionEffect(
       listenerApi.dispatch,
-      listenerApi.getState() as RootState
+      listenerApi.getState() as RootState,
+      action.payload.servicesEndpoint
     )
   },
 })
@@ -68,6 +74,10 @@ regenerationListenerMiddleware.startListening({
   actionCreator: regenerationStart,
   effect: async (action, listenerApi) => {
     const state = listenerApi.getState() as RootState
-    await interactionEffect(listenerApi.dispatch, state)
+    await interactionEffect(
+      listenerApi.dispatch,
+      state,
+      action.payload.servicesEndpoint
+    )
   },
 })

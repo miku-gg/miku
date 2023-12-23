@@ -1,6 +1,8 @@
 import * as MikuExtensions from "@mikugg/extensions";
 import { EmotionTemplateSlug, MikuCard } from "./MikuCardValidator";
 import { BotConfig } from "./BotConfigValidator";
+import base64 from "base-64";
+import utf8 from "utf8";
 
 export function parseAttributes(s: string): [string, string][] {
   return s.split("\n").map((x) => {
@@ -89,3 +91,11 @@ export const mikuCardToBotConfig = (card: MikuCard): BotConfig => {
     ],
   };
 };
+
+export function encodeText(text: string): string {
+  return base64.encode(utf8.encode(text));
+}
+
+export function decodeText(encodedText: string): string {
+  return utf8.decode(base64.decode(encodedText));
+}

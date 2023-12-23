@@ -10,7 +10,7 @@ import './SceneSelector.scss'
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
   const scenes = useAppSelector(selectAvailableScenes)
-  const { assetLinkLoader } = useAppContext()
+  const { assetLinkLoader, servicesEndpoint } = useAppContext()
   const [expanded, setExpended] = useState<boolean>(false)
 
   const handleItemClick = (id: string, prompt: string) => {
@@ -21,6 +21,7 @@ export default function SceneSelector(): JSX.Element | null {
         sceneId: id,
         text: prompt,
         roles: scene?.roles.map((r) => r.role) || [],
+        servicesEndpoint,
       })
     )
   }

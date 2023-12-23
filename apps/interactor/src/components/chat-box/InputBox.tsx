@@ -5,23 +5,36 @@ import {
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { FaPaperPlane } from 'react-icons/fa'
 import { selectCurrentScene } from '../../state/selectors'
+import { useAppContext } from '../../App.context'
 
 import './InputBox.scss'
+import { toast } from 'react-toastify'
 
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
+  const { servicesEndpoint, isInteractionDisabled } = useAppContext()
   const { text, disabled } = useAppSelector((state) => state.narration.input)
   const scene = useAppSelector(selectCurrentScene)
 
   const onSubmit = (e: React.FormEvent<unknown>) => {
     e.stopPropagation()
     e.preventDefault()
+    if (isInteractionDisabled) {
+      toast.warn('Please log in to interact.', {
+        position: 'top-center',
+        style: {
+          top: 10,
+        },
+      })
+      return
+    }
     if (!text || disabled) return
     dispatch(
       interactionStart({
         text,
         sceneId: scene?.id || '',
         roles: scene?.roles.map((r) => r.role) || [],
+        servicesEndpoint,
       })
     )
   }

@@ -1,25 +1,20 @@
 import { createContext, useContext } from 'react'
-import { NovelState } from './state/slices/novelSlice'
-import { NarrationState } from './state/slices/narrationSlice'
+import { RootState } from './state/store'
 
 export interface AppProps {
   isProduction: boolean
-  novelLoader: () => Promise<{
-    novel: NovelState
-    narration: NarrationState
-  }>
+  isInteractionDisabled: boolean
+  servicesEndpoint: string
+  novelLoader: () => Promise<RootState>
   assetLinkLoader: (asset: string, lowres?: boolean) => string
 }
 
 const AppContext = createContext<AppProps>({
   isProduction: false,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  assetLinkLoader: (_asset: string, _lowres?: boolean) => '',
-  novelLoader: () =>
-    Promise.resolve({
-      novel: {} as NovelState,
-      narration: {} as NarrationState,
-    }),
+  isInteractionDisabled: false,
+  servicesEndpoint: '',
+  assetLinkLoader: () => '',
+  novelLoader: () => Promise.resolve({} as RootState),
 })
 
 export const AppProvider = AppContext.Provider

@@ -14,6 +14,7 @@ import {
 } from '../../state/slices/narrationSlice'
 import { DialogueNodeData, setAllNodesPosition } from './utils'
 import { replaceState } from '../../state/slices/replaceState'
+import { useAppContext } from '../../App.context'
 import { toast } from 'react-toastify'
 
 import './History.scss'
@@ -22,6 +23,7 @@ import 'reactflow/dist/style.css'
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
   const state = useAppSelector((state) => state)
+  const { isProduction } = useAppContext()
 
   const handleSave = () => {
     const clonedState = JSON.parse(JSON.stringify(state))
@@ -58,29 +60,33 @@ const HistoryActions = () => {
 
   return (
     <div className="History__actions">
-      <Tooltip id="history-actions-tooltip" place="bottom" />
-      <label
-        className="icon-button"
-        data-tooltip-id="history-actions-tooltip"
-        data-tooltip-content="Load narration history"
-      >
-        <input
-          id="load-history-input"
-          className="hidden"
-          type="file"
-          accept="application/json"
-          onChange={handleLoad}
-        />
-        <BiCloudUpload />
-      </label>
-      <button
-        className="icon-button"
-        data-tooltip-id="history-actions-tooltip"
-        data-tooltip-content="Download narration history"
-        onClick={handleSave}
-      >
-        <BiCloudDownload />
-      </button>
+      {!isProduction ? (
+        <>
+          <Tooltip id="history-actions-tooltip" place="bottom" />
+          <label
+            className="icon-button"
+            data-tooltip-id="history-actions-tooltip"
+            data-tooltip-content="Load narration history"
+          >
+            <input
+              id="load-history-input"
+              className="hidden"
+              type="file"
+              accept="application/json"
+              onChange={handleLoad}
+            />
+            <BiCloudUpload />
+          </label>
+          <button
+            className="icon-button"
+            data-tooltip-id="history-actions-tooltip"
+            data-tooltip-content="Download narration history"
+            onClick={handleSave}
+          >
+            <BiCloudDownload />
+          </button>
+        </>
+      ) : null}
       <button
         className="icon-button"
         onClick={() => dispatch(setHistoryModal(false))}
@@ -239,7 +245,7 @@ const HistoryModal = (): ReactElement => {
         /* eslint-disable-next-line */
         /* @ts-ignore */
         nodeTypes={nodeTypes}
-        onNodeClick={(event, node) => {
+        onNodeClick={(_event, node) => {
           if (narration.responses[node.id]) {
             dispatch(swipeResponse(node.id))
           }

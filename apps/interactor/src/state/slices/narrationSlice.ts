@@ -39,6 +39,7 @@ const narrationSlice = createSlice({
     interactionStart(
       state,
       action: PayloadAction<{
+        servicesEndpoint: string
         text: string
         sceneId: string
         roles: string[]
@@ -143,7 +144,10 @@ const narrationSlice = createSlice({
     },
     regenerationStart(
       state,
-      action: PayloadAction<{ role: string; emotion: string }[]>
+      action: PayloadAction<{
+        servicesEndpoint: string
+        roles: { role: string; emotion: string }[]
+      }>
     ) {
       const currentInteraction =
         state.interactions[
@@ -152,7 +156,7 @@ const narrationSlice = createSlice({
       if (!currentInteraction) return state
       const response: NarrationResponse = {
         id: randomUUID(),
-        characters: action.payload.reduce((acc, role) => {
+        characters: action.payload.roles.reduce((acc, role) => {
           acc[role.role] = {
             text: '',
             emotion: role.emotion,

@@ -11,7 +11,7 @@ export { Voices, ModelType, FontSize, Speed } from '../versioning'
 
 export type { SettingsState } from '../versioning'
 
-const initialState: SettingsState = {
+export const initialState: SettingsState = {
   model: ModelType.Default,
   user: {
     name: 'Anon',
@@ -46,6 +46,9 @@ export const settingSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
+    setSettings: (_state, action: PayloadAction<SettingsState>) => {
+      return action.payload
+    },
     setModel: (state, action: PayloadAction<ModelType>) => {
       state.model = action.payload
     },
@@ -102,6 +105,7 @@ export const settingSlice = createSlice({
 })
 
 export const {
+  setSettings,
   setModel,
   setName,
   setFontSize,

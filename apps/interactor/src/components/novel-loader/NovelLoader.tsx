@@ -1,20 +1,18 @@
 import { Modal } from '@mikugg/ui-kit'
 import { Loader } from '../common/Loader'
-import { useAppDispatch, useAppSelector } from '../../state/store'
+import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
 import { useEffect } from 'react'
-import { setNovel } from '../../state/slices/novelSlice'
-import { setNarration } from '../../state/slices/narrationSlice'
-import './NovelLoader.scss'
 import { useAppContext } from '../../App.context'
+import { replaceState } from '../../state/slices/replaceState'
+import './NovelLoader.scss'
 
 const NovelLoader = (): JSX.Element => {
   const { novelLoader } = useAppContext()
   const novelFetching = useAppSelector((state) => state.novel.fetching)
   const dispatch = useAppDispatch()
   useEffect(() => {
-    novelLoader().then(({ novel, narration }) => {
-      dispatch(setNovel(novel))
-      dispatch(setNarration(narration))
+    novelLoader().then((state: RootState) => {
+      dispatch(replaceState(state))
     })
   }, [dispatch, novelLoader])
 
