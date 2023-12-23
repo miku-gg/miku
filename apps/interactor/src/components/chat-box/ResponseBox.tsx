@@ -20,6 +20,7 @@ import './ResponseBox.scss'
 import { setEditModal } from '../../state/slices/settingsSlice'
 import { useFillTextTemplate } from '../../libs/hooks'
 import { useAppContext } from '../../App.context'
+import { trackEvent } from '../../libs/analytics'
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
@@ -37,8 +38,12 @@ const ResponseBox = (): JSX.Element | null => {
   const swipes = useAppSelector(selectCurrentSwipeResponses)
   const { disabled } = useAppSelector((state) => state.narration.input)
   const displayText = useFillTextTemplate(lastCharacters[0].text)
+  const novelTitle = useAppSelector((state) => state.novel.title)
 
   const handleRegenerateClick = () => {
+    trackEvent('bot_regenerate', {
+      bot: novelTitle,
+    })
     dispatch(
       regenerationStart({
         servicesEndpoint,

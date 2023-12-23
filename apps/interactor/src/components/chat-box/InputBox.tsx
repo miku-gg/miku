@@ -9,16 +9,25 @@ import { useAppContext } from '../../App.context'
 
 import './InputBox.scss'
 import { toast } from 'react-toastify'
+import { trackEvent } from '../../libs/analytics'
 
+let lastInteractionTime = Date.now()
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
   const { servicesEndpoint, isInteractionDisabled } = useAppContext()
   const { text, disabled } = useAppSelector((state) => state.narration.input)
+  const novelTitle = useAppSelector((state) => state.novel.title)
   const scene = useAppSelector(selectCurrentScene)
 
   const onSubmit = (e: React.FormEvent<unknown>) => {
     e.stopPropagation()
     e.preventDefault()
+    if (!text || disabled) return
+    trackEvent('bot_interact', {
+      bot: novelTitle,
+      time: Date.now() - lastInteractionTime,
+      prevented: isInteractionDisabled,
+    })
     if (isInteractionDisabled) {
       toast.warn('Please log in to interact.', {
         position: 'top-center',
@@ -28,7 +37,7 @@ const InputBox = (): JSX.Element | null => {
       })
       return
     }
-    if (!text || disabled) return
+    lastInteractionTime = Date.now()
     dispatch(
       interactionStart({
         text,
