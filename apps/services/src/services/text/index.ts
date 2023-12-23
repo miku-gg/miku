@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import * as Guidance from "@mikugg/guidance";
-import { OpenAIAphroditeTokenGenerator } from "./lib/aphroditeTokenGenerator";
 import { presets, PresetType } from "./data/presets";
 import {
   ModelType,
@@ -8,20 +7,33 @@ import {
   validateGuidanceQuery,
 } from "./lib/queryValidation";
 
-const APHRODITE_API_KEY = process.env.APHRODITE_API_KEY || '';
-const APHRODITE_API_URL = process.env.APHRODITE_API_URL || 'http://localhost:2242/v1';
-const APHRODITE_API_MODEL = process.env.APHRODITE_API_MODEL || 'default';
-const APHRODITE_API_PRESET = (process.env.APHRODITE_API_PRESET as PresetType) || PresetType.DIVINE_INTELECT;
-const APHRODITE_API_MAX_TOKENS = Number(process.env.APHRODITE_API_MAX_TOKENS || 0) || 200;
-const APHRODITE_API_TRUNCATION_LENGTH = Number(process.env.APHRODITE_API_TRUNCATION_LENGTH || 0) || 4096;
+const APHRODITE_API_KEY = process.env.APHRODITE_API_KEY || "";
+const APHRODITE_API_URL =
+  process.env.APHRODITE_API_URL || "http://localhost:2242/v1";
+const APHRODITE_API_MODEL = process.env.APHRODITE_API_MODEL || "default";
+const APHRODITE_API_PRESET =
+  (process.env.APHRODITE_API_PRESET as PresetType) ||
+  PresetType.DIVINE_INTELECT;
+const APHRODITE_API_MAX_TOKENS =
+  Number(process.env.APHRODITE_API_MAX_TOKENS || 0) || 200;
+const APHRODITE_API_TRUNCATION_LENGTH =
+  Number(process.env.APHRODITE_API_TRUNCATION_LENGTH || 0) || 4096;
 
-const APHRODITE_SMART_API_KEY = process.env.APHRODITE_SMART_API_KEY || APHRODITE_API_KEY;
-const APHRODITE_SMART_API_URL = process.env.APHRODITE_SMART_API_URL || APHRODITE_API_URL;
-const APHRODITE_SMART_API_MODEL = process.env.APHRODITE_SMART_API_MODEL || APHRODITE_API_MODEL;
-const APHRODITE_SMART_API_PRESET = (process.env.APHRODITE_SMART_API_PRESET as PresetType) || APHRODITE_API_PRESET;
-const APHRODITE_SMART_API_MAX_TOKENS = Number(process.env.APHRODITE_SMART_API_MAX_TOKENS || 0) || APHRODITE_API_MAX_TOKENS;
-const APHRODITE_SMART_API_TRUNCATION_LENGTH = Number(process.env.APHRODITE_SMART_API_TRUNCATION_LENGTH || 0) || APHRODITE_API_TRUNCATION_LENGTH;
-
+const APHRODITE_SMART_API_KEY =
+  process.env.APHRODITE_SMART_API_KEY || APHRODITE_API_KEY;
+const APHRODITE_SMART_API_URL =
+  process.env.APHRODITE_SMART_API_URL || APHRODITE_API_URL;
+const APHRODITE_SMART_API_MODEL =
+  process.env.APHRODITE_SMART_API_MODEL || APHRODITE_API_MODEL;
+const APHRODITE_SMART_API_PRESET =
+  (process.env.APHRODITE_SMART_API_PRESET as PresetType) ||
+  APHRODITE_API_PRESET;
+const APHRODITE_SMART_API_MAX_TOKENS =
+  Number(process.env.APHRODITE_SMART_API_MAX_TOKENS || 0) ||
+  APHRODITE_API_MAX_TOKENS;
+const APHRODITE_SMART_API_TRUNCATION_LENGTH =
+  Number(process.env.APHRODITE_SMART_API_TRUNCATION_LENGTH || 0) ||
+  APHRODITE_API_TRUNCATION_LENGTH;
 
 const templateProcessors = new Map<
   ModelType,
@@ -31,32 +43,38 @@ const templateProcessors = new Map<
     ModelType.RP,
     new Guidance.Template.TemplateProcessor(
       new Guidance.Tokenizer.LLaMATokenizer(),
-      new OpenAIAphroditeTokenGenerator({
-        apiKey: APHRODITE_API_KEY,
-        baseURL: APHRODITE_API_URL,
-        model: APHRODITE_API_MODEL,
-        defaultConfig: {
+      new Guidance.TokenGenerator.OpenAITokenGenerator(
+        {
+          apiKey: APHRODITE_API_KEY,
+          baseURL: APHRODITE_API_URL,
+          model: APHRODITE_API_MODEL,
+        },
+        {},
+        {
           ...presets.get(APHRODITE_API_PRESET),
           max_tokens: APHRODITE_API_MAX_TOKENS,
           truncation_length: APHRODITE_API_TRUNCATION_LENGTH,
-        },
-      })
+        }
+      )
     ),
   ],
   [
     ModelType.RP_SMART,
     new Guidance.Template.TemplateProcessor(
       new Guidance.Tokenizer.LLaMATokenizer(),
-      new OpenAIAphroditeTokenGenerator({
-        apiKey: APHRODITE_SMART_API_KEY,
-        baseURL: APHRODITE_SMART_API_URL,
-        model: APHRODITE_SMART_API_MODEL,
-        defaultConfig: {
+      new Guidance.TokenGenerator.OpenAITokenGenerator(
+        {
+          apiKey: APHRODITE_SMART_API_KEY,
+          baseURL: APHRODITE_SMART_API_URL,
+          model: APHRODITE_SMART_API_MODEL,
+        },
+        {},
+        {
           ...presets.get(APHRODITE_SMART_API_PRESET),
           max_tokens: APHRODITE_SMART_API_MAX_TOKENS,
           truncation_length: APHRODITE_SMART_API_TRUNCATION_LENGTH,
-        },
-      })
+        }
+      )
     ),
   ],
 ]);

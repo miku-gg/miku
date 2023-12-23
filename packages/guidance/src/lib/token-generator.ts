@@ -89,6 +89,10 @@ export class OpenAITokenGenerator extends AbstractTokenGenerator {
     const stream = await this.openai.completions.create({
       ...this.defaultCompletionParams,
       ...options,
+      stop: [
+        ...(this.defaultCompletionParams?.stop || []),
+        ...(options.stop ? options.stop.split(",") : []),
+      ],
       model: this.model,
       prompt,
       stream: true,
