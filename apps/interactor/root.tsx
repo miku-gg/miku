@@ -11,10 +11,15 @@ import queryString from 'query-string'
 import mergeWith from 'lodash.mergewith'
 import { toast } from 'react-toastify'
 
-const ASSETS_ENDPOINT = 'https://assets.miku.gg'
-const CARD_ENDPOINT = 'https://mikugg-configs-public.s3.us-east-2.amazonaws.com'
-const CARD_ID = 'QmNTiMDQKh2ZhNzujupeGjWBFGC3WfcNHHNvDNXsC9rPBF.json'
-const SERVICES_ENDPOINT = 'http://localhost:8484'
+const ASSETS_ENDPOINT =
+  import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets'
+const CARD_ENDPOINT =
+  import.meta.env.VITE_CARD_ENDPOINT || 'http://localhost:8585/s3/bots'
+const CARD_ID =
+  import.meta.env.VITE_CARD_ID ||
+  'QmNTiMDQKh2ZhNzujupeGjWBFGC3WfcNHHNvDNXsC9rPBF.json'
+const SERVICES_ENDPOINT =
+  import.meta.env.VITE_SERVICES_ENDPOINT || 'http://localhost:8484'
 
 function getCongurationFromParams(): {
   production: boolean

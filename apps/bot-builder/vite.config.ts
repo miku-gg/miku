@@ -13,7 +13,7 @@ export default defineConfig({
     setImmediate: "setTimeout.bind(null)",
   },
   optimizeDeps: {
-    include: ["@mikugg/bot-utils", "@mikugg/guidance"],
+    include: ["@mikugg/bot-utils", "@mikugg/ui-kit"],
   },
   build: {
     commonjsOptions: {
