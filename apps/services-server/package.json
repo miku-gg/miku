@@ -5,13 +5,12 @@
   "description": "",
   "main": "src/server2.ts",
   "scripts": {
-    "start": "nodemon ./src/server2.ts"
+    "start": "nodemon ./src/server.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mikugg/extensions": "workspace:^",
     "@mikugg/guidance": "workspace:^",
     "@types/body-parser": "^1.19.2",
     "@types/cors": "^2.8.13",

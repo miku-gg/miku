@@ -5,12 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    include: [
-      '@mikugg/core',
-      '@mikugg/extensions',
-      '@mikugg/bot-utils',
-      '@mikugg/guidance',
-    ],
+    include: ['@mikugg/bot-utils', '@mikugg/guidance'],
   },
   build: {
     commonjsOptions: {

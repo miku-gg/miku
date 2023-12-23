@@ -11,7 +11,7 @@ MikuGG is a generative visual novel platform. This is the open source interactor
 - A GPU for running a large language model.
 
 > **Note**
-> On windows, Make sure to add  Node.js to your system's **PATH**.
+> On windows, Make sure to add Node.js to your system's **PATH**.
 
 ### LLM endpoint setup
 
@@ -22,6 +22,7 @@ We only support the OpenAI-like APIs
 
 **Recommended models**
 We recommend using GPTQ quants to get the best possible model with the less GPU power. The more parameters (7B, 13B, etc..), the better the model will be (in this examples). But it will require more GPU power. It only supports NVIDIA cards.
+
 > This are recommendations based on December 2023.
 > Also, You can use oobabooga to run llama.cpp models without GPU.
 
@@ -88,7 +89,9 @@ python -m aphrodite.endpoints.openai.api_server --model TheBloke/MythoMax-L2-13B
 2. Run `make run`
 
 ## Servers
+
 The UIs that are up an running are
+
 ```
 # Bot directory UI
 http://localhost:8585/
@@ -105,27 +108,32 @@ http://localhost:8586/
 For more information on how to use the Mikugg project, please refer to the official documentation at [https://docs.miku.gg](https://docs.miku.gg).
 
 # Local Development (Linux / MacOS)
+
 ```
 pnpm install
 pnpm build
 ```
 
 ### run
+
 ```bash
 pnpm run
 
 # hotfix for vite not refreshing deps
-# need to restart the app with this command if you edit the deps under package/ 
-rm -rf apps/browser-chat/node_modules/.vite && pnpm start 
+# need to restart the app with this command if you edit the deps under package/
+rm -rf apps/interactor/node_modules/.vite && pnpm start
 ```
 
 #### Pull new changes
+
 To sync with the lastest version from git, just run
+
 ```bash
 pnpm pull
 ```
 
 #### publish
+
 ```bash
 # publish public packages to npm
 npx lerna publish --no-private

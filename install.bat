@@ -10,7 +10,7 @@ call npm --version >nul 2>&1 || (
 echo Node.js is installed.
 
 echo Installing Node.js dependencies...
-del /q/s apps\browser-chat\node_modules\.vite > nul 2>&1 || exit
+del /q/s apps\interactor\node_modules\.vite > nul 2>&1 || exit
 call npm install -g pnpm 0
 call pnpm install
 if errorlevel 1 (

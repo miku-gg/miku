@@ -1,4 +1,4 @@
-import { StateEventType, emitStateEvent } from '../libs/events'
+import { StateEventType, emitStateEvent } from '../libs/stateEvents'
 import { RootState } from './store'
 
 // eslint-disable-next-line
