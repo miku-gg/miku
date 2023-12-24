@@ -26,6 +26,9 @@ const TTSPlayer2: React.FC = () => {
       state.narration.responses[state.narration.currentResponseId]
         ?.parentInteractionId === null
   )
+  const characterId = useAppSelector(
+    (state) => Object.values(state.novel.characters)[0]?.id || ''
+  )
   const isPremium = useAppSelector((state) => state.settings.user.isPremium)
   const nextText =
     (!disabled &&
@@ -34,6 +37,8 @@ const TTSPlayer2: React.FC = () => {
       isProduction &&
       lastCharacterText) ||
     ''
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_provider, _voiceId, speakingStyle = 'default'] = voiceId.split('.')
 
   useEffect(() => {
     if (!window.MediaSource) {
@@ -64,10 +69,6 @@ const TTSPlayer2: React.FC = () => {
 
         fetchControllerRef.current = new AbortController()
         const { signal } = fetchControllerRef.current
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [_provider, _voiceId, speakingStyle = 'default'] =
-          voiceId.split('.')
 
         const response = await fetch(`${servicesEndpoint}/audio`, {
           method: 'POST',
@@ -126,7 +127,7 @@ const TTSPlayer2: React.FC = () => {
       }
       queueRef.current = []
     }
-  }, [voiceId, nextText]) // Add text as a dependency
+  }, [_voiceId, _provider, speakingStyle, nextText]) // Add text as a dependency
 
   if (!isProduction) return null
 
@@ -138,8 +139,8 @@ const TTSPlayer2: React.FC = () => {
         style={{ position: 'absolute', display: 'none' }}
         autoPlay={autoPlay}
         src={
-          isFirstMessage
-            ? 'https://assets.miku.gg/Hina.en-US-SaraNeural.whispering.wav'
+          isFirstMessage && isProduction
+            ? `https://assets.miku.gg/${characterId}.${_voiceId}.${speakingStyle}.wav`
             : undefined
         }
       >
