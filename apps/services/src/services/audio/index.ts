@@ -35,7 +35,7 @@ export default async (req: Request<string>, res: Response) => {
   if (!text) {
     return res.status(400).send("Text is required");
   }
-
+  res.write("");
   try {
     // Replace with your Azure endpoint and key
     const azureEndpoint =
@@ -69,9 +69,6 @@ export default async (req: Request<string>, res: Response) => {
         return;
       }
     }
-
-    // Set the content type as audio/mpeg or the appropriate type
-    res.setHeader("Content-Type", "audio/mpeg");
 
     // Stream the audio response back
     response.data.pipe(res);
