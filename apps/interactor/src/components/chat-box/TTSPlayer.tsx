@@ -79,6 +79,7 @@ const TTSPlayer2: React.FC = () => {
             speakingStyle: speakingStyle,
           }),
           signal,
+          credentials: 'include',
         })
         const reader = response.body?.getReader()
         if (!reader) return
