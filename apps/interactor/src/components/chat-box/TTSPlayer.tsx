@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useAppSelector } from '../../state/store'
 import { selectLastLoadedCharacters } from '../../state/selectors'
 import { replaceAll } from '../../utils/replace'
@@ -21,6 +21,7 @@ const TTSPlayer2: React.FC = () => {
   const lastCharacterText = lastCharacters[0]?.text || ''
   const autoPlay = useAppSelector((state) => state.settings.voice.autoplay)
   const playSpeed = useAppSelector((state) => state.settings.voice.speed)
+  const [listening, setListening] = useState<boolean>(false)
   const isFirstMessage = useAppSelector(
     (state) =>
       state.narration.responses[state.narration.currentResponseId]
@@ -41,11 +42,18 @@ const TTSPlayer2: React.FC = () => {
   const [_provider, _voiceId, speakingStyle = 'default'] = voiceId.split('.')
 
   useEffect(() => {
+    if (disabled || lastCharacterText) {
+      audioRef.current?.pause()
+      setListening(false)
+    }
+  }, [disabled, lastCharacterText])
+
+  useEffect(() => {
     if (!window.MediaSource) {
       console.error('MediaSource API is not supported in this browser.')
       return
     }
-    if (!nextText) return
+    if (!nextText || (!listening && !autoPlay)) return
 
     // Function to initialize MediaSource and start fetching audio
     const initializeMediaSource = () => {
@@ -66,7 +74,6 @@ const TTSPlayer2: React.FC = () => {
         sourceBufferRef.current =
           mediaSourceRef.current?.addSourceBuffer('audio/mpeg') // Adjust MIME type as needed
         sourceBufferRef.current?.addEventListener('updateend', processQueue)
-
         fetchControllerRef.current = new AbortController()
         const { signal } = fetchControllerRef.current
 
@@ -84,16 +91,22 @@ const TTSPlayer2: React.FC = () => {
         const reader = response.body?.getReader()
         if (!reader) return
 
+        let started = false
         /* eslint-disable no-constant-condition */
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
             mediaSourceRef.current?.endOfStream()
+            setListening(false)
             break
           }
           if (value) {
             queueRef.current.push(value)
             processQueue()
+            if (!started) {
+              started = true
+              audioRef.current?.play()
+            }
           }
         }
       } catch (error: unknown) {
@@ -128,7 +141,7 @@ const TTSPlayer2: React.FC = () => {
       }
       queueRef.current = []
     }
-  }, [_voiceId, _provider, speakingStyle, nextText]) // Add text as a dependency
+  }, [_voiceId, _provider, speakingStyle, nextText, listening]) // Add text as a dependency
 
   if (!isProduction) return null
 
@@ -159,19 +172,19 @@ const TTSPlayer2: React.FC = () => {
             audioRef.current.currentTime = 0
             switch (playSpeed) {
               case Speed.Slow:
-                audioRef.current.playbackRate = 0.75
+                audioRef.current.playbackRate = 0.85
                 break
               case Speed.Normal:
-                audioRef.current.playbackRate = 1
+                audioRef.current.playbackRate = 1.1
                 break
               case Speed.Fast:
-                audioRef.current.playbackRate = 1.5
+                audioRef.current.playbackRate = 1.35
                 break
               case Speed.Presto:
-                audioRef.current.playbackRate = 2
+                audioRef.current.playbackRate = 1.75
                 break
             }
-            audioRef.current.play()
+            setListening(true)
           }
         }}
         disabled={!isPremium && !freeTTS && !isFirstMessage}
