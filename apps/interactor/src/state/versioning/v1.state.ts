@@ -97,8 +97,8 @@ export interface NovelState {
 }
 
 export enum ModelType {
-  Default = 'default',
-  Smart = 'smart',
+  RP = 'RP',
+  RP_SMART = 'RP_SMART',
 }
 
 export enum FontSize {

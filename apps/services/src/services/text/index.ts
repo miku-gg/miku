@@ -83,7 +83,7 @@ export default async (req: Request<string>, res: Response) => {
   const guidanceQuery: GuidanceQuery = req.body;
   validateGuidanceQuery(guidanceQuery);
   const stream = templateProcessors
-    .get(guidanceQuery.model)
+    .get(ModelType.RP)
     ?.processTemplateStream(
       guidanceQuery.template,
       new Map(Object.entries(guidanceQuery.variables || {}))
@@ -92,6 +92,8 @@ export default async (req: Request<string>, res: Response) => {
     throw { message: "Error completing guidance.", status: 500 };
   }
   res.setHeader("Content-Type", "application/json");
+  res.setHeader("Transfer-Encoding", "chunked");
+  res.write(JSON.stringify({}));
   for await (const result of stream) {
     const keys = Array.from(result.keys());
     const values = Array.from(result.values());

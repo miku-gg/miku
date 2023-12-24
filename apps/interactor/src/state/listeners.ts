@@ -7,7 +7,7 @@ import {
   NarrationResponse,
 } from './slices/narrationSlice'
 import { RootState } from './store'
-import textCompletion, { ModelType } from '../libs/textCompletion'
+import textCompletion from '../libs/textCompletion'
 import PromptBuilder from '../libs/memory/PromptBuilder'
 
 const interactionEffect = async (
@@ -26,7 +26,7 @@ const interactionEffect = async (
     const completionQuery = promptBuilder.buildPrompt(state)
     const stream = textCompletion({
       ...completionQuery,
-      model: ModelType.RP,
+      model: state.settings.model,
       serviceBaseUrl: servicesEndpoint,
     })
 

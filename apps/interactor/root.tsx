@@ -24,6 +24,8 @@ const SERVICES_ENDPOINT =
 function getCongurationFromParams(): {
   production: boolean
   disabled: boolean
+  freeTTS: boolean
+  freeSmart: boolean
   cardId: string
   narrationId: string
   assetsEndpoint: string
@@ -31,22 +33,26 @@ function getCongurationFromParams(): {
   servicesEndpoint: string
   settings: RootState['settings']
 } {
-  const params = queryString.parse(window.location.search)
-  const cardId = (params.cardId || '') as string
-  const narrationId = (params.narrationId || '') as string
-  const production = params.production === 'true'
-  const disabled = params.disabled === 'true'
-  const configuration = params.configuration as string
+  const queryParams = queryString.parse(window.location.search)
+  const cardId = (queryParams.cardId || '') as string
+  const narrationId = (queryParams.narrationId || '') as string
+  const production = queryParams.production === 'true'
+  const disabled = queryParams.disabled === 'true'
+  const configuration = queryParams.configuration as string
   try {
     const configurationJson = JSON.parse(decodeText(configuration)) as {
       assetsEndpoint: string
       cardEndpoint: string
       servicesEndpoint: string
+      freeTTS: boolean
+      freeSmart: boolean
       settings?: RootState['settings']
     }
     return {
       production,
       disabled,
+      freeTTS: configurationJson.freeTTS || false,
+      freeSmart: configurationJson.freeSmart || false,
       cardId: cardId || CARD_ID,
       narrationId,
       assetsEndpoint: configurationJson.assetsEndpoint || ASSETS_ENDPOINT,
@@ -61,6 +67,8 @@ function getCongurationFromParams(): {
     return {
       production,
       disabled,
+      freeTTS: false,
+      freeSmart: false,
       cardId: cardId || CARD_ID,
       narrationId,
       assetsEndpoint: ASSETS_ENDPOINT,
@@ -115,6 +123,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       isProduction={params.production}
       isInteractionDisabled={params.disabled}
       servicesEndpoint={params.servicesEndpoint}
+      freeSmart={params.freeSmart}
+      freeTTS={params.freeTTS}
       novelLoader={loadNarration}
       assetLinkLoader={(asset: string, lowres?: boolean) => {
         if (lowres) {

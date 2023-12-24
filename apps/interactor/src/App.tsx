@@ -11,6 +11,8 @@ import { AppProvider, AppProps } from './App.context'
 function App(props: AppProps) {
   const contextValue = {
     isProduction: props.isProduction,
+    freeSmart: props.freeSmart,
+    freeTTS: props.freeTTS,
     isInteractionDisabled: props.isInteractionDisabled,
     servicesEndpoint: props.servicesEndpoint,
     assetLinkLoader: props.assetLinkLoader,

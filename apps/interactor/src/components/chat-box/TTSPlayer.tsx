@@ -9,7 +9,7 @@ import { Speed } from '../../state/versioning'
 import { useAppContext } from '../../App.context'
 
 const TTSPlayer2: React.FC = () => {
-  const { servicesEndpoint, isProduction } = useAppContext()
+  const { servicesEndpoint, isProduction, freeTTS } = useAppContext()
   const voiceId = useAppSelector((state) => state.settings.voice.voiceId)
   const audioRef = useRef<HTMLAudioElement>(null)
   const sourceBufferRef = useRef<SourceBuffer | null>(null)
@@ -33,7 +33,7 @@ const TTSPlayer2: React.FC = () => {
   const nextText =
     (!disabled &&
       !isFirstMessage &&
-      isPremium &&
+      (isPremium || freeTTS) &&
       isProduction &&
       lastCharacterText) ||
     ''
@@ -149,7 +149,8 @@ const TTSPlayer2: React.FC = () => {
       <button
         className={classNames({
           ResponseBox__voice: true,
-          'ResponseBox__voice--disabled': !isPremium && !isFirstMessage,
+          'ResponseBox__voice--disabled':
+            !isPremium && !freeTTS && !isFirstMessage,
         })}
         onClick={() => {
           if (audioRef.current) {
@@ -172,10 +173,14 @@ const TTSPlayer2: React.FC = () => {
             audioRef.current.play()
           }
         }}
-        disabled={!isPremium && !isFirstMessage}
+        disabled={!isPremium && !freeTTS && !isFirstMessage}
         data-tooltip-id="smart-tooltip"
         data-tooltip-content={
-          !isPremium && !isFirstMessage ? 'This is a premium feature' : ''
+          !isPremium && !freeTTS && !isFirstMessage
+            ? 'This is a premium feature'
+            : !isPremium && freeTTS
+            ? 'Free for a limited time'
+            : ''
         }
       >
         <MdRecordVoiceOver />

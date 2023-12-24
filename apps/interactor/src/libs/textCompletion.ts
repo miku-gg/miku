@@ -1,7 +1,4 @@
-export enum ModelType {
-  RP = 'RP',
-  RP_SMART = 'RP_SMART',
-}
+import { ModelType } from '../state/versioning'
 
 function getLastJsonObject(jsonString: string): Record<string, string> {
   // Regular expression to match JSON objects
@@ -40,9 +37,9 @@ const textCompletion = async function* ({
         variables,
       }),
       headers: {
-        // Authorization: "Bearer sk-EMPTY",
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     })
     const reader = response.body?.getReader()
     const decoder = new TextDecoder('utf-8')
