@@ -31,6 +31,7 @@ const interactionEffect = async (
     })
 
     for await (const result of stream) {
+      if (!result.size) continue
       currentResponseState = promptBuilder.completeResponse(
         currentResponseState,
         result
@@ -41,6 +42,9 @@ const interactionEffect = async (
           completed: false,
         })
       )
+    }
+    if (!Object.values(currentResponseState.characters)[0]?.text) {
+      throw new Error('No text')
     }
 
     dispatch(
