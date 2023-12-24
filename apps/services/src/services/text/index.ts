@@ -83,7 +83,7 @@ export default async (req: Request<string>, res: Response) => {
   const guidanceQuery: GuidanceQuery = req.body;
   validateGuidanceQuery(guidanceQuery);
   const stream = templateProcessors
-    .get(ModelType.RP)
+    .get(guidanceQuery.model)
     ?.processTemplateStream(
       guidanceQuery.template,
       new Map(Object.entries(guidanceQuery.variables || {}))
