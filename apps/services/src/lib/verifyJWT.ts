@@ -62,9 +62,9 @@ const jwtPermissionMiddleware = async (
       }
     }
 
-    if (!(await verifyJWT(req.headers))) {
-      return res.status(401).send("Unauthorized: Token expired or missing");
-    }
+    // if (!(await verifyJWT(req.headers))) {
+    //   return res.status(401).send("Unauthorized: Token expired or missing");
+    // }
     next();
   } else {
     next();
