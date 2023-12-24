@@ -184,6 +184,7 @@ const TTSPlayer2: React.FC = () => {
                 audioRef.current.playbackRate = 1.75
                 break
             }
+            audioRef.current.play()
             setListening(true)
           }
         }}
