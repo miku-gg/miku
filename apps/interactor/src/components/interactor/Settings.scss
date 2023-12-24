@@ -1,0 +1,107 @@
+$primary-background-color: #ffffff11;
+$secondary-background-color: #ffffff22;
+$font-color-light-gray: lightgray;
+$font-size-small: 0.8rem;
+$border-radius: 8px;
+$gap: 10px;
+$margin: 15px 0;
+$padding-standard: 20px 15px;
+$flex-wrap-gap: 10px;
+
+.Settings {
+  display: inline-flex;
+}
+
+.SettingsModal {
+  padding: 10px 20px;
+  overflow: auto;
+
+  &__name,
+  &__text-speed,
+  &__text-font-size,
+  &__voice {
+    padding: $padding-standard;
+    background-color: $primary-background-color;
+    border-radius: $border-radius;
+    margin: $margin;
+  }
+
+  &__text-speed,
+  &__text-font-size,
+  &__voice-speed {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $flex-wrap-gap;
+  }
+
+  &__voice {
+    border: 1px solid $secondary-background-color;
+  }
+
+  &__voice-description {
+    font-size: $font-size-small;
+    font-style: italic;
+    color: $font-color-light-gray;
+  }
+
+  &__voice-enabled,
+  &__voice-header {
+    display: flex;
+    justify-content: space-between;
+    margin: $margin;
+    flex-wrap: wrap;
+    gap: $gap;
+  }
+
+  &__voice-enabled {
+    justify-content: flex-end;
+  }
+
+  &__voice-header-title {
+    flex: 3;
+  }
+
+  &__voice-id {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    align-items: center;
+    gap: $gap;
+    flex-wrap: wrap;
+  }
+
+  &__voice-id p,
+  &__text-speed p,
+  &__text-font-size p,
+  &__voice-speed p {
+    flex: 1;
+    text-wrap: nowrap;
+  }
+
+  &__voice-id-input {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 200px;
+
+    .dropdown__list {
+      top: initial;
+      bottom: 100%;
+    }
+  }
+
+  &__voice-id-listen {
+    cursor: pointer;
+
+    &:hover {
+      color: gray;
+    }
+  }
+
+  .slider-container {
+    flex: 2;
+    min-width: 200px;
+  }
+}

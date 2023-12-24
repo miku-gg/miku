@@ -19,15 +19,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
       - name: Install
-        run: npm i -g pnpm && pnpm install --no-frozen-lockfile && pnpm run build --scope=@mikugg/browser-chat
+        run: npm i -g pnpm && pnpm install --no-frozen-lockfile && pnpm run build --scope=@mikugg/interactor
         env:
           VITE_SERVICES_ENDPOINT: ${{ secrets.VITE_SERVICES_ENDPOINT }}
-          VITE_BOT_DIRECTORY_ENDPOINT: ${{ secrets.VITE_BOT_DIRECTORY_ENDPOINT }}
-          VITE_ASSETS_DIRECTORY_ENDPOINT: ${{ secrets.VITE_ASSETS_DIRECTORY_ENDPOINT }}
+          VITE_CARD_ENDPOINT: ${{ secrets.VITE_BOT_DIRECTORY_ENDPOINT }}
+          VITE_ASSETS_ENDPOINT: ${{ secrets.VITE_ASSETS_DIRECTORY_ENDPOINT }}
           VITE_GTM_ID: ${{ secrets.VITE_GTM_ID}}
       - name: Deploy to S3
-        run: aws s3 sync apps/browser-chat/dist ${{ secrets.S3_BUCKET_INTERACTOR }} --delete
+        run: aws s3 sync apps/interactor/dist ${{ secrets.S3_BUCKET_INTERACTOR }} --delete
       - name: Set Cache-Control
-        run: aws s3 cp apps/browser-chat/dist/index.html ${{ secrets.S3_BUCKET_INTERACTOR }}/index.html --metadata-directive REPLACE --cache-control max-age=0
+        run: aws s3 cp apps/interactor/dist/index.html ${{ secrets.S3_BUCKET_INTERACTOR }}/index.html --metadata-directive REPLACE --cache-control max-age=0
       - name: Invalidate Cloudfront distribution
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_DISTRIBUTION_INTERACTOR }} --paths "/*"

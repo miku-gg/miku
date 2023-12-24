@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import ReactModal from 'react-modal';
+import { classnames } from '@bem-react/classnames';
 import './Modal.scss';
-
 interface ModalProps {
   opened: boolean;
   title?: string;
@@ -9,6 +9,8 @@ interface ModalProps {
   onCloseModal?: () => void;
   shouldCloseOnOverlayClick?: boolean;
   hideCloseButton?: boolean;
+  className?: string;
+  overlayClassName?: string;
 }
 
 export default function Modal(props: ModalProps): JSX.Element {
@@ -20,8 +22,8 @@ export default function Modal(props: ModalProps): JSX.Element {
       isOpen={opened}
       shouldCloseOnOverlayClick={shouldCloseOnOverlayClick}
       onRequestClose={onCloseModal}
-      className="Modal"
-      overlayClassName="Modal__overlay"
+      className={classnames('Modal', props.className || '')}
+      overlayClassName={classnames('Modal__overlay', props.overlayClassName)}
       contentLabel="Modal"
       ariaHideApp={false}
     >

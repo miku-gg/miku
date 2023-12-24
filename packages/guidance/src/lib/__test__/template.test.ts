@@ -8,7 +8,7 @@ class MockTokenGenerator extends AbstractTokenGenerator {
       return '<TOK>';
    }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  override async generateString(prompt: string, options: Record<string, string>): Promise<string> {
+  override async *generateString(prompt: string, options: Record<string, string>): AsyncGenerator<string> {
       return 'generated';
   }
 }
@@ -74,9 +74,12 @@ describe('TemplateProcessor', () => {
     });
 
     it('should process template with SEL method in a JSON correctly', async () => {
+      const mockGenerateString = async function *(): AsyncGenerator<string> {
+        yield 'wizard'
+      }
       // 29879 = "s"
       const spyGenerateToken = jest.spyOn(generator, 'generateToken').mockReturnValue(new Promise((resolve) => resolve("s")));
-      const spyGenerateString = jest.spyOn(generator, 'generateString').mockReturnValue(new Promise((resolve) => resolve("wizard")));
+      const spyGenerateString = jest.spyOn(generator, 'generateString').mockImplementation(mockGenerateString);
       const result = await templateProcessor.processTemplate(
         `RPG Game Character specification
         {

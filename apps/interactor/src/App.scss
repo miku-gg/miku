@@ -1,0 +1,69 @@
+@import './_variables.scss';
+@import './fonts.scss';
+
+.Modal__overlay {
+  z-index: 3 !important;
+}
+
+.App {
+  color: $color-white;
+  font-family: 'Poppins', 'Roboto', sans-serif;
+  color: $text-1;
+  background: linear-gradient(rgb(12, 10, 29) 0%, rgb(30, 26, 65) 100%);
+  text-align: center;
+  padding: 1.25rem;
+  min-width: 100%;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+}
+
+.ReactModalPortal {
+  font-family: 'Poppins', 'Roboto', sans-serif;
+  color: $text-1;
+  color: $color-white;
+}
+
+.App .scrollbar::-webkit-scrollbar {
+  width: 0.3em;
+}
+
+.App .scrollbar::-webkit-scrollbar-track {
+  border-radius: 100vh;
+  background: transparent;
+}
+
+.App .scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(167 139 250);
+  border-radius: 100vh;
+  border: 0;
+}
+
+.App .scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(196 181 253);
+}
+
+.App .scrollbar {
+  scrollbar-color: rgb(167 139 250) transparent;
+  scrollbar-width: auto;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+button,
+a {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  text-decoration: none;
+}
+
+@media not all and (min-width: 1024px) {
+  .App {
+    padding: 0px;
+  }
+}

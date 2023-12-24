@@ -1,6 +1,6 @@
 {
   "name": "@mikugg/bot-utils",
-  "version": "0.9.2",
+  "version": "0.10.0",
   "description": "",
   "repository": {
     "type": "git",
@@ -32,17 +32,19 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@mikugg/core": "workspace:^",
-    "@mikugg/extensions": "workspace:^",
+    "@types/base-64": "^1.0.0",
     "@types/node": "^18.15.5",
     "@types/prop-types": "^15.7.5",
+    "@types/utf8": "^3.0.1",
     "axios": "^1.2.4",
+    "base-64": "^1.0.0",
     "buffer": "^6.0.3",
     "form-data": "^4.0.0",
     "ipfs-only-hash": "^4.0.0",
     "png-chunk-text": "^1.0.0",
     "png-chunks-extract": "^1.0.0",
-    "prop-types": "^15.8.1"
+    "prop-types": "^15.8.1",
+    "utf8": "^3.0.0"
   },
-  "gitHead": "2a1ced2ec5f6b6e6dbc3e12143d0a6a29abfe2f3"
+  "gitHead": "73073416020c05b15d4f58805fe914743e7ffd6e"
 }
