@@ -2,7 +2,7 @@
 
 MikuGG is a generative visual novel platform. This is the open source interactor code for the website miku.gg. You can set up miku locally or develop features using this respository instructions.
 
-![](/preview.png)
+![](/docs/src/assets/overview.png)
 
 ## Prerequisites
 
