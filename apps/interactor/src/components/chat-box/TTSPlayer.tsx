@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useAppSelector } from '../../state/store'
 import { selectLastLoadedCharacters } from '../../state/selectors'
 import { replaceAll } from '../../utils/replace'
@@ -7,6 +7,32 @@ import { Tooltip } from '@mikugg/ui-kit'
 import classNames from 'classnames'
 import { Speed } from '../../state/versioning'
 import { useAppContext } from '../../App.context'
+
+// eslint-disable-next-line
+// @ts-ignore
+window.currentInference = ''
+
+const setAudioSpeed = (
+  audioRef: React.RefObject<HTMLAudioElement>,
+  playSpeed: Speed
+) => {
+  if (audioRef.current) {
+    switch (playSpeed) {
+      case Speed.Slow:
+        audioRef.current.playbackRate = 0.85
+        break
+      case Speed.Normal:
+        audioRef.current.playbackRate = 1.1
+        break
+      case Speed.Fast:
+        audioRef.current.playbackRate = 1.35
+        break
+      case Speed.Presto:
+        audioRef.current.playbackRate = 1.75
+        break
+    }
+  }
+}
 
 const TTSPlayer2: React.FC = () => {
   const { servicesEndpoint, isProduction, freeTTS } = useAppContext()
@@ -21,7 +47,6 @@ const TTSPlayer2: React.FC = () => {
   const lastCharacterText = lastCharacters[0]?.text || ''
   const autoPlay = useAppSelector((state) => state.settings.voice.autoplay)
   const playSpeed = useAppSelector((state) => state.settings.voice.speed)
-  const [listening, setListening] = useState<boolean>(false)
   const isFirstMessage = useAppSelector(
     (state) =>
       state.narration.responses[state.narration.currentResponseId]
@@ -31,29 +56,33 @@ const TTSPlayer2: React.FC = () => {
     (state) => Object.values(state.novel.characters)[0]?.id || ''
   )
   const isPremium = useAppSelector((state) => state.settings.user.isPremium)
-  const nextText =
-    (!disabled &&
-      !isFirstMessage &&
-      (isPremium || freeTTS) &&
-      isProduction &&
-      lastCharacterText) ||
-    ''
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_provider, _voiceId, speakingStyle = 'default'] = voiceId.split('.')
 
   useEffect(() => {
-    if (disabled || lastCharacterText) {
+    if (disabled) {
       audioRef.current?.pause()
-      setListening(false)
     }
-  }, [disabled, lastCharacterText])
+  }, [disabled])
 
-  useEffect(() => {
+  const inferAudio = useCallback(() => {
     if (!window.MediaSource) {
       console.error('MediaSource API is not supported in this browser.')
       return
     }
-    if (!nextText || (!listening && !autoPlay)) return
+
+    const _inferenceSignature = `${lastCharacterText}.${_voiceId}.${speakingStyle}`
+    // eslint-disable-next-line
+    // @ts-ignore
+    if (_inferenceSignature === window.currentInference) {
+      if (audioRef.current) {
+        setAudioSpeed(audioRef, playSpeed)
+        audioRef.current.play()
+        audioRef.current.currentTime = 0
+        return
+      }
+    }
 
     // Function to initialize MediaSource and start fetching audio
     const initializeMediaSource = () => {
@@ -63,6 +92,7 @@ const TTSPlayer2: React.FC = () => {
 
       if (audioRef.current) {
         audioRef.current.src = audioUrl
+        setAudioSpeed(audioRef, playSpeed)
       }
     }
 
@@ -96,8 +126,10 @@ const TTSPlayer2: React.FC = () => {
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
+            // eslint-disable-next-line
+            // @ts-ignore
+            window.currentInference = _inferenceSignature
             mediaSourceRef.current?.endOfStream()
-            setListening(false)
             break
           }
           if (value) {
@@ -141,7 +173,13 @@ const TTSPlayer2: React.FC = () => {
       }
       queueRef.current = []
     }
-  }, [_voiceId, _provider, speakingStyle, nextText, listening]) // Add text as a dependency
+  }, [lastCharacterText, servicesEndpoint, _voiceId, speakingStyle, playSpeed])
+
+  useEffect(() => {
+    if (autoPlay) {
+      inferAudio()
+    }
+  }, [inferAudio, autoPlay])
 
   if (!isProduction) return null
 
@@ -167,25 +205,11 @@ const TTSPlayer2: React.FC = () => {
             !isPremium && !freeTTS && !isFirstMessage,
         })}
         onClick={() => {
-          if (audioRef.current) {
-            // restart audio
-            audioRef.current.currentTime = 0
-            switch (playSpeed) {
-              case Speed.Slow:
-                audioRef.current.playbackRate = 0.85
-                break
-              case Speed.Normal:
-                audioRef.current.playbackRate = 1.1
-                break
-              case Speed.Fast:
-                audioRef.current.playbackRate = 1.35
-                break
-              case Speed.Presto:
-                audioRef.current.playbackRate = 1.75
-                break
-            }
+          if (isFirstMessage && audioRef.current) {
             audioRef.current.play()
-            setListening(true)
+            audioRef.current.currentTime = 0
+          } else {
+            inferAudio()
           }
         }}
         disabled={!isPremium && !freeTTS && !isFirstMessage}
