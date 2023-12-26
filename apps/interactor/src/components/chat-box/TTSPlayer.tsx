@@ -206,6 +206,7 @@ const TTSPlayer2: React.FC = () => {
         })}
         onClick={() => {
           if (isFirstMessage && audioRef.current) {
+            setAudioSpeed(audioRef, playSpeed)
             audioRef.current.play()
             audioRef.current.currentTime = 0
           } else {
