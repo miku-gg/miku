@@ -88,6 +88,7 @@ export const selectAvailableScenes = createSelector(
     selectCurrentScene,
   ],
   (scenes, characters, currentScene) => {
+    if (scenes.length === 1) return []
     return scenes
       .filter(
         (scene) =>
