@@ -8,7 +8,7 @@ export abstract class AbstractTokenGenerator {
   ): Promise<string>;
   abstract generateString(
     prompt: string,
-    options: Record<string, string>
+    options: Record<string, number | string | string[]>
   ): AsyncGenerator<string>;
 }
 /**
@@ -84,15 +84,11 @@ export class OpenAITokenGenerator extends AbstractTokenGenerator {
 
   override async *generateString(
     prompt: string,
-    options: Record<string, string>
+    options: Record<string, string | number | string[]>
   ): AsyncGenerator<string> {
     const stream = await this.openai.completions.create({
       ...this.defaultCompletionParams,
       ...options,
-      stop: [
-        ...(this.defaultCompletionParams?.stop || []),
-        ...(options.stop ? options.stop.split(",") : []),
-      ],
       model: this.model,
       prompt,
       stream: true,

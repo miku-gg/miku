@@ -1,6 +1,7 @@
 import Trie from "./_trie";
 import { AbstractTokenizer } from "./tokenizer";
 import { AbstractTokenGenerator } from "./token-generator";
+import templateParser from "./templateParser";
 
 export enum TEMPLATE_METHODS {
   SEL = "SEL", // select for a group of options
@@ -54,25 +55,23 @@ export class TemplateProcessor {
     });
 
     // Replace {{method variableName methodArg1=methodArg1Value methodArg2=methodArg2Value}} in template
-    const indexes = this.findAllIndexes(template, "{{");
+    const indexes = [
+      ...this.findAllIndexes(template, "{{GEN"),
+      ...this.findAllIndexes(template, "{{SEL"),
+    ].sort((a, b) => a - b);
     let nextTemplateIndexForPrompt = 0;
     let prompt = "";
     for (let i = 0; i < indexes.length; i++) {
       prompt += template.substring(nextTemplateIndexForPrompt, indexes[i]);
 
-      const start = indexes[i] + 2;
-      const end = template.substring(start).indexOf("}}") + start;
+      const start = indexes[i];
+      const end = template.substring(start).indexOf("}}") + 2 + start;
       const content = template.substring(start, end);
-      const args = content.split(" ");
-      const method = args[0];
-      const variableName = args[1];
-      const methodArgs: Record<string, string> = args
-        .slice(2)
-        .reduce((acc, arg) => {
-          const [key, value] = arg.split("=");
-          acc[key] = value;
-          return acc;
-        }, {} as Record<string, string>);
+      const {
+        type: method,
+        name: variableName,
+        params: methodArgs,
+      } = templateParser(content);
       let completion = "";
 
       switch (method) {
@@ -80,15 +79,6 @@ export class TemplateProcessor {
           const stream = this.generator.generateString(prompt, methodArgs);
           for await (const chunk of stream) {
             completion = chunk;
-            // Remove string after stop
-            if (methodArgs["stop"]) {
-              if (completion.indexOf(methodArgs["stop"]) >= 0) {
-                completion = completion.substring(
-                  0,
-                  completion.indexOf(methodArgs["stop"])
-                );
-              }
-            }
             result.set(variableName, completion);
             yield result;
           }
@@ -98,7 +88,9 @@ export class TemplateProcessor {
           const trie = new Trie();
 
           // Get options from variables
-          const options = variables.get(methodArgs["options"]) as string[];
+          const options = variables.get(
+            String(methodArgs["options"])
+          ) as string[];
           if (!options) {
             throw new Error(`${methodArgs["options"]} variable not found`);
           }
