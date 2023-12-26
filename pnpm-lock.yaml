@@ -421,7 +421,7 @@ importers:
   apps/services:
     dependencies:
       '@mikugg/guidance':
-        specifier: 0.10.0
+        specifier: 0.11.0
         version: link:../../packages/guidance
       '@types/body-parser':
         specifier: ^1.19.2
