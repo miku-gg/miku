@@ -89,7 +89,11 @@ export const selectAvailableScenes = createSelector(
   ],
   (scenes, characters, currentScene) => {
     return scenes
-      .filter((scene) => currentScene?.children.includes(scene.id))
+      .filter(
+        (scene) =>
+          !currentScene?.children.length ||
+          currentScene?.children.includes(scene.id)
+      )
       .map((scene) => {
         const firstCharacter = characters[scene.roles[0]?.characterId]
         const emotionImage =
