@@ -17,8 +17,7 @@ export class RoleplayStrategyAlpaca extends AbstractPromptStrategy {
   override buildPrompt(
     state: RootState,
     maxNewTokens: number,
-    memorySize: number,
-    continueResponse?: boolean
+    memorySize: number
   ): {
     template: string
     variables: Record<string, string | string[]>
@@ -55,10 +54,6 @@ export class RoleplayStrategyAlpaca extends AbstractPromptStrategy {
     template += scenario ? `${scenario}\n` : ''
 
     template += this.getDialogueHistoryPrompt(state, memorySize)
-    if (continueResponse) {
-      template +=
-        "\n\n### Instruction: Continue writing {{char}}'s response below."
-    }
     template += this.getResponseAskLine(state, maxNewTokens)
 
     template = fillTextTemplate(template, {
