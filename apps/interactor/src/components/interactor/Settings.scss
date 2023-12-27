@@ -18,6 +18,7 @@ $flex-wrap-gap: 10px;
 
   &__name,
   &__text-speed,
+  &__prompt-strategy,
   &__text-font-size,
   &__voice {
     padding: $padding-standard;
@@ -27,6 +28,7 @@ $flex-wrap-gap: 10px;
   }
 
   &__text-speed,
+  &__prompt-strategy,
   &__text-font-size,
   &__voice-speed {
     display: flex;
@@ -73,6 +75,7 @@ $flex-wrap-gap: 10px;
 
   &__voice-id p,
   &__text-speed p,
+  &__prompt-strategy p,
   &__text-font-size p,
   &__voice-speed p {
     flex: 1;

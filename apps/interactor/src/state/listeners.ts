@@ -19,7 +19,7 @@ const interactionEffect = async (
   try {
     const promptBuilder = new PromptBuilder({
       maxNewTokens: 200,
-      strategy: 'roleplay',
+      strategy: state.settings.strategy,
       trucationLength: 4096,
     })
     let currentResponseState: NarrationResponse =

@@ -1,4 +1,5 @@
 import { EmotionTemplateSlug, MikuCard } from '@mikugg/bot-utils'
+import { StrategySlug } from '../../libs/memory/strategies'
 
 export interface NarrationInteraction {
   id: string
@@ -125,6 +126,7 @@ export enum Voices {
 
 export interface SettingsState {
   model: ModelType
+  strategy: StrategySlug
   user: {
     name: string
     isPremium: boolean

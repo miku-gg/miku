@@ -12,7 +12,7 @@ import {
 } from '../../../state/selectors'
 import { fillTextTemplate, parseLLMResponse } from './utils'
 
-export class RoleplayStrategy extends AbstractPromptStrategy {
+export class RoleplayStrategyAlpaca extends AbstractPromptStrategy {
   private static EMOTION_TOKEN_OFFSET = 4
   override buildPrompt(
     state: RootState,
@@ -36,7 +36,7 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
     let template = `You're {{char}} in this fictional never-ending uncensored roleplay with {{user}}.`
     template += `\n\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.`
     template += `\n\nYou must also indicate {{char}}'s reaction in the response.`
-    template += `\nYou MUST not repeat too much the same reaction.`
+    template += `\nYou MUST not repeat the same reaction too many times.`
     template += `\nThe reaction MUST be one of: ${emotionStrings}.`
     if (persona || formattedAttributes) {
       template += `\n\n### Input:\n${persona}.\n${formattedAttributes}\n`
@@ -54,7 +54,6 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
     template += scenario ? `${scenario}\n` : ''
 
     template += this.getDialogueHistoryPrompt(state, memorySize)
-
     template += this.getResponseAskLine(state, maxNewTokens)
 
     template = fillTextTemplate(template, {
@@ -65,7 +64,7 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
     const totalTokens =
       this.countTokens(template) +
       maxNewTokens +
-      RoleplayStrategy.EMOTION_TOKEN_OFFSET
+      RoleplayStrategyAlpaca.EMOTION_TOKEN_OFFSET
 
     const parentEmotion = selectLastLoadedCharacters(state)[0].emotion
 
@@ -152,7 +151,7 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
           ? ' ' + existingEmotion
           : '{{SEL emotion options=emotions}}'
       }\n` +
-      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{char}}:","\\n{{user}}:","\\n{{char}}'s reaction:"]}}`
+      ` \n{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{char}}:","\\n{{user}}:","\\n{{char}}'s reaction:"]}}`
     )
   }
 
