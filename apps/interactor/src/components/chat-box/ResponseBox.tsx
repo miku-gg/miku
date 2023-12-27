@@ -5,7 +5,7 @@ import {
   selectLastLoadedCharacters,
   selectLastLoadedResponse,
 } from '../../state/selectors'
-import { FaDice, FaPlusCircle } from 'react-icons/fa'
+import { FaDice, FaForward } from 'react-icons/fa'
 import { FaPencil } from 'react-icons/fa6'
 import { IoIosBookmarks } from 'react-icons/io'
 
@@ -129,7 +129,7 @@ const ResponseBox = (): JSX.Element | null => {
         {!disabled &&
           lastReponse?.parentInteractionId ? (
           <button className="ResponseBox__continue" onClick={handleContinueClick}>
-            <FaPlusCircle />
+            <FaForward />
             <span>Continue</span>
           </button>
         ) : null}
