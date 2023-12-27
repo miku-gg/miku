@@ -1,4 +1,4 @@
-type TrackableEvent = 'bot_interact' | 'bot_regenerate'
+type TrackableEvent = 'bot_interact' | 'bot_regenerate' | 'bot_continue'
 
 // eslint-disable-next-line
 export const trackEvent = (event: TrackableEvent, data: any) => {

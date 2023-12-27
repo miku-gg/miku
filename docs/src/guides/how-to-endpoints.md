@@ -17,7 +17,7 @@ You need to have a LLM (large language model) service to use the bots. A LLM is 
 ### Get an Aphrodite endpoint
 
 First, download and install [Aphrodite](https://github.com/PygmalionAI/aphrodite-engine) and run a model.
-To run a local model, you can use cloudflared to publish your API by downloading it from [here](https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64) and doing `./cloudflare-linux-amd64 tunnel --url localhost:<YOUR PORT HERE>`. You might have to give execution permission to the file by doing `chmod +x cloudflared-linux-amd64`.
+To run a local model, you can use cloudflared to publish your API by downloading it from [here](https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64) and doing `./cloudflared-linux-amd64 tunnel --url localhost:<YOUR PORT HERE>`. You might have to give execution permission to the file by doing `chmod +x cloudflared-linux-amd64`.
 
 For example, to run a model like `ludis/tsukasa-120b-qlora-gptq`
 

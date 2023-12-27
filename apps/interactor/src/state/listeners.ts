@@ -5,6 +5,7 @@ import {
   interactionSuccess,
   regenerationStart,
   NarrationResponse,
+  continueResponse,
 } from './slices/narrationSlice'
 import { RootState } from './store'
 import textCompletion from '../libs/textCompletion'
@@ -23,6 +24,8 @@ const interactionEffect = async (
     })
     let currentResponseState: NarrationResponse =
       state.narration.responses[state.narration.currentResponseId]!
+    const startText =
+      Object.values(currentResponseState.characters)[0]?.text || ''
     const completionQuery = promptBuilder.buildPrompt(state)
     const stream = textCompletion({
       ...completionQuery,
@@ -31,7 +34,7 @@ const interactionEffect = async (
     })
 
     for await (const result of stream) {
-      if (!result.size) continue
+      result.set('text', startText + (result.get('text') || ''))
       currentResponseState = promptBuilder.completeResponse(
         currentResponseState,
         result
@@ -76,6 +79,20 @@ export const regenerationListenerMiddleware = createListenerMiddleware()
 
 regenerationListenerMiddleware.startListening({
   actionCreator: regenerationStart,
+  effect: async (action, listenerApi) => {
+    const state = listenerApi.getState() as RootState
+    await interactionEffect(
+      listenerApi.dispatch,
+      state,
+      action.payload.servicesEndpoint
+    )
+  },
+})
+
+export const continueListenerMiddleware = createListenerMiddleware()
+
+continueListenerMiddleware.startListening({
+  actionCreator: continueResponse,
   effect: async (action, listenerApi) => {
     const state = listenerApi.getState() as RootState
     await interactionEffect(

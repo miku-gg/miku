@@ -1,6 +1,6 @@
 {
   "version": "3.0.3",
-  "created": "2023-12-17T16:17:33Z",
+  "created": "2023-12-27T10:56:00Z",
   "files": [
     {
       "path": ".nojekyll"
@@ -141,10 +141,18 @@
       "path": "assets/keyexposure.png"
     },
     {
-      "path": "assets/live-settings.png"
+      "path": "assets/live-demo.png"
     },
     {
-      "path": "assets/llama-demo.png"
+      "path": "assets/live-settings.png",
+      "old": true
+    },
+    {
+      "path": "assets/llama-demo.png",
+      "old": true
+    },
+    {
+      "path": "assets/local_bot_directory.png"
     },
     {
       "path": "assets/logo.png"

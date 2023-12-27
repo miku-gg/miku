@@ -54,6 +54,7 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
     template += scenario ? `${scenario}\n` : ''
 
     template += this.getDialogueHistoryPrompt(state, memorySize)
+
     template += this.getResponseAskLine(state, maxNewTokens)
 
     template = fillTextTemplate(template, {

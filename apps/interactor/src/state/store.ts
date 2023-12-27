@@ -5,6 +5,7 @@ import narration from './slices/narrationSlice'
 import novel from './slices/novelSlice'
 import version from './slices/versionSlice'
 import {
+  continueListenerMiddleware,
   interactionListenerMiddleware,
   regenerationListenerMiddleware,
 } from './listeners'
@@ -23,6 +24,7 @@ export const store = configureStore({
       updateStateMiddleware,
       interactionListenerMiddleware.middleware,
       regenerationListenerMiddleware.middleware,
+      continueListenerMiddleware.middleware,
       stateReplacementMiddleware,
     ]),
 })

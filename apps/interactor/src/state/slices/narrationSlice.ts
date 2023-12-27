@@ -6,6 +6,7 @@ import {
   NarrationResponse,
 } from '../versioning'
 import { toast } from 'react-toastify'
+import trim from 'lodash.trim'
 
 export type {
   NarrationState,
@@ -182,6 +183,31 @@ const narrationSlice = createSlice({
       state.input.disabled = true
       state.currentResponseId = response.id
     },
+    continueResponse(
+      state,
+      // eslint-disable-next-line
+      _action: PayloadAction<{
+        servicesEndpoint: string
+      }>
+    ) {
+      const response = state.responses[state.currentResponseId]
+      const characterResponses = Object.values(response?.characters || {})
+      const lastResponse = characterResponses.length
+        ? characterResponses[0]
+        : null
+      if (!lastResponse) return state
+
+      const continuationTokens = ['\n"', '\n*', '\n*{{char}}']
+      const endingTokens = ['\n', '*', '"', '.']
+      if (endingTokens.some((token) => lastResponse.text.endsWith(token))) {
+        lastResponse.text =
+          trim(lastResponse.text) +
+          continuationTokens[
+            Math.floor(Math.random() * continuationTokens.length)
+          ]
+      }
+      state.input.disabled = false
+    },
     swipeResponse(state, action: PayloadAction<string>) {
       const response = state.responses[action.payload]
       if (response) {
@@ -249,6 +275,7 @@ export const {
   interactionStart,
   interactionSuccess,
   regenerationStart,
+  continueResponse,
   swipeResponse,
   updateResponse,
   updateInteraction,

@@ -120,8 +120,13 @@ const TextFormatter: React.FC<TextFormatterProps> = ({ text }) => {
 
   useEffect(() => {
     if (!text.startsWith(displayedText)) {
-      setDisplayedText('')
-      setCurrentIndex(0)
+      if (displayedText.startsWith(text)) {
+        setDisplayedText(text)
+        setCurrentIndex(text.length)
+      } else {
+        setDisplayedText('')
+        setCurrentIndex(0)
+      }
     }
   }, [text, displayedText])
 
