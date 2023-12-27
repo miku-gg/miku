@@ -5,7 +5,7 @@ import {
   selectLastLoadedCharacters,
   selectLastLoadedResponse,
 } from '../../state/selectors'
-import { FaDice } from 'react-icons/fa'
+import { FaDice, FaPlusCircle } from 'react-icons/fa'
 import { FaPencil } from 'react-icons/fa6'
 import { IoIosBookmarks } from 'react-icons/io'
 
@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '../../state/store'
 import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
 import TTSPlayer from './TTSPlayer'
 import {
+  continueResponse,
   regenerationStart,
   swipeResponse,
 } from '../../state/slices/narrationSlice'
@@ -71,6 +72,17 @@ const ResponseBox = (): JSX.Element | null => {
     )
   }
 
+  const handleContinueClick = () => {
+    trackEvent('bot_continue', {
+      bot: novelTitle,
+    })
+    dispatch(
+      continueResponse({
+        servicesEndpoint
+      })
+    )
+  }
+
   const handleEditClick = () => {
     if (lastReponse) {
       dispatch(
@@ -104,14 +116,21 @@ const ResponseBox = (): JSX.Element | null => {
       <div className="ResponseBox__actions">
         {!disabled ? <TTSPlayer /> : null}
         {!disabled &&
-        lastReponse?.parentInteractionId &&
-        (swipes?.length || 0) < 8 ? (
+          lastReponse?.parentInteractionId &&
+          (swipes?.length || 0) < 8 ? (
           <button
             className="ResponseBox__regenerate"
             onClick={handleRegenerateClick}
           >
             <FaDice />
             <span>Regenerate</span>
+          </button>
+        ) : null}
+        {!disabled &&
+          lastReponse?.parentInteractionId ? (
+          <button className="ResponseBox__continue" onClick={handleContinueClick}>
+            <FaPlusCircle />
+            <span>Continue</span>
           </button>
         ) : null}
         {!disabled && !isInteractionDisabled ? (
@@ -127,9 +146,8 @@ const ResponseBox = (): JSX.Element | null => {
             if (!swipe?.id) return null
             return (
               <button
-                className={`ResponseBox__swipe ${
-                  lastReponse?.id === swipe.id ? 'selected' : ''
-                }`}
+                className={`ResponseBox__swipe ${lastReponse?.id === swipe.id ? 'selected' : ''
+                  }`}
                 key={`swipe-${swipe.id}`}
                 onClick={() => dispatch(swipeResponse(swipe.id))}
                 disabled={disabled}

@@ -18,7 +18,10 @@ class PromptBuilder {
     this.strategy = this.getStrategyFromSlug(options.strategy)
   }
 
-  public buildPrompt(state: RootState): {
+  public buildPrompt(
+    state: RootState,
+    continueResponse?: boolean
+  ): {
     template: string
     variables: Record<string, string | string[]>
   } {
@@ -51,7 +54,8 @@ class PromptBuilder {
     return this.strategy.buildPrompt(
       state,
       this.options.maxNewTokens,
-      memorySize
+      memorySize,
+      continueResponse
     )
   }
 

@@ -17,7 +17,8 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
   override buildPrompt(
     state: RootState,
     maxNewTokens: number,
-    memorySize: number
+    memorySize: number,
+    continueResponse?: boolean
   ): {
     template: string
     variables: Record<string, string | string[]>
@@ -54,6 +55,12 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
     template += scenario ? `${scenario}\n` : ''
 
     template += this.getDialogueHistoryPrompt(state, memorySize)
+
+    if (continueResponse) {
+      template +=
+        "\n\n### Instruction: Continue writing {{char}}'s response below."
+    }
+
     template += this.getResponseAskLine(state, maxNewTokens)
 
     template = fillTextTemplate(template, {

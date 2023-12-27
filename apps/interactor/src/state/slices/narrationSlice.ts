@@ -182,6 +182,15 @@ const narrationSlice = createSlice({
       state.input.disabled = true
       state.currentResponseId = response.id
     },
+    continueResponse(
+      state,
+      action: PayloadAction<{
+        servicesEndpoint: string
+      }>
+    ) {
+      console.log(state) // won't compile if they're unused but i need them in the listener
+      console.log(action)
+    },
     swipeResponse(state, action: PayloadAction<string>) {
       const response = state.responses[action.payload]
       if (response) {
@@ -249,6 +258,7 @@ export const {
   interactionStart,
   interactionSuccess,
   regenerationStart,
+  continueResponse,
   swipeResponse,
   updateResponse,
   updateInteraction,
