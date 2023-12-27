@@ -72,8 +72,7 @@
 
   &__regenerate,
   &__voice,
-  &__edit,
-  &__continue {
+  &__edit {
     transition: all 0.2s ease-out;
     display: inline-flex;
     align-items: center;
@@ -156,6 +155,30 @@
 
     &:hover {
       color: lightgray;
+    }
+  }
+
+  &__continue {
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: 0.5rem;
+    font-size: 1rem;
+    opacity: 0;
+    transition: all 0.2s ease-out;
+    text-transform: lowercase;
+    font-variant: small-caps;
+    position: relative;
+    top: -1px;
+
+    &:hover {
+      opacity: 0.8;
+      text-shadow: 0 0 6px white;
+    }
+
+    svg {
+      font-size: 0.8rem;
     }
   }
 }

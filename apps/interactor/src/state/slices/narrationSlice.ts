@@ -197,8 +197,8 @@ const narrationSlice = createSlice({
         : null
       if (!lastResponse) return state
 
-      const continuationTokens = ['\n"', '\n*', '\n*{{char}}']
-      const endingTokens = ['\n', '*', '"', '.']
+      const continuationTokens = ['\n"', '\n*', '\n"{{user}},', '\n*{{char}}']
+      const endingTokens = ['\n', '*', '"', '.', '?', '!']
       if (endingTokens.some((token) => lastResponse.text.endsWith(token))) {
         lastResponse.text =
           trim(lastResponse.text) +
