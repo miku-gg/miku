@@ -137,7 +137,7 @@ export class TemplateProcessor {
           throw new Error(`Invalid method ${method} in template`);
       }
       prompt += completion;
-      nextTemplateIndexForPrompt = end + 2;
+      nextTemplateIndexForPrompt = end;
     }
   }
 
