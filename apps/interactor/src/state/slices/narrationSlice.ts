@@ -6,6 +6,7 @@ import {
   NarrationResponse,
 } from '../versioning'
 import { toast } from 'react-toastify'
+import trim from 'lodash.trim'
 
 export type {
   NarrationState,
@@ -184,12 +185,28 @@ const narrationSlice = createSlice({
     },
     continueResponse(
       state,
-      action: PayloadAction<{
+      // eslint-disable-next-line
+      _action: PayloadAction<{
         servicesEndpoint: string
       }>
     ) {
-      console.log(state) // won't compile if they're unused but i need them in the listener
-      console.log(action)
+      const response = state.responses[state.currentResponseId]
+      const characterResponses = Object.values(response?.characters || {})
+      const lastResponse = characterResponses.length
+        ? characterResponses[0]
+        : null
+      if (!lastResponse) return state
+
+      const continuationTokens = ['\n"', '\n*', '\n*{{char}}']
+      const endingTokens = ['\n', '*', '"', '.']
+      if (endingTokens.some((token) => lastResponse.text.endsWith(token))) {
+        lastResponse.text =
+          trim(lastResponse.text) +
+          continuationTokens[
+            Math.floor(Math.random() * continuationTokens.length)
+          ]
+      }
+      state.input.disabled = false
     },
     swipeResponse(state, action: PayloadAction<string>) {
       const response = state.responses[action.payload]

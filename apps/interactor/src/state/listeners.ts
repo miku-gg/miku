@@ -14,8 +14,7 @@ import PromptBuilder from '../libs/memory/PromptBuilder'
 const interactionEffect = async (
   dispatch: Dispatch,
   state: RootState,
-  servicesEndpoint: string,
-  continueResponse?: boolean
+  servicesEndpoint: string
 ) => {
   try {
     const promptBuilder = new PromptBuilder({
@@ -25,45 +24,21 @@ const interactionEffect = async (
     })
     let currentResponseState: NarrationResponse =
       state.narration.responses[state.narration.currentResponseId]!
-    const completionQuery = promptBuilder.buildPrompt(state, continueResponse)
+    const startText =
+      Object.values(currentResponseState.characters)[0]?.text || ''
+    const completionQuery = promptBuilder.buildPrompt(state)
     const stream = textCompletion({
       ...completionQuery,
       model: state.settings.model,
       serviceBaseUrl: servicesEndpoint,
     })
 
-    const role = Object.keys(currentResponseState.characters)[0]
-
-    const originalResponse = currentResponseState.characters[role]?.text + '\n' // have to store it here or else the text is mangeled later on
-
     for await (const result of stream) {
-      const prompt = promptBuilder.completeResponse(
+      result.set('text', startText + (result.get('text') || ''))
+      currentResponseState = promptBuilder.completeResponse(
         currentResponseState,
         result
       )
-      if (!result.size) continue
-      if (!continueResponse) {
-        currentResponseState = prompt
-      } else {
-        const role = Object.keys(currentResponseState.characters)[0]
-        const charResponse = currentResponseState.characters[role]
-        if (charResponse) {
-          const firstCharacter = {
-            text: originalResponse! + prompt.characters[role]?.text,
-            emotion:
-              Object.values(currentResponseState.characters)[0]?.emotion || '',
-            pose: Object.values(currentResponseState.characters)[0]?.pose || '',
-          }
-
-          currentResponseState = {
-            ...currentResponseState,
-            characters: {
-              ...currentResponseState.characters,
-              [role]: firstCharacter,
-            },
-          }
-        }
-      }
       dispatch(
         interactionSuccess({
           ...currentResponseState,
@@ -123,8 +98,7 @@ continueListenerMiddleware.startListening({
     await interactionEffect(
       listenerApi.dispatch,
       state,
-      action.payload.servicesEndpoint,
-      true
+      action.payload.servicesEndpoint
     )
   },
 })
