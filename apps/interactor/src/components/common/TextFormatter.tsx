@@ -6,9 +6,13 @@ import classNames from 'classnames'
 
 interface TextFormatterProps {
   text: string
+  children?: React.ReactNode
 }
 
-export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text }) => {
+export const TextFormatterStatic: React.FC<TextFormatterProps> = ({
+  text,
+  children,
+}) => {
   const fontSize = useAppSelector((state) => state.settings.text.fontSize)
   const textFormatterDiv = React.useRef<HTMLDivElement>(null)
   const [userScrolled, setUserScrolled] = useState(false)
@@ -102,6 +106,7 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text }) => {
       }}
     >
       {elements}
+      {children}
     </div>
   )
 }
@@ -113,7 +118,7 @@ const SpeedToMs = new Map<Speed, number>([
   [Speed.Slow, 30],
 ])
 
-const TextFormatter: React.FC<TextFormatterProps> = ({ text }) => {
+const TextFormatter: React.FC<TextFormatterProps> = ({ text, children }) => {
   const [displayedText, setDisplayedText] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
   const speed = useAppSelector((state) => state.settings.text.speed)
@@ -141,7 +146,12 @@ const TextFormatter: React.FC<TextFormatterProps> = ({ text }) => {
     }
   }, [currentIndex, text, speed])
 
-  return <TextFormatterStatic text={displayedText} />
+  return (
+    <TextFormatterStatic
+      text={displayedText}
+      children={displayedText === text ? children : null}
+    />
+  )
 }
 
 export default TextFormatter

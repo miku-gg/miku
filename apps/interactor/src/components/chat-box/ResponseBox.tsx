@@ -78,7 +78,7 @@ const ResponseBox = (): JSX.Element | null => {
     })
     dispatch(
       continueResponse({
-        servicesEndpoint
+        servicesEndpoint,
       })
     )
   }
@@ -110,27 +110,33 @@ const ResponseBox = (): JSX.Element | null => {
         {isLastResponseFetching ? (
           <TextFormatterStatic text="*Typing...*" />
         ) : (
-          <TextFormatter text={displayText} />
+          <TextFormatter
+            text={displayText}
+            children={
+              !disabled ? (
+                <button
+                  className="ResponseBox__continue"
+                  onClick={handleContinueClick}
+                >
+                  continue
+                  <FaForward />
+                </button>
+              ) : null
+            }
+          />
         )}
       </div>
       <div className="ResponseBox__actions">
         {!disabled ? <TTSPlayer /> : null}
         {!disabled &&
-          lastReponse?.parentInteractionId &&
-          (swipes?.length || 0) < 8 ? (
+        lastReponse?.parentInteractionId &&
+        (swipes?.length || 0) < 8 ? (
           <button
             className="ResponseBox__regenerate"
             onClick={handleRegenerateClick}
           >
             <FaDice />
             <span>Regenerate</span>
-          </button>
-        ) : null}
-        {!disabled &&
-          lastReponse?.parentInteractionId ? (
-          <button className="ResponseBox__continue" onClick={handleContinueClick}>
-            <FaForward />
-            <span>Continue</span>
           </button>
         ) : null}
         {!disabled && !isInteractionDisabled ? (
@@ -146,8 +152,9 @@ const ResponseBox = (): JSX.Element | null => {
             if (!swipe?.id) return null
             return (
               <button
-                className={`ResponseBox__swipe ${lastReponse?.id === swipe.id ? 'selected' : ''
-                  }`}
+                className={`ResponseBox__swipe ${
+                  lastReponse?.id === swipe.id ? 'selected' : ''
+                }`}
                 key={`swipe-${swipe.id}`}
                 onClick={() => dispatch(swipeResponse(swipe.id))}
                 disabled={disabled}
