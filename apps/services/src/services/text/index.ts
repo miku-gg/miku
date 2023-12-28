@@ -6,10 +6,14 @@ import {
   GuidanceQuery,
   validateGuidanceQuery,
 } from "./lib/queryValidation";
+import * as backend_config from "../../../backend_config.json";
 
-const APHRODITE_API_KEY = process.env.APHRODITE_API_KEY || "";
+const APHRODITE_API_KEY =
+  backend_config.apiKey || process.env.APHRODITE_API_KEY || "";
 const APHRODITE_API_URL =
-  process.env.APHRODITE_API_URL || "http://localhost:2242/v1";
+  backend_config.apiUrl ||
+  process.env.APHRODITE_API_URL ||
+  "http://localhost:2242/v1";
 const APHRODITE_API_MODEL = process.env.APHRODITE_API_MODEL || "default";
 const APHRODITE_API_PRESET =
   (process.env.APHRODITE_API_PRESET as PresetType) ||
@@ -35,29 +39,29 @@ const APHRODITE_SMART_API_TRUNCATION_LENGTH =
   Number(process.env.APHRODITE_SMART_API_TRUNCATION_LENGTH || 0) ||
   APHRODITE_API_TRUNCATION_LENGTH;
 
-const defaultTemplateProcessor = new Guidance.Template.TemplateProcessor(
-  new Guidance.Tokenizer.LLaMATokenizer(),
-  new Guidance.TokenGenerator.OpenAITokenGenerator(
-    {
-      apiKey: APHRODITE_API_KEY,
-      baseURL: APHRODITE_API_URL,
-      model: APHRODITE_API_MODEL,
-    },
-    {},
-    {
-      ...presets.get(APHRODITE_API_PRESET),
-      max_tokens: APHRODITE_API_MAX_TOKENS,
-      truncation_length: APHRODITE_API_TRUNCATION_LENGTH,
-    }
-  )
-);
-
 const templateProcessors = new Map<
   ModelType,
   Guidance.Template.TemplateProcessor
 >([
-  [ModelType.RP, defaultTemplateProcessor],
-  [ModelType.METHARME, defaultTemplateProcessor],
+  [
+    ModelType.RP,
+    new Guidance.Template.TemplateProcessor(
+      new Guidance.Tokenizer.LLaMATokenizer(),
+      new Guidance.TokenGenerator.OpenAITokenGenerator(
+        {
+          apiKey: APHRODITE_API_KEY,
+          baseURL: APHRODITE_API_URL,
+          model: APHRODITE_API_MODEL,
+        },
+        {},
+        {
+          ...presets.get(APHRODITE_API_PRESET),
+          max_tokens: APHRODITE_API_MAX_TOKENS,
+          truncation_length: APHRODITE_API_TRUNCATION_LENGTH,
+        }
+      )
+    ),
+  ],
   [
     ModelType.RP_SMART,
     new Guidance.Template.TemplateProcessor(

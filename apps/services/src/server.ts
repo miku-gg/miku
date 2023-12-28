@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import textHandler from "./services/text";
 import audioHandler from "./services/audio";
 import jwtPermissionMiddleware from "./lib/verifyJWT";
+import * as backend_config from "../backend_config.json";
 
 const PORT = process.env.SERVICES_PORT || 8484;
 
@@ -57,11 +58,11 @@ app.get("/", (req, res) => {
 });
 
 app.get("/text/strategy/:model", async (req, res) => {
-  if (req.params.model === "METHARME") {
+  try {
     res.send({
-      strategy: "metharmerp",
+      strategy: backend_config.strat,
     });
-  } else {
+  } catch (error) {
     res.send({
       strategy: "alpacarp",
     });

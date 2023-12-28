@@ -12,7 +12,7 @@ export { Voices, ModelType, FontSize, Speed } from '../versioning'
 export type { SettingsState } from '../versioning'
 
 export const initialState: SettingsState = {
-  model: import.meta.env.VITE_MODEL_OVERRIDE || ModelType.RP,
+  model: ModelType.RP,
   user: {
     name: 'Anon',
     isPremium: false,
