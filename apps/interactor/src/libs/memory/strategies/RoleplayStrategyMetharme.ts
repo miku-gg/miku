@@ -148,7 +148,7 @@ export class RoleplayStrategyMetharme extends AbstractPromptStrategy {
       existingEmotion
         ? ' ' + existingEmotion
         : '{{SEL emotion options=emotions}}'
-    }\n\n<|model|>{{char}}:${existingText.trimStart()}{{GEN text max_tokens=${maxTokens} stop=["\\n{{user}}:","\\n{{char}}:","<|model|>","<|system|>","<|user|>"]}}`
+    }<|model|>{{char}}:${existingText.trimStart()}{{GEN text max_tokens=${maxTokens} stop=["\\n{{user}}:","\\n{{char}}:","<|model|>","<|system|>","<|user|>"]}}`
   }
 
   private getFirstCharacterEmotions(state: RootState): string[] {
