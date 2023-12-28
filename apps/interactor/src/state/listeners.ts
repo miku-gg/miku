@@ -11,6 +11,8 @@ import { RootState } from './store'
 import textCompletion from '../libs/textCompletion'
 import PromptBuilder from '../libs/memory/PromptBuilder'
 
+let lastTime = new Date().getTime()
+
 const interactionEffect = async (
   dispatch: Dispatch,
   state: RootState,
@@ -24,8 +26,11 @@ const interactionEffect = async (
         headers: {
           'Content-Type': 'application/json',
         },
+        cache:
+          new Date().getTime() - lastTime > 600000 ? 'reload' : 'force-cache',
       }
     )
+    lastTime = new Date().getTime()
 
     if (!response.ok || response.status != 200) {
       throw new Error('Error getting prompt strategy')
