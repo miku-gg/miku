@@ -12,28 +12,14 @@ import {
   setSpeed,
   setVoiceAutoplay,
   setVoiceId,
-  setVoiceSpeed,
-  setStrategy
+  setVoiceSpeed
 } from '../../state/slices/settingsSlice'
 import './Settings.scss'
-import { strategySlugs } from '../../libs/memory/strategies'
-
 const audio = new Audio()
 
 const Settings = (): JSX.Element => {
   const dispatch = useAppDispatch()
   const settings = useAppSelector((state) => state.settings)
-
-  const strategyItems = [
-    {
-      name: 'Alapca Roleplay (Default)',
-      value: strategySlugs[0],
-    },
-    {
-      name: 'Metharme Roleplay',
-      value: strategySlugs[1],
-    },
-  ]
 
   const voiceItems = [
     {
@@ -111,18 +97,6 @@ const Settings = (): JSX.Element => {
                   value: Speed.Presto,
                 },
               ]}
-            />
-          </div>
-          <div className="SettingsModal__prompt-strategy">
-            <p>Prompt Strategy</p>
-            <Dropdown
-              selectedIndex={strategyItems.findIndex(
-                (item) => item.value === settings.strategy
-              )}
-              onChange={(index) =>
-                dispatch(setStrategy(strategyItems[index].value))
-              }
-              items={strategyItems}
             />
           </div>
           <div className="SettingsModal__text-font-size">

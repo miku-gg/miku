@@ -56,6 +56,18 @@ app.get("/", (req, res) => {
   res.status(200).send("Miku Services");
 });
 
+app.get("/text/strategy/:model", async (req, res) => {
+  if (req.params.model === "METHARME") {
+    res.send({
+      strategy: "metharmerp",
+    });
+  } else {
+    res.send({
+      strategy: "alpacarp",
+    });
+  }
+});
+
 // Start the Express server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

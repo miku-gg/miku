@@ -6,15 +6,13 @@ import {
   Speed,
   SettingsState,
 } from '../versioning'
-import { StrategySlug, strategySlugs } from '../../libs/memory/strategies'
 
 export { Voices, ModelType, FontSize, Speed } from '../versioning'
 
 export type { SettingsState } from '../versioning'
 
 export const initialState: SettingsState = {
-  model: ModelType.RP,
-  strategy: strategySlugs[0],
+  model: import.meta.env.VITE_MODEL_OVERRIDE || ModelType.RP,
   user: {
     name: 'Anon',
     isPremium: false,
@@ -53,9 +51,6 @@ export const settingSlice = createSlice({
     },
     setModel: (state, action: PayloadAction<ModelType>) => {
       state.model = action.payload
-    },
-    setStrategy: (state, action: PayloadAction<StrategySlug>) => {
-      state.strategy = action.payload
     },
     setName: (state, action: PayloadAction<string>) => {
       state.user.name = action.payload
@@ -125,7 +120,6 @@ export const {
   setAboutModal,
   setHistoryModal,
   setEditModal,
-  setStrategy,
 } = settingSlice.actions
 
 export default settingSlice.reducer

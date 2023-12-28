@@ -1,6 +1,7 @@
 export enum ModelType {
   RP = "RP",
   RP_SMART = "RP_SMART",
+  METHARME = "METHARME",
 }
 
 export interface GuidanceQuery {

@@ -17,9 +17,25 @@ const interactionEffect = async (
   servicesEndpoint: string
 ) => {
   try {
+    const response = await fetch(
+      `${servicesEndpoint}/text/strategy/${state.settings.model}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    if (!response.ok || response.status != 200) {
+      throw new Error('Error getting prompt strategy')
+    }
+
+    const data = await response.json()
+
     const promptBuilder = new PromptBuilder({
       maxNewTokens: 200,
-      strategy: state.settings.strategy,
+      strategy: data.strategy,
       trucationLength: 4096,
     })
     let currentResponseState: NarrationResponse =
