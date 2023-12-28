@@ -10,8 +10,7 @@ import {
 import { RootState } from './store'
 import textCompletion from '../libs/textCompletion'
 import PromptBuilder from '../libs/memory/PromptBuilder'
-
-let lastTime = new Date().getTime()
+import { retrieveStrategy } from '../libs/retrieveStrategy'
 
 const interactionEffect = async (
   dispatch: Dispatch,
@@ -19,28 +18,11 @@ const interactionEffect = async (
   servicesEndpoint: string
 ) => {
   try {
-    const response = await fetch(
-      `${servicesEndpoint}/text/strategy/${state.settings.model}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        cache:
-          new Date().getTime() - lastTime > 600000 ? 'reload' : 'force-cache',
-      }
-    )
-    lastTime = new Date().getTime()
-
-    if (!response.ok || response.status != 200) {
-      throw new Error('Error getting prompt strategy')
-    }
-
-    const data = await response.json()
-
     const promptBuilder = new PromptBuilder({
       maxNewTokens: 200,
-      strategy: data.strategy,
+      strategy:
+        (await retrieveStrategy(servicesEndpoint, state.settings.model)) ||
+        'alpacarp',
       trucationLength: 4096,
     })
     let currentResponseState: NarrationResponse =
