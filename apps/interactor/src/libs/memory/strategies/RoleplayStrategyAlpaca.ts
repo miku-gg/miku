@@ -151,7 +151,7 @@ export class RoleplayStrategyAlpaca extends AbstractPromptStrategy {
           ? ' ' + existingEmotion
           : '{{SEL emotion options=emotions}}'
       }\n` +
-      ` {{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{char}}:","\\n{{user}}:","\\n{{char}}'s reaction:"]}}`
+      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{char}}:","\\n{{user}}:","\\n{{char}}'s reaction:"]}}`
     )
   }
 
