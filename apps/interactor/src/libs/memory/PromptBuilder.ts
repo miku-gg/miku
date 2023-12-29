@@ -70,8 +70,10 @@ class PromptBuilder {
     slug: Strategies.StrategySlug
   ): Strategies.AbstractPromptStrategy {
     switch (slug) {
-      case 'roleplay':
-        return new Strategies.RoleplayStrategy()
+      case 'alpacarp':
+        return new Strategies.RoleplayStrategyAlpaca()
+      case 'metharmerp':
+        return new Strategies.RoleplayStrategyMetharme()
       default:
         throw new Error(`Invalid strategy slug: ${slug}`)
     }

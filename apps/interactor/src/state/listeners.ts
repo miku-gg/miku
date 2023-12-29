@@ -10,6 +10,7 @@ import {
 import { RootState } from './store'
 import textCompletion from '../libs/textCompletion'
 import PromptBuilder from '../libs/memory/PromptBuilder'
+import { retrieveStrategy } from '../libs/retrieveStrategy'
 
 const interactionEffect = async (
   dispatch: Dispatch,
@@ -19,7 +20,9 @@ const interactionEffect = async (
   try {
     const promptBuilder = new PromptBuilder({
       maxNewTokens: 200,
-      strategy: 'roleplay',
+      strategy:
+        (await retrieveStrategy(servicesEndpoint, state.settings.model)) ||
+        'alpacarp',
       trucationLength: 4096,
     })
     let currentResponseState: NarrationResponse =

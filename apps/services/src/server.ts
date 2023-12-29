@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import textHandler from "./services/text";
 import audioHandler from "./services/audio";
 import jwtPermissionMiddleware from "./lib/verifyJWT";
+import * as backend_config from "../backend_config.json";
 
 const PORT = process.env.SERVICES_PORT || 8484;
 
@@ -54,6 +55,18 @@ app.post("/audio", async (req: Request<string>, res: Response) => {
 
 app.get("/", (req, res) => {
   res.status(200).send("Miku Services");
+});
+
+app.get("/text/strategy/:model", async (req, res) => {
+  try {
+    res.send({
+      strategy: backend_config.strat,
+    });
+  } catch (error) {
+    res.send({
+      strategy: "alpacarp",
+    });
+  }
 });
 
 // Start the Express server

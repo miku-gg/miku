@@ -7,8 +7,7 @@ export abstract class AbstractPromptStrategy {
   public abstract buildPrompt(
     state: RootState,
     maxNewTokens: number,
-    memorySize: number,
-    continueResponse?: boolean
+    memorySize: number
   ): {
     template: string
     variables: Record<string, string | string[]>

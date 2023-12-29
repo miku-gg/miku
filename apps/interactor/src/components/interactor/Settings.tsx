@@ -12,10 +12,9 @@ import {
   setSpeed,
   setVoiceAutoplay,
   setVoiceId,
-  setVoiceSpeed,
+  setVoiceSpeed
 } from '../../state/slices/settingsSlice'
 import './Settings.scss'
-
 const audio = new Audio()
 
 const Settings = (): JSX.Element => {
