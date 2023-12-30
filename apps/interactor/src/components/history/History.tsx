@@ -19,6 +19,8 @@ import { toast } from 'react-toastify'
 
 import './History.scss'
 import 'reactflow/dist/style.css'
+import { VersionId as V1VersionId } from '../../state/versioning/v1.state'
+import { migrateV1toV2 } from '../../state/versioning/migrations'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -50,7 +52,11 @@ const HistoryActions = () => {
     reader.onload = () => {
       try {
         const stateJsonString = reader.result as string
-        dispatch(replaceState(JSON.parse(stateJsonString)))
+        let stateJson = JSON.parse(stateJsonString)
+        if (stateJson.version === V1VersionId) {
+          stateJson = migrateV1toV2(stateJson)
+        }
+        dispatch(replaceState(stateJson))
       } catch (e) {
         toast.error('Error reading history file')
       }
@@ -133,12 +139,12 @@ const HistoryModal = (): ReactElement => {
         (scene) => scene.id === parentSceneId
       )
 
-      const avatars =
-        parentScene?.roles.map(
-          (role) =>
-            'https://assets.miku.gg/' +
-            (novel.characters[role.characterId]?.profile_pic || '')
-        ) || ([] as string[])
+      const avatars = response.characters.map(({ role }) => {
+        const id =
+          parentScene?.roles.find(({ role: _role }) => _role === role)
+            ?.characterId || ''
+        return novel.characters[id]?.profile_pic || ''
+      })
 
       const isLastResponse = parentIds[0] === response.id
       const isRoot = response.id === topResponse?.id
@@ -154,10 +160,7 @@ const HistoryModal = (): ReactElement => {
           isRoot,
           isLeaf: response.childrenInteractions.length === 0,
           highlighted: parentIdsSet.has(response.id),
-          text: (Object.values(response.characters)[0]?.text || '').substring(
-            0,
-            100
-          ),
+          text: (response.characters[0]?.text || '').substring(0, 100),
         },
         type: 'dialogueNode',
         position: { x: 0, y: 0 },
@@ -180,7 +183,7 @@ const HistoryModal = (): ReactElement => {
             text: interaction?.query.substring(0, 100) || '',
             isLeaf: interaction?.responsesId.length === 0,
             isRoot: false,
-            avatars: ['https://assets.miku.gg/default-profile-pic.png'],
+            avatars: ['default-profile-pic.png'],
           },
           position: { x: 0, y: 0 },
         })

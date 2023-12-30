@@ -10,6 +10,7 @@ import { decodeText } from '@mikugg/bot-utils'
 import queryString from 'query-string'
 import mergeWith from 'lodash.mergewith'
 import { toast } from 'react-toastify'
+import { migrateV1toV2 } from './src/state/versioning/migrations'
 
 const ASSETS_ENDPOINT =
   import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets'
@@ -94,6 +95,14 @@ export const loadNarration = async (): Promise<RootState> => {
   if (params.narrationId) {
     return narrationData.then((data) => {
       if (data.version !== VersionId) {
+        if (data.version === 'v1') {
+          return {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            ...migrateV1toV2(data),
+            settings: params.settings,
+          }
+        }
         toast.error('Narration version mismatch')
         throw 'Narration version mismatch'
       }

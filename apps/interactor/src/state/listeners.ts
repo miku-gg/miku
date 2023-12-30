@@ -6,6 +6,7 @@ import {
   regenerationStart,
   NarrationResponse,
   continueResponse,
+  roleResponseStart,
 } from './slices/narrationSlice'
 import { RootState } from './store'
 import textCompletion from '../libs/textCompletion'
@@ -15,9 +16,13 @@ import { retrieveStrategy } from '../libs/retrieveStrategy'
 const interactionEffect = async (
   dispatch: Dispatch,
   state: RootState,
-  servicesEndpoint: string
+  servicesEndpoint: string,
+  selectedRole: string
 ) => {
   try {
+    let currentResponseState: NarrationResponse =
+      state.narration.responses[state.narration.currentResponseId]!
+    const role = selectedRole
     const promptBuilder = new PromptBuilder({
       maxNewTokens: 200,
       strategy:
@@ -25,11 +30,10 @@ const interactionEffect = async (
         'alpacarp',
       trucationLength: 4096,
     })
-    let currentResponseState: NarrationResponse =
-      state.narration.responses[state.narration.currentResponseId]!
     const startText =
-      Object.values(currentResponseState.characters)[0]?.text || ''
-    const completionQuery = promptBuilder.buildPrompt(state)
+      currentResponseState.characters.find(({ role: _role }) => _role == role)
+        ?.text || ''
+    const completionQuery = promptBuilder.buildPrompt(state, role)
     const stream = textCompletion({
       ...completionQuery,
       model: state.settings.model,
@@ -40,7 +44,8 @@ const interactionEffect = async (
       result.set('text', startText + (result.get('text') || ''))
       currentResponseState = promptBuilder.completeResponse(
         currentResponseState,
-        result
+        result,
+        role
       )
       dispatch(
         interactionSuccess({
@@ -49,7 +54,10 @@ const interactionEffect = async (
         })
       )
     }
-    if (!Object.values(currentResponseState.characters)[0]?.text) {
+    if (
+      !currentResponseState.characters.find(({ role: _role }) => _role === role)
+        ?.text
+    ) {
       throw new Error('No text')
     }
 
@@ -73,7 +81,8 @@ interactionListenerMiddleware.startListening({
     await interactionEffect(
       listenerApi.dispatch,
       listenerApi.getState() as RootState,
-      action.payload.servicesEndpoint
+      action.payload.servicesEndpoint,
+      action.payload.selectedRole
     )
   },
 })
@@ -87,7 +96,8 @@ regenerationListenerMiddleware.startListening({
     await interactionEffect(
       listenerApi.dispatch,
       state,
-      action.payload.servicesEndpoint
+      action.payload.servicesEndpoint,
+      action.payload.selectedRole
     )
   },
 })
@@ -98,10 +108,30 @@ continueListenerMiddleware.startListening({
   actionCreator: continueResponse,
   effect: async (action, listenerApi) => {
     const state = listenerApi.getState() as RootState
+    const lastResponseCharacters =
+      state.narration.responses[state.narration.currentResponseId]?.characters
+    const lastResponseRole =
+      lastResponseCharacters?.[lastResponseCharacters.length - 1].role || ''
     await interactionEffect(
       listenerApi.dispatch,
       state,
-      action.payload.servicesEndpoint
+      action.payload.servicesEndpoint,
+      lastResponseRole
+    )
+  },
+})
+
+export const roleResponseListenerMiddleware = createListenerMiddleware()
+
+roleResponseListenerMiddleware.startListening({
+  actionCreator: roleResponseStart,
+  effect: async (action, listenerApi) => {
+    const state = listenerApi.getState() as RootState
+    await interactionEffect(
+      listenerApi.dispatch,
+      state,
+      action.payload.servicesEndpoint,
+      action.payload.role
     )
   },
 })

@@ -1,5 +1,5 @@
 import { RootState } from './store'
-import { NovelCharacters, NovelScene } from './slices/novelSlice'
+import { NovelScene } from './slices/novelSlice'
 import {
   NarrationInteraction,
   NarrationResponse,
@@ -51,33 +51,73 @@ export const selectCurrentScene = (
   return selectSceneFromResponse(state, response)
 }
 
+export const selectLastImageOfRole = (
+  state: RootState,
+  role: string,
+  responseId?: string
+): string => {
+  const { currentResponseId } = state.narration
+  responseId = responseId || currentResponseId
+  const response = state.narration.responses[responseId]
+  const scene = selectSceneFromResponse(state, response)
+  const roleResponse = response?.characters.find(
+    (character) => character.role === role
+  )
+  if (roleResponse?.text) {
+    const character =
+      state.novel.characters[
+        scene?.roles.find(({ role: _role }) => _role === role)?.characterId ||
+          ''
+      ]
+    const outfit = character?.outfits[character?.roles[role] || '']
+    return (
+      outfit?.emotions.find((emotion) => emotion.id === roleResponse.emotion)
+        ?.source[0] || ''
+    )
+  } else if (response?.parentInteractionId) {
+    const interaction =
+      state.narration.interactions[response?.parentInteractionId]
+    const oldResponseId = interaction?.parentResponseId
+    if (!oldResponseId) return ''
+    else return selectLastImageOfRole(state, role, oldResponseId || '')
+  } else {
+    return ''
+  }
+}
+
 export const selectLastLoadedCharacters = createSelector(
   [
+    (state) => state,
     selectLastLoadedResponse,
     (state: RootState) =>
       selectSceneFromResponse(state, selectLastLoadedResponse(state)),
     (state: RootState) => state.novel.characters,
+    (state) => state,
   ],
-  (
-    response?: NarrationResponse,
-    scene?: NovelScene,
-    characters: NovelCharacters = {}
-  ) => {
+  (state: RootState, response?: NarrationResponse, scene?: NovelScene) => {
     return (
       scene?.roles.map(({ role, characterId }) => {
-        const outfitSlug = characters[characterId]?.roles[role] || ''
-        const emotionSlug = response?.characters[role]?.emotion
-        const emotion = characters[characterId]?.outfits[
-          outfitSlug
-        ]?.emotions?.find((_emotion) => _emotion.id === emotionSlug)
+        const characterResponse = response?.characters.find(
+          (character) => character.role === role
+        )
+        const emotionSlug = characterResponse?.emotion || ''
         return {
           id: characterId || '',
-          text: response?.characters[role]?.text || '',
-          image: emotion?.source[0],
+          role: role || '',
+          text: characterResponse?.text || '',
+          image: selectLastImageOfRole(state, role, response?.id),
           emotion: emotionSlug,
+          selected: role === response?.selectedRole,
         }
       }) || []
     )
+  }
+)
+
+export const selectLastSelectedCharacter = createSelector(
+  [selectLastLoadedCharacters],
+  (characters) => {
+    return characters.find((character) => character.selected) || characters[0]
   }
 )
 
@@ -179,6 +219,8 @@ export const selectCurrentCharacterOutfits = createSelector(
           const characterOutfit =
             characters[role.characterId]?.outfits[characterOutfitId]
           return {
+            id: role.characterId,
+            role: role.role,
             name: characters[role.characterId]?.name,
             outfit: characterOutfit,
           }

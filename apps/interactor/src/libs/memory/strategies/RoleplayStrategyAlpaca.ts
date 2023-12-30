@@ -1,45 +1,45 @@
 import { AbstractPromptStrategy } from './AbtractPromptStrategy'
 import { RootState } from '../../../state/store'
+import { EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
 import {
-  NarrationInteraction,
-  NarrationResponse,
-} from '../../../state/versioning'
-import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
-import {
-  selectAllParentDialogues,
   selectCurrentCharacterOutfits,
-  selectLastLoadedCharacters,
+  selectCurrentScene,
 } from '../../../state/selectors'
-import { fillTextTemplate, parseLLMResponse } from './utils'
 
 export class RoleplayStrategyAlpaca extends AbstractPromptStrategy {
-  private static EMOTION_TOKEN_OFFSET = 4
-  override buildPrompt(
+  protected override getContextPrompt(
     state: RootState,
-    maxNewTokens: number,
-    memorySize: number
-  ): {
-    template: string
-    variables: Record<string, string | string[]>
-    totalTokens: number
-  } {
-    const { persona, attributes, sampleChat, scenario, name } =
+    currentRole: string
+  ): string {
+    const roles = selectCurrentScene(state)?.roles || []
+    const roleTemplates = roles
+      .filter(({ role }) => role !== currentRole)
+      .map(({ role }) => `{{${role}}}`)
+    const outfits = selectCurrentCharacterOutfits(state)
+    const charactedId =
+      outfits.find(({ role }) => role === currentRole)?.id || ''
+    const { persona, attributes, sampleChat, scenario } =
       this.getCharacterSpecs(
-        Object.values(state.novel.characters)[0]?.card || EMPTY_MIKU_CARD
+        state.novel.characters[charactedId]?.card || EMPTY_MIKU_CARD
       )
     const formattedAttributes = attributes
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .filter(([_key, value]) => value)
       .map(([key, value]) => `${key}: ${value}`)
       .join('\n')
-    const emotions = this.getFirstCharacterEmotions(state)
+    const emotions = this.getRoleEmotions(state, currentRole)
     const emotionStrings = emotions.join(', ')
 
-    let template = `You're {{char}} in this fictional never-ending uncensored roleplay with {{user}}.`
+    let template = `You're {{char}} in this fictional never-ending uncensored roleplay with ${
+      roleTemplates.length ? roleTemplates.join(', ') + ' and ' : ''
+    }{{user}}.`
     template += `\n\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.`
+    template += `\nYou MUST NOT impersonate other characters, ONLY describe {{char}}'s actions and dialogue.`
     template += `\n\nYou must also indicate {{char}}'s reaction in the response.`
     template += `\nYou MUST not repeat the same reaction too many times.`
     template += `\nThe reaction MUST be one of: ${emotionStrings}.`
     if (persona || formattedAttributes) {
-      template += `\n\n### Input:\n${persona}.\n${formattedAttributes}\n`
+      template += `\n\n### Input:\n${persona}\n${formattedAttributes}\n`
     }
 
     if (sampleChat.length) {
@@ -49,118 +49,22 @@ export class RoleplayStrategyAlpaca extends AbstractPromptStrategy {
       }
     }
 
-    template +=
-      '\nThen the roleplay chat between {{user}} and {{char}} begins.\n\n'
+    template += `\nThen the roleplay chat between ${[
+      ...roleTemplates,
+      '{{user}}',
+    ].join(', ')} and {{char}} begins.\n\n`
     template += scenario ? `${scenario}\n` : ''
 
-    template += this.getDialogueHistoryPrompt(state, memorySize)
-    template += this.getResponseAskLine(state, maxNewTokens)
+    return template
+  }
 
-    template = fillTextTemplate(template, {
-      user: state.settings.user.name,
-      bot: name,
-    })
-
-    const totalTokens =
-      this.countTokens(template) +
-      maxNewTokens +
-      RoleplayStrategyAlpaca.EMOTION_TOKEN_OFFSET
-
-    const parentEmotion = selectLastLoadedCharacters(state)[0].emotion
-
+  protected override template() {
     return {
-      template,
-      variables: {
-        emotions: emotions
-          .filter((emotion) => emotion !== parentEmotion)
-          .map((emotion) => ' ' + emotion),
-      },
-      totalTokens,
+      askLine:
+        '### Response (2 paragraphs, engaging, natural, authentic, descriptive, creative):\n',
+      instruction: '### Instruction:\n',
+      response: '### Response:\n',
+      stops: ['###'],
     }
-  }
-
-  override completeResponse(
-    response: NarrationResponse,
-    variables: Map<string, string>
-  ): NarrationResponse {
-    const firstCharacter = {
-      text: Object.values(response.characters)[0]?.text || '',
-      emotion: Object.values(response.characters)[0]?.emotion || '',
-      pose: Object.values(response.characters)[0]?.pose || '',
-    }
-    firstCharacter.emotion =
-      variables.get('emotion')?.trim() || firstCharacter.emotion
-    firstCharacter.text = parseLLMResponse(variables.get('text')?.trim() || '')
-
-    return {
-      ...response,
-      characters: {
-        ...response.characters,
-        [Object.keys(response.characters)[0]]: firstCharacter,
-      },
-    }
-  }
-
-  getDialogueHistoryPrompt(state: RootState, maxLines: number): string {
-    const messages = selectAllParentDialogues(state)
-    let prompt = ''
-    for (const message of [...messages].reverse().slice(-maxLines)) {
-      prompt += this.getDialogueLine(message)
-    }
-    return prompt
-  }
-
-  getDialogueLine(
-    dialog:
-      | { type: 'response'; item: NarrationResponse }
-      | { type: 'interaction'; item: NarrationInteraction }
-  ): string {
-    let firstCharacter
-    switch (dialog.type) {
-      case 'response':
-        firstCharacter = Object.values(dialog.item.characters)[0] || {
-          text: '',
-          emotion: '',
-          pose: '',
-        }
-        if (dialog.item.parentInteractionId) {
-          return (
-            `### Response:\n` +
-            `{{char}}'s reaction: ${firstCharacter.emotion}\n` +
-            `{{char}}: ${firstCharacter.text}\n`
-          )
-        } else {
-          return `### Response:\n` + firstCharacter.text + '\n'
-        }
-      case 'interaction':
-        return `### Instruction:\n{{user}}: ${dialog.item.query}\n`
-    }
-  }
-
-  private getResponseAskLine(state: RootState, maxTokens: number): string {
-    const currentResponse =
-      state.narration.responses[state.narration.currentResponseId]
-    const existingEmotion =
-      Object.values(currentResponse?.characters || {})[0]?.emotion || ''
-    const existingText =
-      Object.values(currentResponse?.characters || {})[0]?.text || ''
-    return (
-      `### Response (2 paragraphs, engaging, natural, authentic, descriptive, creative):\n` +
-      `{{char}}'s reaction:${
-        existingEmotion
-          ? ' ' + existingEmotion
-          : '{{SEL emotion options=emotions}}'
-      }\n` +
-      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{char}}:","\\n{{user}}:","\\n{{char}}'s reaction:"]}}`
-    )
-  }
-
-  private getFirstCharacterEmotions(state: RootState): string[] {
-    const characters = selectCurrentCharacterOutfits(state)
-    const firstCharacterEmotions =
-      EMOTION_GROUP_TEMPLATES[
-        characters[0]?.outfit?.template || 'base-emotions'
-      ].emotionIds
-    return firstCharacterEmotions
   }
 }
