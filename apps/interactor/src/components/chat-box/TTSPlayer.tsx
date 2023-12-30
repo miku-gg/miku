@@ -35,7 +35,8 @@ const setAudioSpeed = (
 }
 
 const TTSPlayer2: React.FC = () => {
-  const { servicesEndpoint, isProduction, freeTTS } = useAppContext()
+  const { servicesEndpoint, isProduction, freeTTS, assetLinkLoader } =
+    useAppContext()
   const voiceId = useAppSelector((state) => state.settings.voice.voiceId)
   const audioRef = useRef<HTMLAudioElement>(null)
   const sourceBufferRef = useRef<SourceBuffer | null>(null)
@@ -44,7 +45,8 @@ const TTSPlayer2: React.FC = () => {
   const fetchControllerRef = useRef<AbortController | null>(null)
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
   const { disabled } = useAppSelector((state) => state.narration.input)
-  const lastCharacterText = lastCharacters[0]?.text || ''
+  const lastCharacter = lastCharacters.find((char) => char.selected)
+  const lastCharacterText = lastCharacter?.text || ''
   const autoPlay = useAppSelector((state) => state.settings.voice.autoplay)
   const playSpeed = useAppSelector((state) => state.settings.voice.speed)
   const isFirstMessage = useAppSelector(
@@ -52,9 +54,7 @@ const TTSPlayer2: React.FC = () => {
       state.narration.responses[state.narration.currentResponseId]
         ?.parentInteractionId === null
   )
-  const characterId = useAppSelector(
-    (state) => Object.values(state.novel.characters)[0]?.id || ''
-  )
+  const characterId = lastCharacter?.id
   const isPremium = useAppSelector((state) => state.settings.user.isPremium)
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -192,7 +192,7 @@ const TTSPlayer2: React.FC = () => {
         autoPlay={autoPlay}
         src={
           isFirstMessage && isProduction
-            ? `https://assets.miku.gg/${characterId}.${_voiceId}.${speakingStyle}.wav`
+            ? assetLinkLoader(`${characterId}.${_voiceId}.${speakingStyle}.wav`)
             : undefined
         }
       >
