@@ -62,6 +62,8 @@
     pointer-events: none;
     user-select: none;
     width: 100%;
+    display: flex;
+    justify-content: center;
   }
 
   &__emotion-renderer {
@@ -75,6 +77,8 @@
   &__characters--multiple {
     opacity: 1;
     z-index: 1;
+    display: initial;
+    justify-content: initial;
 
     .Interactor__emotion-renderer {
       position: absolute;
