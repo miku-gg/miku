@@ -19,6 +19,8 @@ import { toast } from 'react-toastify'
 
 import './History.scss'
 import 'reactflow/dist/style.css'
+import { VersionId as V1VersionId } from '../../state/versioning/v1.state'
+import { migrateV1toV2 } from '../../state/versioning/migrations'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -50,7 +52,11 @@ const HistoryActions = () => {
     reader.onload = () => {
       try {
         const stateJsonString = reader.result as string
-        dispatch(replaceState(JSON.parse(stateJsonString)))
+        let stateJson = JSON.parse(stateJsonString)
+        if (stateJson.version === V1VersionId) {
+          stateJson = migrateV1toV2(stateJson)
+        }
+        dispatch(replaceState(stateJson))
       } catch (e) {
         toast.error('Error reading history file')
       }
