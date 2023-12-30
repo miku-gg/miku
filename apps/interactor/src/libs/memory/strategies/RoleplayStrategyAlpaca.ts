@@ -13,7 +13,7 @@ import {
 } from '../../../state/selectors'
 import { fillTextTemplate, parseLLMResponse } from './utils'
 
-export class RoleplayStrategy extends AbstractPromptStrategy {
+export class RoleplayStrategyAlpaca extends AbstractPromptStrategy {
   private static EMOTION_TOKEN_OFFSET = 4
   override buildPrompt(
     state: RootState,
@@ -50,7 +50,7 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
     template += `\n\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.`
     template += `\nYou MUST NOT impersonate other characters, ONLY describe {{char}} actions and dialogue.`
     template += `\n\nYou must also indicate {{char}}'s reaction in the response.`
-    template += `\nYou MUST not repeat too much the same reaction.`
+    template += `\nYou MUST not repeat the same reaction too many times.`
     template += `\nThe reaction MUST be one of: ${emotionStrings}.`
     if (persona || formattedAttributes) {
       template += `\n\n### Input:\n${persona}\n${formattedAttributes}\n`
@@ -70,7 +70,6 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
     template += scenario ? `${scenario}\n` : ''
 
     template += this.getDialogueHistoryPrompt(state, memorySize, currentRole)
-
     template += this.getResponseAskLine(state, maxNewTokens, currentRole)
 
     template = fillTextTemplate(template, {
@@ -85,7 +84,7 @@ export class RoleplayStrategy extends AbstractPromptStrategy {
     const totalTokens =
       this.countTokens(template) +
       maxNewTokens +
-      RoleplayStrategy.EMOTION_TOKEN_OFFSET
+      RoleplayStrategyAlpaca.EMOTION_TOKEN_OFFSET
 
     const parentEmotion =
       selectLastLoadedCharacters(state).find(({ role }) => role === currentRole)

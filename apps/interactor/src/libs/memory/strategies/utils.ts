@@ -52,7 +52,16 @@ export const fillTextTemplate = (
 
 const buildTextStops = (): string[] => {
   // const subjects: string[] = _subjects.map((subject) => `${subject}:`)
-  return ['<|endoftext|>', '<START>', 'USER:', '\n\n\n', '###']
+  return [
+    '<|endoftext|>',
+    '<START>',
+    'USER:',
+    '\n\n\n',
+    '###',
+    '<|user|>',
+    '<|model|>',
+    '<|system|>',
+  ]
 }
 
 export const hasTextStop = (text: string): boolean => {

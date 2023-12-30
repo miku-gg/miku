@@ -6,10 +6,14 @@ import {
   GuidanceQuery,
   validateGuidanceQuery,
 } from "./lib/queryValidation";
+import * as backend_config from "../../../backend_config.json";
 
-const APHRODITE_API_KEY = process.env.APHRODITE_API_KEY || "";
+const APHRODITE_API_KEY =
+  backend_config.apiKey || process.env.APHRODITE_API_KEY || "";
 const APHRODITE_API_URL =
-  process.env.APHRODITE_API_URL || "http://localhost:2242/v1";
+  backend_config.apiUrl ||
+  process.env.APHRODITE_API_URL ||
+  "http://localhost:2242/v1";
 const APHRODITE_API_MODEL = process.env.APHRODITE_API_MODEL || "default";
 const APHRODITE_API_PRESET =
   (process.env.APHRODITE_API_PRESET as PresetType) ||
