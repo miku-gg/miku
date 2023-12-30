@@ -71,7 +71,7 @@ function getCongurationFromParams(): {
       freeSmart: false,
       cardId: cardId || CARD_ID,
       narrationId,
-      assetsEndpoint: ASSETS_ENDPOINT,
+      assetsEndpoint: 'https://assets.miku.gg',
       cardEndpoint: CARD_ENDPOINT,
       servicesEndpoint: SERVICES_ENDPOINT,
       settings: initialSettingsState,

@@ -18,7 +18,10 @@ class PromptBuilder {
     this.strategy = this.getStrategyFromSlug(options.strategy)
   }
 
-  public buildPrompt(state: RootState): {
+  public buildPrompt(
+    state: RootState,
+    role: string
+  ): {
     template: string
     variables: Record<string, string | string[]>
   } {
@@ -36,7 +39,8 @@ class PromptBuilder {
       const tokens = this.strategy.buildPrompt(
         state,
         this.options.maxNewTokens,
-        midIndex
+        midIndex,
+        role
       ).totalTokens
       if (tokens > maxTokens) {
         return recursiveBinarySearch(minIndex, midIndex - 1, maxTokens)
@@ -51,15 +55,17 @@ class PromptBuilder {
     return this.strategy.buildPrompt(
       state,
       this.options.maxNewTokens,
-      memorySize
+      memorySize,
+      role
     )
   }
 
   public completeResponse(
     response: NarrationResponse,
-    variables: Map<string, string>
+    variables: Map<string, string>,
+    role: string
   ): NarrationResponse {
-    return this.strategy.completeResponse(response, variables)
+    return this.strategy.completeResponse(response, variables, role)
   }
 
   public setStrategy(strategy: Strategies.StrategySlug) {

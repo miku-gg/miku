@@ -44,6 +44,7 @@ const narrationSlice = createSlice({
         text: string
         sceneId: string
         roles: string[]
+        selectedRole: string
       }>
     ) {
       const { text, sceneId } = action.payload
@@ -51,14 +52,15 @@ const narrationSlice = createSlice({
       const newInteractionId = randomUUID()
       const response: NarrationResponse = {
         id: randomUUID(),
-        characters: action.payload.roles.reduce((acc, roleId) => {
-          acc[roleId] = {
+        selectedRole: action.payload.selectedRole,
+        characters: [
+          {
+            role: action.payload.selectedRole,
             text: '',
             emotion: '',
             pose: '',
-          }
-          return acc
-        }, {} as NarrationResponse['characters']),
+          },
+        ],
         childrenInteractions: [],
         fetching: true,
         parentInteractionId: newInteractionId,
@@ -136,7 +138,7 @@ const narrationSlice = createSlice({
         response.childrenInteractions = []
         response.characters = characters
         response.suggestedScenes = suggestedScenes
-        response.fetching = false
+        response.fetching = characters.every((char) => !char.text)
         response.selected = true
       }
       if (action.payload.completed) {
@@ -147,7 +149,8 @@ const narrationSlice = createSlice({
       state,
       action: PayloadAction<{
         servicesEndpoint: string
-        roles: { role: string; emotion: string }[]
+        emotion: string
+        selectedRole: string
       }>
     ) {
       const currentInteraction =
@@ -157,14 +160,15 @@ const narrationSlice = createSlice({
       if (!currentInteraction) return state
       const response: NarrationResponse = {
         id: randomUUID(),
-        characters: action.payload.roles.reduce((acc, role) => {
-          acc[role.role] = {
+        selectedRole: action.payload.selectedRole,
+        characters: [
+          {
+            role: action.payload.selectedRole,
+            emotion: action.payload.emotion,
             text: '',
-            emotion: role.emotion,
             pose: '',
-          }
-          return acc
-        }, {} as NarrationResponse['characters']),
+          },
+        ],
         childrenInteractions: [],
         fetching: true,
         parentInteractionId: currentInteraction.id,
@@ -191,13 +195,18 @@ const narrationSlice = createSlice({
       }>
     ) {
       const response = state.responses[state.currentResponseId]
-      const characterResponses = Object.values(response?.characters || {})
+      const characterResponses = response?.characters || []
       const lastResponse = characterResponses.length
-        ? characterResponses[0]
+        ? characterResponses[characterResponses.length - 1]
         : null
       if (!lastResponse) return state
 
-      const continuationTokens = ['\n"', '\n*', '\n"{{user}},', '\n*{{char}}']
+      const continuationTokens = [
+        '\n"',
+        '\n*',
+        '\n"{{user}},',
+        `\n*{{${lastResponse.role}}}`,
+      ]
       const endingTokens = ['\n', '*', '"', '.', '?', '!']
       if (endingTokens.some((token) => lastResponse.text.endsWith(token))) {
         lastResponse.text =
@@ -207,6 +216,32 @@ const narrationSlice = createSlice({
           ]
       }
       state.input.disabled = false
+    },
+    roleResponseStart(
+      state,
+      action: PayloadAction<{
+        servicesEndpoint: string
+        role: string
+      }>
+    ) {
+      const { role } = action.payload
+      const response = state.responses[state.currentResponseId]
+      if (!response) return state
+      const index = response.characters.findIndex((char) => char.role === role)
+      const characters = response.characters.slice(
+        0,
+        index !== -1 ? index : response.characters.length
+      )
+      characters.push({
+        role,
+        text: '',
+        emotion: '',
+        pose: '',
+      })
+      response.characters = characters
+      response.selectedRole = role
+      response.fetching = true
+      state.input.disabled = true
     },
     swipeResponse(state, action: PayloadAction<string>) {
       const response = state.responses[action.payload]
@@ -236,13 +271,12 @@ const narrationSlice = createSlice({
     ) {
       const { id, text, role, emotion } = action.payload
       const response = state.responses[id]
-      if (response && response.characters[role]) {
-        const charResponse = response.characters[role]
-
-        if (charResponse) {
-          charResponse.emotion = emotion
-          charResponse.text = text
-        }
+      const charResponse = response?.characters.find(
+        (char) => char.role === role
+      )
+      if (charResponse) {
+        charResponse.emotion = emotion
+        charResponse.text = text
       }
     },
     updateInteraction(
@@ -256,6 +290,19 @@ const narrationSlice = createSlice({
       const interaction = state.interactions[id]
       if (interaction) {
         interaction.query = text
+      }
+    },
+    selectRoleOfResponse: (
+      state,
+      action: PayloadAction<{
+        roleId: string
+        responseId: string
+      }>
+    ) => {
+      const { roleId, responseId } = action.payload
+      const response = state.responses[responseId]
+      if (response) {
+        response.selectedRole = roleId
       }
     },
   },
@@ -279,6 +326,8 @@ export const {
   swipeResponse,
   updateResponse,
   updateInteraction,
+  selectRoleOfResponse,
+  roleResponseStart,
 } = narrationSlice.actions
 
 export default narrationSlice.reducer

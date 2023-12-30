@@ -8,7 +8,7 @@ export abstract class AbstractPromptStrategy {
     state: RootState,
     maxNewTokens: number,
     memorySize: number,
-    continueResponse?: boolean
+    role: string
   ): {
     template: string
     variables: Record<string, string | string[]>
@@ -17,7 +17,8 @@ export abstract class AbstractPromptStrategy {
 
   public abstract completeResponse(
     response: NarrationResponse,
-    variables: Map<string, string>
+    variables: Map<string, string>,
+    role: string
   ): NarrationResponse
 
   protected getCharacterSpecs(card: MikuCard): {

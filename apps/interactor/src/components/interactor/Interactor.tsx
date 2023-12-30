@@ -4,16 +4,19 @@ import { useAppSelector } from '../../state/store'
 import {
   selectCurrentScene,
   selectLastLoadedCharacters,
+  selectLastSelectedCharacter,
 } from '../../state/selectors'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { useAppContext } from '../../App.context'
 import InteractorHeader from './InteractorHeader'
 import ChatBox from '../chat-box/ChatBox'
+import classNames from 'classnames'
 
 const Interactor = () => {
   const { assetLinkLoader } = useAppContext()
   const scene = useAppSelector(selectCurrentScene)
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
+  const displayCharacter = useAppSelector(selectLastSelectedCharacter)
 
   if (!scene) {
     return null
@@ -42,20 +45,30 @@ const Interactor = () => {
               />
             )}
           </ProgressiveImage>
-          {lastCharacters.map(({ id, image }) => {
-            if (!image) {
-              return null
-            }
-            return (
-              <EmotionRenderer
-                key={`character-emotion-render-${id}`}
-                assetLinkLoader={assetLinkLoader}
-                assetUrl={image}
-                upDownAnimation
-                className="Interactor__emotion-renderer"
-              />
-            )
-          })}
+          <div
+            className={classNames({
+              Interactor__characters: true,
+              'Interactor__characters--multiple': lastCharacters.length > 1,
+            })}
+          >
+            {lastCharacters.map(({ id, image }) => {
+              if (!image) {
+                return null
+              }
+              return (
+                <EmotionRenderer
+                  key={`character-emotion-render-${id}`}
+                  assetLinkLoader={assetLinkLoader}
+                  assetUrl={image}
+                  upDownAnimation
+                  className={classNames({
+                    'Interactor__emotion-renderer': true,
+                    selected: displayCharacter?.id === id,
+                  })}
+                />
+              )
+            })}
+          </div>
         </div>
         <ChatBox />
       </div>

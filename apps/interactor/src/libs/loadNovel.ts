@@ -3,6 +3,8 @@ import { EmotionTemplateSlug, MikuCard } from '@mikugg/bot-utils'
 import { NovelCharacterOutfit, NovelState } from '../state/slices/novelSlice'
 import { NarrationState } from '../state/slices/narrationSlice'
 import { v4 as randomUUID } from 'uuid'
+import { VersionId } from '../state/versioning'
+import { toast } from 'react-toastify'
 
 export async function loadNovelFromSingleCard({
   cardId,
@@ -17,9 +19,16 @@ export async function loadNovelFromSingleCard({
   narration: NarrationState
 }> {
   try {
-    const { data: card } = await axios.get<MikuCard>(
-      `${cardEndpoint}/${cardId}`
-    )
+    const { data: _card } = await axios.get(`${cardEndpoint}/${cardId}`)
+    if (_card.version) {
+      if (_card.version !== VersionId) {
+        toast.error('Unsupported card version')
+        throw new Error('Unsupported card version')
+      } else {
+        return _card
+      }
+    }
+    const card = _card as MikuCard
     const { mikugg } = card.data.extensions
     const assets = new Set<string>()
     assets.add(mikugg.profile_pic)
@@ -45,7 +54,7 @@ export async function loadNovelFromSingleCard({
         roles: [
           {
             characterId: cardId,
-            role: scenario.id,
+            role: scenario.id + '_char1',
           },
         ],
         children: scenario.children_scenarios,
@@ -105,7 +114,7 @@ export async function loadNovelFromSingleCard({
             profile_pic: mikugg.profile_pic,
             outfits,
             roles: mikugg.scenarios.reduce((roles, scenario) => {
-              roles[scenario.id] = scenario.emotion_group
+              roles[scenario.id + '_char1'] = scenario.emotion_group
               return roles
             }, {} as { [role: string]: string | undefined }),
           },
@@ -127,13 +136,15 @@ export async function loadNovelFromSingleCard({
           [cardId]: {
             id: cardId,
             parentInteractionId: null,
-            characters: {
-              [mikugg.start_scenario]: {
+            selectedRole: mikugg.start_scenario + '_char1',
+            characters: [
+              {
+                role: mikugg.start_scenario + '_char1',
                 text: card.data.first_mes,
                 emotion: firstEmotion?.id || 'happy',
                 pose: 'standing',
               },
-            },
+            ],
             fetching: false,
             selected: true,
             suggestedScenes: [],

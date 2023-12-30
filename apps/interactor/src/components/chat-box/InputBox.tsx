@@ -4,12 +4,16 @@ import {
 } from '../../state/slices/narrationSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { FaPaperPlane } from 'react-icons/fa'
-import { selectCurrentScene } from '../../state/selectors'
+import {
+  selectCurrentScene,
+  selectLastLoadedResponse,
+} from '../../state/selectors'
 import { useAppContext } from '../../App.context'
 
 import './InputBox.scss'
 import { toast } from 'react-toastify'
 import { trackEvent } from '../../libs/analytics'
+import classNames from 'classnames'
 
 let lastInteractionTime = Date.now()
 const InputBox = (): JSX.Element | null => {
@@ -18,11 +22,12 @@ const InputBox = (): JSX.Element | null => {
   const { text, disabled } = useAppSelector((state) => state.narration.input)
   const novelTitle = useAppSelector((state) => state.novel.title)
   const scene = useAppSelector(selectCurrentScene)
+  const lastResponse = useAppSelector(selectLastLoadedResponse)
 
   const onSubmit = (e: React.FormEvent<unknown>) => {
     e.stopPropagation()
     e.preventDefault()
-    if (!text || disabled) return
+    if (!text) return
     trackEvent('bot_interact', {
       bot: novelTitle,
       time: Date.now() - lastInteractionTime,
@@ -44,17 +49,24 @@ const InputBox = (): JSX.Element | null => {
         sceneId: scene?.id || '',
         roles: scene?.roles.map((r) => r.role) || [],
         servicesEndpoint,
+        selectedRole: lastResponse?.selectedRole || '',
       })
     )
   }
 
   return (
     <div className="InputBox">
-      <form className="InputBox__form" onSubmit={onSubmit}>
+      <form
+        className={classNames({
+          InputBox__form: true,
+          'InputBox__form--disabled': disabled,
+        })}
+        onSubmit={onSubmit}
+      >
         <textarea
           className="InputBox__input scrollbar"
           value={text}
-          onChange={(e) => dispatch(setInputText(e.target.value))}
+          onChange={(e) => !disabled && dispatch(setInputText(e.target.value))}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               onSubmit(e)

@@ -20,7 +20,11 @@ export const replaceAll = function (
 
 export const fillTextTemplate = (
   text: string,
-  { user, bot }: { user: string; bot: string }
+  {
+    user,
+    bot,
+    roles,
+  }: { user: string; bot: string; roles?: Record<string, string> }
 ): string => {
   text = replaceAll(text, '{{char}}', bot)
   text = replaceAll(text, '{{Char}}', bot)
@@ -36,6 +40,13 @@ export const fillTextTemplate = (
   text = replaceAll(text, '{{USER}}', user)
   text = replaceAll(text, '<USER>', user)
   text = replaceAll(text, '<User>', user)
+
+  if (roles) {
+    Object.keys(roles).forEach((role) => {
+      text = replaceAll(text, `{{${role}}}`, roles[role])
+    })
+  }
+
   return text
 }
 

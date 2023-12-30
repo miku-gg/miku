@@ -53,15 +53,66 @@
     user-select: none;
   }
 
-  &__emotion-renderer {
+  &__characters {
     position: absolute;
     bottom: 0;
     height: 90%;
-    z-index: 1;
     object-fit: cover;
     transition: all 0.2s ease-in;
     pointer-events: none;
     user-select: none;
+    width: 100%;
+  }
+
+  &__emotion-renderer {
     opacity: 0;
+    z-index: 0;
+    object-fit: contain;
+    height: 100%;
+    transition: all 0.2s ease-out;
+  }
+
+  &__characters--multiple {
+    opacity: 1;
+    z-index: 1;
+
+    .Interactor__emotion-renderer {
+      position: absolute;
+      width: 100%;
+      filter: brightness(0.6);
+
+      &.selected {
+        animation: up-and-down 3s ease-in-out infinite,
+          brightnessfade 0.5s ease-in-out forwards;
+        z-index: 1;
+      }
+
+      &:first-child {
+        left: -25%;
+      }
+
+      &:last-child {
+        right: -25%;
+      }
+    }
+  }
+}
+
+@keyframes brightnessfade {
+  0% {
+    filter: brightness(0.6);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+@keyframes up-and-down {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
   }
 }

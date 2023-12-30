@@ -38,6 +38,10 @@
       // box-shadow: 0 0 10px #cd5fea;
       box-shadow: 0 0 5px #cd5fea;
     }
+
+    &--disabled:hover {
+      box-shadow: none;
+    }
   }
 
   &__input {

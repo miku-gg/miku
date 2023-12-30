@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
+import classNames from 'classnames'
 import {
+  selectRoleOfResponse,
   updateInteraction,
   updateResponse,
 } from '../../state/slices/narrationSlice'
@@ -7,6 +9,8 @@ import { useAppDispatch, useAppSelector } from '../../state/store'
 import { NarrationInteraction, NarrationResponse } from '../../state/versioning'
 import { Button, Dropdown } from '@mikugg/ui-kit'
 import { selectSceneFromResponse } from '../../state/selectors'
+import { useAppContext } from '../../App.context'
+import './NodeEditor.scss'
 
 const TextEditor = ({
   text,
@@ -63,8 +67,11 @@ const ResponseEditor = ({
   onClose: () => void
 }) => {
   const dispatch = useAppDispatch()
-  const charResponse = Object.values(response.characters)[0]
-  const role = Object.keys(response.characters)[0]
+  const { assetLinkLoader } = useAppContext()
+  const role = response.selectedRole || ''
+  const charResponse = response.characters.find(
+    (_charResponse) => _charResponse.role === role
+  )
   const scene = useAppSelector((state) =>
     selectSceneFromResponse(state, response)
   )
@@ -92,7 +99,39 @@ const ResponseEditor = ({
   }
 
   return (
-    <>
+    <div>
+      {scene?.roles.length ? (
+        <div className="NodeEditor__characters">
+          {response.characters.map((_charResponse) => {
+            const id = scene.roles.find(
+              (r) => r.role === _charResponse.role
+            )?.characterId
+            return (
+              <button
+                className={classNames({
+                  NodeEditor__character: true,
+                  'NodeEditor__character--selected':
+                    _charResponse.role === role,
+                })}
+                onClick={() =>
+                  dispatch(
+                    selectRoleOfResponse({
+                      responseId: response.id,
+                      roleId: _charResponse.role,
+                    })
+                  )
+                }
+              >
+                <img
+                  className="NodeEditor__character-img"
+                  src={assetLinkLoader(characters[id || '']?.profile_pic || '')}
+                  alt={character.name}
+                />
+              </button>
+            )
+          })}
+        </div>
+      ) : null}
       <TextEditor
         text={charResponse.text}
         onChange={handleChange}
@@ -106,7 +145,7 @@ const ResponseEditor = ({
         selectedIndex={emotions.findIndex((emotion) => emotion.id === _emotion)}
         onChange={(index) => _setEmotion(emotions[index].id)}
       />
-    </>
+    </div>
   )
 }
 

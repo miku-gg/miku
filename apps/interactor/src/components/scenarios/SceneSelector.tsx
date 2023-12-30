@@ -22,6 +22,9 @@ export default function SceneSelector(): JSX.Element | null {
         text: prompt,
         roles: scene?.roles.map((r) => r.role) || [],
         servicesEndpoint,
+        selectedRole:
+          scene?.roles[Math.floor(Math.random() * (scene?.roles.length || 0))]
+            .role || '',
       })
     )
   }

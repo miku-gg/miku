@@ -10,6 +10,7 @@ import ModelSelector from './ModelSelector'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
+  const title = useAppSelector((state) => state.novel.title)
   const firstCharacter = useAppSelector(
     (state) => Object.values(state.novel.characters)[0]
   )
@@ -29,9 +30,7 @@ const InteractorHeader = () => {
               : '',
           }}
         />
-        <div className="InteractorHeader__header-name">
-          {firstCharacter.name}
-        </div>
+        <div className="InteractorHeader__header-name">{title}</div>
         <SceneSelector />
         <History />
       </div>

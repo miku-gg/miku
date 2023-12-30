@@ -7,9 +7,11 @@ import { FaPencil } from 'react-icons/fa6'
 import { useAppDispatch } from '../../state/store'
 import { setEditModal } from '../../state/slices/settingsSlice'
 import { useFillTextTemplate } from '../../libs/hooks'
+import { useAppContext } from '../../App.context'
 
 export default memo(({ data }: { data: DialogueNodeData }) => {
   const dispatch = useAppDispatch()
+  const { assetLinkLoader } = useAppContext()
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
     e.stopPropagation()
@@ -41,11 +43,12 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
         isConnectable={false}
       />
       <div className="DialogueNode__avatars">
-        {data.avatars.map((avatar) => (
+        {data.avatars.map((avatar, index) => (
           <img
             className="DialogueNode__avatar"
-            src={avatar}
+            src={assetLinkLoader(avatar)}
             key={`avatar-${data.id}-${avatar}`}
+            style={{ marginLeft: (data.avatars.length - index - 1) * 10 }}
           />
         ))}
       </div>
