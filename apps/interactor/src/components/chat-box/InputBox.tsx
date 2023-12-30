@@ -27,7 +27,7 @@ const InputBox = (): JSX.Element | null => {
   const onSubmit = (e: React.FormEvent<unknown>) => {
     e.stopPropagation()
     e.preventDefault()
-    if (!text) return
+    if (!text || disabled) return
     trackEvent('bot_interact', {
       bot: novelTitle,
       time: Date.now() - lastInteractionTime,
