@@ -72,6 +72,7 @@
     object-fit: contain;
     height: 100%;
     transition: all 0.2s ease-out;
+    animation: up-and-down 3s ease-in-out infinite;
   }
 
   &__characters--multiple {
@@ -84,6 +85,7 @@
       position: absolute;
       width: 100%;
       filter: brightness(0.6);
+      animation: none;
 
       &.selected {
         animation: up-and-down 3s ease-in-out infinite,
