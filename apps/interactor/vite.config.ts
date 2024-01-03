@@ -9,7 +9,7 @@ export default defineConfig({
   },
   build: {
     commonjsOptions: {
-      include: [/core/, /extensions/, /bot-utils/, /guidance/, /node_modules/],
+      include: [/bot-utils/, /ui-kit/, /guidance/, /node_modules/],
     },
   },
 })

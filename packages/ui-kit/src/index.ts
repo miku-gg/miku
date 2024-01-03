@@ -17,6 +17,7 @@ import CheckBox from './components/CheckBox';
 import Tooltip from './components/Tooltip';
 import TagAutocomplete from './components/TagAutocomplete';
 import Slider from './components/Slider';
+import SlidePanel from './components/SlidePanel';
 import * as Icons from './assets/svg';
 
 export {
@@ -41,4 +42,5 @@ export {
   Icons,
   Colors,
   Slider,
+  SlidePanel,
 };
