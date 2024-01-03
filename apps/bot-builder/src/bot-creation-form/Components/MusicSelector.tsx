@@ -130,6 +130,12 @@ const MusicSelector = ({
                     const reader = new FileReader();
                     reader.onload = (e) => {
                       const result = e.target?.result as string;
+                      // if size is more than 5MB, reject
+                      if (result.length > 5 * 1024 * 1024) {
+                        alert("File size is larger than 5MB");
+                        return;
+                      }
+
                       onChange(
                         {
                           name: file.name,
