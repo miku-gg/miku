@@ -6,6 +6,9 @@ import { selectAvailableScenes } from '../../state/selectors'
 import { useAppContext } from '../../App.context'
 import { interactionStart } from '../../state/slices/narrationSlice'
 import './SceneSelector.scss'
+import SlidePanel from './SlidePanel'
+import CreateScene from './CreateScene'
+import { setModalOpened } from '../../state/slices/creationSlice'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
@@ -28,51 +31,71 @@ export default function SceneSelector(): JSX.Element | null {
       })
     )
   }
-
-  if (!scenes?.length) return null
-
   return (
     <div
       className={`SceneSelector ${expanded ? 'SceneSelector--expanded' : ''}`}
-      onClick={setExpended.bind(null, !expanded)}
     >
-      <button className="SceneSelector__trigger icon-button">
+      <button
+        className="SceneSelector__trigger icon-button"
+        onClick={() => setExpended(true)}
+      >
         <BiCameraMovie />
       </button>
-      <div
-        className="SceneSelector__list-container"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="SceneSelector__list">
-          {scenes.map((scene, index) => {
-            return (
-              <button
-                className="SceneSelector__item"
-                key={`scene-selector-${scene.id}-${index}`}
-                onClick={handleItemClick.bind(null, scene.id, scene.prompt)}
-              >
-                <div
-                  className="SceneSelector__item-background"
-                  style={{
-                    backgroundImage: `url(${assetLinkLoader(
-                      scene.background,
-                      true
-                    )})`,
-                  }}
-                />
-                {scene.emotion ? (
-                  <EmotionRenderer
-                    className="SceneSelector__item-emotion"
-                    assetLinkLoader={assetLinkLoader}
-                    assetUrl={scene.emotion}
+      <SlidePanel opened={expanded} onClose={() => setExpended(false)}>
+        <div
+          className="SceneSelector__list-container"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h2>Scenes</h2>
+          <div className="SceneSelector__list">
+            <button
+              className="SceneSelector__item"
+              onClick={() =>
+                dispatch(
+                  setModalOpened({
+                    id: 'scene',
+                    opened: true,
+                  })
+                )
+              }
+            >
+              <div
+                className="SceneSelector__item-background"
+                style={{ backgroundColor: 'gray' }}
+              />
+              <div className="SceneSelector__item-text">Create new scene</div>
+            </button>{' '}
+            {scenes.map((scene, index) => {
+              return (
+                <button
+                  className="SceneSelector__item"
+                  key={`scene-selector-${scene.id}-${index}`}
+                  onClick={handleItemClick.bind(null, scene.id, scene.prompt)}
+                >
+                  <div
+                    className="SceneSelector__item-background"
+                    style={{
+                      backgroundImage: `url(${assetLinkLoader(
+                        scene.background,
+                        true
+                      )})`,
+                    }}
                   />
-                ) : null}
-                <div className="SceneSelector__item-text">{scene.name}</div>
-              </button>
-            )
-          })}
+                  {scene.emotion ? (
+                    <EmotionRenderer
+                      className="SceneSelector__item-emotion"
+                      assetLinkLoader={assetLinkLoader}
+                      assetUrl={scene.emotion}
+                    />
+                  ) : null}
+                  <div className="SceneSelector__item-text">{scene.name}</div>
+                </button>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      </SlidePanel>
+      <CreateScene />
     </div>
   )
 }
