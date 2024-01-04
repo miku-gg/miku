@@ -9,10 +9,10 @@
     outline: none;
     width: 100%;
     height: 100%;
-    max-width: 400px;
+    max-width: 414px;
     transition: all 0.2s ease-out;
     transform: translateX(-100%);
-    background: linear-gradient(to right, #0c0a1d 0%, #1e1a41 100%);
+    background: linear-gradient(#0c0a1d 0%, #1e1a41 100%);
     height: 100%;
     box-shadow: 0 0 24px 0 #aaa1ff;
 
@@ -34,6 +34,5 @@
     background-color: rgba(0, 0, 0, 0.7);
     transition: background-color 0.3s ease-in-out;
     z-index: 3;
-    pointer-events: visible;
   }
 }

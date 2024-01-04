@@ -2,7 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface CreationState {
   scene: {
-    opened: boolean
+    slidePanelOpened: boolean
+    sceneOpened: boolean
     background: {
       opened: boolean
       selected: string
@@ -27,7 +28,8 @@ interface CreationState {
 
 export const initialState: CreationState = {
   scene: {
-    opened: false,
+    slidePanelOpened: false,
+    sceneOpened: false,
     background: {
       opened: false,
       selected: '',
@@ -35,6 +37,10 @@ export const initialState: CreationState = {
     characters: {
       openedIndex: -1,
       selected: [
+        {
+          id: '',
+          outfit: '',
+        },
         {
           id: '',
           outfit: '',
@@ -59,12 +65,14 @@ export const creationSlice = createSlice({
     setModalOpened: (
       state,
       action: PayloadAction<{
-        id: 'scene' | 'background' | 'music'
+        id: 'slidepanel' | 'scene' | 'background' | 'music'
         opened: boolean
       }>
     ) => {
       if (action.payload.id === 'scene') {
-        state.scene.opened = action.payload.opened
+        state.scene.sceneOpened = action.payload.opened
+      } else if (action.payload.id === 'slidepanel') {
+        state.scene.slidePanelOpened = action.payload.opened
       } else {
         state.scene[action.payload.id].opened = action.payload.opened
       }

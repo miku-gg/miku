@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { BiCameraMovie } from 'react-icons/bi'
 import { useAppDispatch, useAppSelector } from '../../state/store'
@@ -14,14 +13,16 @@ export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
   const scenes = useAppSelector(selectAvailableScenes)
   const { assetLinkLoader, servicesEndpoint } = useAppContext()
-  const [expanded, setExpended] = useState<boolean>(false)
+  const slidePanelOpened = useAppSelector(
+    (state) => state.creation.scene.slidePanelOpened
+  )
   const createSceneOpened = useAppSelector(
-    (state) => state.creation.scene.opened
+    (state) => state.creation.scene.sceneOpened
   )
 
   const handleItemClick = (id: string, prompt: string) => {
     const scene = scenes.find((s) => s.id === id)
-    setExpended(false)
+    dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
     dispatch(
       interactionStart({
         sceneId: id,
@@ -36,41 +37,31 @@ export default function SceneSelector(): JSX.Element | null {
   }
   return (
     <div
-      className={`SceneSelector ${expanded ? 'SceneSelector--expanded' : ''}`}
+      className={`SceneSelector ${
+        slidePanelOpened ? 'SceneSelector--expanded' : ''
+      }`}
     >
       <button
         className="SceneSelector__trigger icon-button"
-        onClick={() => setExpended(true)}
+        onClick={() =>
+          dispatch(setModalOpened({ id: 'slidepanel', opened: true }))
+        }
       >
         <BiCameraMovie />
       </button>
-      <SlidePanel opened={expanded} onClose={() => setExpended(false)}>
-        <div
-          className="SceneSelector__list-container"
-          onClick={(e) => e.stopPropagation()}
-        >
+      <SlidePanel
+        opened={slidePanelOpened}
+        onClose={() => {
+          dispatch(setModalOpened({ id: 'scene', opened: false }))
+          dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
+        }}
+      >
+        <div className="SceneSelector__list-container">
           <h2>{createSceneOpened ? 'Create Scene' : 'Scenes'}</h2>
           {createSceneOpened ? (
             <CreateScene />
           ) : (
             <div className="SceneSelector__list">
-              <button
-                className="SceneSelector__item"
-                onClick={() =>
-                  dispatch(
-                    setModalOpened({
-                      id: 'scene',
-                      opened: true,
-                    })
-                  )
-                }
-              >
-                <div
-                  className="SceneSelector__item-background"
-                  style={{ backgroundColor: 'gray' }}
-                />
-                <div className="SceneSelector__item-text">Create new scene</div>
-              </button>{' '}
               {scenes.map((scene, index) => {
                 return (
                   <button
@@ -98,6 +89,23 @@ export default function SceneSelector(): JSX.Element | null {
                   </button>
                 )
               })}
+              <button
+                className="SceneSelector__item"
+                onClick={() =>
+                  dispatch(
+                    setModalOpened({
+                      id: 'scene',
+                      opened: true,
+                    })
+                  )
+                }
+              >
+                <div
+                  className="SceneSelector__item-background"
+                  style={{ backgroundColor: 'gray' }}
+                />
+                <div className="SceneSelector__item-text">Create new scene</div>
+              </button>
             </div>
           )}
         </div>

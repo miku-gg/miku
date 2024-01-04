@@ -1,14 +1,17 @@
+@import '../../variables';
+
 .CreateScene {
   &__background__button,
   &__characters__item {
-    width: 100px;
     height: 100px;
-    background-color: gray;
     border-radius: 10px;
     transition: all 0.2s ease-out;
     background-size: cover;
     background-position: center;
     border: 2px solid transparent;
+    color: white;
+    background-color: $background-1;
+    outline: none;
 
     &:hover {
       border: 2px solid #aaa1ff;
@@ -84,5 +87,46 @@
         }
       }
     }
+  }
+
+  &__form {
+    padding: 0 15px;
+  }
+
+  &__music,
+  &__prompt,
+  &__characters,
+  &__background {
+    margin-top: 20px;
+
+    &__title {
+      margin-bottom: 10px;
+    }
+  }
+
+  &__background__button {
+    width: 100%;
+  }
+
+  &__characters__list {
+    display: flex;
+    gap: 10px;
+  }
+
+  &__characters__item {
+    width: 100px;
+  }
+
+  &__prompt {
+    .Input__textArea {
+      height: 100px;
+    }
+  }
+
+  &__actions {
+    margin-top: 10px;
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
   }
 }

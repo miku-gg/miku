@@ -26,29 +26,19 @@ const MusicSelector = ({
 
   return (
     <div className="MusicSelector">
-      <div className="MusicSelector__title">Scene Music</div>
       <div className="MusicSelector__form">
         <div className="MusicSelector__selected">
           <div className="MusicSelector__selected-name">
             {selectedMusic.name || 'No music selected'}
           </div>
-          <div className="MusicSelector__selected-source">
-            {selectedMusic.source ? (
-              <audio
-                src={selectedMusic.source}
-                className="MusicSelector__player"
-                controls
-              />
-            ) : null}
-          </div>
         </div>
         <div className="MusicSelector__actions">
-          <Button theme="gradient" onClick={() => setExpanded(true)}>
-            Select another
+          <Button theme="secondary" onClick={() => setExpanded(true)}>
+            {selectedMusic.name ? 'Change' : 'Select'}
           </Button>
           {selectedMusic.name ? (
             <Button
-              theme="primary"
+              theme="transparent"
               onClick={() =>
                 onChange(
                   {
@@ -59,11 +49,20 @@ const MusicSelector = ({
                 )
               }
             >
-              Remove
+              Clear
             </Button>
           ) : null}
         </div>
       </div>
+      {selectedMusic.source ? (
+        <div className="MusicSelector__selected-source">
+          <audio
+            src={selectedMusic.source}
+            className="MusicSelector__player"
+            controls
+          />
+        </div>
+      ) : null}
       <Modal
         title="Select music"
         opened={expanded}

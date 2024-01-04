@@ -2,9 +2,19 @@
 
 .MusicSelector {
   background-color: $background-1;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 
-  &__title {
-    font-weight: bold;
+  &__form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
   }
 
   &__selected {
@@ -13,9 +23,9 @@
   }
 
   &__actions {
-    margin-top: 10px;
     display: flex;
     justify-content: space-between;
+    gap: 10px;
   }
 
   &__defaults {
