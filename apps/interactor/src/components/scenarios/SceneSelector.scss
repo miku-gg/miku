@@ -33,6 +33,7 @@
     font-size: 0.8em;
     position: relative;
     transition: all 0.2s ease-out;
+    outline: none;
 
     &:hover {
       .SceneSelector__item-background {

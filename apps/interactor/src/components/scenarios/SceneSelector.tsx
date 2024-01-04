@@ -15,6 +15,9 @@ export default function SceneSelector(): JSX.Element | null {
   const scenes = useAppSelector(selectAvailableScenes)
   const { assetLinkLoader, servicesEndpoint } = useAppContext()
   const [expanded, setExpended] = useState<boolean>(false)
+  const createSceneOpened = useAppSelector(
+    (state) => state.creation.scene.opened
+  )
 
   const handleItemClick = (id: string, prompt: string) => {
     const scene = scenes.find((s) => s.id === id)
@@ -46,56 +49,59 @@ export default function SceneSelector(): JSX.Element | null {
           className="SceneSelector__list-container"
           onClick={(e) => e.stopPropagation()}
         >
-          <h2>Scenes</h2>
-          <div className="SceneSelector__list">
-            <button
-              className="SceneSelector__item"
-              onClick={() =>
-                dispatch(
-                  setModalOpened({
-                    id: 'scene',
-                    opened: true,
-                  })
-                )
-              }
-            >
-              <div
-                className="SceneSelector__item-background"
-                style={{ backgroundColor: 'gray' }}
-              />
-              <div className="SceneSelector__item-text">Create new scene</div>
-            </button>{' '}
-            {scenes.map((scene, index) => {
-              return (
-                <button
-                  className="SceneSelector__item"
-                  key={`scene-selector-${scene.id}-${index}`}
-                  onClick={handleItemClick.bind(null, scene.id, scene.prompt)}
-                >
-                  <div
-                    className="SceneSelector__item-background"
-                    style={{
-                      backgroundImage: `url(${assetLinkLoader(
-                        scene.background,
-                        true
-                      )})`,
-                    }}
-                  />
-                  {scene.emotion ? (
-                    <EmotionRenderer
-                      className="SceneSelector__item-emotion"
-                      assetLinkLoader={assetLinkLoader}
-                      assetUrl={scene.emotion}
+          <h2>{createSceneOpened ? 'Create Scene' : 'Scenes'}</h2>
+          {createSceneOpened ? (
+            <CreateScene />
+          ) : (
+            <div className="SceneSelector__list">
+              <button
+                className="SceneSelector__item"
+                onClick={() =>
+                  dispatch(
+                    setModalOpened({
+                      id: 'scene',
+                      opened: true,
+                    })
+                  )
+                }
+              >
+                <div
+                  className="SceneSelector__item-background"
+                  style={{ backgroundColor: 'gray' }}
+                />
+                <div className="SceneSelector__item-text">Create new scene</div>
+              </button>{' '}
+              {scenes.map((scene, index) => {
+                return (
+                  <button
+                    className="SceneSelector__item"
+                    key={`scene-selector-${scene.id}-${index}`}
+                    onClick={handleItemClick.bind(null, scene.id, scene.prompt)}
+                  >
+                    <div
+                      className="SceneSelector__item-background"
+                      style={{
+                        backgroundImage: `url(${assetLinkLoader(
+                          scene.background,
+                          true
+                        )})`,
+                      }}
                     />
-                  ) : null}
-                  <div className="SceneSelector__item-text">{scene.name}</div>
-                </button>
-              )
-            })}
-          </div>
+                    {scene.emotion ? (
+                      <EmotionRenderer
+                        className="SceneSelector__item-emotion"
+                        assetLinkLoader={assetLinkLoader}
+                        assetUrl={scene.emotion}
+                      />
+                    ) : null}
+                    <div className="SceneSelector__item-text">{scene.name}</div>
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
       </SlidePanel>
-      <CreateScene />
     </div>
   )
 }

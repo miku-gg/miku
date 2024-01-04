@@ -1,4 +1,11 @@
-import { Button, DragAndDropImages, Input, Modal } from '@mikugg/ui-kit'
+import {
+  Button,
+  DragAndDropImages,
+  Input,
+  Modal,
+  MusicSelector,
+} from '@mikugg/ui-kit'
+import { DEFAULT_MUSIC } from '@mikugg/bot-utils'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { useAppContext } from '../../App.context'
 import { v4 as randomUUID } from 'uuid'
@@ -18,9 +25,15 @@ import { toast } from 'react-toastify'
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
   const { assetLinkLoader, servicesEndpoint } = useAppContext()
+
+  const musicList: { name: string; source: string }[] =
+    DEFAULT_MUSIC.sort().map((_name) => ({
+      name: _name,
+      source: assetLinkLoader(_name),
+    }))
+
   const dispatch = useAppDispatch()
 
-  const opened = useAppSelector((state) => state.creation.scene.opened)
   const backgroundSelectorOpened = useAppSelector(
     (state) => state.creation.scene.background.opened
   )
@@ -95,17 +108,7 @@ const CreateScene = () => {
   }
 
   return (
-    <Modal
-      opened={opened}
-      onCloseModal={() =>
-        dispatch(
-          setModalOpened({
-            id: 'scene',
-            opened: false,
-          })
-        )
-      }
-    >
+    <>
       <div className="CreateScene">
         <div className="CreateScene__title">Create a new scene</div>
         <div className="CreateScene__form">
@@ -162,6 +165,14 @@ const CreateScene = () => {
               )
             })}
           </div>
+          <div className="CreateScene__music">
+            music
+            <MusicSelector
+              musicList={musicList}
+              selectedMusic={musicList[0]}
+              onChange={() => {}}
+            />
+          </div>
           <div className="CreateScene__prompt">
             <Input
               placeHolder="*{{user}} goes with Hina to a swimming pool. It's a hot summer day and they're having fun.*"
@@ -175,7 +186,14 @@ const CreateScene = () => {
             <Button theme="gradient" onClick={submitScene}>
               Go to scene
             </Button>
-            <Button theme="transparent">Cancel</Button>
+            <Button
+              theme="transparent"
+              onClick={() =>
+                dispatch(setModalOpened({ id: 'scene', opened: false }))
+              }
+            >
+              Cancel
+            </Button>
           </div>
         </div>
       </div>
@@ -300,7 +318,7 @@ const CreateScene = () => {
           </div>
         </div>
       </Modal>
-    </Modal>
+    </>
   )
 }
 
