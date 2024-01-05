@@ -12,6 +12,7 @@ import { RootState } from './store'
 import textCompletion from '../libs/textCompletion'
 import PromptBuilder from '../libs/memory/PromptBuilder'
 import { retrieveStrategy } from '../libs/retrieveStrategy'
+import { ModelType } from './versioning'
 
 const interactionEffect = async (
   dispatch: Dispatch,
@@ -28,7 +29,8 @@ const interactionEffect = async (
       strategy:
         (await retrieveStrategy(servicesEndpoint, state.settings.model)) ||
         'alpacarp',
-      trucationLength: 4096,
+      trucationLength:
+        state.settings.model === ModelType.RP_SMART ? 8192 : 4096,
     })
     const startText =
       currentResponseState.characters.find(({ role: _role }) => _role == role)
