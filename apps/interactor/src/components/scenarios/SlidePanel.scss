@@ -15,6 +15,8 @@
     background: linear-gradient(#0c0a1d 0%, #1e1a41 100%);
     height: 100%;
     box-shadow: 0 0 24px 0 #aaa1ff;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 
     &.ReactModal__Content--after-open {
       transform: translateX(0);
@@ -34,5 +36,28 @@
     background-color: rgba(0, 0, 0, 0.7);
     transition: background-color 0.3s ease-in-out;
     z-index: 3;
+  }
+
+  &__close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    z-index: 4;
+
+    svg {
+      color: white;
+      width: 100%;
+      height: 100%;
+      transition: all 0.2s ease-out;
+    }
+
+    &:hover {
+      svg {
+        color: #aaa1ff;
+      }
+    }
   }
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import Modal from 'react-modal'
+import { MdOutlineKeyboardArrowLeft } from 'react-icons/md'
 import './SlidePanel.scss'
 
 Modal.setAppElement('#root')
@@ -19,6 +20,9 @@ const SlidePanel: React.FC<{
       shouldCloseOnOverlayClick
     >
       {children}
+      <button className="SlidePanel__close-btn" onClick={onClose}>
+        <MdOutlineKeyboardArrowLeft />
+      </button>
     </Modal>
   )
 }

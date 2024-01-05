@@ -4,6 +4,7 @@ import App from './src/App'
 import { loadNovelFromSingleCard } from './src/libs/loadNovel'
 import './root.scss'
 import { initialState as initialSettingsState } from './src/state/slices/settingsSlice'
+import { initialState as initialCreationState } from './src/state/slices/creationSlice'
 import { RootState } from './src/state/store'
 import { VersionId } from './src/state/versioning'
 import { decodeText } from '@mikugg/bot-utils'
@@ -11,9 +12,12 @@ import queryString from 'query-string'
 import mergeWith from 'lodash.mergewith'
 import { toast } from 'react-toastify'
 import { migrateV1toV2 } from './src/state/versioning/migrations'
+import { uploadAsset } from './src/libs/assetUpload'
 
 const ASSETS_ENDPOINT =
   import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets'
+const ASSETS_UPLOAD_ENDPOINT =
+  import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/s3/assets'
 const CARD_ENDPOINT =
   import.meta.env.VITE_CARD_ENDPOINT || 'http://localhost:8585/s3/bots'
 const CARD_ID =
@@ -29,6 +33,7 @@ function getCongurationFromParams(): {
   freeSmart: boolean
   cardId: string
   narrationId: string
+  assetsUploadEndpoint: string
   assetsEndpoint: string
   cardEndpoint: string
   servicesEndpoint: string
@@ -42,6 +47,7 @@ function getCongurationFromParams(): {
   const configuration = queryParams.configuration as string
   try {
     const configurationJson = JSON.parse(decodeText(configuration)) as {
+      assetsUploadEndpoint: string
       assetsEndpoint: string
       cardEndpoint: string
       servicesEndpoint: string
@@ -56,6 +62,8 @@ function getCongurationFromParams(): {
       freeSmart: configurationJson.freeSmart || false,
       cardId: cardId || CARD_ID,
       narrationId,
+      assetsUploadEndpoint:
+        configurationJson.assetsUploadEndpoint || ASSETS_UPLOAD_ENDPOINT,
       assetsEndpoint: configurationJson.assetsEndpoint || ASSETS_ENDPOINT,
       cardEndpoint: configurationJson.cardEndpoint || CARD_ENDPOINT,
       servicesEndpoint: configurationJson.servicesEndpoint || SERVICES_ENDPOINT,
@@ -72,6 +80,7 @@ function getCongurationFromParams(): {
       freeSmart: false,
       cardId: cardId || CARD_ID,
       narrationId,
+      assetsUploadEndpoint: ASSETS_UPLOAD_ENDPOINT,
       assetsEndpoint: ASSETS_ENDPOINT,
       cardEndpoint: CARD_ENDPOINT,
       servicesEndpoint: SERVICES_ENDPOINT,
@@ -100,6 +109,7 @@ export const loadNarration = async (): Promise<RootState> => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             ...migrateV1toV2(data),
+            creation: initialCreationState,
             settings: params.settings,
           }
         }
@@ -108,6 +118,7 @@ export const loadNarration = async (): Promise<RootState> => {
       }
       return {
         ...data,
+        creation: initialCreationState,
         settings: params.settings,
       }
     })
@@ -120,6 +131,7 @@ export const loadNarration = async (): Promise<RootState> => {
     return {
       novel,
       narration,
+      creation: initialCreationState,
       settings: initialSettingsState,
       version: VersionId,
     }
@@ -135,6 +147,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       freeSmart={params.freeSmart}
       freeTTS={params.freeTTS}
       novelLoader={loadNarration}
+      assetUploader={(base64String: string) =>
+        uploadAsset(params.assetsUploadEndpoint, base64String)
+      }
       assetLinkLoader={(asset: string, lowres?: boolean) => {
         if (lowres) {
           return `${params.assetsEndpoint}/480p_${asset}`

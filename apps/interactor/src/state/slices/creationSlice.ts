@@ -1,9 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface CreationState {
+  importedBackgrounds: string[]
   scene: {
     slidePanelOpened: boolean
     sceneOpened: boolean
+    title: string
+    submitting: boolean
     background: {
       opened: boolean
       selected: string
@@ -27,9 +30,12 @@ interface CreationState {
 }
 
 export const initialState: CreationState = {
+  importedBackgrounds: [],
   scene: {
     slidePanelOpened: false,
     sceneOpened: false,
+    title: '',
+    submitting: false,
     background: {
       opened: false,
       selected: '',
@@ -107,6 +113,20 @@ export const creationSlice = createSlice({
     setPromptValue: (state, action: PayloadAction<string>) => {
       state.scene.prompt.value = action.payload
     },
+    setTitleValue: (state, action: PayloadAction<string>) => {
+      state.scene.title = action.payload
+    },
+    setSubmitting: (state, action: PayloadAction<boolean>) => {
+      state.scene.submitting = action.payload
+    },
+    addImportedBackground: (state, action: PayloadAction<string>) => {
+      state.importedBackgrounds.push(action.payload)
+    },
+    removeImportedBackground: (state, action: PayloadAction<string>) => {
+      state.importedBackgrounds = state.importedBackgrounds.filter(
+        (background) => background !== action.payload
+      )
+    },
   },
 })
 
@@ -116,6 +136,10 @@ export const {
   setCharacterModalOpened,
   selectCharacter,
   setPromptValue,
+  setTitleValue,
+  setSubmitting,
+  addImportedBackground,
+  removeImportedBackground,
 } = creationSlice.actions
 
 export default creationSlice.reducer

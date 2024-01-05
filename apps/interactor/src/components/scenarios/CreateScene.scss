@@ -30,12 +30,19 @@
   }
 
   &__selector {
+    &__group {
+      margin-top: 20px;
+    }
+
     &__list {
       display: flex;
       flex-wrap: wrap;
       width: 100%;
-      margin-top: 20px;
       gap: 10px;
+    }
+
+    &__title {
+      margin-bottom: 10px;
     }
 
     &__item {
@@ -49,8 +56,9 @@
       cursor: pointer;
       opacity: 0.7;
       display: inline-flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: center;
+      background-color: $background-1;
 
       img {
         height: 100%;

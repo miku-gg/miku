@@ -9,6 +9,10 @@ export interface AppProps {
   freeSmart: boolean
   novelLoader: () => Promise<RootState>
   assetLinkLoader: (asset: string, lowres?: boolean) => string
+  assetUploader: (data: string) => Promise<{
+    fileName: string
+    fileSize: number
+  }>
 }
 
 const AppContext = createContext<AppProps>({
@@ -17,8 +21,13 @@ const AppContext = createContext<AppProps>({
   servicesEndpoint: '',
   freeTTS: false,
   freeSmart: false,
-  assetLinkLoader: () => '',
   novelLoader: () => Promise.resolve({} as RootState),
+  assetLinkLoader: () => '',
+  assetUploader: () =>
+    Promise.resolve({
+      fileName: '',
+      fileSize: 0,
+    }),
 })
 
 export const AppProvider = AppContext.Provider

@@ -12,10 +12,12 @@ const MusicSelector = ({
   selectedMusic,
   onChange,
   musicList,
+  hideUpload,
 }: {
   selectedMusic: Music;
   onChange: (music: Music, isDefault: boolean) => void;
   musicList: Music[];
+  hideUpload?: boolean;
 }): JSX.Element => {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [currentPlaying, setCurrentPlaying] = useState<string>('');
@@ -109,42 +111,44 @@ const MusicSelector = ({
               autoPlay
             />
           ) : null}
-          <div className="MusicSelector__custom">
-            <div className="MusicSelector__custom-title">
-              Custom music from file
-            </div>
-            <div className="MusicSelector__custom-input">
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                      const result = e.target?.result as string;
-                      // if size is more than 5MB, reject
-                      if (result.length > 5 * 1024 * 1024) {
-                        alert('File size is larger than 5MB');
-                        return;
-                      }
+          {!hideUpload ? (
+            <div className="MusicSelector__custom">
+              <div className="MusicSelector__custom-title">
+                Custom music from file
+              </div>
+              <div className="MusicSelector__custom-input">
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (e) => {
+                        const result = e.target?.result as string;
+                        // if size is more than 5MB, reject
+                        if (result.length > 5 * 1024 * 1024) {
+                          alert('File size is larger than 5MB');
+                          return;
+                        }
 
-                      onChange(
-                        {
-                          name: file.name,
-                          source: result,
-                        },
-                        false
-                      );
-                      setExpanded(false);
-                      setCurrentPlaying('');
-                    };
-                    reader.readAsDataURL(file);
-                  }
-                }}
-              />
+                        onChange(
+                          {
+                            name: file.name,
+                            source: result,
+                          },
+                          false
+                        );
+                        setExpanded(false);
+                        setCurrentPlaying('');
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </Modal>
     </div>

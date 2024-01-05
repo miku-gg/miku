@@ -11,17 +11,22 @@ import { useAppContext } from '../../App.context'
 import { v4 as randomUUID } from 'uuid'
 import './CreateScene.scss'
 import {
+  addImportedBackground,
   selectCharacter,
   setCharacterModalOpened,
   setModalOpened,
   setModalSelected,
   setPromptValue,
+  setTitleValue,
+  setSubmitting,
+  removeImportedBackground,
 } from '../../state/slices/creationSlice'
 import classNames from 'classnames'
 import { interactionStart } from '../../state/slices/narrationSlice'
 import { addScene } from '../../state/slices/novelSlice'
 import { toast } from 'react-toastify'
 import { createSelector } from '@reduxjs/toolkit'
+import { Loader } from '../common/Loader'
 
 const selectSelectableCharacters = createSelector(
   [(state: RootState) => state.novel.characters],
@@ -45,7 +50,7 @@ const selectSelectableCharacters = createSelector(
 
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
-  const { assetLinkLoader, servicesEndpoint } = useAppContext()
+  const { assetLinkLoader, assetUploader, servicesEndpoint } = useAppContext()
 
   const musicList: { name: string; source: string }[] =
     DEFAULT_MUSIC.sort().map((_name) => ({
@@ -66,8 +71,10 @@ const CreateScene = () => {
     (state) => state.creation.scene.music.selected
   )
   const prompt = useAppSelector((state) => state.creation.scene.prompt.value)
+  const title = useAppSelector((state) => state.creation.scene.title)
+  const submitting = useAppSelector((state) => state.creation.scene.submitting)
 
-  const submitScene = () => {
+  const submitScene = async () => {
     const sceneId = randomUUID()
     const characters = charactersSelected
       .filter(({ id, outfit }) => id && outfit)
@@ -90,10 +97,27 @@ const CreateScene = () => {
       })
       return
     }
+    let _background = backgroundSelected
+    if (backgroundSelected.startsWith('data:image')) {
+      try {
+        dispatch(setSubmitting(true))
+        const asset = await assetUploader(backgroundSelected)
+        _background = asset.fileName
+        dispatch(removeImportedBackground(backgroundSelected))
+        dispatch(setModalSelected({ id: 'background', selected: _background }))
+        dispatch(setSubmitting(false))
+      } catch (e) {
+        dispatch(setSubmitting(false))
+        toast.error(`Error uploading background: ${e}`, {
+          position: 'bottom-left',
+        })
+        return
+      }
+    }
     dispatch(
       addScene({
         id: sceneId,
-        background: backgroundSelected,
+        background: _background,
         characters,
         prompt,
         music: selectedMusic,
@@ -122,8 +146,10 @@ const CreateScene = () => {
             style={{
               backgroundImage: `url(${
                 backgroundSelected
-                  ? assetLinkLoader(backgroundSelected, true)
-                  : '/default_background.png'
+                  ? backgroundSelected.startsWith('data:image')
+                    ? backgroundSelected
+                    : assetLinkLoader(backgroundSelected, true)
+                  : './default_background.png'
               })`,
             }}
             onClick={() =>
@@ -168,6 +194,7 @@ const CreateScene = () => {
         <div className="CreateScene__music">
           <div className="CreateScene__music__title">Music</div>
           <MusicSelector
+            hideUpload
             musicList={musicList}
             selectedMusic={
               musicList.find((music) => music.name === selectedMusic) || {
@@ -194,6 +221,14 @@ const CreateScene = () => {
             onChange={(e) => dispatch(setPromptValue(e.target.value))}
           />
         </div>
+        <div className="CreateScene__prompt">
+          <div className="CreateScene__prompt__title">Scene title</div>
+          <Input
+            placeHolder="Go to the pool"
+            value={title}
+            onChange={(e) => dispatch(setTitleValue(e.target.value))}
+          />
+        </div>
         <div className="CreateScene__actions">
           <Button
             theme="transparent"
@@ -203,8 +238,13 @@ const CreateScene = () => {
           >
             Cancel
           </Button>
-          <Button theme="gradient" onClick={submitScene}>
-            Start scene
+          <Button
+            className={submitting ? 'Loader__container' : ''}
+            theme={submitting ? 'transparent' : 'gradient'}
+            onClick={submitScene}
+            disabled={submitting}
+          >
+            {submitting ? <Loader /> : 'Start scene'}
           </Button>
         </div>
       </div>
@@ -225,8 +265,17 @@ const CreateSceneBackgroundModal = () => {
   const backgroundSelected = useAppSelector(
     (state) => state.creation.scene.background.selected
   )
-  const backgrounds = useAppSelector((state) =>
-    Array.from(new Set(state.novel.scenes.map((s) => s.background)))
+  const backgrounds = useAppSelector(
+    createSelector(
+      [
+        (state: RootState) => state.novel.scenes,
+        (state: RootState) => state.creation.importedBackgrounds,
+      ],
+      (scenes, importedBackgrounds) =>
+        Array.from(
+          new Set([...scenes.map((s) => s.background), ...importedBackgrounds])
+        )
+    )
   )
 
   return (
@@ -254,7 +303,11 @@ const CreateSceneBackgroundModal = () => {
                 key={`background-selector-${index}`}
                 style={{
                   backgroundImage: `url(${
-                    background ? assetLinkLoader(background, true) : ''
+                    background
+                      ? background.startsWith('data:image')
+                        ? background
+                        : assetLinkLoader(background, true)
+                      : ''
                   })`,
                 }}
                 onClick={() => {
@@ -278,6 +331,23 @@ const CreateSceneBackgroundModal = () => {
             <DragAndDropImages
               placeHolder="Upload background"
               errorMessage="Error uploading images"
+              handleChange={(file: File) => {
+                // transform file to base64 string
+                const reader = new FileReader()
+                reader.readAsDataURL(file)
+                reader.onload = () => {
+                  const base64String = reader.result
+                  if (typeof base64String === 'string') {
+                    dispatch(addImportedBackground(base64String))
+                    dispatch(
+                      setModalSelected({
+                        id: 'background',
+                        selected: base64String,
+                      })
+                    )
+                  }
+                }
+              }}
             />
           </div>
         </div>
@@ -307,7 +377,7 @@ const CreateSceneCharacterModal = () => {
     >
       <div className="CreateScene__selector">
         <div className="CreateScene__selector__title">Select a character</div>
-        <div className="CreateScene__selector__list">
+        <div className="CreateScene__selector__group">
           <div
             className={classNames('CreateScene__selector__item', {
               'CreateScene__selector__item--selected': selectedChar?.id === '',
@@ -320,73 +390,54 @@ const CreateSceneCharacterModal = () => {
                   index: characterOpenedIndex,
                 })
               )
+              dispatch(setCharacterModalOpened(-1))
             }}
           >
-            No character
+            Empty
           </div>
-          {characters
-            .filter((_character) => {
-              const character = charactersSelected.find(
-                ({ id }) => _character?.id === id
-              )
-              return !character || character?.id === selectedChar?.id
-            })
-            .map((character) => {
-              return (
-                <div
-                  className={classNames('CreateScene__selector__item', {
-                    'CreateScene__selector__item--selected':
-                      selectedChar?.id === character?.id,
-                  })}
-                  key={`character-selector-${character?.id}`}
-                  onClick={() => {
-                    dispatch(
-                      selectCharacter({
-                        id: character?.id || '',
-                        outfit: character?.outfits[0]?.id || '',
-                        index: characterOpenedIndex,
-                      })
-                    )
-                  }}
-                >
-                  <img
-                    src={assetLinkLoader(
-                      character?.outfits[0]?.image || '',
-                      true
-                    )}
-                  />
+        </div>
+        {characters
+          .filter((_character) => {
+            const character = charactersSelected.find(
+              ({ id }) => _character?.id === id
+            )
+            return !character || character?.id === selectedChar?.id
+          })
+          .map((character) => {
+            return (
+              <div className="CreateScene__selector__group">
+                <div className="CreateScene__selector__title">
+                  {character?.name}
                 </div>
-              )
-            })}
-        </div>
-        <div className="CreateScene__selector__list">
-          {selectedChar?.id &&
-            characters
-              .find((_char) => _char?.id === selectedChar?.id)
-              ?.outfits.map((outfit) => {
-                return (
-                  <div
-                    className={classNames('CreateScene__selector__item', {
-                      'CreateScene__selector__item--selected':
-                        selectedChar?.outfit === outfit?.id,
-                    })}
-                    key={`character-selector-${selectedChar?.id}-${outfit?.id}`}
-                    onClick={() => {
-                      dispatch(
-                        selectCharacter({
-                          id: selectedChar?.id || '',
-                          outfit: outfit?.id || '',
-                          index: characterOpenedIndex,
-                        })
-                      )
-                      dispatch(setCharacterModalOpened(-1))
-                    }}
-                  >
-                    <img src={assetLinkLoader(outfit?.image || '', true)} />
-                  </div>
-                )
-              })}
-        </div>
+                <div className="CreateScene__selector__list">
+                  {character?.outfits.map((outfit) => {
+                    return (
+                      <div
+                        className={classNames('CreateScene__selector__item', {
+                          'CreateScene__selector__item--selected':
+                            selectedChar?.id === character?.id &&
+                            selectedChar?.outfit === outfit?.id,
+                        })}
+                        key={`character-selector-${character?.id}-${outfit?.id}`}
+                        onClick={() => {
+                          dispatch(
+                            selectCharacter({
+                              id: character?.id || '',
+                              outfit: outfit?.id || '',
+                              index: characterOpenedIndex,
+                            })
+                          )
+                          dispatch(setCharacterModalOpened(-1))
+                        }}
+                      >
+                        <img src={assetLinkLoader(outfit?.image || '', true)} />
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
       </div>
     </Modal>
   )
