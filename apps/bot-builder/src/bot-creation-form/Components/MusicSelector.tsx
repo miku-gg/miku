@@ -131,7 +131,7 @@ const MusicSelector = ({
                     reader.onload = (e) => {
                       const result = e.target?.result as string;
                       // if size is more than 15MB, reject
-                      if (file.size > 16 * 1024 * 1024) {
+                      if (file.size > 19.5 * 1024 * 1024) {
                         alert("File size is larger than 15MB");
                         return;
                       }
