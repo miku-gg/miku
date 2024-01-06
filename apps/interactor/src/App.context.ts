@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react'
 import { RootState } from './state/store'
+import { BackgroundResult } from './libs/backgroundSearch'
 
 export interface AppProps {
   isProduction: boolean
@@ -13,6 +14,11 @@ export interface AppProps {
     fileName: string
     fileSize: number
   }>
+  backgroundSearcher: (params: {
+    search: string
+    take: number
+    skip: number
+  }) => Promise<BackgroundResult[]>
 }
 
 const AppContext = createContext<AppProps>({
@@ -28,6 +34,7 @@ const AppContext = createContext<AppProps>({
       fileName: '',
       fileSize: 0,
     }),
+  backgroundSearcher: () => Promise.resolve([]),
 })
 
 export const AppProvider = AppContext.Provider

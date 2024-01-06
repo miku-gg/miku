@@ -5,7 +5,9 @@ import {
   Modal,
   MusicSelector,
 } from '@mikugg/ui-kit'
+import { MdOutlineImageSearch } from 'react-icons/md'
 import { DEFAULT_MUSIC } from '@mikugg/bot-utils'
+import debounce from 'lodash.debounce'
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
 import { useAppContext } from '../../App.context'
 import { v4 as randomUUID } from 'uuid'
@@ -20,6 +22,7 @@ import {
   setTitleValue,
   setSubmitting,
   removeImportedBackground,
+  setSearchQuery,
 } from '../../state/slices/creationSlice'
 import classNames from 'classnames'
 import { interactionStart } from '../../state/slices/narrationSlice'
@@ -27,6 +30,8 @@ import { addScene } from '../../state/slices/novelSlice'
 import { toast } from 'react-toastify'
 import { createSelector } from '@reduxjs/toolkit'
 import { Loader } from '../common/Loader'
+import { useCallback, useEffect, useState } from 'react'
+import { BackgroundResult } from '../../libs/backgroundSearch'
 
 const selectSelectableCharacters = createSelector(
   [(state: RootState) => state.novel.characters],
@@ -166,7 +171,7 @@ const CreateScene = () => {
         </div>
         <div className="CreateScene__characters">
           <div className="CreateScene__characters__title">Characters</div>
-          <div className="CreateScene__characters__list">
+          <div className="CreateScene__characters__list scrollbar">
             {charactersSelected.map(({ id, outfit }, index) => {
               const character = characters.find((c) => c?.id === id)
               return (
@@ -250,7 +255,121 @@ const CreateScene = () => {
       </div>
       <CreateSceneBackgroundModal />
       <CreateSceneCharacterModal />
+      <SearchBackgroundModal />
     </div>
+  )
+}
+
+const SearchBackgroundModal = () => {
+  const TAKE = 10
+  const dispatch = useAppDispatch()
+  const { assetLinkLoader, backgroundSearcher } = useAppContext()
+  const { opened, query } = useAppSelector(
+    (state) => state.creation.scene.background.search
+  )
+  const backgroundSelected = useAppSelector(
+    (state) => state.creation.scene.background.selected
+  )
+  const [loading, setLoading] = useState<boolean>(false)
+  const [results, setResults] = useState<BackgroundResult[]>([])
+  const [completed, setCompleted] = useState<boolean>(false)
+
+  const search = useCallback(
+    debounce((query: string, skip: number = 0) => {
+      backgroundSearcher({ search: query, skip, take: TAKE })
+        .then((results) => {
+          setLoading(false)
+          if (results.length < TAKE) {
+            setCompleted(true)
+          }
+          setResults((_results) => [..._results, ...results])
+        })
+        .catch((e) => {
+          setLoading(false)
+          toast.error(`Error searching background`)
+          console.error(e)
+        })
+    }, 500),
+    [backgroundSearcher]
+  )
+
+  useEffect(() => {
+    setCompleted(false)
+    setResults([])
+    setLoading(true)
+    search(query, 0)
+  }, [query, search])
+
+  return (
+    <Modal
+      opened={opened}
+      title="Search background"
+      onCloseModal={() =>
+        dispatch(
+          setModalOpened({
+            id: 'background-search',
+            opened: false,
+          })
+        )
+      }
+    >
+      <div className="CreateScene__background-search">
+        <div className="CreateScene__background-search__input">
+          <Input
+            placeHolder="Search background..."
+            value={query}
+            onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+          />
+          {loading ? <Loader /> : null}
+        </div>
+        <div className="CreateScene__selector__list scrollbar">
+          {results.map((result, index) => {
+            return (
+              <div
+                key={`background-search-${index}-${result.asset}`}
+                className={classNames('CreateScene__selector__item', {
+                  'CreateScene__selector__item--selected':
+                    backgroundSelected === result.asset,
+                })}
+                style={{
+                  backgroundImage: `url(${assetLinkLoader(
+                    result.asset,
+                    true
+                  )})`,
+                }}
+                onClick={() => {
+                  dispatch(
+                    setModalSelected({
+                      id: 'background',
+                      selected: result.asset,
+                    })
+                  )
+                  dispatch(addImportedBackground(result.asset))
+                  dispatch(
+                    setModalOpened({
+                      id: 'background-search',
+                      opened: false,
+                    })
+                  )
+                }}
+              />
+            )
+          })}
+        </div>
+        {!completed && !loading ? (
+          <div className="CreateScene__background-search__load-more">
+            <Button
+              theme="secondary"
+              onClick={() => {
+                search(query, results.length)
+              }}
+            >
+              Load more
+            </Button>
+          </div>
+        ) : null}
+      </div>
+    </Modal>
   )
 }
 
@@ -292,7 +411,7 @@ const CreateSceneBackgroundModal = () => {
     >
       <div className="CreateScene__selector">
         <div className="CreateScene__selector__title">Select a background</div>
-        <div className="CreateScene__selector__list">
+        <div className="CreateScene__selector__list scrollbar">
           {backgrounds.map((background, index) => {
             return (
               <div
@@ -327,6 +446,21 @@ const CreateSceneBackgroundModal = () => {
               />
             )
           })}
+          <div
+            className="CreateScene__selector__item CreateScene__selector__item--search"
+            style={{}}
+            onClick={() => {
+              dispatch(
+                setModalOpened({
+                  id: 'background-search',
+                  opened: true,
+                })
+              )
+            }}
+          >
+            <MdOutlineImageSearch />
+            <p>Search</p>
+          </div>{' '}
           <div className="CreateScene__selector__item CreateScene__selector__item--upload">
             <DragAndDropImages
               placeHolder="Upload background"
@@ -409,7 +543,7 @@ const CreateSceneCharacterModal = () => {
                 <div className="CreateScene__selector__title">
                   {character?.name}
                 </div>
-                <div className="CreateScene__selector__list">
+                <div className="CreateScene__selector__list scrollbar">
                   {character?.outfits.map((outfit) => {
                     return (
                       <div

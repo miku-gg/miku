@@ -13,9 +13,12 @@ import mergeWith from 'lodash.mergewith'
 import { toast } from 'react-toastify'
 import { migrateV1toV2 } from './src/state/versioning/migrations'
 import { uploadAsset } from './src/libs/assetUpload'
+import { backgroundSearcher } from './src/libs/backgroundSearch'
 
 const ASSETS_ENDPOINT =
   import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets'
+const ASSETS_UPLOAD_TEMP_ENDPOINT =
+  import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/s3/assets'
 const ASSETS_UPLOAD_ENDPOINT =
   import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/s3/assets'
 const CARD_ENDPOINT =
@@ -25,6 +28,9 @@ const CARD_ID =
   'QmNTiMDQKh2ZhNzujupeGjWBFGC3WfcNHHNvDNXsC9rPBF.json'
 const SERVICES_ENDPOINT =
   import.meta.env.VITE_SERVICES_ENDPOINT || 'http://localhost:8484'
+const BACKGROUND_SEARCH_ENDPOINT =
+  import.meta.env.VITE_BACKGROUND_SEARCH_ENDPOINT ||
+  'https://localhost:8080/backgrounds'
 
 function getCongurationFromParams(): {
   production: boolean
@@ -33,6 +39,8 @@ function getCongurationFromParams(): {
   freeSmart: boolean
   cardId: string
   narrationId: string
+  backgroundSearchEndpoint: string
+  assetsUploadTempEndpoint: string
   assetsUploadEndpoint: string
   assetsEndpoint: string
   cardEndpoint: string
@@ -47,6 +55,7 @@ function getCongurationFromParams(): {
   const configuration = queryParams.configuration as string
   try {
     const configurationJson = JSON.parse(decodeText(configuration)) as {
+      backgroundSearchEndpoint: string
       assetsUploadEndpoint: string
       assetsEndpoint: string
       cardEndpoint: string
@@ -62,6 +71,10 @@ function getCongurationFromParams(): {
       freeSmart: configurationJson.freeSmart || false,
       cardId: cardId || CARD_ID,
       narrationId,
+      backgroundSearchEndpoint:
+        configurationJson.backgroundSearchEndpoint ||
+        BACKGROUND_SEARCH_ENDPOINT,
+      assetsUploadTempEndpoint: '',
       assetsUploadEndpoint:
         configurationJson.assetsUploadEndpoint || ASSETS_UPLOAD_ENDPOINT,
       assetsEndpoint: configurationJson.assetsEndpoint || ASSETS_ENDPOINT,
@@ -80,7 +93,9 @@ function getCongurationFromParams(): {
       freeSmart: false,
       cardId: cardId || CARD_ID,
       narrationId,
+      backgroundSearchEndpoint: BACKGROUND_SEARCH_ENDPOINT,
       assetsUploadEndpoint: ASSETS_UPLOAD_ENDPOINT,
+      assetsUploadTempEndpoint: ASSETS_UPLOAD_TEMP_ENDPOINT,
       assetsEndpoint: ASSETS_ENDPOINT,
       cardEndpoint: CARD_ENDPOINT,
       servicesEndpoint: SERVICES_ENDPOINT,
@@ -156,6 +171,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         }
         return `${params.assetsEndpoint}/${asset}`
       }}
+      backgroundSearcher={(_params: {
+        search: string
+        take: number
+        skip: number
+      }) => backgroundSearcher(params.backgroundSearchEndpoint, _params)}
     />
   </React.StrictMode>
 )

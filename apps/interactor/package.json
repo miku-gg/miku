@@ -15,6 +15,7 @@
     "@reduxjs/toolkit": "^2.0.1",
     "axios": "^1.2.4",
     "classnames": "^2.3.2",
+    "lodash.debounce": "^4.0.8",
     "lodash.mergewith": "^4.6.2",
     "lodash.trim": "^4.5.1",
     "normalize.css": "^8.0.1",
@@ -31,6 +32,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.9",
     "@types/lodash.mergewith": "^4.6.9",
     "@types/lodash.trim": "^4.5.7",
     "@types/react": "^18.2.43",

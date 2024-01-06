@@ -10,6 +10,10 @@ interface CreationState {
     background: {
       opened: boolean
       selected: string
+      search: {
+        opened: boolean
+        query: string
+      }
     }
     characters: {
       openedIndex: number
@@ -39,6 +43,10 @@ export const initialState: CreationState = {
     background: {
       opened: false,
       selected: '',
+      search: {
+        opened: false,
+        query: '',
+      },
     },
     characters: {
       openedIndex: -1,
@@ -71,7 +79,12 @@ export const creationSlice = createSlice({
     setModalOpened: (
       state,
       action: PayloadAction<{
-        id: 'slidepanel' | 'scene' | 'background' | 'music'
+        id:
+          | 'slidepanel'
+          | 'scene'
+          | 'background'
+          | 'music'
+          | 'background-search'
         opened: boolean
       }>
     ) => {
@@ -79,6 +92,8 @@ export const creationSlice = createSlice({
         state.scene.sceneOpened = action.payload.opened
       } else if (action.payload.id === 'slidepanel') {
         state.scene.slidePanelOpened = action.payload.opened
+      } else if (action.payload.id === 'background-search') {
+        state.scene.background.search.opened = action.payload.opened
       } else {
         state.scene[action.payload.id].opened = action.payload.opened
       }
@@ -127,6 +142,9 @@ export const creationSlice = createSlice({
         (background) => background !== action.payload
       )
     },
+    setSearchQuery: (state, action: PayloadAction<string>) => {
+      state.scene.background.search.query = action.payload
+    },
   },
 })
 
@@ -140,6 +158,7 @@ export const {
   setSubmitting,
   addImportedBackground,
   removeImportedBackground,
+  setSearchQuery,
 } = creationSlice.actions
 
 export default creationSlice.reducer
