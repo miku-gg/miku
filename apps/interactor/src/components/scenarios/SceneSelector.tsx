@@ -8,11 +8,13 @@ import './SceneSelector.scss'
 import SlidePanel from './SlidePanel'
 import CreateScene from './CreateScene'
 import { setModalOpened } from '../../state/slices/creationSlice'
+import { toast } from 'react-toastify'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
   const scenes = useAppSelector(selectAvailableScenes)
-  const { assetLinkLoader, servicesEndpoint } = useAppContext()
+  const { assetLinkLoader, servicesEndpoint, isInteractionDisabled } =
+    useAppContext()
   const slidePanelOpened = useAppSelector(
     (state) => state.creation.scene.slidePanelOpened
   )
@@ -21,6 +23,15 @@ export default function SceneSelector(): JSX.Element | null {
   )
 
   const handleItemClick = (id: string, prompt: string) => {
+    if (isInteractionDisabled) {
+      toast.warn('Please log in to interact.', {
+        position: 'top-center',
+        style: {
+          top: 10,
+        },
+      })
+      return
+    }
     const scene = scenes.find((s) => s.id === id)
     dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
     dispatch(
@@ -91,14 +102,23 @@ export default function SceneSelector(): JSX.Element | null {
               })}
               <button
                 className="SceneSelector__item"
-                onClick={() =>
+                onClick={() => {
+                  if (isInteractionDisabled) {
+                    toast.warn('Please log in to interact.', {
+                      position: 'top-center',
+                      style: {
+                        top: 10,
+                      },
+                    })
+                    return
+                  }
                   dispatch(
                     setModalOpened({
                       id: 'scene',
                       opened: true,
                     })
                   )
-                }
+                }}
               >
                 <div
                   className="SceneSelector__item-background"

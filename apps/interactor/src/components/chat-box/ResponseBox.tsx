@@ -117,6 +117,7 @@ const ResponseBox = (): JSX.Element | null => {
             text={displayText}
             children={
               !disabled &&
+              !isInteractionDisabled &&
               displayCharacter.id ===
                 lastCharacters[lastCharacters.length - 1].id ? (
                 <button
