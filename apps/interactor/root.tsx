@@ -18,7 +18,7 @@ import { backgroundSearcher } from './src/libs/backgroundSearch'
 const ASSETS_ENDPOINT =
   import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets'
 const ASSETS_UPLOAD_ENDPOINT =
-  import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/s3/assets'
+  import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/asset-upload'
 const CARD_ENDPOINT =
   import.meta.env.VITE_CARD_ENDPOINT || 'http://localhost:8585/s3/bots'
 const CARD_ID =

@@ -35,13 +35,17 @@ export const uploadAsset = async (
         }
       )
 
-      await new Promise((resolve) => {
+      await new Promise((resolve, reject) => {
         const reader = new FileReader()
 
         reader.addEventListener('load', async (event) => {
           const fileData = event.target?.result
-          await axios.put(result.data.url, fileData)
-          resolve(true)
+          try {
+            await axios.put(result.data.url, fileData)
+            resolve(true)
+          } catch (error) {
+            reject('Error uploading file')
+          }
         })
 
         reader.readAsArrayBuffer(file as File)
