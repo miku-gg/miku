@@ -82,8 +82,8 @@
           margin-bottom: 0;
 
           &__dropzone {
-            width: 100%;
-            height: 100%;
+            width: 100% !important;
+            height: 100% !important;
             border: 0;
           }
           svg {
