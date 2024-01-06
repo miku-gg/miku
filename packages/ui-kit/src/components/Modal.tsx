@@ -2,6 +2,9 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import { classnames } from '@bem-react/classnames';
 import './Modal.scss';
+
+ReactModal.setAppElement('#root');
+
 interface ModalProps {
   opened: boolean;
   title?: string;

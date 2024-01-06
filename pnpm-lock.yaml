@@ -329,6 +329,9 @@ importers:
       classnames:
         specifier: ^2.3.2
         version: 2.3.2
+      lodash.debounce:
+        specifier: ^4.0.8
+        version: 4.0.8
       lodash.mergewith:
         specifier: ^4.6.2
         version: 4.6.2
@@ -350,6 +353,9 @@ importers:
       react-icons:
         specifier: ^4.12.0
         version: 4.12.0(react@18.2.0)
+      react-modal:
+        specifier: ^3.16.1
+        version: 3.16.1(react-dom@18.2.0)(react@18.2.0)
       react-progressive-graceful-image:
         specifier: ^0.7.0
         version: 0.7.0(react-dom@18.2.0)(react@18.2.0)
@@ -369,6 +375,9 @@ importers:
         specifier: ^9.0.0
         version: 9.0.0
     devDependencies:
+      '@types/lodash.debounce':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@types/lodash.mergewith':
         specifier: ^4.6.9
         version: 4.6.9
@@ -381,6 +390,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.17
         version: 18.2.18
+      '@types/react-modal':
+        specifier: ^3.16.3
+        version: 3.16.3
       '@types/uuid':
         specifier: ^9.0.1
         version: 9.0.1
@@ -6342,6 +6354,12 @@ packages:
       '@types/node': 18.15.5
     dev: false
 
+  /@types/lodash.debounce@4.0.9:
+    resolution: {integrity: sha512-Ma5JcgTREwpLRwMM+XwBR7DaWe96nC38uCBDFKZWbNKD+osjVzdpnUSwBcqCptrp16sSOLBAUb50Car5I0TCsQ==}
+    dependencies:
+      '@types/lodash': 4.14.194
+    dev: true
+
   /@types/lodash.mergewith@4.6.9:
     resolution: {integrity: sha512-fgkoCAOF47K7sxrQ7Mlud2TH023itugZs2bUg8h/KzT+BnZNrR2jAOmaokbLunHNnobXVWOezAeNn/lZqwxkcw==}
     dependencies:
@@ -6432,7 +6450,6 @@ packages:
     resolution: {integrity: sha512-xXuGavyEGaFQDgBv4UVm8/ZsG+qxeQ7f77yNrW3n+1J6XAstUy5rYHeIHPh1KzsGc6IkCIdu6lQ2xWzu1jBTLg==}
     dependencies:
       '@types/react': 18.2.45
-    dev: false
 
   /@types/react-slider@1.3.1:
     resolution: {integrity: sha512-4X2yK7RyCIy643YCFL+bc6XNmcnBtt8n88uuyihvcn5G7Lut23eNQU3q3KmwF7MWIfKfsW5NxCjw0SeDZRtgaA==}

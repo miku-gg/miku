@@ -39,8 +39,10 @@ const Interactor = () => {
                 src={`${src}`}
                 alt="background"
                 onError={({ currentTarget }) => {
-                  currentTarget.onerror = null
-                  currentTarget.src = '/images/default_background.png'
+                  if (currentTarget.src !== '/images/default_background.png') {
+                    currentTarget.onerror = null
+                    currentTarget.src = '/images/default_background.png'
+                  }
                 }}
               />
             )}

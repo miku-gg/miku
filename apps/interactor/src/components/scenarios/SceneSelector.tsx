@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { BiCameraMovie } from 'react-icons/bi'
 import { useAppDispatch, useAppSelector } from '../../state/store'
@@ -6,16 +5,24 @@ import { selectAvailableScenes } from '../../state/selectors'
 import { useAppContext } from '../../App.context'
 import { interactionStart } from '../../state/slices/narrationSlice'
 import './SceneSelector.scss'
+import SlidePanel from './SlidePanel'
+import CreateScene from './CreateScene'
+import { setModalOpened } from '../../state/slices/creationSlice'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
   const scenes = useAppSelector(selectAvailableScenes)
   const { assetLinkLoader, servicesEndpoint } = useAppContext()
-  const [expanded, setExpended] = useState<boolean>(false)
+  const slidePanelOpened = useAppSelector(
+    (state) => state.creation.scene.slidePanelOpened
+  )
+  const createSceneOpened = useAppSelector(
+    (state) => state.creation.scene.sceneOpened
+  )
 
   const handleItemClick = (id: string, prompt: string) => {
     const scene = scenes.find((s) => s.id === id)
-    setExpended(false)
+    dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
     dispatch(
       interactionStart({
         sceneId: id,
@@ -28,51 +35,81 @@ export default function SceneSelector(): JSX.Element | null {
       })
     )
   }
-
-  if (!scenes?.length) return null
-
   return (
     <div
-      className={`SceneSelector ${expanded ? 'SceneSelector--expanded' : ''}`}
-      onClick={setExpended.bind(null, !expanded)}
+      className={`SceneSelector ${
+        slidePanelOpened ? 'SceneSelector--expanded' : ''
+      }`}
     >
-      <button className="SceneSelector__trigger icon-button">
+      <button
+        className="SceneSelector__trigger icon-button"
+        onClick={() =>
+          dispatch(setModalOpened({ id: 'slidepanel', opened: true }))
+        }
+      >
         <BiCameraMovie />
       </button>
-      <div
-        className="SceneSelector__list-container"
-        onClick={(e) => e.stopPropagation()}
+      <SlidePanel
+        opened={slidePanelOpened}
+        onClose={() => {
+          dispatch(setModalOpened({ id: 'scene', opened: false }))
+          dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
+        }}
       >
-        <div className="SceneSelector__list">
-          {scenes.map((scene, index) => {
-            return (
+        <div className="SceneSelector__list-container">
+          <h2>{createSceneOpened ? 'Create Scene' : 'Scenes'}</h2>
+          {createSceneOpened ? (
+            <CreateScene />
+          ) : (
+            <div className="SceneSelector__list">
+              {scenes.map((scene, index) => {
+                return (
+                  <button
+                    className="SceneSelector__item"
+                    key={`scene-selector-${scene.id}-${index}`}
+                    onClick={handleItemClick.bind(null, scene.id, scene.prompt)}
+                  >
+                    <div
+                      className="SceneSelector__item-background"
+                      style={{
+                        backgroundImage: `url(${assetLinkLoader(
+                          scene.background,
+                          true
+                        )})`,
+                      }}
+                    />
+                    {scene.emotion ? (
+                      <EmotionRenderer
+                        className="SceneSelector__item-emotion"
+                        assetLinkLoader={assetLinkLoader}
+                        assetUrl={scene.emotion}
+                      />
+                    ) : null}
+                    <div className="SceneSelector__item-text">{scene.name}</div>
+                  </button>
+                )
+              })}
               <button
                 className="SceneSelector__item"
-                key={`scene-selector-${scene.id}-${index}`}
-                onClick={handleItemClick.bind(null, scene.id, scene.prompt)}
+                onClick={() =>
+                  dispatch(
+                    setModalOpened({
+                      id: 'scene',
+                      opened: true,
+                    })
+                  )
+                }
               >
                 <div
                   className="SceneSelector__item-background"
-                  style={{
-                    backgroundImage: `url(${assetLinkLoader(
-                      scene.background,
-                      true
-                    )})`,
-                  }}
+                  style={{ backgroundColor: 'gray' }}
                 />
-                {scene.emotion ? (
-                  <EmotionRenderer
-                    className="SceneSelector__item-emotion"
-                    assetLinkLoader={assetLinkLoader}
-                    assetUrl={scene.emotion}
-                  />
-                ) : null}
-                <div className="SceneSelector__item-text">{scene.name}</div>
+                <div className="SceneSelector__item-text">Create new scene</div>
               </button>
-            )
-          })}
+            </div>
+          )}
         </div>
-      </div>
+      </SlidePanel>
     </div>
   )
 }

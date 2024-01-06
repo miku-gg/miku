@@ -4,6 +4,7 @@ import settings from './slices/settingsSlice'
 import narration from './slices/narrationSlice'
 import novel from './slices/novelSlice'
 import version from './slices/versionSlice'
+import creation from './slices/creationSlice'
 import {
   continueListenerMiddleware,
   interactionListenerMiddleware,
@@ -15,6 +16,7 @@ import updateStateMiddleware from './updateState.middleware'
 
 export const store = configureStore({
   reducer: {
+    creation,
     settings,
     narration,
     novel,

@@ -30,6 +30,6 @@ export async function retrieveStrategy(
     return isOfTypeStrategySlug(strategy) ? strategy : 'alpacarp'
   } catch (error) {
     console.error(error)
-    throw error
+    return 'alpacarp'
   }
 }

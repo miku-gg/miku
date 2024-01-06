@@ -17,8 +17,15 @@ app.use("/public", express.static(process.cwd() + "/public"));
 app.set("view engine", "ejs");
 
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(
+  "/asset-upload/presigned/:key",
+  express.raw({
+    type: "*/*",
+    limit: "50mb", // Adjust the size limit as per your requirements
+  })
+);
 const upload = multer({ dest: "_temp" });
 
 app.get("/", (req, res) => {

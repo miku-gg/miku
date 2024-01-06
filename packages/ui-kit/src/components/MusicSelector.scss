@@ -1,0 +1,80 @@
+@import '../variables';
+
+.MusicSelector {
+  background-color: $background-1;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+
+  &__form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__selected {
+    display: flex;
+    gap: 20px;
+
+    &-name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      text-wrap: nowrap;
+      max-width: 150px;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  &__defaults-selector {
+    margin-top: 20px;
+  }
+
+  &__defaults {
+    max-height: 500px;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__default {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background-color: rgba($background-2, 0.7);
+    padding: 10px;
+    transition: all 0.2s ease-out;
+
+    &:hover {
+      background-color: $background-1;
+    }
+
+    &-name {
+      font-size: 0.8rem;
+      width: 15rem;
+    }
+
+    &__source {
+      font-size: 0.8rem;
+    }
+  }
+
+  &__player {
+    height: 26px;
+  }
+
+  &__custom {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+  }
+}

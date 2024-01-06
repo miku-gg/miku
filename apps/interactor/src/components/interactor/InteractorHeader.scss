@@ -92,3 +92,9 @@
     filter: drop-shadow(0 0 8px white);
   }
 }
+
+@media screen and (max-width: 400px) {
+  .ScreenSizer {
+    display: none !important;
+  }
+}

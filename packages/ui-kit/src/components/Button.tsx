@@ -28,7 +28,10 @@ const Button: React.FC<ButtonProps> = ({
           {children}
         </a>
       ) : (
-        <button className={`${cnTheme()} ${iconPosition}`} {...rest}>
+        <button
+          {...rest}
+          className={`${cnTheme()} ${iconPosition} ${rest.className || ''}`}
+        >
           {iconSRC ? <img src={iconSRC} alt="button-icon" /> : null}
           {children}
         </button>
