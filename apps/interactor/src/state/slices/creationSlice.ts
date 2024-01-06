@@ -29,6 +29,7 @@ interface CreationState {
     music: {
       opened: boolean
       selected: string
+      source: string
     }
   }
 }
@@ -68,6 +69,7 @@ export const initialState: CreationState = {
     music: {
       opened: false,
       selected: '',
+      source: '',
     },
   },
 }
@@ -98,14 +100,18 @@ export const creationSlice = createSlice({
         state.scene[action.payload.id].opened = action.payload.opened
       }
     },
-    setModalSelected: (
+    setBackground: (state, action: PayloadAction<string>) => {
+      state.scene.background.selected = action.payload
+    },
+    setMusic: (
       state,
       action: PayloadAction<{
-        id: 'background' | 'music'
-        selected: string
+        name: string
+        source: string
       }>
     ) => {
-      state.scene[action.payload.id].selected = action.payload.selected
+      state.scene.music.selected = action.payload.name
+      state.scene.music.source = action.payload.source
     },
     setCharacterModalOpened: (state, action: PayloadAction<number>) => {
       state.scene.characters.openedIndex = action.payload
@@ -150,7 +156,8 @@ export const creationSlice = createSlice({
 
 export const {
   setModalOpened,
-  setModalSelected,
+  setBackground,
+  setMusic,
   setCharacterModalOpened,
   selectCharacter,
   setPromptValue,

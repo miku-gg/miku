@@ -17,8 +17,6 @@ import { backgroundSearcher } from './src/libs/backgroundSearch'
 
 const ASSETS_ENDPOINT =
   import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets'
-const ASSETS_UPLOAD_TEMP_ENDPOINT =
-  import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/s3/assets'
 const ASSETS_UPLOAD_ENDPOINT =
   import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/s3/assets'
 const CARD_ENDPOINT =
@@ -30,7 +28,7 @@ const SERVICES_ENDPOINT =
   import.meta.env.VITE_SERVICES_ENDPOINT || 'http://localhost:8484'
 const BACKGROUND_SEARCH_ENDPOINT =
   import.meta.env.VITE_BACKGROUND_SEARCH_ENDPOINT ||
-  'https://localhost:8080/backgrounds'
+  'http://localhost:8080/backgrounds'
 
 function getCongurationFromParams(): {
   production: boolean
@@ -40,7 +38,6 @@ function getCongurationFromParams(): {
   cardId: string
   narrationId: string
   backgroundSearchEndpoint: string
-  assetsUploadTempEndpoint: string
   assetsUploadEndpoint: string
   assetsEndpoint: string
   cardEndpoint: string
@@ -74,7 +71,6 @@ function getCongurationFromParams(): {
       backgroundSearchEndpoint:
         configurationJson.backgroundSearchEndpoint ||
         BACKGROUND_SEARCH_ENDPOINT,
-      assetsUploadTempEndpoint: '',
       assetsUploadEndpoint:
         configurationJson.assetsUploadEndpoint || ASSETS_UPLOAD_ENDPOINT,
       assetsEndpoint: configurationJson.assetsEndpoint || ASSETS_ENDPOINT,
@@ -95,7 +91,6 @@ function getCongurationFromParams(): {
       narrationId,
       backgroundSearchEndpoint: BACKGROUND_SEARCH_ENDPOINT,
       assetsUploadEndpoint: ASSETS_UPLOAD_ENDPOINT,
-      assetsUploadTempEndpoint: ASSETS_UPLOAD_TEMP_ENDPOINT,
       assetsEndpoint: ASSETS_ENDPOINT,
       cardEndpoint: CARD_ENDPOINT,
       servicesEndpoint: SERVICES_ENDPOINT,

@@ -20,6 +20,13 @@
   &__selected {
     display: flex;
     gap: 20px;
+
+    &-name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      text-wrap: nowrap;
+      max-width: 150px;
+    }
   }
 
   &__actions {

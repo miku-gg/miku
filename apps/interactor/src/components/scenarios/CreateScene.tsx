@@ -17,12 +17,13 @@ import {
   selectCharacter,
   setCharacterModalOpened,
   setModalOpened,
-  setModalSelected,
   setPromptValue,
   setTitleValue,
   setSubmitting,
   removeImportedBackground,
   setSearchQuery,
+  setBackground,
+  setMusic,
 } from '../../state/slices/creationSlice'
 import classNames from 'classnames'
 import { interactionStart } from '../../state/slices/narrationSlice'
@@ -72,9 +73,10 @@ const CreateScene = () => {
     (state) => state.creation.scene.background.selected
   )
   const characters = useAppSelector(selectSelectableCharacters)
-  const selectedMusic = useAppSelector(
-    (state) => state.creation.scene.music.selected
-  )
+  const selectedMusic = useAppSelector((state) => ({
+    name: state.creation.scene.music.selected,
+    source: state.creation.scene.music.source,
+  }))
   const prompt = useAppSelector((state) => state.creation.scene.prompt.value)
   const title = useAppSelector((state) => state.creation.scene.title)
   const submitting = useAppSelector((state) => state.creation.scene.submitting)
@@ -103,13 +105,22 @@ const CreateScene = () => {
       return
     }
     let _background = backgroundSelected
-    if (backgroundSelected.startsWith('data:image')) {
+    let _music = selectedMusic.name
+    if (
+      backgroundSelected.startsWith('data:image') ||
+      selectedMusic.source.startsWith('data:audio')
+    ) {
       try {
         dispatch(setSubmitting(true))
-        const asset = await assetUploader(backgroundSelected)
-        _background = asset.fileName
+        _background = backgroundSelected.startsWith('data:image')
+          ? (await assetUploader(backgroundSelected)).fileName
+          : backgroundSelected
+        _music = selectedMusic.source.startsWith('data:audio')
+          ? (await assetUploader(selectedMusic.source)).fileName
+          : selectedMusic.name
         dispatch(removeImportedBackground(backgroundSelected))
-        dispatch(setModalSelected({ id: 'background', selected: _background }))
+        dispatch(setBackground(_background))
+        dispatch(setMusic({ name: _music, source: assetLinkLoader(_music) }))
         dispatch(setSubmitting(false))
       } catch (e) {
         dispatch(setSubmitting(false))
@@ -125,7 +136,7 @@ const CreateScene = () => {
         background: _background,
         characters,
         prompt,
-        music: selectedMusic,
+        music: _music,
       })
     )
     dispatch(
@@ -199,19 +210,13 @@ const CreateScene = () => {
         <div className="CreateScene__music">
           <div className="CreateScene__music__title">Music</div>
           <MusicSelector
-            hideUpload
             musicList={musicList}
-            selectedMusic={
-              musicList.find((music) => music.name === selectedMusic) || {
-                name: '',
-                source: '',
-              }
-            }
+            selectedMusic={selectedMusic}
             onChange={(value) => {
               dispatch(
-                setModalSelected({
-                  id: 'music',
-                  selected: value.name,
+                setMusic({
+                  name: value.name,
+                  source: value.source,
                 })
               )
             }}
@@ -294,11 +299,13 @@ const SearchBackgroundModal = () => {
   )
 
   useEffect(() => {
-    setCompleted(false)
-    setResults([])
-    setLoading(true)
-    search(query, 0)
-  }, [query, search])
+    if (opened) {
+      setCompleted(false)
+      setResults([])
+      setLoading(true)
+      search(query, 0)
+    }
+  }, [query, search, opened])
 
   return (
     <Modal
@@ -338,12 +345,7 @@ const SearchBackgroundModal = () => {
                   )})`,
                 }}
                 onClick={() => {
-                  dispatch(
-                    setModalSelected({
-                      id: 'background',
-                      selected: result.asset,
-                    })
-                  )
+                  dispatch(setBackground(result.asset))
                   dispatch(addImportedBackground(result.asset))
                   dispatch(
                     setModalOpened({
@@ -430,12 +432,7 @@ const CreateSceneBackgroundModal = () => {
                   })`,
                 }}
                 onClick={() => {
-                  dispatch(
-                    setModalSelected({
-                      id: 'background',
-                      selected: background,
-                    })
-                  )
+                  dispatch(setBackground(background))
                   dispatch(
                     setModalOpened({
                       id: 'background',
@@ -473,12 +470,7 @@ const CreateSceneBackgroundModal = () => {
                   const base64String = reader.result
                   if (typeof base64String === 'string') {
                     dispatch(addImportedBackground(base64String))
-                    dispatch(
-                      setModalSelected({
-                        id: 'background',
-                        selected: base64String,
-                      })
-                    )
+                    dispatch(setBackground(base64String))
                   }
                 }
               }}
