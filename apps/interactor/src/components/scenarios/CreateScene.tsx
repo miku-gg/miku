@@ -531,7 +531,10 @@ const CreateSceneCharacterModal = () => {
           })
           .map((character) => {
             return (
-              <div className="CreateScene__selector__group">
+              <div
+                className="CreateScene__selector__group"
+                key={`character-selector-item-${character?.id}`}
+              >
                 <div className="CreateScene__selector__title">
                   {character?.name}
                 </div>
