@@ -154,7 +154,7 @@ export const loadNarration = async (): Promise<RootState> => {
       novel,
       narration,
       creation: initialCreationState,
-      settings: initialSettingsState,
+      settings: params.settings,
       version: VersionId,
     }
   }
