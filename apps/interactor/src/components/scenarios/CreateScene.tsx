@@ -474,7 +474,7 @@ const SearchCharacterModal = () => {
               data-tooltip-content={result.description}
               data-tooltip-varaint="dark"
             >
-              <img src={assetLinkLoader(result.profilePic, true)} />
+              <img src={assetLinkLoader(result.profilePic)} />
               <p className="CreateScene__selector__item-name">{result.name}</p>
               {loadingIndex === index ? <Loader /> : null}
             </div>
