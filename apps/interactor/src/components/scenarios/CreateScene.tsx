@@ -461,13 +461,13 @@ const SearchCharacterModal = () => {
                 })
                 setLoadingIndex(-1)
                 dispatch(
-                  addImportedCharacter(Object.values(novel.characters)[0]!)
-                )
-                dispatch(
                   setModalOpened({
                     id: 'characters-search',
                     opened: false,
                   })
+                )
+                dispatch(
+                  addImportedCharacter(Object.values(novel.characters)[0]!)
                 )
               }}
               data-tooltip-id={`input-tooltip-documentation`}
