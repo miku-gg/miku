@@ -14,7 +14,6 @@ import {
 } from '../../state/slices/narrationSlice'
 import { DialogueNodeData, setAllNodesPosition } from './utils'
 import { replaceState } from '../../state/slices/replaceState'
-import { useAppContext } from '../../App.context'
 import { toast } from 'react-toastify'
 
 import './History.scss'
@@ -25,7 +24,9 @@ import { migrateV1toV2 } from '../../state/versioning/migrations'
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
   const state = useAppSelector((state) => state)
-  const { isProduction } = useAppContext()
+  const hasInteractions = useAppSelector(
+    (state) => Object.keys(state.narration.interactions).length > 0
+  )
 
   const handleSave = () => {
     const clonedState = JSON.parse(JSON.stringify(state))
@@ -66,33 +67,31 @@ const HistoryActions = () => {
 
   return (
     <div className="History__actions">
-      {!isProduction ? (
-        <>
-          <Tooltip id="history-actions-tooltip" place="bottom" />
-          <label
-            className="icon-button"
-            data-tooltip-id="history-actions-tooltip"
-            data-tooltip-content="Load narration history"
-          >
-            <input
-              id="load-history-input"
-              className="hidden"
-              type="file"
-              accept="application/json"
-              onChange={handleLoad}
-            />
-            <BiCloudUpload />
-          </label>
-          <button
-            className="icon-button"
-            data-tooltip-id="history-actions-tooltip"
-            data-tooltip-content="Download narration history"
-            onClick={handleSave}
-          >
-            <BiCloudDownload />
-          </button>
-        </>
+      <Tooltip id="history-actions-tooltip" place="bottom" />
+      {!hasInteractions ? (
+        <label
+          className="icon-button"
+          data-tooltip-id="history-actions-tooltip"
+          data-tooltip-content="Load narration history"
+        >
+          <input
+            id="load-history-input"
+            className="hidden"
+            type="file"
+            accept="application/json"
+            onChange={handleLoad}
+          />
+          <BiCloudUpload />
+        </label>
       ) : null}
+      <button
+        className="icon-button"
+        data-tooltip-id="history-actions-tooltip"
+        data-tooltip-content="Download narration history"
+        onClick={handleSave}
+      >
+        <BiCloudDownload />
+      </button>
       <button
         className="icon-button"
         onClick={() => dispatch(setHistoryModal(false))}
