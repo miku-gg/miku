@@ -15,15 +15,34 @@ export interface BackgroundResult {
   createdAt: Date
   tags: string[]
 }
-export const backgroundSearcher = async (
+
+export interface CharacterResult {
+  id: string
+  name: string
+  description: string
+  card: string
+  profilePic: string
+  language: string
+  nsfw: boolean
+  author: {
+    id: string
+    username: string
+    profilePic: string | null
+  }
+  createdAt: Date
+  updatedAt: Date
+  tags: string[]
+}
+
+export const listSearch = async <T extends BackgroundResult | CharacterResult>(
   apiEndpont: string,
   params: {
     search: string
     take: number
     skip: number
   }
-): Promise<BackgroundResult[]> => {
-  const response = await axios.get<BackgroundResult[]>(apiEndpont, {
+): Promise<T[]> => {
+  const response = await axios.get<T[]>(apiEndpont, {
     params,
     headers: {
       Accept: 'application/json',

@@ -4,6 +4,7 @@ import {
   Input,
   Modal,
   MusicSelector,
+  Tooltip,
 } from '@mikugg/ui-kit'
 import { MdOutlineImageSearch } from 'react-icons/md'
 import { DEFAULT_MUSIC } from '@mikugg/bot-utils'
@@ -21,37 +22,45 @@ import {
   setTitleValue,
   setSubmitting,
   removeImportedBackground,
-  setSearchQuery,
   setBackground,
   setMusic,
+  addImportedCharacter,
+  clearImportedCharacters,
 } from '../../state/slices/creationSlice'
 import classNames from 'classnames'
 import { interactionStart } from '../../state/slices/narrationSlice'
-import { addScene } from '../../state/slices/novelSlice'
+import { NovelCharacters, addScene } from '../../state/slices/novelSlice'
 import { toast } from 'react-toastify'
 import { createSelector } from '@reduxjs/toolkit'
 import { Loader } from '../common/Loader'
 import { useCallback, useEffect, useState } from 'react'
-import { BackgroundResult } from '../../libs/backgroundSearch'
+import { BackgroundResult, CharacterResult } from '../../libs/listSearch'
+import EmotionRenderer from '../emotion-render/EmotionRenderer'
+import { loadNovelFromSingleCard } from '../../libs/loadNovel'
 
 const selectSelectableCharacters = createSelector(
-  [(state: RootState) => state.novel.characters],
-  (characters) =>
-    Object.values(characters).map((character) => {
-      if (!character) return null
-      return {
-        id: character.id,
-        name: character.name,
-        outfits: Object.values(character.outfits).map((outfit) => {
-          if (!outfit) return null
-          return {
-            id: outfit.id,
-            name: outfit.name,
-            image: outfit.emotions[0].source[0],
-          }
-        }),
+  [
+    (state: RootState) => state.novel.characters,
+    (state: RootState) => state.creation.importedCharacters,
+  ],
+  (characters, importedCharacters) =>
+    [...Object.values(characters), ...Object.values(importedCharacters)].map(
+      (character) => {
+        if (!character) return null
+        return {
+          id: character.id,
+          name: character.name,
+          outfits: Object.values(character.outfits).map((outfit) => {
+            if (!outfit) return null
+            return {
+              id: outfit.id,
+              name: outfit.name,
+              image: outfit.emotions[0].source[0],
+            }
+          }),
+        }
       }
-    })
+    )
 )
 
 // Definition: Defines the CreateSceneModal component
@@ -80,12 +89,28 @@ const CreateScene = () => {
   const prompt = useAppSelector((state) => state.creation.scene.prompt.value)
   const title = useAppSelector((state) => state.creation.scene.title)
   const submitting = useAppSelector((state) => state.creation.scene.submitting)
+  const importedCharacters = useAppSelector(
+    (state) => state.creation.importedCharacters
+  )
 
   const submitScene = async () => {
     const sceneId = randomUUID()
     const characters = charactersSelected
       .filter(({ id, outfit }) => id && outfit)
       .map(({ id, outfit }) => ({ id, outfit, role: randomUUID() }))
+    const charactersToImport = characters.reduce((acc, char) => {
+      const imported = importedCharacters[char.id]
+      if (imported) {
+        acc[char.id] = {
+          ...imported,
+          roles: {
+            ...imported.roles,
+          },
+        }
+      }
+      return acc
+    }, {} as NovelCharacters)
+
     if (!characters.length) {
       toast.error('You need to select at least one character', {
         position: 'bottom-left',
@@ -104,6 +129,7 @@ const CreateScene = () => {
       })
       return
     }
+    // check if
     let _background = backgroundSelected
     let _music = selectedMusic.name
     if (
@@ -130,10 +156,12 @@ const CreateScene = () => {
         return
       }
     }
+    dispatch(clearImportedCharacters())
     dispatch(
       addScene({
         id: sceneId,
         background: _background,
+        newChars: charactersToImport,
         characters,
         prompt,
         music: _music,
@@ -192,12 +220,12 @@ const CreateScene = () => {
                   onClick={() => dispatch(setCharacterModalOpened(index))}
                 >
                   {character?.name ? (
-                    <img
-                      src={assetLinkLoader(
+                    <EmotionRenderer
+                      assetLinkLoader={assetLinkLoader}
+                      assetUrl={
                         character?.outfits.find((o) => o?.id === outfit)
-                          ?.image || '',
-                        true
-                      )}
+                          ?.image || ''
+                      }
                     />
                   ) : (
                     'Select'
@@ -261,27 +289,37 @@ const CreateScene = () => {
       <CreateSceneBackgroundModal />
       <CreateSceneCharacterModal />
       <SearchBackgroundModal />
+      <SearchCharacterModal />
     </div>
   )
 }
 
-const SearchBackgroundModal = () => {
+function SearchModal<T>({
+  modalId,
+  searcher,
+  renderResult,
+}: {
+  modalId: 'background' | 'characters'
+  searcher: (params: {
+    search: string
+    skip: number
+    take: number
+  }) => Promise<T[]>
+  renderResult: (result: T, index: number) => JSX.Element
+}): JSX.Element {
   const TAKE = 10
   const dispatch = useAppDispatch()
-  const { assetLinkLoader, backgroundSearcher } = useAppContext()
-  const { opened, query } = useAppSelector(
-    (state) => state.creation.scene.background.search
+  const { opened } = useAppSelector(
+    (state) => state.creation.scene[modalId].search
   )
-  const backgroundSelected = useAppSelector(
-    (state) => state.creation.scene.background.selected
-  )
+  const [query, setQuery] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
-  const [results, setResults] = useState<BackgroundResult[]>([])
+  const [results, setResults] = useState<T[]>([])
   const [completed, setCompleted] = useState<boolean>(false)
 
   const search = useCallback(
     debounce((query: string, skip: number = 0) => {
-      backgroundSearcher({ search: query, skip, take: TAKE })
+      searcher({ search: query, skip, take: TAKE })
         .then((results) => {
           setLoading(false)
           if (results.length < TAKE) {
@@ -295,7 +333,7 @@ const SearchBackgroundModal = () => {
           console.error(e)
         })
     }, 500),
-    [backgroundSearcher]
+    [searcher]
   )
 
   useEffect(() => {
@@ -310,11 +348,11 @@ const SearchBackgroundModal = () => {
   return (
     <Modal
       opened={opened}
-      title="Search background"
+      title={`Search ${modalId}`}
       onCloseModal={() =>
         dispatch(
           setModalOpened({
-            id: 'background-search',
+            id: `${modalId}-search`,
             opened: false,
           })
         )
@@ -323,40 +361,14 @@ const SearchBackgroundModal = () => {
       <div className="CreateScene__background-search">
         <div className="CreateScene__background-search__input">
           <Input
-            placeHolder="Search background..."
+            placeHolder={`Search ${modalId}...`}
             value={query}
-            onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+            onChange={(e) => setQuery(e.target.value)}
           />
           {loading ? <Loader /> : null}
         </div>
         <div className="CreateScene__selector__list scrollbar">
-          {results.map((result, index) => {
-            return (
-              <div
-                key={`background-search-${index}-${result.asset}`}
-                className={classNames('CreateScene__selector__item', {
-                  'CreateScene__selector__item--selected':
-                    backgroundSelected === result.asset,
-                })}
-                style={{
-                  backgroundImage: `url(${assetLinkLoader(
-                    result.asset,
-                    true
-                  )})`,
-                }}
-                onClick={() => {
-                  dispatch(setBackground(result.asset))
-                  dispatch(addImportedBackground(result.asset))
-                  dispatch(
-                    setModalOpened({
-                      id: 'background-search',
-                      opened: false,
-                    })
-                  )
-                }}
-              />
-            )
-          })}
+          {results.map(renderResult)}
         </div>
         {!completed && !loading ? (
           <div className="CreateScene__background-search__load-more">
@@ -372,6 +384,105 @@ const SearchBackgroundModal = () => {
         ) : null}
       </div>
     </Modal>
+  )
+}
+
+const SearchBackgroundModal = () => {
+  const dispatch = useAppDispatch()
+  const { assetLinkLoader, backgroundSearcher } = useAppContext()
+  const backgroundSelected = useAppSelector(
+    (state) => state.creation.scene.background.selected
+  )
+  return (
+    <SearchModal<BackgroundResult>
+      modalId="background"
+      searcher={backgroundSearcher}
+      renderResult={(result: BackgroundResult, index) => {
+        return (
+          <div
+            key={`background-search-${index}-${result.asset}`}
+            className={classNames('CreateScene__selector__item', {
+              'CreateScene__selector__item--selected':
+                backgroundSelected === result.asset,
+            })}
+            style={{
+              backgroundImage: `url(${assetLinkLoader(result.asset, true)})`,
+            }}
+            onClick={() => {
+              dispatch(setBackground(result.asset))
+              dispatch(addImportedBackground(result.asset))
+              dispatch(
+                setModalOpened({
+                  id: 'background-search',
+                  opened: false,
+                })
+              )
+            }}
+          />
+        )
+      }}
+    />
+  )
+}
+
+const SearchCharacterModal = () => {
+  const dispatch = useAppDispatch()
+  const { assetLinkLoader, characterSearcher, cardEndpoint } = useAppContext()
+  const charactersSelected = useAppSelector(
+    (state) => state.creation.scene.characters.selected
+  )
+  const characters = useAppSelector(selectSelectableCharacters)
+  const [loadingIndex, setLoadingIndex] = useState<number>(-1)
+  return (
+    <SearchModal<CharacterResult>
+      modalId="characters"
+      searcher={(...args) =>
+        characterSearcher(...args).then((r) =>
+          r.filter(
+            (c) => characters.find((c2) => c2?.id === c.card) === undefined
+          )
+        )
+      }
+      renderResult={(result: CharacterResult, index) => {
+        return (
+          <div key={`background-search-${index}-${result.id}`}>
+            <div
+              className={classNames('CreateScene__selector__item', {
+                'CreateScene__selector__item--selected':
+                  charactersSelected.find((c) => c.id === result.id),
+                'CreateScene__selector__item--loading': loadingIndex === index,
+              })}
+              onClick={async () => {
+                setLoadingIndex(index)
+                const { novel } = await loadNovelFromSingleCard({
+                  cardId: result.card,
+                  cardEndpoint,
+                  assetsEndpoint: '',
+                })
+                setLoadingIndex(-1)
+                dispatch(
+                  addImportedCharacter(Object.values(novel.characters)[0]!)
+                )
+                dispatch(
+                  setModalOpened({
+                    id: 'characters-search',
+                    opened: false,
+                  })
+                )
+              }}
+              data-tooltip-id={`input-tooltip-documentation`}
+              data-tooltip-content={result.description}
+              data-tooltip-varaint="dark"
+            >
+              <img src={assetLinkLoader(result.profilePic, true)} />
+              <p className="CreateScene__selector__item-name">Nala</p>
+              {loadingIndex === index ? <Loader /> : null}
+            </div>
+            <Tooltip id={`input-tooltip-documentation`} place="bottom" />
+          </div>
+        )
+      }}
+    />
   )
 }
 
@@ -503,7 +614,7 @@ const CreateSceneCharacterModal = () => {
     >
       <div className="CreateScene__selector">
         <div className="CreateScene__selector__title">Select a character</div>
-        <div className="CreateScene__selector__group">
+        <div className="CreateScene__selector__list scrollbar">
           <div
             className={classNames('CreateScene__selector__item', {
               'CreateScene__selector__item--selected': selectedChar?.id === '',
@@ -520,6 +631,21 @@ const CreateSceneCharacterModal = () => {
             }}
           >
             Empty
+          </div>
+          <div
+            className="CreateScene__selector__item CreateScene__selector__item--search"
+            style={{}}
+            onClick={() => {
+              dispatch(
+                setModalOpened({
+                  id: 'characters-search',
+                  opened: true,
+                })
+              )
+            }}
+          >
+            <MdOutlineImageSearch />
+            <p>Search</p>
           </div>
         </div>
         {characters
@@ -559,7 +685,10 @@ const CreateSceneCharacterModal = () => {
                           dispatch(setCharacterModalOpened(-1))
                         }}
                       >
-                        <img src={assetLinkLoader(outfit?.image || '', true)} />
+                        <EmotionRenderer
+                          assetLinkLoader={assetLinkLoader}
+                          assetUrl={outfit?.image || ''}
+                        />
                       </div>
                     )
                   })}

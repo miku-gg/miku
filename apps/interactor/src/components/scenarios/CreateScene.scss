@@ -40,7 +40,7 @@
       width: 100%;
       gap: 10px;
       max-height: 400px;
-      overflow-y: scroll;
+      overflow-y: auto;
     }
 
     &__title {
@@ -61,9 +61,23 @@
       align-items: center;
       justify-content: center;
       background-color: $background-1;
+      overflow: hidden;
+      position: relative;
 
-      img {
+      img,
+      video {
         height: 100%;
+      }
+
+      &-name {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: $background-1;
+        border-bottom-left-radius: 10px;
+        font-size: 0.7rem;
+        padding: 0.1rem 0.3rem;
+        padding-bottom: 0.2rem;
       }
 
       &:hover {
@@ -96,6 +110,19 @@
           }
         }
       }
+
+      &--loading {
+        img {
+          opacity: 0.2;
+        }
+
+        .Loader {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+      }
     }
   }
 
@@ -125,6 +152,11 @@
 
   &__characters__item {
     width: 100px;
+
+    img,
+    video {
+      height: 100%;
+    }
   }
 
   &__prompt {

@@ -13,7 +13,11 @@ import mergeWith from 'lodash.mergewith'
 import { toast } from 'react-toastify'
 import { migrateV1toV2 } from './src/state/versioning/migrations'
 import { uploadAsset } from './src/libs/assetUpload'
-import { backgroundSearcher } from './src/libs/backgroundSearch'
+import {
+  listSearch,
+  BackgroundResult,
+  CharacterResult,
+} from './src/libs/listSearch'
 
 const ASSETS_ENDPOINT =
   import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets'
@@ -29,6 +33,9 @@ const SERVICES_ENDPOINT =
 const BACKGROUND_SEARCH_ENDPOINT =
   import.meta.env.VITE_BACKGROUND_SEARCH_ENDPOINT ||
   'http://localhost:8080/backgrounds'
+const CHARACTER_SEARCH_ENDPOINT =
+  import.meta.env.CHARACTER_SEARCH_ENDPOINT ||
+  'http://localhost:8080/characters'
 
 function getCongurationFromParams(): {
   production: boolean
@@ -38,6 +45,7 @@ function getCongurationFromParams(): {
   cardId: string
   narrationId: string
   backgroundSearchEndpoint: string
+  characterSearchEndpoint: string
   assetsUploadEndpoint: string
   assetsEndpoint: string
   cardEndpoint: string
@@ -52,6 +60,7 @@ function getCongurationFromParams(): {
   const configuration = queryParams.configuration as string
   try {
     const configurationJson = JSON.parse(decodeText(configuration)) as {
+      characterSearchEndpoint: string
       backgroundSearchEndpoint: string
       assetsUploadEndpoint: string
       assetsEndpoint: string
@@ -68,6 +77,8 @@ function getCongurationFromParams(): {
       freeSmart: configurationJson.freeSmart || false,
       cardId: cardId || CARD_ID,
       narrationId,
+      characterSearchEndpoint:
+        configurationJson.characterSearchEndpoint || CHARACTER_SEARCH_ENDPOINT,
       backgroundSearchEndpoint:
         configurationJson.backgroundSearchEndpoint ||
         BACKGROUND_SEARCH_ENDPOINT,
@@ -89,6 +100,7 @@ function getCongurationFromParams(): {
       freeSmart: false,
       cardId: cardId || CARD_ID,
       narrationId,
+      characterSearchEndpoint: CHARACTER_SEARCH_ENDPOINT,
       backgroundSearchEndpoint: BACKGROUND_SEARCH_ENDPOINT,
       assetsUploadEndpoint: ASSETS_UPLOAD_ENDPOINT,
       assetsEndpoint: ASSETS_ENDPOINT,
@@ -154,6 +166,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       isProduction={params.production}
       isInteractionDisabled={params.disabled}
       servicesEndpoint={params.servicesEndpoint}
+      cardEndpoint={params.cardEndpoint}
       freeSmart={params.freeSmart}
       freeTTS={params.freeTTS}
       novelLoader={loadNarration}
@@ -170,7 +183,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         search: string
         take: number
         skip: number
-      }) => backgroundSearcher(params.backgroundSearchEndpoint, _params)}
+      }) =>
+        listSearch<BackgroundResult>(params.backgroundSearchEndpoint, _params)
+      }
+      characterSearcher={(_params: {
+        search: string
+        take: number
+        skip: number
+      }) =>
+        listSearch<CharacterResult>(params.characterSearchEndpoint, _params)
+      }
     />
   </React.StrictMode>
 )

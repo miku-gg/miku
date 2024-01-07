@@ -68,7 +68,7 @@ export default function SceneSelector(): JSX.Element | null {
         }}
       >
         <div className="SceneSelector__list-container">
-          <h2>{createSceneOpened ? 'Create Scene' : 'Scenes'}</h2>
+          <h2>{createSceneOpened ? 'Create Scene' : 'Change Scene'}</h2>
           {createSceneOpened ? (
             <CreateScene />
           ) : (
