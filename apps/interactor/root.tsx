@@ -24,7 +24,7 @@ const ASSETS_ENDPOINT =
 const ASSETS_UPLOAD_ENDPOINT =
   import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/asset-upload'
 const CARD_ENDPOINT =
-  import.meta.env.VITE_CARD_ENDPOINT || 'http://localhost:8585/s3/bots'
+  import.meta.env.VITE_CARD_ENDPOINT || 'https://apidev.miku.gg/bot/config'
 const CARD_ID =
   import.meta.env.VITE_CARD_ID ||
   'QmNTiMDQKh2ZhNzujupeGjWBFGC3WfcNHHNvDNXsC9rPBF.json'
@@ -34,7 +34,7 @@ const BACKGROUND_SEARCH_ENDPOINT =
   import.meta.env.VITE_BACKGROUND_SEARCH_ENDPOINT ||
   'http://localhost:8080/backgrounds'
 const CHARACTER_SEARCH_ENDPOINT =
-  import.meta.env.CHARACTER_SEARCH_ENDPOINT ||
+  import.meta.env.VITE_CHARACTER_SEARCH_ENDPOINT ||
   'http://localhost:8080/characters'
 
 function getCongurationFromParams(): {
