@@ -97,9 +97,13 @@ export async function loadNovelFromSingleCard({
     assets.add(firstSceneBackground)
 
     // await all assets load dummy fetch
-    await Promise.all(
-      Array.from(assets).map((asset) => axios.get(`${assetsEndpoint}/${asset}`))
-    )
+    if (assetsEndpoint) {
+      await Promise.all(
+        Array.from(assets).map((asset) =>
+          axios.get(`${assetsEndpoint}/${asset}`)
+        )
+      )
+    }
 
     return {
       novel: {

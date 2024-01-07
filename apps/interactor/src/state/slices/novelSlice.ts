@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { NovelState } from '../versioning'
+import { NovelCharacters, NovelState } from '../versioning'
 
 export type {
   NovelScene,
@@ -30,21 +30,33 @@ const novelSlice = createSlice({
         id: string
         prompt: string
         background: string
+        newChars?: NovelCharacters
         characters: { id: string; outfit: string; role: string }[]
         music: string
       }>
     ) => {
       const roles = action.payload.characters.map(({ id, outfit, role }) => {
-        const character = state.characters[id]
+        const character =
+          state.characters[id] ||
+          (action.payload.newChars && action.payload.newChars[id])
         if (!character) {
           return null
         }
-        character.roles[role] = outfit
+        character.roles = {
+          ...character.roles,
+          [role]: outfit,
+        }
         return {
           characterId: id,
           role,
         }
       })
+      if (action.payload.newChars) {
+        state.characters = {
+          ...state.characters,
+          ...action.payload.newChars,
+        }
+      }
       state.scenes.push({
         id: action.payload.id,
         name: action.payload.prompt,

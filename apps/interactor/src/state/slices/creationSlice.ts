@@ -1,7 +1,10 @@
+import { MikuCard } from '@mikugg/bot-utils'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { NovelCharacterOutfit, NovelCharacters } from '../versioning'
 
 interface CreationState {
   importedBackgrounds: string[]
+  importedCharacters: NovelCharacters
   scene: {
     slidePanelOpened: boolean
     sceneOpened: boolean
@@ -12,7 +15,6 @@ interface CreationState {
       selected: string
       search: {
         opened: boolean
-        query: string
       }
     }
     characters: {
@@ -21,6 +23,9 @@ interface CreationState {
         id: string
         outfit: string
       }[]
+      search: {
+        opened: boolean
+      }
     }
     prompt: {
       loading: boolean
@@ -36,6 +41,7 @@ interface CreationState {
 
 export const initialState: CreationState = {
   importedBackgrounds: [],
+  importedCharacters: {},
   scene: {
     slidePanelOpened: false,
     sceneOpened: false,
@@ -46,7 +52,6 @@ export const initialState: CreationState = {
       selected: '',
       search: {
         opened: false,
-        query: '',
       },
     },
     characters: {
@@ -61,6 +66,9 @@ export const initialState: CreationState = {
           outfit: '',
         },
       ],
+      search: {
+        opened: false,
+      },
     },
     prompt: {
       loading: false,
@@ -87,6 +95,7 @@ export const creationSlice = createSlice({
           | 'background'
           | 'music'
           | 'background-search'
+          | 'characters-search'
         opened: boolean
       }>
     ) => {
@@ -96,6 +105,8 @@ export const creationSlice = createSlice({
         state.scene.slidePanelOpened = action.payload.opened
       } else if (action.payload.id === 'background-search') {
         state.scene.background.search.opened = action.payload.opened
+      } else if (action.payload.id === 'characters-search') {
+        state.scene.characters.search.opened = action.payload.opened
       } else {
         state.scene[action.payload.id].opened = action.payload.opened
       }
@@ -148,8 +159,26 @@ export const creationSlice = createSlice({
         (background) => background !== action.payload
       )
     },
-    setSearchQuery: (state, action: PayloadAction<string>) => {
-      state.scene.background.search.query = action.payload
+    addImportedCharacter: (
+      state,
+      action: PayloadAction<{
+        id: string
+        name: string
+        profile_pic: string
+        card: MikuCard
+        outfits: {
+          [outfit: string]: NovelCharacterOutfit | undefined
+        }
+        /** Role to outfit mapping */
+        roles: {
+          [role: string]: string | undefined
+        }
+      }>
+    ) => {
+      state.importedCharacters[action.payload.id] = action.payload
+    },
+    clearImportedCharacters: (state) => {
+      state.importedCharacters = {}
     },
   },
 })
@@ -165,7 +194,8 @@ export const {
   setSubmitting,
   addImportedBackground,
   removeImportedBackground,
-  setSearchQuery,
+  addImportedCharacter,
+  clearImportedCharacters,
 } = creationSlice.actions
 
 export default creationSlice.reducer

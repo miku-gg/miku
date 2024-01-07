@@ -142,40 +142,46 @@ const ResponseBox = (): JSX.Element | null => {
             })) || []),
             ...(scene?.roles.filter(({ role }) => !isRoleGenerated(role)) ||
               []),
-          ].map(({ characterId, role }) => {
-            const character = characters[characterId]
-            const isGenerated = isRoleGenerated(role)
-            return (
-              <div
-                className={classNames({
-                  ResponseBox__character: true,
-                  generated: isGenerated,
-                  selected: displayCharacter?.role === role,
-                })}
-                key={`response-character-${role}`}
-              >
-                <button
-                  className="ResponseBox__character-button"
-                  onClick={() =>
-                    dispatch(
-                      isGenerated
-                        ? selectRoleOfResponse({
-                            responseId: lastReponse?.id || '',
-                            roleId: role,
-                          })
-                        : roleResponseStart({
-                            servicesEndpoint,
-                            role,
-                          })
-                    )
-                  }
-                  disabled={disabled}
-                >
-                  <img src={assetLinkLoader(character?.profile_pic || '')} />
-                </button>
-              </div>
+          ]
+            .filter(
+              ({ characterId }) =>
+                !!characters[characterId] &&
+                !!characters[characterId]?.profile_pic
             )
-          })}
+            .map(({ characterId, role }) => {
+              const character = characters[characterId]
+              const isGenerated = isRoleGenerated(role)
+              return (
+                <div
+                  className={classNames({
+                    ResponseBox__character: true,
+                    generated: isGenerated,
+                    selected: displayCharacter?.role === role,
+                  })}
+                  key={`response-character-${role}`}
+                >
+                  <button
+                    className="ResponseBox__character-button"
+                    onClick={() =>
+                      dispatch(
+                        isGenerated
+                          ? selectRoleOfResponse({
+                              responseId: lastReponse?.id || '',
+                              roleId: role,
+                            })
+                          : roleResponseStart({
+                              servicesEndpoint,
+                              role,
+                            })
+                      )
+                    }
+                    disabled={disabled}
+                  >
+                    <img src={assetLinkLoader(character?.profile_pic || '')} />
+                  </button>
+                </div>
+              )
+            })}
         </div>
       ) : null}
       <div className="ResponseBox__actions">
