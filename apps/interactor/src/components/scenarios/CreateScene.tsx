@@ -329,7 +329,7 @@ function SearchModal<T>({
         })
         .catch((e) => {
           setLoading(false)
-          toast.error(`Error searching background`)
+          toast.error(`Error searching ${modalId}`)
           console.error(e)
         })
     }, 500),
@@ -475,7 +475,7 @@ const SearchCharacterModal = () => {
               data-tooltip-varaint="dark"
             >
               <img src={assetLinkLoader(result.profilePic, true)} />
-              <p className="CreateScene__selector__item-name">Nala</p>
+              <p className="CreateScene__selector__item-name">{result.name}</p>
               {loadingIndex === index ? <Loader /> : null}
             </div>
             <Tooltip id={`input-tooltip-documentation`} place="bottom" />
