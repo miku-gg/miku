@@ -108,6 +108,7 @@ const ResponseEditor = ({
             )?.characterId
             return (
               <button
+                key={response.id}
                 className={classNames({
                   NodeEditor__character: true,
                   'NodeEditor__character--selected':

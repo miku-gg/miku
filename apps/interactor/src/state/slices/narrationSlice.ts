@@ -279,6 +279,36 @@ const narrationSlice = createSlice({
         charResponse.text = text
       }
     },
+    deleteNode(state, action: PayloadAction<string>) {
+      const interaction = state.interactions[action.payload]
+      if (interaction) {
+        interaction.responsesId.forEach((responseId) => {
+          const response = state.responses[responseId]
+          if (response) {
+            delete state.responses[responseId]
+          }
+        })
+        delete state.interactions[action.payload]
+      }
+
+      const response = state.responses[action.payload]
+      if (response) {
+        const parentInteractionId = response.parentInteractionId
+        if (parentInteractionId) {
+          const parentInteraction = state.interactions[parentInteractionId]
+          if (parentInteraction) {
+            const index = parentInteraction.responsesId.indexOf(response.id, 0)
+            if (index > -1)
+              state.interactions[parentInteractionId]!.responsesId.splice(
+                index,
+                1
+              )
+          }
+        }
+
+        delete state.responses[action.payload]
+      }
+    },
     updateInteraction(
       state,
       action: PayloadAction<{
@@ -325,6 +355,7 @@ export const {
   continueResponse,
   swipeResponse,
   updateResponse,
+  deleteNode,
   updateInteraction,
   selectRoleOfResponse,
   roleResponseStart,

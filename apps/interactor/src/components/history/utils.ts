@@ -46,7 +46,7 @@ export const setAllNodesPosition = (
 
   function calculateSubtreeWidth(nodeId: string): number {
     const node = nodeMap.get(nodeId)
-    if (!node) return 0
+    if (!node) return 200
     if (node.subtreeWidth) return node.subtreeWidth
     if (node.children.length === 0) {
       return NODE_WIDTH
