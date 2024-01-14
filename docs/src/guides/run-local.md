@@ -35,12 +35,10 @@ This command will check the dependencies and install the required packages for `
 
 Next, you will be prompted for the environment variables
 
-* `OPENAI_ENDPOINT`, the OAI-like endpoint (Aphrodite/Ooba/Tabby)
-* `OPENAI_KEY`, the password for the OAI-like endpoint (Aphrodite/Ooba/Tabby)
 * `AZURE_API_KEY`, a valid API for querying Azure TTS models
 * `ELEVENLABS_API_KEY`, a valid API for querying ElevenLabs TTS models
 
-An `OPENAI_API_KEY` must be provided for the bots to generate responses. You can take a look at the [How to use the endpoints](/guides/how-to-endpoints) guide for getting one of these values.
+Backend API keys and URLs are set in the bot directory config. You can take a look at the [How to use the endpoints](/guides/how-to-endpoints) guide for getting one of these values.
 
 ### 3. Run the project
 After setting up the `.env` file, you can run the project by running the following command:
