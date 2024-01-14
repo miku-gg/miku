@@ -71,6 +71,20 @@ app.post("/save", async (req, res) => {
   );
 });
 
+app.get("/get", async (req, res) => {
+  const config = fs.readFileSync(
+    path.join(__dirname, "../../services/backend_config.json"),
+    "utf8"
+  );
+  const data = JSON.parse(config);
+
+  res.send({
+    apiUrl: data.apiUrl,
+    apiKey: data.apiKey,
+    strat: data.strat,
+  });
+});
+
 app.get(`/bot/config/:hash`, (req, res) => {
   const file = getS3File(BUCKET.BOTS, req.params.hash);
   if (file) {

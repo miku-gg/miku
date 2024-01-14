@@ -156,7 +156,7 @@
         <p class="text-white w-24">Prompt Strategy</p>
         <input class="mb-8 w-full mr-8" type="text" value="" placeholder="alpacarp OR metharmerp" required name="strat" id="strat" />
       </div>
-      <button class="ui button save-button w-64" onclick="save_backend_config()">Save</button>
+      <button class="ui button save-button w-64" onclick="save_backend_config(); toggle_backend_modal(false)">Save</button>
     </div>
   </div>
 
@@ -165,7 +165,7 @@
   <script src="/public/semantic.min.js"></script>
   <script src="/public/form.min.js"></script>
   <script>
-    $(document).ready(function() {
+    $(document).ready(async function() {
       $('.dropdown').dropdown();
 
       // toggle button formatting
@@ -179,6 +179,19 @@
       $(".nsfw_toggle:checkbox").on("change", function() {
         toggle_nsfw($(this).is(":checked"));
       });
+
+      const getResult = await fetch("/get", {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json"
+        }
+      });
+      const data = await getResult.json()
+
+
+      document.getElementById('apiUrl').value = data.apiUrl
+      document.getElementById('apiKey').value = data.apiKey
+      document.getElementById('strat').value = data.strat
     });
 
     function change_theme(dark_mode) {
