@@ -25,12 +25,6 @@ For example, to run a model like `ludis/tsukasa-120b-qlora-gptq`
 ./runtime.sh python -m aphrodite.endpoints.openai.api_server --port <YOUR PORT HERE> --model ludis/tsukasa-120b-qlora-gptq -q gptq --dtype float16 --api-keys <YOUR_API_PASSWORD_HERE> -gmu 0.88 -tp 2
 ```
 
-If you're using multiple GPUs (`-tp` set to a value >1) you might get a speed boost from setting the affinity of Aphrodite's ray processes to a higher value with this command.
-
-```
-cpuid=0 ; for pid in $(ps xo '%p %c' | grep ray:: | awk '{print $1;}') ; do taskset -cp $cpuid $pid ; cpuid=$(($cpuid + 1)) ; done
-```
-
 ### Get a TabbyAPI endpoint
 
 First, download and install [TabbyAPI](https://github.com/theroyallab/tabbyAPI) and run a model.
