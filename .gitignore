@@ -4,4 +4,3 @@ node_modules/
 .npmrc
 .DS_Store
 env/
-apps/services/backend_config.json

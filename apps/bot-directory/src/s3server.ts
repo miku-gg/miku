@@ -1,9 +1,8 @@
 import fs from "fs";
 import path from "path";
 import multer from "multer";
-import express, { Express } from "express";
+import { Express } from "express";
 import { BUCKET } from "@mikugg/bot-utils";
-import bodyParser from "body-parser";
 export { BUCKET } from "@mikugg/bot-utils";
 
 const dataDir = path.join(__dirname, "../db"); // Directory to store files

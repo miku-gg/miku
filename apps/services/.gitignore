@@ -2,3 +2,4 @@ node_modules/
 dist/
 _temp/*
 !_temp/.gitkeep
+backend_config.json
