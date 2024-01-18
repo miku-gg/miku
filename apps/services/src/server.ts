@@ -14,6 +14,9 @@ app.use(
     credentials: true,
     origin: [
       "http://localhost:5173",
+      "http://localhost:5100",
+      "https://miku.gg",
+      "https://dev.miku.gg",
       "https://alpha.miku.gg",
       "https://interactor.miku.gg",
     ],
