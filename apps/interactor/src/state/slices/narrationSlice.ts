@@ -280,15 +280,34 @@ const narrationSlice = createSlice({
       }
     },
     deleteNode(state, action: PayloadAction<string>) {
+      const _deleteNode = (id: string) => {
+        const response = state.responses[id]
+        if (response) {
+          response.childrenInteractions.forEach((child) => {
+            _deleteNode(child.interactionId)
+          })
+
+          delete state.responses[id]
+        }
+        const interaction = state.interactions[id]
+        if (interaction) {
+          interaction.responsesId.forEach((responseId) => {
+            _deleteNode(responseId)
+          })
+          delete state.interactions[id]
+        }
+      }
+
       const interaction = state.interactions[action.payload]
-      if (interaction) {
-        interaction.responsesId.forEach((responseId) => {
-          const response = state.responses[responseId]
-          if (response) {
-            delete state.responses[responseId]
-          }
-        })
-        delete state.interactions[action.payload]
+
+      if (interaction?.parentResponseId) {
+        const parentResponse = state.responses[interaction.parentResponseId]
+        if (parentResponse) {
+          parentResponse.childrenInteractions =
+            parentResponse.childrenInteractions.filter(
+              (child) => child.interactionId !== interaction.id
+            )
+        }
       }
 
       const response = state.responses[action.payload]
@@ -297,17 +316,14 @@ const narrationSlice = createSlice({
         if (parentInteractionId) {
           const parentInteraction = state.interactions[parentInteractionId]
           if (parentInteraction) {
-            const index = parentInteraction.responsesId.indexOf(response.id, 0)
-            if (index > -1)
-              state.interactions[parentInteractionId]!.responsesId.splice(
-                index,
-                1
+            parentInteraction.responsesId =
+              parentInteraction.responsesId.filter(
+                (responseId) => responseId !== response.id
               )
           }
         }
-
-        delete state.responses[action.payload]
       }
+      _deleteNode(action.payload)
     },
     updateInteraction(
       state,
