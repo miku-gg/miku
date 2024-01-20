@@ -10,7 +10,7 @@ import {
 } from './slices/narrationSlice'
 import { RootState } from './store'
 import textCompletion from '../libs/textCompletion'
-import PromptBuilder from '../libs/memory/PromptBuilder'
+import PromptBuilder from '../libs/prompts/PromptBuilder'
 import { retrieveStrategy } from '../libs/retrieveStrategy'
 import { ModelType } from './versioning'
 

@@ -1,5 +1,5 @@
 import { ModelType } from '../state/versioning'
-import { StrategySlug, isOfTypeStrategySlug } from './memory/strategies'
+import { StrategySlug, isOfTypeStrategySlug } from './prompts/strategies'
 
 const cacheStrategy = new Map<ModelType, StrategySlug>()
 
