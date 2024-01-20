@@ -44,15 +44,19 @@ export abstract class AbstractPromptStrategy {
   } {
     const roles = selectCurrentScene(state)?.roles || []
     const outfits = selectCurrentCharacterOutfits(state)
-    const charactedId =
-      outfits.find(({ role }) => role === currentRole)?.id || ''
+    const currentCharacter =
+      outfits.find(({ role }) => role === currentRole) || null
     const { name } = this.getCharacterSpecs(
-      state.novel.characters[charactedId]?.card || EMPTY_MIKU_CARD
+      state.novel.characters[currentCharacter?.id || '']?.card ||
+        EMPTY_MIKU_CARD
     )
     const emotions = this.getRoleEmotions(state, currentRole)
 
     let template = this.getContextPrompt(state, currentRole)
-    template += this.getDialogueHistoryPrompt(state, memorySize, currentRole)
+    template += this.getDialogueHistoryPrompt(state, memorySize, {
+      name: state.novel.characters[currentCharacter?.id || '']?.name || '',
+      roles: state.novel.characters[currentCharacter?.id || '']?.roles || {},
+    })
     template += this.getResponseAskLine(state, maxNewTokens, currentRole)
 
     template = fillTextTemplate(template, {
@@ -121,12 +125,15 @@ export abstract class AbstractPromptStrategy {
   protected getDialogueHistoryPrompt(
     state: RootState,
     maxLines: number,
-    currentRole: string
+    currentCharacter?: {
+      name: string
+      roles: Record<string, string | undefined>
+    }
   ): string {
     const messages = selectAllParentDialogues(state)
     let prompt = ''
     for (const message of [...messages].reverse().slice(-maxLines)) {
-      prompt += this.getDialogueLine(message, currentRole, prompt)
+      prompt += this.getDialogueLine(message, currentCharacter, prompt)
     }
     return prompt
   }
@@ -135,20 +142,23 @@ export abstract class AbstractPromptStrategy {
     dialog:
       | { type: 'response'; item: NarrationResponse }
       | { type: 'interaction'; item: NarrationInteraction },
-    currentRole: string,
+    character?: {
+      name: string
+      roles: Record<string, string | undefined>
+    },
     currentText?: string
   ): string {
     const temp = this.template()
     let prevCharString = ''
     let nextCharString = ''
     let currentCharacterIndex
-    let characterCharacter
+    let currentCharacter
     switch (dialog.type) {
       case 'response':
-        currentCharacterIndex = dialog.item.characters.findIndex(
-          ({ role }) => role === currentRole
-        )
-        characterCharacter =
+        currentCharacterIndex = dialog.item.characters.findIndex(({ role }) => {
+          return Object.keys(character?.roles || {}).includes(role)
+        })
+        currentCharacter =
           currentCharacterIndex !== -1
             ? dialog.item.characters[currentCharacterIndex]
             : {
@@ -173,18 +183,18 @@ export abstract class AbstractPromptStrategy {
         if (dialog.item.parentInteractionId) {
           return (
             (prevCharString ? prevCharString + '\n' : '') +
-            (characterCharacter.text
+            (currentCharacter.text
               ? temp.response +
-                `{{char}}'s reaction: ${characterCharacter.emotion}\n` +
-                `{{char}}: ${characterCharacter.text}\n`
+                `{{char}}'s reaction: ${currentCharacter.emotion}\n` +
+                `{{char}}: ${currentCharacter.text}\n`
               : '') +
             (nextCharString ? `${temp.instruction}${nextCharString}\n` : '')
           )
         } else {
           return (
             (prevCharString ? `${temp.instruction}${prevCharString}\n` : '') +
-            (characterCharacter.text
-              ? temp.response + characterCharacter.text
+            (currentCharacter.text
+              ? temp.response + currentCharacter.text
               : '') +
             '\n' +
             (nextCharString ? `${temp.instruction}${nextCharString}\n` : '')
