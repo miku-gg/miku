@@ -4,6 +4,7 @@ import {
 } from '../../state/slices/narrationSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { FaPaperPlane } from 'react-icons/fa'
+import { GiFeather } from 'react-icons/gi'
 import {
   selectCurrentScene,
   selectLastLoadedResponse,
@@ -14,6 +15,7 @@ import './InputBox.scss'
 import { toast } from 'react-toastify'
 import { trackEvent } from '../../libs/analytics'
 import classNames from 'classnames'
+import { Tooltip } from '@mikugg/ui-kit'
 
 let lastInteractionTime = Date.now()
 const InputBox = (): JSX.Element | null => {
@@ -54,6 +56,8 @@ const InputBox = (): JSX.Element | null => {
     )
   }
 
+  const onAutocomplete = () => {}
+
   return (
     <div className="InputBox">
       <form
@@ -76,10 +80,21 @@ const InputBox = (): JSX.Element | null => {
           rows={1}
           placeholder="Type a message..."
         />
+        <button
+          className="InputBox__suggestion-trigger"
+          disabled={disabled}
+          data-tooltip-id={`suggestion-tooltip`}
+          data-tooltip-html="Autocomplete"
+          data-tooltip-varaint="light"
+          onClick={onAutocomplete}
+        >
+          <GiFeather />
+        </button>
         <button className="InputBox__submit" disabled={disabled}>
           <FaPaperPlane />
         </button>
       </form>
+      <Tooltip id="suggestion-tooltip" place="top" />
     </div>
   )
 }
