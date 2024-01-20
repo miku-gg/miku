@@ -21,6 +21,9 @@ export default function SceneSelector(): JSX.Element | null {
   const createSceneOpened = useAppSelector(
     (state) => state.creation.scene.sceneOpened
   )
+  const { disabled: inputDisabled } = useAppSelector(
+    (state) => state.narration.input
+  )
 
   const handleItemClick = (id: string, prompt: string) => {
     if (isInteractionDisabled) {
@@ -54,6 +57,7 @@ export default function SceneSelector(): JSX.Element | null {
     >
       <button
         className="SceneSelector__trigger icon-button"
+        disabled={inputDisabled}
         onClick={() =>
           dispatch(setModalOpened({ id: 'slidepanel', opened: true }))
         }

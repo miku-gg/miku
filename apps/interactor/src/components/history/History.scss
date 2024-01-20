@@ -183,6 +183,13 @@
 
   &__trigger {
     font-size: 1.2rem;
+
+    &:disabled {
+      svg {
+        color: gray;
+        cursor: default;
+      }
+    }
   }
 
   &__edit-modal.Modal {

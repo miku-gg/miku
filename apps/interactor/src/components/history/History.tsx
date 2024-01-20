@@ -311,11 +311,16 @@ const History = (): JSX.Element => {
   const { opened: editOpened, id: editId } = useAppSelector(
     (state) => state.settings.modals.edit
   )
+  const { disabled: inputDisabled } = useAppSelector(
+    (state) => state.narration.input
+  )
+
   return (
     <div className="History">
       <button
         className="History__trigger icon-button"
         onClick={() => dispatch(setHistoryModal(true))}
+        disabled={inputDisabled}
       >
         <GrHistory />
       </button>

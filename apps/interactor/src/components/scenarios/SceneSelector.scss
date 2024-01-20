@@ -11,6 +11,13 @@
     display: inline-flex;
 
     font-size: 1.5rem;
+
+    &:disabled {
+      svg {
+        color: gray;
+        cursor: default;
+      }
+    }
   }
 
   &__list-container {
