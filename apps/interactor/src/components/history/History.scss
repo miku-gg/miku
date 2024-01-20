@@ -46,8 +46,29 @@
       }
     }
 
+    &__delete-btn {
+      position: absolute;
+      right: 1px;
+      top: -16px;
+      opacity: 0;
+      transition: all 0.2s ease-out;
+      color: lightcoral;
+      padding-right: 10%;
+      z-index: -1;
+
+      &:hover {
+        color: red;
+      }
+    }
+
     &:hover {
       .DialogueNode__edit-btn {
+        opacity: 1;
+      }
+    }
+
+    &:hover {
+      .DialogueNode__delete-btn {
         opacity: 1;
       }
     }
@@ -72,6 +93,15 @@
 
         &:hover {
           color: white;
+        }
+      }
+
+      .DialogueNode__delete-btn {
+        opacity: 1;
+        color: lightcoral;
+
+        &:hover {
+          color: red;
         }
       }
     }
@@ -136,6 +166,7 @@
   }
 
   &__modal-container.Modal {
+    overflow: clip;
     width: 90%;
     max-width: initial;
     z-index: 3;

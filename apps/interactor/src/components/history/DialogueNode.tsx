@@ -4,13 +4,46 @@ import { Handle, Position } from 'reactflow'
 import classNames from 'classnames'
 import { DialogueNodeData } from './utils'
 import { FaPencil } from 'react-icons/fa6'
-import { useAppDispatch } from '../../state/store'
-import { setEditModal } from '../../state/slices/settingsSlice'
+import { useAppDispatch, useAppSelector } from '../../state/store'
+import {
+  setDeleteNodeConfirmationModal,
+  setEditModal,
+} from '../../state/slices/settingsSlice'
 import { useFillTextTemplate } from '../../libs/hooks'
 import { useAppContext } from '../../App.context'
+import { FaTrash } from 'react-icons/fa'
 
 export default memo(({ data }: { data: DialogueNodeData }) => {
   const dispatch = useAppDispatch()
+  const narration = useAppSelector((state) => state.narration)
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    dispatch(
+      setDeleteNodeConfirmationModal({
+        opened: true,
+        id: data.id,
+      })
+    )
+  }
+
+  const canDelete = () => {
+    let hasSwipes = false
+    const response = narration.responses[data.id]
+    if (response) {
+      const parentInteractionID = response.parentInteractionId
+      if (parentInteractionID) {
+        const parentInteraction = narration.interactions[parentInteractionID]
+        if (parentInteraction) {
+          hasSwipes = parentInteraction.responsesId.length > 1
+        }
+      }
+    }
+
+    return !data.isRoot && (hasSwipes || data.isUser)
+  }
+
   const { assetLinkLoader } = useAppContext()
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
@@ -55,6 +88,11 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
       <button className="DialogueNode__edit-btn" onClick={handleEdit}>
         <FaPencil />
       </button>
+      {canDelete() && (
+        <button className="DialogueNode__delete-btn" onClick={handleDelete}>
+          <FaTrash />
+        </button>
+      )}
       <div className="DialogueNode__text scrollbar">{displayText}</div>
       {/* eslint-disable-next-line */}
       {/* @ts-ignore */}
