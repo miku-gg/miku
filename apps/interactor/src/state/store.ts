@@ -10,7 +10,7 @@ import {
   interactionListenerMiddleware,
   regenerationListenerMiddleware,
   roleResponseListenerMiddleware,
-} from './listeners'
+} from './listeners/interaction'
 import { stateReplacementMiddleware } from './slices/replaceState'
 import updateStateMiddleware from './updateState.middleware'
 

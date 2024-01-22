@@ -1,5 +1,5 @@
 import { useAppSelector } from '../state/store'
-import { fillTextTemplate } from '../libs/memory/strategies/utils'
+import { fillTextTemplate } from './prompts/strategies/utils'
 import { selectCurrentScene } from '../state/selectors'
 
 export const useFillTextTemplate = (text: string) => {

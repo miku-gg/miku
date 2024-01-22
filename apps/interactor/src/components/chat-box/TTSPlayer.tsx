@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react'
 import { useAppSelector } from '../../state/store'
 import { selectLastLoadedCharacters } from '../../state/selectors'
-import { replaceAll } from '../../libs/memory/strategies/utils'
+import { replaceAll } from '../../libs/prompts/strategies/utils'
 import { MdRecordVoiceOver } from 'react-icons/md'
 import { Tooltip } from '@mikugg/ui-kit'
 import classNames from 'classnames'

@@ -61,7 +61,8 @@
     // font-style: italic;
   }
 
-  &__submit {
+  &__submit,
+  &__suggestion-trigger {
     background-color: transparent;
     outline: none;
     border: none;
@@ -80,6 +81,21 @@
     &:hover {
       color: #c4b5fd;
     }
+  }
+
+  &__suggestion-trigger {
+    font-size: 1.3rem;
+    width: 1.6rem;
+    display: flex;
+    justify-content: center;
+
+    &--generated {
+      color: $color-geen;
+    }
+  }
+
+  #suggestion-tooltip {
+    background-color: $text-3;
   }
 }
 

@@ -229,3 +229,69 @@ export const selectCurrentCharacterOutfits = createSelector(
     )
   }
 )
+
+export const selectChatHistory = createSelector(
+  [
+    selectAllParentDialogues,
+    (state: RootState) => state.novel.characters,
+    (state: RootState) => state,
+  ],
+  (
+    dialogues,
+    characters,
+    state
+  ): {
+    name: string
+    text: string
+    type: 'response' | 'interaction'
+  }[] => {
+    return dialogues
+      .map(
+        (
+          dialogue
+        ): {
+          name: string
+          text: string
+          type: 'response' | 'interaction'
+        }[] => {
+          const interaction = state.narration.interactions[dialogue.item.id]
+          if (interaction) {
+            const character = state.settings.user.name
+            return [
+              {
+                name: character,
+                text: interaction.query,
+                type: 'interaction',
+              },
+            ]
+          }
+
+          const response = state.narration.responses[dialogue.item.id]
+          if (response) {
+            return response.characters.map(
+              ({
+                role,
+                text,
+              }): {
+                name: string
+                text: string
+                type: 'response' | 'interaction'
+              } => {
+                const char = Object.values(characters).find(
+                  (character) => character?.roles[role] !== undefined
+                )
+                return {
+                  name: char?.name || '',
+                  text,
+                  type: 'response',
+                }
+              }
+            )
+          } else {
+            return []
+          }
+        }
+      )
+      .flat()
+  }
+)

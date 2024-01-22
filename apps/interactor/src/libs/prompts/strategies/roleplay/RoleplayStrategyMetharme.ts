@@ -1,12 +1,12 @@
-import { AbstractPromptStrategy } from './AbtractPromptStrategy'
-import { RootState } from '../../../state/store'
+import { AbstractRoleplayStrategy } from './AbstractRoleplayStrategy'
+import { RootState } from '../../../../state/store'
 import { EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
 import {
   selectCurrentCharacterOutfits,
   selectCurrentScene,
-} from '../../../state/selectors'
+} from '../../../../state/selectors'
 
-export class RoleplayStrategyMetharme extends AbstractPromptStrategy {
+export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
   protected override getContextPrompt(
     state: RootState,
     currentRole: string
