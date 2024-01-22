@@ -7,12 +7,12 @@ import {
   NarrationResponse,
   continueResponse,
   roleResponseStart,
-} from './slices/narrationSlice'
-import { RootState } from './store'
-import textCompletion from '../libs/textCompletion'
-import PromptBuilder from '../libs/prompts/PromptBuilder'
-import { retrieveStrategy } from '../libs/retrieveStrategy'
-import { ModelType } from './versioning'
+} from '../slices/narrationSlice'
+import { RootState } from '../store'
+import textCompletion from '../../libs/textCompletion'
+import RoleplayPromptBuilder from '../../libs/prompts/PromptBuilder'
+import { retrieveStrategy } from '../../libs/retrieveStrategy'
+import { ModelType } from '../versioning'
 
 const interactionEffect = async (
   dispatch: Dispatch,
@@ -24,7 +24,7 @@ const interactionEffect = async (
     let currentResponseState: NarrationResponse =
       state.narration.responses[state.narration.currentResponseId]!
     const role = selectedRole
-    const promptBuilder = new PromptBuilder({
+    const promptBuilder = new RoleplayPromptBuilder({
       maxNewTokens: 200,
       strategy:
         (await retrieveStrategy(servicesEndpoint, state.settings.model)) ||
@@ -47,7 +47,8 @@ const interactionEffect = async (
       currentResponseState = promptBuilder.completeResponse(
         currentResponseState,
         result,
-        role
+        role,
+        state
       )
       dispatch(
         interactionSuccess({

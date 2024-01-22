@@ -3,23 +3,29 @@ import {
   EMPTY_MIKU_CARD,
   MikuCard,
 } from '@mikugg/bot-utils'
-import { RootState } from '../../../state/store'
+import { RootState } from '../../../../state/store'
 import {
   NarrationInteraction,
   NarrationResponse,
-} from '../../../state/versioning'
-import llamaTokenizer from '../_llama-tokenizer'
-import { fillTextTemplate, parseLLMResponse } from '.'
+} from '../../../../state/versioning'
+import llamaTokenizer from '../../_llama-tokenizer'
+import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..'
 import {
   selectCurrentScene,
   selectCurrentCharacterOutfits,
   selectLastLoadedCharacters,
   selectAllParentDialogues,
-} from '../../../state/selectors'
+} from '../../../../state/selectors'
 
 const EMOTION_TOKEN_OFFSET = 4
 
-export abstract class AbstractPromptStrategy {
+export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
+  {
+    state: RootState
+    currentRole: string
+  },
+  NarrationResponse
+> {
   protected abstract getContextPrompt(
     state: RootState,
     currentRole: string
@@ -32,38 +38,46 @@ export abstract class AbstractPromptStrategy {
     stops: string[]
   }
 
-  public buildPrompt(
-    state: RootState,
+  public buildGuidancePrompt(
     maxNewTokens: number,
     memorySize: number,
-    currentRole: string
+    input: {
+      state: RootState
+      currentRole: string
+    }
   ): {
     template: string
     variables: Record<string, string | string[]>
     totalTokens: number
   } {
-    const roles = selectCurrentScene(state)?.roles || []
-    const outfits = selectCurrentCharacterOutfits(state)
+    const roles = selectCurrentScene(input.state)?.roles || []
+    const outfits = selectCurrentCharacterOutfits(input.state)
     const currentCharacter =
-      outfits.find(({ role }) => role === currentRole) || null
+      outfits.find(({ role }) => role === input.currentRole) || null
     const { name } = this.getCharacterSpecs(
-      state.novel.characters[currentCharacter?.id || '']?.card ||
+      input.state.novel.characters[currentCharacter?.id || '']?.card ||
         EMPTY_MIKU_CARD
     )
-    const emotions = this.getRoleEmotions(state, currentRole)
+    const emotions = this.getRoleEmotions(input.state, input.currentRole)
 
-    let template = this.getContextPrompt(state, currentRole)
-    template += this.getDialogueHistoryPrompt(state, memorySize, {
-      name: state.novel.characters[currentCharacter?.id || '']?.name || '',
-      roles: state.novel.characters[currentCharacter?.id || '']?.roles || {},
+    let template = this.getContextPrompt(input.state, input.currentRole)
+    template += this.getDialogueHistoryPrompt(input.state, memorySize, {
+      name:
+        input.state.novel.characters[currentCharacter?.id || '']?.name || '',
+      roles:
+        input.state.novel.characters[currentCharacter?.id || '']?.roles || {},
     })
-    template += this.getResponseAskLine(state, maxNewTokens, currentRole)
+    template += this.getResponseAskLine(
+      input.state,
+      maxNewTokens,
+      input.currentRole
+    )
 
     template = fillTextTemplate(template, {
-      user: state.settings.user.name,
+      user: input.state.settings.user.name,
       bot: name,
       roles: roles.reduce((prev, { role, characterId }) => {
-        prev[role] = state.novel.characters[characterId]?.name || ''
+        prev[role] = input.state.novel.characters[characterId]?.name || ''
         return prev
       }, {} as Record<string, string>),
     })
@@ -72,8 +86,9 @@ export abstract class AbstractPromptStrategy {
       this.countTokens(template) + maxNewTokens + EMOTION_TOKEN_OFFSET
 
     const parentEmotion =
-      selectLastLoadedCharacters(state).find(({ role }) => role === currentRole)
-        ?.emotion || ''
+      selectLastLoadedCharacters(input.state).find(
+        ({ role }) => role === input.currentRole
+      )?.emotion || ''
 
     return {
       template,
@@ -87,15 +102,18 @@ export abstract class AbstractPromptStrategy {
   }
 
   public completeResponse(
+    input: {
+      state: RootState
+      currentRole: string
+    },
     response: NarrationResponse,
-    variables: Map<string, string>,
-    role: string
+    variables: Map<string, string>
   ): NarrationResponse {
     const currentCharacterResponse = response.characters.find(
-      ({ role: characterRole }) => characterRole === role
+      ({ role: characterRole }) => characterRole === input.currentRole
     )
     const characterResponse = {
-      role: currentCharacterResponse?.role || role,
+      role: currentCharacterResponse?.role || input.currentRole,
       text: currentCharacterResponse?.text || '',
       emotion: currentCharacterResponse?.emotion || '',
       pose: currentCharacterResponse?.pose || '',
@@ -107,7 +125,7 @@ export abstract class AbstractPromptStrategy {
     )
 
     const index = response.characters.findIndex(
-      ({ role: characterRole }) => characterRole === role
+      ({ role: characterRole }) => characterRole === input.currentRole
     )
 
     return {

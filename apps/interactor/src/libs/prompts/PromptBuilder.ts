@@ -3,17 +3,17 @@ import { RootState } from '../../state/store'
 import { selectAllParentDialogues } from '../../state/selectors'
 import { NarrationResponse } from '../../state/versioning'
 
-export interface PromptBuilderOptions {
+export interface RoleplayPromptBuilderOptions {
   strategy: Strategies.StrategySlug
   trucationLength: number
   maxNewTokens: number
 }
 
-class PromptBuilder {
-  private options: PromptBuilderOptions
-  private strategy: Strategies.AbstractPromptStrategy
+class RoleplayPromptBuilder {
+  private options: RoleplayPromptBuilderOptions
+  private strategy: Strategies.AbstractRoleplayStrategy
 
-  constructor(options: PromptBuilderOptions) {
+  constructor(options: RoleplayPromptBuilderOptions) {
     this.options = options
     this.strategy = this.getStrategyFromSlug(options.strategy)
   }
@@ -36,11 +36,10 @@ class PromptBuilder {
         return minIndex
       }
       const midIndex = Math.floor((minIndex + maxIndex) / 2)
-      const tokens = this.strategy.buildPrompt(
-        state,
+      const tokens = this.strategy.buildGuidancePrompt(
         this.options.maxNewTokens,
         midIndex,
-        role
+        { state, currentRole: role }
       ).totalTokens
       if (tokens > maxTokens) {
         return recursiveBinarySearch(minIndex, midIndex - 1, maxTokens)
@@ -52,29 +51,33 @@ class PromptBuilder {
       recursiveBinarySearch(0, messages.length, this.options.trucationLength) -
       1
 
-    return this.strategy.buildPrompt(
-      state,
+    return this.strategy.buildGuidancePrompt(
       this.options.maxNewTokens,
       memorySize,
-      role
+      { state, currentRole: role }
     )
   }
 
   public completeResponse(
     response: NarrationResponse,
     variables: Map<string, string>,
-    role: string
+    role: string,
+    state: RootState
   ): NarrationResponse {
-    return this.strategy.completeResponse(response, variables, role)
+    return this.strategy.completeResponse(
+      { currentRole: role, state },
+      response,
+      variables
+    )
   }
 
-  public setStrategy(strategy: Strategies.StrategySlug) {
+  public setRoleplayStrategy(strategy: Strategies.StrategySlug) {
     this.strategy = this.getStrategyFromSlug(strategy)
   }
 
   private getStrategyFromSlug(
     slug: Strategies.StrategySlug
-  ): Strategies.AbstractPromptStrategy {
+  ): Strategies.AbstractRoleplayStrategy {
     switch (slug) {
       case 'alpacarp':
         return new Strategies.RoleplayStrategyAlpaca()
@@ -86,4 +89,4 @@ class PromptBuilder {
   }
 }
 
-export default PromptBuilder
+export default RoleplayPromptBuilder

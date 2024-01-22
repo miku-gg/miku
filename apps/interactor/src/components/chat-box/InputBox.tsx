@@ -1,6 +1,7 @@
 import {
   interactionStart,
   setInputText,
+  setSuggestions,
 } from '../../state/slices/narrationSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { FaPaperPlane } from 'react-icons/fa'
@@ -16,6 +17,10 @@ import { toast } from 'react-toastify'
 import { trackEvent } from '../../libs/analytics'
 import classNames from 'classnames'
 import { Tooltip } from '@mikugg/ui-kit'
+import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSuggestionStrategy'
+import textCompletion from '../../libs/textCompletion'
+import React, { useState } from 'react'
+import { Loader } from '../common/Loader'
 
 let lastInteractionTime = Date.now()
 const InputBox = (): JSX.Element | null => {
@@ -23,8 +28,14 @@ const InputBox = (): JSX.Element | null => {
   const { servicesEndpoint, isInteractionDisabled } = useAppContext()
   const { text, disabled } = useAppSelector((state) => state.narration.input)
   const novelTitle = useAppSelector((state) => state.novel.title)
+  const state = useAppSelector((state) => state)
   const scene = useAppSelector(selectCurrentScene)
   const lastResponse = useAppSelector(selectLastLoadedResponse)
+  const suggestions = useAppSelector(
+    (state) => state.narration.input.suggestions
+  )
+  const [isAutocompleteLoading, setIsAutocompleteLoading] =
+    useState<boolean>(false)
 
   const onSubmit = (e: React.FormEvent<unknown>) => {
     e.stopPropagation()
@@ -56,7 +67,40 @@ const InputBox = (): JSX.Element | null => {
     )
   }
 
-  const onAutocomplete = () => {}
+  const onAutocomplete = async (e: React.MouseEvent<unknown>) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (suggestions.length > 0) {
+      const newSuggestions = [...suggestions]
+      const first = newSuggestions.shift()
+      if (first) newSuggestions.push(first)
+      dispatch(setSuggestions(newSuggestions))
+      dispatch(setInputText(newSuggestions[0]))
+      return
+    }
+    setIsAutocompleteLoading(true)
+    try {
+      const strategy = new AlpacaSuggestionStrategy()
+      const prompt = strategy.buildGuidancePrompt(4096, 100, state)
+      const stream = textCompletion({
+        template: prompt.template,
+        variables: prompt.variables,
+        model: state.settings.model,
+        serviceBaseUrl: servicesEndpoint,
+      })
+
+      let response: string[] = []
+      for await (const result of stream) {
+        response = strategy.completeResponse(state, response, result)
+      }
+      dispatch(setInputText(response[0]))
+      dispatch(setSuggestions(response))
+      setIsAutocompleteLoading(false)
+    } catch (err) {
+      setIsAutocompleteLoading(false)
+      console.error(err)
+    }
+  }
 
   return (
     <div className="InputBox">
@@ -81,14 +125,18 @@ const InputBox = (): JSX.Element | null => {
           placeholder="Type a message..."
         />
         <button
-          className="InputBox__suggestion-trigger"
-          disabled={disabled}
+          className={classNames({
+            'InputBox__suggestion-trigger': true,
+            'InputBox__suggestion-trigger--disabled': disabled,
+            'InputBox__suggestion-trigger--generated': suggestions.length > 0,
+          })}
+          disabled={disabled || isAutocompleteLoading}
           data-tooltip-id={`suggestion-tooltip`}
-          data-tooltip-html="Autocomplete"
+          data-tooltip-html={!suggestions.length ? 'Autocomplete' : ''}
           data-tooltip-varaint="light"
           onClick={onAutocomplete}
         >
-          <GiFeather />
+          {isAutocompleteLoading ? <Loader /> : <GiFeather />}
         </button>
         <button className="InputBox__submit" disabled={disabled}>
           <FaPaperPlane />

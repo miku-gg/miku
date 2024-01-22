@@ -1,12 +1,12 @@
-import { AbstractPromptStrategy } from './AbtractPromptStrategy'
-import { RootState } from '../../../state/store'
+import { RootState } from '../../../../state/store'
 import { EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
 import {
   selectCurrentCharacterOutfits,
   selectCurrentScene,
-} from '../../../state/selectors'
+} from '../../../../state/selectors'
+import { AbstractRoleplayStrategy } from './AbstractRoleplayStrategy'
 
-export class RoleplayStrategyAlpaca extends AbstractPromptStrategy {
+export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
   protected override getContextPrompt(
     state: RootState,
     currentRole: string

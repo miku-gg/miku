@@ -37,6 +37,9 @@ const narrationSlice = createSlice({
     setInputText(state, action: PayloadAction<string>) {
       state.input.text = action.payload
     },
+    setSuggestions(state, action: PayloadAction<string[]>) {
+      state.input.suggestions = action.payload
+    },
     interactionStart(
       state,
       action: PayloadAction<{
@@ -86,6 +89,7 @@ const narrationSlice = createSlice({
       state.responses[response.id] = response
       state.currentResponseId = response.id
       state.input.disabled = true
+      state.input.suggestions = []
     },
     interactionFailure(state) {
       state.input.disabled = false
@@ -186,6 +190,7 @@ const narrationSlice = createSlice({
 
       state.input.disabled = true
       state.currentResponseId = response.id
+      state.input.suggestions = []
     },
     continueResponse(
       state,
@@ -242,6 +247,7 @@ const narrationSlice = createSlice({
       response.selectedRole = role
       response.fetching = true
       state.input.disabled = true
+      state.input.suggestions = []
     },
     swipeResponse(state, action: PayloadAction<string>) {
       const response = state.responses[action.payload]
@@ -258,6 +264,7 @@ const narrationSlice = createSlice({
         }
         response.selected = true
         state.currentResponseId = response.id
+        state.input.suggestions = []
       }
     },
     updateResponse(
@@ -364,6 +371,7 @@ const narrationSlice = createSlice({
 export const {
   setNarration,
   setInputText,
+  setSuggestions,
   interactionFailure,
   interactionStart,
   interactionSuccess,

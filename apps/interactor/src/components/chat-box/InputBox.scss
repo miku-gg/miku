@@ -85,6 +85,13 @@
 
   &__suggestion-trigger {
     font-size: 1.3rem;
+    width: 1.6rem;
+    display: flex;
+    justify-content: center;
+
+    &--generated {
+      color: $color-geen;
+    }
   }
 
   #suggestion-tooltip {
