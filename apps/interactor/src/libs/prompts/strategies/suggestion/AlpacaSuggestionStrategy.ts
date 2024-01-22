@@ -38,7 +38,7 @@ export class AlpacaSuggestionStrategy extends AbstractPromptStrategy<
   }
 
   public completeResponse(
-    input: RootState,
+    _input: RootState,
     response: string[],
     variables: Map<string, string>
   ): string[] {
