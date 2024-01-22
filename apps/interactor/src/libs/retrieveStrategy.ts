@@ -1,12 +1,15 @@
 import { ModelType } from '../state/versioning'
-import { StrategySlug, isOfTypeStrategySlug } from './prompts/strategies'
+import {
+  RoleplayStrategySlug,
+  isOfTypeStrategySlug,
+} from './prompts/strategies/roleplay'
 
-const cacheStrategy = new Map<ModelType, StrategySlug>()
+const cacheStrategy = new Map<ModelType, RoleplayStrategySlug>()
 
-export async function retrieveStrategy(
+export async function retrieveModelStrategy(
   servicesEndpoint: string,
   model: ModelType
-): Promise<StrategySlug> {
+): Promise<RoleplayStrategySlug> {
   try {
     if (!cacheStrategy.get(model)) {
       const response = await fetch(
@@ -22,7 +25,7 @@ export async function retrieveStrategy(
         throw new Error('Error getting prompt strategy')
       }
       const data = await response.json()
-      cacheStrategy.set(model, data.strategy as StrategySlug)
+      cacheStrategy.set(model, data.strategy as RoleplayStrategySlug)
     }
 
     const strategy = cacheStrategy.get(model)

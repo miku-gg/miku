@@ -1,31 +1,45 @@
-import * as Strategies from './strategies'
-import { RootState } from '../../state/store'
-import { selectAllParentDialogues } from '../../state/selectors'
-import { NarrationResponse } from '../../state/versioning'
+import { AbstractPromptStrategy } from './strategies'
 
-export interface RoleplayPromptBuilderOptions {
-  strategy: Strategies.StrategySlug
+type InferI<T> = T extends AbstractPromptStrategy<infer I, unknown> ? I : never
+type InferO<T> = T extends AbstractPromptStrategy<unknown, infer O> ? O : never
+
+export interface PromptBuilderOptions<
+  StrategyClass extends AbstractPromptStrategy<unknown, unknown>
+> {
+  strategy: StrategyClass
   trucationLength: number
   maxNewTokens: number
 }
+class PromptBuilder<
+  StrategyClass extends AbstractPromptStrategy<unknown, unknown>
+> {
+  private options: PromptBuilderOptions<
+    AbstractPromptStrategy<InferI<StrategyClass>, InferO<StrategyClass>>
+  >
+  private strategy: AbstractPromptStrategy<
+    InferI<StrategyClass>,
+    InferO<StrategyClass>
+  >
 
-class RoleplayPromptBuilder {
-  private options: RoleplayPromptBuilderOptions
-  private strategy: Strategies.AbstractRoleplayStrategy
-
-  constructor(options: RoleplayPromptBuilderOptions) {
+  constructor(
+    options: PromptBuilderOptions<
+      AbstractPromptStrategy<InferI<StrategyClass>, InferO<StrategyClass>>
+    >
+  ) {
     this.options = options
-    this.strategy = this.getStrategyFromSlug(options.strategy)
+    this.strategy = options.strategy as AbstractPromptStrategy<
+      InferI<StrategyClass>,
+      InferO<StrategyClass>
+    >
   }
 
   public buildPrompt(
-    state: RootState,
-    role: string
+    input: InferI<StrategyClass>,
+    maxMemorySize: number
   ): {
     template: string
     variables: Record<string, string | string[]>
   } {
-    const messages = selectAllParentDialogues(state)
     // binary search for the last message that fits within the max tokens
     const recursiveBinarySearch = (
       minIndex: number,
@@ -39,7 +53,7 @@ class RoleplayPromptBuilder {
       const tokens = this.strategy.buildGuidancePrompt(
         this.options.maxNewTokens,
         midIndex,
-        { state, currentRole: role }
+        input
       ).totalTokens
       if (tokens > maxTokens) {
         return recursiveBinarySearch(minIndex, midIndex - 1, maxTokens)
@@ -48,45 +62,31 @@ class RoleplayPromptBuilder {
       }
     }
     const memorySize =
-      recursiveBinarySearch(0, messages.length, this.options.trucationLength) -
-      1
+      recursiveBinarySearch(0, maxMemorySize, this.options.trucationLength) - 1
 
     return this.strategy.buildGuidancePrompt(
       this.options.maxNewTokens,
       memorySize,
-      { state, currentRole: role }
+      input
     )
   }
 
   public completeResponse(
-    response: NarrationResponse,
+    response: InferO<StrategyClass>,
     variables: Map<string, string>,
-    role: string,
-    state: RootState
-  ): NarrationResponse {
-    return this.strategy.completeResponse(
-      { currentRole: role, state },
-      response,
-      variables
-    )
+    input: InferI<StrategyClass>
+  ): InferO<StrategyClass> {
+    return this.strategy.completeResponse(input, response, variables)
   }
 
-  public setRoleplayStrategy(strategy: Strategies.StrategySlug) {
-    this.strategy = this.getStrategyFromSlug(strategy)
-  }
-
-  private getStrategyFromSlug(
-    slug: Strategies.StrategySlug
-  ): Strategies.AbstractRoleplayStrategy {
-    switch (slug) {
-      case 'alpacarp':
-        return new Strategies.RoleplayStrategyAlpaca()
-      case 'metharmerp':
-        return new Strategies.RoleplayStrategyMetharme()
-      default:
-        throw new Error(`Invalid strategy slug: ${slug}`)
-    }
+  public setStrategy(
+    strategy: AbstractPromptStrategy<
+      InferI<StrategyClass>,
+      InferO<StrategyClass>
+    >
+  ) {
+    this.strategy = strategy
   }
 }
 
-export default RoleplayPromptBuilder
+export default PromptBuilder

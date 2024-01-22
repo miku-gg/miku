@@ -21,6 +21,7 @@ import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggesti
 import textCompletion from '../../libs/textCompletion'
 import React, { useState } from 'react'
 import { Loader } from '../common/Loader'
+import PromptBuilder from '../../libs/prompts/PromptBuilder'
 
 let lastInteractionTime = Date.now()
 const InputBox = (): JSX.Element | null => {
@@ -80,8 +81,12 @@ const InputBox = (): JSX.Element | null => {
     }
     setIsAutocompleteLoading(true)
     try {
-      const strategy = new AlpacaSuggestionStrategy()
-      const prompt = strategy.buildGuidancePrompt(4096, 100, state)
+      const promptBuilder = new PromptBuilder<AlpacaSuggestionStrategy>({
+        maxNewTokens: 35,
+        strategy: new AlpacaSuggestionStrategy(),
+        trucationLength: 4096,
+      })
+      const prompt = promptBuilder.buildPrompt(state, 30)
       const stream = textCompletion({
         template: prompt.template,
         variables: prompt.variables,
@@ -91,7 +96,7 @@ const InputBox = (): JSX.Element | null => {
 
       let response: string[] = []
       for await (const result of stream) {
-        response = strategy.completeResponse(state, response, result)
+        response = promptBuilder.completeResponse(response, result, state)
       }
       dispatch(setInputText(response[0]))
       dispatch(setSuggestions(response))

@@ -1,7 +1,6 @@
 import { AbstractPromptStrategy } from '../AbstractPromptStrategy'
 import { selectChatHistory } from '../../../../state/selectors'
 import { RootState } from '../../../../state/store'
-import llamaTokenizer from '../../_llama-tokenizer'
 
 export class AlpacaSuggestionStrategy extends AbstractPromptStrategy<
   RootState,
@@ -16,7 +15,6 @@ export class AlpacaSuggestionStrategy extends AbstractPromptStrategy<
     variables: Record<string, string | string[]>
     totalTokens: number
   } {
-    const maxTokens = 35
     const personas = Object.values(input.novel.characters)
       .map((character) => character?.card?.data?.description || '')
       .filter(Boolean)
@@ -28,14 +26,14 @@ export class AlpacaSuggestionStrategy extends AbstractPromptStrategy<
     template += `### Instruction:\n`
     template += `Suggest 3 possible reply dialogs from ${input.settings.user.name} to continue the conversation. They MUST BE ONE SENTENCE EACH.\n`
     template += `### Response:\n`
-    template += `Smart Reply: ${input.settings.user.name}: "{{GEN smart max_tokens=${maxTokens} stop=["\\n", "\\""]}}"\n`
-    template += `Funny Reply: ${input.settings.user.name}: "{{GEN funny max_tokens=${maxTokens} stop=["\\n", "\\""]}}"\n`
-    template += `Flirty Reply: ${input.settings.user.name}: "{{GEN flirt max_tokens=${maxTokens} stop=["\\n", "\\""]}}"\n`
+    template += `Smart Reply: ${input.settings.user.name}: "{{GEN smart max_tokens=${maxNewTokens} stop=["\\n", "\\""]}}"\n`
+    template += `Funny Reply: ${input.settings.user.name}: "{{GEN funny max_tokens=${maxNewTokens} stop=["\\n", "\\""]}}"\n`
+    template += `Flirty Reply: ${input.settings.user.name}: "{{GEN flirt max_tokens=${maxNewTokens} stop=["\\n", "\\""]}}"\n`
 
     return {
       template,
       variables: {},
-      totalTokens: llamaTokenizer.encode(template).length,
+      totalTokens: this.countTokens(template) + maxNewTokens * 3,
     }
   }
 

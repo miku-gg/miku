@@ -8,7 +8,6 @@ import {
   NarrationInteraction,
   NarrationResponse,
 } from '../../../../state/versioning'
-import llamaTokenizer from '../../_llama-tokenizer'
 import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..'
 import {
   selectCurrentScene,
@@ -285,11 +284,6 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
           ?.template || 'base-emotions'
       ].emotionIds
     return characterEmotions
-  }
-
-  protected countTokens(template: string): number {
-    const _template = template.replace(/{{.*?}}/g, '')
-    return llamaTokenizer.encode(_template).length
   }
 
   private parseAttributes(s: string): [string, string][] {

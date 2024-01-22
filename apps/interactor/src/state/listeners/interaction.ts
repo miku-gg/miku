@@ -10,9 +10,12 @@ import {
 } from '../slices/narrationSlice'
 import { RootState } from '../store'
 import textCompletion from '../../libs/textCompletion'
-import RoleplayPromptBuilder from '../../libs/prompts/PromptBuilder'
-import { retrieveStrategy } from '../../libs/retrieveStrategy'
+import PromptBuilder from '../../libs/prompts/PromptBuilder'
+import { retrieveModelStrategy } from '../../libs/retrieveStrategy'
 import { ModelType } from '../versioning'
+import { AbstractRoleplayStrategy } from '../../libs/prompts/strategies'
+import { getRoleplayStrategyFromSlug } from '../../libs/prompts/strategies/roleplay'
+import { selectAllParentDialogues } from '../selectors'
 
 const interactionEffect = async (
   dispatch: Dispatch,
@@ -24,18 +27,23 @@ const interactionEffect = async (
     let currentResponseState: NarrationResponse =
       state.narration.responses[state.narration.currentResponseId]!
     const role = selectedRole
-    const promptBuilder = new RoleplayPromptBuilder({
+    const strategySlug =
+      (await retrieveModelStrategy(servicesEndpoint, state.settings.model)) ||
+      'alpacarp'
+    const maxMessages = selectAllParentDialogues(state).length
+    const promptBuilder = new PromptBuilder<AbstractRoleplayStrategy>({
       maxNewTokens: 200,
-      strategy:
-        (await retrieveStrategy(servicesEndpoint, state.settings.model)) ||
-        'alpacarp',
+      strategy: getRoleplayStrategyFromSlug(strategySlug),
       trucationLength:
         state.settings.model === ModelType.RP_SMART ? 8192 : 4096,
     })
     const startText =
       currentResponseState.characters.find(({ role: _role }) => _role == role)
         ?.text || ''
-    const completionQuery = promptBuilder.buildPrompt(state, role)
+    const completionQuery = promptBuilder.buildPrompt(
+      { state, currentRole: role },
+      maxMessages
+    )
     const stream = textCompletion({
       ...completionQuery,
       model: state.settings.model,
@@ -47,8 +55,7 @@ const interactionEffect = async (
       currentResponseState = promptBuilder.completeResponse(
         currentResponseState,
         result,
-        role,
-        state
+        { state, currentRole: role }
       )
       dispatch(
         interactionSuccess({
