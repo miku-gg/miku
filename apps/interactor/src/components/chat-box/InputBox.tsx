@@ -71,6 +71,15 @@ const InputBox = (): JSX.Element | null => {
   const onAutocomplete = async (e: React.MouseEvent<unknown>) => {
     e.stopPropagation()
     e.preventDefault()
+    if (isInteractionDisabled) {
+      toast.warn('Please log in to interact.', {
+        position: 'top-center',
+        style: {
+          top: 10,
+        },
+      })
+      return
+    }
     if (suggestions.length > 0) {
       const newSuggestions = [...suggestions]
       const first = newSuggestions.shift()
