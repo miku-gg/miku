@@ -62,7 +62,11 @@ class PromptBuilder<
       }
     }
     const memorySize =
-      recursiveBinarySearch(0, maxMemorySize, this.options.trucationLength) - 1
+      recursiveBinarySearch(
+        0,
+        maxMemorySize,
+        this.options.trucationLength - 200
+      ) - 1
 
     return this.strategy.buildGuidancePrompt(
       this.options.maxNewTokens,
