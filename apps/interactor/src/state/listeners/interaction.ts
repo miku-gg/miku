@@ -35,7 +35,7 @@ const interactionEffect = async (
       maxNewTokens: 200,
       strategy: getRoleplayStrategyFromSlug(strategySlug),
       trucationLength:
-        state.settings.model === ModelType.RP_SMART ? 8192 : 4096,
+        state.settings.model === ModelType.RP_SMART ? 4096 : 4096,
     })
     const startText =
       currentResponseState.characters.find(({ role: _role }) => _role == role)
