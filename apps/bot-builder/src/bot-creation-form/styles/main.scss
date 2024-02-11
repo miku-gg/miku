@@ -1,22 +1,8 @@
-@import "variables";
-@import "buttons";
-@import "topbar";
 @import "step1-description";
 @import "step2-assets";
 @import "step3-scenarios";
 @import "step4-preview";
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  background-color: #121a36;
-  font-family: "Poppins", "Roboto", sans-serif;
-  color: $text-1;
-  padding: 0;
-  margin: 0;
-}
 .characterCreationForm {
   display: flex;
   flex-direction: column;

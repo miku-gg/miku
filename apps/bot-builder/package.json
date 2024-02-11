@@ -47,6 +47,7 @@
     "@mikugg/bot-utils": "workspace:^",
     "@mikugg/ui-kit": "workspace:^",
     "@primer/octicons-react": "^17.12.0",
+    "@reduxjs/toolkit": "^2.0.1",
     "@types/axios": "^0.14.0",
     "@types/base-64": "^1.0.0",
     "@types/polycrc": "^0.1.0",
@@ -64,6 +65,9 @@
     "png-chunks-extract": "^1.0.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
+    "react-icons": "^4.12.0",
+    "react-redux": "^9.0.4",
+    "react-toastify": "^9.1.1",
     "remove": "^0.1.5",
     "uuid": "^9.0.0",
     "vite-plugin-plain-text": "^1.4.2"

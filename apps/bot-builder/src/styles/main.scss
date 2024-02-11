@@ -1,0 +1,42 @@
+@import "variables";
+@import "buttons";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(#0c0a1d 0%, #1e1a41 100%);
+  min-height: 100vh;
+  font-family: "Poppins", "Roboto", sans-serif;
+  color: $text-1;
+  padding: 0;
+  margin: 0;
+}
+
+.page-container {
+  background-color: transparent;
+  padding: 1.5rem;
+  border-radius: 1rem;
+}
+
+.group {
+  background-color: $background-2;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.title {
+  font-size: 1.375rem;
+  font-weight: 600;
+}
+
+.title-small {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.app {
+  margin: 0 auto;
+  max-width: 1200px;
+}

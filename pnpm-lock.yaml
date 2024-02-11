@@ -32,6 +32,9 @@ importers:
       '@primer/octicons-react':
         specifier: ^17.12.0
         version: 17.12.0(react@18.2.0)
+      '@reduxjs/toolkit':
+        specifier: ^2.0.1
+        version: 2.0.1(react-redux@9.0.4)(react@18.2.0)
       '@types/axios':
         specifier: ^0.14.0
         version: 0.14.0
@@ -83,6 +86,15 @@ importers:
       react:
         specifier: ^18.2.0
         version: 18.2.0
+      react-icons:
+        specifier: ^4.12.0
+        version: 4.12.0(react@18.2.0)
+      react-redux:
+        specifier: ^9.0.4
+        version: 9.0.4(@types/react@18.2.45)(react@18.2.0)(redux@5.0.0)
+      react-toastify:
+        specifier: ^9.1.1
+        version: 9.1.1(react-dom@18.2.0)(react@18.2.0)
       remove:
         specifier: ^0.1.5
         version: 0.1.5
@@ -434,7 +446,7 @@ importers:
     dependencies:
       '@mikugg/guidance':
         specifier: 0.12.0
-        version: link:../../packages/guidance
+        version: 0.12.0
       '@types/body-parser':
         specifier: ^1.19.2
         version: 1.19.2
@@ -5049,6 +5061,16 @@ packages:
       npmlog: 6.0.2
       write-file-atomic: 4.0.2
     dev: true
+
+  /@mikugg/guidance@0.12.0:
+    resolution: {integrity: sha512-Yz3Jk4Ba3bQWsV154x1DR/XHRN3CSFnfPEBot1LsSp3izC6qVQoQUgc1tMeh11E+bXGIKqboD1B+aDa0TFqhBg==}
+    dependencies:
+      gpt-tokenizer: 2.1.2
+      openai: 4.19.0
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+    dev: false
 
   /@multiformats/base-x@4.0.1:
     resolution: {integrity: sha512-eMk0b9ReBbV23xXU693TAIrLyeO5iTgBZGSJfpqriG8UkYvr/hC9u9pyMlAakDNHWmbhMZCDs6KQO0jzKD8OTw==}

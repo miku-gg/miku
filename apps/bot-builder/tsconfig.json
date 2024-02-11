@@ -21,6 +21,10 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "vite-env.d.ts"],
+  "include": [
+    "src",
+    "vite-env.d.ts",
+    "../../packages/ui-kit/src/components/Blocks.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,0 +1,33 @@
+.Loader {
+  position: relative;
+  left: -2px;
+  top: 0.1em;
+
+  &__spin {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgb(196, 181, 253);
+    border-bottom-color: rgb(139, 92, 246);
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: loader-rotation 1s linear infinite;
+  }
+
+  &__container {
+    position: relative;
+    min-width: 100px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+@keyframes loader-rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

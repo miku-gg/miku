@@ -18,6 +18,8 @@ import Tooltip from './components/Tooltip';
 import TagAutocomplete from './components/TagAutocomplete';
 import Slider from './components/Slider';
 import MusicSelector from './components/MusicSelector';
+import Loader from './components/Loader';
+import Blocks from './components/Blocks';
 import * as Icons from './assets/svg';
 
 export {
@@ -43,4 +45,6 @@ export {
   Colors,
   Slider,
   MusicSelector,
+  Loader,
+  Blocks,
 };

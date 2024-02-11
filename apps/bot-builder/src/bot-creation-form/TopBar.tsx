@@ -3,6 +3,8 @@ import React from "react";
 import { Steps } from "@mikugg/ui-kit";
 import { useCharacterCreationForm } from "./CharacterCreationFormContext";
 
+import "./Topbar.scss";
+
 export interface Step {
   label: string;
   description: string;

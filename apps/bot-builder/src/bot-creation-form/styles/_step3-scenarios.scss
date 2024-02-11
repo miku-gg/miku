@@ -1,4 +1,4 @@
-@import "./variables";
+@import "../../styles/variables";
 
 .step3Scenarios {
   &__scenario-text {
@@ -35,16 +35,15 @@
 
   &__preview {
     position: relative;
-    
+
     .ImageSlider {
-      transition: all .2s ease-out;
+      transition: all 0.2s ease-out;
       background-repeat: no-repeat;
       background-color: $background-2;
       overflow: hidden;
 
-
       .ImageSlider__selectedImage {
-        transition: all .2s ease-out;
+        transition: all 0.2s ease-out;
       }
     }
   }
@@ -68,7 +67,7 @@
         // backdrop-filter: blur(5px);
         // background-position-y: 100px;
         // background-repeat: no-repeat;
-        opacity: .3;
+        opacity: 0.3;
       }
       // & + .ImageSlider .ImageSlider__selectedImage {
       //   filter: blur(5px);
@@ -92,7 +91,7 @@
 
     &:hover {
       background-color: rgba(255, 255, 255, 0.8);
-      
+
       & ~ .ImageSlider .ImageSlider__selectedImage {
         filter: blur(5px);
         margin-bottom: -1rem;
@@ -101,7 +100,6 @@
   }
 
   &__child-scenarios {
-
     &-list {
       display: flex;
       flex-wrap: wrap;
