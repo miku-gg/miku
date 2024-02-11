@@ -1,0 +1,21 @@
+.ItemSearch {
+  margin-top: 20px;
+
+  &__input {
+    position: relative;
+    margin-bottom: 20px;
+
+    .Loader {
+      position: absolute;
+      top: 10.5px;
+      left: initial;
+      right: 14px;
+    }
+  }
+
+  &__load-more {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+}

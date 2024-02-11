@@ -1,12 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./styles/main.scss";
 import { Provider } from "react-redux";
-import { store } from "./state/store";
 import { ToastContainer } from "react-toastify";
+import { AreYouSure } from "@mikugg/ui-kit";
+import { store } from "./state/store";
 import Planels from "./panels";
 import BackgroundEditModal from "./modals/BackgroundEditModal";
-import { AreYouSure } from "@mikugg/ui-kit";
+import BackgroundSearchModal from "./modals/BackgroundSearchModal";
+import "./styles/main.scss";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -16,6 +17,7 @@ ReactDOM.render(
           <Planels />
         </div>
         <BackgroundEditModal />
+        <BackgroundSearchModal />
         <ToastContainer />
       </AreYouSure.AreYouSureProvider>
     </Provider>

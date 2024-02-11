@@ -71,6 +71,9 @@ importers:
       ipld-dag-pb:
         specifier: ^0.22.3
         version: 0.22.3
+      lodash.debounce:
+        specifier: ^4.0.8
+        version: 4.0.8
       multiformats:
         specifier: ^11.0.2
         version: 11.0.2
@@ -120,6 +123,9 @@ importers:
       '@originjs/vite-plugin-commonjs':
         specifier: ^1.0.3
         version: 1.0.3
+      '@types/lodash.debounce':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@types/node':
         specifier: ^18.14.1
         version: 18.15.5

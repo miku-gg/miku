@@ -10,7 +10,10 @@ import { selectBackgrounds } from "../../../state/selectors";
 import { addBackground } from "../../../state/slices/novelFormSlice";
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { openBackgroundModal } from "../../../state/slices/inputSlice";
+import {
+  openBackgroundModal,
+  openBackgroundSearchModal,
+} from "../../../state/slices/inputSlice";
 
 export default function Backgrounds() {
   const backgrounds = useAppSelector(selectBackgrounds);
@@ -79,7 +82,7 @@ export default function Backgrounds() {
                 icon: <MdSearch />,
                 text: "Search",
               },
-              onClick: () => {},
+              onClick: () => dispatch(openBackgroundSearchModal()),
             },
           ]}
         />

@@ -6,12 +6,18 @@ export interface InputState {
       opened: boolean;
       editId?: string;
     };
+    backgroundSearch: {
+      opened: boolean;
+    };
   };
 }
 
 const initialState: InputState = {
   modals: {
     background: {
+      opened: false,
+    },
+    backgroundSearch: {
       opened: false,
     },
   },
@@ -29,9 +35,20 @@ const inputSlice = createSlice({
       state.modals.background.opened = false;
       state.modals.background.editId = undefined;
     },
+    openBackgroundSearchModal: (state) => {
+      state.modals.backgroundSearch.opened = true;
+    },
+    closeBackgroundSearchModal: (state) => {
+      state.modals.backgroundSearch.opened = false;
+    },
   },
 });
 
-export const { openBackgroundModal, closeBackgroundModal } = inputSlice.actions;
+export const {
+  openBackgroundModal,
+  closeBackgroundModal,
+  openBackgroundSearchModal,
+  closeBackgroundSearchModal,
+} = inputSlice.actions;
 
 export default inputSlice.reducer;
