@@ -53,9 +53,17 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.backgrounds[index] = action.payload;
     },
+    deleteBackground: (state, action: PayloadAction<string>) => {
+      const index = state.backgrounds.findIndex(
+        (background) => background.id === action.payload
+      );
+      if (index === -1) return;
+      state.backgrounds.splice(index, 1);
+    },
   },
 });
 
-export const { addBackground, updateBackground } = novelFormSlice.actions;
+export const { addBackground, updateBackground, deleteBackground } =
+  novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

@@ -4,28 +4,53 @@ import { Handle, Position } from 'reactflow'
 import classNames from 'classnames'
 import { DialogueNodeData } from './utils'
 import { FaPencil } from 'react-icons/fa6'
+import { AreYouSure } from '@mikugg/ui-kit'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import {
-  setDeleteNodeConfirmationModal,
-  setEditModal,
-} from '../../state/slices/settingsSlice'
+import { setEditModal } from '../../state/slices/settingsSlice'
 import { useFillTextTemplate } from '../../libs/hooks'
 import { useAppContext } from '../../App.context'
 import { FaTrash } from 'react-icons/fa'
+import { deleteNode, swipeResponse } from '../../state/slices/narrationSlice'
 
 export default memo(({ data }: { data: DialogueNodeData }) => {
   const dispatch = useAppDispatch()
   const narration = useAppSelector((state) => state.narration)
+  const { openModal } = AreYouSure.useAreYouSure()
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
     e.stopPropagation()
 
-    dispatch(
-      setDeleteNodeConfirmationModal({
-        opened: true,
-        id: data.id,
-      })
-    )
+    openModal({
+      onYes: () => {
+        const response = narration.responses[data.id]
+        if (response) {
+          const parentInteractionID = response.parentInteractionId
+          if (parentInteractionID) {
+            const parentInteraction =
+              narration.interactions[parentInteractionID]
+            if (parentInteraction) {
+              let index = parentInteraction.responsesId.indexOf(data.id) - 1
+              if (index === -1)
+                index = parentInteraction.responsesId.indexOf(data.id) + 1
+
+              dispatch(swipeResponse(parentInteraction.responsesId[index]))
+              dispatch(deleteNode(data.id))
+            }
+          }
+        }
+
+        const interaction = narration.interactions[data.id]
+        if (interaction) {
+          const parentResponseId = interaction.parentResponseId
+          if (parentResponseId) {
+            dispatch(swipeResponse(parentResponseId))
+            dispatch(deleteNode(data.id))
+          }
+        }
+      },
+      title: 'Are you sure you want to delete this node?',
+      yesLabel: 'Delete',
+    })
   }
 
   const canDelete = () => {

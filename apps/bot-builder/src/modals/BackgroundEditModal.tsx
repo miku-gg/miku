@@ -1,15 +1,33 @@
-import { Button, Input, Modal } from "@mikugg/ui-kit";
+import { AreYouSure, Button, Input, Modal } from "@mikugg/ui-kit";
 import { useAppSelector } from "../state/store";
 import { selectEditingBackground } from "../state/selectors";
 import { useDispatch } from "react-redux";
 import { closeBackgroundModal } from "../state/slices/inputSlice";
 import config from "../config";
 import "./BackgroundEditModal.scss";
-import { updateBackground } from "../state/slices/novelFormSlice";
+import {
+  deleteBackground,
+  updateBackground,
+} from "../state/slices/novelFormSlice";
 
 export default function BackgroundEditModal() {
   const background = useAppSelector(selectEditingBackground);
   const dispatch = useDispatch();
+  const { openModal } = AreYouSure.useAreYouSure();
+
+  const handleDeleteBackground = () => {
+    openModal({
+      title: "Are you sure?",
+      description: "This action cannot be undone",
+      onYes: () => {
+        dispatch(closeBackgroundModal());
+        if (background) {
+          dispatch(deleteBackground(background.id));
+        }
+      },
+    });
+  };
+
   return (
     <Modal
       opened={!!background}
@@ -122,6 +140,11 @@ export default function BackgroundEditModal() {
                 Add
               </Button>
             </div>
+          </div>
+          <div className="BackgroundEditModal_delete">
+            <Button onClick={handleDeleteBackground} theme="primary">
+              Delete background
+            </Button>
           </div>
         </div>
       ) : null}

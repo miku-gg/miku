@@ -1,6 +1,6 @@
 import Accordion from './components/Accordion';
 import AccordionItem from './components/AccordionItem';
-import AreYouSure from './components/AreYouSure';
+import * as AreYouSure from './components/AreYouSure';
 import Modal from './components/Modal';
 import Button from './components/Button';
 import Carousel from './components/Carousel';

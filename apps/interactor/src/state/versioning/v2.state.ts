@@ -149,10 +149,6 @@ export interface SettingsState {
       opened: boolean
       id: string
     }
-    deleteNodeConfirmation: {
-      opened: boolean
-      id: string
-    }
   }
 }
 

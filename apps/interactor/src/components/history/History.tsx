@@ -1,20 +1,15 @@
-import { AreYouSure, Modal, Tooltip } from '@mikugg/ui-kit'
+import { Modal, Tooltip } from '@mikugg/ui-kit'
 import { GrHistory } from 'react-icons/gr'
 import { BiCloudUpload, BiCloudDownload } from 'react-icons/bi'
 import { FaTimes } from 'react-icons/fa'
 import { ReactElement } from 'react'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import {
-  setDeleteNodeConfirmationModal,
-  setEditModal,
-  setHistoryModal,
-} from '../../state/slices/settingsSlice'
+import { setEditModal, setHistoryModal } from '../../state/slices/settingsSlice'
 import ReactFlow, { Position, Node, Edge } from 'reactflow'
 import DialogueNode from './DialogueNode'
 import { NodeEditor } from './NodeEditor'
 import {
   NarrationResponse,
-  deleteNode,
   swipeResponse,
 } from '../../state/slices/narrationSlice'
 import { DialogueNodeData, setAllNodesPosition } from './utils'
@@ -113,40 +108,6 @@ const HistoryModal = (): ReactElement => {
   const dispatch = useAppDispatch()
   const narration = useAppSelector((state) => state.narration)
   const novel = useAppSelector((state) => state.novel)
-
-  const { opened: confirmDeleteNodeOpened, id: confirmDeleteNodeId } =
-    useAppSelector((state) => state.settings.modals.deleteNodeConfirmation)
-
-  const onNodeDelete = () => {
-    const response = narration.responses[confirmDeleteNodeId]
-    if (response) {
-      const parentInteractionID = response.parentInteractionId
-      if (parentInteractionID) {
-        const parentInteraction = narration.interactions[parentInteractionID]
-        if (parentInteraction) {
-          let index =
-            parentInteraction.responsesId.indexOf(confirmDeleteNodeId) - 1
-          if (index === -1)
-            index =
-              parentInteraction.responsesId.indexOf(confirmDeleteNodeId) + 1
-
-          dispatch(swipeResponse(parentInteraction.responsesId[index]))
-          dispatch(deleteNode(confirmDeleteNodeId))
-        }
-      }
-    }
-
-    const interaction = narration.interactions[confirmDeleteNodeId]
-    if (interaction) {
-      const parentResponseId = interaction.parentResponseId
-      if (parentResponseId) {
-        dispatch(swipeResponse(parentResponseId))
-        dispatch(deleteNode(confirmDeleteNodeId))
-      }
-    }
-
-    dispatch(setDeleteNodeConfirmationModal({ opened: false, id: '' }))
-  }
 
   const [nodes, edges, startPos] = (() => {
     const parentIds = (() => {
@@ -269,14 +230,6 @@ const HistoryModal = (): ReactElement => {
 
   return (
     <div className="History__modal">
-      <AreYouSure
-        onClose={() =>
-          dispatch(setDeleteNodeConfirmationModal({ opened: false, id: '' }))
-        }
-        onSubmit={onNodeDelete}
-        isShowingPupUp={confirmDeleteNodeOpened}
-        modalMessage="Are you sure you want to delete this node?"
-      />
       {/* eslint-disable-next-line */}
       {/* @ts-ignore */}
       <ReactFlow

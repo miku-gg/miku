@@ -6,15 +6,18 @@ import { store } from "./state/store";
 import { ToastContainer } from "react-toastify";
 import Planels from "./panels";
 import BackgroundEditModal from "./modals/BackgroundEditModal";
+import { AreYouSure } from "@mikugg/ui-kit";
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <div className="app">
-        <Planels />
-      </div>
-      <BackgroundEditModal />
-      <ToastContainer />
+      <AreYouSure.AreYouSureProvider>
+        <div className="app">
+          <Planels />
+        </div>
+        <BackgroundEditModal />
+        <ToastContainer />
+      </AreYouSure.AreYouSureProvider>
     </Provider>
   </React.StrictMode>,
   document.getElementById("root")

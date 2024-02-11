@@ -1,3 +1,4 @@
+import { AreYouSure } from "@mikugg/ui-kit";
 import AssetsPanel from "./assets/AssetsPanel";
 
 export default function App() {
