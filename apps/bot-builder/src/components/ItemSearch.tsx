@@ -4,15 +4,16 @@ import { toast } from "react-toastify";
 import debounce from "lodash.debounce";
 import "./ItemSearch.scss";
 
-export interface ItemResult {
+export interface ItemResult<T> {
   id: string;
   name: string;
   description: string;
   tags: string[];
   previewAssetUrl: string;
+  value: T;
 }
 
-export default function ItemSearch<T extends ItemResult>(props: {
+export default function ItemSearch<T>(props: {
   opened: boolean;
   pageSize: number;
   onSearch: (query: {
@@ -23,18 +24,18 @@ export default function ItemSearch<T extends ItemResult>(props: {
   }) => Promise<{
     success: boolean;
     result: {
-      public: T[];
-      private: T[];
+      public: ItemResult<T>[];
+      private: ItemResult<T>[];
     };
   }>;
-  onSelect: (item: T) => void;
+  onSelect: (value: T) => void;
   onClose: () => void;
   title: string;
 }) {
   const [query, setQuery] = useState<string>("");
   const [onlyPrivate, setOnlyPrivate] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [results, setResults] = useState<T[]>([]);
+  const [results, setResults] = useState<ItemResult<T>[]>([]);
   const [hasMore, setHasMore] = useState<boolean>(true);
 
   const search = useCallback(
@@ -106,7 +107,7 @@ export default function ItemSearch<T extends ItemResult>(props: {
               key={result.id}
               className="ItemSearch__item"
               tabIndex={0}
-              onClick={() => props.onSelect(result)}
+              onClick={() => props.onSelect(result.value)}
             >
               <img src={result.previewAssetUrl} alt={result.name} />
               <div className="ItemSearch__item__content">
@@ -114,11 +115,11 @@ export default function ItemSearch<T extends ItemResult>(props: {
                 <div className="ItemSearch__item__description">
                   {result.description}
                 </div>
-                <div className="ItemSearch__item__tags">
+                {/* <div className="ItemSearch__item__tags">
                   {result.tags.map((tag, index) => (
                     <span key={`${tag}-${index}`}>{tag}</span>
                   ))}
-                </div>
+                </div> */}
               </div>
             </div>
           ))}

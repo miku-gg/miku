@@ -78,8 +78,28 @@ const configs: Map<"development" | "stating" | "production", BuilderConfig> =
             return {
               success: true,
               result: {
-                public: [],
-                private: [],
+                public: [
+                  {
+                    id: "1",
+                    name: "Background 1",
+                    description: "A background",
+                    attributes: [["tag", "value"]],
+                    source: {
+                      jpg: "QmRKvMSTVnQti536ZXqS6EkwwaZMMVRXZJXd3T5vv2BfoL.png",
+                    },
+                  },
+                ],
+                private: [
+                  {
+                    id: "2",
+                    name: "Background 2",
+                    description: "A background",
+                    attributes: [["tag", "value"]],
+                    source: {
+                      jpg: "QmRKvMSTVnQti536ZXqS6EkwwaZMMVRXZJXd3T5vv2BfoL.png",
+                    },
+                  },
+                ],
               },
             };
           },
