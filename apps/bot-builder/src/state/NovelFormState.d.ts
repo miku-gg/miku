@@ -49,6 +49,8 @@ export interface NovelCharacter {
   id: string;
   name: string;
   profile_pic: string;
+  short_description: string;
+  tags: string[];
   card: TavernCardV2;
   outfits: NovelCharacterOutfit[];
 }
@@ -68,6 +70,7 @@ export interface NovelSong {
   id: string;
   name: string;
   description: string;
+  tags: string[];
   source: string;
 }
 

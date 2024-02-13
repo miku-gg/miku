@@ -1,4 +1,8 @@
-import { NovelBackground, NovelCharacter } from "./state/NovelFormState";
+import {
+  NovelBackground,
+  NovelCharacter,
+  NovelSong,
+} from "./state/NovelFormState";
 
 interface BuilderConfig {
   genAssetLink: (asset: string, lowres?: boolean) => string;
@@ -41,8 +45,8 @@ interface BuilderConfig {
     }) => Promise<{
       success: boolean;
       result: {
-        public: string[];
-        private: string[];
+        public: NovelSong[];
+        private: NovelSong[];
       };
     }>;
   };
@@ -108,7 +112,24 @@ const configs: Map<"development" | "stating" | "production", BuilderConfig> =
             return {
               success: true,
               result: {
-                public: [],
+                public: [
+                  {
+                    id: "3",
+                    name: "Song 3",
+                    description: "relaxing",
+                    tags: ["relaxing"],
+                    source:
+                      "QmfCftjWFfC9BohLrmYXuQCzWnv91qoAi64SJUPnxYJzes.mpeg",
+                  },
+                  {
+                    id: "4",
+                    name: "Song 4",
+                    description: "relaxing",
+                    tags: ["relaxing"],
+                    source:
+                      "QmfCftjWFfC9BohLrmYXuQCzWnv91qoAi64SJUPnxYJzes.mpeg",
+                  },
+                ],
                 private: [],
               },
             };

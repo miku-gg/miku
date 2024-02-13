@@ -1,13 +1,19 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+// Define a type for the modal types
+export type ModalType =
+  | "background"
+  | "backgroundSearch"
+  | "song"
+  | "songSearch"
+  | "character"
+  | "characterSearch";
+
 export interface InputState {
   modals: {
-    background: {
+    [key in ModalType]: {
       opened: boolean;
       editId?: string;
-    };
-    backgroundSearch: {
-      opened: boolean;
     };
   };
 }
@@ -20,6 +26,18 @@ const initialState: InputState = {
     backgroundSearch: {
       opened: false,
     },
+    song: {
+      opened: false,
+    },
+    songSearch: {
+      opened: false,
+    },
+    character: {
+      opened: false,
+    },
+    characterSearch: {
+      opened: false,
+    },
   },
 };
 
@@ -27,28 +45,30 @@ const inputSlice = createSlice({
   name: "input",
   initialState,
   reducers: {
-    openBackgroundModal: (state, action: PayloadAction<string>) => {
-      state.modals.background.opened = true;
-      state.modals.background.editId = action.payload;
+    openModal: (
+      state,
+      action: PayloadAction<{
+        modalType: ModalType;
+        editId?: string;
+      }>
+    ) => {
+      const { modalType, editId } = action.payload;
+      state.modals[modalType].opened = true;
+      if ("editId" in action.payload) {
+        state.modals[modalType].editId = editId;
+      }
     },
-    closeBackgroundModal: (state) => {
-      state.modals.background.opened = false;
-      state.modals.background.editId = undefined;
-    },
-    openBackgroundSearchModal: (state) => {
-      state.modals.backgroundSearch.opened = true;
-    },
-    closeBackgroundSearchModal: (state) => {
-      state.modals.backgroundSearch.opened = false;
+    closeModal: (
+      state,
+      action: PayloadAction<{
+        modalType: ModalType;
+      }>
+    ) => {
+      state.modals[action.payload.modalType].opened = false;
     },
   },
 });
 
-export const {
-  openBackgroundModal,
-  closeBackgroundModal,
-  openBackgroundSearchModal,
-  closeBackgroundSearchModal,
-} = inputSlice.actions;
+export const { openModal, closeModal } = inputSlice.actions;
 
 export default inputSlice.reducer;

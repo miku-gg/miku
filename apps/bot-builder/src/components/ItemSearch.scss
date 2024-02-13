@@ -4,8 +4,15 @@
   margin-top: 20px;
 
   &__input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  &__input-text {
     position: relative;
-    margin-bottom: 20px;
+    width: 100%;
 
     .Loader {
       position: absolute;
@@ -13,6 +20,14 @@
       left: initial;
       right: 14px;
     }
+  }
+
+  &__input-checkbox {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 20px;
+    min-width: 120px;
   }
 
   &__load-more {

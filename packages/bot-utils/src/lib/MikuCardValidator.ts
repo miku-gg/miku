@@ -121,7 +121,10 @@ export const LICENSES = [
   "CC BY-NC-ND",
 ];
 
-export type EmotionTemplateSlug = "base-emotions" | "lewd-emotions";
+export type EmotionTemplateSlug =
+  | "single-emotion"
+  | "base-emotions"
+  | "lewd-emotions";
 
 export const EMOTION_GROUP_TEMPLATES: Record<
   EmotionTemplateSlug,
@@ -131,6 +134,11 @@ export const EMOTION_GROUP_TEMPLATES: Record<
     emotionIds: string[];
   }
 > = {
+  "single-emotion": {
+    id: "single-emotion",
+    label: "Single emotion",
+    emotionIds: ["neutral"],
+  },
   "base-emotions": {
     id: "base-emotions",
     label: "Base emotions",

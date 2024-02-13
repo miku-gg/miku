@@ -1,10 +1,7 @@
 import ItemSearch from "../components/ItemSearch";
 import config from "../config";
 import { NovelBackground } from "../state/NovelFormState";
-import {
-  closeBackgroundSearchModal,
-  openBackgroundModal,
-} from "../state/slices/inputSlice";
+import { closeModal } from "../state/slices/inputSlice";
 import { addBackground } from "../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../state/store";
 
@@ -43,10 +40,10 @@ export default function BackgroundSearchModal() {
         };
       }}
       onSelect={(background) => {
-        dispatch(closeBackgroundSearchModal());
+        dispatch(closeModal({ modalType: "backgroundSearch" }));
         dispatch(addBackground(background));
       }}
-      onClose={() => dispatch(closeBackgroundSearchModal())}
+      onClose={() => dispatch(closeModal({ modalType: "backgroundSearch" }))}
     />
   );
 }

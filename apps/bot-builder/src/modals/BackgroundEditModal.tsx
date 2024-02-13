@@ -2,7 +2,7 @@ import { AreYouSure, Button, Input, Modal } from "@mikugg/ui-kit";
 import { useAppSelector } from "../state/store";
 import { selectEditingBackground } from "../state/selectors";
 import { useDispatch } from "react-redux";
-import { closeBackgroundModal } from "../state/slices/inputSlice";
+import { closeModal } from "../state/slices/inputSlice";
 import config from "../config";
 import "./BackgroundEditModal.scss";
 import {
@@ -20,7 +20,7 @@ export default function BackgroundEditModal() {
       title: "Are you sure?",
       description: "This action cannot be undone",
       onYes: () => {
-        dispatch(closeBackgroundModal());
+        dispatch(closeModal({ modalType: "background" }));
         if (background) {
           dispatch(deleteBackground(background.id));
         }
@@ -34,7 +34,7 @@ export default function BackgroundEditModal() {
       title="Edit Background"
       className="BackgroundEditModal"
       shouldCloseOnOverlayClick
-      onCloseModal={() => dispatch(closeBackgroundModal())}
+      onCloseModal={() => dispatch(closeModal({ modalType: "background" }))}
     >
       {background ? (
         <div className="BackgroundEditModal_content">

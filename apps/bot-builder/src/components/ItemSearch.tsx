@@ -13,6 +13,11 @@ export interface ItemResult<T> {
   value: T;
 }
 
+const isAudioFile = (name: string) => {
+  const audioFormats = [".mp3", ".wav", ".ogg", ".flac", ".mpeg", ".m4a"];
+  return audioFormats.some((format) => name.endsWith(format));
+};
+
 export default function ItemSearch<T>(props: {
   opened: boolean;
   pageSize: number;
@@ -30,6 +35,7 @@ export default function ItemSearch<T>(props: {
   }>;
   onSelect: (value: T) => void;
   onClose: () => void;
+  onError?: (error: string) => void;
   title: string;
 }) {
   const [query, setQuery] = useState<string>("");
@@ -50,14 +56,14 @@ export default function ItemSearch<T>(props: {
         });
         setLoading(false);
         if (!success) {
-          toast.error("Error searching");
+          props.onError && props.onError("Error searching");
           return;
         }
         setResults([...result.private, ...result.public]);
         setHasMore(result.private.length + result.public.length === take);
       } catch (e) {
         setLoading(false);
-        toast.error("Error searching");
+        props.onError && props.onError("Error searching");
       }
     }, 500),
     [props.onSearch]
@@ -93,13 +99,13 @@ export default function ItemSearch<T>(props: {
             />
             {loading ? <Loader /> : null}
           </div>
-          <div className="ItemSearch__input-checkbox">
-            <CheckBox
-              label="Only private"
-              value={onlyPrivate}
-              onChange={(e) => setOnlyPrivate(e.target.checked)}
-            />
-          </div>
+        </div>
+        <div className="ItemSearch__input-checkbox">
+          <CheckBox
+            label="Only mine"
+            value={onlyPrivate}
+            onChange={(e) => setOnlyPrivate(e.target.checked)}
+          />
         </div>
         <div className="ItemSearch__list">
           {results.map((result) => (
@@ -109,7 +115,11 @@ export default function ItemSearch<T>(props: {
               tabIndex={0}
               onClick={() => props.onSelect(result.value)}
             >
-              <img src={result.previewAssetUrl} alt={result.name} />
+              {isAudioFile(result.previewAssetUrl) ? (
+                <audio src={result.previewAssetUrl} controls />
+              ) : (
+                <img src={result.previewAssetUrl} alt={result.name} />
+              )}
               <div className="ItemSearch__item__content">
                 <div className="ItemSearch__item__title">{result.name}</div>
                 <div className="ItemSearch__item__description">

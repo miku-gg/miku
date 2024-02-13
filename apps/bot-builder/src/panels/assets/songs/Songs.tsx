@@ -1,29 +1,96 @@
-import { Modal } from "@mikugg/ui-kit";
+import { FaUpload } from "react-icons/fa6";
+import config from "../../../config";
+import { openModal } from "../../../state/slices/inputSlice";
+import { useAppDispatch, useAppSelector } from "../../../state/store";
 import "./Songs.scss";
-import { FaHammer } from "react-icons/fa6";
+import { Blocks } from "@mikugg/ui-kit";
+import { useRef, useState } from "react";
+import { toast } from "react-toastify";
+import { v4 as randomUUID } from "uuid";
+import { addSong } from "../../../state/slices/novelFormSlice";
+import { MdSearch } from "react-icons/md";
 
 export default function Songs() {
+  const songs = useAppSelector((state) => state.novel.songs);
+  const dispatch = useAppDispatch();
+  const [songUploading, setSongUploading] = useState<boolean>(false);
+  const uploadSong = useRef<HTMLInputElement>(null);
+
+  const handleUploadSong = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setSongUploading(true);
+    const { success, assetId } = await config.uploadAsset(file);
+    if (!success || !assetId) {
+      setSongUploading(false);
+      toast.error("Failed to upload song");
+      return;
+    }
+    setSongUploading(false);
+    const id = randomUUID();
+
+    dispatch(
+      addSong({
+        id,
+        tags: [],
+        description: "",
+        name: `song-${songs.length + 1}`,
+        source: assetId,
+      })
+    );
+    dispatch(openModal({ modalType: "song", editId: id }));
+  };
+
   return (
-    <>
-      <div className="Characters group">
-        <div className="title-small">Music</div>
-        <div className="Characters__list">
-          <div className="Characters__item"></div>
-          <div className="Characters__item"></div>
-          <div className="Characters__item">
-            <FaHammer />
-            Create
-          </div>
-          <div className="Characters__item">Search</div>
-        </div>
+    <div className="Songs group">
+      <div className="title-small">Music</div>
+      <div className="Songs__list">
+        <Blocks
+          tooltipId="songs"
+          items={[
+            ...songs.map((song) => ({
+              id: `songs-${song.id}`,
+              tooltip: song.name,
+              content: {
+                text: song.name,
+              },
+              onClick: () =>
+                dispatch(
+                  openModal({
+                    modalType: "song",
+                    editId: song.id,
+                  })
+                ),
+            })),
+            {
+              id: "upload",
+              content: {
+                icon: <FaUpload />,
+                text: "Upload",
+              },
+              onClick: () => uploadSong?.current?.click(),
+              loading: songUploading,
+              disabled: songUploading,
+            },
+            {
+              id: "search",
+              content: {
+                icon: <MdSearch />,
+                text: "Search",
+              },
+              onClick: () => dispatch(openModal({ modalType: "songSearch" })),
+            },
+          ]}
+        />
+        <input
+          type="file"
+          onChange={handleUploadSong}
+          ref={uploadSong}
+          hidden
+        />
       </div>
-      <Modal opened={false} className="Characters__modal">
-        <div className="title">Edit Character</div>
-        <div>
-          <button>Specification</button>
-          <button>Outfits</button>
-        </div>
-      </Modal>
-    </>
+    </div>
   );
 }

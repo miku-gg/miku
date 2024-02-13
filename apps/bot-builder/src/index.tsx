@@ -8,6 +8,9 @@ import Planels from "./panels";
 import BackgroundEditModal from "./modals/BackgroundEditModal";
 import BackgroundSearchModal from "./modals/BackgroundSearchModal";
 import "./styles/main.scss";
+import SongEditModal from "./modals/SongEditModal";
+import SongSearchModal from "./modals/SongSearchModal";
+import CharacterEditModal from "./modals/character/CharacterEditModal";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -18,6 +21,9 @@ ReactDOM.render(
         </div>
         <BackgroundEditModal />
         <BackgroundSearchModal />
+        <SongEditModal />
+        <SongSearchModal />
+        <CharacterEditModal />
         <ToastContainer />
       </AreYouSure.AreYouSureProvider>
     </Provider>

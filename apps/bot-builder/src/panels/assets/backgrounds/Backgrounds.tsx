@@ -1,6 +1,6 @@
 import "./Backgrounds.scss";
-import { FaHammer } from "react-icons/fa6";
 import { MdSearch } from "react-icons/md";
+import { FaUpload } from "react-icons/fa6";
 import { v4 as randomUUID } from "uuid";
 import config from "../../../config";
 
@@ -10,10 +10,7 @@ import { selectBackgrounds } from "../../../state/selectors";
 import { addBackground } from "../../../state/slices/novelFormSlice";
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
-import {
-  openBackgroundModal,
-  openBackgroundSearchModal,
-} from "../../../state/slices/inputSlice";
+import { openModal } from "../../../state/slices/inputSlice";
 
 export default function Backgrounds() {
   const backgrounds = useAppSelector(selectBackgrounds);
@@ -48,7 +45,7 @@ export default function Backgrounds() {
         },
       })
     );
-    dispatch(openBackgroundModal(id));
+    dispatch(openModal({ modalType: "background", editId: id }));
   };
 
   return (
@@ -64,12 +61,18 @@ export default function Backgrounds() {
               content: {
                 image: config.genAssetLink(background.source.jpg, true),
               },
-              onClick: () => dispatch(openBackgroundModal(background.id)),
+              onClick: () =>
+                dispatch(
+                  openModal({
+                    modalType: "background",
+                    editId: background.id,
+                  })
+                ),
             })),
             {
               id: "upload",
               content: {
-                icon: <FaHammer />,
+                icon: <FaUpload />,
                 text: "Upload",
               },
               onClick: () => uploadBackground?.current?.click(),
@@ -82,7 +85,8 @@ export default function Backgrounds() {
                 icon: <MdSearch />,
                 text: "Search",
               },
-              onClick: () => dispatch(openBackgroundSearchModal()),
+              onClick: () =>
+                dispatch(openModal({ modalType: "backgroundSearch" })),
             },
           ]}
         />

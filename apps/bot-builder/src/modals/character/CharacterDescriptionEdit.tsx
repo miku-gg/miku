@@ -7,11 +7,11 @@ import {
   TagAutocomplete,
   TextHeading,
 } from "@mikugg/ui-kit";
-import { checkFileType } from "./libs/utils";
-import { useAppDispatch, useAppSelector } from "../state/store";
-import config from "../config";
+import { checkFileType } from "../../libs/utils";
+import { useAppDispatch, useAppSelector } from "../../state/store";
+import config from "../../config";
 import { toast } from "react-toastify";
-import { updateCharacter } from "../state/slices/novelFormSlice";
+import { updateCharacter } from "../../state/slices/novelFormSlice";
 
 const DEFAULT_TAGS = [
   { value: "Male" },
@@ -38,13 +38,13 @@ const DEFAULT_TAGS = [
 export default function CharacterDescriptionEdit({
   characterId,
 }: {
-  characterId: string;
+  characterId?: string;
 }) {
   const dispatch = useAppDispatch();
   const character = useAppSelector((state) =>
     state.novel.characters.find((c) => c.id === characterId)
   );
-  if (!character) {
+  if (!character || !characterId) {
     return null;
   }
 
