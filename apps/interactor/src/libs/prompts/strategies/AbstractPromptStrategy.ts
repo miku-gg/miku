@@ -3,7 +3,7 @@ import mistralTokenizer from '../_mistral-tokenizer'
 
 export abstract class AbstractPromptStrategy<Input, Output> {
   private tokenizer: Tokenizer
-  constructor(tokenizerSkug: string) {
+  constructor(tokenizerSkug?: string) {
     if (tokenizerSkug === 'mistral') {
       this.tokenizer = mistralTokenizer
     } else {

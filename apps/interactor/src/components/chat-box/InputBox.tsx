@@ -92,7 +92,7 @@ const InputBox = (): JSX.Element | null => {
     try {
       const promptBuilder = new PromptBuilder<AlpacaSuggestionStrategy>({
         maxNewTokens: 35,
-        strategy: new AlpacaSuggestionStrategy(),
+        strategy: new AlpacaSuggestionStrategy('llama'),
         trucationLength: 4096,
       })
       const prompt = promptBuilder.buildPrompt(state, 30)
