@@ -433,7 +433,7 @@ importers:
   apps/services:
     dependencies:
       '@mikugg/guidance':
-        specifier: workspace:^
+        specifier: 0.14.0
         version: link:../../packages/guidance
       '@types/body-parser':
         specifier: ^1.19.2
