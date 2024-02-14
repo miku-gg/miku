@@ -1,1 +1,8 @@
-{"apiUrl":"","apiKey":"","strat":"alpacarp"}
+{
+  "apiUrl": "",
+  "apiKey": "",
+  "strategy": "alpacarp",
+  "tokenizer": "llama",
+  "truncation_length": 4096,
+  "max_new_tokens": 200
+}

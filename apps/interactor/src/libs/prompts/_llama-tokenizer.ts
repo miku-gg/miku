@@ -13,7 +13,7 @@
  *
  */
 
-export interface LLaMATokenizer {
+export interface Tokenizer {
   encode: (
     text: string,
     add_bos_token?: boolean,
@@ -27,7 +27,7 @@ export interface LLaMATokenizer {
   ) => string
 }
 
-const llamaTokenizer: LLaMATokenizer = {}
+const llamaTokenizer: Tokenizer = {}
 
 const base64decode = function (encodedString) {
   return atob(encodedString)
