@@ -97,23 +97,6 @@ const novelFormSlice = createSlice({
         short_description: "",
         profile_pic: "empty_char.png",
         tags: [],
-        outfits: [
-          {
-            id: randomUUID(),
-            name: "default",
-            description: "The default outfit",
-            attributes: [],
-            template: "single-emotions",
-            emotions: [
-              {
-                id: "neutral",
-                sources: {
-                  png: "empty_char_emotion.png",
-                },
-              },
-            ],
-          },
-        ],
         card: {
           spec: "chara_card_v2",
           spec_version: "2.0",
@@ -124,7 +107,31 @@ const novelFormSlice = createSlice({
             creator: "",
             creator_notes: "",
             description: "",
-            extensions: {},
+            extensions: {
+              mikugg_v2: {
+                license: "CC BY-NC-SA 4.0",
+                language: "en",
+                short_description: "",
+                profile_pic: "empty_char.png",
+                outfits: [
+                  {
+                    id: randomUUID(),
+                    name: "default",
+                    description: "The default outfit",
+                    attributes: [],
+                    template: "single-emotion",
+                    emotions: [
+                      {
+                        id: "neutral",
+                        sources: {
+                          png: "empty_char_emotion.png",
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
             first_mes: "",
             mes_example: "",
             personality: "",

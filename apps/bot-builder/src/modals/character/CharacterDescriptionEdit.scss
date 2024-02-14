@@ -1,0 +1,46 @@
+.CharacterDescriptionEdit {
+  padding: 1rem;
+
+  &__public-specs {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+  }
+
+  &__public-specs-text {
+    width: 100%;
+  }
+
+  &__base-text {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  &__name {
+    flex: 3;
+  }
+  &__version {
+    flex: 2;
+  }
+  &__creator {
+    flex: 3;
+  }
+
+  &__short-description {
+    margin-bottom: 20px;
+  }
+
+  &__description {
+    margin-bottom: 20px;
+  }
+
+  &__personality {
+    margin-bottom: 20px;
+  }
+
+  .Input__textArea {
+    height: 4em;
+  }
+}

@@ -15,7 +15,7 @@ import {
 
 import { checkFileType } from "./libs/utils";
 
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { emotionTemplates } from "./data/emotions";
 import BackgroundSelector from "./Components/BackgroundSelector";
 import AudioPreview from "./Components/AudioPreview";
@@ -36,24 +36,28 @@ const BackgroundsForm: React.FC = () => {
               mikugg: {
                 ...(card.data.extensions.mikugg || {}),
                 backgrounds: images,
-                scenarios: card.data.extensions.mikugg?.scenarios?.map(_scenario => ({
-                  ..._scenario,
-                  background: card.data.extensions.mikugg?.backgrounds?.find(_background => _background.id === _scenario.background)?.id || (images.length ? images[0].id : '')
-                })) || []
-              }
-            }
-          }
+                scenarios:
+                  card.data.extensions.mikugg?.scenarios?.map((_scenario) => ({
+                    ..._scenario,
+                    background:
+                      card.data.extensions.mikugg?.backgrounds?.find(
+                        (_background) => _background.id === _scenario.background
+                      )?.id || (images.length ? images[0].id : ""),
+                  })) || [],
+              },
+            },
+          },
         });
       }}
     />
   );
-}
+};
 
 interface EmotionGroup {
-  id: string
-  name: string
-  template: string
-  emotions: {id: string, source: string[]}[]
+  id: string;
+  name: string;
+  template: string;
+  emotions: { id: string; source: string[] }[];
 }
 
 const EmotionsForm: React.FC = () => {
@@ -65,8 +69,8 @@ const EmotionsForm: React.FC = () => {
   const handleAddGroup = () => {
     const newGroup: EmotionGroup = {
       id: uuidv4(),
-      name: '',
-      template: 'base-emotions',
+      name: "",
+      template: "base-emotions",
       emotions: [],
     };
     setCard({
@@ -77,14 +81,19 @@ const EmotionsForm: React.FC = () => {
           ...card.data.extensions,
           mikugg: {
             ...(card.data.extensions.mikugg || {}),
-            emotion_groups: [...(card.data.extensions.mikugg?.emotion_groups || []), newGroup],
-            scenarios: card.data.extensions.mikugg?.scenarios?.map(scenario => ({
-              ...scenario,
-              emotion_group: scenario.emotion_group || newGroup.id
-            }))
-          }
-        }
-      }
+            emotion_groups: [
+              ...(card.data.extensions.mikugg?.emotion_groups || []),
+              newGroup,
+            ],
+            scenarios: card.data.extensions.mikugg?.scenarios?.map(
+              (scenario) => ({
+                ...scenario,
+                emotion_group: scenario.emotion_group || newGroup.id,
+              })
+            ),
+          },
+        },
+      },
     });
   };
 
@@ -102,16 +111,21 @@ const EmotionsForm: React.FC = () => {
             mikugg: {
               ...(card.data.extensions.mikugg || {}),
               emotion_groups: newGroups,
-              scenarios: card.data.extensions.mikugg?.scenarios?.map(scenario => ({
-                ...scenario,
-                emotion_group: scenario.emotion_group === emotionGroup.id ? (
-                  newGroups.length ? newGroups[0].id : ''
-                ) : scenario.emotion_group
-              }))
-            }
-          }
-        }
-      })
+              scenarios: card.data.extensions.mikugg?.scenarios?.map(
+                (scenario) => ({
+                  ...scenario,
+                  emotion_group:
+                    scenario.emotion_group === emotionGroup.id
+                      ? newGroups.length
+                        ? newGroups[0].id
+                        : ""
+                      : scenario.emotion_group,
+                })
+              ),
+            },
+          },
+        },
+      });
     }
   };
 
@@ -136,9 +150,9 @@ const EmotionsForm: React.FC = () => {
             mikugg: {
               ...(card.data.extensions.mikugg || {}),
               emotion_groups: newGroups,
-            }
-          }
-        }
+            },
+          },
+        },
       });
     }
   };
@@ -173,10 +187,10 @@ const EmotionsForm: React.FC = () => {
             mikugg: {
               ...(card.data.extensions.mikugg || {}),
               emotion_groups: newGroups,
-            }
-          }
-        }
-      })
+            },
+          },
+        },
+      });
     }
   };
 
@@ -184,7 +198,7 @@ const EmotionsForm: React.FC = () => {
     file: File,
     groupIndex: number,
     emotionId: string,
-    isAudio?: boolean,
+    isAudio?: boolean
   ) => {
     if (file && card.data.extensions.mikugg.emotion_groups) {
       const reader = new FileReader();
@@ -207,7 +221,7 @@ const EmotionsForm: React.FC = () => {
 
         if (isAudio) {
           if (emotionIndex >= 0) {
-            let sound = sounds.find(sound => sound.source === base64);
+            let sound = sounds.find((sound) => sound.source === base64);
             if (!sound) {
               sound = {
                 id: uuidv4(),
@@ -224,7 +238,7 @@ const EmotionsForm: React.FC = () => {
           } else {
             emotions.push({
               id: emotionId,
-              source: [base64]
+              source: [base64],
             });
           }
         }
@@ -241,9 +255,9 @@ const EmotionsForm: React.FC = () => {
                 ...(card.data.extensions.mikugg || {}),
                 emotion_groups: newGroups,
                 sounds,
-              }
-            }
-          }
+              },
+            },
+          },
         });
       };
 
@@ -268,94 +282,106 @@ const EmotionsForm: React.FC = () => {
   const renderEmotionGroups = () => {
     if (!card.data.extensions.mikugg.emotion_groups) return null;
 
-    return card.data.extensions.mikugg.emotion_groups.map((group, groupIndex) => {
-      const emotionsTemplate = emotionTemplates.find(
-        (template) => template.id === group.template
-      );
-      const renderEmotionImages = () => {
-        if (!emotionsTemplate) return null;
+    return card.data.extensions.mikugg.emotion_groups.map(
+      (group, groupIndex) => {
+        const emotionsTemplate = emotionTemplates.find(
+          (template) => template.id === group.template
+        );
+        const renderEmotionImages = () => {
+          if (!emotionsTemplate) return null;
 
-        return emotionsTemplate.emotionIds.map((emotionId) => {
-          const PreviewImage = group.emotions.find(
-            (img) => img.id === emotionId
-          );
+          return emotionsTemplate.emotionIds.map((emotionId) => {
+            const PreviewImage = group.emotions.find(
+              (img) => img.id === emotionId
+            );
 
-          const previewSound = card.data.extensions.mikugg?.sounds?.find(sound => sound.id === PreviewImage?.sound);
+            const previewSound = card.data.extensions.mikugg?.sounds?.find(
+              (sound) => sound.id === PreviewImage?.sound
+            );
 
-          return (
-            <div className="step2Assets__emotionPreview" key={`emotion_${emotionId}_group_${group.template}_${groupIndex}`}>
-              <DragAndDropImages
-                size="sm"
-                dragAreaLabel={emotionId}
-                handleChange={(file) => {
-                  handleImageChange(file, groupIndex, emotionId, file.type === 'audio/mpeg')
-                }}
-                previewImage={PreviewImage?.source[0]}
-                placeHolder="(1024x1024)"
-                errorMessage="Please upload PNG, GIF or WEBM."
-                onFileValidate={(file) =>
-                  checkFileType(file, [
-                    "image/png",
-                    "image/gif",
-                    "video/webm",
-                    "audio/mpeg",
-                  ])
-                }
-              />
-              {
-                previewSound ? (
+            return (
+              <div
+                className="step2Assets__emotionPreview"
+                key={`emotion_${emotionId}_group_${group.template}_${groupIndex}`}
+              >
+                <DragAndDropImages
+                  size="sm"
+                  dragAreaLabel={emotionId}
+                  handleChange={(file) => {
+                    handleImageChange(
+                      file,
+                      groupIndex,
+                      emotionId,
+                      file.type === "audio/mpeg"
+                    );
+                  }}
+                  previewImage={PreviewImage?.source[0]}
+                  placeHolder="(1024x1024)"
+                  errorMessage="Please upload PNG, GIF or WEBM."
+                  onFileValidate={(file) =>
+                    checkFileType(file, [
+                      "image/png",
+                      "image/gif",
+                      "video/webm",
+                      "audio/mpeg",
+                    ])
+                  }
+                />
+                {previewSound ? (
                   <div className="step2Assets__audioPreview">
                     <AudioPreview src={previewSound.source} />
                   </div>
-                ) : null
-              }
-            </div>
-          );
-        });
-      };
+                ) : null}
+              </div>
+            );
+          });
+        };
 
-      return (
-        <AccordionItem
-          title={`Emotion Group ${groupIndex + 1}`}
-          key={`group_${groupIndex}`}
-          className="step2Assets__group"
-        >
-          <div className="step2Assets__formGroup">
-            <Input
-              label="Name:"
-              placeHolder="Enter a name for this emotion group"
-              id={`group_${groupIndex}_name`}
-              name="name"
-              value={group.name}
-              onChange={(event) => handleEmotionGroupNameChange(event, groupIndex)}
-            />
-          </div>
-          <div className="step2Assets__formGroup">
-            <input
-              type="file"
-              multiple
-              accept="image/png, image/gif, video/webm"
-              onChange={(event) => handleMultipleImageChange(event, groupIndex)}
-            />
-          </div>
-          <div className="step2Assets__formGroup">
-            <label htmlFor={`group_${groupIndex}_emotionsHash`}>
-              Emotion Set:
-            </label>
-            <Dropdown
-              items={emotionTemplates}
-              onChange={(index) => handleTemplateChange(index, groupIndex)}
-              expanded={expandedTemplateDropdown}
-              onToggle={setExpandedTemplateDropdown}
-              selectedIndex={getDropdownEmotionTemplateIndex(groupIndex)}
-            />
-          </div>
-          <div className="step2Assets__emotions">
-            {renderEmotionImages()}
-          </div>
-        </AccordionItem>
-      );
-    });
+        return (
+          <AccordionItem
+            title={`Emotion Group ${groupIndex + 1}`}
+            key={`group_${groupIndex}`}
+            className="step2Assets__group"
+          >
+            <div className="step2Assets__formGroup">
+              <Input
+                label="Name:"
+                placeHolder="Enter a name for this emotion group"
+                id={`group_${groupIndex}_name`}
+                name="name"
+                value={group.name}
+                onChange={(event) =>
+                  handleEmotionGroupNameChange(event, groupIndex)
+                }
+              />
+            </div>
+            <div className="step2Assets__formGroup">
+              <input
+                type="file"
+                multiple
+                accept="image/png, image/gif, video/webm"
+                onChange={(event) =>
+                  handleMultipleImageChange(event, groupIndex)
+                }
+              />
+            </div>
+            <div className="step2Assets__formGroup">
+              <label htmlFor={`group_${groupIndex}_emotionsHash`}>
+                Emotion Set:
+              </label>
+              <Dropdown
+                items={emotionTemplates}
+                onChange={(index) => handleTemplateChange(index, groupIndex)}
+                expanded={expandedTemplateDropdown}
+                onToggle={setExpandedTemplateDropdown}
+                selectedIndex={getDropdownEmotionTemplateIndex(groupIndex)}
+              />
+            </div>
+            <div className="step2Assets__emotions">{renderEmotionImages()}</div>
+          </AccordionItem>
+        );
+      }
+    );
   };
 
   return (
@@ -371,8 +397,8 @@ const EmotionsForm: React.FC = () => {
         + Add Emotion Group
       </Button>
     </div>
-  )
-}
+  );
+};
 
 const Step2Assets: React.FC = () => {
   return (

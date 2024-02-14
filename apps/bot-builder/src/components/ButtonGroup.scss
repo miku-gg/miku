@@ -1,0 +1,36 @@
+.ButtonGroup {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.ButtonGroup__Button {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  margin: 0 4px;
+  transition: background-color 0.3s, border-color 0.3s;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+
+  &--selected {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+  }
+}
+
+.ButtonGroup__Icon {
+  margin-right: 8px;
+  // Adjust size as necessary or use specific classes/icons
+}
+
+.ButtonGroup__Text {
+  // Text styling if necessary
+}

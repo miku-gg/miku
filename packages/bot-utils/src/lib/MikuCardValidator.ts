@@ -111,6 +111,35 @@ export type MikuCard = TavernCardV2 & {
   };
 };
 
+export type MikuCardV2 = TavernCardV2 & {
+  data: {
+    extensions: {
+      mikugg_v2: {
+        license: string; // LICENSE of the bot, set by the bot author
+        language: string; // Indicates the language of the bot, NOT used in the prompt
+        short_description: string; // Small description of the bot, NOT used in the prompt
+        profile_pic: string; // profile pic of the bot
+        outfits: {
+          id: string; // id of the outfit
+          name: string; // name of the outfit
+          description: string; // description of the outfit
+          attributes: string[][]; // attributes of the outfit
+          template: string; // template of group of emotions to be used
+          emotions: {
+            // list of emotions of the group, derived from the template
+            id: string; // id of the emotion
+            sources: {
+              png: string;
+              webm?: string;
+              sound?: string; // id of the sound to be used when the emotion is triggered
+            };
+          }[];
+        }[];
+      };
+    };
+  };
+};
+
 export const LICENSES = [
   "CC0",
   "CC BY",
@@ -359,6 +388,53 @@ export function validateMikuCard(card: MikuCard): string[] {
         else if (!emotions_ids.get(template_emotion_id)?.length)
           errors.push(
             `mikugg.emotion_groups ${emotion_group.id}: no source files for ${template_emotion_id}`
+          );
+      }
+    }
+  }
+
+  return errors;
+}
+
+export function validateMikuCardV2(card: MikuCardV2): string[] {
+  const errors = [];
+  const { mikugg_v2 } = card.data.extensions;
+
+  if (!mikugg_v2?.language)
+    errors.push("extensions.mikugg_v2.language is empty");
+  if (!mikugg_v2?.profile_pic)
+    errors.push("extensions.mikugg_v2.profile_pic is empty");
+  if (!mikugg_v2?.short_description)
+    errors.push("extensions.mikugg_v2.short_description is empty");
+
+  if (!mikugg_v2?.outfits?.length)
+    errors.push("extensions.mikugg_v2.outfits is empty");
+
+  const outfits = new Map<string, (typeof mikugg_v2.outfits)[0]>();
+  mikugg_v2.outfits.forEach((outfit) => outfits.set(outfit.id, outfit));
+
+  for (const outfit of mikugg_v2.outfits) {
+    if (!Object.keys(EMOTION_GROUP_TEMPLATES).includes(outfit.template)) {
+      errors.push(`${outfit.id}: Invalid outfit template ${outfit.template}`);
+    } else {
+      const emotions_ids = new Map<string, string[]>(
+        outfit.emotions.map((emotion) => [
+          emotion.id,
+          Object.values(emotion.sources),
+        ])
+      );
+
+      // eslint-disable-next-line
+      // @ts-ignore
+      for (const template_emotion_id of EMOTION_GROUP_TEMPLATES[outfit.template]
+        .emotionIds) {
+        if (!emotions_ids.has(template_emotion_id))
+          errors.push(
+            `mikugg_v2.outfits ${outfit.id}: ${template_emotion_id} not found`
+          );
+        else if (!emotions_ids.get(template_emotion_id)?.length)
+          errors.push(
+            `mikugg_v2.outfits ${outfit.id}: no source files for ${template_emotion_id}`
           );
       }
     }

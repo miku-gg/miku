@@ -1,6 +1,7 @@
 import {
   CharacterBook,
   EmotionTemplateSlug,
+  MikuCardV2,
   TavernCardV2,
 } from "@mikugg/bot-utils";
 
@@ -51,8 +52,7 @@ export interface NovelCharacter {
   profile_pic: string;
   short_description: string;
   tags: string[];
-  card: TavernCardV2;
-  outfits: NovelCharacterOutfit[];
+  card: MikuCardV2;
 }
 
 export interface NovelBackground {
