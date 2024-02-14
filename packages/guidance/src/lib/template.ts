@@ -119,14 +119,48 @@ export class TemplateProcessor {
               break;
             } else {
               // If there is more than one child, we generate the next token
-              const nextToken = await this.generator.generateToken(
+              const logit_bias = nextChildren.reduce((acc, child) => {
+                acc[child.toString()] = 100;
+                return acc;
+              }, {} as Record<string, number>);
+              const top_logprobs = await this.generator.generateTokenLogProgs(
                 prompt,
-                nextChildren.reduce((acc, child) => {
-                  acc[child.toString()] = 100;
-                  return acc;
-                }, {} as Record<string, number>)
+                logit_bias
               );
-              currentPrefixPrompt = currentPrefixPrompt + nextToken;
+
+              // get max top_logpobs that is in logit_bias
+              let max = -Infinity;
+              let max_key = "";
+              for (const key in top_logprobs) {
+                const completedPrefix = this.tokenizer.encodeString(
+                  currentPrefixPrompt + key
+                );
+                const completionTokens = completedPrefix.slice(
+                  currentPrefix.length
+                );
+                if (
+                  top_logprobs[key] > max &&
+                  completionTokens[0] &&
+                  completionTokens[0] in logit_bias
+                ) {
+                  max = top_logprobs[key];
+                  max_key = key;
+                }
+              }
+
+              // if no key in logit_bias, get max top_logprobs
+              if (max_key === "") {
+                // no key in logit_bias
+                max = -Infinity;
+                for (const key in top_logprobs) {
+                  if (top_logprobs[key] > max) {
+                    max = top_logprobs[key];
+                    max_key = key;
+                  }
+                }
+              }
+
+              currentPrefixPrompt = currentPrefixPrompt + max_key;
             }
           } while (!completion);
 

@@ -15,13 +15,14 @@ export function isOfTypeStrategySlug(
 }
 
 export const getRoleplayStrategyFromSlug = (
-  slug: RoleplayStrategySlug
+  slug: RoleplayStrategySlug,
+  tokenizerSlug: string = 'llama'
 ): AbstractRoleplayStrategy => {
   switch (slug) {
     case 'alpacarp':
-      return new RoleplayStrategyAlpaca()
+      return new RoleplayStrategyAlpaca(tokenizerSlug)
     case 'metharmerp':
-      return new RoleplayStrategyMetharme()
+      return new RoleplayStrategyMetharme(tokenizerSlug)
     default:
       throw new Error(`Invalid roleplay strategy slug: ${slug}`)
   }

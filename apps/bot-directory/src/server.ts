@@ -81,7 +81,10 @@ app.get("/get", async (req, res) => {
   res.send({
     apiUrl: data.apiUrl,
     apiKey: data.apiKey,
-    strat: data.strat,
+    strategy: data.strategy,
+    tokenizer: data.tokenizer,
+    truncation_length: data.truncation_length,
+    max_new_tokens: data.max_new_tokens,
   });
 });
 

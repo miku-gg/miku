@@ -11,8 +11,7 @@ import {
 import { RootState } from '../store'
 import textCompletion from '../../libs/textCompletion'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
-import { retrieveModelStrategy } from '../../libs/retrieveStrategy'
-import { ModelType } from '../versioning'
+import { retrieveModelMetadata } from '../../libs/retrieveMetadata'
 import { AbstractRoleplayStrategy } from '../../libs/prompts/strategies'
 import { getRoleplayStrategyFromSlug } from '../../libs/prompts/strategies/roleplay'
 import { selectAllParentDialogues } from '../selectors'
@@ -27,15 +26,23 @@ const interactionEffect = async (
     let currentResponseState: NarrationResponse =
       state.narration.responses[state.narration.currentResponseId]!
     const role = selectedRole
-    const strategySlug =
-      (await retrieveModelStrategy(servicesEndpoint, state.settings.model)) ||
-      'alpacarp'
+    const {
+      strategy: strategySlug,
+      truncation_length,
+      tokenizer,
+    } = (await retrieveModelMetadata(
+      servicesEndpoint,
+      state.settings.model
+    )) || {
+      strategy: 'alpacarp',
+      tokenizer: 'llama',
+      truncation_length: 4096,
+    }
     const maxMessages = selectAllParentDialogues(state).length
     const promptBuilder = new PromptBuilder<AbstractRoleplayStrategy>({
       maxNewTokens: 200,
-      strategy: getRoleplayStrategyFromSlug(strategySlug),
-      trucationLength:
-        state.settings.model === ModelType.RP_SMART ? 4096 : 4096,
+      strategy: getRoleplayStrategyFromSlug(strategySlug, tokenizer),
+      trucationLength: truncation_length,
     })
     const startText =
       currentResponseState.characters.find(({ role: _role }) => _role == role)

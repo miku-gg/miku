@@ -154,7 +154,25 @@
       </div>
       <div class="flex gap-2">
         <p class="text-white w-24">Prompt Strategy</p>
-        <input class="mb-8 w-full mr-8" type="text" value="" placeholder="alpacarp OR metharmerp" required name="strat" id="strat" />
+        <select class="ui dropdown" id="strategy">
+          <option value="alpacarp">Alpacarp</option>
+          <option value="metharmerp">Metharmerp</option>
+        </select>
+      </div>
+      <div class="flex gap-2">
+        <p class="text-white w-24">Tokenizer</p>
+        <select class="ui dropdown" id="tokenizer">
+          <option value="llama">LLaMA</option>
+          <option value="mistral">Mistral</option>
+        </select>
+      </div>
+      <div class="flex gap-2">
+        <p class="text-white w-24">Truncation Length</p>
+        <input class="mb-8 w-full mr-8" type="text" value="" placeholder="4096" required name="truncation_length" id="truncation_length" />
+      </div>
+      <div class="flex gap-2">
+        <p class="text-white w-24">Max new tokens</p>
+        <input class="mb-8 w-full mr-8" type="text" value="" placeholder="100" required name="max_new_tokens" id="max_new_tokens" />
       </div>
       <button class="ui button save-button w-64" onclick="save_backend_config(); toggle_backend_modal(false)">Save</button>
     </div>
@@ -191,7 +209,10 @@
 
       document.getElementById('apiUrl').value = data.apiUrl
       document.getElementById('apiKey').value = data.apiKey
-      document.getElementById('strat').value = data.strat
+      $('#strategy').dropdown('set selected', data.strategy);
+      $('#tokenizer').dropdown('set selected', data.tokenizer);
+      document.getElementById('truncation_length').value = data.truncation_length
+      document.getElementById('max_new_tokens').value = data.max_new_tokens
     });
 
     function change_theme(dark_mode) {
@@ -251,12 +272,18 @@
     function save_backend_config() {
       const apiUrl = document.getElementById('apiUrl').value
       const apiKey = document.getElementById('apiKey').value
-      const strat = document.getElementById('strat').value
+      const strategy = document.getElementById('strategy').value
+      const tokenizer = document.getElementById('tokenizer').value
+      const truncation_length = document.getElementById('truncation_length').value
+      const max_new_tokens = document.getElementById('max_new_tokens').value
 
       const config = {
         apiUrl: apiUrl,
         apiKey: apiKey,
-        strat: strat,
+        strategy: strategy,
+        tokenizer: tokenizer,
+        truncation_length: Number(truncation_length || 0) || 0,
+        max_new_tokens: Number(max_new_tokens || 0) || 0
       }
       fetch("/save", {
         method: "POST",

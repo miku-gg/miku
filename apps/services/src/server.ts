@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import textHandler from "./services/text";
+import textHandler, { modelsMetadata } from "./services/text";
 import audioHandler from "./services/audio";
 import jwtPermissionMiddleware from "./lib/verifyJWT";
-import * as backend_config from "../backend_config.json";
+import { ModelType } from "./services/text/lib/queryValidation";
 
 const PORT = process.env.SERVICES_PORT || 8484;
 
@@ -60,14 +60,22 @@ app.get("/", (req, res) => {
   res.status(200).send("Miku Services");
 });
 
-app.get("/text/strategy/:model", async (req, res) => {
+app.get("/text/metadata/:model", async (req, res) => {
   try {
+    const model = req.params.model as ModelType;
+    const metadata = modelsMetadata.get(model);
     res.send({
-      strategy: backend_config.strat,
+      strategy: metadata?.strategy || "alpacarp",
+      tokenizer: metadata?.tokenizer || "llama",
+      trucation_length: metadata?.truncation_length || 4096,
+      max_new_tokens: metadata?.max_new_tokens || 200,
     });
   } catch (error) {
     res.send({
       strategy: "alpacarp",
+      tokenizer: "llama",
+      trucation_length: 4096,
+      max_new_tokens: 200,
     });
   }
 });
