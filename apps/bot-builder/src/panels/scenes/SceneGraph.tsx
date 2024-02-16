@@ -19,7 +19,10 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import "./SceneGraph.scss";
 import { useAppSelector, useAppDispatch } from "../../state/store";
-import { setStartScene } from "../../state/slices/novelFormSlice";
+import {
+  addChildScene,
+  setStartScene,
+} from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
 import { getEdgeParams } from "./utils.js";
@@ -184,7 +187,7 @@ export default function SceneGraph() {
   const onConnect = useCallback(
     (params) => {
       const { source, target } = params;
-      setEdges((eds) => addEdge({ ...params, type: 'floating' }, eds));
+      setEdges((eds) => addEdge({ ...params, type: "floating" }, eds));
       dispatch(addChildScene({ sourceId: source, targetId: target }));
     },
     [setEdges, dispatch]

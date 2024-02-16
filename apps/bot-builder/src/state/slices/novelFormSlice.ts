@@ -112,7 +112,7 @@ const initialState: NovelFormState = {
           outfit: "default",
         },
       ],
-      children: ["scene-2"],
+      children: [],
       musicId: "1",
       name: "Scene 1",
       parentMapId: null,
@@ -141,9 +141,12 @@ const novelFormSlice = createSlice({
   name: "novel",
   initialState,
   reducers: {
-    addChildScene: (state, action: PayloadAction<{ sourceId: string; targetId: string }>) => {
+    addChildScene: (
+      state,
+      action: PayloadAction<{ sourceId: string; targetId: string }>
+    ) => {
       const { sourceId, targetId } = action.payload;
-      const sourceScene = state.scenes.find(scene => scene.id === sourceId);
+      const sourceScene = state.scenes.find((scene) => scene.id === sourceId);
       if (sourceScene && !sourceScene.children.includes(targetId)) {
         sourceScene.children.push(targetId);
       }
@@ -257,7 +260,6 @@ const novelFormSlice = createSlice({
 
 export const {
   addChildScene,
-export const {
   addBackground,
   updateBackground,
   deleteBackground,
