@@ -146,7 +146,6 @@ const edgeTypes = {
 
 const startPos = { x: 0, y: 0 };
 
-const generateNodes = (scenes) => [
 const generateNodes = (scenes, startPos) => [
   ...scenes.map((scene, index) => {
     return {
@@ -164,28 +163,28 @@ const generateNodes = (scenes, startPos) => [
   }),
 ];
 
-const generateEdges = (scenes) => scenes.flatMap((scene) =>
-  scene.children.map((childId) => ({
-    id: `e${scene.id}-${childId}`,
-    source: scene.id,
-    target: childId,
-    type: "default",
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-      width: 16,
-      height: 16,
-      color: "#9747ff",
-    },
-    style: {
-      strokeWidth: 2,
-      stroke: "#9747ff",
-    },
-  }))
-);
+const generateEdges = (scenes) =>
+  scenes.flatMap((scene) =>
+    scene.children.map((childId) => ({
+      id: `e${scene.id}-${childId}`,
+      source: scene.id,
+      target: childId,
+      type: "default",
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        width: 16,
+        height: 16,
+        color: "#9747ff",
+      },
+      style: {
+        strokeWidth: 2,
+        stroke: "#9747ff",
+      },
+    }))
+  );
 
 export default function SceneGraph() {
   const scenes = useAppSelector(selectScenes);
-  const nodesConfig = useMemo(() => generateNodes(scenes), [scenes]);
   const nodesConfig = useMemo(() => generateNodes(scenes, startPos), [scenes]);
   const edgesConfig = useMemo(() => generateEdges(scenes), [scenes]);
   const [nodes, setNodes, onNodesChange] = useNodesState(nodesConfig);
@@ -193,9 +192,9 @@ export default function SceneGraph() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    setNodes(generateNodes(scenes));
-    setEdges(generateEdges(scenes));
-  }, [scenes, setNodes, setEdges]);
+    setNodes(nodesConfig);
+    setEdges(edgesConfig);
+  }, [nodesConfig, edgesConfig, setNodes, setEdges]);
 
   // ... rest of the component
   const onConnect = useCallback(
@@ -210,7 +209,9 @@ export default function SceneGraph() {
     (_event, edge) => {
       // remove edge
       setEdges((es) => es.filter((e) => e.id !== edge.id));
-      dispatch(deleteChildScene({ sourceId: edge.source, targetId: edge.target }));
+      dispatch(
+        deleteChildScene({ sourceId: edge.source, targetId: edge.target })
+      );
     },
     [setEdges, dispatch]
   );
