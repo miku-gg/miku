@@ -200,8 +200,10 @@ export default function SceneGraph() {
   const onConnect = useCallback(
     (params) => {
       const { source, target } = params;
-      setEdges((eds) => addEdge({ ...params, type: "floating" }, eds));
-      dispatch(addChildScene({ sourceId: source, targetId: target }));
+      if (source !== target) {
+        setEdges((eds) => addEdge({ ...params, type: "floating" }, eds));
+        dispatch(addChildScene({ sourceId: source, targetId: target }));
+      }
     },
     [setEdges, dispatch]
   );
