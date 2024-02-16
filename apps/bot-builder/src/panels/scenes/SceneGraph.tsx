@@ -114,7 +114,9 @@ const SceneNode = ({ id, data }) => {
         </div>
         <div className="SceneNode__start-icon-container">
           <RiPlayCircleLine
-            className={`SceneNode__start-icon ${isStartScene ? "selected" : ""}`}
+            className={`SceneNode__start-icon ${
+              isStartScene ? "selected" : ""
+            }`}
             onClick={() => setStartSceneId(id)}
           />
         </div>
@@ -180,7 +182,6 @@ export default function SceneGraph() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const onConnect = useCallback(
     (params) => {
-      console.log("params", params);
       setEdges((eds) => addEdge(params, eds));
     },
     [setEdges]
