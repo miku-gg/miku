@@ -87,12 +87,14 @@ function CustomConnectionLine({ fromX, fromY, toX, toY, connectionLineStyle }) {
   );
 }
 
-const connectionNodeIdSelector = (state) => state.connectionNodeId;
+const connectionNodeIdSelector = (state) => state.connectionNodeId;import { RiDeleteBin6Line } from "react-icons/ri";
+
 const SceneNode = ({ id, data }) => {
   const connectionNodeId = useStore(connectionNodeIdSelector);
   const dispatch = useAppDispatch();
   const startScene = useAppSelector((state) => state.novel.startSceneId);
   const setStartSceneId = (id) => dispatch(setStartScene(id));
+  const deleteScene = (id) => dispatch(deleteSceneById(id));
 
   const isConnecting = !!connectionNodeId;
   const isStartScene = id === startScene;
@@ -119,6 +121,10 @@ const SceneNode = ({ id, data }) => {
         <div className="SceneNode__title">
           {data.title} <RiDragMove2Line />
         </div>
+        <RiDeleteBin6Line
+          className="SceneNode__delete-icon"
+          onClick={() => deleteScene(id)}
+        />
         <div className="SceneNode__start-icon-container">
           <RiPlayCircleLine
             className={`SceneNode__start-icon ${
