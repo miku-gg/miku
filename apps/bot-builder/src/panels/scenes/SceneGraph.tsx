@@ -99,13 +99,6 @@ const SceneNode = ({ id, data }) => {
   const dispatch = useAppDispatch();
   const startScene = useAppSelector((state) => state.novel.startSceneId);
   const setStartSceneId = (id: string) => dispatch(setStartScene(id));
-  const deleteScene = (id: string) =>
-    openModal({
-      onYes: () => {
-        dispatch(deleteSceneById(id));
-      },
-      description: "Are you sure you want to delete this scene?",
-    });
 
   const isConnecting = !!connectionNodeId;
   const isStartScene = id === startScene;
@@ -132,10 +125,6 @@ const SceneNode = ({ id, data }) => {
         <div className="SceneNode__title">
           {data.title} <RiDragMove2Line />
         </div>
-        <RiDeleteBin6Line
-          className="SceneNode__delete-icon"
-          onClick={() => deleteScene(id)}
-        />
         <div className="SceneNode__start-icon-container">
           <RiPlayCircleLine
             className={`SceneNode__start-icon ${
