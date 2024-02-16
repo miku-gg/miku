@@ -111,12 +111,10 @@ const SceneNode = ({ id, data }) => {
         />
         <div className="SceneNode__title">
           {data.title} <RiDragMove2Line />
-          {isStartScene && (
-            <RiPlayCircleLine
-              className="SceneNode__start-icon"
-              onClick={() => setStartSceneId(id)}
-            />
-          )}
+          <RiPlayCircleLine
+            className={`SceneNode__start-icon ${isStartScene ? "selected" : ""}`}
+            onClick={() => setStartSceneId(id)}
+          />
         </div>
         <div className="SceneNode__characters">
           {data.characters.map((char, index) => (

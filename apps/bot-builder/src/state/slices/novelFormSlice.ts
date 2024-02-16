@@ -27,6 +27,7 @@ const initialState: NovelFormState = {
   logoPic: "",
   author: "",
   tags: [],
+  startSceneId: "scene-1",
   characters: [
     {
       id: "char-1",
