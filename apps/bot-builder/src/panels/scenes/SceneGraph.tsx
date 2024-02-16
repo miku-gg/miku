@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import ReactFlow, {
   Position,
   Node,
@@ -147,7 +147,7 @@ const edgeTypes = {
 export default function SceneGraph() {
   const scenes = useAppSelector(selectScenes);
   const startPos = { x: 0, y: 0 };
-  const initialNodes = [
+  const generateNodes = (scenes) => [
     ...scenes.map((scene, index) => {
       return {
         id: scene.id,
@@ -182,9 +182,15 @@ export default function SceneGraph() {
     }))
   );
   console.log("initialEdges", initialEdges);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState(generateNodes(scenes));
+  const [edges, setEdges, onEdgesChange] = useEdgesState(generateEdges(scenes));
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    setNodes(generateNodes(scenes));
+    setEdges(generateEdges(scenes));
+  }, [scenes, setNodes, setEdges]);
+
   const onConnect = useCallback(
     (params) => {
       const { source, target } = params;
