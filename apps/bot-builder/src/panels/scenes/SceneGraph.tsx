@@ -169,7 +169,7 @@ const generateEdges = (scenes) =>
       id: `e${scene.id}-${childId}`,
       source: scene.id,
       target: childId,
-      type: "default",
+      type: "floating",
       markerEnd: {
         type: MarkerType.ArrowClosed,
         width: 16,
@@ -196,7 +196,6 @@ export default function SceneGraph() {
     setEdges(edgesConfig);
   }, [nodesConfig, edgesConfig, setNodes, setEdges]);
 
-  // ... rest of the component
   const onConnect = useCallback(
     (params) => {
       const { source, target } = params;
