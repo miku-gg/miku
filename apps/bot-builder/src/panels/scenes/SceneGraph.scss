@@ -86,38 +86,22 @@
   border: none;
 }
 
-html,
-body,
-#root {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: sans-serif;
-}
 .SceneNode__start-icon {
   position: absolute;
-  top: 0;
-  right: -10px;
-  color: #9747ff;
-  cursor: pointer;
-  border-radius: 50%;
-  padding: 5px;
-}
-
-.SceneNode__start-icon {
-  position: absolute;
-  top: 5px;
-  right: 5px;
+  top: -20px;
+  right: 0px;
   color: gray;
   cursor: pointer;
+  transition: all 0.2s ease-out;
+  opacity: 0;
 }
 
 .SceneNode__start-icon:hover {
   color: lightgray;
+  opacity: 1;
 }
 
 .SceneNode__start-icon.selected {
   color: #9747ff;
+  opacity: 1;
 }

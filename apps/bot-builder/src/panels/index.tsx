@@ -2,12 +2,13 @@ import { AreYouSure } from "@mikugg/ui-kit";
 import AssetsPanel from "./assets/AssetsPanel";
 import ButtonGroup from "../components/ButtonGroup";
 import { useState } from "react";
-import ScenesPanel from "./scenes/ScenesPanel";
+import SceneGraph from "./scenes/SceneGraph";
 
 export default function App() {
-  const [selectedPanel, setSelectedPanel] = useState<string>("assets");
+  const [selectedPanel, setSelectedPanel] = useState<string>("scenes");
+  return <SceneGraph />;
   return (
-    <div className="app">
+    <div className="panels">
       <ButtonGroup
         buttons={[
           {
@@ -22,7 +23,7 @@ export default function App() {
         selected={selectedPanel}
         onButtonClick={(value) => setSelectedPanel(value)}
       />
-      {selectedPanel === "assets" ? <AssetsPanel /> : <ScenesPanel />}
+      {selectedPanel === "assets" ? <AssetsPanel /> : <SceneGraph />}
     </div>
   );
 }

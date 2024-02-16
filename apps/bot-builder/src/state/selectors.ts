@@ -29,3 +29,32 @@ export const selectEditingCharacter = createSelector(
     return characters.find((character) => character.id === modal.editId);
   }
 );
+
+export const selectScenes = createSelector(
+  [
+    (state: RootState) => state.novel.scenes,
+    (state: RootState) => state.novel.starts,
+    (state: RootState) => state.novel.backgrounds,
+    (state: RootState) => state.novel.characters,
+    (state: RootState) => state.novel.songs,
+    (state: RootState) => state.novel.maps,
+  ],
+  (scenes, starts, backgrounds, characters, songs, maps) => {
+    return scenes.map((scene) => {
+      const _starts = starts.filter((start) => start.sceneId === scene.id);
+      return {
+        ...scene,
+        background: backgrounds.find((bg) => bg.id === scene.backgroundId),
+        characters: scene.characters.map((char) => {
+          return {
+            ...characters.find((c) => c.id === char.characterId),
+            outfit: char.outfit,
+          };
+        }),
+        music: songs.find((song) => song.id === scene.musicId),
+        parentMap: maps.find((map) => map.id === scene.parentMapId),
+        starts: _starts,
+      };
+    });
+  }
+);
