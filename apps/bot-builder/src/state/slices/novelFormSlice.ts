@@ -288,6 +288,26 @@ const novelFormSlice = createSlice({
       const newScene = { ...SCENE_DEFAULT, id: randomUUID() };
       state.scenes.push(newScene);
     },
+    deleteSceneById: (state, action: PayloadAction<string>) => {
+      const index = state.scenes.findIndex(
+        (scene) => scene.id === action.payload
+      );
+      if (index === -1) return;
+      state.scenes.forEach((scene) => {
+        scene.children = scene.children.filter(
+          (childId) => childId !== action.payload
+        );
+      });
+      // check if the scene is the start scene
+      state.scenes.splice(index, 1);
+      if (state.startSceneId === action.payload) {
+        if (state.scenes.length) {
+          state.startSceneId = state.scenes[0].id;
+        } else {
+          state.startSceneId = "";
+        }
+      }
+    },
   },
 });
 
@@ -305,6 +325,7 @@ export const {
   deleteCharacter,
   setStartScene,
   createSceneWithDefaults,
+  deleteSceneById,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

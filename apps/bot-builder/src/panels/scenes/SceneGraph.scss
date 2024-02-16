@@ -109,21 +109,26 @@
 // Styles for the delete scene button
 .SceneNode__delete-icon {
   position: absolute;
-  top: -20px;
-  left: 0px;
+  bottom: -20px;
+  right: 0px;
   color: red;
   cursor: pointer;
   transition: all 0.2s ease-out;
   opacity: 0;
+
+  &:hover {
+    color: darkred;
+    opacity: 1;
+  }
 }
 
-.SceneNode__delete-icon:hover {
-  color: darkred;
-  opacity: 1;
-}
-
-.SceneNode:hover .SceneNode__delete-icon {
-  opacity: 0.8;
+.SceneNode:hover {
+  .SceneNode__delete-icon {
+    opacity: 0.8;
+  }
+  .SceneNode__start-icon {
+    opacity: 0.8;
+  }
 }
 
 // Add the following styles

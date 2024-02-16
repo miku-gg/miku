@@ -18,8 +18,11 @@ import ReactFlow, {
   Panel,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { Button } from "@mikugg/ui-kit";
-import { createSceneWithDefaults } from "../../state/slices/novelFormSlice";
+import { Button, AreYouSure } from "@mikugg/ui-kit";
+import {
+  createSceneWithDefaults,
+  deleteSceneById,
+} from "../../state/slices/novelFormSlice";
 import "./SceneGraph.scss";
 import { useAppSelector, useAppDispatch } from "../../state/store";
 import {
@@ -87,14 +90,22 @@ function CustomConnectionLine({ fromX, fromY, toX, toY, connectionLineStyle }) {
   );
 }
 
-const connectionNodeIdSelector = (state) => state.connectionNodeId;import { RiDeleteBin6Line } from "react-icons/ri";
+const connectionNodeIdSelector = (state) => state.connectionNodeId;
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 const SceneNode = ({ id, data }) => {
+  const { openModal } = AreYouSure.useAreYouSure();
   const connectionNodeId = useStore(connectionNodeIdSelector);
   const dispatch = useAppDispatch();
   const startScene = useAppSelector((state) => state.novel.startSceneId);
-  const setStartSceneId = (id) => dispatch(setStartScene(id));
-  const deleteScene = (id) => dispatch(deleteSceneById(id));
+  const setStartSceneId = (id: string) => dispatch(setStartScene(id));
+  const deleteScene = (id: string) =>
+    openModal({
+      onYes: () => {
+        dispatch(deleteSceneById(id));
+      },
+      description: "Are you sure you want to delete this scene?",
+    });
 
   const isConnecting = !!connectionNodeId;
   const isStartScene = id === startScene;
