@@ -149,11 +149,12 @@ const edgeTypes = {
 const startPos = { x: 0, y: 0 };
 
 const generateNodes = (scenes, startPos) => [
-  ...scenes.map((scene, index) => {
+  ...scenes.map((scene) => {
+    const existingNode = nodes.find((n) => n.id === scene.id);
     return {
       id: scene.id,
       type: "sceneNode",
-      position: { x: startPos.x + 200 * index, y: startPos.y }, // Adjusted for simplicity
+      position: existingNode ? existingNode.position : { x: startPos.x + 200 * index, y: startPos.y },
       data: {
         title: scene.name,
         background: config.genAssetLink(scene.background?.source.jpg || ""),
@@ -164,6 +165,8 @@ const generateNodes = (scenes, startPos) => [
     };
   }),
 ];
+
+const nodesStateSelector = (state) => state.nodes;
 
 const generateEdges = (scenes) =>
   scenes.flatMap((scene) =>
@@ -187,6 +190,7 @@ const generateEdges = (scenes) =>
 
 export default function SceneGraph() {
   const scenes = useAppSelector(selectScenes);
+  const nodesState = useStore(nodesStateSelector);
   const nodesConfig = useMemo(() => generateNodes(scenes, startPos), [scenes]);
   const edgesConfig = useMemo(() => generateEdges(scenes), [scenes]);
   const [nodes, setNodes, onNodesChange] = useNodesState(nodesConfig);
