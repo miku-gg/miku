@@ -137,6 +137,23 @@ const initialState: NovelFormState = {
   starts: [],
 };
 import { generateSceneWithDefaults } from "../utils/generateDefaults";
+import { v4 as uuidv4 } from 'uuid';
+
+const SCENE_DEFAULT = {
+  id: '',
+  backgroundId: 'bg-1',
+  characters: [
+    {
+      characterId: 'char-1',
+      outfit: 'default',
+    },
+  ],
+  children: [],
+  musicId: '1',
+  name: 'New Scene',
+  parentMapId: null,
+  prompt: '*xd*',
+};
 
 const novelFormSlice = createSlice({
   name: "novel",
@@ -269,7 +286,7 @@ const novelFormSlice = createSlice({
       state.startSceneId = action.payload;
     },
     createSceneWithDefaults: (state) => {
-      const newScene = generateSceneWithDefaults();
+      const newScene = { ...SCENE_DEFAULT, id: uuidv4() };
       state.scenes.push(newScene);
     },
   },
