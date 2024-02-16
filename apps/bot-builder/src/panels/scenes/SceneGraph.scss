@@ -111,14 +111,14 @@ body,
   position: absolute;
   top: 5px;
   right: 5px;
-  color: #9747ff;
+  color: gray;
   cursor: pointer;
 }
 
 .SceneNode__start-icon:hover {
-  color: #b58cff;
+  color: lightgray;
 }
 
 .SceneNode__start-icon.selected {
-  color: #b58cff;
+  color: #9747ff;
 }

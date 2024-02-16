@@ -23,7 +23,7 @@ import { setStartScene } from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
 import { getEdgeParams } from "./utils.js";
-import { RiDragMove2Line, RiFlag2Line } from "react-icons/ri";
+import { RiDragMove2Line, RiPlayCircleLine } from "react-icons/ri";
 
 function FloatingEdge({ id, source, target, markerEnd, style }) {
   const sourceNode = useStore(
@@ -112,7 +112,7 @@ const SceneNode = ({ id, data }) => {
         <div className="SceneNode__title">
           {data.title} <RiDragMove2Line />
         </div>
-        <RiFlag2Line
+        <RiPlayCircleLine
           className={`SceneNode__start-icon ${isStartScene ? "selected" : ""}`}
           onClick={() => setStartSceneId(id)}
         />
