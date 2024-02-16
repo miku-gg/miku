@@ -106,4 +106,5 @@ export interface NovelFormState {
   maps: NovelMap[];
   scenes: NovelScene[];
   starts: NovelStart[];
+  startSceneId: string;
 }
