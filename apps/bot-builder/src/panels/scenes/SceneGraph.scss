@@ -98,10 +98,13 @@ body,
 }
 .SceneNode__start-icon {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: -10px;
+  right: -10px;
   color: #9747ff;
   cursor: pointer;
+  background: #fff;
+  border-radius: 50%;
+  padding: 5px;
 }
 
 .SceneNode__start-icon {
