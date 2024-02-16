@@ -27,7 +27,59 @@ const initialState: NovelFormState = {
   logoPic: "",
   author: "",
   tags: [],
-  characters: [],
+  characters: [
+    {
+      id: "char-1",
+      name: "char1",
+      short_description: "",
+      profile_pic: "empty_char.png",
+      tags: [],
+      card: {
+        spec: "chara_card_v2",
+        spec_version: "2.0",
+        data: {
+          name: "char1",
+          alternate_greetings: [],
+          character_version: "1",
+          creator: "",
+          creator_notes: "",
+          description: "",
+          extensions: {
+            mikugg_v2: {
+              license: "CC BY-NC-SA 4.0",
+              language: "en",
+              short_description: "",
+              profile_pic: "empty_char.png",
+              outfits: [
+                {
+                  id: randomUUID(),
+                  name: "default",
+                  description: "The default outfit",
+                  attributes: [],
+                  template: "single-emotion",
+                  emotions: [
+                    {
+                      id: "neutral",
+                      sources: {
+                        png: "empty_char_emotion.png",
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          first_mes: "",
+          mes_example: "",
+          personality: "",
+          post_history_instructions: "",
+          scenario: "",
+          system_prompt: "",
+          tags: [],
+        },
+      },
+    },
+  ],
   backgrounds: [
     {
       id: "bg-1",
@@ -49,7 +101,38 @@ const initialState: NovelFormState = {
     },
   ],
   maps: [],
-  scenes: [],
+  scenes: [
+    {
+      id: "scene-1",
+      backgroundId: "bg-1",
+      characters: [
+        {
+          characterId: "char-1",
+          outfit: "default",
+        },
+      ],
+      children: ["scene-2"],
+      musicId: "1",
+      name: "Scene 1",
+      parentMapId: null,
+      prompt: "*xd*",
+    },
+    {
+      id: "scene-2",
+      backgroundId: "bg-1",
+      characters: [
+        {
+          characterId: "char-1",
+          outfit: "default",
+        },
+      ],
+      children: [],
+      musicId: "1",
+      name: "Scene 2",
+      parentMapId: null,
+      prompt: "*xd*",
+    },
+  ],
   starts: [],
 };
 
