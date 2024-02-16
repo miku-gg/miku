@@ -6,7 +6,6 @@ import SceneGraph from "./scenes/SceneGraph";
 
 export default function App() {
   const [selectedPanel, setSelectedPanel] = useState<string>("scenes");
-  return <SceneGraph />;
   return (
     <div className="panels">
       <ButtonGroup

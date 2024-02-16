@@ -15,6 +15,7 @@ import ReactFlow, {
   MarkerType,
   useStore,
   getStraightPath,
+  Panel,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Button } from "@mikugg/ui-kit";
@@ -148,13 +149,12 @@ const edgeTypes = {
 
 const startPos = { x: 0, y: 0 };
 
-const generateNodes = (scenes, startPos) => [
-  ...scenes.map((scene) => {
-    const existingNode = nodes.find((n) => n.id === scene.id);
+const generateNodes = (scenes) => [
+  ...scenes.map((scene, index) => {
     return {
       id: scene.id,
       type: "sceneNode",
-      position: existingNode ? existingNode.position : { x: startPos.x + 200 * index, y: startPos.y },
+      position: { x: startPos.x + 200 * index, y: startPos.y },
       data: {
         title: scene.name,
         background: config.genAssetLink(scene.background?.source.jpg || ""),
@@ -165,8 +165,6 @@ const generateNodes = (scenes, startPos) => [
     };
   }),
 ];
-
-const nodesStateSelector = (state) => state.nodes;
 
 const generateEdges = (scenes) =>
   scenes.flatMap((scene) =>
@@ -190,8 +188,7 @@ const generateEdges = (scenes) =>
 
 export default function SceneGraph() {
   const scenes = useAppSelector(selectScenes);
-  const nodesState = useStore(nodesStateSelector);
-  const nodesConfig = useMemo(() => generateNodes(scenes, startPos), [scenes]);
+  const nodesConfig = useMemo(() => generateNodes(scenes), [scenes]);
   const edgesConfig = useMemo(() => generateEdges(scenes), [scenes]);
   const [nodes, setNodes, onNodesChange] = useNodesState(nodesConfig);
   const [edges, setEdges, onEdgesChange] = useEdgesState(edgesConfig);
@@ -202,7 +199,18 @@ export default function SceneGraph() {
   };
 
   useEffect(() => {
-    setNodes(nodesConfig);
+    setNodes((nodes) =>
+      nodesConfig.map((node) => {
+        const existingNode = nodes.find((n) => n.id === node.id);
+        if (existingNode) {
+          return {
+            ...node,
+            position: existingNode.position,
+          };
+        }
+        return node;
+      })
+    );
     setEdges(edgesConfig);
   }, [nodesConfig, edgesConfig, setNodes, setEdges]);
 
@@ -228,9 +236,6 @@ export default function SceneGraph() {
   );
   return (
     <div className="SceneGraph">
-      <Button className="SceneGraph__add-scene-btn" onClick={handleAddScene}>
-        Add Scene
-      </Button>
       <div className="SceneGraph__graph">
         <ReactFlow
           nodes={nodes}
@@ -276,6 +281,15 @@ export default function SceneGraph() {
         >
           <Controls />
           <Background variant={BackgroundVariant.Dots} gap={32} size={1} />
+          <Panel position="top-right">
+            <Button
+              className="SceneGraph__add-scene-btn"
+              onClick={handleAddScene}
+              theme="secondary"
+            >
+              Add Scene
+            </Button>
+          </Panel>
         </ReactFlow>
       </div>
     </div>
