@@ -17,6 +17,8 @@ import ReactFlow, {
   getStraightPath,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import { Button } from "@mikugg/ui-kit";
+import { createSceneWithDefaults } from "../../state/slices/novelFormSlice";
 import "./SceneGraph.scss";
 import { useAppSelector, useAppDispatch } from "../../state/store";
 import {
@@ -182,8 +184,6 @@ const generateEdges = (scenes) =>
       },
     }))
   );
-import { Button } from 'react-bootstrap';
-import { createSceneWithDefaults } from "../../state/slices/novelFormSlice";
 
 export default function SceneGraph() {
   const scenes = useAppSelector(selectScenes);
@@ -224,10 +224,7 @@ export default function SceneGraph() {
   );
   return (
     <div className="SceneGraph">
-      <Button
-        className="SceneGraph__add-scene-btn"
-        onClick={handleAddScene}
-      >
+      <Button className="SceneGraph__add-scene-btn" onClick={handleAddScene}>
         Add Scene
       </Button>
       <div className="SceneGraph__graph">
