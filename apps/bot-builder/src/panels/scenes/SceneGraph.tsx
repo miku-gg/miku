@@ -22,7 +22,7 @@ import { useAppSelector } from "../../state/store";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
 import { getEdgeParams } from "./utils.js";
-import { RiDragMove2Line } from "react-icons/ri";
+import { RiDragMove2Line, RiPlayCircleLine } from "react-icons/ri";
 
 function FloatingEdge({ id, source, target, markerEnd, style }) {
   const sourceNode = useStore(
@@ -80,10 +80,12 @@ function CustomConnectionLine({ fromX, fromY, toX, toY, connectionLineStyle }) {
 }
 
 const connectionNodeIdSelector = (state) => state.connectionNodeId;
-const SceneNode = ({ data }) => {
+const SceneNode = ({ id, data }) => {
   const connectionNodeId = useStore(connectionNodeIdSelector);
+  const [startScene, setStartScene] = React.useState(id);
 
   const isConnecting = !!connectionNodeId;
+  const isStartScene = id === startScene;
 
   return (
     <>
@@ -106,6 +108,12 @@ const SceneNode = ({ data }) => {
         />
         <div className="SceneNode__title">
           {data.title} <RiDragMove2Line />
+          {isStartScene && (
+            <RiPlayCircleLine
+              className="SceneNode__start-icon"
+              onClick={() => setStartScene(id)}
+            />
+          )}
         </div>
         <div className="SceneNode__characters">
           {data.characters.map((char, index) => (
