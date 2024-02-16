@@ -78,6 +78,9 @@ const SceneNode = ({
   const connectionNodeId = useStore((state) => state.connectionNodeId);
   const dispatch = useAppDispatch();
   const startScene = useAppSelector((state) => state.novel.startSceneId);
+  const openSceneEditModal = () => {
+    dispatch(openModal({ modalType: "scene", editId: id }));
+  };
   const setStartSceneId = (id: string) => dispatch(setStartScene(id));
 
   const isConnecting = !!connectionNodeId;
@@ -111,6 +114,12 @@ const SceneNode = ({
               isStartScene ? "selected" : ""
             }`}
             onClick={() => setStartSceneId(id)}
+          />
+        </div>
+        <div className="SceneNode__edit-icon-container">
+          <RiEdit2Line
+            className="SceneNode__edit-icon"
+            onClick={openSceneEditModal}
           />
         </div>
         <div className="SceneNode__characters">
@@ -283,3 +292,4 @@ export default function SceneGraph() {
     </div>
   );
 }
+import { openModal } from "../../state/slices/inputSlice";
