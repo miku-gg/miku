@@ -136,6 +136,7 @@ const initialState: NovelFormState = {
   ],
   starts: [],
 };
+import { generateSceneWithDefaults } from "../utils/generateDefaults";
 
 const novelFormSlice = createSlice({
   name: "novel",
@@ -267,6 +268,10 @@ const novelFormSlice = createSlice({
     setStartScene: (state, action: PayloadAction<string>) => {
       state.startSceneId = action.payload;
     },
+    createSceneWithDefaults: (state) => {
+      const newScene = generateSceneWithDefaults();
+      state.scenes.push(newScene);
+    },
   },
 });
 
@@ -283,6 +288,7 @@ export const {
   updateCharacter,
   deleteCharacter,
   setStartScene,
+  createSceneWithDefaults,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

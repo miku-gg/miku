@@ -182,6 +182,8 @@ const generateEdges = (scenes) =>
       },
     }))
   );
+import { Button } from 'react-bootstrap';
+import { createSceneWithDefaults } from "../../state/slices/novelFormSlice";
 
 export default function SceneGraph() {
   const scenes = useAppSelector(selectScenes);
@@ -190,6 +192,10 @@ export default function SceneGraph() {
   const [nodes, setNodes, onNodesChange] = useNodesState(nodesConfig);
   const [edges, setEdges, onEdgesChange] = useEdgesState(edgesConfig);
   const dispatch = useAppDispatch();
+
+  const handleAddScene = () => {
+    dispatch(createSceneWithDefaults());
+  };
 
   useEffect(() => {
     setNodes(nodesConfig);
@@ -218,6 +224,12 @@ export default function SceneGraph() {
   );
   return (
     <div className="SceneGraph">
+      <Button
+        className="SceneGraph__add-scene-btn"
+        onClick={handleAddScene}
+      >
+        Add Scene
+      </Button>
       <div className="SceneGraph__graph">
         <ReactFlow
           nodes={nodes}
