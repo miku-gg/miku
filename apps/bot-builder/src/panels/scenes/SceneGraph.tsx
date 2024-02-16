@@ -144,12 +144,15 @@ const edgeTypes = {
   floating: FloatingEdge,
 };
 
+const startPos = { x: 0, y: 0 };
+
+const generateNodes = (scenes) => [
 const generateNodes = (scenes, startPos) => [
   ...scenes.map((scene, index) => {
     return {
       id: scene.id,
       type: "sceneNode",
-      position: { x: startPos.x + 200 * index, y: startPos.y + 25 }, // Adjusted for simplicity
+      position: { x: startPos.x + 200 * index, y: startPos.y }, // Adjusted for simplicity
       data: {
         title: scene.name,
         background: config.genAssetLink(scene.background?.source.jpg || ""),
@@ -182,7 +185,7 @@ const generateEdges = (scenes) => scenes.flatMap((scene) =>
 
 export default function SceneGraph() {
   const scenes = useAppSelector(selectScenes);
-  const startPos = { x: 0, y: 0 };
+  const nodesConfig = useMemo(() => generateNodes(scenes), [scenes]);
   const nodesConfig = useMemo(() => generateNodes(scenes, startPos), [scenes]);
   const edgesConfig = useMemo(() => generateEdges(scenes), [scenes]);
   const [nodes, setNodes, onNodesChange] = useNodesState(nodesConfig);
@@ -194,6 +197,7 @@ export default function SceneGraph() {
     setEdges(generateEdges(scenes));
   }, [scenes, setNodes, setEdges]);
 
+  // ... rest of the component
   const onConnect = useCallback(
     (params) => {
       const { source, target } = params;
