@@ -44,6 +44,7 @@ export const selectScenes = createSelector(
       const _starts = starts.filter((start) => start.sceneId === scene.id);
       return {
         ...scene,
+        _source: scene,
         background: backgrounds.find((bg) => bg.id === scene.backgroundId),
         characters: scene.characters.map((char) => {
           return {
@@ -56,5 +57,13 @@ export const selectScenes = createSelector(
         starts: _starts,
       };
     });
+  }
+);
+
+export const selectEditingScene = createSelector(
+  [(state: RootState) => state.input.modals.scene, selectScenes],
+  (modal, scenes) => {
+    if (!modal.opened) return undefined;
+    return scenes.find((scene) => scene.id === modal.editId);
   }
 );

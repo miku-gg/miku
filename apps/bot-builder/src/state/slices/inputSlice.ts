@@ -7,7 +7,8 @@ export type ModalType =
   | "song"
   | "songSearch"
   | "character"
-  | "characterSearch";
+  | "characterSearch"
+  | "scene";
 
 export interface InputState {
   modals: {
@@ -36,6 +37,9 @@ const initialState: InputState = {
       opened: false,
     },
     characterSearch: {
+      opened: false,
+    },
+    scene: {
       opened: false,
     },
   },

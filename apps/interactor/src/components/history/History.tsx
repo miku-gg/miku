@@ -5,7 +5,7 @@ import { FaTimes } from 'react-icons/fa'
 import { ReactElement } from 'react'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { setEditModal, setHistoryModal } from '../../state/slices/settingsSlice'
-import ReactFlow, { Position, Node, Edge } from 'reactflow'
+import ReactFlow, { Position, Node, Edge, NodeTypes } from 'reactflow'
 import DialogueNode from './DialogueNode'
 import { NodeEditor } from './NodeEditor'
 import {
@@ -101,7 +101,7 @@ const HistoryActions = () => {
     </div>
   )
 }
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
   dialogueNode: DialogueNode,
 }
 const HistoryModal = (): ReactElement => {

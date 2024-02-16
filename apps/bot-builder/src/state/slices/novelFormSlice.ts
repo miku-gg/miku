@@ -4,6 +4,7 @@ import {
   NovelFormState,
   NovelSong,
   NovelCharacter,
+  NovelScene,
 } from "../NovelFormState";
 import { v4 as randomUUID } from "uuid";
 
@@ -308,6 +309,13 @@ const novelFormSlice = createSlice({
         }
       }
     },
+    updateScene: (state, action: PayloadAction<NovelScene>) => {
+      const index = state.scenes.findIndex(
+        (scene) => scene.id === action.payload.id
+      );
+      if (index === -1) return;
+      state.scenes[index] = action.payload;
+    },
   },
 });
 
@@ -326,6 +334,7 @@ export const {
   setStartScene,
   createSceneWithDefaults,
   deleteSceneById,
+  updateScene,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

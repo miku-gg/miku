@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { ComponentType, useCallback, useEffect, useMemo } from "react";
 import ReactFlow, {
   Position,
   Node,
@@ -16,13 +16,13 @@ import ReactFlow, {
   useStore,
   getStraightPath,
   Panel,
+  OnConnect,
+  NodeTypes,
+  NodeProps,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { Button, AreYouSure } from "@mikugg/ui-kit";
-import {
-  createSceneWithDefaults,
-  deleteSceneById,
-} from "../../state/slices/novelFormSlice";
+import { Button } from "@mikugg/ui-kit";
+import { createSceneWithDefaults } from "../../state/slices/novelFormSlice";
 import "./SceneGraph.scss";
 import { useAppSelector, useAppDispatch } from "../../state/store";
 import {
@@ -35,7 +35,7 @@ import config from "../../config";
 import { getEdgeParams } from "./utils.js";
 import { RiDragMove2Line, RiPlayCircleLine } from "react-icons/ri";
 
-function FloatingEdge({ id, source, target, markerEnd, style }) {
+function FloatingEdge({ id, source, target, markerEnd, style }: Edge) {
   const sourceNode = useStore(
     useCallback((store) => store.nodeInternals.get(source), [source])
   );
@@ -61,41 +61,21 @@ function FloatingEdge({ id, source, target, markerEnd, style }) {
       id={id}
       className="react-flow__edge-path"
       d={edgePath}
-      markerEnd={markerEnd}
+      markerEnd={markerEnd?.toString()}
       style={style}
     />
   );
 }
 
-function CustomConnectionLine({ fromX, fromY, toX, toY, connectionLineStyle }) {
-  const [edgePath] = getStraightPath({
-    sourceX: fromX,
-    sourceY: fromY,
-    targetX: toX,
-    targetY: toY,
-  });
-
-  return (
-    <g>
-      <path style={connectionLineStyle} fill="none" d={edgePath} />
-      <circle
-        cx={toX}
-        cy={toY}
-        fill="black"
-        r={3}
-        stroke="black"
-        strokeWidth={1.5}
-      />
-    </g>
-  );
-}
-
-const connectionNodeIdSelector = (state) => state.connectionNodeId;
-import { RiDeleteBin6Line } from "react-icons/ri";
-
-const SceneNode = ({ id, data }) => {
-  const { openModal } = AreYouSure.useAreYouSure();
-  const connectionNodeId = useStore(connectionNodeIdSelector);
+const SceneNode = ({
+  id,
+  data,
+}: Node<{
+  title: string;
+  background: string;
+  characters: string[];
+}>) => {
+  const connectionNodeId = useStore((state) => state.connectionNodeId);
   const dispatch = useAppDispatch();
   const startScene = useAppSelector((state) => state.novel.startSceneId);
   const setStartSceneId = (id: string) => dispatch(setStartScene(id));
@@ -134,10 +114,10 @@ const SceneNode = ({ id, data }) => {
           />
         </div>
         <div className="SceneNode__characters">
-          {data.characters.map((char, index) => (
+          {data.characters.map((charImg, index) => (
             <img
               key={index}
-              src={char}
+              src={charImg}
               alt={`Character ${index}`}
               className="SceneNode__character"
             />
@@ -148,14 +128,16 @@ const SceneNode = ({ id, data }) => {
   );
 };
 
-const nodeTypes = { sceneNode: SceneNode };
+// eslint-disable-next-line
+// @ts-ignore
+const nodeTypes: NodeTypes = { sceneNode: SceneNode };
 const edgeTypes = {
   floating: FloatingEdge,
 };
 
 const startPos = { x: 0, y: 0 };
 
-const generateNodes = (scenes) => [
+const generateNodes = (scenes: ReturnType<typeof selectScenes>) => [
   ...scenes.map((scene, index) => {
     return {
       id: scene.id,
@@ -172,7 +154,7 @@ const generateNodes = (scenes) => [
   }),
 ];
 
-const generateEdges = (scenes) =>
+const generateEdges = (scenes: ReturnType<typeof selectScenes>) =>
   scenes.flatMap((scene) =>
     scene.children.map((childId) => ({
       id: `e${scene.id}-${childId}`,
@@ -220,10 +202,10 @@ export default function SceneGraph() {
     setEdges(edgesConfig);
   }, [nodesConfig, edgesConfig, setNodes, setEdges]);
 
-  const onConnect = useCallback(
+  const onConnect: OnConnect = useCallback(
     (params) => {
       const { source, target } = params;
-      if (source !== target) {
+      if (source !== target && source && target) {
         setEdges((eds) => addEdge({ ...params, type: "floating" }, eds));
         dispatch(addChildScene({ sourceId: source, targetId: target }));
       }
@@ -231,7 +213,7 @@ export default function SceneGraph() {
     [setEdges, dispatch]
   );
   const onEdgeClick = useCallback(
-    (_event, edge) => {
+    (_event: React.MouseEvent<Element, MouseEvent>, edge: Edge) => {
       // remove edge
       setEdges((es) => es.filter((e) => e.id !== edge.id));
       dispatch(

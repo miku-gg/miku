@@ -8,8 +8,8 @@ import {
 import { closeModal } from "../../state/slices/inputSlice";
 import config from "../../config";
 import "./SceneEditModal.scss";
-import { useEffect } from "react";
 import { RiEdit2Line } from "react-icons/ri";
+import { NovelScene } from "../../state/NovelFormState";
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -18,19 +18,27 @@ export default function SceneEditModal() {
   const backgrounds = useAppSelector(selectBackgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
 
-  const handleSceneNameChange = (e) => {
-    const newName = e.target.value;
+  const handleSceneNameChange = (e: { target: { value: string } }) => {
+    const newName = String(e.target.value);
     if (scene) {
-      dispatch(updateScene({ ...scene, name: newName }));
-      dispatch(updateScene({ id: scene.id, changes: { name: newName } }));
+      dispatch(
+        updateScene({
+          ...scene._source,
+          name: newName,
+        })
+      );
     }
   };
 
-  const handleScenePromptChange = (e) => {
-    const newPrompt = e.target.value;
+  const handleScenePromptChange = (e: { target: { value: string } }) => {
+    const newPrompt = String(e.target.value);
     if (scene) {
-      dispatch(updateScene({ ...scene, prompt: newPrompt }));
-      dispatch(updateScene({ id: scene.id, changes: { prompt: newPrompt } }));
+      dispatch(
+        updateScene({
+          ...scene._source,
+          prompt: newPrompt,
+        })
+      );
     }
   };
 
@@ -59,13 +67,13 @@ export default function SceneEditModal() {
           <Input
             label="Scene Name"
             value={scene?.name || ""}
-            value={sceneName}
             onChange={handleSceneNameChange}
           />
           <div className="SceneEditModal_background">
             <img
-              src={config.genAssetLink(selectedBackground.source.jpg)}
-              src={config.genAssetLink(scene?.background?.source.jpg || backgrounds[0].source.jpg)}
+              src={config.genAssetLink(
+                scene?.background?.source.jpg || backgrounds[0].source.jpg
+              )}
               alt="Background"
             />
             <RiEdit2Line className="SceneEditModal_edit-icon" />
@@ -74,7 +82,6 @@ export default function SceneEditModal() {
           {/* TODO: Add music selection */}
           <Input
             label="Scene Prompt"
-            value={scenePrompt}
             value={scene?.prompt || ""}
             onChange={handleScenePromptChange}
           />
