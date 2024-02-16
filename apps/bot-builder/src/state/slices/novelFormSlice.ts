@@ -151,6 +151,18 @@ const novelFormSlice = createSlice({
         sourceScene.children.push(targetId);
       }
     },
+    deleteChildScene: (
+      state,
+      action: PayloadAction<{ sourceId: string; targetId: string }>
+    ) => {
+      const { sourceId, targetId } = action.payload;
+      const sourceScene = state.scenes.find((scene) => scene.id === sourceId);
+      if (sourceScene) {
+        sourceScene.children = sourceScene.children.filter(
+          (childId) => childId !== targetId
+        );
+      }
+    },
     addBackground: (state, action: PayloadAction<NovelBackground>) => {
       state.backgrounds.push(action.payload);
     },
@@ -260,6 +272,7 @@ const novelFormSlice = createSlice({
 
 export const {
   addChildScene,
+  deleteChildScene,
   addBackground,
   updateBackground,
   deleteBackground,

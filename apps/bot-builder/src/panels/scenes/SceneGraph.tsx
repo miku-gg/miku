@@ -22,6 +22,7 @@ import { useAppSelector, useAppDispatch } from "../../state/store";
 import {
   addChildScene,
   setStartScene,
+  deleteChildScene,
 } from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
@@ -192,6 +193,14 @@ export default function SceneGraph() {
     },
     [setEdges, dispatch]
   );
+  const onEdgeClick = useCallback(
+    (_event, edge) => {
+      // remove edge
+      setEdges((es) => es.filter((e) => e.id !== edge.id));
+      dispatch(deleteChildScene({ sourceId: edge.source, targetId: edge.target }));
+    },
+    [setEdges, dispatch]
+  );
   return (
     <div className="SceneGraph">
       <div className="SceneGraph__graph">
@@ -227,10 +236,7 @@ export default function SceneGraph() {
             },
           }}
           connectionRadius={50}
-          onEdgeClick={(_event, edge) => {
-            // remove edge
-            setEdges((es) => es.filter((e) => e.id !== edge.id));
-          }}
+          onEdgeClick={onEdgeClick}
           // connectionLineComponent={CustomConnectionLine}
           // connectionLineStyle={{
           //   strokeWidth: 3,
