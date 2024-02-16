@@ -27,7 +27,7 @@ export interface NovelScene {
     outfit: string;
   }[];
   children: string[];
-  parentMapId: string;
+  parentMapId: string | null;
 }
 
 export interface NovelCharacterOutfit {
