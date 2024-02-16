@@ -180,11 +180,14 @@ export default function SceneGraph() {
   console.log("initialEdges", initialEdges);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const dispatch = useAppDispatch();
   const onConnect = useCallback(
     (params) => {
-      setEdges((eds) => addEdge(params, eds));
+      const { source, target } = params;
+      setEdges((eds) => addEdge({ ...params, type: 'floating' }, eds));
+      dispatch(addChildScene({ sourceId: source, targetId: target }));
     },
-    [setEdges]
+    [setEdges, dispatch]
   );
   return (
     <div className="SceneGraph">
