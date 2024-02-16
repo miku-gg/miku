@@ -245,10 +245,26 @@ const novelFormSlice = createSlice({
     setStartScene: (state, action: PayloadAction<string>) => {
       state.startSceneId = action.payload;
     },
+const novelFormSlice = createSlice({
+  name: "novel",
+  initialState,
+  reducers: {
+    connectScenes: (state, action: PayloadAction<{ sourceId: string; targetId: string }>) => {
+      const { sourceId, targetId } = action.payload;
+      const sourceScene = state.scenes.find(scene => scene.id === sourceId);
+      if (sourceScene && !sourceScene.children.includes(targetId)) {
+        sourceScene.children.push(targetId);
+      }
+    },
+    addBackground: (state, action: PayloadAction<NovelBackground>) => {
+      state.backgrounds.push(action.payload);
+    },
+    // ... other reducers ...
   },
 });
 
 export const {
+  connectScenes,
   addBackground,
   updateBackground,
   deleteBackground,
