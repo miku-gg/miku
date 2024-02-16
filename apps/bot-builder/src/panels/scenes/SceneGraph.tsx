@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import ReactFlow, {
   Position,
   Node,
@@ -144,46 +144,49 @@ const edgeTypes = {
   floating: FloatingEdge,
 };
 
+const generateNodes = (scenes, startPos) => [
+  ...scenes.map((scene, index) => {
+    return {
+      id: scene.id,
+      type: "sceneNode",
+      position: { x: startPos.x + 200 * index, y: startPos.y + 25 }, // Adjusted for simplicity
+      data: {
+        title: scene.name,
+        background: config.genAssetLink(scene.background?.source.jpg || ""),
+        characters: scene.characters.map((char) =>
+          config.genAssetLink(char.profile_pic || "")
+        ),
+      },
+    };
+  }),
+];
+
+const generateEdges = (scenes) => scenes.flatMap((scene) =>
+  scene.children.map((childId) => ({
+    id: `e${scene.id}-${childId}`,
+    source: scene.id,
+    target: childId,
+    type: "default",
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      width: 16,
+      height: 16,
+      color: "#9747ff",
+    },
+    style: {
+      strokeWidth: 2,
+      stroke: "#9747ff",
+    },
+  }))
+);
+
 export default function SceneGraph() {
   const scenes = useAppSelector(selectScenes);
   const startPos = { x: 0, y: 0 };
-  const generateNodes = (scenes) => [
-    ...scenes.map((scene, index) => {
-      return {
-        id: scene.id,
-        type: "sceneNode",
-        position: { x: startPos.x + 200 * index, y: startPos.y + 25 }, // Adjusted for simplicity
-        data: {
-          title: scene.name,
-          background: config.genAssetLink(scene.background?.source.jpg || ""),
-          characters: scene.characters.map((char) =>
-            config.genAssetLink(char.profile_pic || "")
-          ),
-        },
-      };
-    }),
-  ];
-  const initialEdges = scenes.flatMap((scene) =>
-    scene.children.map((childId) => ({
-      id: `e${scene.id}-${childId}`,
-      source: scene.id,
-      target: childId,
-      type: "default",
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-        width: 16,
-        height: 16,
-        color: "#9747ff",
-      },
-      style: {
-        strokeWidth: 2,
-        stroke: "#9747ff",
-      },
-    }))
-  );
-  console.log("initialEdges", initialEdges);
-  const [nodes, setNodes, onNodesChange] = useNodesState(generateNodes(scenes));
-  const [edges, setEdges, onEdgesChange] = useEdgesState(generateEdges(scenes));
+  const nodesConfig = useMemo(() => generateNodes(scenes, startPos), [scenes]);
+  const edgesConfig = useMemo(() => generateEdges(scenes), [scenes]);
+  const [nodes, setNodes, onNodesChange] = useNodesState(nodesConfig);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(edgesConfig);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
