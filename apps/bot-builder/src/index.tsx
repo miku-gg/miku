@@ -11,6 +11,7 @@ import "./styles/main.scss";
 import SongEditModal from "./modals/SongEditModal";
 import SongSearchModal from "./modals/SongSearchModal";
 import CharacterEditModal from "./modals/character/CharacterEditModal";
+import SceneEditModal from "./modals/scene/SceneEditModal";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -19,6 +20,7 @@ ReactDOM.render(
         <div className="app">
           <Planels />
         </div>
+        <SceneEditModal />
         <BackgroundEditModal />
         <BackgroundSearchModal />
         <SongEditModal />

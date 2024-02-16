@@ -33,7 +33,7 @@ import {
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
 import { getEdgeParams } from "./utils.js";
-import { RiDragMove2Line, RiPlayCircleLine } from "react-icons/ri";
+import { RiDragMove2Line, RiEdit2Line, RiPlayCircleLine } from "react-icons/ri";
 
 function FloatingEdge({ id, source, target, markerEnd, style }: Edge) {
   const sourceNode = useStore(

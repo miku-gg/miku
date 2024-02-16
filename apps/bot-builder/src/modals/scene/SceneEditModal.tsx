@@ -7,9 +7,8 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { closeModal } from "../../state/slices/inputSlice";
 import config from "../../config";
-import "./SceneEditModal.scss";
 import { RiEdit2Line } from "react-icons/ri";
-import { NovelScene } from "../../state/NovelFormState";
+import "./SceneEditModal.scss";
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
