@@ -105,3 +105,17 @@
   color: #9747ff;
   opacity: 1;
 }
+
+// Add the following styles
+
+.react-flow__edge-path {
+  cursor: pointer;
+}
+
+.react-flow__edge-path:hover {
+  stroke: red;
+}
+
+.react-flow__edge-path.selected {
+  stroke: #9747ff;
+}
