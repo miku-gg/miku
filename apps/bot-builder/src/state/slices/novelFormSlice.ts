@@ -241,6 +241,9 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.characters.splice(index, 1);
     },
+    setStartScene: (state, action: PayloadAction<string>) => {
+      state.startSceneId = action.payload;
+    },
   },
 });
 
@@ -254,6 +257,7 @@ export const {
   createCharacter,
   updateCharacter,
   deleteCharacter,
+  setStartScene,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

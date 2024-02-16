@@ -18,7 +18,8 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import "./SceneGraph.scss";
-import { useAppSelector } from "../../state/store";
+import { useAppSelector, useAppDispatch } from "../../state/store";
+import { setStartScene } from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
 import { getEdgeParams } from "./utils.js";
@@ -82,7 +83,9 @@ function CustomConnectionLine({ fromX, fromY, toX, toY, connectionLineStyle }) {
 const connectionNodeIdSelector = (state) => state.connectionNodeId;
 const SceneNode = ({ id, data }) => {
   const connectionNodeId = useStore(connectionNodeIdSelector);
-  const [startScene, setStartScene] = React.useState(id);
+  const dispatch = useAppDispatch();
+  const startScene = useAppSelector((state) => state.novel.startSceneId);
+  const setStartSceneId = (id) => dispatch(setStartScene(id));
 
   const isConnecting = !!connectionNodeId;
   const isStartScene = id === startScene;
@@ -111,7 +114,7 @@ const SceneNode = ({ id, data }) => {
           {isStartScene && (
             <RiPlayCircleLine
               className="SceneNode__start-icon"
-              onClick={() => setStartScene(id)}
+              onClick={() => setStartSceneId(id)}
             />
           )}
         </div>
