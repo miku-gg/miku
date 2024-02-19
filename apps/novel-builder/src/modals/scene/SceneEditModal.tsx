@@ -7,7 +7,7 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { closeModal } from "../../state/slices/inputSlice";
 import config from "../../config";
-import { RiEdit2Line } from "react-icons/ri";
+import { AiOutlinePicture } from "react-icons/ai";
 import "./SceneEditModal.scss";
 import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
 import { useState } from "react";
@@ -73,19 +73,20 @@ export default function SceneEditModal() {
               value={scene?.name || ""}
               onChange={handleSceneNameChange}
             />
-            <div
-              className="SceneEditModal__background"
-              style={{
-                backgroundImage: `url(${config.genAssetLink(
+            <div className="SceneEditModal__background-container">
+              <img
+                className="SceneEditModal__background"
+                src={config.genAssetLink(
                   scene?.background?.source.jpg || backgrounds[0].source.jpg
-                )})`,
-              }}
-            >
+                )}
+              />
               <div
-                className="Background__background-edit-btn"
+                className="SceneEditModal__background-edit-btn"
                 onClick={() => setSelectBackgroundModalOpened(true)}
+                tabIndex={0}
+                role="button"
               >
-                <RiEdit2Line className="SceneEditModal_edit-icon" />
+                <AiOutlinePicture />
               </div>
             </div>
             {/* TODO: Add character selection list */}

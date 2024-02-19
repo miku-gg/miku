@@ -1,0 +1,52 @@
+@import "../../styles/variables";
+
+.SceneEditModal {
+  max-width: 1200px;
+  background: $background-3;
+
+  &__background-container {
+    height: 330px;
+    border-radius: 1rem;
+    margin: 20px 0;
+    position: relative;
+
+    &:has(.SceneEditModal__background-edit-btn:hover) {
+      .SceneEditModal__background {
+        opacity: 0.3;
+      }
+    }
+  }
+
+  &__background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem;
+    transition: all 0.2s ease-out;
+  }
+
+  &__background-edit-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: black;
+    z-index: 99999;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 5px;
+    display: flex;
+    transition: all 0.2s ease-out;
+    outline: none;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+  }
+}
