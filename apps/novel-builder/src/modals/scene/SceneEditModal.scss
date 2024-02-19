@@ -118,6 +118,58 @@
   &__character {
     position: relative;
   }
+
+  &__scene-details {
+    background-color: $background-1;
+    padding: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__scene-details-row {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+    align-items: center;
+    & > div {
+      flex: 3;
+    }
+
+    .SceneEditModal__scene-details-nsfw {
+      flex: 2;
+    }
+  }
+
+  &__scene-music {
+    margin-top: 1rem;
+    background-color: $background-1;
+    padding: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+
+    &-label {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    audio {
+      height: 26px;
+    }
+  }
+
+  &__scene-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 
 // if screen is mobile

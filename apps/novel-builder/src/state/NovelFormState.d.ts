@@ -26,6 +26,8 @@ export interface NovelScene {
   id: string;
   name: string;
   prompt: string;
+  actionText: string;
+  condition: string | null;
   backgroundId: string;
   musicId: string;
   characters: {

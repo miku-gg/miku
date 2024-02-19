@@ -24,6 +24,8 @@ const SCENE_DEFAULT = {
   name: "New Scene",
   parentMapId: null,
   prompt: "*xd*",
+  actionText: "Go to scene 1",
+  condition: null,
 };
 
 /*
@@ -140,6 +142,8 @@ const initialState: NovelFormState = {
       name: "Scene 1",
       parentMapId: null,
       prompt: "*xd*",
+      actionText: "Go to scene 1",
+      condition: null,
     },
     {
       id: "scene-2",
@@ -156,6 +160,8 @@ const initialState: NovelFormState = {
       name: "Scene 2",
       parentMapId: null,
       prompt: "*xd*",
+      actionText: "Go to scene 1",
+      condition: null,
     },
   ],
   starts: [],

@@ -2,9 +2,11 @@ import {
   AreYouSure,
   Button,
   Carousel,
+  CheckBox,
   ImageSlider,
   Input,
   Modal,
+  MusicSelector,
 } from "@mikugg/ui-kit";
 import { useAppSelector, useAppDispatch } from "../../state/store";
 import { selectEditingScene, selectBackgrounds } from "../../state/selectors";
@@ -21,6 +23,7 @@ import { useState } from "react";
 import { FaUser } from "react-icons/fa6";
 import classNames from "classnames";
 import Characters from "../../panels/assets/characters/Characters";
+import Songs from "../../panels/assets/songs/Songs";
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -30,24 +33,13 @@ export default function SceneEditModal() {
   const characters = useAppSelector((state) => state.novel.characters);
   const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] =
     useState(false);
+  const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
   const [selectCharacterModal, setSelectCharacterModal] = useState({
     opened: false,
     characterIndex: 0,
   });
   const [showingEmotionChar1, setShowingEmotionChar1] = useState("neutral");
   const [showingEmotionChar2, setShowingEmotionChar2] = useState("neutral");
-
-  const handleSceneNameChange = (e: { target: { value: string } }) => {
-    const newName = String(e.target.value);
-    if (scene) {
-      dispatch(
-        updateScene({
-          ...scene._source,
-          name: newName,
-        })
-      );
-    }
-  };
 
   const handleScenePromptChange = (e: { target: { value: string } }) => {
     const newPrompt = String(e.target.value);
@@ -79,16 +71,12 @@ export default function SceneEditModal() {
         opened={!!scene}
         title="Edit Scene"
         className="SceneEditModal"
+        overlayClassName="scrollbar"
         shouldCloseOnOverlayClick
         onCloseModal={() => dispatch(closeModal({ modalType: "scene" }))}
       >
         {scene ? (
           <div className="SceneEditModal__content">
-            <Input
-              label="Scene Name"
-              value={scene?.name || ""}
-              onChange={handleSceneNameChange}
-            />
             <div className="SceneEditModal__background-container">
               <img
                 className="SceneEditModal__background"
@@ -203,15 +191,137 @@ export default function SceneEditModal() {
                 })}
               </div>
             </div>
-            {/* TODO: Add music selection */}
-            <Input
-              label="Scene Prompt"
-              value={scene?.prompt || ""}
-              onChange={handleScenePromptChange}
-            />
-            <Button theme="primary" onClick={handleDeleteScene}>
-              Delete Scene
-            </Button>
+            <div className="SceneEditModal__scene-details">
+              <div className="SceneEditModal__scene-details-row">
+                <Input
+                  id="scene-name"
+                  name="name"
+                  placeHolder="school"
+                  label="Scene name"
+                  value={scene?.name}
+                  onChange={(e) =>
+                    dispatch(
+                      updateScene({
+                        ...scene._source,
+                        name: e.target.value,
+                      })
+                    )
+                  }
+                  maxLength={256}
+                />
+                <Input
+                  id="scene-actionText"
+                  name="actionText"
+                  placeHolder="Go to the classroom"
+                  label="Call to action"
+                  description="The text that will be displayed when the scene is suggested."
+                  value={scene?.actionText}
+                  onChange={(e) =>
+                    dispatch(
+                      updateScene({
+                        ...scene._source,
+                        name: e.target.value,
+                      })
+                    )
+                  }
+                  maxLength={256}
+                />
+                <div className="SceneEditModal__scene-details-nsfw">
+                  <CheckBox
+                    id="scene-nsfw"
+                    name="nsfw"
+                    label="Is NSFW"
+                    value={scene?.nsfw > 0}
+                    onChange={(e) =>
+                      dispatch(
+                        updateScene({
+                          ...scene._source,
+                          nsfw: e.target.checked ? 1 : 0,
+                        })
+                      )
+                    }
+                  />
+                  <CheckBox
+                    id="scene-nsfw-2"
+                    name="nsfw-2"
+                    label="Has explicit content"
+                    value={scene?.nsfw === 2}
+                    onChange={(e) => {
+                      dispatch(
+                        updateScene({
+                          ...scene._source,
+                          nsfw: e.target.checked ? 2 : 1,
+                        })
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="SceneEditModal__scene-details-row">
+                <Input
+                  id="context"
+                  name="context"
+                  placeHolder="*{{user}} and Nino are at the classroom working on a project.*"
+                  label="Prompt"
+                  description="Instruction for the AI when this scene is triggered."
+                  value={scene.prompt}
+                  onChange={(e) => {
+                    dispatch(
+                      updateScene({
+                        ...scene._source,
+                        prompt: e.target.value,
+                      })
+                    );
+                  }}
+                  isTextArea
+                />
+              </div>
+              <div className="SceneEditModal__scene-details-row">
+                <Input
+                  id="context"
+                  name="context"
+                  placeHolder="{{user}} should have invited Nino to the classroom."
+                  label="Condition"
+                  description="OPTIONAL. This condition must be met for the scene to be suggested."
+                  value={scene.condition || ""}
+                  onChange={(e) => {
+                    dispatch(
+                      updateScene({
+                        ...scene._source,
+                        condition: e.target.value || null,
+                      })
+                    );
+                  }}
+                  isTextArea
+                />
+              </div>
+            </div>
+            <div className="SceneEditModal__scene-music">
+              <div className="SceneEditModal__scene-music-label">
+                {scene.music?.name || "No music"}
+                <Button
+                  theme="secondary"
+                  onClick={() => setSelectSongModalOpened(true)}
+                >
+                  Change
+                </Button>
+              </div>
+              <div className="SceneEditModal__scene-music-audio">
+                <audio
+                  controls
+                  src={
+                    scene.music?.source
+                      ? config.genAssetLink(scene.music?.source)
+                      : undefined
+                  }
+                ></audio>
+              </div>
+            </div>
+            <div className="SceneEditModal__scene-actions">
+              <Button theme="primary" onClick={handleDeleteScene}>
+                Delete Scene
+              </Button>
+            </div>
           </div>
         ) : null}
       </Modal>
@@ -230,6 +340,7 @@ export default function SceneEditModal() {
                   backgroundId,
                 })
               );
+              setSelectBackgroundModalOpened(false);
             }
           }}
         />
@@ -285,6 +396,26 @@ export default function SceneEditModal() {
                 opened: false,
                 characterIndex: 0,
               });
+            }
+          }}
+        />
+      </Modal>
+      <Modal
+        opened={selectSongModalOpened}
+        onCloseModal={() => setSelectSongModalOpened(false)}
+        className="SceneEditModal__select-song-modal"
+      >
+        <Songs
+          selected={scene?.musicId}
+          onSelect={(musicId) => {
+            if (scene?._source) {
+              dispatch(
+                updateScene({
+                  ...scene._source,
+                  musicId,
+                })
+              );
+              setSelectSongModalOpened(false);
             }
           }}
         />

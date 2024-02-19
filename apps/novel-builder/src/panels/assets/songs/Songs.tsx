@@ -1,4 +1,4 @@
-import { FaUpload } from "react-icons/fa6";
+import { FaPencil, FaUpload } from "react-icons/fa6";
 import config from "../../../config";
 import { openModal } from "../../../state/slices/inputSlice";
 import { useAppDispatch, useAppSelector } from "../../../state/store";
@@ -10,7 +10,13 @@ import { v4 as randomUUID } from "uuid";
 import { addSong } from "../../../state/slices/novelFormSlice";
 import { MdSearch } from "react-icons/md";
 
-export default function Songs() {
+export default function Songs({
+  selected,
+  onSelect,
+}: {
+  selected?: string;
+  onSelect?: (id: string) => void;
+}) {
   const songs = useAppSelector((state) => state.novel.songs);
   const dispatch = useAppDispatch();
   const [songUploading, setSongUploading] = useState<boolean>(false);
@@ -56,13 +62,15 @@ export default function Songs() {
               content: {
                 text: song.name,
               },
-              onClick: () =>
+              onEditClick: () =>
                 dispatch(
                   openModal({
                     modalType: "song",
                     editId: song.id,
                   })
                 ),
+              editIcon: <FaPencil />,
+              onClick: () => onSelect?.(song.id),
             })),
             {
               id: "upload",
