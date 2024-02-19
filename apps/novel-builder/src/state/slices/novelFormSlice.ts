@@ -5,12 +5,14 @@ import {
   NovelSong,
   NovelCharacter,
   NovelScene,
-} from "../NovelFormState";
+  NovelNSFW,
+} from "../NovelFormState.d";
 import { v4 as randomUUID } from "uuid";
 
 const SCENE_DEFAULT = {
   id: "",
   backgroundId: "bg-1",
+  nsfw: NovelNSFW.NONE,
   characters: [
     {
       characterId: "char-1",
@@ -45,7 +47,6 @@ const initialState: NovelFormState = {
   logoPic: "",
   author: "",
   tags: [],
-  startSceneId: "scene-1",
   characters: [
     {
       id: "char-1",
@@ -53,6 +54,7 @@ const initialState: NovelFormState = {
       short_description: "",
       profile_pic: "empty_char.png",
       tags: [],
+      nsfw: NovelNSFW.NONE,
       card: {
         spec: "chara_card_v2",
         spec_version: "2.0",
@@ -69,6 +71,7 @@ const initialState: NovelFormState = {
               language: "en",
               short_description: "",
               profile_pic: "empty_char.png",
+              nsfw: NovelNSFW.NONE,
               outfits: [
                 {
                   id: randomUUID(),
@@ -76,6 +79,7 @@ const initialState: NovelFormState = {
                   description: "The default outfit",
                   attributes: [],
                   template: "single-emotion",
+                  nsfw: NovelNSFW.NONE,
                   emotions: [
                     {
                       id: "neutral",
@@ -130,6 +134,7 @@ const initialState: NovelFormState = {
           outfit: "default",
         },
       ],
+      nsfw: NovelNSFW.NONE,
       children: [],
       musicId: "1",
       name: "Scene 1",
@@ -145,6 +150,7 @@ const initialState: NovelFormState = {
           outfit: "default",
         },
       ],
+      nsfw: NovelNSFW.NONE,
       children: [],
       musicId: "1",
       name: "Scene 2",
@@ -221,6 +227,7 @@ const novelFormSlice = createSlice({
         short_description: "",
         profile_pic: "empty_char.png",
         tags: [],
+        nsfw: NovelNSFW.NONE,
         card: {
           spec: "chara_card_v2",
           spec_version: "2.0",
@@ -237,6 +244,7 @@ const novelFormSlice = createSlice({
                 language: "en",
                 short_description: "",
                 profile_pic: "empty_char.png",
+                nsfw: NovelNSFW.NONE,
                 outfits: [
                   {
                     id: randomUUID(),
@@ -244,6 +252,7 @@ const novelFormSlice = createSlice({
                     description: "The default outfit",
                     attributes: [],
                     template: "single-emotion",
+                    nsfw: NovelNSFW.NONE,
                     emotions: [
                       {
                         id: "neutral",
@@ -282,9 +291,6 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.characters.splice(index, 1);
     },
-    setStartScene: (state, action: PayloadAction<string>) => {
-      state.startSceneId = action.payload;
-    },
     createSceneWithDefaults: (state) => {
       const newScene = { ...SCENE_DEFAULT, id: randomUUID() };
       state.scenes.push(newScene);
@@ -301,13 +307,6 @@ const novelFormSlice = createSlice({
       });
       // check if the scene is the start scene
       state.scenes.splice(index, 1);
-      if (state.startSceneId === action.payload) {
-        if (state.scenes.length) {
-          state.startSceneId = state.scenes[0].id;
-        } else {
-          state.startSceneId = "";
-        }
-      }
     },
     updateScene: (state, action: PayloadAction<NovelScene>) => {
       const index = state.scenes.findIndex(
@@ -331,7 +330,6 @@ export const {
   createCharacter,
   updateCharacter,
   deleteCharacter,
-  setStartScene,
   createSceneWithDefaults,
   deleteSceneById,
   updateScene,

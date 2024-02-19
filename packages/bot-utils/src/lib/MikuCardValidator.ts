@@ -119,14 +119,14 @@ export type MikuCardV2 = TavernCardV2 & {
         language: string; // Indicates the language of the bot, NOT used in the prompt
         short_description: string; // Small description of the bot, NOT used in the prompt
         profile_pic: string; // profile pic of the bot
-        nsfw: number; // indicates if the prompt is mainly NSFW (0: false, 1: nudity, 2: explicit)
+        nsfw?: number; // indicates if the prompt is mainly NSFW (0: false, 1: nudity, 2: explicit)
         outfits: {
           id: string; // id of the outfit
           name: string; // name of the outfit
           description: string; // description of the outfit
           attributes: string[][]; // attributes of the outfit
           template: string; // template of group of emotions to be used
-          nsfw: number; // whether the outfit is NSFW (0: false, 1: nudity, 2: explicit)
+          nsfw?: number; // whether the outfit is NSFW (0: false, 1: nudity, 2: explicit)
           emotions: {
             // list of emotions of the group, derived from the template
             id: string; // id of the emotion

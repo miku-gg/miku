@@ -27,7 +27,6 @@ import "./SceneGraph.scss";
 import { useAppSelector, useAppDispatch } from "../../state/store";
 import {
   addChildScene,
-  setStartScene,
   deleteChildScene,
 } from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
@@ -77,14 +76,11 @@ const SceneNode = ({
 }>) => {
   const connectionNodeId = useStore((state) => state.connectionNodeId);
   const dispatch = useAppDispatch();
-  const startScene = useAppSelector((state) => state.novel.startSceneId);
   const openSceneEditModal = () => {
     dispatch(openModal({ modalType: "scene", editId: id }));
   };
-  const setStartSceneId = (id: string) => dispatch(setStartScene(id));
 
   const isConnecting = !!connectionNodeId;
-  const isStartScene = id === startScene;
 
   return (
     <>
@@ -107,14 +103,6 @@ const SceneNode = ({
         />
         <div className="SceneNode__title">
           {data.title} <RiDragMove2Line />
-        </div>
-        <div className="SceneNode__start-icon-container">
-          <RiPlayCircleLine
-            className={`SceneNode__start-icon ${
-              isStartScene ? "selected" : ""
-            }`}
-            onClick={() => setStartSceneId(id)}
-          />
         </div>
         <div className="SceneNode__edit-icon-container">
           <RiEdit2Line

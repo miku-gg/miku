@@ -110,12 +110,10 @@ export interface NovelFormState {
   tags: string[];
   logoPic: string;
   author: string;
-  nsfw: NovelNSFW;
   characters: NovelCharacter[];
   backgrounds: NovelBackground[];
   songs: NovelSong[];
   maps: NovelMap[];
   scenes: NovelScene[];
   starts: NovelStart[];
-  startSceneId: string;
 }
