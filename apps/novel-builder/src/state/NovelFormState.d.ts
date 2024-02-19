@@ -5,6 +5,12 @@ import {
   TavernCardV2,
 } from "@mikugg/bot-utils";
 
+export enum NovelNSFW {
+  NONE = 0,
+  NUDITY = 1,
+  EXPLICIT = 2,
+}
+
 export interface NovelStart {
   id: string;
   sceneId: string;
@@ -25,9 +31,11 @@ export interface NovelScene {
   characters: {
     characterId: string;
     outfit: string;
+    objective?: string;
   }[];
   children: string[];
   parentMapId: string | null;
+  nsfw: NovelNSFW;
 }
 
 export interface NovelCharacterOutfit {
@@ -36,6 +44,7 @@ export interface NovelCharacterOutfit {
   description: string;
   attributes: string[][];
   template: EmotionTemplateSlug;
+  nsfw: NovelNSFW;
   emotions: {
     id: string;
     sources: {
@@ -53,6 +62,7 @@ export interface NovelCharacter {
   short_description: string;
   tags: string[];
   card: MikuCardV2;
+  nsfw: NovelNSFW;
 }
 
 export interface NovelBackground {
@@ -100,6 +110,7 @@ export interface NovelFormState {
   tags: string[];
   logoPic: string;
   author: string;
+  nsfw: NovelNSFW;
   characters: NovelCharacter[];
   backgrounds: NovelBackground[];
   songs: NovelSong[];
