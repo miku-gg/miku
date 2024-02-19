@@ -9,6 +9,8 @@ import { closeModal } from "../../state/slices/inputSlice";
 import config from "../../config";
 import { RiEdit2Line } from "react-icons/ri";
 import "./SceneEditModal.scss";
+import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
+import { useState } from "react";
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -16,6 +18,8 @@ export default function SceneEditModal() {
   const scene = useAppSelector(selectEditingScene);
   const backgrounds = useAppSelector(selectBackgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
+  const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] =
+    useState(false);
 
   const handleSceneNameChange = (e: { target: { value: string } }) => {
     const newName = String(e.target.value);
@@ -54,41 +58,68 @@ export default function SceneEditModal() {
   };
 
   return (
-    <Modal
-      opened={!!scene}
-      title="Edit Scene"
-      className="SceneEditModal"
-      shouldCloseOnOverlayClick
-      onCloseModal={() => dispatch(closeModal({ modalType: "scene" }))}
-    >
-      {scene ? (
-        <div className="SceneEditModal_content">
-          <Input
-            label="Scene Name"
-            value={scene?.name || ""}
-            onChange={handleSceneNameChange}
-          />
-          <div className="SceneEditModal_background">
-            <img
-              src={config.genAssetLink(
-                scene?.background?.source.jpg || backgrounds[0].source.jpg
-              )}
-              alt="Background"
+    <>
+      <Modal
+        opened={!!scene}
+        title="Edit Scene"
+        className="SceneEditModal"
+        shouldCloseOnOverlayClick
+        onCloseModal={() => dispatch(closeModal({ modalType: "scene" }))}
+      >
+        {scene ? (
+          <div className="SceneEditModal__content">
+            <Input
+              label="Scene Name"
+              value={scene?.name || ""}
+              onChange={handleSceneNameChange}
             />
-            <RiEdit2Line className="SceneEditModal_edit-icon" />
+            <div
+              className="SceneEditModal__background"
+              style={{
+                backgroundImage: `url(${config.genAssetLink(
+                  scene?.background?.source.jpg || backgrounds[0].source.jpg
+                )})`,
+              }}
+            >
+              <div
+                className="Background__background-edit-btn"
+                onClick={() => setSelectBackgroundModalOpened(true)}
+              >
+                <RiEdit2Line className="SceneEditModal_edit-icon" />
+              </div>
+            </div>
+            {/* TODO: Add character selection list */}
+            {/* TODO: Add music selection */}
+            <Input
+              label="Scene Prompt"
+              value={scene?.prompt || ""}
+              onChange={handleScenePromptChange}
+            />
+            <Button theme="primary" onClick={handleDeleteScene}>
+              Delete Scene
+            </Button>
           </div>
-          {/* TODO: Add character selection list */}
-          {/* TODO: Add music selection */}
-          <Input
-            label="Scene Prompt"
-            value={scene?.prompt || ""}
-            onChange={handleScenePromptChange}
-          />
-          <Button theme="primary" onClick={handleDeleteScene}>
-            Delete Scene
-          </Button>
-        </div>
-      ) : null}
-    </Modal>
+        ) : null}
+      </Modal>
+      <Modal
+        opened={selectBackgroundModalOpened}
+        onCloseModal={() => setSelectBackgroundModalOpened(false)}
+        className="SceneEditModal__select-background-modal"
+      >
+        <Backgrounds
+          selected={scene?.background?.id}
+          onSelect={(backgroundId) => {
+            if (scene?._source) {
+              dispatch(
+                updateScene({
+                  ...scene._source,
+                  backgroundId,
+                })
+              );
+            }
+          }}
+        />
+      </Modal>
+    </>
   );
 }

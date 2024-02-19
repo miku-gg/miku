@@ -2,14 +2,18 @@ import React from 'react';
 import Tooltip from './Tooltip';
 import './Blocks.scss';
 import Loader from './Loader';
+import { classnames } from '@bem-react/classnames';
 
 export interface BlockProps {
   tooltipId?: string;
   items: {
     id: string;
+    highlighted: boolean;
     tooltip?: string;
     loading?: boolean;
     disabled?: boolean;
+    onEditClick?: () => void;
+    editIcon?: React.ReactNode;
     content:
       | { image: string }
       | {
@@ -32,9 +36,14 @@ const Blocks = ({ tooltipId, items }: BlockProps) => {
           icon?: React.ReactNode;
           text: string;
         };
+        const className = classnames(
+          'Blocks__item',
+          item.highlighted ? 'Blocks__item--highlighted' : null
+        );
+
         return (
           <div
-            className="Blocks__item"
+            className={className}
             onClick={!item.disabled ? item.onClick : null}
             aria-disabled={item.disabled}
             key={item.id}
@@ -58,6 +67,17 @@ const Blocks = ({ tooltipId, items }: BlockProps) => {
                 ) : null}
                 {contentText.text ? (
                   <div className="Blocks__item-text">{contentText.text}</div>
+                ) : null}
+                {item.editIcon ? (
+                  <div
+                    className="Blocks__item-edit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      item.onEditClick?.();
+                    }}
+                  >
+                    {item.editIcon}
+                  </div>
                 ) : null}
               </>
             )}

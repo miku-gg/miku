@@ -11,8 +11,15 @@ import { addBackground } from "../../../state/slices/novelFormSlice";
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { openModal } from "../../../state/slices/inputSlice";
+import { FaPencil } from "react-icons/fa6";
 
-export default function Backgrounds() {
+export default function Backgrounds({
+  selected,
+  onSelect,
+}: {
+  selected?: string;
+  onSelect?: (id: string) => void;
+}) {
   const backgrounds = useAppSelector(selectBackgrounds);
   const dispatch = useAppDispatch();
   const [backgroundUploading, setBackgroundUploading] =
@@ -49,54 +56,60 @@ export default function Backgrounds() {
   };
 
   return (
-    <>
-      <div className="Backgrounds group">
-        <div className="title-small">Backgrounds</div>
-        <Blocks
-          tooltipId="backgrounds"
-          items={[
-            ...backgrounds.map((background) => ({
-              id: `backgrounds-${background.id}`,
-              tooltip: background.name,
-              content: {
-                image: config.genAssetLink(background.source.jpg, true),
-              },
-              onClick: () =>
-                dispatch(
-                  openModal({
-                    modalType: "background",
-                    editId: background.id,
-                  })
-                ),
-            })),
-            {
-              id: "upload",
-              content: {
-                icon: <FaUpload />,
-                text: "Upload",
-              },
-              onClick: () => uploadBackground?.current?.click(),
-              loading: backgroundUploading,
-              disabled: backgroundUploading,
+    <div className="Backgrounds group">
+      <div className="title-small">Backgrounds</div>
+      <Blocks
+        tooltipId="backgrounds"
+        items={[
+          ...backgrounds.map((background) => ({
+            id: `backgrounds-${background.id}`,
+            tooltip: background.name,
+            highlighted: selected === background.id,
+            editIcon: <FaPencil />,
+            onEditClick: () => {
+              dispatch(
+                openModal({
+                  modalType: "background",
+                  editId: background.id,
+                })
+              );
             },
-            {
-              id: "search",
-              content: {
-                icon: <MdSearch />,
-                text: "Search",
-              },
-              onClick: () =>
-                dispatch(openModal({ modalType: "backgroundSearch" })),
+            content: {
+              image: config.genAssetLink(background.source.jpg, true),
             },
-          ]}
-        />
-        <input
-          type="file"
-          onChange={handleUploadBackground}
-          ref={uploadBackground}
-          hidden
-        />
-      </div>
-    </>
+            onClick: () => {
+              onSelect?.(background.id);
+            },
+          })),
+          {
+            id: "upload",
+            highlighted: false,
+            content: {
+              icon: <FaUpload />,
+              text: "Upload",
+            },
+            onClick: () => uploadBackground?.current?.click(),
+            loading: backgroundUploading,
+            disabled: backgroundUploading,
+          },
+          {
+            id: "search",
+            highlighted: false,
+            content: {
+              icon: <MdSearch />,
+              text: "Search",
+            },
+            onClick: () =>
+              dispatch(openModal({ modalType: "backgroundSearch" })),
+          },
+        ]}
+      />
+      <input
+        type="file"
+        onChange={handleUploadBackground}
+        ref={uploadBackground}
+        hidden
+      />
+    </div>
   );
 }

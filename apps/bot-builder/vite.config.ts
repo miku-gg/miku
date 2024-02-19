@@ -17,7 +17,14 @@ export default defineConfig({
   },
   build: {
     commonjsOptions: {
-      include: [/core/, /extensions/, /bot-utils/, /guidance/, /node_modules/],
+      include: [
+        /core/,
+        /extensions/,
+        /ui-kit/,
+        /bot-utils/,
+        /guidance/,
+        /node_modules/,
+      ],
     },
   },
   resolve: {

@@ -18,6 +18,8 @@
     background-color: #25284b;
     outline: none;
     overflow: hidden;
+    gap: 10px;
+    position: relative;
 
     &:hover {
       border: 2px solid #aaa1ff;
@@ -27,5 +29,15 @@
       height: 100%;
       object-fit: cover;
     }
+
+    &--highlighted {
+      border: 2px solid #9747ff;
+    }
+  }
+
+  &__item-edit {
+    position: absolute;
+    top: 5px;
+    right: 5px;
   }
 }
