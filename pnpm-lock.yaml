@@ -15,166 +15,6 @@ importers:
         specifier: ^6.4.1
         version: 6.4.1
 
-  apps/novel-builder:
-    dependencies:
-      '@aws-crypto/crc32':
-        specifier: ^4.0.0
-        version: 4.0.0
-      '@ipld/dag-pb':
-        specifier: ^4.0.2
-        version: 4.1.0
-      '@mikugg/bot-utils':
-        specifier: workspace:^
-        version: link:../../packages/bot-utils
-      '@mikugg/ui-kit':
-        specifier: workspace:^
-        version: link:../../packages/ui-kit
-      '@primer/octicons-react':
-        specifier: ^17.12.0
-        version: 17.12.0(react@18.2.0)
-      '@reactflow/node-resizer':
-        specifier: ^2.2.9
-        version: 2.2.9(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)
-      '@reduxjs/toolkit':
-        specifier: ^2.0.1
-        version: 2.0.1(react-redux@9.0.4)(react@18.2.0)
-      '@types/axios':
-        specifier: ^0.14.0
-        version: 0.14.0
-      '@types/base-64':
-        specifier: ^1.0.0
-        version: 1.0.0
-      '@types/polycrc':
-        specifier: ^0.1.0
-        version: 0.1.2
-      '@types/prop-types':
-        specifier: ^15.7.5
-        version: 15.7.5
-      '@types/uuid':
-        specifier: ^9.0.1
-        version: 9.0.1
-      axios:
-        specifier: ^1.2.4
-        version: 1.2.4
-      base-64:
-        specifier: ^1.0.0
-        version: 1.0.0
-      buffer:
-        specifier: ^6.0.3
-        version: 6.0.3
-      classnames:
-        specifier: ^2.3.2
-        version: 2.3.2
-      digest:
-        specifier: link:multiformats/hashes/digest
-        version: link:multiformats/hashes/digest
-      ipfs-only-hash:
-        specifier: ^4.0.0
-        version: 4.0.0
-      ipld-dag-pb:
-        specifier: ^0.22.3
-        version: 0.22.3
-      lodash.debounce:
-        specifier: ^4.0.8
-        version: 4.0.8
-      multiformats:
-        specifier: ^11.0.2
-        version: 11.0.2
-      png-chunk-text:
-        specifier: ^1.0.0
-        version: 1.0.0
-      png-chunks-extract:
-        specifier: ^1.0.0
-        version: 1.0.0
-      prop-types:
-        specifier: ^15.8.1
-        version: 15.8.1
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
-      react-icons:
-        specifier: ^4.12.0
-        version: 4.12.0(react@18.2.0)
-      react-redux:
-        specifier: ^9.0.4
-        version: 9.0.4(@types/react@18.2.45)(react@18.2.0)(redux@5.0.0)
-      react-toastify:
-        specifier: ^9.1.1
-        version: 9.1.1(react-dom@18.2.0)(react@18.2.0)
-      reactflow:
-        specifier: ^11.10.1
-        version: 11.10.1(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)
-      remove:
-        specifier: ^0.1.5
-        version: 0.1.5
-      uuid:
-        specifier: ^9.0.0
-        version: 9.0.0
-      vite-plugin-plain-text:
-        specifier: ^1.4.2
-        version: 1.4.2
-    devDependencies:
-      '@babel/core':
-        specifier: ^7.21.3
-        version: 7.23.6
-      '@babel/preset-env':
-        specifier: ^7.20.2
-        version: 7.20.2(@babel/core@7.23.6)
-      '@babel/preset-react':
-        specifier: ^7.18.6
-        version: 7.18.6(@babel/core@7.23.6)
-      '@babel/register':
-        specifier: ^7.21.0
-        version: 7.21.0(@babel/core@7.23.6)
-      '@originjs/vite-plugin-commonjs':
-        specifier: ^1.0.3
-        version: 1.0.3
-      '@types/lodash.debounce':
-        specifier: ^4.0.9
-        version: 4.0.9
-      '@types/node':
-        specifier: ^18.14.1
-        version: 18.15.5
-      '@types/react':
-        specifier: ^18.2.45
-        version: 18.2.45
-      '@types/react-dom':
-        specifier: ^18.2.18
-        version: 18.2.18
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^5.48.2
-        version: 5.48.2(@typescript-eslint/parser@5.48.2)(eslint@8.56.0)(typescript@4.9.5)
-      '@typescript-eslint/parser':
-        specifier: ^5.48.2
-        version: 5.48.2(eslint@8.56.0)(typescript@4.9.5)
-      '@vitejs/plugin-react':
-        specifier: ^3.1.0
-        version: 3.1.0(vite@4.0.0)
-      eslint:
-        specifier: ^8.32.0
-        version: 8.56.0
-      fs:
-        specifier: 0.0.1-security
-        version: 0.0.1-security
-      path:
-        specifier: ^0.12.7
-        version: 0.12.7
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.2.0(react@18.2.0)
-      sass:
-        specifier: ^1.59.3
-        version: 1.59.3
-      ts-node:
-        specifier: ^10.9.1
-        version: 10.9.1(@types/node@18.15.5)(typescript@4.9.5)
-      typescript:
-        specifier: ^4.9.4
-        version: 4.9.5
-      vite:
-        specifier: ^4.0.0
-        version: 4.0.0(@types/node@18.15.5)(sass@1.59.3)
-
   apps/bot-directory:
     dependencies:
       '@mikugg/bot-utils':
@@ -453,6 +293,166 @@ importers:
       vite:
         specifier: ^5.0.8
         version: 5.0.10(sass@1.59.3)
+
+  apps/novel-builder:
+    dependencies:
+      '@aws-crypto/crc32':
+        specifier: ^4.0.0
+        version: 4.0.0
+      '@ipld/dag-pb':
+        specifier: ^4.0.2
+        version: 4.1.0
+      '@mikugg/bot-utils':
+        specifier: workspace:^
+        version: link:../../packages/bot-utils
+      '@mikugg/ui-kit':
+        specifier: workspace:^
+        version: link:../../packages/ui-kit
+      '@primer/octicons-react':
+        specifier: ^17.12.0
+        version: 17.12.0(react@18.2.0)
+      '@reactflow/node-resizer':
+        specifier: ^2.2.9
+        version: 2.2.9(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)
+      '@reduxjs/toolkit':
+        specifier: ^2.0.1
+        version: 2.0.1(react-redux@9.0.4)(react@18.2.0)
+      '@types/axios':
+        specifier: ^0.14.0
+        version: 0.14.0
+      '@types/base-64':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@types/polycrc':
+        specifier: ^0.1.0
+        version: 0.1.2
+      '@types/prop-types':
+        specifier: ^15.7.5
+        version: 15.7.5
+      '@types/uuid':
+        specifier: ^9.0.1
+        version: 9.0.1
+      axios:
+        specifier: ^1.2.4
+        version: 1.2.4
+      base-64:
+        specifier: ^1.0.0
+        version: 1.0.0
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
+      classnames:
+        specifier: ^2.3.2
+        version: 2.3.2
+      digest:
+        specifier: link:multiformats/hashes/digest
+        version: link:multiformats/hashes/digest
+      ipfs-only-hash:
+        specifier: ^4.0.0
+        version: 4.0.0
+      ipld-dag-pb:
+        specifier: ^0.22.3
+        version: 0.22.3
+      lodash.debounce:
+        specifier: ^4.0.8
+        version: 4.0.8
+      multiformats:
+        specifier: ^11.0.2
+        version: 11.0.2
+      png-chunk-text:
+        specifier: ^1.0.0
+        version: 1.0.0
+      png-chunks-extract:
+        specifier: ^1.0.0
+        version: 1.0.0
+      prop-types:
+        specifier: ^15.8.1
+        version: 15.8.1
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-icons:
+        specifier: ^4.12.0
+        version: 4.12.0(react@18.2.0)
+      react-redux:
+        specifier: ^9.0.4
+        version: 9.0.4(@types/react@18.2.45)(react@18.2.0)(redux@5.0.0)
+      react-toastify:
+        specifier: ^9.1.1
+        version: 9.1.1(react-dom@18.2.0)(react@18.2.0)
+      reactflow:
+        specifier: ^11.10.1
+        version: 11.10.1(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)
+      remove:
+        specifier: ^0.1.5
+        version: 0.1.5
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.0
+      vite-plugin-plain-text:
+        specifier: ^1.4.2
+        version: 1.4.2
+    devDependencies:
+      '@babel/core':
+        specifier: ^7.21.3
+        version: 7.23.6
+      '@babel/preset-env':
+        specifier: ^7.20.2
+        version: 7.20.2(@babel/core@7.23.6)
+      '@babel/preset-react':
+        specifier: ^7.18.6
+        version: 7.18.6(@babel/core@7.23.6)
+      '@babel/register':
+        specifier: ^7.21.0
+        version: 7.21.0(@babel/core@7.23.6)
+      '@originjs/vite-plugin-commonjs':
+        specifier: ^1.0.3
+        version: 1.0.3
+      '@types/lodash.debounce':
+        specifier: ^4.0.9
+        version: 4.0.9
+      '@types/node':
+        specifier: ^18.14.1
+        version: 18.15.5
+      '@types/react':
+        specifier: ^18.2.45
+        version: 18.2.45
+      '@types/react-dom':
+        specifier: ^18.2.18
+        version: 18.2.18
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^5.48.2
+        version: 5.48.2(@typescript-eslint/parser@5.48.2)(eslint@8.56.0)(typescript@4.9.5)
+      '@typescript-eslint/parser':
+        specifier: ^5.48.2
+        version: 5.48.2(eslint@8.56.0)(typescript@4.9.5)
+      '@vitejs/plugin-react':
+        specifier: ^3.1.0
+        version: 3.1.0(vite@4.0.0)
+      eslint:
+        specifier: ^8.32.0
+        version: 8.56.0
+      fs:
+        specifier: 0.0.1-security
+        version: 0.0.1-security
+      path:
+        specifier: ^0.12.7
+        version: 0.12.7
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
+      sass:
+        specifier: ^1.59.3
+        version: 1.59.3
+      ts-node:
+        specifier: ^10.9.1
+        version: 10.9.1(@types/node@18.15.5)(typescript@4.9.5)
+      typescript:
+        specifier: ^4.9.4
+        version: 4.9.5
+      vite:
+        specifier: ^4.0.0
+        version: 4.0.0(@types/node@18.15.5)(sass@1.59.3)
 
   apps/services:
     dependencies:
@@ -1335,7 +1335,7 @@ packages:
       '@babel/core': ^7.13.0
     dependencies:
       '@babel/core': 7.21.3
-      '@babel/helper-plugin-utils': 7.21.5
+      '@babel/helper-plugin-utils': 7.22.5
       '@babel/helper-skip-transparent-expression-wrappers': 7.20.0
       '@babel/plugin-proposal-optional-chaining': 7.21.0(@babel/core@7.21.3)
     dev: true
@@ -1722,7 +1722,7 @@ packages:
     dependencies:
       '@babel/core': 7.21.3
       '@babel/helper-create-regexp-features-plugin': 7.21.8(@babel/core@7.21.3)
-      '@babel/helper-plugin-utils': 7.21.5
+      '@babel/helper-plugin-utils': 7.22.5
     dev: true
 
   /@babel/plugin-proposal-unicode-property-regex@7.18.6(@babel/core@7.23.6):
@@ -3206,8 +3206,8 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.21.3
-      '@babel/helper-plugin-utils': 7.21.5
-      '@babel/helper-validator-option': 7.21.0
+      '@babel/helper-plugin-utils': 7.22.5
+      '@babel/helper-validator-option': 7.23.5
       '@babel/plugin-transform-react-display-name': 7.18.6(@babel/core@7.21.3)
       '@babel/plugin-transform-react-jsx': 7.21.5(@babel/core@7.21.3)
       '@babel/plugin-transform-react-jsx-development': 7.18.6(@babel/core@7.21.3)

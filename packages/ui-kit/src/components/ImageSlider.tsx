@@ -23,7 +23,10 @@ const ImageSlider = ({
   fullWidth,
   onChange,
 }: ImageSliderProps) => {
-  const selectedImage = images[selectedIndex];
+  const selectedImage = images[selectedIndex] || {
+    source: '',
+    label: '',
+  };
 
   return (
     <div

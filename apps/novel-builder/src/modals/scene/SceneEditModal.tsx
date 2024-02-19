@@ -1,4 +1,11 @@
-import { AreYouSure, Button, Input, Modal } from "@mikugg/ui-kit";
+import {
+  AreYouSure,
+  Button,
+  Carousel,
+  ImageSlider,
+  Input,
+  Modal,
+} from "@mikugg/ui-kit";
 import { useAppSelector, useAppDispatch } from "../../state/store";
 import { selectEditingScene, selectBackgrounds } from "../../state/selectors";
 import {
@@ -11,6 +18,9 @@ import { AiOutlinePicture } from "react-icons/ai";
 import "./SceneEditModal.scss";
 import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
 import { useState } from "react";
+import { FaUser } from "react-icons/fa6";
+import classNames from "classnames";
+import Characters from "../../panels/assets/characters/Characters";
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -20,6 +30,12 @@ export default function SceneEditModal() {
   const characters = useAppSelector((state) => state.novel.characters);
   const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] =
     useState(false);
+  const [selectCharacterModal, setSelectCharacterModal] = useState({
+    opened: false,
+    characterIndex: 0,
+  });
+  const [showingEmotionChar1, setShowingEmotionChar1] = useState("neutral");
+  const [showingEmotionChar2, setShowingEmotionChar2] = useState("neutral");
 
   const handleSceneNameChange = (e: { target: { value: string } }) => {
     const newName = String(e.target.value);
@@ -88,8 +104,105 @@ export default function SceneEditModal() {
               >
                 <AiOutlinePicture />
               </div>
+              <div
+                className="SceneEditModal__character-select1-btn"
+                onClick={() =>
+                  setSelectCharacterModal({
+                    opened: true,
+                    characterIndex: 0,
+                  })
+                }
+                tabIndex={0}
+                role="button"
+              >
+                <FaUser /> 1
+              </div>
+              <div
+                className={classNames({
+                  "SceneEditModal__character-select2-btn": true,
+                  "SceneEditModal__character-select2-btn--disabled":
+                    scene.characters.length < 2,
+                })}
+                onClick={() =>
+                  setSelectCharacterModal({
+                    opened: true,
+                    characterIndex: 1,
+                  })
+                }
+                tabIndex={0}
+                role="button"
+              >
+                <FaUser /> 2
+              </div>
+              <div className="SceneEditModal__characters">
+                {scene.characters.map((character, characterIndex) => {
+                  const outfits =
+                    character.card?.data.extensions.mikugg_v2.outfits || [];
+                  const selectedOutfitIndex = Math.max(
+                    outfits.findIndex(
+                      (outfit) => outfit.id === character.outfit
+                    ),
+                    0
+                  );
+                  const selectedEmotion =
+                    outfits[selectedOutfitIndex].emotions.find(
+                      (emotion) =>
+                        emotion.id ===
+                        (characterIndex === 0
+                          ? showingEmotionChar1
+                          : showingEmotionChar2)
+                    ) || outfits[selectedOutfitIndex].emotions[0];
+                  return (
+                    <div
+                      key={character.id}
+                      className="SceneEditModal__character"
+                    >
+                      <ImageSlider
+                        images={outfits.map((outfit) => ({
+                          source: config.genAssetLink(
+                            selectedEmotion.sources.png
+                          ),
+                          label: outfit.name,
+                        }))}
+                        backgroundImageSource=""
+                        selectedIndex={selectedOutfitIndex}
+                        onChange={(delta) => {
+                          let newOutfitIndex = selectedOutfitIndex + delta;
+                          if (newOutfitIndex < 0) {
+                            newOutfitIndex = outfits.length - 1;
+                          } else if (newOutfitIndex >= outfits.length) {
+                            newOutfitIndex = 0;
+                          }
+                        }}
+                      />
+                      <Carousel
+                        items={outfits[selectedOutfitIndex].emotions.map(
+                          (emotion) => ({
+                            title: emotion.id,
+                          })
+                        )}
+                        selectedIndex={
+                          outfits[selectedOutfitIndex].emotions.findIndex(
+                            (emotion) => emotion.id === selectedEmotion.id
+                          ) || 0
+                        }
+                        onClick={(index) => {
+                          characterIndex === 0
+                            ? setShowingEmotionChar1(
+                                outfits[selectedOutfitIndex].emotions[index]
+                                  .id || ""
+                              )
+                            : setShowingEmotionChar2(
+                                outfits[selectedOutfitIndex].emotions[index]
+                                  .id || ""
+                              );
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            {/* TODO: Add character selection list */}
             {/* TODO: Add music selection */}
             <Input
               label="Scene Prompt"
@@ -117,6 +230,61 @@ export default function SceneEditModal() {
                   backgroundId,
                 })
               );
+            }
+          }}
+        />
+      </Modal>
+      <Modal
+        opened={selectCharacterModal.opened}
+        onCloseModal={() =>
+          setSelectCharacterModal((_state) => ({ ..._state, opened: false }))
+        }
+        className="SceneEditModal__select-character-modal"
+      >
+        <Characters
+          ignoreIds={
+            selectCharacterModal.characterIndex == 0
+              ? scene?.characters[1]?.id
+                ? [scene?.characters[1]?.id]
+                : []
+              : scene?.characters[0]?.id
+              ? [scene?.characters[0]?.id]
+              : []
+          }
+          showNone={selectCharacterModal.characterIndex === 1}
+          selected={scene?.characters[selectCharacterModal.characterIndex]?.id}
+          onSelect={(characterId) => {
+            if (scene?._source) {
+              const newSceneCharacters = scene.characters.map((character) => ({
+                characterId: character.id || "",
+                outfit: character.outfit || "",
+              }));
+              const newCharacter = characters.find(
+                (character) => character.id === characterId
+              );
+              if (newCharacter) {
+                newSceneCharacters[selectCharacterModal.characterIndex || 0] = {
+                  characterId,
+                  outfit:
+                    newCharacter?.card.data.extensions.mikugg_v2.outfits[0]
+                      .id || "",
+                };
+              } else {
+                newSceneCharacters.splice(
+                  selectCharacterModal.characterIndex,
+                  1
+                );
+              }
+              dispatch(
+                updateScene({
+                  ...scene._source,
+                  characters: newSceneCharacters,
+                })
+              );
+              setSelectCharacterModal({
+                opened: false,
+                characterIndex: 0,
+              });
             }
           }}
         />

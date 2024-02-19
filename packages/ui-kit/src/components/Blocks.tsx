@@ -8,7 +8,7 @@ export interface BlockProps {
   tooltipId?: string;
   items: {
     id: string;
-    highlighted: boolean;
+    highlighted?: boolean;
     tooltip?: string;
     loading?: boolean;
     disabled?: boolean;
