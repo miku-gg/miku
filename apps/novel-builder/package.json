@@ -1,12 +1,12 @@
 {
-  "name": "@mikugg/bot-builder",
+  "name": "@mikugg/novel-builder",
   "version": "0.3.0",
   "private": true,
   "description": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/miku-gg/miku.git",
-    "directory": "apps/bot-builder"
+    "directory": "apps/novel-builder"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

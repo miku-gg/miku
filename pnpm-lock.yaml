@@ -15,7 +15,7 @@ importers:
         specifier: ^6.4.1
         version: 6.4.1
 
-  apps/bot-builder:
+  apps/novel-builder:
     dependencies:
       '@aws-crypto/crc32':
         specifier: ^4.0.0
