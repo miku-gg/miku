@@ -16,6 +16,7 @@
       width: 250px;
       height: 100px;
       margin-top: 10px;
+      cursor: pointer;
     }
   }
 
@@ -36,8 +37,10 @@
 
   &__item-docs {
     flex: 1;
-    // width: 100%;
     padding-right: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
   &__item-prompt {
@@ -60,6 +63,35 @@
 
   &__item-prompt-character-emotion {
     width: 200px;
+  }
+
+  &__scene-selection-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 40px;
+  }
+
+  &__scene-selection-item {
+    flex: 1;
+    opacity: 0.5;
+    transition: all 0.2s ease-out;
+    cursor: pointer;
+
+    .SceneNode {
+      width: 100%;
+      height: 100px;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &--selected {
+      border: 2px solid $secondary-color;
+      opacity: 1;
+      border-radius: 10px;
+    }
   }
 }
 

@@ -1,9 +1,11 @@
-import { Button, Dropdown, Input, AreYouSure } from "@mikugg/ui-kit";
+import { Button, Dropdown, Input, AreYouSure, Modal } from "@mikugg/ui-kit";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import { createStart, updateStart } from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
 import "./StartsPanel.scss";
+import { useState } from "react";
+import classNames from "classnames";
 
 export default function StartsPanel() {
   const dispatch = useAppDispatch();
@@ -11,10 +13,15 @@ export default function StartsPanel() {
   const characters = useAppSelector((state) => state.novel.characters);
   const scenes = useAppSelector(selectScenes);
   const { openModal: openAreYouSureModal } = AreYouSure.useAreYouSure();
-
-  const handleAddStartClick = () => {
-    dispatch(createStart(scenes[0].id));
-  };
+  const [sceneSelection, setSceneSelection] = useState<{
+    opened: boolean;
+    selectedSceneId: string | null;
+    startId: string | null;
+  }>({
+    opened: false,
+    selectedSceneId: null,
+    startId: null,
+  });
 
   return (
     <div className="StartsPanel">
@@ -37,6 +44,13 @@ export default function StartsPanel() {
                         scene?.background?.source.jpg || ""
                       )})`,
                     }}
+                    onClick={() =>
+                      setSceneSelection({
+                        opened: true,
+                        selectedSceneId: start.sceneId,
+                        startId: start.id,
+                      })
+                    }
                   >
                     <div className="SceneNode__title">{scene?.name || ""}</div>
                     <div className="SceneNode__characters">
@@ -55,6 +69,7 @@ export default function StartsPanel() {
                 <div className="StartsPanel__item-docs">
                   <Input
                     label="Title"
+                    placeHolder="Title of this starting point..."
                     value={start.title || ""}
                     onChange={(e) =>
                       dispatch(updateStart({ ...start, title: e.target.value }))
@@ -63,6 +78,7 @@ export default function StartsPanel() {
                   <Input
                     label="Description"
                     value={start.description || ""}
+                    placeHolder="Description of this starting point..."
                     onChange={(e) =>
                       dispatch(
                         updateStart({ ...start, description: e.target.value })
@@ -129,6 +145,7 @@ export default function StartsPanel() {
                       <Input
                         value={_character.text || ""}
                         isTextArea
+                        placeHolder="Type the character's first message here..."
                         onChange={(e) =>
                           dispatch(
                             updateStart({
@@ -161,10 +178,99 @@ export default function StartsPanel() {
         })}
       </div>
       <div className="StartsPanel__add-button">
-        <Button theme="secondary" onClick={handleAddStartClick}>
+        <Button
+          theme="secondary"
+          onClick={() =>
+            setSceneSelection({
+              opened: true,
+              selectedSceneId: null,
+              startId: null,
+            })
+          }
+        >
           Add Start
         </Button>
       </div>
+      <Modal
+        title="Select a Scene"
+        opened={sceneSelection.opened}
+        onCloseModal={() =>
+          setSceneSelection({
+            opened: false,
+            selectedSceneId: null,
+            startId: null,
+          })
+        }
+      >
+        <div className="StartsPanel__scene-selection">
+          <div className="StartsPanel__scene-selection-list">
+            {scenes.map((scene) => (
+              <div
+                className={classNames({
+                  "StartsPanel__scene-selection-item": true,
+                  "StartsPanel__scene-selection-item--selected":
+                    scene.id === sceneSelection.selectedSceneId,
+                })}
+                key={scene.id}
+                onClick={() => {
+                  const start = starts.find(
+                    (start) => start.id === sceneSelection.startId
+                  );
+                  const characters = scene.characters.map((character) => {
+                    const outfit =
+                      character.card?.data.extensions.mikugg_v2.outfits.find(
+                        (outfit) => outfit.id === character.outfit
+                      );
+                    return {
+                      characterId: character.id || "",
+                      emotion: outfit?.emotions[0].id || "",
+                      text: "",
+                      pose: "standing",
+                    };
+                  });
+                  if (start) {
+                    dispatch(
+                      updateStart({
+                        ...start,
+                        sceneId: scene.id,
+                        characters,
+                      })
+                    );
+                  } else {
+                    dispatch(createStart(scene.id));
+                  }
+                  setSceneSelection({
+                    opened: false,
+                    selectedSceneId: null,
+                    startId: null,
+                  });
+                }}
+              >
+                <div
+                  className="SceneNode"
+                  style={{
+                    backgroundImage: `url(${config.genAssetLink(
+                      scene.background?.source.jpg || ""
+                    )})`,
+                  }}
+                >
+                  <div className="SceneNode__title">{scene.name}</div>
+                  <div className="SceneNode__characters">
+                    {scene.characters.map((character, index) => (
+                      <img
+                        key={index}
+                        src={config.genAssetLink(character.profile_pic || "")}
+                        alt={`Character ${index}`}
+                        className="SceneNode__character"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
