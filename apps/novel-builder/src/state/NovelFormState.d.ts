@@ -14,6 +14,8 @@ export enum NovelNSFW {
 export interface NovelStart {
   id: string;
   sceneId: string;
+  title?: string;
+  description?: string;
   characters: {
     characterId: string;
     emotion: string;

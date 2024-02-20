@@ -6,6 +6,7 @@ import {
   NovelCharacter,
   NovelScene,
   NovelNSFW,
+  NovelStart,
 } from "../NovelFormState.d";
 import { v4 as randomUUID } from "uuid";
 
@@ -16,7 +17,7 @@ const SCENE_DEFAULT = {
   characters: [
     {
       characterId: "char-1",
-      outfit: "default",
+      outfit: "outfit-1",
     },
   ],
   children: [],
@@ -76,7 +77,7 @@ const initialState: NovelFormState = {
               nsfw: NovelNSFW.NONE,
               outfits: [
                 {
-                  id: randomUUID(),
+                  id: "outfit-1",
                   name: "default",
                   description: "The default outfit",
                   attributes: [],
@@ -133,7 +134,7 @@ const initialState: NovelFormState = {
       characters: [
         {
           characterId: "char-1",
-          outfit: "default",
+          outfit: "outfit-1",
         },
       ],
       nsfw: NovelNSFW.NONE,
@@ -321,6 +322,37 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.scenes[index] = action.payload;
     },
+    createStart: (state, action: PayloadAction<string>) => {
+      const sceneId = action.payload;
+      const scene = state.scenes.find((scene) => scene.id === sceneId);
+      state.starts.push({
+        id: randomUUID(),
+        sceneId,
+        characters:
+          scene?.characters.map((character) => {
+            const characterOutfit = state.characters
+              .find((char) => char.id === character.characterId)
+              ?.card.data.extensions.mikugg_v2.outfits.find(
+                (outfit) => outfit.id === character.outfit
+              );
+            return {
+              characterId: character.characterId,
+              emotion: characterOutfit?.emotions[0].id || "neutral",
+              pose: "standing",
+              text: "",
+            };
+          }) || [],
+        description: "",
+        title: "",
+      });
+    },
+    updateStart: (state, action: PayloadAction<NovelStart>) => {
+      const index = state.starts.findIndex(
+        (start) => start.id === action.payload.id
+      );
+      if (index === -1) return;
+      state.starts[index] = action.payload;
+    },
   },
 });
 
@@ -339,6 +371,8 @@ export const {
   createSceneWithDefaults,
   deleteSceneById,
   updateScene,
+  createStart,
+  updateStart,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

@@ -88,6 +88,8 @@ export default function ItemSearch<T>(props: {
       opened={props.opened}
       onCloseModal={props.onClose}
       title={props.title}
+      className="ItemSearch__modal"
+      overlayClassName="scrollbar"
     >
       <div className="ItemSearch">
         <div className="ItemSearch__input">
