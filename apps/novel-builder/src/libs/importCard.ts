@@ -344,7 +344,49 @@ export const tavernCardToNovelState = (card: TavernCardV2): NovelStateV3 => {
 };
 
 export const migrateNovelV2ToV3 = (novel: NovelStateV2): NovelStateV3 => {
-  return novel;
+  // Assuming that the structure of NovelStateV2 is compatible with NovelStateV3,
+  // and there are no changes in the property names or types that need to be handled.
+  // If there are changes, this function needs to be updated to handle the migration logic.
+  const novelV3: NovelStateV3 = {
+    title: novel.title,
+    description: novel.description,
+    tags: novel.tags || [],
+    logoPic: '', // Assuming there is no direct mapping for logoPic in V2
+    author: '', // Assuming there is no direct mapping for author in V2
+    characters: novel.characters.map(character => {
+      if (!character) return undefined;
+      return {
+        id: character.id,
+        name: character.name,
+        profile_pic: character.profile_pic,
+        short_description: '', // Assuming there is no direct mapping for short_description in V2
+        tags: [], // Assuming there are no tags for characters in V2
+        card: character.card,
+        nsfw: NovelNSFW.NONE, // Assuming there is no NSFW information in V2
+      };
+    }).filter(Boolean) as NovelCharacter[],
+    backgrounds: novel.scenes.map(scene => ({
+      id: scene.background,
+      name: '', // Assuming there is no direct mapping for background name in V2
+      description: '', // Assuming there is no direct mapping for background description in V2
+      attributes: [], // Assuming there are no attributes for backgrounds in V2
+      source: {
+        jpg: scene.background, // Assuming the background ID is a direct URL or path
+      },
+    })),
+    songs: [], // Assuming there are no songs in V2
+    maps: [], // Assuming there are no maps in V2
+    scenes: novel.scenes.map(scene => ({
+      ...scene,
+      actionText: '', // Assuming there is no direct mapping for actionText in V2
+      condition: null, // Assuming there is no direct mapping for condition in V2
+      backgroundId: scene.background,
+      musicId: '', // Assuming there is no direct mapping for musicId in V2
+      nsfw: NovelNSFW.NONE, // Assuming there is no NSFW information in V2
+    })),
+    starts: [], // Assuming there are no starts in V2
+  };
+  return novelV3;
 };
 
 export const migrateNovelV1ToV2 = (novel: NovelStateV3): NovelStateV3 => {
