@@ -1,12 +1,15 @@
 import AssetsPanel from "./assets/AssetsPanel";
 import ButtonGroup from "../components/ButtonGroup";
-import { useState } from "react";
 import SceneGraph from "./scenes/SceneGraph";
 import StartsPanel from "./starts/StartsPanel";
 import PreviewPanel from "./preview/PreviewPanel";
+import HomePanel from "./HomePanel";
+import { useAppDispatch, useAppSelector } from "../state/store";
+import { isPanelType, navigatePanel } from "../state/slices/inputSlice";
 
-export default function App() {
-  const [selectedPanel, setSelectedPanel] = useState<string>("scenes");
+function PanelExplorer() {
+  const selectedPanel = useAppSelector((state) => state.input.navigation.panel);
+  const dispatch = useAppDispatch();
   return (
     <div className="panels">
       <ButtonGroup
@@ -29,7 +32,9 @@ export default function App() {
           },
         ]}
         selected={selectedPanel}
-        onButtonClick={(value) => setSelectedPanel(value)}
+        onButtonClick={(value) =>
+          isPanelType(value) && dispatch(navigatePanel(value))
+        }
       />
       {selectedPanel === "assets" ? <AssetsPanel /> : null}
       {selectedPanel === "scenes" ? <SceneGraph /> : null}
@@ -37,4 +42,9 @@ export default function App() {
       {selectedPanel === "preview" ? <PreviewPanel /> : null}
     </div>
   );
+}
+
+export default function App() {
+  const page = useAppSelector((state) => state.input.navigation.page);
+  return page === "homepage" ? <HomePanel /> : <PanelExplorer />;
 }

@@ -353,6 +353,9 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.starts[index] = action.payload;
     },
+    loadCompleteState: (state, action: PayloadAction<NovelFormState>) => {
+      return action.payload;
+    },
   },
 });
 
@@ -373,6 +376,7 @@ export const {
   updateScene,
   createStart,
   updateStart,
+  loadCompleteState,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

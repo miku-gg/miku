@@ -10,7 +10,15 @@ export type ModalType =
   | "characterSearch"
   | "scene";
 
+export type PanelType = "assets" | "scenes" | "starts" | "preview";
+export const isPanelType = (panel: string): panel is PanelType =>
+  ["assets", "scenes", "starts", "preview"].includes(panel);
+
 export interface InputState {
+  navigation: {
+    page: "homepage" | "edit";
+    panel: PanelType;
+  };
   modals: {
     [key in ModalType]: {
       opened: boolean;
@@ -20,6 +28,10 @@ export interface InputState {
 }
 
 const initialState: InputState = {
+  navigation: {
+    page: "homepage",
+    panel: "assets",
+  },
   modals: {
     background: {
       opened: false,
@@ -70,9 +82,16 @@ const inputSlice = createSlice({
     ) => {
       state.modals[action.payload.modalType].opened = false;
     },
+    navigatePanel(state, action: PayloadAction<PanelType>) {
+      state.navigation.panel = action.payload;
+    },
+    navigatePage(state, action: PayloadAction<"homepage" | "edit">) {
+      state.navigation.page = action.payload;
+    },
   },
 });
 
-export const { openModal, closeModal } = inputSlice.actions;
+export const { openModal, closeModal, navigatePage, navigatePanel } =
+  inputSlice.actions;
 
 export default inputSlice.reducer;

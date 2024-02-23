@@ -2,7 +2,6 @@ import {
   CharacterBook,
   EmotionTemplateSlug,
   MikuCardV2,
-  TavernCardV2,
 } from "@mikugg/bot-utils";
 
 export enum NovelNSFW {

@@ -1,0 +1,46 @@
+@import "../styles//variables";
+
+.HomePanel {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 70vh;
+
+  &__options {
+    display: flex;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  &__option {
+    height: 400px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease-out;
+    background-color: rgba(white, 0.1);
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(white, 0.2);
+    }
+
+    &__icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    &__text {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    &__description {
+      font-style: italic;
+    }
+  }
+}
