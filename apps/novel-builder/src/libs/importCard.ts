@@ -4,7 +4,8 @@ import {
   TavernCardV2,
   hashBase64URI,
 } from "@mikugg/bot-utils";
-import { NovelFormState } from "../state/NovelFormState";
+import { NovelState as NovelStateV3 } from "./novel.v3.state";
+import { NovelState as NovelStateV2 } from "./novel.v2.state";
 
 const randomString = (length = 32) => {
   const characters =
@@ -215,7 +216,7 @@ export const tavernCardToMikuCardV2 = (
   return mikuCardToMikuCardV2(tavernCardV2ToMikuCard(tavernCard));
 };
 
-export const tavernCardToNovelState = (card: TavernCardV2): NovelFormState => {
+export const tavernCardToNovelState = (card: TavernCardV2): NovelStateV3 => {
   let oldMikuCard: MikuCard | null = null;
   let cardV2: MikuCardV2 | null = null;
   if (card.data.extensions.mikugg) {
@@ -342,17 +343,17 @@ export const tavernCardToNovelState = (card: TavernCardV2): NovelFormState => {
   };
 };
 
-export const migrateNovelV2ToV3 = (novel: NovelFormState): NovelFormState => {
+export const migrateNovelV2ToV3 = (novel: NovelStateV2): NovelStateV3 => {
   return novel;
 };
 
-export const migrateNovelV1ToV2 = (novel: NovelFormState): NovelFormState => {
+export const migrateNovelV1ToV2 = (novel: NovelStateV3): NovelStateV3 => {
   return novel;
 };
 
 export const inputToNovelState = (
   input: any
-): { version: "v3"; novel: NovelFormState } => {
+): { version: "v3"; novel: NovelStateV3 } => {
   if (input?.novel) {
     if (input.version === "v3") {
       return {
@@ -387,9 +388,9 @@ const isDataUri = (string: string): boolean => {
 };
 
 export const extractNovelAssets = async (
-  novel: NovelFormState
+  novel: NovelStateV3
 ): Promise<{
-  novel: NovelFormState;
+  novel: NovelStateV3;
   assets: {
     images: Map<string, string>;
     audios: Map<string, string>;
@@ -523,7 +524,7 @@ export enum ErrorImportType {
 }
 
 export const importAndReplaceNovelStateAssets = async (
-  novel: NovelFormState,
+  novel: NovelStateV3,
   options: {
     uploadAsset: (
       dataString: string
@@ -536,7 +537,7 @@ export const importAndReplaceNovelStateAssets = async (
     onError: (error: ErrorImportType, message?: string) => void;
     uploadBatchSize: number;
   }
-): Promise<NovelFormState> => {
+): Promise<NovelStateV3> => {
   const {
     novel: novelWithReplacedAssets,
     assets: { images, audios, videos },
