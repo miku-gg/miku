@@ -1,6 +1,6 @@
 import ItemSearch from "../components/ItemSearch";
 import config from "../config";
-import { NovelBackground } from "../state/NovelFormState";
+import { NovelV3 } from "@mikugg/bot-utils";
 import { closeModal } from "../state/slices/inputSlice";
 import { addBackground } from "../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../state/store";
@@ -12,14 +12,14 @@ export default function BackgroundSearchModal() {
   const dispatch = useAppDispatch();
 
   return (
-    <ItemSearch<NovelBackground>
+    <ItemSearch<NovelV3.NovelBackground>
       title="Search Backgrounds"
       opened={opened}
       pageSize={10}
       onSearch={async (query) => {
         const { result, success } = await config.search.backgrounds(query);
         if (!success) throw new Error("Error searching backgrounds");
-        const mapBackground = (item: NovelBackground) => {
+        const mapBackground = (item: NovelV3.NovelBackground) => {
           return {
             id: item.id,
             description: item.description,

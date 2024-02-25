@@ -6,8 +6,10 @@ import PreviewPanel from "./preview/PreviewPanel";
 import HomePanel from "./HomePanel";
 import { useAppDispatch, useAppSelector } from "../state/store";
 import { isPanelType, navigatePanel } from "../state/slices/inputSlice";
+import { downloadNovelState } from "../libs/utils";
 
 function PanelExplorer() {
+  const novel = useAppSelector((state) => state.novel);
   const selectedPanel = useAppSelector((state) => state.input.navigation.panel);
   const dispatch = useAppDispatch();
   return (
@@ -30,11 +32,19 @@ function PanelExplorer() {
             text: "Preview",
             value: "preview",
           },
+          {
+            text: "Save",
+            value: "save",
+          },
         ]}
         selected={selectedPanel}
-        onButtonClick={(value) =>
-          isPanelType(value) && dispatch(navigatePanel(value))
-        }
+        onButtonClick={(value) => {
+          if (isPanelType(value)) {
+            dispatch(navigatePanel(value));
+          } else if (value === "save") {
+            downloadNovelState(novel);
+          }
+        }}
       />
       {selectedPanel === "assets" ? <AssetsPanel /> : null}
       {selectedPanel === "scenes" ? <SceneGraph /> : null}

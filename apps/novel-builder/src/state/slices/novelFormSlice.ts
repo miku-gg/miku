@@ -1,19 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-  NovelBackground,
-  NovelFormState,
-  NovelSong,
-  NovelCharacter,
-  NovelScene,
-  NovelNSFW,
-  NovelStart,
-} from "../NovelFormState.d";
+import { NovelV3 } from "@mikugg/bot-utils";
 import { v4 as randomUUID } from "uuid";
 
 const SCENE_DEFAULT = {
   id: "",
   backgroundId: "bg-1",
-  nsfw: NovelNSFW.NONE,
+  nsfw: NovelV3.NovelNSFW.NONE,
   characters: [
     {
       characterId: "char-1",
@@ -44,7 +36,7 @@ const initialState: NovelFormState = {
   starts: [],
 };
 */
-const initialState: NovelFormState = {
+const initialState: NovelV3.NovelState = {
   title: "",
   description: "",
   logoPic: "",
@@ -57,7 +49,7 @@ const initialState: NovelFormState = {
       short_description: "",
       profile_pic: "empty_char.png",
       tags: [],
-      nsfw: NovelNSFW.NONE,
+      nsfw: NovelV3.NovelNSFW.NONE,
       card: {
         spec: "chara_card_v2",
         spec_version: "2.0",
@@ -74,7 +66,7 @@ const initialState: NovelFormState = {
               language: "en",
               short_description: "",
               profile_pic: "empty_char.png",
-              nsfw: NovelNSFW.NONE,
+              nsfw: NovelV3.NovelNSFW.NONE,
               outfits: [
                 {
                   id: "outfit-1",
@@ -82,7 +74,7 @@ const initialState: NovelFormState = {
                   description: "The default outfit",
                   attributes: [],
                   template: "single-emotion",
-                  nsfw: NovelNSFW.NONE,
+                  nsfw: NovelV3.NovelNSFW.NONE,
                   emotions: [
                     {
                       id: "neutral",
@@ -137,7 +129,7 @@ const initialState: NovelFormState = {
           outfit: "outfit-1",
         },
       ],
-      nsfw: NovelNSFW.NONE,
+      nsfw: NovelV3.NovelNSFW.NONE,
       children: [],
       musicId: "1",
       name: "Scene 1",
@@ -155,7 +147,7 @@ const initialState: NovelFormState = {
           outfit: "default",
         },
       ],
-      nsfw: NovelNSFW.NONE,
+      nsfw: NovelV3.NovelNSFW.NONE,
       children: [],
       musicId: "1",
       name: "Scene 2",
@@ -194,10 +186,13 @@ const novelFormSlice = createSlice({
         );
       }
     },
-    addBackground: (state, action: PayloadAction<NovelBackground>) => {
+    addBackground: (state, action: PayloadAction<NovelV3.NovelBackground>) => {
       state.backgrounds.push(action.payload);
     },
-    updateBackground: (state, action: PayloadAction<NovelBackground>) => {
+    updateBackground: (
+      state,
+      action: PayloadAction<NovelV3.NovelBackground>
+    ) => {
       const index = state.backgrounds.findIndex(
         (background) => background.id === action.payload.id
       );
@@ -211,10 +206,10 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.backgrounds.splice(index, 1);
     },
-    addSong: (state, action: PayloadAction<NovelSong>) => {
+    addSong: (state, action: PayloadAction<NovelV3.NovelSong>) => {
       state.songs.push(action.payload);
     },
-    updateSong: (state, action: PayloadAction<NovelSong>) => {
+    updateSong: (state, action: PayloadAction<NovelV3.NovelSong>) => {
       const index = state.songs.findIndex(
         (song) => song.id === action.payload.id
       );
@@ -228,13 +223,13 @@ const novelFormSlice = createSlice({
     },
     createCharacter: (state, action: PayloadAction<string>) => {
       const id = action.payload;
-      const character: NovelCharacter = {
+      const character: NovelV3.NovelCharacter = {
         id,
         name: "char1",
         short_description: "",
         profile_pic: "empty_char.png",
         tags: [],
-        nsfw: NovelNSFW.NONE,
+        nsfw: NovelV3.NovelNSFW.NONE,
         card: {
           spec: "chara_card_v2",
           spec_version: "2.0",
@@ -251,7 +246,7 @@ const novelFormSlice = createSlice({
                 language: "en",
                 short_description: "",
                 profile_pic: "empty_char.png",
-                nsfw: NovelNSFW.NONE,
+                nsfw: NovelV3.NovelNSFW.NONE,
                 outfits: [
                   {
                     id: randomUUID(),
@@ -259,7 +254,7 @@ const novelFormSlice = createSlice({
                     description: "The default outfit",
                     attributes: [],
                     template: "single-emotion",
-                    nsfw: NovelNSFW.NONE,
+                    nsfw: NovelV3.NovelNSFW.NONE,
                     emotions: [
                       {
                         id: "neutral",
@@ -284,7 +279,7 @@ const novelFormSlice = createSlice({
       };
       state.characters.push(character);
     },
-    updateCharacter: (state, action: PayloadAction<NovelCharacter>) => {
+    updateCharacter: (state, action: PayloadAction<NovelV3.NovelCharacter>) => {
       const index = state.characters.findIndex(
         (character) => character.id === action.payload.id
       );
@@ -297,6 +292,9 @@ const novelFormSlice = createSlice({
       );
       if (index === -1) return;
       state.characters.splice(index, 1);
+    },
+    addCharacter(state, action: PayloadAction<NovelV3.NovelCharacter>) {
+      state.characters.push(action.payload);
     },
     createSceneWithDefaults: (state) => {
       const newScene = { ...SCENE_DEFAULT, id: randomUUID() };
@@ -315,7 +313,7 @@ const novelFormSlice = createSlice({
       // check if the scene is the start scene
       state.scenes.splice(index, 1);
     },
-    updateScene: (state, action: PayloadAction<NovelScene>) => {
+    updateScene: (state, action: PayloadAction<NovelV3.NovelScene>) => {
       const index = state.scenes.findIndex(
         (scene) => scene.id === action.payload.id
       );
@@ -346,14 +344,14 @@ const novelFormSlice = createSlice({
         title: "",
       });
     },
-    updateStart: (state, action: PayloadAction<NovelStart>) => {
+    updateStart: (state, action: PayloadAction<NovelV3.NovelStart>) => {
       const index = state.starts.findIndex(
         (start) => start.id === action.payload.id
       );
       if (index === -1) return;
       state.starts[index] = action.payload;
     },
-    loadCompleteState: (state, action: PayloadAction<NovelFormState>) => {
+    loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;
     },
   },
@@ -361,6 +359,7 @@ const novelFormSlice = createSlice({
 
 export const {
   addChildScene,
+  addCharacter,
   deleteChildScene,
   addBackground,
   updateBackground,

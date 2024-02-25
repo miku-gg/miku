@@ -1,6 +1,6 @@
 import ItemSearch from "../components/ItemSearch";
 import config from "../config";
-import { NovelSong } from "../state/NovelFormState";
+import { NovelV3 } from "@mikugg/bot-utils";
 import { closeModal } from "../state/slices/inputSlice";
 import { addSong } from "../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../state/store";
@@ -12,14 +12,14 @@ export default function SongSearchModal() {
   const dispatch = useAppDispatch();
 
   return (
-    <ItemSearch<NovelSong>
+    <ItemSearch<NovelV3.NovelSong>
       title="Search Songs"
       opened={opened}
       pageSize={10}
       onSearch={async (query) => {
         const { result, success } = await config.search.songs(query);
         if (!success) throw new Error("Error searching songs");
-        const mapSong = (item: NovelSong) => {
+        const mapSong = (item: NovelV3.NovelSong) => {
           return {
             id: item.id,
             description: item.description,

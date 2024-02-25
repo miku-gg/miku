@@ -6,8 +6,6 @@ import {
 } from "../MikuCardUtils";
 import * as NovelV3 from "./NovelV3";
 import * as NovelV2 from "./_deprecated.NovelV2";
-export * as DeprecatedNovelV2 from "./_deprecated.NovelV2";
-export * as NovelV3 from "./NovelV3";
 
 const randomString = (length = 32) => {
   const characters =

@@ -102,6 +102,8 @@ const HistoryActions = () => {
   )
 }
 const nodeTypes: NodeTypes = {
+  // eslint-disable-next-line
+  // @ts-ignore
   dialogueNode: DialogueNode,
 }
 const HistoryModal = (): ReactElement => {

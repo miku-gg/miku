@@ -13,7 +13,7 @@ import { useRef } from "react";
 import {
   importAndReplaceNovelStateAssets,
   inputToNovelState,
-} from "../libs/importCard";
+} from "@mikugg/bot-utils";
 import { loadCompleteState } from "../state/slices/novelFormSlice";
 import { Loader, Modal } from "@mikugg/ui-kit";
 
