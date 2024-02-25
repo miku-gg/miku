@@ -8,6 +8,7 @@ export type ModalType =
   | "songSearch"
   | "character"
   | "characterSearch"
+  | "loading"
   | "scene";
 
 export type PanelType = "assets" | "scenes" | "starts" | "preview";
@@ -23,6 +24,7 @@ export interface InputState {
     [key in ModalType]: {
       opened: boolean;
       editId?: string;
+      text?: string;
     };
   };
 }
@@ -33,6 +35,9 @@ const initialState: InputState = {
     panel: "assets",
   },
   modals: {
+    loading: {
+      opened: false,
+    },
     background: {
       opened: false,
     },
@@ -66,12 +71,16 @@ const inputSlice = createSlice({
       action: PayloadAction<{
         modalType: ModalType;
         editId?: string;
+        text?: string;
       }>
     ) => {
       const { modalType, editId } = action.payload;
       state.modals[modalType].opened = true;
       if ("editId" in action.payload) {
         state.modals[modalType].editId = editId;
+      }
+      if ("text" in action.payload) {
+        state.modals[modalType].text = action.payload.text;
       }
     },
     closeModal: (

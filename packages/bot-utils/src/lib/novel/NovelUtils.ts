@@ -1,11 +1,13 @@
+import { MikuCard, MikuCardV2, TavernCardV2 } from "../MikuCardValidator";
 import {
-  MikuCard,
-  MikuCardV2,
-  TavernCardV2,
   hashBase64URI,
-} from "@mikugg/bot-utils";
-import * as V3 from "./novel.v3.state";
-import { NovelState as NovelStateV2 } from "./novel.v2.state";
+  mikuCardToMikuCardV2,
+  tavernCardV2ToMikuCard,
+} from "../MikuCardUtils";
+import * as NovelV3 from "./NovelV3";
+import * as NovelV2 from "./_deprecated.NovelV2";
+export * as DeprecatedNovelV2 from "./_deprecated.NovelV2";
+export * as NovelV3 from "./NovelV3";
 
 const randomString = (length = 32) => {
   const characters =
@@ -27,196 +29,15 @@ const replaceStringsInObject = (
   );
 };
 
-const tavernCardV2ToMikuCard = (json: TavernCardV2): MikuCard => {
-  const default_scenario_id = "default_scene";
-  return {
-    spec: "chara_card_v2",
-    spec_version: "2.0",
-    data: {
-      name: String(json.data.name) || "",
-      description: String(json.data.description) || "",
-      first_mes: String(json.data.first_mes) || "",
-      personality: String(json.data.personality) || "",
-      mes_example: String(json.data.mes_example) || "",
-      scenario: String(json.data.scenario),
-      alternate_greetings: [
-        ...(json.data.alternate_greetings || []).map(
-          (greeting) => String(greeting) || ""
-        ),
-      ],
-      system_prompt: String(json.data.system_prompt) || "",
-      post_history_instructions:
-        String(json.data.post_history_instructions) || "",
-      creator: String(json.data.creator) || "",
-      character_version: String(json.data.character_version) || "",
-      tags: [...(json.data.tags || []).map((tag) => String(tag) || "")],
-      creator_notes: String(json.data.creator_notes) || "",
-      character_book: json.data.character_book
-        ? {
-            ...json.data.character_book,
-            name: String(json.data.character_book.name) || "",
-            description: String(json.data.character_book.description) || "",
-            scan_depth: Number(json.data.character_book.scan_depth) || 0,
-            token_budget: Number(json.data.character_book.token_budget) || 0,
-            recursive_scanning:
-              Boolean(json.data.character_book.recursive_scanning) || false,
-            entries: json.data.character_book.entries.map((entry) => ({
-              ...entry,
-              keys: entry.keys.map((key) => String(key) || ""),
-              content: String(entry.content) || "",
-              enabled: Boolean(entry.enabled) || false,
-              insertion_order: Number(entry.insertion_order) || 0,
-            })),
-          }
-        : undefined,
-      extensions: {
-        ...(json.data.extensions || {}),
-        mikugg: {
-          ...(json.data.extensions?.mikugg || {}),
-          license: json.data.extensions?.mikugg?.license || "CC BY",
-          language: json.data.extensions?.mikugg?.language || "en",
-          profile_pic: json.data.extensions?.mikugg?.profile_pic || "",
-          short_description:
-            json.data.extensions?.mikugg?.short_description || "",
-          start_scenario:
-            json.data.extensions?.mikugg?.start_scenario ||
-            json.data.extensions?.mikugg?.scenarios?.length
-              ? json.data.extensions?.mikugg?.scenarios[0].id
-              : default_scenario_id,
-          scenarios: json.data.extensions?.mikugg?.scenarios?.length
-            ? json.data.extensions?.mikugg?.scenarios?.map(
-                // eslint-disable-next-line
-                // @ts-ignore
-                (scenario) => ({
-                  ...scenario,
-                  name: String(scenario.name) || "",
-                  children_scenarios: scenario.children_scenarios.map(
-                    // eslint-disable-next-line
-                    // @ts-ignore
-                    (child) => String(child) || ""
-                  ),
-                  context: String(scenario.context) || "",
-                  trigger_suggestion_similarity:
-                    String(scenario.trigger_suggestion_similarity) || "",
-                  trigger_action: String(scenario.trigger_action) || "",
-                  background: String(scenario.background) || "",
-                  emotion_group: String(scenario.emotion_group) || "",
-                  voice: String(scenario.voice) || "",
-                })
-              )
-            : [
-                {
-                  id: default_scenario_id,
-                  name: "scenario-1",
-                  children_scenarios: [],
-                  context: "",
-                  trigger_suggestion_similarity: "",
-                  trigger_action: "",
-                  background: "",
-                  emotion_group: "",
-                  voice: "",
-                },
-              ],
-          emotion_groups:
-            // eslint-disable-next-line
-            // @ts-ignore
-            json.data.extensions?.mikugg?.emotion_groups?.map((group) => ({
-              ...group,
-              emotions:
-                // eslint-disable-next-line
-                // @ts-ignore
-                group.emotions.map((emotion) => ({
-                  ...emotion,
-                  // eslint-disable-next-line
-                  // @ts-ignore
-                  source: emotion.source.map((src) => String(src) || ""),
-                })) || [],
-            })) || [],
-          backgrounds:
-            // eslint-disable-next-line
-            // @ts-ignore
-            json.data.extensions?.mikugg?.backgrounds?.map((bg) => ({
-              ...bg,
-              description: String(bg.description) || "",
-              source: String(bg.source) || "",
-            })) || [],
-          voices: json.data.extensions?.mikugg?.voices
-            ? // eslint-disable-next-line
-              // @ts-ignore
-              json.data.extensions?.mikugg?.voices?.map((voice) => ({
-                ...voice,
-                id: String(voice.id) || "",
-                provider: String(voice.provider) || "",
-                provider_voice_id: String(voice.provider_voice_id) || "",
-                provider_emotion: voice.provider_emotion
-                  ? String(voice.provider_emotion)
-                  : undefined,
-                training_sample: voice.training_sample
-                  ? String(voice.training_sample)
-                  : undefined,
-              }))
-            : [
-                {
-                  id: "azure_tts.en-GB-SoniaNeural",
-                  provider: "azure_tts",
-                  provider_voice_id: "en-GB-SoniaNeural",
-                  provider_emotion: "sad",
-                },
-              ],
-        },
-      },
-    },
-  };
-};
-export const mikuCardToMikuCardV2 = (mikuCard: MikuCard): MikuCardV2 => {
-  const {
-    extensions: { mikugg },
-  } = mikuCard.data;
-
-  const outfits: MikuCardV2["data"]["extensions"]["mikugg_v2"]["outfits"] =
-    mikugg.emotion_groups.map((group) => ({
-      id: group.id,
-      template: group.template,
-      name: group.name,
-      description: group.name,
-      attributes: [],
-      nsfw: group.template === "lewd-emotions" ? 1 : 0,
-      emotions: group.emotions.map((emotion) => ({
-        id: emotion.id,
-        sources: {
-          png: emotion.source[0], // Assuming first source is png
-          webm: emotion.source.length > 1 ? emotion.source[1] : undefined, // Assuming second source, if exists, is webm
-          sound: emotion.sound,
-        },
-      })),
-    }));
-
-  // Construct the new MikuCardV2 format
-  return {
-    ...mikuCard, // Copy over existing structure
-    data: {
-      ...mikuCard.data,
-      extensions: {
-        mikugg_v2: {
-          license: mikugg.license,
-          language: mikugg.language,
-          short_description: mikugg.short_description,
-          profile_pic: mikugg.profile_pic,
-          nsfw: 0, // Assuming default as no information provided
-          outfits,
-        },
-      },
-    },
-  };
-};
-
 export const tavernCardToMikuCardV2 = (
   tavernCard: TavernCardV2
 ): MikuCardV2 => {
   return mikuCardToMikuCardV2(tavernCardV2ToMikuCard(tavernCard));
 };
 
-export const tavernCardToNovelState = (card: TavernCardV2): V3.NovelState => {
+export const tavernCardToNovelState = (
+  card: TavernCardV2
+): NovelV3.NovelState => {
   let oldMikuCard: MikuCard | null = null;
   let cardV2: MikuCardV2 | null = null;
   if (card.data.extensions.mikugg) {
@@ -343,10 +164,12 @@ export const tavernCardToNovelState = (card: TavernCardV2): V3.NovelState => {
   };
 };
 
-export const migrateNovelV2ToV3 = (novel: NovelStateV2): V3.NovelState => {
+export const migrateNovelV2ToV3 = (
+  novel: NovelV2.NovelState
+): NovelV3.NovelState => {
   const _characters = Object.values(novel.characters);
   const firstCharacter = _characters[0] || null;
-  const novelV3: V3.NovelState = {
+  const novelV3: NovelV3.NovelState = {
     title: novel.title,
     description: novel.description,
     tags: [],
@@ -363,10 +186,10 @@ export const migrateNovelV2ToV3 = (novel: NovelStateV2): V3.NovelState => {
             character.card.data.extensions.mikugg.short_description,
           tags: character.card.data.tags,
           card: mikuCardToMikuCardV2(character.card),
-          nsfw: V3.NovelNSFW.NONE,
+          nsfw: NovelV3.NovelNSFW.NONE,
         };
       })
-      .filter(Boolean) as V3.NovelCharacter[],
+      .filter(Boolean) as NovelV3.NovelCharacter[],
     backgrounds: novel.scenes.map((scene) => ({
       id: scene.background,
       name: "",
@@ -395,20 +218,22 @@ export const migrateNovelV2ToV3 = (novel: NovelStateV2): V3.NovelState => {
       })),
       backgroundId: scene.background,
       musicId: "",
-      nsfw: V3.NovelNSFW.NONE,
+      nsfw: NovelV3.NovelNSFW.NONE,
     })),
     starts: [],
   };
   return novelV3;
 };
 
-export const migrateNovelV1ToV2 = (novel: V3.NovelState): V3.NovelState => {
+export const migrateNovelV1ToV2 = (
+  novel: NovelV3.NovelState
+): NovelV3.NovelState => {
   return novel;
 };
 
 export const inputToNovelState = (
   input: any
-): { version: "v3"; novel: V3.NovelState } => {
+): { version: "v3"; novel: NovelV3.NovelState } => {
   if (input?.novel) {
     if (input.version === "v3") {
       return {
@@ -443,9 +268,9 @@ const isDataUri = (string: string): boolean => {
 };
 
 export const extractNovelAssets = async (
-  novel: V3.NovelState
+  novel: NovelV3.NovelState
 ): Promise<{
-  novel: V3.NovelState;
+  novel: NovelV3.NovelState;
   assets: {
     images: Map<string, string>;
     audios: Map<string, string>;
@@ -579,7 +404,7 @@ export enum ErrorImportType {
 }
 
 export const importAndReplaceNovelStateAssets = async (
-  novel: V3.NovelState,
+  novel: NovelV3.NovelState,
   options: {
     uploadAsset: (
       dataString: string
@@ -592,7 +417,7 @@ export const importAndReplaceNovelStateAssets = async (
     onError: (error: ErrorImportType, message?: string) => void;
     uploadBatchSize: number;
   }
-): Promise<V3.NovelState> => {
+): Promise<NovelV3.NovelState> => {
   const {
     novel: novelWithReplacedAssets,
     assets: { images, audios, videos },

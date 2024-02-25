@@ -120,6 +120,7 @@ export type MikuCardV2 = TavernCardV2 & {
         short_description: string; // Small description of the bot, NOT used in the prompt
         profile_pic: string; // profile pic of the bot
         nsfw?: number; // indicates if the prompt is mainly NSFW (0: false, 1: nudity, 2: explicit)
+        voice?: string; // reference audio for bot's voice to be used in this scenario
         outfits: {
           id: string; // id of the outfit
           name: string; // name of the outfit
