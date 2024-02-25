@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
 import multer from "multer";
-import { Express } from "express";
-import { BUCKET } from "@mikugg/bot-utils";
+import express, { Express } from "express";
+import { BUCKET, hashBase64 } from "@mikugg/bot-utils";
+import sharp from "sharp";
 export { BUCKET } from "@mikugg/bot-utils";
 
 const dataDir = path.join(__dirname, "../db"); // Directory to store files
@@ -79,17 +80,78 @@ export default function s3ServerDecorator(app: Express): void {
     });
   });
 
-  app.post("/asset-upload/complete", (req, res) => {
+  app.use(
+    "/asset-upload/presigned/:fileName",
+    express.raw({ type: "application/octet-stream", limit: "50mb" })
+  );
+
+  app.put("/asset-upload/presigned/:fileName", (req, res) => {
+    const fileName = req.params.fileName;
+    if (!fileName) {
+      return res.status(400).send("No fileName in path.");
+    }
+
+    const filePath = path.join(path.join(dataDir, `assets/${fileName}`));
+
+    // Now `req.body` should be a Buffer
+    fs.writeFile(filePath, req.body, (err) => {
+      if (err) {
+        console.error("Error writing file:", err);
+        return res.status(500).send("Error writing file.");
+      }
+      res.status(200).send("File uploaded successfully.");
+    });
+  });
+
+  app.post("/asset-upload/complete", async (req, res) => {
     // check fileName and contentType from body json
-    const fileName = String(req.body.fileName);
+    const _fileName = String(req.body.fileName);
     const contentType = String(req.body.contentType);
-    if (!fileName || !contentType) {
+    if (!_fileName || !contentType) {
       return res.status(400).send("No fileName or contentType.");
     }
+    // read file as buffer
+    const filePath = path.join(path.join(dataDir, `assets/${_fileName}`));
+    const fileBuffer = fs.readFileSync(filePath);
+    const fileHash = await hashBase64(fileBuffer.toString("base64"));
+    const fileName = `${fileHash}.${contentType.split("/")[1]}`;
+
+    // change _fileName to fileName
+    fs.renameSync(filePath, path.join(dataDir, `assets/${fileName}`));
+    // if it's an image, also write it as 480p
+    try {
+      // Check if the file is an image
+      if (contentType.startsWith("image/")) {
+        let resizedImage;
+
+        if (contentType === "image/gif") {
+          // Handling GIFs: Sharp doesn't support GIF resizing, so we just skip resizing for GIFs
+          resizedImage = fileBuffer;
+        } else {
+          // Resize other image types
+          resizedImage = await sharp(fileBuffer)
+            .resize({ height: 480, fit: "inside", withoutEnlargement: true })
+            // @ts-ignore
+            .toFormat(contentType.split("/")[1], { quality: 70 }) // Adjust quality for supported formats
+            .toBuffer();
+        }
+
+        // Upload the resized image
+        const resizedFileName = `480p_${fileName}`;
+        fs.writeFileSync(
+          path.join(dataDir, `assets/${resizedFileName}`),
+          resizedImage
+        );
+      }
+    } catch (err) {
+      console.warn("Error resizing image:", fileName);
+      console.error(err);
+    }
+
     // check file extension
     res.send({
       fileName: fileName,
-      fileSize: 1,
+      fileSize: fileBuffer.length,
     });
   });
 }

@@ -16,6 +16,7 @@ import {
 } from "@mikugg/bot-utils";
 import { loadCompleteState } from "../state/slices/novelFormSlice";
 import { Loader, Modal } from "@mikugg/ui-kit";
+import config from "../config";
 
 export default function HomePanel() {
   const { opened: loadingOpened, text: loadingText } = useAppSelector(
@@ -49,13 +50,12 @@ export default function HomePanel() {
                 })
               );
             },
-            uploadAsset: async (asset: string) => {
-              // wait for 0.1 second to simulate upload
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-              return {
-                success: true,
-                assetId: "test.jpg",
-              };
+            uploadAsset: async (assetBase64URI: string) => {
+              if (assetBase64URI.startsWith("data:")) {
+                return await config.uploadAsset(assetBase64URI);
+              } else {
+                return { success: true, assetId: assetBase64URI };
+              }
             },
             uploadBatchSize: 10,
           }

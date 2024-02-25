@@ -1,12 +1,14 @@
-import {
-  NovelBackground,
-  NovelCharacter,
-  NovelSong,
-} from "./state/NovelFormState";
+import { NovelV3, uploadAsset } from "@mikugg/bot-utils";
+
+async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
+  const response = await fetch(dataURI);
+  const blob = await response.blob();
+  return new File([blob], filename, { type: blob.type });
+}
 
 interface BuilderConfig {
   genAssetLink: (asset: string, lowres?: boolean) => string;
-  uploadAsset: (file: File) => Promise<{
+  uploadAsset: (file: File | string) => Promise<{
     success: boolean;
     assetId: string;
   }>;
@@ -19,8 +21,8 @@ interface BuilderConfig {
     }) => Promise<{
       success: boolean;
       result: {
-        public: NovelCharacter[];
-        private: NovelCharacter[];
+        public: NovelV3.NovelCharacter[];
+        private: NovelV3.NovelCharacter[];
       };
     }>;
 
@@ -32,8 +34,8 @@ interface BuilderConfig {
     }) => Promise<{
       success: boolean;
       result: {
-        public: NovelBackground[];
-        private: NovelBackground[];
+        public: NovelV3.NovelBackground[];
+        private: NovelV3.NovelBackground[];
       };
     }>;
 
@@ -45,8 +47,8 @@ interface BuilderConfig {
     }) => Promise<{
       success: boolean;
       result: {
-        public: NovelSong[];
-        private: NovelSong[];
+        public: NovelV3.NovelSong[];
+        private: NovelV3.NovelSong[];
       };
     }>;
   };
@@ -58,12 +60,20 @@ const configs: Map<"development" | "stating" | "production", BuilderConfig> =
       "development",
       {
         genAssetLink: (asset: string, lowres?: boolean) =>
-          `https://assets.miku.gg/${lowres ? `480p_${asset}` : asset}`,
-        uploadAsset: async (file: File) => {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          `http://localhost:8585/s3/assets/${lowres ? `480p_${asset}` : asset}`,
+        uploadAsset: async (file: File | string) => {
+          if (typeof file === "string") {
+            file = await dataURItoFile(file, "asset");
+          }
+
+          const result = await uploadAsset(
+            "http://localhost:8585/asset-upload",
+            file
+          );
+
           return {
-            success: true,
-            assetId: "QmRKvMSTVnQti536ZXqS6EkwwaZMMVRXZJXd3T5vv2BfoL.png",
+            success: !!result.fileName,
+            assetId: result.fileName,
           };
         },
         search: {
