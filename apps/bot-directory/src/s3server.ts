@@ -6,6 +6,17 @@ import { BUCKET, hashBase64 } from "@mikugg/bot-utils";
 import sharp from "sharp";
 export { BUCKET } from "@mikugg/bot-utils";
 
+const randomString = (length: number = 10) => {
+  let result = "";
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 const dataDir = path.join(__dirname, "../db"); // Directory to store files
 
 if (!fs.existsSync(dataDir)) {
@@ -54,6 +65,15 @@ export default function s3ServerDecorator(app: Express): void {
       const file = getS3File(bucket, req.params.key);
       if (file) {
         if (req.params.key.endsWith(".webm")) res.contentType("video/webm");
+        if (req.params.key.endsWith(".mp4")) res.contentType("video/mp4");
+        if (req.params.key.endsWith(".png")) res.contentType("image/png");
+        if (req.params.key.endsWith(".jpg")) res.contentType("image/jpeg");
+        if (req.params.key.endsWith(".jpeg")) res.contentType("image/jpeg");
+        if (req.params.key.endsWith(".gif")) res.contentType("image/gif");
+        if (req.params.key.endsWith(".mp3")) res.contentType("audio/mpeg");
+        if (req.params.key.endsWith(".mpeg")) res.contentType("audio/mpeg");
+        if (req.params.key.endsWith(".wav")) res.contentType("audio/wav");
+        if (req.params.key.endsWith(".ogg")) res.contentType("audio/ogg");
         res.send(file);
       } else {
         res.status(404).send("File not found.");
@@ -72,7 +92,7 @@ export default function s3ServerDecorator(app: Express): void {
     if (!ext) {
       return res.status(400).send("Invalid contentType.");
     }
-    const fileName = `${Date.now()}.${ext}`;
+    const fileName = `_temp_${Date.now()}_${randomString()}.${ext}`;
 
     res.send({
       url: `http://localhost:8585/asset-upload/presigned/${fileName}`,
@@ -104,22 +124,20 @@ export default function s3ServerDecorator(app: Express): void {
   });
 
   app.post("/asset-upload/complete", async (req, res) => {
-    // check fileName and contentType from body json
     const _fileName = String(req.body.fileName);
-    const contentType = String(req.body.contentType);
-    if (!_fileName || !contentType) {
-      return res.status(400).send("No fileName or contentType.");
-    }
-    // read file as buffer
-    const filePath = path.join(path.join(dataDir, `assets/${_fileName}`));
-    const fileBuffer = fs.readFileSync(filePath);
-    const fileHash = await hashBase64(fileBuffer.toString("base64"));
-    const fileName = `${fileHash}.${contentType.split("/")[1]}`;
-
-    // change _fileName to fileName
-    fs.renameSync(filePath, path.join(dataDir, `assets/${fileName}`));
-    // if it's an image, also write it as 480p
     try {
+      const contentType = String(req.body.contentType);
+      if (!_fileName || !contentType) {
+        return res.status(400).send("No fileName or contentType.");
+      }
+      // read file as buffer
+      const filePath = path.join(path.join(dataDir, `assets/${_fileName}`));
+      const fileBuffer = fs.readFileSync(filePath);
+      const fileHash = await hashBase64(fileBuffer.toString("base64"));
+      const fileName = `${fileHash}.${contentType.split("/")[1]}`;
+
+      // change _fileName to fileName
+      fs.renameSync(filePath, path.join(dataDir, `assets/${fileName}`));
       // Check if the file is an image
       if (contentType.startsWith("image/")) {
         let resizedImage;
@@ -143,15 +161,19 @@ export default function s3ServerDecorator(app: Express): void {
           resizedImage
         );
       }
+      res.send({
+        fileName: fileName,
+        fileSize: fileBuffer.length,
+      });
     } catch (err) {
-      console.warn("Error resizing image:", fileName);
+      console.warn("Error resizing image:", _fileName);
       console.error(err);
+      res.send({
+        fileName: _fileName,
+        fileSize: 0,
+      });
     }
 
     // check file extension
-    res.send({
-      fileName: fileName,
-      fileSize: fileBuffer.length,
-    });
   });
 }

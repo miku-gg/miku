@@ -12,6 +12,7 @@ import SongEditModal from "./modals/SongEditModal";
 import SongSearchModal from "./modals/SongSearchModal";
 import CharacterEditModal from "./modals/character/CharacterEditModal";
 import SceneEditModal from "./modals/scene/SceneEditModal";
+import LoadingModal from "./modals/LoadingModal";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -26,6 +27,7 @@ ReactDOM.render(
         <SongEditModal />
         <SongSearchModal />
         <CharacterEditModal />
+        <LoadingModal />
         <ToastContainer />
       </AreYouSure.AreYouSureProvider>
     </Provider>

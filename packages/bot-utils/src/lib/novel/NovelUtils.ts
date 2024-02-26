@@ -285,11 +285,15 @@ export const extractNovelAssets = async (
       const bgHashJpg = await hashBase64URI(background.source.jpg);
       images.set(bgHashJpg, background.source.jpg);
       background.source.jpg = bgHashJpg;
+    } else {
+      images.set(background.source.jpg, background.source.jpg);
     }
     if (background.source.webm?.startsWith("data:")) {
       const bgHashWebm = await hashBase64URI(background.source.webm);
       videos.set(bgHashWebm, background.source.webm);
       background.source.webm = bgHashWebm;
+    } else if (background.source.webm) {
+      videos.set(background.source.webm, background.source.webm);
     }
   }
 
@@ -299,6 +303,8 @@ export const extractNovelAssets = async (
       const songHash = await hashBase64URI(song.source);
       audios.set(songHash, song.source);
       song.source = songHash;
+    } else {
+      audios.set(song.source, song.source);
     }
   }
 
@@ -308,16 +314,22 @@ export const extractNovelAssets = async (
       const mapHashPng = await hashBase64URI(map.source.png);
       images.set(mapHashPng, map.source.png);
       map.source.png = mapHashPng;
+    } else {
+      images.set(map.source.png, map.source.png);
     }
     if (map.source.webm?.startsWith("data:")) {
       const mapHashWebm = await hashBase64URI(map.source.webm);
       videos.set(mapHashWebm, map.source.webm);
       map.source.webm = mapHashWebm;
+    } else if (map.source.webm) {
+      videos.set(map.source.webm, map.source.webm);
     }
     if (map.source.music?.startsWith("data:")) {
       const mapMusicHash = await hashBase64URI(map.source.music);
       audios.set(mapMusicHash, map.source.music);
       map.source.music = mapMusicHash;
+    } else if (map.source.music) {
+      audios.set(map.source.music, map.source.music);
     }
 
     for (const place of map.places) {
@@ -325,11 +337,15 @@ export const extractNovelAssets = async (
         const placePreviewHash = await hashBase64URI(place.previewSource);
         images.set(placePreviewHash, place.previewSource);
         place.previewSource = placePreviewHash;
+      } else {
+        images.set(place.previewSource, place.previewSource);
       }
       if (place.maskSource.startsWith("data:")) {
         const placeMaskHash = await hashBase64URI(place.maskSource);
         images.set(placeMaskHash, place.maskSource);
         place.maskSource = placeMaskHash;
+      } else if (place.maskSource) {
+        images.set(place.maskSource, place.maskSource);
       }
     }
   }
@@ -339,6 +355,8 @@ export const extractNovelAssets = async (
     const logoPicHash = await hashBase64URI(novel.logoPic);
     images.set(logoPicHash, novel.logoPic);
     novel.logoPic = logoPicHash;
+  } else {
+    images.set(novel.logoPic, novel.logoPic);
   }
 
   // process characters
@@ -347,6 +365,8 @@ export const extractNovelAssets = async (
       const profilePicHash = await hashBase64URI(character.profile_pic);
       images.set(profilePicHash, character.profile_pic);
       character.profile_pic = profilePicHash;
+    } else {
+      images.set(character.profile_pic, character.profile_pic);
     }
 
     if (
@@ -360,6 +380,11 @@ export const extractNovelAssets = async (
         character.card.data.extensions.mikugg_v2.profile_pic
       );
       character.card.data.extensions.mikugg_v2.profile_pic = profilePicHash;
+    } else {
+      images.set(
+        character.card.data.extensions.mikugg_v2.profile_pic,
+        character.card.data.extensions.mikugg_v2.profile_pic
+      );
     }
 
     // process character outfits
@@ -369,16 +394,22 @@ export const extractNovelAssets = async (
           const emotionPngHash = await hashBase64URI(emotion.sources.png);
           images.set(emotionPngHash, emotion.sources.png);
           emotion.sources.png = emotionPngHash;
+        } else {
+          images.set(emotion.sources.png, emotion.sources.png);
         }
         if (emotion.sources.webm && isDataUri(emotion.sources.webm)) {
           const emotionWebmHash = await hashBase64URI(emotion.sources.webm);
           videos.set(emotionWebmHash, emotion.sources.webm);
           emotion.sources.webm = emotionWebmHash;
+        } else if (emotion.sources.webm) {
+          videos.set(emotion.sources.webm, emotion.sources.webm);
         }
         if (emotion.sources.sound && isDataUri(emotion.sources.sound)) {
           const emotionSoundHash = await hashBase64URI(emotion.sources.sound);
           audios.set(emotionSoundHash, emotion.sources.sound);
           emotion.sources.sound = emotionSoundHash;
+        } else if (emotion.sources.sound) {
+          audios.set(emotion.sources.sound, emotion.sources.sound);
         }
       }
     }

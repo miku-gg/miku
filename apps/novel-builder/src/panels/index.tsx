@@ -5,8 +5,14 @@ import StartsPanel from "./starts/StartsPanel";
 import PreviewPanel from "./preview/PreviewPanel";
 import HomePanel from "./HomePanel";
 import { useAppDispatch, useAppSelector } from "../state/store";
-import { isPanelType, navigatePanel } from "../state/slices/inputSlice";
+import {
+  closeModal,
+  isPanelType,
+  navigatePanel,
+  openModal,
+} from "../state/slices/inputSlice";
 import { downloadNovelState } from "../libs/utils";
+import config from "../config";
 
 function PanelExplorer() {
   const novel = useAppSelector((state) => state.novel);
@@ -38,11 +44,23 @@ function PanelExplorer() {
           },
         ]}
         selected={selectedPanel}
-        onButtonClick={(value) => {
+        onButtonClick={async (value) => {
           if (isPanelType(value)) {
             dispatch(navigatePanel(value));
           } else if (value === "save") {
-            downloadNovelState(novel);
+            await downloadNovelState(
+              novel,
+              config.genAssetLink,
+              (text: string) => {
+                dispatch(
+                  openModal({
+                    modalType: "loading",
+                    text,
+                  })
+                );
+              }
+            );
+            dispatch(closeModal({ modalType: "loading" }));
           }
         }}
       />

@@ -1,0 +1,16 @@
+.LoadingModal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+
+  .Loader {
+    left: 0;
+  }
+
+  .Loader__spin {
+    width: 32px;
+    height: 32px;
+  }
+}
