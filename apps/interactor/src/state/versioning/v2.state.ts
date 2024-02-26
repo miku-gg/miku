@@ -126,11 +126,13 @@ export interface SettingsState {
   user: {
     name: string
     isPremium: boolean
+    settingsTab: 'general' | 'prompt' | 'audio'
   }
   text: {
     speed: Speed
     fontSize: FontSize
     autoContinue: boolean
+    systemPrompt: string
   }
   voice: {
     autoplay: boolean

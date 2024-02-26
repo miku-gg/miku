@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
-  Voices,
-  ModelType,
   FontSize,
-  Speed,
+  ModelType,
   SettingsState,
+  Speed,
+  Voices,
 } from '../versioning'
 
-export { Voices, ModelType, FontSize, Speed } from '../versioning'
+export { FontSize, ModelType, Speed, Voices } from '../versioning'
 
 export type { SettingsState } from '../versioning'
 
@@ -16,11 +16,13 @@ export const initialState: SettingsState = {
   user: {
     name: 'Anon',
     isPremium: false,
+    settingsTab: 'general',
   },
   text: {
     speed: Speed.Normal,
     fontSize: FontSize.Medium,
     autoContinue: false,
+    systemPrompt: '',
   },
   voice: {
     autoplay: false,
@@ -58,6 +60,15 @@ export const settingSlice = createSlice({
     },
     setName: (state, action: PayloadAction<string>) => {
       state.user.name = action.payload
+    },
+    setSettingsTab: (
+      state,
+      action: PayloadAction<'general' | 'prompt' | 'audio'>
+    ) => {
+      state.user.settingsTab = action.payload
+    },
+    setSystemPrompt: (state, action: PayloadAction<string>) => {
+      state.text.systemPrompt = action.payload
     },
     setFontSize: (state, action: PayloadAction<FontSize>) => {
       state.text.fontSize = action.payload
@@ -118,9 +129,11 @@ export const {
   setSettings,
   setModel,
   setName,
+  setSystemPrompt,
   setFontSize,
   setSpeed,
   setAutoContinue,
+  setSettingsTab,
   setVoiceAutoplay,
   setVoiceSpeed,
   setVoiceId,

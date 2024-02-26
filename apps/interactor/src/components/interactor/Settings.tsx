@@ -1,7 +1,6 @@
 import { CheckBox, Dropdown, Modal, Slider, TextEditable } from '@mikugg/ui-kit'
 import { MdRecordVoiceOver } from 'react-icons/md'
 import { SlSettings } from 'react-icons/sl'
-import { useAppDispatch, useAppSelector } from '../../state/store'
 import {
   FontSize,
   Speed,
@@ -9,17 +8,21 @@ import {
   setFontSize,
   setName,
   setSettingsModal,
+  setSettingsTab,
   setSpeed,
+  setSystemPrompt,
   setVoiceAutoplay,
   setVoiceId,
-  setVoiceSpeed
+  setVoiceSpeed,
 } from '../../state/slices/settingsSlice'
+import { useAppDispatch, useAppSelector } from '../../state/store'
 import './Settings.scss'
 const audio = new Audio()
 
 const Settings = (): JSX.Element => {
   const dispatch = useAppDispatch()
   const settings = useAppSelector((state) => state.settings)
+  const settingsTab = useAppSelector((state) => state.settings.user.settingsTab)
 
   const voiceItems = [
     {
@@ -65,133 +68,172 @@ const Settings = (): JSX.Element => {
         onCloseModal={() => dispatch(setSettingsModal(false))}
         shouldCloseOnOverlayClick
       >
+        <div className="SettingsModal__header">Settings</div>
+        <div className="SettingsModal__navigation">
+          <button
+            className={`SettingsModal__navigation__button ${
+              settingsTab === 'general' ? 'selected' : ''
+            }`}
+            onClick={() => dispatch(setSettingsTab('general'))}
+          >
+            General
+          </button>
+          <button
+            className={`SettingsModal__navigation__button ${
+              settingsTab === 'prompt' ? 'selected' : ''
+            }`}
+            onClick={() => dispatch(setSettingsTab('prompt'))}
+          >
+            Prompt
+          </button>
+        </div>
         <div className="SettingsModal scrollbar">
-          <div className="SettingsModal__header">Settings</div>
-          <div className="SettingsModal__name">
-            <TextEditable
-              label="Your name"
-              value={settings.user.name}
-              onChange={(event) => dispatch(setName(event.target.value))}
-            />
-          </div>
-          <div className="SettingsModal__text-speed">
-            <p>Text Animation Speed</p>
-            <Slider
-              value={settings.text.speed}
-              onChange={(value) => dispatch(setSpeed(value as Speed))}
-              steps={[
-                {
-                  label: 'Slow',
-                  value: Speed.Slow,
-                },
-                {
-                  label: 'Normal',
-                  value: Speed.Normal,
-                },
-                {
-                  label: 'Fast',
-                  value: Speed.Fast,
-                },
-                {
-                  label: 'Presto',
-                  value: Speed.Presto,
-                },
-              ]}
-            />
-          </div>
-          <div className="SettingsModal__text-font-size">
-            <p>Text Font Size</p>
-            <Slider
-              value={settings.text.fontSize}
-              onChange={(value) => dispatch(setFontSize(value as FontSize))}
-              steps={[
-                {
-                  label: 'Small',
-                  value: FontSize.Small,
-                },
-                {
-                  label: 'Normal',
-                  value: FontSize.Medium,
-                },
-                {
-                  label: 'Large',
-                  value: FontSize.Large,
-                },
-              ]}
-            />
-          </div>
-          <div className="SettingsModal__voice">
-            <div className="SettingsModal__voice-header">
-              <div className="SettingsModal__voice-header-title">
-                <div className="SettingsModal__voice-title">
-                  Narration Voice
-                </div>
-                <div className="SettingsModal__voice-description">
-                  Enhances the experience by adding a narration voice audio to
-                  every response. This feature is only avalable for premium
-                  users.
-                </div>
+          {settingsTab === 'prompt' && (
+            <>
+              <div className="SettingsModal__name">
+                <TextEditable
+                  label="Your name"
+                  value={settings.user.name}
+                  onChange={(event) => dispatch(setName(event.target.value))}
+                />
               </div>
-              <div className="SettingsModal__voice-enabled">
-                <CheckBox
-                  label="Autoplay"
-                  value={settings.voice.autoplay}
+              <div className="SettingsModal__systemPrompt">
+                <label>Custom system prompt</label>
+                <textarea
+                  placeholder="Add your memorable data, example: (it's my teacher)"
+                  rows={5}
+                  value={settings.text.systemPrompt}
                   onChange={(event) =>
-                    dispatch(setVoiceAutoplay(event.target.checked))
+                    dispatch(setSystemPrompt(event.target.value))
                   }
                 />
               </div>
-            </div>
-            <div className="SettingsModal__voice-id">
-              <p>Voice ID</p>
-              <div className="SettingsModal__voice-id-input">
-                <div
-                  className="SettingsModal__voice-id-listen"
-                  onClick={() => {
-                    audio.src = `https://assets.miku.gg/${settings.voice.voiceId}.mp3`
-                    audio.play()
-                  }}
-                  tabIndex={0}
-                >
-                  <MdRecordVoiceOver />
+            </>
+          )}
+          {settingsTab === 'general' && (
+            <>
+              <div className="SettingsModal__text-speed">
+                <p>Text Animation Speed</p>
+                <Slider
+                  value={settings.text.speed}
+                  onChange={(value) => dispatch(setSpeed(value as Speed))}
+                  steps={[
+                    {
+                      label: 'Slow',
+                      value: Speed.Slow,
+                    },
+                    {
+                      label: 'Normal',
+                      value: Speed.Normal,
+                    },
+                    {
+                      label: 'Fast',
+                      value: Speed.Fast,
+                    },
+                    {
+                      label: 'Presto',
+                      value: Speed.Presto,
+                    },
+                  ]}
+                />
+              </div>
+              <div className="SettingsModal__text-font-size">
+                <p>Text Font Size</p>
+                <Slider
+                  value={settings.text.fontSize}
+                  onChange={(value) => dispatch(setFontSize(value as FontSize))}
+                  steps={[
+                    {
+                      label: 'Small',
+                      value: FontSize.Small,
+                    },
+                    {
+                      label: 'Normal',
+                      value: FontSize.Medium,
+                    },
+                    {
+                      label: 'Large',
+                      value: FontSize.Large,
+                    },
+                  ]}
+                />
+              </div>
+              <div className="SettingsModal__voice">
+                <div className="SettingsModal__voice-header">
+                  <div className="SettingsModal__voice-header-title">
+                    <div className="SettingsModal__voice-title">
+                      Narration Voice
+                    </div>
+                    <div className="SettingsModal__voice-description">
+                      Enhances the experience by adding a narration voice audio
+                      to every response. This feature is only avalable for
+                      premium users.
+                    </div>
+                  </div>
+                  <div className="SettingsModal__voice-enabled">
+                    <CheckBox
+                      label="Autoplay"
+                      value={settings.voice.autoplay}
+                      onChange={(event) =>
+                        dispatch(setVoiceAutoplay(event.target.checked))
+                      }
+                    />
+                  </div>
                 </div>
-                <Dropdown
-                  selectedIndex={voiceItems.findIndex(
-                    (item) => item.value === settings.voice.voiceId
-                  )}
-                  onChange={(index) =>
-                    dispatch(setVoiceId(voiceItems[index].value))
-                  }
-                  items={voiceItems}
-                />
+                <div className="SettingsModal__voice-id">
+                  <p>Voice ID</p>
+                  <div className="SettingsModal__voice-id-input">
+                    <div
+                      className="SettingsModal__voice-id-listen"
+                      onClick={() => {
+                        audio.src = `https://assets.miku.gg/${settings.voice.voiceId}.mp3`
+                        audio.play()
+                      }}
+                      tabIndex={0}
+                    >
+                      <MdRecordVoiceOver />
+                    </div>
+                    <Dropdown
+                      selectedIndex={voiceItems.findIndex(
+                        (item) => item.value === settings.voice.voiceId
+                      )}
+                      onChange={(index) =>
+                        dispatch(setVoiceId(voiceItems[index].value))
+                      }
+                      items={voiceItems}
+                    />
+                  </div>
+                </div>
+                <div className="SettingsModal__voice-speed">
+                  <p>Reading speed</p>
+                  <Slider
+                    value={settings.voice.speed}
+                    onChange={(value) =>
+                      dispatch(setVoiceSpeed(value as Speed))
+                    }
+                    steps={[
+                      {
+                        label: 'Slow',
+                        value: Speed.Slow,
+                      },
+                      {
+                        label: 'Normal',
+                        value: Speed.Normal,
+                      },
+                      {
+                        label: 'Fast',
+                        value: Speed.Fast,
+                      },
+                      {
+                        label: 'Presto',
+                        value: Speed.Presto,
+                      },
+                    ]}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="SettingsModal__voice-speed">
-              <p>Reading speed</p>
-              <Slider
-                value={settings.voice.speed}
-                onChange={(value) => dispatch(setVoiceSpeed(value as Speed))}
-                steps={[
-                  {
-                    label: 'Slow',
-                    value: Speed.Slow,
-                  },
-                  {
-                    label: 'Normal',
-                    value: Speed.Normal,
-                  },
-                  {
-                    label: 'Fast',
-                    value: Speed.Fast,
-                  },
-                  {
-                    label: 'Presto',
-                    value: Speed.Presto,
-                  },
-                ]}
-              />
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </Modal>
     </div>

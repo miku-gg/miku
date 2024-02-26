@@ -1,10 +1,11 @@
 $primary-background-color: #ffffff11;
 $secondary-background-color: #ffffff22;
+$primary-color: #9747ff;
 $font-color-light-gray: lightgray;
 $font-size-small: 0.8rem;
 $border-radius: 8px;
 $gap: 10px;
-$margin: 15px 0;
+$margin: 0 0 15px 0;
 $padding-standard: 20px 15px;
 $flex-wrap-gap: 10px;
 
@@ -16,10 +17,29 @@ $flex-wrap-gap: 10px;
   padding: 10px 20px;
   overflow: auto;
 
+  &__navigation {
+    display: flex;
+    align-items: center;
+    gap: $gap;
+    margin-left: 10px;
+    margin-top: 10px;
+
+    &__button {
+      color: $font-color-light-gray;
+      padding: 4px 3px;
+    }
+    .selected {
+      text-decoration: underline;
+      text-decoration-color: $primary-color;
+      text-decoration-thickness: 2px;
+    }
+  }
+
   &__name,
   &__text-speed,
   &__text-font-size,
-  &__voice {
+  &__voice,
+  &__systemPrompt {
     padding: $padding-standard;
     background-color: $primary-background-color;
     border-radius: $border-radius;
@@ -103,5 +123,48 @@ $flex-wrap-gap: 10px;
   .slider-container {
     flex: 2;
     min-width: 200px;
+  }
+
+  &__systemPrompt {
+    display: flex;
+    flex-direction: column;
+
+    & label {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: #6c7293;
+      margin-bottom: 0.5rem;
+    }
+
+    & textarea {
+      width: 100%;
+      background: transparent;
+      border: unset;
+      resize: none;
+      border: 1px solid #6c7293;
+      border-radius: $border-radius;
+      padding: 0.5rem;
+      font-size: 0.875rem;
+      color: $font-color-light-gray;
+      height: 100%;
+
+      &::placeholder {
+        font-style: italic;
+      }
+      &::-webkit-scrollbar {
+        width: 3px; /* Ancho del scrollbar */
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: $primary-color;
+        border-radius: 5px;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 2px rgba(151, 71, 255, 0.3);
+      }
+    }
   }
 }
