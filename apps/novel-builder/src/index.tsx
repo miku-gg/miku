@@ -13,6 +13,7 @@ import SongSearchModal from "./modals/SongSearchModal";
 import CharacterEditModal from "./modals/character/CharacterEditModal";
 import SceneEditModal from "./modals/scene/SceneEditModal";
 import LoadingModal from "./modals/LoadingModal";
+import "react-toastify/dist/ReactToastify.css";
 
 ReactDOM.render(
   <React.StrictMode>

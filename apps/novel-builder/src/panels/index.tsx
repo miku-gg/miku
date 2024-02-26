@@ -13,6 +13,7 @@ import {
 } from "../state/slices/inputSlice";
 import { downloadNovelState } from "../libs/utils";
 import config from "../config";
+import { toast } from "react-toastify";
 
 function PanelExplorer() {
   const novel = useAppSelector((state) => state.novel);
@@ -48,18 +49,22 @@ function PanelExplorer() {
           if (isPanelType(value)) {
             dispatch(navigatePanel(value));
           } else if (value === "save") {
-            await downloadNovelState(
-              novel,
-              config.genAssetLink,
-              (text: string) => {
-                dispatch(
-                  openModal({
-                    modalType: "loading",
-                    text,
-                  })
-                );
-              }
-            );
+            try {
+              await downloadNovelState(
+                novel,
+                config.genAssetLink,
+                (text: string) => {
+                  dispatch(
+                    openModal({
+                      modalType: "loading",
+                      text,
+                    })
+                  );
+                }
+              );
+            } catch (e) {
+              toast.error("Failed to save novel");
+            }
             dispatch(closeModal({ modalType: "loading" }));
           }
         }}

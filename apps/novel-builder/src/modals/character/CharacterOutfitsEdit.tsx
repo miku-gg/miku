@@ -17,6 +17,9 @@ import AudioPreview from "../../components/AudioPreview";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import { updateCharacter } from "../../state/slices/novelFormSlice";
 import { MikuCardV2 } from "@mikugg/bot-utils";
+import config from "../../config";
+import "./CharacterOutfitsEdit.scss";
+import { toast } from "react-toastify";
 
 interface EmotionGroup {
   id: string;
@@ -145,79 +148,77 @@ export default function CharacterOutfitsEdit({
     isAudio?: boolean
   ) => {
     if (file) {
-      const reader = new FileReader();
+      const { assetId, success } = await config.uploadAsset(file);
+      if (!success) {
+        toast.warn("Failed to upload asset");
+        return;
+      }
+      const newGroups = [...outfits];
+      const emotionTemplate = emotionTemplates.find(
+        (template) => template.id === newGroups[groupIndex].template
+      );
 
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
-        const newGroups = [...outfits];
-        const emotionTemplate = emotionTemplates.find(
-          (template) => template.id === newGroups[groupIndex].template
-        );
+      if (emotionTemplate?.emotionIds.includes(emotionId) === false) {
+        console.warn(`Invalid emotion id: ${emotionId}`);
+        return;
+      }
 
-        if (emotionTemplate?.emotionIds.includes(emotionId) === false) {
-          console.warn(`Invalid emotion id: ${emotionId}`);
-          return;
+      const emotions = [...newGroups[groupIndex].emotions] || [];
+      const emotionIndex = emotions.findIndex((img) => img.id === emotionId);
+
+      if (isAudio) {
+        if (emotionIndex >= 0) {
+          emotions[emotionIndex] = {
+            ...emotions[emotionIndex],
+            sources: {
+              ...emotions[emotionIndex].sources,
+              sound: assetId,
+            },
+          };
         }
-
-        const emotions = [...newGroups[groupIndex].emotions] || [];
-        const emotionIndex = emotions.findIndex((img) => img.id === emotionId);
-
-        if (isAudio) {
-          if (emotionIndex >= 0) {
-            emotions[emotionIndex] = {
-              ...emotions[emotionIndex],
-              sources: {
-                ...emotions[emotionIndex].sources,
-                sound: base64,
-              },
-            };
-          }
-        } else if (file.type === "video/webm") {
-          if (emotionIndex >= 0) {
-            emotions[emotionIndex] = {
-              ...emotions[emotionIndex],
-              sources: {
-                ...emotions[emotionIndex].sources,
-                webm: base64,
-              },
-            };
-          } else {
-            emotions.push({
-              id: emotionId,
-              sources: {
-                png: "",
-                webm: base64,
-              },
-            });
-          }
+      } else if (file.type === "video/webm") {
+        if (emotionIndex >= 0) {
+          emotions[emotionIndex] = {
+            ...emotions[emotionIndex],
+            sources: {
+              ...emotions[emotionIndex].sources,
+              webm: assetId,
+            },
+          };
         } else {
-          if (emotionIndex >= 0) {
-            emotions[emotionIndex] = {
-              ...emotions[emotionIndex],
-              sources: {
-                ...emotions[emotionIndex].sources,
-                png: base64,
-              },
-            };
-          } else {
-            emotions.push({
-              id: emotionId,
-              sources: {
-                png: base64,
-              },
-            });
-          }
+          emotions.push({
+            id: emotionId,
+            sources: {
+              png: "",
+              webm: assetId,
+            },
+          });
         }
+      } else {
+        if (emotionIndex >= 0) {
+          emotions[emotionIndex] = {
+            ...emotions[emotionIndex],
+            sources: {
+              ...emotions[emotionIndex].sources,
+              png: assetId,
+            },
+          };
+        } else {
+          emotions.push({
+            id: emotionId,
+            sources: {
+              png: assetId,
+            },
+          });
+        }
+      }
 
-        newGroups[groupIndex] = {
-          ...newGroups[groupIndex],
-          emotions,
-        };
-
-        dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
+      newGroups[groupIndex] = {
+        ...newGroups[groupIndex],
+        emotions,
       };
 
-      reader.readAsDataURL(file);
+      dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
     }
   };
   const handleMultipleImageChange = (
@@ -248,7 +249,7 @@ export default function CharacterOutfitsEdit({
 
           return (
             <div
-              className="step2Assets__emotionPreview"
+              className="CharacterOutfitsEdit__emotionPreview"
               key={`emotion_${emotionId}_group_${group.template}_${groupIndex}`}
             >
               <DragAndDropImages
@@ -262,7 +263,13 @@ export default function CharacterOutfitsEdit({
                     file.type === "audio/mpeg"
                   );
                 }}
-                previewImage={emotion?.sources.webm || emotion?.sources.png}
+                previewImage={
+                  emotion?.sources.webm || emotion?.sources.png
+                    ? config.genAssetLink(
+                        emotion?.sources.webm || emotion?.sources.png
+                      )
+                    : undefined
+                }
                 placeHolder="(1024x1024)"
                 errorMessage="Please upload PNG, GIF or WEBM."
                 onFileValidate={(file) =>
@@ -275,8 +282,10 @@ export default function CharacterOutfitsEdit({
                 }
               />
               {emotion?.sources.sound ? (
-                <div className="step2Assets__audioPreview">
-                  <AudioPreview src={emotion?.sources.sound} />
+                <div className="CharacterOutfitsEdit__audioPreview">
+                  <AudioPreview
+                    src={config.genAssetLink(emotion?.sources.sound)}
+                  />
                 </div>
               ) : null}
             </div>
@@ -288,9 +297,9 @@ export default function CharacterOutfitsEdit({
         <AccordionItem
           title={`Emotion Group ${groupIndex + 1}`}
           key={`group_${groupIndex}`}
-          className="step2Assets__group"
+          className="CharacterOutfitsEdit__group"
         >
-          <div className="step2Assets__formGroup">
+          <div className="CharacterOutfitsEdit__formGroup">
             <Input
               label="Name:"
               placeHolder="Enter a name for this emotion group"
@@ -302,7 +311,7 @@ export default function CharacterOutfitsEdit({
               }
             />
           </div>
-          <div className="step2Assets__formGroup">
+          <div className="CharacterOutfitsEdit__formGroup">
             <input
               type="file"
               multiple
@@ -310,7 +319,7 @@ export default function CharacterOutfitsEdit({
               onChange={(event) => handleMultipleImageChange(event, groupIndex)}
             />
           </div>
-          <div className="step2Assets__formGroup">
+          <div className="CharacterOutfitsEdit__formGroup">
             <label htmlFor={`group_${groupIndex}_emotionsHash`}>
               Emotion Set:
             </label>
@@ -322,7 +331,9 @@ export default function CharacterOutfitsEdit({
               selectedIndex={getDropdownEmotionTemplateIndex(groupIndex)}
             />
           </div>
-          <div className="step2Assets__emotions">{renderEmotionImages()}</div>
+          <div className="CharacterOutfitsEdit__emotions">
+            {renderEmotionImages()}
+          </div>
         </AccordionItem>
       );
     });
