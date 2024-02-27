@@ -126,13 +126,14 @@ export interface SettingsState {
   user: {
     name: string
     isPremium: boolean
-    settingsTab: 'general' | 'prompt' | 'audio'
+  }
+  prompt: {
+    systemPrompt: string
   }
   text: {
     speed: Speed
     fontSize: FontSize
     autoContinue: boolean
-    systemPrompt: string
   }
   voice: {
     autoplay: boolean
@@ -145,6 +146,7 @@ export interface SettingsState {
   }
   modals: {
     settings: boolean
+    settingsTab: 'general' | 'prompt' | 'audio'
     about: boolean
     history: boolean
     edit: {

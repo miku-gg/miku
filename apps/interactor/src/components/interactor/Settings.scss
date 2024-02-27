@@ -1,6 +1,7 @@
 $primary-background-color: #ffffff11;
 $secondary-background-color: #ffffff22;
 $primary-color: #9747ff;
+$secondary-color: #5f6388;
 $font-color-light-gray: lightgray;
 $font-size-small: 0.8rem;
 $border-radius: 8px;
@@ -21,8 +22,8 @@ $flex-wrap-gap: 10px;
     display: flex;
     align-items: center;
     gap: $gap;
-    margin-left: 10px;
-    margin-top: 10px;
+    margin-left: $gap;
+    margin-top: $gap;
 
     &__button {
       color: $font-color-light-gray;
@@ -126,45 +127,16 @@ $flex-wrap-gap: 10px;
   }
 
   &__systemPrompt {
-    display: flex;
-    flex-direction: column;
+    &__count {
+      line-height: 1.25rem;
+      font-weight: 500;
+      font-size: 0.679rem;
+      color: $secondary-color;
 
-    & label {
-      font-size: 0.75rem;
-      font-weight: 400;
-      color: #6c7293;
-      margin-bottom: 0.5rem;
+      text-align: end;
     }
-
     & textarea {
-      width: 100%;
-      background: transparent;
-      border: unset;
       resize: none;
-      border: 1px solid #6c7293;
-      border-radius: $border-radius;
-      padding: 0.5rem;
-      font-size: 0.875rem;
-      color: $font-color-light-gray;
-      height: 100%;
-
-      &::placeholder {
-        font-style: italic;
-      }
-      &::-webkit-scrollbar {
-        width: 3px; /* Ancho del scrollbar */
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background-color: $primary-color;
-        border-radius: 5px;
-      }
-
-      &:focus {
-        outline: none;
-        border-color: $primary-color;
-        box-shadow: 0 0 0 2px rgba(151, 71, 255, 0.3);
-      }
     }
   }
 }

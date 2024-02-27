@@ -1,4 +1,4 @@
-import { CheckBox, Dropdown, Modal, Slider, TextEditable } from '@mikugg/ui-kit'
+import { CheckBox, Dropdown, Input, Modal, Slider } from '@mikugg/ui-kit'
 import { MdRecordVoiceOver } from 'react-icons/md'
 import { SlSettings } from 'react-icons/sl'
 import {
@@ -22,7 +22,13 @@ const audio = new Audio()
 const Settings = (): JSX.Element => {
   const dispatch = useAppDispatch()
   const settings = useAppSelector((state) => state.settings)
-  const settingsTab = useAppSelector((state) => state.settings.user.settingsTab)
+  const settingsTab = useAppSelector(
+    (state) => state.settings.modals.settingsTab
+  )
+  const currentSystemPromptLenght = useAppSelector(
+    (state) => state.settings.prompt.systemPrompt.length
+  )
+  const systemPromptMaxLenght = 800
 
   const voiceItems = [
     {
@@ -91,22 +97,27 @@ const Settings = (): JSX.Element => {
           {settingsTab === 'prompt' && (
             <>
               <div className="SettingsModal__name">
-                <TextEditable
+                <Input
                   label="Your name"
                   value={settings.user.name}
                   onChange={(event) => dispatch(setName(event.target.value))}
                 />
               </div>
               <div className="SettingsModal__systemPrompt">
-                <label>Custom system prompt</label>
-                <textarea
-                  placeholder="Add your memorable data, example: (it's my teacher)"
-                  rows={5}
-                  value={settings.text.systemPrompt}
+                <Input
+                  className="SettingsModal__systemPrompt__input"
+                  isTextArea
+                  maxLength={systemPromptMaxLenght}
+                  label="Custom system prompt"
+                  placeHolder={`Add information to always be remembered. For Example: Anon is Miku's student.`}
+                  value={settings.prompt.systemPrompt}
                   onChange={(event) =>
                     dispatch(setSystemPrompt(event.target.value))
                   }
                 />
+                <p className='SettingsModal__systemPrompt__count'>
+                  {currentSystemPromptLenght}/{systemPromptMaxLenght}
+                </p>
               </div>
             </>
           )}

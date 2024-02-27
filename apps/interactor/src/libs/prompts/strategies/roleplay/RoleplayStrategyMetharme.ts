@@ -40,8 +40,8 @@ export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
       }
     }
 
-    if (state.settings.text.systemPrompt !== '') {
-      template += `\n${state.settings.text.systemPrompt}\n`
+    if (state.settings.prompt.systemPrompt) {
+      template += `\n${state.settings.prompt.systemPrompt}\n`
     }
 
     template += `\nThen the roleplay chat between ${roleTemplates.join(

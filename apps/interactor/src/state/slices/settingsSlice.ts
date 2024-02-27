@@ -16,13 +16,14 @@ export const initialState: SettingsState = {
   user: {
     name: 'Anon',
     isPremium: false,
-    settingsTab: 'general',
+  },
+  prompt: {
+    systemPrompt: '',
   },
   text: {
     speed: Speed.Normal,
     fontSize: FontSize.Medium,
     autoContinue: false,
-    systemPrompt: '',
   },
   voice: {
     autoplay: false,
@@ -35,6 +36,7 @@ export const initialState: SettingsState = {
   },
   modals: {
     settings: false,
+    settingsTab: 'general',
     about: false,
     history: false,
     edit: {
@@ -65,10 +67,10 @@ export const settingSlice = createSlice({
       state,
       action: PayloadAction<'general' | 'prompt' | 'audio'>
     ) => {
-      state.user.settingsTab = action.payload
+      state.modals.settingsTab = action.payload
     },
     setSystemPrompt: (state, action: PayloadAction<string>) => {
-      state.text.systemPrompt = action.payload
+      state.prompt.systemPrompt = action.payload
     },
     setFontSize: (state, action: PayloadAction<FontSize>) => {
       state.text.fontSize = action.payload
