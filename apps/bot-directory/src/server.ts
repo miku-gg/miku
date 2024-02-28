@@ -8,7 +8,12 @@ import fs from "fs";
 import config from "./config";
 import open from "open";
 import s3ServerDecorator, { BUCKET, getS3File } from "./s3server";
-import { EMPTY_MIKU_CARD, MikuCard } from "@mikugg/bot-utils";
+import {
+  EMPTY_MIKU_CARD,
+  MikuCard,
+  NovelV3,
+  inputToNovelState,
+} from "@mikugg/bot-utils";
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "../../.env") });
 
@@ -39,26 +44,34 @@ app.get("/", (req, res) => {
     const files = (
       await Promise.all(
         _files.map(async (file) => {
-          const data = JSON.parse(
+          if (file === ".gitkeep") return null;
+          const _data = JSON.parse(
             getS3File(BUCKET.BOTS, file)?.toString("utf-8") || "{}"
-          ) as MikuCard;
+          ) as { novel: NovelV3.NovelState; version: "v3" };
 
-          return {
-            ...data,
-            hash: file,
-          };
+          try {
+            const data = inputToNovelState(_data);
+
+            return {
+              ...data,
+              hash: file,
+            };
+          } catch (e) {
+            console.error(e);
+            return null;
+          }
         })
       )
     ).filter(
       (x) =>
-        x?.spec === "chara_card_v2" &&
-        x?.data?.extensions?.mikugg?.scenarios?.length &&
-        x?.data?.extensions?.mikugg?.profile_pic &&
-        x?.data?.extensions?.mikugg?.backgrounds?.length &&
-        x?.data?.extensions?.mikugg?.emotion_groups?.length
+        x?.version === "v3" &&
+        x?.novel?.scenes?.length &&
+        x?.novel?.logoPic &&
+        x?.novel?.backgrounds?.length &&
+        x?.novel?.characters?.length
     );
 
-    res.render("index", { bots: files });
+    res.render("index", { novels: files });
   });
 });
 

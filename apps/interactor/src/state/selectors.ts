@@ -39,9 +39,8 @@ export const selectSceneFromResponse = (
         scene.id === state.narration.interactions[interactionId]?.sceneId
     )
   } else {
-    return state.novel.scenes.find(
-      (scene) => scene.id === state.novel.starts[0]?.id
-    )
+    const start = state.novel.starts.find((start) => start.id === response?.id)
+    return state.novel.scenes.find((scene) => scene.id === start?.sceneId)
   }
 }
 

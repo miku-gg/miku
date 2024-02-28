@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import multer from "multer";
-import express, { Express } from "express";
+import express, { Express, Request, Response } from "express";
 import { BUCKET, hashBase64 } from "@mikugg/bot-utils";
 import sharp from "sharp";
 export { BUCKET } from "@mikugg/bot-utils";
@@ -49,6 +49,66 @@ export function getS3File(bucket: BUCKET, key: string): Buffer | null {
 }
 
 const upload = multer({ storage: multer.memoryStorage() });
+
+export const uploadAssetHandler = async (
+  req: Request,
+  res: Response
+): Promise<string> => {
+  const _fileName = String(req.body.fileName);
+  try {
+    const contentType = String(req.body.contentType);
+    if (!_fileName || !contentType) {
+      res.status(400).send("No fileName or contentType.");
+      return "";
+    }
+    // read file as buffer
+    const filePath = path.join(path.join(dataDir, `assets/${_fileName}`));
+    const fileBuffer = fs.readFileSync(filePath);
+    const fileHash = await hashBase64(fileBuffer.toString("base64"));
+    const fileName = `${fileHash}.${contentType.split("/")[1]}`;
+
+    // change _fileName to fileName
+    fs.renameSync(filePath, path.join(dataDir, `assets/${fileName}`));
+    // Check if the file is an image
+    if (contentType.startsWith("image/")) {
+      let resizedImage;
+
+      if (contentType === "image/gif") {
+        // Handling GIFs: Sharp doesn't support GIF resizing, so we just skip resizing for GIFs
+        resizedImage = fileBuffer;
+      } else {
+        // Resize other image types
+        resizedImage = await sharp(fileBuffer)
+          .resize({ height: 480, fit: "inside", withoutEnlargement: true })
+          // @ts-ignore
+          .toFormat(contentType.split("/")[1], { quality: 70 }) // Adjust quality for supported formats
+          .toBuffer();
+      }
+
+      // Upload the resized image
+      const resizedFileName = `480p_${fileName}`;
+      fs.writeFileSync(
+        path.join(dataDir, `assets/${resizedFileName}`),
+        resizedImage
+      );
+    }
+    res.send({
+      fileName: fileName,
+      fileSize: fileBuffer.length,
+    });
+    return fileName;
+  } catch (err) {
+    console.warn("Error resizing image:", _fileName);
+    console.error(err);
+    res.send({
+      fileName: _fileName,
+      fileSize: 0,
+    });
+    return "";
+  }
+
+  // check file extension
+};
 
 export default function s3ServerDecorator(app: Express): void {
   // for each bucket
@@ -123,57 +183,5 @@ export default function s3ServerDecorator(app: Express): void {
     });
   });
 
-  app.post("/asset-upload/complete", async (req, res) => {
-    const _fileName = String(req.body.fileName);
-    try {
-      const contentType = String(req.body.contentType);
-      if (!_fileName || !contentType) {
-        return res.status(400).send("No fileName or contentType.");
-      }
-      // read file as buffer
-      const filePath = path.join(path.join(dataDir, `assets/${_fileName}`));
-      const fileBuffer = fs.readFileSync(filePath);
-      const fileHash = await hashBase64(fileBuffer.toString("base64"));
-      const fileName = `${fileHash}.${contentType.split("/")[1]}`;
-
-      // change _fileName to fileName
-      fs.renameSync(filePath, path.join(dataDir, `assets/${fileName}`));
-      // Check if the file is an image
-      if (contentType.startsWith("image/")) {
-        let resizedImage;
-
-        if (contentType === "image/gif") {
-          // Handling GIFs: Sharp doesn't support GIF resizing, so we just skip resizing for GIFs
-          resizedImage = fileBuffer;
-        } else {
-          // Resize other image types
-          resizedImage = await sharp(fileBuffer)
-            .resize({ height: 480, fit: "inside", withoutEnlargement: true })
-            // @ts-ignore
-            .toFormat(contentType.split("/")[1], { quality: 70 }) // Adjust quality for supported formats
-            .toBuffer();
-        }
-
-        // Upload the resized image
-        const resizedFileName = `480p_${fileName}`;
-        fs.writeFileSync(
-          path.join(dataDir, `assets/${resizedFileName}`),
-          resizedImage
-        );
-      }
-      res.send({
-        fileName: fileName,
-        fileSize: fileBuffer.length,
-      });
-    } catch (err) {
-      console.warn("Error resizing image:", _fileName);
-      console.error(err);
-      res.send({
-        fileName: _fileName,
-        fileSize: 0,
-      });
-    }
-
-    // check file extension
-  });
+  app.post("/asset-upload/complete", uploadAssetHandler);
 }

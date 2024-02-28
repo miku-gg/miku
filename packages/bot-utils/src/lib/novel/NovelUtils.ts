@@ -119,11 +119,11 @@ export const tavernCardToNovelState = (
             emotion: "happy",
           },
         ],
-        sceneId: mikugg?.start_scenario || "default-scenario",
+        sceneId: mikugg?.start_scenario || "",
       },
     ],
     scenes: mikugg?.scenarios.map((scenario, index) => ({
-      id: scenario.id,
+      id: scenario.id || "",
       backgroundId: scenario.background,
       actionText: scenario.trigger_action,
       name: scenario.name,
@@ -542,7 +542,6 @@ export const importAndReplaceNovelStateAssets = async (
   }
 
   const hashes = await uploadAssetsInBatches();
-  console.log(hashes);
   let novelResult = novelWithReplacedAssets;
   hashes.forEach(({ find, replace }) => {
     novelResult = replaceStringsInObject(novelResult, find, replace);

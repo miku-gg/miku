@@ -8,7 +8,7 @@ import './NovelLoader.scss'
 
 const NovelLoader = (): JSX.Element => {
   const { novelLoader } = useAppContext()
-  const novelFetching = useAppSelector((state) => !!state.novel.author)
+  const novelFetching = useAppSelector((state) => !state.novel.starts.length)
   const dispatch = useAppDispatch()
   useEffect(() => {
     novelLoader().then((state: RootState) => {

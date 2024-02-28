@@ -134,7 +134,7 @@ const HistoryModal = (): ReactElement => {
       // get parent scene
       const parentSceneId = response.parentInteractionId
         ? narration.interactions[response.parentInteractionId]?.sceneId
-        : novel.starts[0]?.id
+        : novel.starts.find((start) => start.id === response.id)?.sceneId
 
       const parentScene = novel.scenes.find(
         (scene) => scene.id === parentSceneId

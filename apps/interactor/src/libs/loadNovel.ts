@@ -36,9 +36,11 @@ export async function loadNovelFromSingleCard({
         novel = _card.novel as NovelState
       }
     }
-    const card = tavernCardToMikuCardV2(_card as TavernCardV2)
-    if (card.spec === 'chara_card_v2') {
-      novel = tavernCardToNovelState(card)
+    if (!novel) {
+      const card = tavernCardToMikuCardV2(_card as TavernCardV2)
+      if (card.spec === 'chara_card_v2') {
+        novel = tavernCardToNovelState(card)
+      }
     }
 
     if (!novel) {
@@ -53,7 +55,7 @@ export async function loadNovelFromSingleCard({
     const start = novel.starts[0]
     const narration: NarrationState = {
       fetching: false,
-      currentResponseId: cardId,
+      currentResponseId: start.id,
       id: randomUUID(),
       input: {
         text: '',
@@ -62,8 +64,8 @@ export async function loadNovelFromSingleCard({
       },
       interactions: {},
       responses: {
-        [cardId]: {
-          id: cardId,
+        [start.id]: {
+          id: start.id,
           parentInteractionId: null,
           selectedCharacterId: start.characters[0].characterId,
           characters: start.characters,
@@ -97,11 +99,15 @@ export async function loadNovelFromSingleCard({
 
     // await all assets load dummy fetch
     if (assetsEndpoint) {
-      await Promise.all(
-        Array.from(assets).map((asset) =>
-          axios.get(`${assetsEndpoint}/${asset}`)
+      try {
+        await Promise.all(
+          Array.from(assets).map((asset) =>
+            axios.get(`${assetsEndpoint}/${asset}`)
+          )
         )
-      )
+      } catch (error) {
+        console.error(error)
+      }
     }
 
     return {
