@@ -1,7 +1,7 @@
 import {
   EMOTION_GROUP_TEMPLATES,
   EMPTY_MIKU_CARD,
-  MikuCard,
+  TavernCardV2,
 } from '@mikugg/bot-utils'
 import { RootState } from '../../../../state/store'
 import {
@@ -21,13 +21,13 @@ const EMOTION_TOKEN_OFFSET = 4
 export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
   {
     state: RootState
-    currentRole: string
+    currentCharacterId: string
   },
   NarrationResponse
 > {
   protected abstract getContextPrompt(
     state: RootState,
-    currentRole: string
+    currentCharacterId: string
   ): string
 
   protected abstract template(): {
@@ -42,41 +42,43 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     memorySize: number,
     input: {
       state: RootState
-      currentRole: string
+      currentCharacterId: string
     }
   ): {
     template: string
     variables: Record<string, string | string[]>
     totalTokens: number
   } {
-    const roles = selectCurrentScene(input.state)?.roles || []
-    const outfits = selectCurrentCharacterOutfits(input.state)
-    const currentCharacter =
-      outfits.find(({ role }) => role === input.currentRole) || null
-    const { name } = this.getCharacterSpecs(
-      input.state.novel.characters[currentCharacter?.id || '']?.card ||
-        EMPTY_MIKU_CARD
+    const characters = selectCurrentScene(input.state)?.characters || []
+    const currentCharacter = input.state.novel.characters.find(
+      (character) => character.id === input.currentCharacterId
     )
-    const emotions = this.getRoleEmotions(input.state, input.currentRole)
+    const { name } = this.getCharacterSpecs(
+      currentCharacter?.card || EMPTY_MIKU_CARD
+    )
+    const emotions = this.getCharacterEmotions(
+      input.state,
+      input.currentCharacterId
+    )
 
-    let template = this.getContextPrompt(input.state, input.currentRole)
+    let template = this.getContextPrompt(input.state, input.currentCharacterId)
     template += this.getDialogueHistoryPrompt(input.state, memorySize, {
-      name:
-        input.state.novel.characters[currentCharacter?.id || '']?.name || '',
-      roles:
-        input.state.novel.characters[currentCharacter?.id || '']?.roles || {},
+      name: currentCharacter?.name || '',
+      id: currentCharacter?.id || '',
     })
     template += this.getResponseAskLine(
       input.state,
       maxNewTokens,
-      input.currentRole
+      input.currentCharacterId
     )
 
     template = fillTextTemplate(template, {
       user: input.state.settings.user.name,
       bot: name,
-      roles: roles.reduce((prev, { role, characterId }) => {
-        prev[role] = input.state.novel.characters[characterId]?.name || ''
+      characters: characters.reduce((prev, { characterId }) => {
+        prev[characterId] =
+          input.state.novel.characters.find(({ id }) => id === characterId)
+            ?.name || ''
         return prev
       }, {} as Record<string, string>),
     })
@@ -86,7 +88,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
 
     const parentEmotion =
       selectLastLoadedCharacters(input.state).find(
-        ({ role }) => role === input.currentRole
+        ({ id }) => id === input.currentCharacterId
       )?.emotion || ''
 
     return {
@@ -103,16 +105,17 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
   public completeResponse(
     input: {
       state: RootState
-      currentRole: string
+      currentCharacterId: string
     },
     response: NarrationResponse,
     variables: Map<string, string>
   ): NarrationResponse {
     const currentCharacterResponse = response.characters.find(
-      ({ role: characterRole }) => characterRole === input.currentRole
+      ({ characterId }) => characterId === input.currentCharacterId
     )
     const characterResponse = {
-      role: currentCharacterResponse?.role || input.currentRole,
+      characterId:
+        currentCharacterResponse?.characterId || input.currentCharacterId,
       text: currentCharacterResponse?.text || '',
       emotion: currentCharacterResponse?.emotion || '',
       pose: currentCharacterResponse?.pose || '',
@@ -124,7 +127,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     )
 
     const index = response.characters.findIndex(
-      ({ role: characterRole }) => characterRole === input.currentRole
+      ({ characterId }) => characterId === input.currentCharacterId
     )
 
     return {
@@ -144,7 +147,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     maxLines: number,
     currentCharacter?: {
       name: string
-      roles: Record<string, string | undefined>
+      id: string
     }
   ): string {
     const messages = selectAllParentDialogues(state)
@@ -161,7 +164,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       | { type: 'interaction'; item: NarrationInteraction },
     character?: {
       name: string
-      roles: Record<string, string | undefined>
+      id: string
     },
     currentText?: string
   ): string {
@@ -172,9 +175,11 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     let currentCharacter
     switch (dialog.type) {
       case 'response':
-        currentCharacterIndex = dialog.item.characters.findIndex(({ role }) => {
-          return Object.keys(character?.roles || {}).includes(role)
-        })
+        currentCharacterIndex = dialog.item.characters.findIndex(
+          ({ characterId }) => {
+            return character?.id === characterId
+          }
+        )
         currentCharacter =
           currentCharacterIndex !== -1
             ? dialog.item.characters[currentCharacterIndex]
@@ -186,15 +191,15 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
         if (currentCharacterIndex !== -1) {
           prevCharString = dialog.item.characters
             .slice(0, currentCharacterIndex)
-            .map(({ text, role }) => `{{${role}}}: ${text}`)
+            .map(({ text, characterId }) => `{{${characterId}}}: ${text}`)
             .join('\n')
           nextCharString = dialog.item.characters
             .slice(currentCharacterIndex + 1)
-            .map(({ text, role }) => `{{${role}}}: ${text}`)
+            .map(({ text, characterId }) => `{{${characterId}}}: ${text}`)
             .join('\n')
         } else {
           prevCharString = dialog.item.characters
-            .map(({ text, role }) => `{{${role}}}: ${text}`)
+            .map(({ text, characterId }) => `{{${characterId}}}: ${text}`)
             .join('\n')
         }
         if (dialog.item.parentInteractionId) {
@@ -230,20 +235,20 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
   protected getResponseAskLine(
     state: RootState,
     maxTokens: number,
-    role: string
+    characterId: string
   ): string {
     const temp = this.template()
     const currentResponse =
       state.narration.responses[state.narration.currentResponseId]
     const currentCharacterResponse = currentResponse?.characters.find(
-      ({ role: characterRole }) => characterRole === role
+      (char) => char.characterId === characterId
     )
     const scene = selectCurrentScene(state)
     const existingEmotion = currentCharacterResponse?.emotion || ''
     const existingText = currentCharacterResponse?.text || ''
-    const charStops = scene?.roles
-      .map(({ role }) => {
-        return `"\\n{{${role}}}:","\\n{{${role}}}'s reaction:"`
+    const charStops = scene?.characters
+      .map(({ characterId }) => {
+        return `"\\n{{${characterId}}}:","\\n{{${characterId}}}'s reaction:"`
       })
       .concat(temp.stops.map((stop) => `"${stop}"`))
       .join(',')
@@ -258,7 +263,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     )
   }
 
-  protected getCharacterSpecs(card: MikuCard): {
+  protected getCharacterSpecs(card: TavernCardV2): {
     persona: string
     attributes: [string, string][]
     sampleChat: string[]
@@ -276,11 +281,14 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     }
   }
 
-  protected getRoleEmotions(state: RootState, role: string): string[] {
+  protected getCharacterEmotions(
+    state: RootState,
+    characterId: string
+  ): string[] {
     const characters = selectCurrentCharacterOutfits(state)
     const characterEmotions =
       EMOTION_GROUP_TEMPLATES[
-        characters.find((character) => character.role === role)?.outfit
+        characters.find((character) => character.id === characterId)?.outfit
           ?.template || 'base-emotions'
       ].emotionIds
     return characterEmotions

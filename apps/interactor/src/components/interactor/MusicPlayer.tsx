@@ -53,9 +53,11 @@ const MusicPlayer: React.FC = () => {
   const { assetLinkLoader } = useAppContext()
   const _volume = useAppSelector((state) => state.settings.music.volume)
   const enabled = useAppSelector((state) => state.settings.music.enabled)
+  const songs = useAppSelector((state) => state.novel.songs)
   const scene = useAppSelector(selectCurrentScene)
   const audioRef = useRef<HTMLAudioElement>(null)
-  const src = scene?.music ? assetLinkLoader(scene.music) : ''
+  const _src = songs.find((s) => s.id === scene?.musicId)?.source
+  const src = _src ? assetLinkLoader(_src) : ''
 
   const volume = enabled ? _volume : 0
 

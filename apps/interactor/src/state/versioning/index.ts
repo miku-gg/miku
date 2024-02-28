@@ -1,13 +1,24 @@
-// SELECTED TYPE: v1
-export { VersionId, ModelType, FontSize, Speed, Voices } from './v2.state'
+// SELECTED TYPE: v3
+export {
+  VersionId,
+  ModelType,
+  FontSize,
+  Speed,
+  Voices,
+  NovelNSFW,
+} from './v3.state'
 export type {
   State,
   SettingsState,
   NovelState,
   NarrationState,
-  NovelCharacters,
+  NovelCharacter,
   NovelCharacterOutfit,
   NovelScene,
   NarrationInteraction,
   NarrationResponse,
-} from './v2.state'
+  NovelBackground,
+  NovelMap,
+  NovelSong,
+  NovelStart,
+} from './v3.state'

@@ -1,10 +1,9 @@
-import { MikuCard } from '@mikugg/bot-utils'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { NovelCharacterOutfit, NovelCharacters } from '../versioning'
+import { NovelCharacter, NovelBackground } from '../versioning'
 
 interface CreationState {
-  importedBackgrounds: string[]
-  importedCharacters: NovelCharacters
+  importedBackgrounds: NovelBackground[]
+  importedCharacters: NovelCharacter[]
   scene: {
     slidePanelOpened: boolean
     sceneOpened: boolean
@@ -41,7 +40,7 @@ interface CreationState {
 
 export const initialState: CreationState = {
   importedBackgrounds: [],
-  importedCharacters: {},
+  importedCharacters: [],
   scene: {
     slidePanelOpened: false,
     sceneOpened: false,
@@ -152,33 +151,26 @@ export const creationSlice = createSlice({
       state.scene.submitting = action.payload
     },
     addImportedBackground: (state, action: PayloadAction<string>) => {
-      state.importedBackgrounds.push(action.payload)
+      state.importedBackgrounds.push({
+        id: action.payload,
+        name: 'background',
+        attributes: [],
+        description: '',
+        source: {
+          jpg: action.payload,
+        },
+      })
     },
     removeImportedBackground: (state, action: PayloadAction<string>) => {
       state.importedBackgrounds = state.importedBackgrounds.filter(
-        (background) => background !== action.payload
+        (background) => background.id !== action.payload
       )
     },
-    addImportedCharacter: (
-      state,
-      action: PayloadAction<{
-        id: string
-        name: string
-        profile_pic: string
-        card: MikuCard
-        outfits: {
-          [outfit: string]: NovelCharacterOutfit | undefined
-        }
-        /** Role to outfit mapping */
-        roles: {
-          [role: string]: string | undefined
-        }
-      }>
-    ) => {
-      state.importedCharacters[action.payload.id] = action.payload
+    addImportedCharacter: (state, action: PayloadAction<NovelCharacter>) => {
+      state.importedCharacters.push(action.payload)
     },
     clearImportedCharacters: (state) => {
-      state.importedCharacters = {}
+      state.importedCharacters = []
     },
   },
 })

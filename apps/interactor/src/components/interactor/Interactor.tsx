@@ -18,11 +18,13 @@ const Interactor = () => {
   const scene = useAppSelector(selectCurrentScene)
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
   const displayCharacter = useAppSelector(selectLastSelectedCharacter)
+  const backgrounds = useAppSelector((state) => state.novel.backgrounds)
 
   if (!scene) {
     return null
   }
 
+  const background = backgrounds.find((b) => b.id === scene.backgroundId)
   return (
     <AreYouSure.AreYouSureProvider>
       <div className="Interactor">
@@ -30,9 +32,15 @@ const Interactor = () => {
           <InteractorHeader />
           <div className="Interactor__main-image-container">
             <ProgressiveImage
-              src={scene.background ? assetLinkLoader(scene.background) : ''}
+              src={
+                background
+                  ? assetLinkLoader(
+                      background.source.webm || background.source.jpg
+                    )
+                  : ''
+              }
               placeholder={
-                scene.background ? assetLinkLoader(scene.background, true) : ''
+                background ? assetLinkLoader(background.source.jpg, true) : ''
               }
             >
               {(src) => (

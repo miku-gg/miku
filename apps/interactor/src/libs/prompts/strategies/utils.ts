@@ -23,8 +23,8 @@ export const fillTextTemplate = (
   {
     user,
     bot,
-    roles,
-  }: { user: string; bot: string; roles?: Record<string, string> }
+    characters,
+  }: { user: string; bot: string; characters?: Record<string, string> }
 ): string => {
   text = replaceAll(text, '{{char}}', bot)
   text = replaceAll(text, '{{Char}}', bot)
@@ -41,9 +41,9 @@ export const fillTextTemplate = (
   text = replaceAll(text, '<USER>', user)
   text = replaceAll(text, '<User>', user)
 
-  if (roles) {
-    Object.keys(roles).forEach((role) => {
-      text = replaceAll(text, `{{${role}}}`, roles[role])
+  if (characters) {
+    Object.keys(characters).forEach((id) => {
+      text = replaceAll(text, `{{${id}}}`, characters[id])
     })
   }
 

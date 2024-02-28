@@ -134,17 +134,18 @@ const HistoryModal = (): ReactElement => {
       // get parent scene
       const parentSceneId = response.parentInteractionId
         ? narration.interactions[response.parentInteractionId]?.sceneId
-        : novel.startSceneId
+        : novel.starts[0]?.id
 
       const parentScene = novel.scenes.find(
         (scene) => scene.id === parentSceneId
       )
 
-      const avatars = response.characters.map(({ role }) => {
+      const avatars = response.characters.map(({ characterId }) => {
         const id =
-          parentScene?.roles.find(({ role: _role }) => _role === role)
-            ?.characterId || ''
-        return novel.characters[id]?.profile_pic || ''
+          parentScene?.characters.find(
+            ({ characterId: _characterId }) => _characterId === characterId
+          )?.characterId || ''
+        return novel.characters.find((c) => c.id === id)?.profile_pic || ''
       })
 
       const isLastResponse = parentIds[0] === response.id

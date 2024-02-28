@@ -1,4 +1,4 @@
-import { DeprecatedNovelV2 as NovelV2 } from '@mikugg/bot-utils'
+import { NovelV3 } from '@mikugg/bot-utils'
 
 export interface NarrationInteraction {
   id: string
@@ -14,9 +14,9 @@ export interface NarrationResponse {
   fetching: boolean
   parentInteractionId: string | null
   suggestedScenes: string[]
-  selectedRole: string | null
+  selectedCharacterId: string | null
   characters: {
-    role: string
+    characterId: string
     emotion: string
     pose: string
     text: string
@@ -44,10 +44,20 @@ export interface NarrationState {
   }
 }
 
-export interface NovelScene extends NovelV2.NovelScene {}
-export interface NovelCharacterOutfit extends NovelV2.NovelCharacterOutfit {}
-export interface NovelCharacters extends NovelV2.NovelCharacters {}
-export interface NovelState extends NovelV2.NovelState {}
+export interface NovelScene extends NovelV3.NovelScene {}
+export interface NovelCharacterOutfit extends NovelV3.NovelCharacterOutfit {}
+export interface NovelState extends NovelV3.NovelState {}
+export interface NovelCharacter extends NovelV3.NovelCharacter {}
+export interface NovelBackground extends NovelV3.NovelBackground {}
+export interface NovelMap extends NovelV3.NovelMap {}
+export interface NovelSong extends NovelV3.NovelSong {}
+export interface NovelStart extends NovelV3.NovelStart {}
+
+export enum NovelNSFW {
+  NONE = NovelV3.NovelNSFW.NONE,
+  NUDITY = NovelV3.NovelNSFW.NUDITY,
+  EXPLICIT = NovelV3.NovelNSFW.EXPLICIT,
+}
 
 export enum ModelType {
   RP = 'RP',
@@ -107,7 +117,7 @@ export interface SettingsState {
   }
 }
 
-export const VersionId = 'v2'
+export const VersionId = 'v3'
 
 export interface State {
   version: string

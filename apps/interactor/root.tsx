@@ -11,7 +11,7 @@ import { decodeText } from '@mikugg/bot-utils'
 import queryString from 'query-string'
 import mergeWith from 'lodash.mergewith'
 import { toast } from 'react-toastify'
-import { migrateV1toV2 } from './src/state/versioning/migrations'
+import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
 import { uploadAsset } from './src/libs/assetUpload'
 import {
   listSearch,
@@ -130,7 +130,15 @@ export const loadNarration = async (): Promise<RootState> => {
           return {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            ...migrateV1toV2(data),
+            ...migrateV2toV3(migrateV1toV2(data)),
+            creation: initialCreationState,
+            settings: params.settings,
+          }
+        } else if (data.version === 'v2') {
+          return {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            ...migrateV2toV3(data),
             creation: initialCreationState,
             settings: params.settings,
           }

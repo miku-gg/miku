@@ -1,10 +1,12 @@
 import { RootState } from './store'
-import { NovelScene } from './slices/novelSlice'
+import { NovelCharacterOutfit, NovelScene } from './slices/novelSlice'
 import {
   NarrationInteraction,
   NarrationResponse,
 } from './slices/narrationSlice'
 import { createSelector } from '@reduxjs/toolkit'
+import { EmotionTemplateSlug } from '@mikugg/bot-utils'
+import { NovelNSFW } from './versioning'
 
 export const selectLastLoadedResponse = (
   state: RootState
@@ -38,7 +40,7 @@ export const selectSceneFromResponse = (
     )
   } else {
     return state.novel.scenes.find(
-      (scene) => scene.id === state.novel.startSceneId
+      (scene) => scene.id === state.novel.starts[0]?.id
     )
   }
 }
@@ -51,35 +53,50 @@ export const selectCurrentScene = (
   return selectSceneFromResponse(state, response)
 }
 
-export const selectLastImageOfRole = (
+export const selectCharacterOutfits = (
   state: RootState,
-  role: string,
+  characterId: string
+): NovelCharacterOutfit[] => {
+  return (
+    state.novel.characters
+      .find((character) => character.id === characterId)
+      ?.card.data.extensions.mikugg_v2.outfits.map((outfit) => ({
+        ...outfit,
+        nsfw: outfit.nsfw as NovelNSFW,
+        template: outfit.template as EmotionTemplateSlug,
+      })) || []
+  )
+}
+
+export const selectLastImageOfCharacter = (
+  state: RootState,
+  characterId: string,
   responseId?: string
 ): string => {
   const { currentResponseId } = state.narration
   responseId = responseId || currentResponseId
   const response = state.narration.responses[responseId]
   const scene = selectSceneFromResponse(state, response)
-  const roleResponse = response?.characters.find(
-    (character) => character.role === role
+  const characterResponse = response?.characters.find(
+    (character) => character.characterId === characterId
   )
-  if (roleResponse?.text) {
-    const character =
-      state.novel.characters[
-        scene?.roles.find(({ role: _role }) => _role === role)?.characterId ||
-          ''
-      ]
-    const outfit = character?.outfits[character?.roles[role] || '']
-    return (
-      outfit?.emotions.find((emotion) => emotion.id === roleResponse.emotion)
-        ?.source[0] || ''
+  if (characterResponse?.text) {
+    const characterOutfitId = scene?.characters.find(
+      (character) => character.characterId === characterId
+    )?.outfit
+    const outfits = selectCharacterOutfits(state, characterId)
+    const outfit = outfits.find((outfit) => outfit.id === characterOutfitId)
+    const emotions = outfit?.emotions.find(
+      (emotion) => emotion.id === characterResponse.emotion
     )
+    return emotions?.sources.webm || emotions?.sources.png || ''
   } else if (response?.parentInteractionId) {
     const interaction =
       state.narration.interactions[response?.parentInteractionId]
     const oldResponseId = interaction?.parentResponseId
     if (!oldResponseId) return ''
-    else return selectLastImageOfRole(state, role, oldResponseId || '')
+    else
+      return selectLastImageOfCharacter(state, characterId, oldResponseId || '')
   } else {
     return ''
   }
@@ -96,18 +113,18 @@ export const selectLastLoadedCharacters = createSelector(
   ],
   (state: RootState, response?: NarrationResponse, scene?: NovelScene) => {
     return (
-      scene?.roles.map(({ role, characterId }) => {
+      scene?.characters.map(({ characterId, outfit }) => {
         const characterResponse = response?.characters.find(
-          (character) => character.role === role
+          (character) => character.characterId === characterId
         )
         const emotionSlug = characterResponse?.emotion || ''
         return {
           id: characterId || '',
-          role: role || '',
+          outfit: outfit || '',
           text: characterResponse?.text || '',
-          image: selectLastImageOfRole(state, role, response?.id),
+          image: selectLastImageOfCharacter(state, characterId, response?.id),
           emotion: emotionSlug,
-          selected: role === response?.selectedRole,
+          selected: characterId === response?.selectedCharacterId,
         }
       }) || []
     )
@@ -136,20 +153,23 @@ export const selectAvailableScenes = createSelector(
           currentScene?.children.includes(scene.id)
       )
       .map((scene) => {
-        const firstCharacter = characters[scene.roles[0]?.characterId]
-        const emotionImage =
-          firstCharacter?.outfits[
-            firstCharacter?.roles[scene.roles[0]?.role] || ''
-          ]?.emotions[0].source[0] || ''
+        const outfits = selectCharacterOutfits(
+          { novel: { characters } } as RootState,
+          scene.characters[0]?.characterId || ''
+        )
+        const outfit = outfits.find(
+          (outfit) => outfit.id === scene.characters[0]?.outfit
+        )
+        const emotionImage = outfit?.emotions[0].sources.png || ''
 
         return {
           id: scene.id,
           name: scene.name,
           prompt: scene.prompt,
-          background: scene.background,
-          music: scene.music,
+          backgroundId: scene.backgroundId,
+          musicId: scene.musicId,
           emotion: emotionImage,
-          roles: scene.roles,
+          characters: scene.characters,
         }
       })
   }
@@ -212,20 +232,23 @@ export const selectCurrentCharacterOutfits = createSelector(
   ],
   (characters, scene) => {
     return (
-      scene?.roles
-        .map((role) => {
-          const characterOutfitId =
-            characters[role.characterId]?.roles[role.role] || ''
-          const characterOutfit =
-            characters[role.characterId]?.outfits[characterOutfitId]
+      scene?.characters
+        .map(({ characterId, outfit: outfitId }) => {
+          const character = characters.find(
+            (character) => character.id === characterId
+          )
+          const outfits = selectCharacterOutfits(
+            { novel: { characters } } as RootState,
+            characterId
+          )
+          const outfit = outfits.find((outfit) => outfit.id === outfitId)
           return {
-            id: role.characterId,
-            role: role.role,
-            name: characters[role.characterId]?.name,
-            outfit: characterOutfit,
+            id: characterId,
+            name: character?.name,
+            outfit,
           }
         })
-        .filter((outfit) => outfit.outfit) || []
+        .filter((char) => char.outfit) || []
     )
   }
 )
@@ -270,15 +293,15 @@ export const selectChatHistory = createSelector(
           if (response) {
             return response.characters.map(
               ({
-                role,
+                characterId,
                 text,
               }): {
                 name: string
                 text: string
                 type: 'response' | 'interaction'
               } => {
-                const char = Object.values(characters).find(
-                  (character) => character?.roles[role] !== undefined
+                const char = characters.find(
+                  (character) => character.id === characterId
                 )
                 return {
                   name: char?.name || '',

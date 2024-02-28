@@ -12,6 +12,7 @@ import { toast } from 'react-toastify'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
+  const backgrounds = useAppSelector((state) => state.novel.backgrounds)
   const scenes = useAppSelector(selectAvailableScenes)
   const { assetLinkLoader, servicesEndpoint, isInteractionDisabled } =
     useAppContext()
@@ -41,11 +42,12 @@ export default function SceneSelector(): JSX.Element | null {
       interactionStart({
         sceneId: id,
         text: prompt,
-        roles: scene?.roles.map((r) => r.role) || [],
+        characters: scene?.characters.map((r) => r.characterId) || [],
         servicesEndpoint,
-        selectedRole:
-          scene?.roles[Math.floor(Math.random() * (scene?.roles.length || 0))]
-            .role || '',
+        selectedCharacterId:
+          scene?.characters[
+            Math.floor(Math.random() * (scene?.characters.length || 0))
+          ].characterId || '',
       })
     )
   }
@@ -88,7 +90,8 @@ export default function SceneSelector(): JSX.Element | null {
                       className="SceneSelector__item-background"
                       style={{
                         backgroundImage: `url(${assetLinkLoader(
-                          scene.background,
+                          backgrounds.find((b) => b.id === scene.backgroundId)
+                            ?.source.jpg || '',
                           true
                         )})`,
                       }}

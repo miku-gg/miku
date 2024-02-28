@@ -29,7 +29,7 @@ import {
 } from '../../state/slices/creationSlice'
 import classNames from 'classnames'
 import { interactionStart } from '../../state/slices/narrationSlice'
-import { NovelCharacters, addScene } from '../../state/slices/novelSlice'
+import { addScene } from '../../state/slices/novelSlice'
 import { toast } from 'react-toastify'
 import { createSelector } from '@reduxjs/toolkit'
 import { Loader } from '../common/Loader'
@@ -44,23 +44,14 @@ const selectSelectableCharacters = createSelector(
     (state: RootState) => state.creation.importedCharacters,
   ],
   (characters, importedCharacters) =>
-    [...Object.values(characters), ...Object.values(importedCharacters)].map(
-      (character) => {
-        if (!character) return null
-        return {
-          id: character.id,
-          name: character.name,
-          outfits: Object.values(character.outfits).map((outfit) => {
-            if (!outfit) return null
-            return {
-              id: outfit.id,
-              name: outfit.name,
-              image: outfit.emotions[0].source[0],
-            }
-          }),
-        }
+    [...characters, ...importedCharacters].map((character) => {
+      if (!character) return null
+      return {
+        id: character.id,
+        name: character.name,
+        outfits: character.card.data.extensions.mikugg_v2.outfits,
       }
-    )
+    })
 )
 
 // Definition: Defines the CreateSceneModal component
@@ -97,19 +88,10 @@ const CreateScene = () => {
     const sceneId = randomUUID()
     const characters = charactersSelected
       .filter(({ id, outfit }) => id && outfit)
-      .map(({ id, outfit }) => ({ id, outfit, role: randomUUID() }))
-    const charactersToImport = characters.reduce((acc, char) => {
-      const imported = importedCharacters[char.id]
-      if (imported) {
-        acc[char.id] = {
-          ...imported,
-          roles: {
-            ...imported.roles,
-          },
-        }
-      }
-      return acc
-    }, {} as NovelCharacters)
+      .map(({ id, outfit }) => ({ id, outfit }))
+    const charactersToImport = importedCharacters.filter(
+      (c) => charactersSelected.find((c2) => c2.id === c.id) === undefined
+    )
 
     if (!characters.length) {
       toast.error('You need to select at least one character', {
@@ -172,8 +154,8 @@ const CreateScene = () => {
         servicesEndpoint,
         text: prompt,
         sceneId,
-        roles: characters.map(({ role }) => role),
-        selectedRole: characters[0].role,
+        characters: characters.map(({ id }) => id),
+        selectedCharacterId: characters[0].id,
       })
     )
     dispatch(setModalOpened({ id: 'scene', opened: false }))
@@ -224,7 +206,7 @@ const CreateScene = () => {
                       assetLinkLoader={assetLinkLoader}
                       assetUrl={
                         character?.outfits.find((o) => o?.id === outfit)
-                          ?.image || ''
+                          ?.emotions[0].sources.png || ''
                       }
                     />
                   ) : (
@@ -501,11 +483,17 @@ const CreateSceneBackgroundModal = () => {
     createSelector(
       [
         (state: RootState) => state.novel.scenes,
+        (state: RootState) => state.novel.backgrounds,
         (state: RootState) => state.creation.importedBackgrounds,
       ],
-      (scenes, importedBackgrounds) =>
+      (scenes, backgrounds, importedBackgrounds) =>
         Array.from(
-          new Set([...scenes.map((s) => s.background), ...importedBackgrounds])
+          new Set([
+            ...scenes.map((s) =>
+              backgrounds.find((b) => b.id === s.backgroundId)
+            ),
+            ...importedBackgrounds,
+          ])
         )
     )
   )
@@ -530,20 +518,20 @@ const CreateSceneBackgroundModal = () => {
               <div
                 className={classNames('CreateScene__selector__item', {
                   'CreateScene__selector__item--selected':
-                    backgroundSelected === background,
+                    backgroundSelected === background?.id,
                 })}
                 key={`background-selector-${index}`}
                 style={{
                   backgroundImage: `url(${
                     background
-                      ? background.startsWith('data:image')
+                      ? background.source.jpg.startsWith('data:image')
                         ? background
-                        : assetLinkLoader(background, true)
+                        : assetLinkLoader(background.source.jpg, true)
                       : ''
                   })`,
                 }}
                 onClick={() => {
-                  dispatch(setBackground(background))
+                  dispatch(setBackground(background?.id || ''))
                   dispatch(
                     setModalOpened({
                       id: 'background',
@@ -687,7 +675,7 @@ const CreateSceneCharacterModal = () => {
                       >
                         <EmotionRenderer
                           assetLinkLoader={assetLinkLoader}
-                          assetUrl={outfit?.image || ''}
+                          assetUrl={outfit?.emotions[0].sources.png || ''}
                         />
                       </div>
                     )

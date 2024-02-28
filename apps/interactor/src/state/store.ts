@@ -9,7 +9,7 @@ import {
   continueListenerMiddleware,
   interactionListenerMiddleware,
   regenerationListenerMiddleware,
-  roleResponseListenerMiddleware,
+  characterResponseListenerMiddleware,
 } from './listeners/interaction'
 import { stateReplacementMiddleware } from './slices/replaceState'
 import updateStateMiddleware from './updateState.middleware'
@@ -28,7 +28,7 @@ export const store = configureStore({
       interactionListenerMiddleware.middleware,
       regenerationListenerMiddleware.middleware,
       continueListenerMiddleware.middleware,
-      roleResponseListenerMiddleware.middleware,
+      characterResponseListenerMiddleware.middleware,
       stateReplacementMiddleware,
     ]),
 })

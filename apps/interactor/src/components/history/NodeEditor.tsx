@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react'
 import classNames from 'classnames'
 import {
-  selectRoleOfResponse,
+  selectCharacterOfResponse,
   updateInteraction,
   updateResponse,
 } from '../../state/slices/narrationSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { NarrationInteraction, NarrationResponse } from '../../state/versioning'
 import { Button, Dropdown } from '@mikugg/ui-kit'
-import { selectSceneFromResponse } from '../../state/selectors'
+import {
+  selectCharacterOutfits,
+  selectSceneFromResponse,
+} from '../../state/selectors'
 import { useAppContext } from '../../App.context'
 import './NodeEditor.scss'
 
@@ -68,29 +71,30 @@ const ResponseEditor = ({
 }) => {
   const dispatch = useAppDispatch()
   const { assetLinkLoader } = useAppContext()
-  const role = response.selectedRole || ''
+  const characterId = response.selectedCharacterId || ''
   const charResponse = response.characters.find(
-    (_charResponse) => _charResponse.role === role
+    (_charResponse) => _charResponse.characterId === characterId
   )
   const scene = useAppSelector((state) =>
     selectSceneFromResponse(state, response)
   )
+  const outfits = useAppSelector((state) =>
+    selectCharacterOutfits(state, characterId)
+  )
   const characters = useAppSelector((state) => state.novel.characters)
-  const character =
-    characters[
-      scene?.roles.find((_role) => _role.role === role)?.characterId || ''
-    ]
+  const characterOutfitId =
+    scene?.characters.find((c) => c.characterId === characterId)?.outfit || ''
   const emotions =
-    character?.outfits[character?.roles[role] || '']?.emotions || []
+    outfits.find((o) => o.id === characterOutfitId)?.emotions || []
   const [_emotion, _setEmotion] = useState(charResponse?.emotion || '')
 
-  if (!charResponse || !character) return null
+  if (!charResponse || !characterOutfitId) return null
 
   const handleChange = (text: string) => {
     dispatch(
       updateResponse({
         id: response.id,
-        role,
+        characterId,
         emotion: _emotion,
         text,
       })
@@ -100,33 +104,33 @@ const ResponseEditor = ({
 
   return (
     <div>
-      {scene?.roles.length ? (
+      {scene?.characters.length ? (
         <div className="NodeEditor__characters">
           {response.characters.map((_charResponse) => {
-            const id = scene.roles.find(
-              (r) => r.role === _charResponse.role
-            )?.characterId
+            const character = characters.find(
+              (c) => c.id === _charResponse.characterId
+            )
             return (
               <button
                 key={response.id}
                 className={classNames({
                   NodeEditor__character: true,
                   'NodeEditor__character--selected':
-                    _charResponse.role === role,
+                    _charResponse.characterId === characterId,
                 })}
                 onClick={() =>
                   dispatch(
-                    selectRoleOfResponse({
+                    selectCharacterOfResponse({
                       responseId: response.id,
-                      roleId: _charResponse.role,
+                      characterId: _charResponse.characterId,
                     })
                   )
                 }
               >
                 <img
                   className="NodeEditor__character-img"
-                  src={assetLinkLoader(characters[id || '']?.profile_pic || '')}
-                  alt={character.name}
+                  src={assetLinkLoader(character?.profile_pic || '')}
+                  alt={character?.name}
                 />
               </button>
             )

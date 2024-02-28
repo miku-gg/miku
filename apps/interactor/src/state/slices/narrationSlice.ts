@@ -46,8 +46,8 @@ const narrationSlice = createSlice({
         servicesEndpoint: string
         text: string
         sceneId: string
-        roles: string[]
-        selectedRole: string
+        characters: string[]
+        selectedCharacterId: string
       }>
     ) {
       const { text, sceneId } = action.payload
@@ -55,10 +55,10 @@ const narrationSlice = createSlice({
       const newInteractionId = randomUUID()
       const response: NarrationResponse = {
         id: randomUUID(),
-        selectedRole: action.payload.selectedRole,
+        selectedCharacterId: action.payload.selectedCharacterId,
         characters: [
           {
-            role: action.payload.selectedRole,
+            characterId: action.payload.selectedCharacterId,
             text: '',
             emotion: '',
             pose: '',
@@ -154,7 +154,7 @@ const narrationSlice = createSlice({
       action: PayloadAction<{
         servicesEndpoint: string
         emotion: string
-        selectedRole: string
+        characterId: string
       }>
     ) {
       const currentInteraction =
@@ -164,10 +164,10 @@ const narrationSlice = createSlice({
       if (!currentInteraction) return state
       const response: NarrationResponse = {
         id: randomUUID(),
-        selectedRole: action.payload.selectedRole,
+        selectedCharacterId: action.payload.characterId,
         characters: [
           {
-            role: action.payload.selectedRole,
+            characterId: action.payload.characterId,
             emotion: action.payload.emotion,
             text: '',
             pose: '',
@@ -210,7 +210,7 @@ const narrationSlice = createSlice({
         '\n"',
         '\n*',
         '\n"{{user}},',
-        `\n*{{${lastResponse.role}}}`,
+        `\n*{{${lastResponse.characterId}}}`,
       ]
       const endingTokens = ['\n', '*', '"', '.', '?', '!']
       if (endingTokens.some((token) => lastResponse.text.endsWith(token))) {
@@ -222,29 +222,31 @@ const narrationSlice = createSlice({
       }
       state.input.disabled = false
     },
-    roleResponseStart(
+    characterResponseStart(
       state,
       action: PayloadAction<{
         servicesEndpoint: string
-        role: string
+        characterId: string
       }>
     ) {
-      const { role } = action.payload
+      const { characterId } = action.payload
       const response = state.responses[state.currentResponseId]
       if (!response) return state
-      const index = response.characters.findIndex((char) => char.role === role)
+      const index = response.characters.findIndex(
+        (char) => char.characterId === characterId
+      )
       const characters = response.characters.slice(
         0,
         index !== -1 ? index : response.characters.length
       )
       characters.push({
-        role,
+        characterId,
         text: '',
         emotion: '',
         pose: '',
       })
       response.characters = characters
-      response.selectedRole = role
+      response.selectedCharacterId = characterId
       response.fetching = true
       state.input.disabled = true
       state.input.suggestions = []
@@ -272,14 +274,14 @@ const narrationSlice = createSlice({
       action: PayloadAction<{
         id: string
         text: string
-        role: string
+        characterId: string
         emotion: string
       }>
     ) {
-      const { id, text, role, emotion } = action.payload
+      const { id, text, characterId, emotion } = action.payload
       const response = state.responses[id]
       const charResponse = response?.characters.find(
-        (char) => char.role === role
+        (char) => char.characterId === characterId
       )
       if (charResponse) {
         charResponse.emotion = emotion
@@ -345,17 +347,17 @@ const narrationSlice = createSlice({
         interaction.query = text
       }
     },
-    selectRoleOfResponse: (
+    selectCharacterOfResponse: (
       state,
       action: PayloadAction<{
-        roleId: string
+        characterId: string
         responseId: string
       }>
     ) => {
-      const { roleId, responseId } = action.payload
+      const { characterId, responseId } = action.payload
       const response = state.responses[responseId]
       if (response) {
-        response.selectedRole = roleId
+        response.selectedCharacterId = characterId
       }
     },
   },
@@ -381,8 +383,8 @@ export const {
   updateResponse,
   deleteNode,
   updateInteraction,
-  selectRoleOfResponse,
-  roleResponseStart,
+  selectCharacterOfResponse,
+  characterResponseStart,
 } = narrationSlice.actions
 
 export default narrationSlice.reducer

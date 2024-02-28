@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import {
+  selectCharacterOutfits,
   selectCurrentScene,
   selectCurrentSwipeResponses,
   selectLastLoadedCharacters,
@@ -10,14 +11,14 @@ import { FaDice, FaForward } from 'react-icons/fa'
 import { FaPencil } from 'react-icons/fa6'
 import { IoIosBookmarks } from 'react-icons/io'
 
-import { useAppDispatch, useAppSelector } from '../../state/store'
+import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
 import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
 import TTSPlayer from './TTSPlayer'
 import {
   continueResponse,
   regenerationStart,
-  roleResponseStart,
-  selectRoleOfResponse,
+  characterResponseStart,
+  selectCharacterOfResponse,
   swipeResponse,
 } from '../../state/slices/narrationSlice'
 import './ResponseBox.scss'
@@ -51,14 +52,22 @@ const ResponseBox = (): JSX.Element | null => {
     trackEvent('bot_regenerate', {
       bot: novelTitle,
     })
-    const roleIndex = Math.floor(Math.random() * (scene?.roles.length || 0))
-    const { role, characterId } = scene?.roles[roleIndex] || {
-      role: '',
+    const characterIndex = Math.floor(
+      Math.random() * (scene?.characters.length || 0)
+    )
+    const { outfit: outfitId, characterId } = scene?.characters[
+      characterIndex
+    ] || {
+      outfit: '',
       characterId: '',
     }
-    const character = characters[characterId]
-    const chracterOutfitId = character?.roles[role] || ''
-    const outfit = character?.outfits[chracterOutfitId]
+    const outfits = selectCharacterOutfits(
+      {
+        novel: { characters },
+      } as RootState,
+      characterId
+    )
+    const outfit = outfits.find((o) => o.id === outfitId)
     const randomIndex = Math.floor(
       Math.random() * (outfit?.emotions?.length || 0)
     )
@@ -67,7 +76,7 @@ const ResponseBox = (): JSX.Element | null => {
       regenerationStart({
         servicesEndpoint,
         emotion: randomEmotion,
-        selectedRole: role,
+        characterId,
       })
     )
   }
@@ -104,8 +113,9 @@ const ResponseBox = (): JSX.Element | null => {
     return null
   }
 
-  const isRoleGenerated = (role: string) =>
-    !!lastReponse?.characters.find((r) => r.role === role)?.role
+  const isCharacterGenerated = (characterId: string) =>
+    !!lastReponse?.characters.find((r) => r.characterId === characterId)
+      ?.characterId
 
   return (
     <div className="ResponseBox">
@@ -132,46 +142,43 @@ const ResponseBox = (): JSX.Element | null => {
           />
         )}
       </div>
-      {(scene?.roles.length || 0) > 1 ? (
+      {(scene?.characters.length || 0) > 1 ? (
         <div className="ResponseBox__characters">
           {[
-            ...(lastReponse?.characters.map((c) => ({
-              characterId:
-                scene?.roles.find((r) => r.role === c.role)?.characterId || '',
-              role: c.role,
-            })) || []),
-            ...(scene?.roles.filter(({ role }) => !isRoleGenerated(role)) ||
-              []),
+            ...(lastReponse?.characters.map((c) => c.characterId) || []),
+            ...(scene?.characters
+              .filter(({ characterId }) => !isCharacterGenerated(characterId))
+              .map((c) => c.characterId) || []),
           ]
             .filter(
-              ({ characterId }) =>
-                !!characters[characterId] &&
-                !!characters[characterId]?.profile_pic
+              (characterId) =>
+                !!characters.find((c) => c.id === characterId) &&
+                !!characters.find((c) => c.id === characterId)?.profile_pic
             )
-            .map(({ characterId, role }) => {
-              const character = characters[characterId]
-              const isGenerated = isRoleGenerated(role)
+            .map((characterId) => {
+              const character = characters.find((c) => c.id === characterId)
+              const isGenerated = isCharacterGenerated(characterId)
               return (
                 <div
                   className={classNames({
                     ResponseBox__character: true,
                     generated: isGenerated,
-                    selected: displayCharacter?.role === role,
+                    selected: displayCharacter?.id === characterId,
                   })}
-                  key={`response-character-${role}`}
+                  key={`response-character-${characterId}`}
                 >
                   <button
                     className="ResponseBox__character-button"
                     onClick={() =>
                       dispatch(
                         isGenerated
-                          ? selectRoleOfResponse({
+                          ? selectCharacterOfResponse({
                               responseId: lastReponse?.id || '',
-                              roleId: role,
+                              characterId,
                             })
-                          : roleResponseStart({
+                          : characterResponseStart({
                               servicesEndpoint,
-                              role,
+                              characterId,
                             })
                       )
                     }
