@@ -368,6 +368,9 @@ importers:
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1
+      query-string:
+        specifier: ^8.1.0
+        version: 8.1.0
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -386,6 +389,9 @@ importers:
       remove:
         specifier: ^0.1.5
         version: 0.1.5
+      utf8:
+        specifier: ^3.0.0
+        version: 3.0.0
       uuid:
         specifier: ^9.0.0
         version: 9.0.0
@@ -420,6 +426,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.18
         version: 18.2.18
+      '@types/utf8':
+        specifier: ^3.0.1
+        version: 3.0.1
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.48.2
         version: 5.48.2(@typescript-eslint/parser@5.48.2)(eslint@8.56.0)(typescript@4.9.5)
@@ -6568,7 +6577,6 @@ packages:
 
   /@types/utf8@3.0.1:
     resolution: {integrity: sha512-1EkWuw7rT3BMz2HpmcEOr/HL61mWNA6Ulr/KdbXR9AI0A55wD4Qfv8hizd8Q1DnknSIzzDvQmvvY/guvX7jjZA==}
-    dev: false
 
   /@types/uuid@9.0.1:
     resolution: {integrity: sha512-rFT3ak0/2trgvp4yYZo5iKFEPsET7vKydKF+VRCxlQ9bpheehyAJH89dAkaLEq/j/RZXJIqcgsmPJKUP1Z28HA==}

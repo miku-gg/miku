@@ -12,6 +12,7 @@ interface BuilderConfig {
     success: boolean;
     assetId: string;
   }>;
+  previewIframe: string;
   search: {
     characters: (query: {
       text: string;
@@ -76,6 +77,7 @@ const configs: Map<"development" | "stating" | "production", BuilderConfig> =
             assetId: result.fileName,
           };
         },
+        previewIframe: "http://localhost:5173",
         search: {
           characters: async (query) => {
             await new Promise((resolve) => setTimeout(resolve, 1000));
