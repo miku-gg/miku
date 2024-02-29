@@ -135,8 +135,17 @@ $flex-wrap-gap: 10px;
 
       text-align: end;
     }
-    & textarea {
-      resize: none;
-    }
+  }
+
+  &__title {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
   }
 }

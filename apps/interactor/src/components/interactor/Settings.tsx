@@ -74,24 +74,26 @@ const Settings = (): JSX.Element => {
         onCloseModal={() => dispatch(setSettingsModal(false))}
         shouldCloseOnOverlayClick
       >
-        <div className="SettingsModal__header">Settings</div>
-        <div className="SettingsModal__navigation">
-          <button
-            className={`SettingsModal__navigation__button ${
-              settingsTab === 'general' ? 'selected' : ''
-            }`}
-            onClick={() => dispatch(setSettingsTab('general'))}
-          >
-            General
-          </button>
-          <button
-            className={`SettingsModal__navigation__button ${
-              settingsTab === 'prompt' ? 'selected' : ''
-            }`}
-            onClick={() => dispatch(setSettingsTab('prompt'))}
-          >
-            Prompt
-          </button>
+        <div className="SettingsModal__header">
+          <div className="SettingsModal__title">Settings</div>
+          <div className="SettingsModal__navigation">
+            <button
+              className={`SettingsModal__navigation__button ${
+                settingsTab === 'general' ? 'selected' : ''
+              }`}
+              onClick={() => dispatch(setSettingsTab('general'))}
+            >
+              General Settings
+            </button>
+            <button
+              className={`SettingsModal__navigation__button ${
+                settingsTab === 'prompt' ? 'selected' : ''
+              }`}
+              onClick={() => dispatch(setSettingsTab('prompt'))}
+            >
+              Prompt Settings
+            </button>
+          </div>
         </div>
         <div className="SettingsModal scrollbar">
           {settingsTab === 'prompt' && (
@@ -115,7 +117,7 @@ const Settings = (): JSX.Element => {
                     dispatch(setSystemPrompt(event.target.value))
                   }
                 />
-                <p className='SettingsModal__systemPrompt__count'>
+                <p className="SettingsModal__systemPrompt__count">
                   {currentSystemPromptLenght}/{systemPromptMaxLenght}
                 </p>
               </div>
