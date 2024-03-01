@@ -20,6 +20,10 @@ export interface NarrationResponse {
     emotion: string
     pose: string
     text: string
+    voices: {
+      gpt_cond_latent: number[][];
+      speaker_embedding: number[];
+    };
   }[]
   childrenInteractions: {
     interactionId: string
@@ -111,15 +115,6 @@ export enum Speed {
   Fast = 2,
   Presto = 3,
 }
-export enum Voices {
-  Sara = 'azure_tts.en-US-SaraNeural',
-  SaraWhispering = 'azure_tts.en-US-SaraNeural.whispering',
-  Sonia = 'azure_tts.en-GB-SoniaNeural.sad',
-  Jane = 'azure_tts.en-US-JaneNeural.angry',
-  Maisie = 'azure_tts.en-GB-MaisieNeural',
-  Davis = 'azure_tts.en-US-DavisNeural',
-  Tony = 'azure_tts.en-US-TonyNeural',
-}
 
 export interface SettingsState {
   model: ModelType
@@ -138,7 +133,6 @@ export interface SettingsState {
   voice: {
     autoplay: boolean
     speed: Speed
-    voiceId: Voices
   }
   music: {
     enabled: boolean

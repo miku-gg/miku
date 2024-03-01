@@ -83,42 +83,11 @@ $flex-wrap-gap: 10px;
     flex: 3;
   }
 
-  &__voice-id {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px 0;
-    align-items: center;
-    gap: $gap;
-    flex-wrap: wrap;
-  }
-
-  &__voice-id p,
   &__text-speed p,
   &__text-font-size p,
   &__voice-speed p {
     flex: 1;
     text-wrap: nowrap;
-  }
-
-  &__voice-id-input {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    min-width: 200px;
-
-    .dropdown__list {
-      top: initial;
-      bottom: 100%;
-    }
-  }
-
-  &__voice-id-listen {
-    cursor: pointer;
-
-    &:hover {
-      color: gray;
-    }
   }
 
   .slider-container {

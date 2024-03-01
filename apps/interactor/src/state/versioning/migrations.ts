@@ -28,6 +28,7 @@ export const migrateV1toV2 = (v1: {
       emotion: response.characters[role]?.emotion || '',
       pose: response.characters[role]?.pose || '',
       text: response.characters[role]?.text || '',
+      voices: response.characters[role]?.voices!
     }))
 
     return {

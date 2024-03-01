@@ -101,6 +101,13 @@ export const selectLastLoadedCharacters = createSelector(
           (character) => character.role === role
         )
         const emotionSlug = characterResponse?.emotion || ''
+
+        const character =
+        state.novel.characters[
+          scene?.roles.find(({ role: _role }) => _role === role)?.characterId ||
+            ''
+        ]
+
         return {
           id: characterId || '',
           role: role || '',
@@ -108,6 +115,7 @@ export const selectLastLoadedCharacters = createSelector(
           image: selectLastImageOfRole(state, role, response?.id),
           emotion: emotionSlug,
           selected: role === response?.selectedRole,
+          voices: characterResponse?.voices || character?.card.data.extensions.mikugg.voices
         }
       }) || []
     )

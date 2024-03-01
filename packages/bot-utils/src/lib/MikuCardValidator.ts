@@ -75,7 +75,6 @@ export type MikuCard = TavernCardV2 & {
           trigger_action: string; // text of the button that triggers this scenario, NOT in prompt
           background: string; // id of the background to be used in this scenario
           emotion_group: string; // id of the bot's emotion group to be used in this scenario
-          voice: string; // id of the bot's voice to be used in this scenario
           music?: string; // id of the music to be used in this scenario
         }[];
         emotion_groups: {
@@ -95,12 +94,9 @@ export type MikuCard = TavernCardV2 & {
           source: string; // hash of the background image, can be jpg, png or webm
         }[];
         voices: {
-          id: string; // id of the voice
-          provider: string; // provider of the voice (elevenlabs or azure)
-          provider_voice_id: string; // id of the voice in the provider
-          provider_emotion?: string; // emotion of the voice in the provider (optional)
-          training_sample?: string; // text sample used to train the voice (optional)
-        }[];
+          gpt_cond_latent: number[][];
+          speaker_embedding: number[];
+        };
         sounds?: {
           id: string; // id of the music
           name: string; // name of the music, NOT used in the prompt
@@ -224,20 +220,15 @@ export const EMPTY_MIKU_CARD: MikuCard = {
             trigger_action: "",
             background: "",
             emotion_group: "",
-            voice: "",
             music: "",
           },
         ],
         emotion_groups: [],
         backgrounds: [],
-        voices: [
-          {
-            id: "azure_tts.en-GB-SoniaNeural",
-            provider: "azure_tts",
-            provider_voice_id: "en-GB-SoniaNeural",
-            provider_emotion: "sad",
-          },
-        ],
+        voices: {
+          gpt_cond_latent: [[]],
+          speaker_embedding: [],
+        },
         sounds: [],
       },
     },
@@ -253,12 +244,11 @@ export function validateMikuCard(card: MikuCard): string[] {
     errors.push("extensions.mikugg.backgrounds is empty");
   if (!mikugg.emotion_groups.length)
     errors.push("extensions.mikugg.emotion_groups is empty");
-  if (!mikugg.voices.length) errors.push("extensions.mikugg.voices is empty");
+  if (!mikugg.voices.gpt_cond_latent || !mikugg.voices.speaker_embedding) errors.push("extensions.mikugg.voices is empty");
 
   const scenarios = new Map<string, (typeof mikugg.scenarios)[0]>();
   const backgrounds = new Map<string, (typeof mikugg.backgrounds)[0]>();
   const emotion_groups = new Map<string, (typeof mikugg.emotion_groups)[0]>();
-  const voices = new Map<string, (typeof mikugg.voices)[0]>();
   const sounds = new Map<
     string,
     { id: string; name: string; source: string }
@@ -271,7 +261,6 @@ export function validateMikuCard(card: MikuCard): string[] {
   mikugg.emotion_groups.forEach((emotion_group) =>
     emotion_groups.set(emotion_group.id, emotion_group)
   );
-  mikugg.voices.forEach((voice) => voices.set(voice.id, voice));
   mikugg.sounds?.forEach((sound) => sounds.set(sound.id, sound));
 
   // check start scenario
@@ -287,10 +276,6 @@ export function validateMikuCard(card: MikuCard): string[] {
     if (!emotion_groups.has(scenario.emotion_group))
       errors.push(
         `${scenario.id}: ${scenario.emotion_group} not found in mikugg.emotion_groups`
-      );
-    if (!voices.has(scenario.voice))
-      errors.push(
-        `${scenario.id}: ${scenario.voice} not found in mikugg.voices`
       );
 
     for (const child_scenario of scenario.children_scenarios)

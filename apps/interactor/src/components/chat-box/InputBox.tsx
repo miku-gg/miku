@@ -8,6 +8,7 @@ import { FaPaperPlane } from 'react-icons/fa'
 import { GiFeather } from 'react-icons/gi'
 import {
   selectCurrentScene,
+  selectLastLoadedCharacters,
   selectLastLoadedResponse,
 } from '../../state/selectors'
 import { useAppContext } from '../../App.context'
@@ -38,6 +39,9 @@ const InputBox = (): JSX.Element | null => {
   const [isAutocompleteLoading, setIsAutocompleteLoading] =
     useState<boolean>(false)
 
+    const lastCharacters = useAppSelector(selectLastLoadedCharacters)
+    const lastCharacter = lastCharacters.find((char) => char.selected)
+
   const onSubmit = (e: React.FormEvent<unknown>) => {
     e.stopPropagation()
     e.preventDefault()
@@ -64,6 +68,7 @@ const InputBox = (): JSX.Element | null => {
         roles: scene?.roles.map((r) => r.role) || [],
         servicesEndpoint,
         selectedRole: lastResponse?.selectedRole || '',
+        voices: lastCharacter?.voices
       })
     )
   }

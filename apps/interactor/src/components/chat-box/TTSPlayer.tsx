@@ -1,16 +1,12 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppSelector } from '../../state/store'
 import { selectLastLoadedCharacters } from '../../state/selectors'
 import { replaceAll } from '../../libs/prompts/strategies/utils'
-import { MdRecordVoiceOver } from 'react-icons/md'
+import { MdRecordVoiceOver, MdStop } from 'react-icons/md'
 import { Tooltip } from '@mikugg/ui-kit'
 import classNames from 'classnames'
 import { Speed } from '../../state/versioning'
 import { useAppContext } from '../../App.context'
-
-// eslint-disable-next-line
-// @ts-ignore
-window.currentInference = ''
 
 const setAudioSpeed = (
   audioRef: React.RefObject<HTMLAudioElement>,
@@ -35,9 +31,7 @@ const setAudioSpeed = (
 }
 
 const TTSPlayer2: React.FC = () => {
-  const { servicesEndpoint, isProduction, freeTTS, assetLinkLoader } =
-    useAppContext()
-  const voiceId = useAppSelector((state) => state.settings.voice.voiceId)
+  const { servicesEndpoint, isProduction, freeTTS } = useAppContext()
   const audioRef = useRef<HTMLAudioElement>(null)
   const sourceBufferRef = useRef<SourceBuffer | null>(null)
   const mediaSourceRef = useRef<MediaSource | null>(null)
@@ -54,11 +48,12 @@ const TTSPlayer2: React.FC = () => {
       state.narration.responses[state.narration.currentResponseId]
         ?.parentInteractionId === null
   )
-  const characterId = lastCharacter?.id
   const isPremium = useAppSelector((state) => state.settings.user.isPremium)
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_provider, _voiceId, speakingStyle = 'default'] = voiceId.split('.')
+  const userName = useAppSelector((state) => state.settings.user.name)
+  const botName = useAppSelector(
+    (state) => state.novel.characters[lastCharacter!.id]?.name
+  )
+  const [playing, setPlaying] = useState(false)
 
   useEffect(() => {
     if (disabled) {
@@ -66,22 +61,25 @@ const TTSPlayer2: React.FC = () => {
     }
   }, [disabled])
 
+  const cleanup = () => {
+    audioRef.current?.pause()
+    if (fetchControllerRef.current) {
+      fetchControllerRef.current.abort()
+    }
+    if (mediaSourceRef.current) {
+      if (mediaSourceRef.current.readyState === 'open') {
+        mediaSourceRef.current.endOfStream()
+      }
+      URL.revokeObjectURL(audioRef.current?.src || '')
+    }
+    queueRef.current = []
+    setPlaying(false)
+  }
+
   const inferAudio = useCallback(() => {
     if (!window.MediaSource) {
       console.error('MediaSource API is not supported in this browser.')
       return
-    }
-
-    const _inferenceSignature = `${lastCharacterText}.${_voiceId}.${speakingStyle}`
-    // eslint-disable-next-line
-    // @ts-ignore
-    if (_inferenceSignature === window.currentInference) {
-      if (audioRef.current) {
-        setAudioSpeed(audioRef, playSpeed)
-        audioRef.current.play()
-        audioRef.current.currentTime = 0
-        return
-      }
     }
 
     // Function to initialize MediaSource and start fetching audio
@@ -107,13 +105,18 @@ const TTSPlayer2: React.FC = () => {
         fetchControllerRef.current = new AbortController()
         const { signal } = fetchControllerRef.current
 
+        let text = replaceAll(lastCharacterText, '*', '')
+
+        text = replaceAll(text, '{{user}}', userName)
+        text = replaceAll(text, '{{char}}', botName!)
+
         const response = await fetch(`${servicesEndpoint}/audio`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            text: replaceAll(lastCharacterText, '*', ''),
-            voiceId: _voiceId,
-            speakingStyle: speakingStyle,
+            text: text,
+            gpt_cond_latent: lastCharacter?.voices?.gpt_cond_latent,
+            speaker_embedding: lastCharacter?.voices?.speaker_embedding,
           }),
           signal,
           credentials: 'include',
@@ -121,28 +124,28 @@ const TTSPlayer2: React.FC = () => {
         const reader = response.body?.getReader()
         if (!reader) return
 
-        let started = false
-        /* eslint-disable no-constant-condition */
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
-            // eslint-disable-next-line
-            // @ts-ignore
-            window.currentInference = _inferenceSignature
-            mediaSourceRef.current?.endOfStream()
+            if (
+              sourceBufferRef.current &&
+              !sourceBufferRef.current.updating &&
+              mediaSourceRef.current
+            )
+              mediaSourceRef.current.endOfStream()
             break
           }
           if (value) {
             queueRef.current.push(value)
             processQueue()
-            if (!started) {
-              started = true
+            if (!playing) {
+              setPlaying(true)
               audioRef.current?.play()
             }
           }
         }
       } catch (error: unknown) {
-        console.error(error)
+        // if user presses stop button the abort will error
       }
     }
 
@@ -161,19 +164,8 @@ const TTSPlayer2: React.FC = () => {
     initializeMediaSource()
 
     // Cleanup function
-    return () => {
-      if (fetchControllerRef.current) {
-        fetchControllerRef.current.abort()
-      }
-      if (mediaSourceRef.current) {
-        if (mediaSourceRef.current.readyState === 'open') {
-          mediaSourceRef.current.endOfStream()
-        }
-        URL.revokeObjectURL(audioRef.current?.src || '')
-      }
-      queueRef.current = []
-    }
-  }, [lastCharacterText, servicesEndpoint, _voiceId, speakingStyle, playSpeed])
+    return cleanup
+  }, [lastCharacterText, servicesEndpoint, playSpeed])
 
   useEffect(() => {
     if (autoPlay) {
@@ -187,32 +179,17 @@ const TTSPlayer2: React.FC = () => {
     <>
       <audio
         ref={audioRef}
-        controls
-        style={{ position: 'absolute', display: 'none' }}
+        src={undefined}
         autoPlay={autoPlay}
-        src={
-          isFirstMessage && isProduction
-            ? assetLinkLoader(`${characterId}.${_voiceId}.${speakingStyle}.wav`)
-            : undefined
-        }
-      >
-        Your browser does not support the audio element.
-      </audio>
+        onEnded={() => setPlaying(false)}
+      />
       <button
         className={classNames({
           ResponseBox__voice: true,
           'ResponseBox__voice--disabled':
             !isPremium && !freeTTS && !isFirstMessage,
         })}
-        onClick={() => {
-          if (isFirstMessage && audioRef.current) {
-            setAudioSpeed(audioRef, playSpeed)
-            audioRef.current.play()
-            audioRef.current.currentTime = 0
-          } else {
-            inferAudio()
-          }
-        }}
+        onClick={() => (playing ? cleanup() : inferAudio())}
         disabled={!isPremium && !freeTTS && !isFirstMessage}
         data-tooltip-id="smart-tooltip"
         data-tooltip-content={
@@ -223,8 +200,17 @@ const TTSPlayer2: React.FC = () => {
             : ''
         }
       >
-        <MdRecordVoiceOver />
-        <span>Listen</span>
+        {playing ? (
+          <>
+            <MdStop />
+            <span>Stop</span>
+          </>
+        ) : (
+          <>
+            <MdRecordVoiceOver />
+            <span>Listen</span>
+          </>
+        )}
       </button>
       <Tooltip id="audio-tooltip" place="top" />
     </>

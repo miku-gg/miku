@@ -145,6 +145,10 @@
         </button>
       </div>
       <div class="flex gap-2">
+        <p class="text-white w-24">XTTS URL</p>
+        <input class="mb-8 w-full mr-8" type="text" value="" placeholder="http://0.0.0.0:8000" required name="xttsUrl" id="xttsUrl" />
+      </div>
+      <div class="flex gap-2">
         <p class="text-white w-24">API URL</p>
         <input class="mb-8 w-full mr-8" type="text" value="" placeholder="https://students-appears-injured-alto.trycloudflare.com/v1" required name="apiUrl" id="apiUrl" />
       </div>
@@ -207,6 +211,7 @@
       const data = await getResult.json()
 
 
+      document.getElementById('xttsUrl').value = data.xttsUrl
       document.getElementById('apiUrl').value = data.apiUrl
       document.getElementById('apiKey').value = data.apiKey
       $('#strategy').dropdown('set selected', data.strategy);
@@ -270,6 +275,7 @@
     }
 
     function save_backend_config() {
+      const xttsUrl = document.getElementById('xttsUrl').value
       const apiUrl = document.getElementById('apiUrl').value
       const apiKey = document.getElementById('apiKey').value
       const strategy = document.getElementById('strategy').value
@@ -278,6 +284,7 @@
       const max_new_tokens = document.getElementById('max_new_tokens').value
 
       const config = {
+        xttsUrl: xttsUrl,
         apiUrl: apiUrl,
         apiKey: apiKey,
         strategy: strategy,

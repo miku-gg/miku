@@ -1,5 +1,5 @@
 // SELECTED TYPE: v1
-export { VersionId, ModelType, FontSize, Speed, Voices } from './v2.state'
+export { VersionId, ModelType, FontSize, Speed } from './v2.state'
 export type {
   State,
   SettingsState,
