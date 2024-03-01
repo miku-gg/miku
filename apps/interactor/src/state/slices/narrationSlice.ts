@@ -48,6 +48,10 @@ const narrationSlice = createSlice({
         sceneId: string
         roles: string[]
         selectedRole: string
+        voices?: {
+          gpt_cond_latent: number[][],
+          speaker_embedding: number[],
+        }
       }>
     ) {
       const { text, sceneId } = action.payload
@@ -62,6 +66,10 @@ const narrationSlice = createSlice({
             text: '',
             emotion: '',
             pose: '',
+            voices: {
+              gpt_cond_latent: action.payload.voices?.gpt_cond_latent!,
+              speaker_embedding: action.payload.voices?.speaker_embedding!
+            }
           },
         ],
         childrenInteractions: [],
@@ -155,6 +163,10 @@ const narrationSlice = createSlice({
         servicesEndpoint: string
         emotion: string
         selectedRole: string
+        voices?: {
+          gpt_cond_latent: number[][],
+          speaker_embedding: number[],
+        }
       }>
     ) {
       const currentInteraction =
@@ -171,6 +183,7 @@ const narrationSlice = createSlice({
             emotion: action.payload.emotion,
             text: '',
             pose: '',
+            voices: action.payload.voices!
           },
         ],
         childrenInteractions: [],
@@ -242,6 +255,10 @@ const narrationSlice = createSlice({
         text: '',
         emotion: '',
         pose: '',
+        voices: {
+          gpt_cond_latent: [[]],
+          speaker_embedding: []
+        }
       })
       response.characters = characters
       response.selectedRole = role

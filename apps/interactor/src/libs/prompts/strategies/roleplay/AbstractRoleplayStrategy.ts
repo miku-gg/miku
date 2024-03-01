@@ -116,6 +116,10 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       text: currentCharacterResponse?.text || '',
       emotion: currentCharacterResponse?.emotion || '',
       pose: currentCharacterResponse?.pose || '',
+      voices: currentCharacterResponse?.voices || {
+        gpt_cond_latent: currentCharacterResponse?.voices.gpt_cond_latent!,
+        speaker_embedding: currentCharacterResponse?.voices.speaker_embedding!
+      },
     }
     characterResponse.emotion =
       variables.get('emotion')?.trim() || characterResponse.emotion

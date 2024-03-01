@@ -46,6 +46,7 @@ const ResponseBox = (): JSX.Element | null => {
   const novelTitle = useAppSelector((state) => state.novel.title)
   const displayCharacter = useAppSelector(selectLastSelectedCharacter)
   const displayText = useFillTextTemplate(displayCharacter.text)
+  const lastCharacter = lastCharacters.find((char) => char.selected)
 
   const handleRegenerateClick = () => {
     trackEvent('bot_regenerate', {
@@ -68,6 +69,7 @@ const ResponseBox = (): JSX.Element | null => {
         servicesEndpoint,
         emotion: randomEmotion,
         selectedRole: role,
+        voices: lastCharacter?.voices || character?.card.data.extensions.mikugg.voices
       })
     )
   }

@@ -13,7 +13,7 @@ const APHRODITE_API_KEY =
 const APHRODITE_API_URL =
   process.env.APHRODITE_API_URL ||
   backend_config?.apiUrl ||
-  "http://localhost:2242/v1";
+  "http://localhost:2242/";
 const APHRODITE_API_MODEL = process.env.APHRODITE_API_MODEL || "default";
 const APHRODITE_API_PRESET =
   (process.env.APHRODITE_API_PRESET as PresetType) ||
@@ -97,7 +97,7 @@ const templateProcessors = new Map<
       new Guidance.TokenGenerator.OpenAITokenGenerator(
         {
           apiKey: APHRODITE_API_KEY,
-          baseURL: APHRODITE_API_URL,
+          baseURL: APHRODITE_API_URL + "/v1",
           model: APHRODITE_API_MODEL,
         },
         {},

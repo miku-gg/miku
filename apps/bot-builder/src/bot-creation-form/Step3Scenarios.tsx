@@ -14,7 +14,6 @@ import {
 } from "@mikugg/ui-kit";
 import { MikuCard, DEFAULT_MUSIC } from "@mikugg/bot-utils";
 import { useCharacterCreationForm } from "./CharacterCreationFormContext";
-import VoiceSelector from "./Components/VoiceSelector";
 import { BackgroundIcon, SlidesIcon } from "./assets/svg";
 
 const ASSETS_ENDPOINT =
@@ -249,7 +248,7 @@ const Step3Scenarios: React.FC = () => {
   const handleTextChange = (event: {
     target: { name: string; value: string };
   }) => {
-    const { name, value } = event.target;
+    const { value } = event.target;
     const newCard = {
       ...card,
       data: {
@@ -263,8 +262,7 @@ const Step3Scenarios: React.FC = () => {
         },
       },
     };
-    newCard.data.extensions.mikugg.scenarios[selectedScenarioIndex][name] =
-      value;
+    newCard.data.extensions.mikugg.scenarios[selectedScenarioIndex].name = value;
     setCard(newCard);
   };
 
@@ -284,10 +282,8 @@ const Step3Scenarios: React.FC = () => {
               }
               const emotion_group =
                 card.data.extensions.mikugg.emotion_groups[0].id;
-              let voiceId = card.data.extensions.mikugg.voices[0]?.id || "";
               let backgroundId = card.data.extensions.mikugg.backgrounds[0].id;
               if (card.data.extensions.mikugg.scenarios.length) {
-                voiceId = card.data.extensions.mikugg.scenarios[0].voice || "";
                 backgroundId =
                   card.data.extensions.mikugg.scenarios[0].background;
               }
@@ -310,7 +306,6 @@ const Step3Scenarios: React.FC = () => {
                           trigger_suggestion_similarity: "",
                           emotion_group,
                           background: backgroundId,
-                          voice: voiceId,
                           children_scenarios: [],
                         },
                       ],
@@ -377,35 +372,6 @@ const Step3Scenarios: React.FC = () => {
                   },
                 });
               }
-            }}
-          />
-        </div>
-        <div>
-          <VoiceSelector
-            voice={
-              card.data.extensions.mikugg.voices.find(
-                (voice) => voice.id === selectedScenario.voice
-              ) || card.data.extensions.mikugg.voices[0]
-            }
-            onChange={(voice) => {
-              const newCard = { ...card };
-              if (
-                !card.data.extensions.mikugg.voices.find(
-                  (_voice) => _voice.id === voice.id
-                )
-              ) {
-                newCard.data.extensions.mikugg.voices.push(voice);
-              }
-              newCard.data.extensions.mikugg.scenarios[
-                selectedScenarioIndex
-              ].voice = voice.id;
-              newCard.data.extensions.mikugg.voices =
-                newCard.data.extensions.mikugg.voices.filter((_voice) => {
-                  return newCard.data.extensions.mikugg.scenarios.find(
-                    (_scenario) => _scenario.voice === _voice.id
-                  );
-                });
-              setCard(newCard);
             }}
           />
         </div>

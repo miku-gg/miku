@@ -220,26 +220,6 @@ const tavernCardV2ToMikuCard = (json: TavernCardV2): MikuCard => {
               source: String(bg.source) || "",
             })) || [],
           voices: json.data.extensions?.mikugg?.voices
-            ? json.data.extensions?.mikugg?.voices?.map((voice) => ({
-                ...voice,
-                id: String(voice.id) || "",
-                provider: String(voice.provider) || "",
-                provider_voice_id: String(voice.provider_voice_id) || "",
-                provider_emotion: voice.provider_emotion
-                  ? String(voice.provider_emotion)
-                  : undefined,
-                training_sample: voice.training_sample
-                  ? String(voice.training_sample)
-                  : undefined,
-              }))
-            : [
-                {
-                  id: "azure_tts.en-GB-SoniaNeural",
-                  provider: "azure_tts",
-                  provider_voice_id: "en-GB-SoniaNeural",
-                  provider_emotion: "sad",
-                },
-              ],
         },
       },
     },

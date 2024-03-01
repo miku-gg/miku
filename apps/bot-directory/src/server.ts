@@ -79,6 +79,7 @@ app.get("/get", async (req, res) => {
   const data = JSON.parse(config);
 
   res.send({
+    xttsUrl: data.xttsUrl,
     apiUrl: data.apiUrl,
     apiKey: data.apiKey,
     strategy: data.strategy,

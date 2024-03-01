@@ -83,7 +83,7 @@ Once you select a background and an emotion group, you need to defined other att
 
 * *Scenario name* is a short name for referencing the scenario. It will not be used in the prompt.
 
-* *Voice* is the voice that will be used for the bot. It's recommended to use Azure voices since it's the cheapest. You can also use ElevenLabs voices.
+* *Voice* is the voice that will be used for the bot.
 
 * *Keywords* are a list of words that define the scenario. This will be used by the emotion interpreter to try to guess when it's appropiate to change to this scenario and suggest it to the user. *This is a work in progress feature.*
 

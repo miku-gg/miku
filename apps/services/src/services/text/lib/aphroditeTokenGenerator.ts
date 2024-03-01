@@ -40,6 +40,19 @@ export interface OpenAIAphroditeConfig {
   best_of?: number;
 
   /**
+   * The range to use for dynamic temperature. When used, the actual temperature is allowed to be automatically adjusted dynamically between DynaTemp ± DynaTempRange.
+   * For example, setting `temperature=0.4` and `dynatemp_range=0.1` will result in a minimum temp of 0.3 and max of 0.5.
+   */
+
+  dynatemp_range?: number;
+
+  /**
+   * Exponent for dynatemp sampling. Range [0, inf).
+   */
+
+  dynatemp_exponent?: number;
+
+  /**
    * Float that penalizes new tokens based on whether they appear in the
    * generated text so far. Values > 0 encourage the model to use new tokens,
    * while values < 0 encourage the model to repeat tokens.

@@ -1,8 +1,6 @@
 import { MikuCard } from '@mikugg/bot-utils';
 import { emotionTemplates } from '../data/emotions';
 export { type EmotionTemplate, emotionTemplates } from '../data/emotions';
-export { voices } from '../data/voices';
-
 export type ValidationError = {
   field: string;
   message: string;
@@ -119,12 +117,6 @@ export const validateCharacterData = ({ data: characterData }: MikuCard): Valida
         field: `scenario.${scenario.name}.emotion_group`,
         message: `Scenario ${scenario.name} emotion group not found`
       })
-    }
-    if (!scenario.voice || characterData.extensions.mikugg.voices.findIndex((voice) => voice.id === scenario.voice) === -1) {
-      errors.push({
-        field: `scenario.${scenario.name}.voice`,
-        message: `Scenario ${scenario.name} voice not found`
-      });
     }
   })
 

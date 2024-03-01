@@ -147,6 +147,7 @@ export async function loadNovelFromSingleCard({
                 text: card.data.first_mes,
                 emotion: firstEmotion?.id || 'happy',
                 pose: 'standing',
+                voices: mikugg.voices
               },
             ],
             fetching: false,

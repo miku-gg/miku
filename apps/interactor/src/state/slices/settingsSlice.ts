@@ -4,10 +4,9 @@ import {
   ModelType,
   SettingsState,
   Speed,
-  Voices,
 } from '../versioning'
 
-export { FontSize, ModelType, Speed, Voices } from '../versioning'
+export { ModelType, FontSize, Speed } from '../versioning'
 
 export type { SettingsState } from '../versioning'
 
@@ -28,7 +27,7 @@ export const initialState: SettingsState = {
   voice: {
     autoplay: false,
     speed: Speed.Normal,
-    voiceId: Voices.SaraWhispering,
+    readAsteriks: false,
   },
   music: {
     enabled: false,
@@ -87,8 +86,8 @@ export const settingSlice = createSlice({
     setVoiceSpeed: (state, action: PayloadAction<Speed>) => {
       state.voice.speed = action.payload
     },
-    setVoiceId: (state, action: PayloadAction<Voices>) => {
-      state.voice.voiceId = action.payload
+    setReadAsteriks: (state, action: PayloadAction<boolean>) => {
+      state.voice.readAsteriks = action.payload
     },
     setMusicEnabled: (state, action: PayloadAction<boolean>) => {
       state.music.enabled = action.payload
@@ -138,7 +137,6 @@ export const {
   setSettingsTab,
   setVoiceAutoplay,
   setVoiceSpeed,
-  setVoiceId,
   setMusicEnabled,
   setMusicVolume,
   setSettingsModal,
@@ -146,6 +144,7 @@ export const {
   setHistoryModal,
   setEditModal,
   setDeleteNodeConfirmationModal,
+  setReadAsteriks,
 } = settingSlice.actions
 
 export default settingSlice.reducer
