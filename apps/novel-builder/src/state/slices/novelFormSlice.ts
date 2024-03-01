@@ -144,7 +144,7 @@ const initialState: NovelV3.NovelState = {
       characters: [
         {
           characterId: "char-1",
-          outfit: "default",
+          outfit: "outfit-1",
         },
       ],
       nsfw: NovelV3.NovelNSFW.NONE,
@@ -337,7 +337,7 @@ const novelFormSlice = createSlice({
               characterId: character.characterId,
               emotion: characterOutfit?.emotions[0].id || "neutral",
               pose: "standing",
-              text: "",
+              text: "Hello!",
             };
           }) || [],
         description: "",

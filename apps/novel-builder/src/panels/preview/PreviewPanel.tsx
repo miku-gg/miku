@@ -5,6 +5,7 @@ import base64 from "base-64";
 import utf8 from "utf8";
 import queryString from "query-string";
 import { useAppSelector } from "../../state/store";
+import "./PreviewPanel.scss";
 
 export function generateAlphaLink({
   botHash,
@@ -100,10 +101,10 @@ export default function PreviewPanel() {
   }, [loadingIframe, novel]);
 
   return (
-    <div>
-      <h1>PreviewPanel</h1>
+    <div className="PreviewPanel">
+      <h1>Preview Panel</h1>
       {loadingIframe ? <Loader /> : null}
-      <div className="ChatPage__interactor-container">
+      <div className="PreviewPanel__iframe-container">
         <iframe
           ref={iframeRef}
           onLoad={() => setLoadingIframe(false)}
