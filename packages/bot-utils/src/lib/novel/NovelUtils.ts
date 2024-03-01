@@ -549,3 +549,241 @@ export const importAndReplaceNovelStateAssets = async (
 
   return novelResult;
 };
+
+export enum NovelValidationTargetType {
+  SCENE,
+  CHARACTER,
+  OUTFIT,
+  SONG,
+  BACKGROUND,
+  START,
+  MAP,
+}
+export interface NovelValidation {
+  targetType: NovelValidationTargetType;
+  targetId: string;
+  severity: "error" | "warning";
+  message: string;
+}
+
+export function validateNovelState(
+  novel: NovelV3.NovelState
+): NovelValidation[] {
+  const errors: NovelValidation[] = [];
+
+  // Validate scene IDs in starts
+  novel.starts.forEach((start) => {
+    const startScene = novel.scenes.find((scene) => scene.id === start.sceneId);
+    if (!startScene) {
+      errors.push({
+        targetType: NovelValidationTargetType.START,
+        severity: "error",
+        targetId: start.id,
+        message: `Scene ${start.sceneId} not found`,
+      });
+    } else {
+      // check if characters are in the scene
+      start.characters.forEach((character) => {
+        if (
+          !startScene.characters.some(
+            (sceneCharacter) =>
+              sceneCharacter.characterId === character.characterId
+          )
+        ) {
+          errors.push({
+            targetType: NovelValidationTargetType.START,
+            severity: "error",
+            targetId: start.id,
+            message: `Character ${character.characterId} not found in scene ${start.sceneId}`,
+          });
+        }
+      });
+    }
+
+    // Validate character IDs in starts
+    start.characters.forEach((character) => {
+      if (!novel.characters.some((c) => c.id === character.characterId)) {
+        errors.push({
+          targetType: NovelValidationTargetType.START,
+          severity: "error",
+          targetId: start.id,
+          message: `Character ${character.characterId} not found`,
+        });
+      }
+    });
+  });
+
+  novel.scenes.forEach((scene) => {
+    // validate background ids
+    if (!novel.backgrounds.some((bg) => bg.id === scene.backgroundId)) {
+      errors.push({
+        targetType: NovelValidationTargetType.SCENE,
+        targetId: scene.id,
+        severity: "error",
+        message: `Background ${scene.backgroundId} not found`,
+      });
+    }
+    // validate music ids
+    if (!novel.songs.some((song) => song.id === scene.musicId)) {
+      errors.push({
+        targetType: NovelValidationTargetType.SCENE,
+        targetId: scene.id,
+        severity: "error",
+        message: `Music ${scene.musicId} not found`,
+      });
+    }
+
+    // validate character ids
+    scene.characters.forEach((character) => {
+      if (!novel.characters.some((c) => c.id === character.characterId)) {
+        errors.push({
+          targetType: NovelValidationTargetType.SCENE,
+          targetId: scene.id,
+          severity: "error",
+          message: `Character ${character.characterId} not found`,
+        });
+      }
+    });
+
+    // validate character outfits
+    scene.characters.forEach((character) => {
+      const characterObject = novel.characters.find(
+        (c) => c.id === character.characterId
+      );
+      if (!characterObject) return;
+      if (
+        !characterObject.card.data.extensions.mikugg_v2.outfits.some(
+          (outfit) => outfit.id === character.outfit
+        )
+      ) {
+        errors.push({
+          targetType: NovelValidationTargetType.SCENE,
+          targetId: scene.id,
+          severity: "error",
+          message: `Outfit ${character.outfit} not found for character ${character.characterId}`,
+        });
+      }
+    });
+
+    // validate children
+    scene.children.forEach((childId) => {
+      if (!novel.scenes.some((s) => s.id === childId)) {
+        errors.push({
+          targetType: NovelValidationTargetType.SCENE,
+          targetId: scene.id,
+          severity: "error",
+          message: `Child scene ${childId} not found`,
+        });
+      }
+    });
+
+    // validate parentMapId
+    if (
+      scene.parentMapId &&
+      !novel.maps.some((map) => map.id === scene.parentMapId)
+    ) {
+      errors.push({
+        targetType: NovelValidationTargetType.SCENE,
+        targetId: scene.id,
+        severity: "error",
+        message: `Parent map ${scene.parentMapId} not found`,
+      });
+    }
+  });
+
+  // validate backgrounds
+  novel.backgrounds.forEach((bg) => {
+    if (!bg.source.jpg) {
+      errors.push({
+        targetType: NovelValidationTargetType.BACKGROUND,
+        targetId: bg.id,
+        severity: "error",
+        message: `Background ${bg.name} has no jpg source`,
+      });
+    }
+  });
+
+  // validate songs
+  novel.songs.forEach((song) => {
+    if (!song.source) {
+      errors.push({
+        targetType: NovelValidationTargetType.SONG,
+        targetId: song.id,
+        severity: "error",
+        message: `Song ${song.name} has no source`,
+      });
+    }
+  });
+
+  // validate characters
+  novel.characters.forEach((character) => {
+    if (!character.profile_pic) {
+      errors.push({
+        targetType: NovelValidationTargetType.CHARACTER,
+        targetId: character.id,
+        severity: "error",
+        message: `Character ${character.name} has no profile pic`,
+      });
+    }
+    character.card.data.extensions.mikugg_v2.outfits.forEach((outfit) => {
+      outfit.emotions.forEach((emotion) => {
+        if (!emotion.sources.png) {
+          errors.push({
+            targetType: NovelValidationTargetType.OUTFIT,
+            targetId: outfit.id,
+            severity: "error",
+            message: `Outfit ${outfit.name} has no png source for emotion "${emotion.id}"`,
+          });
+        }
+      });
+    });
+  });
+
+  // validate non-empty
+  if (!novel.characters.length) {
+    errors.push({
+      targetType: NovelValidationTargetType.CHARACTER,
+      targetId: "characters",
+      severity: "warning",
+      message: `Novel has no characters`,
+    });
+  }
+
+  if (!novel.scenes.length) {
+    errors.push({
+      targetType: NovelValidationTargetType.SCENE,
+      targetId: "scenes",
+      severity: "warning",
+      message: `Novel has no scenes`,
+    });
+  }
+
+  if (!novel.backgrounds.length) {
+    errors.push({
+      targetType: NovelValidationTargetType.BACKGROUND,
+      targetId: "backgrounds",
+      severity: "warning",
+      message: `Novel has no backgrounds`,
+    });
+  }
+
+  if (!novel.songs.length) {
+    errors.push({
+      targetType: NovelValidationTargetType.SONG,
+      targetId: "songs",
+      severity: "warning",
+      message: `Novel has no songs`,
+    });
+  }
+
+  if (!novel.starts.length) {
+    errors.push({
+      targetType: NovelValidationTargetType.START,
+      targetId: "starts",
+      severity: "warning",
+      message: `Novel has no starts`,
+    });
+  }
+
+  return errors;
+}

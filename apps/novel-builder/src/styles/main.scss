@@ -1,5 +1,6 @@
 @import "variables";
 @import "buttons";
+@import "normalize";
 
 * {
   box-sizing: border-box;
@@ -14,6 +15,13 @@ body {
   margin: 0;
 }
 
+button,
+a {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  text-decoration: none;
+}
 .page-container {
   background-color: transparent;
   padding: 1.5rem;

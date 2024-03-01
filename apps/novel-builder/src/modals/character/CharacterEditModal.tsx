@@ -35,11 +35,11 @@ export default function CharacterEditModal() {
         onButtonClick={(value) => setSelected(value)}
         buttons={[
           {
-            text: "Description",
+            content: "Description",
             value: "prompt",
           },
           {
-            text: "Outfits",
+            content: "Outfits",
             value: "outfits",
           },
         ]}
