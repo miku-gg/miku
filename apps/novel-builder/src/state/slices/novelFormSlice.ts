@@ -105,7 +105,7 @@ const initialState: NovelV3.NovelState = {
       description: "A beautiful forest",
       name: "Forest",
       source: {
-        jpg: "QmUdzioMR7UBC7qGAaFvsN1FyLujeHSqcsc4LAj3paYpFC.png",
+        jpg: "default_background.png",
       },
     },
   ],
@@ -115,7 +115,7 @@ const initialState: NovelV3.NovelState = {
       name: "Song 1",
       description: "A song",
       tags: ["hopeful"],
-      source: "QmQqLXpsB2D5LL3o2aAVGobM7hxPfxfGQ45FzENaMw23cb.mpeg",
+      source: "devonshire.mp3",
     },
   ],
   maps: [],
