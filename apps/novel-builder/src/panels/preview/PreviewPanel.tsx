@@ -80,8 +80,8 @@ export default function PreviewPanel() {
                 disabled: false,
               },
               interactions: {},
-              responses: {
-                [start.id]: {
+              responses: novel.starts.reduce((acc, start) => {
+                acc[start.id] = {
                   id: start.id,
                   parentInteractionId: null,
                   selectedCharacterId: start.characters[0].characterId,
@@ -90,8 +90,9 @@ export default function PreviewPanel() {
                   selected: true,
                   suggestedScenes: [],
                   childrenInteractions: [],
-                },
-              },
+                };
+                return acc;
+              }, {} as Record<string, object>),
             },
           },
         },

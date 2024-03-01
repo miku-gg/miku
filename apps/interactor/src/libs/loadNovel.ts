@@ -8,7 +8,7 @@ import {
 import { NovelState } from '../state/slices/novelSlice'
 import { NarrationState } from '../state/slices/narrationSlice'
 import { v4 as randomUUID } from 'uuid'
-import { VersionId } from '../state/versioning'
+import { NarrationResponse, VersionId } from '../state/versioning'
 import { toast } from 'react-toastify'
 
 export async function loadNovelFromSingleCard({
@@ -63,8 +63,8 @@ export async function loadNovelFromSingleCard({
         disabled: false,
       },
       interactions: {},
-      responses: {
-        [start.id]: {
+      responses: novel.starts.reduce((acc, start) => {
+        acc[start.id] = {
           id: start.id,
           parentInteractionId: null,
           selectedCharacterId: start.characters[0].characterId,
@@ -73,8 +73,9 @@ export async function loadNovelFromSingleCard({
           selected: true,
           suggestedScenes: [],
           childrenInteractions: [],
-        },
-      },
+        }
+        return acc
+      }, {} as Record<string, NarrationResponse>),
     }
     const startScene = novel.scenes.find((scene) => scene.id === start.sceneId)
     startScene?.characters.forEach((character) => {

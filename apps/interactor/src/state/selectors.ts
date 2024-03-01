@@ -181,9 +181,15 @@ export const selectCurrentSwipeResponses = createSelector(
     (state: RootState) => state.narration.currentResponseId,
   ],
   (interactions, responses, currentResponseId) => {
-    const interaction =
-      interactions[responses[currentResponseId]?.parentInteractionId || '']
-    return interaction?.responsesId.map((id) => responses[id])
+    if (responses[currentResponseId]?.parentInteractionId) {
+      const interaction =
+        interactions[responses[currentResponseId]?.parentInteractionId || '']
+      return interaction?.responsesId.map((id) => responses[id])
+    } else {
+      return Object.values(responses).filter(
+        (responses) => responses?.parentInteractionId === null
+      )
+    }
   }
 )
 
