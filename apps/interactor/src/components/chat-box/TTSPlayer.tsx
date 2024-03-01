@@ -113,7 +113,7 @@ const TTSPlayer2: React.FC = () => {
         text = replaceAll(text, '{{user}}', userName)
         text = replaceAll(text, '{{char}}', botName!)
 
-        if (!readAsteriks) text = text.replace(/\*.*?\*/g, '')
+        text = readAsteriks ? replaceAll(lastCharacterText, '*', '') : text.replace(/\*.*?\*/g, '')
 
         const response = await fetch(`${servicesEndpoint}/audio`, {
           method: 'POST',
