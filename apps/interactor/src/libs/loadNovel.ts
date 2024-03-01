@@ -37,9 +37,8 @@ export async function loadNovelFromSingleCard({
       }
     }
     if (!novel) {
-      const card = tavernCardToMikuCardV2(_card as TavernCardV2)
-      if (card.spec === 'chara_card_v2') {
-        novel = tavernCardToNovelState(card)
+      if (_card.spec === 'chara_card_v2') {
+        novel = tavernCardToNovelState(_card)
       }
     }
 

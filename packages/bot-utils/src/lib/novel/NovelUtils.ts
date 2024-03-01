@@ -119,7 +119,7 @@ export const tavernCardToNovelState = (
             emotion: "happy",
           },
         ],
-        sceneId: mikugg?.start_scenario || "",
+        sceneId: mikugg?.start_scenario || "default-scenario",
       },
     ],
     scenes: mikugg?.scenarios.map((scenario, index) => ({
