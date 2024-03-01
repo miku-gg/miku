@@ -41,6 +41,9 @@ const TTSPlayer2: React.FC = () => {
   const { disabled } = useAppSelector((state) => state.narration.input)
   const lastCharacter = lastCharacters.find((char) => char.selected)
   const lastCharacterText = lastCharacter?.text || ''
+  const readAsteriks = useAppSelector(
+    (state) => state.settings.voice.readAsteriks
+  )
   const autoPlay = useAppSelector((state) => state.settings.voice.autoplay)
   const playSpeed = useAppSelector((state) => state.settings.voice.speed)
   const isFirstMessage = useAppSelector(
@@ -105,10 +108,12 @@ const TTSPlayer2: React.FC = () => {
         fetchControllerRef.current = new AbortController()
         const { signal } = fetchControllerRef.current
 
-        let text = replaceAll(lastCharacterText, '*', '')
+        let text = lastCharacterText
 
         text = replaceAll(text, '{{user}}', userName)
         text = replaceAll(text, '{{char}}', botName!)
+
+        if (!readAsteriks) text = text.replace(/\*.*?\*/g, '')
 
         const response = await fetch(`${servicesEndpoint}/audio`, {
           method: 'POST',
@@ -165,7 +170,7 @@ const TTSPlayer2: React.FC = () => {
 
     // Cleanup function
     return cleanup
-  }, [lastCharacterText, servicesEndpoint, playSpeed])
+  }, [lastCharacterText, servicesEndpoint, playSpeed, readAsteriks])
 
   useEffect(() => {
     if (autoPlay) {

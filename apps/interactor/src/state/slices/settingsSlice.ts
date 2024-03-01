@@ -27,6 +27,7 @@ export const initialState: SettingsState = {
   voice: {
     autoplay: false,
     speed: Speed.Normal,
+    readAsteriks: false,
   },
   music: {
     enabled: false,
@@ -85,6 +86,9 @@ export const settingSlice = createSlice({
     setVoiceSpeed: (state, action: PayloadAction<Speed>) => {
       state.voice.speed = action.payload
     },
+    setReadAsteriks: (state, action: PayloadAction<boolean>) => {
+      state.voice.readAsteriks = action.payload
+    },
     setMusicEnabled: (state, action: PayloadAction<boolean>) => {
       state.music.enabled = action.payload
     },
@@ -140,6 +144,7 @@ export const {
   setHistoryModal,
   setEditModal,
   setDeleteNodeConfirmationModal,
+  setReadAsteriks,
 } = settingSlice.actions
 
 export default settingSlice.reducer

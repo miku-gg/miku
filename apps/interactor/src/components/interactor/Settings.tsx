@@ -1,8 +1,9 @@
-import { Input, Modal, Slider } from '@mikugg/ui-kit'
+import { CheckBox, Input, Modal, Slider } from '@mikugg/ui-kit'
 import { SlSettings } from 'react-icons/sl'
 import {
   Speed,
   setName,
+  setReadAsteriks,
   setSettingsModal,
   setSettingsTab,
   setSystemPrompt,
@@ -20,7 +21,7 @@ const Settings = (): JSX.Element => {
   const currentSystemPromptLenght = useAppSelector(
     (state) => state.settings.prompt.systemPrompt.length
   )
-  const systemPromptMaxLenght = 800
+  const systemPromptMaxLength = 800
 
   return (
     <div className="Settings">
@@ -70,7 +71,7 @@ const Settings = (): JSX.Element => {
                 <Input
                   className="SettingsModal__systemPrompt__input"
                   isTextArea
-                  maxLength={systemPromptMaxLenght}
+                  maxLength={systemPromptMaxLength}
                   label="Custom system prompt"
                   placeHolder={`Add information to always be remembered. For Example: Anon is Miku's student.`}
                   value={settings.prompt.systemPrompt}
@@ -79,7 +80,7 @@ const Settings = (): JSX.Element => {
                   }
                 />
                 <p className="SettingsModal__systemPrompt__count">
-                  {currentSystemPromptLenght}/{systemPromptMaxLenght}
+                  {currentSystemPromptLenght}/{systemPromptMaxLength}
                 </p>
               </div>
             </>
@@ -107,6 +108,15 @@ const Settings = (): JSX.Element => {
                   value: Speed.Presto,
                 },
               ]}
+            />
+          </div>
+          <div className="SettingsModal__voice-readAsteriks">
+            <p>Read Between Asteriks</p>
+            <CheckBox
+              value={settings.voice.readAsteriks}
+              onChange={(event) =>
+                dispatch(setReadAsteriks(event.target.checked))
+              }
             />
           </div>
         </div>

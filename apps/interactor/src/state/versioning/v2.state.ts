@@ -133,6 +133,7 @@ export interface SettingsState {
   voice: {
     autoplay: boolean
     speed: Speed
+    readAsteriks: boolean
   }
   music: {
     enabled: boolean

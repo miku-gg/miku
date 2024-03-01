@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
 import textHandler, { modelsMetadata } from "./services/text";
 import audioHandler from "./services/audio";
 import jwtPermissionMiddleware from "./lib/verifyJWT";
@@ -22,7 +21,7 @@ app.use(
     ],
   })
 );
-app.use(bodyParser.json());
+app.use(express.json({limit: '5mb'}));
 
 if (process.env.JWT_SECRET) {
   app.use(jwtPermissionMiddleware);
