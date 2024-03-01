@@ -111,7 +111,7 @@ const Settings = (): JSX.Element => {
             />
           </div>
           <div className="SettingsModal__voice-readAsteriks">
-            <p>Read Between Asteriks</p>
+            <p>Read Text Between Asteriks</p>
             <CheckBox
               value={settings.voice.readAsteriks}
               onChange={(event) =>
