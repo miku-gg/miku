@@ -50,6 +50,7 @@ export const selectScenes = createSelector(
           return {
             ...characters.find((c) => c.id === char.characterId),
             outfit: char.outfit,
+            objective: char.objective,
           };
         }),
         music: songs.find((song) => song.id === scene.musicId),

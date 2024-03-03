@@ -11,9 +11,9 @@ export type ModalType =
   | "loading"
   | "scene";
 
-export type PanelType = "assets" | "scenes" | "starts" | "preview";
+export type PanelType = "details" | "assets" | "scenes" | "starts" | "preview";
 export const isPanelType = (panel: string): panel is PanelType =>
-  ["assets", "scenes", "starts", "preview"].includes(panel);
+  ["details", "assets", "scenes", "starts", "preview"].includes(panel);
 
 export interface InputState {
   navigation: {
@@ -32,7 +32,7 @@ export interface InputState {
 const initialState: InputState = {
   navigation: {
     page: "homepage",
-    panel: "assets",
+    panel: "details",
   },
   modals: {
     loading: {

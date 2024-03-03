@@ -26,7 +26,18 @@ import "./styles/main.scss";
 import { downloadPng, BUILDING_STEPS } from "./libs/encodePNG";
 import BotImport from "./Components/BotImport";
 
-const DocIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 2.75A2.75 2.75 0 0 1 5.75 0h14.5a.75.75 0 0 1 .75.75v20.5a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h5.25v-4H6A1.5 1.5 0 0 0 4.5 18v.75c0 .716.43 1.334 1.05 1.605a.75.75 0 0 1-.6 1.374A3.251 3.251 0 0 1 3 18.75ZM19.5 1.5H5.75c-.69 0-1.25.56-1.25 1.25v12.651A2.989 2.989 0 0 1 6 15h13.5Z"></path><path d="M7 18.25a.25.25 0 0 1 .25-.25h5a.25.25 0 0 1 .25.25v5.01a.25.25 0 0 1-.397.201l-2.206-1.604a.25.25 0 0 0-.294 0L7.397 23.46a.25.25 0 0 1-.397-.2v-5.01Z"></path></svg>;
+const DocIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    width="18"
+    height="18"
+  >
+    <path d="M3 2.75A2.75 2.75 0 0 1 5.75 0h14.5a.75.75 0 0 1 .75.75v20.5a.75.75 0 0 1-.75.75h-6a.75.75 0 0 1 0-1.5h5.25v-4H6A1.5 1.5 0 0 0 4.5 18v.75c0 .716.43 1.334 1.05 1.605a.75.75 0 0 1-.6 1.374A3.251 3.251 0 0 1 3 18.75ZM19.5 1.5H5.75c-.69 0-1.25.56-1.25 1.25v12.651A2.989 2.989 0 0 1 6 15h13.5Z"></path>
+    <path d="M7 18.25a.25.25 0 0 1 .25-.25h5a.25.25 0 0 1 .25.25v5.01a.25.25 0 0 1-.397.201l-2.206-1.604a.25.25 0 0 0-.294 0L7.397 23.46a.25.25 0 0 1-.397-.2v-5.01Z"></path>
+  </svg>
+);
 
 const save = (card: MikuCard, jsonName?: string) => {
   const cardJSON = JSON.stringify(card, null, 2);
@@ -71,21 +82,21 @@ const _CharacterCreationForm: React.FC = () => {
       card.data.name,
       setBuildingStep
     );
-  }
+  };
 
   const handleBuildBot = async () => {
-    await save(card, `${card.data.name}.miku.json`)
+    await save(card, `${card.data.name}.miku.json`);
   };
 
   return (
     <div className="characterCreationForm">
       <div className="characterCreationForm__headingContainer">
         <div className="characterCreationForm__titleContainer">
-          <TextHeading size="h1">
-            Create a Character
-          </TextHeading>
+          <TextHeading size="h1">Create a Character</TextHeading>
           <a
-            href="https://docs.miku.gg/guides/bots/create-bots/" target="_blank" rel="nofollow"
+            href="https://docs.miku.gg/guides/bots/create-bots/"
+            target="_blank"
+            rel="nofollow"
             className="Input__infoIcon"
             data-tooltip-id={`input-tooltip-documentation`}
             data-tooltip-content="How to use this builder?"
@@ -93,10 +104,7 @@ const _CharacterCreationForm: React.FC = () => {
           >
             <DocIcon />
           </a>
-          <Tooltip
-            id={`input-tooltip-documentation`}
-            place="bottom"
-          />
+          <Tooltip id={`input-tooltip-documentation`} place="bottom" />
         </div>
         <TopBar
           steps={[
@@ -118,9 +126,7 @@ const _CharacterCreationForm: React.FC = () => {
           <Button theme="transparent" onClick={handleSave} iconSRC={saveIcon}>
             Save
           </Button>
-          {
-            currentStep === 1 && <BotImport />
-          }
+          {currentStep === 1 && <BotImport />}
         </div>
         <div className="characterCreationForm__navigationButtons">
           {currentStep > 1 && (
@@ -144,71 +150,71 @@ const _CharacterCreationForm: React.FC = () => {
           )}
         </div>
       </div>
-      <Modal opened={buildModalOpened} onCloseModal={() => {
-        if (buildingStep === BUILDING_STEPS.STEP_5_DONE || buildingStep === BUILDING_STEPS.STEP_0_NOT_BUILDING) {
-          setBuildModalOpened(false);
-          setBuildingStep(BUILDING_STEPS.STEP_0_NOT_BUILDING)  
-        }
-      }}>
-        <TextHeading size="h2">
-          Build character as package.
-        </TextHeading>
-        {
-          buildingStep > BUILDING_STEPS.STEP_0_NOT_BUILDING ? (
-            <div>
-              {buildingStep !== BUILDING_STEPS.STEP_5_DONE && (
-                <div className="loading"></div>
-              )}
-              <div className="loading-text">
-                {(function () {
-                  switch (buildingStep) {
-                    case BUILDING_STEPS.STEP_1_COMBINE_IMAGE:
-                      return "Generating png image...";
-                    case BUILDING_STEPS.STEP_2_GENERATING_CHUNKS:
-                      return "Generating chunks...";
-                    case BUILDING_STEPS.STEP_3_ENCODING_CHUNKS:
-                      return "Encoding chunks in png...";
-                    case BUILDING_STEPS.STEP_4_BUILDING_DOWNLOAD_FILE:
-                      return "Downloading png file...";
-                    case BUILDING_STEPS.STEP_5_DONE:
-                      return "Bot builded successfully";
-                    default:
-                      return "Building bot...";
-                  }
-                })()}
+      <Modal
+        opened={buildModalOpened}
+        onCloseModal={() => {
+          if (
+            buildingStep === BUILDING_STEPS.STEP_5_DONE ||
+            buildingStep === BUILDING_STEPS.STEP_0_NOT_BUILDING
+          ) {
+            setBuildModalOpened(false);
+            setBuildingStep(BUILDING_STEPS.STEP_0_NOT_BUILDING);
+          }
+        }}
+      >
+        <TextHeading size="h2">Build character as package.</TextHeading>
+        {buildingStep > BUILDING_STEPS.STEP_0_NOT_BUILDING ? (
+          <div>
+            {buildingStep !== BUILDING_STEPS.STEP_5_DONE && (
+              <div className="loading"></div>
+            )}
+            <div className="loading-text">
+              {(function () {
+                switch (buildingStep) {
+                  case BUILDING_STEPS.STEP_1_COMBINE_IMAGE:
+                    return "Generating png image...";
+                  case BUILDING_STEPS.STEP_2_GENERATING_CHUNKS:
+                    return "Generating chunks...";
+                  case BUILDING_STEPS.STEP_3_ENCODING_CHUNKS:
+                    return "Encoding chunks in png...";
+                  case BUILDING_STEPS.STEP_4_BUILDING_DOWNLOAD_FILE:
+                    return "Downloading png file...";
+                  case BUILDING_STEPS.STEP_5_DONE:
+                    return "Bot builded successfully";
+                  default:
+                    return "Building bot...";
+                }
+              })()}
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="step4Preview__build-options">
+              <div
+                id="BotImport__button"
+                data-tooltip-id={`bot-build-png-button`}
+                data-tooltip-html="For compatibility: bots.miku.gg and local"
+                data-tooltip-varaint="dark"
+              >
+                <Button theme="transparent" onClick={handelBuildBotAsPNG}>
+                  Build as .png
+                </Button>
+              </div>
+              <div
+                id="BotImport__button"
+                data-tooltip-id={`bot-build-json-button`}
+                data-tooltip-html="For miku.gg"
+                data-tooltip-varaint="dark"
+              >
+                <Button theme="gradient" onClick={handleBuildBot}>
+                  Build as .json
+                </Button>
               </div>
             </div>
-          ) : (
-            <>
-              <div className="step4Preview__build-options">
-                <div
-                    id="BotImport__button"
-                    data-tooltip-id={`bot-build-png-button`}
-                    data-tooltip-html="For compatibility: bots.miku.gg and local"
-                    data-tooltip-varaint="dark"
-                  >
-                  <Button theme="transparent" onClick={handelBuildBotAsPNG}>Build as .png</Button>
-                </div>
-                <div
-                    id="BotImport__button"
-                    data-tooltip-id={`bot-build-json-button`}
-                    data-tooltip-html="For miku.gg"
-                    data-tooltip-varaint="dark"
-                  >
-                  <Button theme="gradient" onClick={handleBuildBot}>Build as .json</Button>
-                </div>
-              </div>
-              <Tooltip
-                id="bot-build-png-button"
-                place="top"
-              />
-              <Tooltip
-                id="bot-build-json-button"
-                place="top"
-              />
-            </>
-          )
-        }
+            <Tooltip id="bot-build-png-button" place="top" />
+            <Tooltip id="bot-build-json-button" place="top" />
+          </>
+        )}
       </Modal>
     </div>
   );

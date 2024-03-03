@@ -171,6 +171,52 @@
     display: flex;
     justify-content: flex-end;
   }
+
+  &__scene-objectives {
+    margin-top: 1rem;
+    background-color: $background-1;
+    padding: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    &-title {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    &-description {
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+  }
+
+  &__scene-objective {
+    flex: 1;
+    min-width: 300px;
+
+    &__character {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-bottom: 0.5rem;
+
+      img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+    }
+    &__input {
+    }
+  }
+
+  &__scene-objectives-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
 }
 
 // if screen is mobile

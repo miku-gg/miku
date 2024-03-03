@@ -354,6 +354,15 @@ const novelFormSlice = createSlice({
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;
     },
+    updateDetails: (
+      state,
+      action: PayloadAction<{
+        name: "title" | "description" | "author" | "logoPic";
+        value: string;
+      }>
+    ) => {
+      state[action.payload.name] = action.payload.value;
+    },
   },
 });
 
@@ -376,6 +385,7 @@ export const {
   createStart,
   updateStart,
   loadCompleteState,
+  updateDetails,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

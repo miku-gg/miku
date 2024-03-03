@@ -59,7 +59,7 @@ export default function HomePanel() {
         dispatch(closeModal({ modalType: "loading" }));
         dispatch(loadCompleteState(novelWithUploadedAssets));
         dispatch(navigatePage("edit"));
-        dispatch(navigatePanel("assets"));
+        dispatch(navigatePanel("details"));
       } catch (e) {
         console.error(e);
       }
@@ -76,7 +76,7 @@ export default function HomePanel() {
           role="button"
           onClick={() => {
             dispatch(navigatePage("edit"));
-            dispatch(navigatePanel("assets"));
+            dispatch(navigatePanel("details"));
           }}
         >
           <div className="HomePanel__option__icon">

@@ -41,18 +41,6 @@ export default function SceneEditModal() {
   const [showingEmotionChar1, setShowingEmotionChar1] = useState("neutral");
   const [showingEmotionChar2, setShowingEmotionChar2] = useState("neutral");
 
-  const handleScenePromptChange = (e: { target: { value: string } }) => {
-    const newPrompt = String(e.target.value);
-    if (scene) {
-      dispatch(
-        updateScene({
-          ...scene._source,
-          prompt: newPrompt,
-        })
-      );
-    }
-  };
-
   const handleDeleteScene = () => {
     if (scene) {
       openAreYouSure({
@@ -315,6 +303,61 @@ export default function SceneEditModal() {
                       : undefined
                   }
                 ></audio>
+              </div>
+            </div>
+            <div className="SceneEditModal__scene-objectives">
+              <div className="SceneEditModal__scene-objectives-header">
+                <div className="SceneEditModal__scene-objectives-title">
+                  Character Objectives
+                </div>
+                <div className="SceneEditModal__scene-objectives-description">
+                  [Optional] Indicate what each character is trying to achieve
+                  in this scene.
+                </div>
+              </div>
+              <div className="SceneEditModal__scene-objectives-list">
+                {scene.characters.map((character) => {
+                  return (
+                    <div className="SceneEditModal__scene-objective">
+                      <div className="SceneEditModal__scene-objective__character">
+                        <img
+                          src={config.genAssetLink(character.profile_pic || "")}
+                        />
+                        <span>{character.name}</span>
+                      </div>
+                      <div className="SceneEditModal__scene-objective__input">
+                        <Input
+                          id={`objective-${character.id}`}
+                          name={`objective-${character.id}`}
+                          placeHolder={`What is ${character.name} trying to achieve?`}
+                          value={character.objective || ""}
+                          onChange={(e) => {
+                            dispatch(
+                              updateScene({
+                                ...scene._source,
+                                characters: scene.characters.map((char) => {
+                                  if (char.id === character.id) {
+                                    return {
+                                      characterId: char.id || "",
+                                      objective: e.target.value,
+                                      outfit: char.outfit,
+                                    };
+                                  }
+                                  return {
+                                    characterId: char.id || "",
+                                    objective: char.objective,
+                                    outfit: char.outfit,
+                                  };
+                                }),
+                              })
+                            );
+                          }}
+                          isTextArea
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
             <div className="SceneEditModal__scene-actions">

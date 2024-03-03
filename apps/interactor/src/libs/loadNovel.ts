@@ -1,10 +1,5 @@
 import axios from 'axios'
-import {
-  TavernCardV2,
-  migrateNovelV2ToV3,
-  tavernCardToMikuCardV2,
-  tavernCardToNovelState,
-} from '@mikugg/bot-utils'
+import { migrateNovelV2ToV3, tavernCardToNovelState } from '@mikugg/bot-utils'
 import { NovelState } from '../state/slices/novelSlice'
 import { NarrationState } from '../state/slices/narrationSlice'
 import { v4 as randomUUID } from 'uuid'

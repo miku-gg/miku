@@ -20,6 +20,7 @@ import { BiCameraMovie } from "react-icons/bi";
 import { TbBoxMultiple } from "react-icons/tb";
 import { LuMonitorPlay } from "react-icons/lu";
 import { BiSolidSave } from "react-icons/bi";
+import DetailsPanel from "./details/DetailsPanel";
 
 const allowUntilStep = (novel: NovelV3.NovelState): number => {
   if (
@@ -43,6 +44,14 @@ function PanelExplorer() {
     <div className="panels">
       <ButtonGroup
         buttons={[
+          {
+            content: (
+              <>
+                <MdOutlinePermMedia /> <span>Details</span>
+              </>
+            ),
+            value: "details",
+          },
           {
             content: (
               <>
@@ -116,6 +125,7 @@ function PanelExplorer() {
           }
         }}
       />
+      {selectedPanel === "details" ? <DetailsPanel /> : null}
       {selectedPanel === "assets" ? <AssetsPanel /> : null}
       {selectedPanel === "scenes" ? <SceneGraph /> : null}
       {selectedPanel === "starts" ? <StartsPanel /> : null}
