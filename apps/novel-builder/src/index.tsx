@@ -20,6 +20,9 @@ ReactDOM.render(
     <Provider store={store}>
       <AreYouSure.AreYouSureProvider>
         <div className="app">
+          <div className="app__header">
+            <div>Novel Builder</div>
+          </div>
           <Planels />
         </div>
         <SceneEditModal />

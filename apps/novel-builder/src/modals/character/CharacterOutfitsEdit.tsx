@@ -141,6 +141,24 @@ export default function CharacterOutfitsEdit({
     }
   };
 
+  const handleEmotionGroupDescriptionChange = (
+    event: {
+      target: { value: string };
+    },
+    groupIndex: number
+  ) => {
+    const { value } = event.target;
+    if (groupIndex < outfits.length) {
+      const newGroups = [...outfits];
+      newGroups[groupIndex] = {
+        ...newGroups[groupIndex],
+        description: value,
+      };
+
+      dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
+    }
+  };
+
   const handleImageChange = async (
     file: File,
     groupIndex: number,
@@ -301,13 +319,26 @@ export default function CharacterOutfitsEdit({
         >
           <div className="CharacterOutfitsEdit__formGroup">
             <Input
-              label="Name:"
-              placeHolder="Enter a name for this emotion group"
+              label="Name"
+              placeHolder="Enter a name for this outfit"
               id={`group_${groupIndex}_name`}
               name="name"
               value={group.name}
               onChange={(event) =>
                 handleEmotionGroupNameChange(event, groupIndex)
+              }
+            />
+          </div>
+          <div className="CharacterOutfitsEdit__formGroup">
+            <Input
+              label="Description"
+              placeHolder={`[Maiko's Body= "white long hair", "black horns", "dark body lingerie",  "deep pink eyes", "pale skin", "slender figure", "big breasts", "clumsy posture", "pointy ears", "small devilish wings"]`}
+              id={`group_${groupIndex}_name`}
+              name="description"
+              isTextArea
+              value={group.description}
+              onChange={(event) =>
+                handleEmotionGroupDescriptionChange(event, groupIndex)
               }
             />
           </div>

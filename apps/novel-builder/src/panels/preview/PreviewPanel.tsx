@@ -1,10 +1,11 @@
-import { Loader } from "@mikugg/ui-kit";
+import { Button, Loader } from "@mikugg/ui-kit";
 import config from "../../config";
 import { useEffect, useMemo, useRef, useState } from "react";
 import base64 from "base-64";
 import utf8 from "utf8";
 import queryString from "query-string";
 import { useAppSelector } from "../../state/store";
+import { PiHammerBold } from "react-icons/pi";
 import "./PreviewPanel.scss";
 
 export function generateAlphaLink({
@@ -103,7 +104,15 @@ export default function PreviewPanel() {
 
   return (
     <div className="PreviewPanel">
-      <h1>Preview Panel</h1>
+      <div className="PreviewPanel__header">
+        <h1 className="PreviewPanel__title">Preview</h1>
+        <div className="PreviewPanel__build">
+          <Button theme="gradient">
+            <PiHammerBold />
+            Build
+          </Button>
+        </div>
+      </div>
       {loadingIframe ? <Loader /> : null}
       <div className="PreviewPanel__iframe-container">
         <iframe

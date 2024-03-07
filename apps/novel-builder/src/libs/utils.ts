@@ -67,9 +67,14 @@ export const downloadNovelState = async (
   for (let i = 0; i < allAssets.length; i += BATCH_SIZE) {
     const batch = allAssets.slice(i, i + BATCH_SIZE);
     const promises = batch.map(async ([key, value]) => {
-      const base64 = await downloadAssetAsBase64URI(getAssetUrl(value));
-      onUpdate(`Downloading assets ${++dl}/${allAssets.length}...`);
-      return base64;
+      if (value && !value.startsWith("data:")) {
+        const base64 = await downloadAssetAsBase64URI(getAssetUrl(value));
+        onUpdate(`Downloading assets ${++dl}/${allAssets.length}...`);
+        return base64;
+      } else {
+        onUpdate(`Downloading assets ${++dl}/${allAssets.length}...`);
+        return value;
+      }
     });
     const base64s = await Promise.all(promises);
     batch.forEach(([key, value], index) => {

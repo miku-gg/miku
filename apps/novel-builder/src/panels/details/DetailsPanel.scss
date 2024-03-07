@@ -1,0 +1,14 @@
+.DetailsPanel {
+  &__form {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+
+  &__texts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+}

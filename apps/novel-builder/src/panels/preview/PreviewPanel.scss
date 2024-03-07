@@ -2,4 +2,18 @@
   &__iframe-container {
     height: 60vh;
   }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  &__build {
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
 }

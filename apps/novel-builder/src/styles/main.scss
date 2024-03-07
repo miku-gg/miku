@@ -7,7 +7,8 @@
 }
 
 body {
-  background: linear-gradient(#0c0a1d 0%, #1e1a41 100%);
+  // background: linear-gradient(#0c0a1d 0%, #1e1a41 100%);
+  background: $background-2;
   min-height: 100vh;
   font-family: "Poppins", "Roboto", sans-serif;
   color: $text-1;
@@ -29,7 +30,7 @@ a {
 }
 
 .group {
-  background-color: $background-2;
+  background-color: $background-1;
   padding: 1rem;
   border-radius: 1rem;
 }
@@ -47,4 +48,10 @@ a {
 .app {
   margin: 0 auto;
   max-width: 1200px;
+
+  &__header {
+    padding: 1rem 0;
+    font-size: 1.4rem;
+    font-weight: bold;
+  }
 }

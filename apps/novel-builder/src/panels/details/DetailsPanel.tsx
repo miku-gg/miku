@@ -5,6 +5,8 @@ import { checkFileType } from "../../libs/utils";
 import { toast } from "react-toastify";
 import { updateDetails } from "../../state/slices/novelFormSlice";
 
+import "./DetailsPanel.scss";
+
 export default function DetailsPanel() {
   const dispatch = useAppDispatch();
   const { title, description, author, logoPic } = useAppSelector(
@@ -31,60 +33,62 @@ export default function DetailsPanel() {
   return (
     <div className="DetailsPanel">
       <h1>Details</h1>
-      <div className="Details__form">
-        <div className="DetailsPanel__formGroup">
-          <Input
-            placeHolder="The title of your Novel"
-            id="title"
-            name="title"
-            label="Novel Title"
-            description="The title of your Novel"
-            value={title}
-            onChange={(e) => {
-              dispatch(
-                updateDetails({
-                  name: "title",
-                  value: e.target.value,
-                })
-              );
-            }}
-          />
-        </div>
-        <div className="DetailsPanel__formGroup">
-          <Input
-            placeHolder="The description of your Novel"
-            id="description"
-            name="description"
-            label="Novel Description"
-            description="The description of your Novel"
-            value={description}
-            onChange={(e) => {
-              dispatch(
-                updateDetails({
-                  name: "description",
-                  value: e.target.value,
-                })
-              );
-            }}
-          />
-        </div>
-        <div className="DetailsPanel__formGroup">
-          <Input
-            placeHolder="The author of the Novel"
-            id="author"
-            name="author"
-            label="Author"
-            description="The author of the Novel"
-            value={author}
-            onChange={(e) => {
-              dispatch(
-                updateDetails({
-                  name: "author",
-                  value: e.target.value,
-                })
-              );
-            }}
-          />
+      <div className="DetailsPanel__form">
+        <div className="DetailsPanel__texts">
+          <div className="DetailsPanel__formGroup">
+            <Input
+              placeHolder="The title of your Novel"
+              id="title"
+              name="title"
+              label="Novel Title"
+              description="The title of your Novel"
+              value={title}
+              onChange={(e) => {
+                dispatch(
+                  updateDetails({
+                    name: "title",
+                    value: e.target.value,
+                  })
+                );
+              }}
+            />
+          </div>
+          <div className="DetailsPanel__formGroup">
+            <Input
+              placeHolder="The description of your Novel"
+              id="description"
+              name="description"
+              label="Novel Description"
+              description="The description of your Novel"
+              value={description}
+              onChange={(e) => {
+                dispatch(
+                  updateDetails({
+                    name: "description",
+                    value: e.target.value,
+                  })
+                );
+              }}
+            />
+          </div>
+          <div className="DetailsPanel__formGroup">
+            <Input
+              placeHolder="The author of the Novel"
+              id="author"
+              name="author"
+              label="Author"
+              description="The author of the Novel"
+              value={author}
+              onChange={(e) => {
+                dispatch(
+                  updateDetails({
+                    name: "author",
+                    value: e.target.value,
+                  })
+                );
+              }}
+            />
+          </div>
         </div>
         <div className="DetailsPanel__formGroup">
           <label>Upload novel icon (256x256)</label>

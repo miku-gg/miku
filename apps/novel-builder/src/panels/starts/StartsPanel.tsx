@@ -25,7 +25,7 @@ export default function StartsPanel() {
 
   return (
     <div className="StartsPanel">
-      <div className="StartsPanel__title">Starts</div>
+      <h1 className="StartsPanel__title">Starts</h1>
       <div className="StartsPanel__description">
         List all possible starting points for your novel. For each, indicate the
         start scene and character's message.
