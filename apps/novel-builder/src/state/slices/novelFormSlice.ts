@@ -2,27 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { NovelV3 } from "@mikugg/bot-utils";
 import { v4 as randomUUID } from "uuid";
 
-const SCENE_DEFAULT = {
-  id: "",
-  backgroundId: "bg-1",
-  nsfw: NovelV3.NovelNSFW.NONE,
-  characters: [
-    {
-      characterId: "char-1",
-      outfit: "outfit-1",
-    },
-  ],
-  children: [],
-  musicId: "1",
-  name: "New Scene",
-  parentMapId: null,
-  prompt: "*xd*",
-  actionText: "Go to scene 1",
-  condition: null,
-};
-
-/*
-const initialState: NovelFormState = {
+const initialState: NovelV3.NovelState = {
   title: "",
   description: "",
   logoPic: "",
@@ -33,130 +13,6 @@ const initialState: NovelFormState = {
   songs: [],
   maps: [],
   scenes: [],
-  starts: [],
-};
-*/
-const initialState: NovelV3.NovelState = {
-  title: "",
-  description: "",
-  logoPic: "",
-  author: "",
-  tags: [],
-  characters: [
-    {
-      id: "char-1",
-      name: "char1",
-      short_description: "",
-      profile_pic: "empty_char.png",
-      tags: [],
-      nsfw: NovelV3.NovelNSFW.NONE,
-      card: {
-        spec: "chara_card_v2",
-        spec_version: "2.0",
-        data: {
-          name: "char1",
-          alternate_greetings: [],
-          character_version: "1",
-          creator: "",
-          creator_notes: "",
-          description: "",
-          extensions: {
-            mikugg_v2: {
-              license: "CC BY-NC-SA 4.0",
-              language: "en",
-              short_description: "",
-              profile_pic: "empty_char.png",
-              nsfw: NovelV3.NovelNSFW.NONE,
-              outfits: [
-                {
-                  id: "outfit-1",
-                  name: "default",
-                  description: "The default outfit",
-                  attributes: [],
-                  template: "single-emotion",
-                  nsfw: NovelV3.NovelNSFW.NONE,
-                  emotions: [
-                    {
-                      id: "neutral",
-                      sources: {
-                        png: "empty_char_emotion.png",
-                      },
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-          first_mes: "",
-          mes_example: "",
-          personality: "",
-          post_history_instructions: "",
-          scenario: "",
-          system_prompt: "",
-          tags: [],
-        },
-      },
-    },
-  ],
-  backgrounds: [
-    {
-      id: "bg-1",
-      attributes: [],
-      description: "A beautiful forest",
-      name: "Forest",
-      source: {
-        jpg: "default_background.png",
-      },
-    },
-  ],
-  songs: [
-    {
-      id: "1",
-      name: "Song 1",
-      description: "A song",
-      tags: ["hopeful"],
-      source: "devonshire.mp3",
-    },
-  ],
-  maps: [],
-  scenes: [
-    {
-      id: "scene-1",
-      backgroundId: "bg-1",
-      characters: [
-        {
-          characterId: "char-1",
-          outfit: "outfit-1",
-        },
-      ],
-      nsfw: NovelV3.NovelNSFW.NONE,
-      children: [],
-      musicId: "1",
-      name: "Scene 1",
-      parentMapId: null,
-      prompt: "*xd*",
-      actionText: "Go to scene 1",
-      condition: null,
-    },
-    {
-      id: "scene-2",
-      backgroundId: "bg-1",
-      characters: [
-        {
-          characterId: "char-1",
-          outfit: "outfit-1",
-        },
-      ],
-      nsfw: NovelV3.NovelNSFW.NONE,
-      children: [],
-      musicId: "1",
-      name: "Scene 2",
-      parentMapId: null,
-      prompt: "*xd*",
-      actionText: "Go to scene 1",
-      condition: null,
-    },
-  ],
   starts: [],
 };
 
@@ -297,7 +153,27 @@ const novelFormSlice = createSlice({
       state.characters.push(action.payload);
     },
     createSceneWithDefaults: (state) => {
-      const newScene = { ...SCENE_DEFAULT, id: randomUUID() };
+      const newScene: NovelV3.NovelScene = {
+        id: randomUUID(),
+        actionText: "",
+        condition: "",
+        musicId: state.songs[0]?.id || "",
+        name: "New Scene",
+        backgroundId: state.backgrounds[0]?.id || "default_background.jpg",
+        characters: [
+          {
+            characterId: state.characters[0]?.id || "",
+            outfit:
+              state.characters[0]?.card?.data?.extensions?.mikugg_v2?.outfits[0]
+                ?.id || "",
+            objective: "",
+          },
+        ],
+        children: [],
+        nsfw: NovelV3.NovelNSFW.NONE,
+        parentMapId: null,
+        prompt: "",
+      };
       state.scenes.push(newScene);
     },
     deleteSceneById: (state, action: PayloadAction<string>) => {
@@ -363,6 +239,7 @@ const novelFormSlice = createSlice({
     ) => {
       state[action.payload.name] = action.payload.value;
     },
+    clearNovelState: () => initialState,
   },
 });
 
@@ -386,6 +263,7 @@ export const {
   updateStart,
   loadCompleteState,
   updateDetails,
+  clearNovelState,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

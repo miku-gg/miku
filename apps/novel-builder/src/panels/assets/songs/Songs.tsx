@@ -96,6 +96,7 @@ export default function Songs({
           type="file"
           onChange={handleUploadSong}
           ref={uploadSong}
+          accept="audio/*"
           hidden
         />
       </div>

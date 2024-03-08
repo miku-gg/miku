@@ -95,7 +95,9 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       template,
       variables: {
         emotions: emotions
-          .filter((emotion) => emotion !== parentEmotion)
+          .filter((emotion) =>
+            emotions.length > 1 ? emotion !== parentEmotion : true
+          )
           .map((emotion) => ' ' + emotion),
       },
       totalTokens,

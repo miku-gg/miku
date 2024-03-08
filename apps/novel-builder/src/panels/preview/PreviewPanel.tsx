@@ -4,9 +4,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import base64 from "base-64";
 import utf8 from "utf8";
 import queryString from "query-string";
-import { useAppSelector } from "../../state/store";
+import { useAppDispatch, useAppSelector } from "../../state/store";
 import { PiHammerBold } from "react-icons/pi";
 import "./PreviewPanel.scss";
+import { downloadNovelState } from "../../libs/utils";
+import cloneDeep from "lodash.clonedeep";
+import { closeModal, openModal } from "../../state/slices/inputSlice";
+import { toast } from "react-toastify";
 
 export function generateAlphaLink({
   botHash,
@@ -49,6 +53,7 @@ export default function PreviewPanel() {
   const [loadingIframe, setLoadingIframe] = useState<boolean>(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const novel = useAppSelector((state) => state.novel);
+  const dispatch = useAppDispatch();
 
   const botInteractionUrl = useMemo(
     () =>
@@ -58,6 +63,28 @@ export default function PreviewPanel() {
       }),
     []
   );
+
+  const handleBuild = async () => {
+    try {
+      await downloadNovelState(
+        cloneDeep(novel),
+        config.genAssetLink,
+        (text: string) => {
+          dispatch(
+            openModal({
+              modalType: "loading",
+              text,
+            })
+          );
+        },
+        true
+      );
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to build novel");
+    }
+    dispatch(closeModal({ modalType: "loading" }));
+  };
 
   useEffect(() => {
     if (!loadingIframe) {
@@ -107,7 +134,7 @@ export default function PreviewPanel() {
       <div className="PreviewPanel__header">
         <h1 className="PreviewPanel__title">Preview</h1>
         <div className="PreviewPanel__build">
-          <Button theme="gradient">
+          <Button theme="gradient" onClick={handleBuild}>
             <PiHammerBold />
             Build
           </Button>

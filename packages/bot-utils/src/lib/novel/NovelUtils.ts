@@ -6,6 +6,7 @@ import {
 } from "../MikuCardUtils";
 import * as NovelV3 from "./NovelV3";
 import * as NovelV2 from "./_deprecated.NovelV2";
+import { replaceStringsInObject } from "../utils";
 
 const randomString = (length = 32) => {
   const characters =
@@ -15,16 +16,6 @@ const randomString = (length = 32) => {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
-};
-
-const replaceStringsInObject = (
-  obj: any,
-  find: string,
-  replace: string
-): any => {
-  return JSON.parse(
-    JSON.stringify(obj).replace(new RegExp(find, "g"), replace)
-  );
 };
 
 export const tavernCardToMikuCardV2 = (
@@ -261,8 +252,8 @@ export const inputToNovelState = (
   }
 };
 
-const isDataUri = (string: string): boolean => {
-  return /^data:/.test(string);
+const isDataUri = (str: string): boolean => {
+  return str.startsWith("data:");
 };
 
 export const extractNovelAssets = async (
@@ -544,7 +535,11 @@ export const importAndReplaceNovelStateAssets = async (
   const hashes = await uploadAssetsInBatches();
   let novelResult = novelWithReplacedAssets;
   hashes.forEach(({ find, replace }) => {
-    novelResult = replaceStringsInObject(novelResult, find, replace);
+    novelResult = replaceStringsInObject(
+      novelResult,
+      find,
+      replace
+    ) as NovelV3.NovelState;
   });
 
   return novelResult;

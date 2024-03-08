@@ -9,11 +9,11 @@ import { toast } from 'react-toastify'
 export async function loadNovelFromSingleCard({
   cardId,
   cardEndpoint,
-  assetsEndpoint,
+  assetLinkLoader,
 }: {
   cardId: string
   cardEndpoint: string
-  assetsEndpoint: string
+  assetLinkLoader: (asset: string, lowres?: boolean) => string
 }): Promise<{
   novel: NovelState
   narration: NarrationState
@@ -93,12 +93,15 @@ export async function loadNovelFromSingleCard({
     if (firstSceneBackground) assets.add(firstSceneBackground)
 
     // await all assets load dummy fetch
-    if (assetsEndpoint) {
+    if (assetLinkLoader) {
       try {
         await Promise.all(
-          Array.from(assets).map((asset) =>
-            axios.get(`${assetsEndpoint}/${asset}`)
-          )
+          Array.from(assets).map(async (_asset) => {
+            const asset = assetLinkLoader(_asset)
+            return !asset.startsWith('data:')
+              ? axios.get(assetLinkLoader(asset))
+              : asset
+          })
         )
       } catch (error) {
         console.error(error)

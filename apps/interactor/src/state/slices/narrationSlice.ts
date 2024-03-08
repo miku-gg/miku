@@ -48,6 +48,7 @@ const narrationSlice = createSlice({
         sceneId: string
         characters: string[]
         selectedCharacterId: string
+        emotion?: string
       }>
     ) {
       const { text, sceneId } = action.payload

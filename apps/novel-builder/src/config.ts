@@ -6,6 +6,20 @@ async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
   return new File([blob], filename, { type: blob.type });
 }
 
+async function fileToDataURI(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target) {
+        resolve(e.target.result as string);
+      } else {
+        reject("Failed to read file");
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 interface BuilderConfig {
   genAssetLink: (asset: string, lowres?: boolean) => string;
   uploadAsset: (file: File | string) => Promise<{
@@ -60,8 +74,15 @@ const configs: Map<"development" | "stating" | "production", BuilderConfig> =
     [
       "development",
       {
-        genAssetLink: (asset: string, lowres?: boolean) =>
-          `http://localhost:8585/s3/assets/${lowres ? `480p_${asset}` : asset}`,
+        genAssetLink: (asset: string, lowres?: boolean) => {
+          if (asset.startsWith("data")) {
+            return asset;
+          } else {
+            return `http://localhost:8585/s3/assets/${
+              lowres ? `480p_${asset}` : asset
+            }`;
+          }
+        },
         uploadAsset: async (file: File | string) => {
           if (typeof file === "string") {
             file = await dataURItoFile(file, "asset");

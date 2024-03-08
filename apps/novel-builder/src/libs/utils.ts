@@ -1,4 +1,8 @@
-import { NovelV3, extractNovelAssets } from "@mikugg/bot-utils";
+import {
+  NovelV3,
+  extractNovelAssets,
+  replaceStringsInObject,
+} from "@mikugg/bot-utils";
 import Hash from "ipfs-only-hash";
 
 export async function stringToIPFSHash(context: string): Promise<string> {
@@ -18,16 +22,6 @@ export const checkFileType = (file: File, types = ["image/png"]): boolean => {
   return types.includes(file.type);
 };
 
-export const replaceStringsInObject = (
-  obj: any,
-  find: string,
-  replace: string
-): any => {
-  return JSON.parse(
-    JSON.stringify(obj).replace(new RegExp(find, "g"), replace)
-  );
-};
-
 export const downloadAssetAsBase64URI = async (
   url: string
 ): Promise<string> => {
@@ -45,9 +39,12 @@ export const downloadAssetAsBase64URI = async (
 export const downloadNovelState = async (
   _novel: NovelV3.NovelState,
   getAssetUrl: (asset: string) => string,
-  onUpdate: (text: string) => void
+  onUpdate: (text: string) => void,
+  asBuild = false
 ) => {
-  const filename = _novel.title.replace(/ /g, "_") + ".novel.miku-temp.json";
+  const filename =
+    _novel.title.replace(/ /g, "_") +
+    (asBuild ? ".novel.json" : ".novel.miku-temp.json");
   onUpdate("Extracting assets...");
   const { assets, novel } = await extractNovelAssets(_novel);
 
@@ -78,7 +75,11 @@ export const downloadNovelState = async (
     });
     const base64s = await Promise.all(promises);
     batch.forEach(([key, value], index) => {
-      novelResult = replaceStringsInObject(novelResult, value, base64s[index]);
+      novelResult = replaceStringsInObject(
+        novelResult,
+        key,
+        base64s[index]
+      ) as NovelV3.NovelState;
     });
   }
 

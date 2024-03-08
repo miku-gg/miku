@@ -1,3 +1,5 @@
+@import '../variables';
+
 .Blocks {
   display: flex;
   gap: 15px;
@@ -7,7 +9,6 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
     height: 100px;
     border-radius: 10px;
     transition: all 0.2s ease-out;
@@ -39,5 +40,15 @@
     position: absolute;
     top: 5px;
     right: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+
+    &:hover {
+      color: $secondary-color;
+    }
+  }
+
+  &--clickable {
+    cursor: pointer;
   }
 }

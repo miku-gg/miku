@@ -353,6 +353,9 @@ importers:
       ipld-dag-pb:
         specifier: ^0.22.3
         version: 0.22.3
+      lodash.clonedeep:
+        specifier: ^4.5.0
+        version: 4.5.0
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
@@ -414,6 +417,9 @@ importers:
       '@originjs/vite-plugin-commonjs':
         specifier: ^1.0.3
         version: 1.0.3
+      '@types/lodash.clonedeep':
+        specifier: ^4.5.9
+        version: 4.5.9
       '@types/lodash.debounce':
         specifier: ^4.0.9
         version: 4.0.9
@@ -6418,6 +6424,12 @@ packages:
       '@types/node': 18.15.5
     dev: false
 
+  /@types/lodash.clonedeep@4.5.9:
+    resolution: {integrity: sha512-19429mWC+FyaAhOLzsS8kZUsI+/GmBAQ0HFiCPsKGU+7pBXOQWhyrY6xNNDwUSX8SMZMJvuFVMF9O5dQOlQK9Q==}
+    dependencies:
+      '@types/lodash': 4.14.194
+    dev: true
+
   /@types/lodash.debounce@4.0.9:
     resolution: {integrity: sha512-Ma5JcgTREwpLRwMM+XwBR7DaWe96nC38uCBDFKZWbNKD+osjVzdpnUSwBcqCptrp16sSOLBAUb50Car5I0TCsQ==}
     dependencies:
@@ -12077,6 +12089,10 @@ packages:
     dependencies:
       p-locate: 5.0.0
     dev: true
+
+  /lodash.clonedeep@4.5.0:
+    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
+    dev: false
 
   /lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}

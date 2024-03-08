@@ -113,6 +113,16 @@ function getCongurationFromParams(): {
 
 const params = getCongurationFromParams()
 
+const assetLinkLoader = (asset: string, lowres?: boolean) => {
+  if (asset.startsWith('data')) {
+    return asset
+  }
+  if (lowres) {
+    return `${params.assetsEndpoint}/480p_${asset}`
+  }
+  return `${params.assetsEndpoint}/${asset}`
+}
+
 const narrationData: Promise<RootState> = new Promise((resolve) => {
   window.addEventListener('message', (event) => {
     const { type, payload } = event.data
@@ -156,7 +166,7 @@ export const loadNarration = async (): Promise<RootState> => {
     const { novel, narration } = await loadNovelFromSingleCard({
       cardId: params.cardId,
       cardEndpoint: params.cardEndpoint,
-      assetsEndpoint: params.assetsEndpoint,
+      assetLinkLoader,
     })
     return {
       novel,
@@ -181,12 +191,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       assetUploader={(base64String: string) =>
         uploadAsset(params.assetsUploadEndpoint, base64String)
       }
-      assetLinkLoader={(asset: string, lowres?: boolean) => {
-        if (lowres) {
-          return `${params.assetsEndpoint}/480p_${asset}`
-        }
-        return `${params.assetsEndpoint}/${asset}`
-      }}
+      assetLinkLoader={assetLinkLoader}
       backgroundSearcher={(_params: {
         search: string
         take: number

@@ -69,9 +69,15 @@ const CreateScene = () => {
   const charactersSelected = useAppSelector(
     (state) => state.creation.scene.characters.selected
   )
-  const backgroundSelected = useAppSelector(
+  const backgroundSelectedId = useAppSelector(
     (state) => state.creation.scene.background.selected
   )
+  const backgroundSelected = useAppSelector((state) => {
+    const background = state.novel.backgrounds.find(
+      (b) => b.id === backgroundSelectedId
+    )
+    return background ? background.source.jpg : ''
+  })
   const characters = useAppSelector(selectSelectableCharacters)
   const selectedMusic = useAppSelector((state) => ({
     name: state.creation.scene.music.selected,
@@ -380,6 +386,7 @@ const SearchBackgroundModal = () => {
       modalId="background"
       searcher={backgroundSearcher}
       renderResult={(result: BackgroundResult, index) => {
+        const backgroundURL = assetLinkLoader(result.asset, true)
         return (
           <div
             key={`background-search-${index}-${result.asset}`}
@@ -388,11 +395,13 @@ const SearchBackgroundModal = () => {
                 backgroundSelected === result.asset,
             })}
             style={{
-              backgroundImage: `url(${assetLinkLoader(result.asset, true)})`,
+              backgroundImage: backgroundURL.startsWith('data:')
+                ? backgroundURL
+                : `url(${backgroundURL})`,
             }}
             onClick={() => {
-              dispatch(setBackground(result.asset))
-              dispatch(addImportedBackground(result.asset))
+              dispatch(setBackground(backgroundURL))
+              dispatch(addImportedBackground(backgroundURL))
               dispatch(
                 setModalOpened({
                   id: 'background-search',
@@ -439,7 +448,7 @@ const SearchCharacterModal = () => {
                 const { novel } = await loadNovelFromSingleCard({
                   cardId: result.card,
                   cardEndpoint,
-                  assetsEndpoint: '',
+                  assetLinkLoader,
                 })
                 setLoadingIndex(-1)
                 dispatch(
@@ -525,7 +534,7 @@ const CreateSceneBackgroundModal = () => {
                   backgroundImage: `url(${
                     background
                       ? background.source.jpg.startsWith('data:image')
-                        ? background
+                        ? background.source.jpg
                         : assetLinkLoader(background.source.jpg, true)
                       : ''
                   })`,

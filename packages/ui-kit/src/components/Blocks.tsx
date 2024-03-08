@@ -38,7 +38,8 @@ const Blocks = ({ tooltipId, items }: BlockProps) => {
         };
         const className = classnames(
           'Blocks__item',
-          item.highlighted ? 'Blocks__item--highlighted' : null
+          item.highlighted ? 'Blocks__item--highlighted' : null,
+          item.onClick && !item.disabled ? 'Blocks__item--clickable' : null
         );
 
         return (

@@ -25,6 +25,8 @@ import { LuTextQuote } from "react-icons/lu";
 import DetailsPanel from "./details/DetailsPanel";
 import "./PanelExplorer.scss";
 import { AreYouSure } from "@mikugg/ui-kit";
+import cloneDeep from "lodash.clonedeep";
+import { clearNovelState } from "../state/slices/novelFormSlice";
 
 const allowUntilStep = (novel: NovelV3.NovelState): number => {
   if (
@@ -102,24 +104,6 @@ function PanelExplorer() {
           onButtonClick={async (value) => {
             if (isPanelType(value)) {
               dispatch(navigatePanel(value));
-            } else if (value === "save") {
-              try {
-                await downloadNovelState(
-                  novel,
-                  config.genAssetLink,
-                  (text: string) => {
-                    dispatch(
-                      openModal({
-                        modalType: "loading",
-                        text,
-                      })
-                    );
-                  }
-                );
-              } catch (e) {
-                toast.error("Failed to save novel");
-              }
-              dispatch(closeModal({ modalType: "loading" }));
             }
           }}
         />
@@ -147,7 +131,7 @@ function PanelExplorer() {
             if (value === "save") {
               try {
                 await downloadNovelState(
-                  novel,
+                  cloneDeep(novel),
                   config.genAssetLink,
                   (text: string) => {
                     dispatch(
@@ -159,6 +143,7 @@ function PanelExplorer() {
                   }
                 );
               } catch (e) {
+                console.error(e);
                 toast.error("Failed to save novel");
               }
               dispatch(closeModal({ modalType: "loading" }));
@@ -167,6 +152,7 @@ function PanelExplorer() {
                 title: "Are you sure you want to restart?",
                 description: "This will delete your current progress.",
                 onYes: () => {
+                  dispatch(clearNovelState());
                   dispatch(navigatePage("homepage"));
                 },
               });
