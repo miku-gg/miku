@@ -14,6 +14,7 @@ export default function DetailsPanel() {
   );
 
   const handleLogoPicChange = async (file: File) => {
+    console.log("file", file);
     if (file) {
       try {
         const asset = await config.uploadAsset(file);
@@ -98,7 +99,7 @@ export default function DetailsPanel() {
             handleChange={handleLogoPicChange}
             previewImage={logoPic && config.genAssetLink(logoPic)}
             placeHolder="(256x256)"
-            onFileValidate={(file) => {
+            onFileValidate={async (file) => {
               if (file.size > 1000000) {
                 toast.error("File size should be less than 1MB");
                 return false;
@@ -110,18 +111,21 @@ export default function DetailsPanel() {
                 return false;
               }
               // check size
-              const img = new Image();
-              img.src = URL.createObjectURL(file);
-              img.onload = function () {
-                if (img.width !== 256 || img.height !== 256) {
-                  toast.error(
-                    "Please upload an image with dimensions of 256x256 pixels."
-                  );
-                }
-              };
-              return true;
+              return new Promise((resolve) => {
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = function () {
+                  if (img.width !== 256 || img.height !== 256) {
+                    toast.error(
+                      "Please upload an image with dimensions of 256x256 pixels."
+                    );
+                    resolve(false);
+                  } else {
+                    resolve(true);
+                  }
+                };
+              });
             }}
-            errorMessage="Please upload an image with dimensions of 256x256 pixels."
           />
         </div>
       </div>

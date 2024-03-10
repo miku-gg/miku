@@ -128,6 +128,7 @@ export default function BackgroundEditModal() {
                 ))}
               <Button
                 theme="secondary"
+                className="BackgroundEditModal__addAttributeButton"
                 onClick={() =>
                   dispatch(
                     updateBackground({
@@ -137,11 +138,11 @@ export default function BackgroundEditModal() {
                   )
                 }
               >
-                Add
+                Add attribute
               </Button>
             </div>
           </div>
-          <div className="BackgroundEditModal_delete">
+          <div className="BackgroundEditModal__delete">
             <Button onClick={handleDeleteBackground} theme="primary">
               Delete background
             </Button>

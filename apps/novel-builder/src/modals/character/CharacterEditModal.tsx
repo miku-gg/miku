@@ -30,34 +30,37 @@ export default function CharacterEditModal() {
       shouldCloseOnOverlayClick
       className="CharacterEditModal"
     >
-      <ButtonGroup
-        selected={selected}
-        onButtonClick={(value) => setSelected(value)}
-        buttons={[
-          {
-            content: "Description",
-            value: "prompt",
-          },
-          {
-            content: "Outfits",
-            value: "outfits",
-          },
-        ]}
-      />
-      <div className="CharacterEditModal__delete">
-        <Button
-          theme="primary"
-          onClick={() =>
-            openModal({
-              onYes: () => {
-                dispatch(closeModal({ modalType: "character" }));
-                dispatch(deleteCharacter(editId || ""));
-              },
-            })
-          }
-        >
-          Delete character
-        </Button>
+      <div className="CharacterEditModal__header">
+        <ButtonGroup
+          selected={selected}
+          onButtonClick={(value) => setSelected(value)}
+          buttons={[
+            {
+              content: "Description",
+              value: "prompt",
+            },
+            {
+              content: "Outfits",
+              value: "outfits",
+            },
+          ]}
+        />
+        <div className="CharacterEditModal__delete">
+          <Button
+            theme="primary"
+            onClick={() =>
+              openModal({
+                description: "Are you sure you want to delete this character?",
+                onYes: () => {
+                  dispatch(closeModal({ modalType: "character" }));
+                  dispatch(deleteCharacter(editId || ""));
+                },
+              })
+            }
+          >
+            Delete character
+          </Button>
+        </div>
       </div>
       {selected === "prompt" ? (
         <CharacterDescriptionEdit characterId={editId} />

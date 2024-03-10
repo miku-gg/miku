@@ -8,7 +8,7 @@ interface DragAndDropImagesProps {
   placeHolder: string;
   dragAreaLabel?: string;
   onFileValidate?: (file: File) => boolean | Promise<boolean>;
-  errorMessage: string;
+  errorMessage?: string;
   handleChange?: (file: File) => void;
   previewImage?: string;
   size?: 'sm' | 'md' | 'lg';
@@ -20,7 +20,7 @@ const DragAndDropImages = ({
   placeHolder,
   dragAreaLabel,
   onFileValidate = () => true,
-  errorMessage = 'Please upload an correct file format.',
+  errorMessage,
   handleChange,
   previewImage = '',
   size = 'md',
@@ -36,7 +36,7 @@ const DragAndDropImages = ({
   const handleDropZoneChange = async (file: File) => {
     if (await onFileValidate(file)) {
       handleChange(file);
-    } else {
+    } else if (errorMessage) {
       alert(errorMessage);
     }
   };

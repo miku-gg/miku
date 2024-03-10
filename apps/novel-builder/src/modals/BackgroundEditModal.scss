@@ -18,4 +18,14 @@
       margin-left: 1rem;
     }
   }
+
+  &__addAttributeButton {
+    margin-top: 1em;
+  }
+
+  &__delete {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1em;
+  }
 }

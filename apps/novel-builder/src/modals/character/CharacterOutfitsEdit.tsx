@@ -289,7 +289,6 @@ export default function CharacterOutfitsEdit({
                     : undefined
                 }
                 placeHolder="(1024x1024)"
-                errorMessage="Please upload PNG, GIF or WEBM."
                 onFileValidate={(file) =>
                   checkFileType(file, [
                     "image/png",
@@ -313,7 +312,7 @@ export default function CharacterOutfitsEdit({
 
       return (
         <AccordionItem
-          title={`Emotion Group ${groupIndex + 1}`}
+          title={`Outfit ${groupIndex + 1}`}
           key={`group_${groupIndex}`}
           className="CharacterOutfitsEdit__group"
         >
