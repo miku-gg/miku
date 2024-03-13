@@ -1,7 +1,7 @@
-import { AbstractRoleplayStrategy } from './AbstractRoleplayStrategy'
-import { RootState } from '../../../../state/store'
 import { EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
 import { selectCurrentScene } from '../../../../state/selectors'
+import { RootState } from '../../../../state/store'
+import { AbstractRoleplayStrategy } from './AbstractRoleplayStrategy'
 
 export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
   protected override getContextPrompt(
@@ -47,6 +47,10 @@ export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
       for (const example of sampleChat) {
         template += example + '\n'
       }
+    }
+
+    if (state.settings.prompt.systemPrompt) {
+      template += `\n${state.settings.prompt.systemPrompt}\n`
     }
 
     template += `\nThen the roleplay chat between ${[

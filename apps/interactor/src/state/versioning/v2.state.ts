@@ -82,6 +82,9 @@ export interface SettingsState {
     name: string
     isPremium: boolean
   }
+  prompt: {
+    systemPrompt: string
+  }
   text: {
     speed: Speed
     fontSize: FontSize
@@ -98,6 +101,7 @@ export interface SettingsState {
   }
   modals: {
     settings: boolean
+    settingsTab: 'general' | 'prompt' | 'audio'
     about: boolean
     history: boolean
     edit: {

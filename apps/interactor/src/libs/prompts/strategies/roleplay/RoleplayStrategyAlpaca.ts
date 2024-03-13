@@ -1,6 +1,6 @@
-import { RootState } from '../../../../state/store'
 import { EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
 import { selectCurrentScene } from '../../../../state/selectors'
+import { RootState } from '../../../../state/store'
 import { AbstractRoleplayStrategy } from './AbstractRoleplayStrategy'
 
 export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
@@ -42,6 +42,10 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
       for (const example of sampleChat) {
         template += example + '\n'
       }
+    }
+
+    if (state.settings.prompt.systemPrompt) {
+      template += `\n${state.settings.prompt.systemPrompt}\n`
     }
 
     template += `\nThen the roleplay chat between ${[
