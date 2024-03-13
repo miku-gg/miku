@@ -98,9 +98,7 @@ export async function loadNovelFromSingleCard({
         await Promise.all(
           Array.from(assets).map(async (_asset) => {
             const asset = assetLinkLoader(_asset)
-            return !asset.startsWith('data:')
-              ? axios.get(assetLinkLoader(asset))
-              : asset
+            return !asset.startsWith('data:') ? axios.get(asset) : asset
           })
         )
       } catch (error) {

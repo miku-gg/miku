@@ -19,7 +19,11 @@ import { toast } from 'react-toastify'
 import './History.scss'
 import 'reactflow/dist/style.css'
 import { VersionId as V1VersionId } from '../../state/versioning/v1.state'
-import { migrateV1toV2 } from '../../state/versioning/migrations'
+import { VersionId as V2VersionId } from '../../state/versioning/v2.state'
+import { VersionId as V3VersionId } from '../../state/versioning/v3.state'
+import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
+import { initialState as initialSettingsState } from '../../state/slices/settingsSlice'
+import { initialState as initialCreationState } from '../../state/slices/creationSlice'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -50,14 +54,27 @@ const HistoryActions = () => {
       return
     }
     const reader = new FileReader()
-    reader.onload = () => {
+    reader.onload = async () => {
       try {
         const stateJsonString = reader.result as string
         let stateJson = JSON.parse(stateJsonString)
         if (stateJson.version === V1VersionId) {
-          stateJson = migrateV1toV2(stateJson)
+          stateJson = migrateV2toV3(migrateV1toV2(stateJson))
+        } else if (stateJson.version === V2VersionId) {
+          stateJson = migrateV2toV3(stateJson)
         }
-        dispatch(replaceState(stateJson))
+
+        if (stateJson.version !== V3VersionId) {
+          throw new Error('Narration version mismatch')
+        }
+
+        dispatch(
+          replaceState({
+            ...stateJson,
+            creation: initialCreationState,
+            settings: initialSettingsState,
+          })
+        )
       } catch (e) {
         toast.error('Error reading history file')
       }

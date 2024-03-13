@@ -16,6 +16,7 @@ import {
   NarrationState as V3_NarrationState,
   NovelState as V3_NovelState,
   VersionId as V3_VersionId,
+  NarrationResponse as V3_NarrationResponse,
 } from './v3.state'
 
 export const migrateV1toV2 = (v1: {
@@ -78,27 +79,56 @@ export const migrateV2toV3 = (v2: {
       })
     }
   })
+  const startScene =
+    v2.novel.scenes.find((scene) => scene.id === v2.novel.startSceneId) ||
+    v2.novel.scenes[0]
+
+  const novel = migrateNovelV2ToV3(v2.novel)
+  // get first responseId with null parent
+  const firstResponseId = Object.keys(v2.narration.responses).find(
+    (key) => !v2.narration.responses[key]?.parentInteractionId
+  )
+  const firstResponse = v2.narration.responses[firstResponseId!]
+  const start = {
+    id: firstResponseId || '',
+    title: 'Default Start',
+    description: '',
+    sceneId: startScene.id,
+    characters:
+      firstResponse?.characters?.map((character) => {
+        const characterId = roleToCharacterID.get(character.role) || ''
+        return {
+          characterId,
+          text: character.text,
+          pose: character.pose || 'standing',
+          emotion: character.emotion,
+        }
+      }) || [],
+  }
+  novel.starts = [start]
+
   return {
     narration: {
       ...v2.narration,
-      responses: Object.keys(v2.narration.responses).reduce(
-        (acc, key) => ({
+      responses: Object.keys(v2.narration.responses).reduce((acc, key) => {
+        return {
           ...acc,
           [key]: {
             ...v2.narration.responses[key]!,
-            selectedCharacterId: v2.narration.responses[key]!.selectedRole,
+            selectedCharacterId: roleToCharacterID.get(
+              v2.narration.responses[key]?.selectedRole || ''
+            ),
             characters: v2.narration.responses[key]!.characters.map(
               ({ role, ...rest }) => ({
                 characterId: roleToCharacterID.get(role) || '',
                 ...rest,
               })
             ),
-          },
-        }),
-        {}
-      ),
+          } as V3_NarrationResponse,
+        }
+      }, {}),
     },
-    novel: migrateNovelV2ToV3(v2.novel),
+    novel,
     version: V3_VersionId,
   }
 }

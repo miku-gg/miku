@@ -167,6 +167,10 @@ export const migrateNovelV2ToV3 = (
     characters: _characters
       .map((character) => {
         if (!character) return undefined;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        character.card.data.extensions.mikugg.emotion_groups =
+          Object.values(character.outfits) || [];
         return {
           id: character.id,
           name: character.name,
@@ -200,10 +204,7 @@ export const migrateNovelV2ToV3 = (
       prompt: scene.prompt,
       characters: scene.roles.map(({ role, characterId }) => ({
         characterId: characterId,
-        outfit:
-          _characters.find((c) => c?.roles[role] === characterId)?.roles[
-            role
-          ] || "",
+        outfit: novel.characters[characterId]?.roles[role] || "",
       })),
       backgroundId: scene.background,
       musicId: "",
