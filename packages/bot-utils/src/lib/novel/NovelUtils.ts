@@ -114,7 +114,7 @@ export const tavernCardToNovelState = (
       },
     ],
     scenes: mikugg?.scenarios.map((scenario, index) => ({
-      id: scenario.id || "",
+      id: scenario.id || "default-scenario",
       backgroundId: scenario.background,
       actionText: scenario.trigger_action,
       name: scenario.name,
