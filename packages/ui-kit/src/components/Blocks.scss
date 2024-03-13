@@ -3,6 +3,7 @@
 .Blocks {
   display: flex;
   gap: 15px;
+  flex-wrap: wrap;
 
   &__item {
     width: 100px;

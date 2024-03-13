@@ -53,7 +53,7 @@ export default function SongEditModal() {
                 dispatch(
                   updateSong({
                     ...song,
-                    description: e.target.value,
+                    name: e.target.value,
                   })
                 )
               }

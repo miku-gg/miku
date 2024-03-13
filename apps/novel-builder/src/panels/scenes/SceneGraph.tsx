@@ -31,8 +31,8 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
-import { getEdgeParams } from "./utils.js";
-import { RiDragMove2Line, RiEdit2Line, RiPlayCircleLine } from "react-icons/ri";
+import { getEdgeParams, setAllNodesPosition } from "./utils.js";
+import { RiDragMove2Line, RiEdit2Line } from "react-icons/ri";
 
 function FloatingEdge({ id, source, target, markerEnd, style }: Edge) {
   const sourceNode = useStore(
@@ -173,6 +173,9 @@ const generateEdges = (scenes: ReturnType<typeof selectScenes>) =>
 
 export default function SceneGraph() {
   const scenes = useAppSelector(selectScenes);
+  const startScenes = useAppSelector((state) =>
+    state.novel.starts.map((s) => s.sceneId)
+  );
   const nodesConfig = useMemo(() => generateNodes(scenes), [scenes]);
   const edgesConfig = useMemo(() => generateEdges(scenes), [scenes]);
   const [nodes, setNodes, onNodesChange] = useNodesState(nodesConfig);
@@ -184,8 +187,8 @@ export default function SceneGraph() {
   };
 
   useEffect(() => {
-    setNodes((nodes) =>
-      nodesConfig.map((node) => {
+    setNodes((nodes) => {
+      const _nodes = nodesConfig.map((node, i) => {
         const existingNode = nodes.find((n) => n.id === node.id);
         if (existingNode) {
           return {
@@ -194,8 +197,20 @@ export default function SceneGraph() {
           };
         }
         return node;
-      })
-    );
+      });
+
+      // get scenes with no children or parent
+      const topScenes = new Set<string>([]);
+      scenes.forEach((scene) => {
+        if (!scenes.some((s) => s.children.includes(scene.id))) {
+          topScenes.add(scene.id);
+        }
+      });
+
+      setAllNodesPosition(_nodes, edgesConfig, Array.from(topScenes));
+
+      return _nodes;
+    });
     setEdges(edgesConfig);
   }, [nodesConfig, edgesConfig, setNodes, setEdges]);
 

@@ -53,6 +53,7 @@ export default function Backgrounds({
       })
     );
     dispatch(openModal({ modalType: "background", editId: id }));
+    onSelect?.(id);
   };
 
   return (

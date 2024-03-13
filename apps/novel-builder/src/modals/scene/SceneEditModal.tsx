@@ -149,6 +149,25 @@ export default function SceneEditModal() {
                           } else if (newOutfitIndex >= outfits.length) {
                             newOutfitIndex = 0;
                           }
+                          dispatch(
+                            updateScene({
+                              ...scene._source,
+                              characters: scene.characters.map((char) => {
+                                if (char.id === character.id) {
+                                  return {
+                                    characterId: char.id || "",
+                                    objective: char.objective,
+                                    outfit: outfits[newOutfitIndex].id,
+                                  };
+                                }
+                                return {
+                                  characterId: char.id || "",
+                                  objective: char.objective,
+                                  outfit: char.outfit,
+                                };
+                              }),
+                            })
+                          );
                         }}
                       />
                       <Carousel

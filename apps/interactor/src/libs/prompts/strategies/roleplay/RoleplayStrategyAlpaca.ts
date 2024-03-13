@@ -8,15 +8,15 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
     state: RootState,
     currentCharacterId: string
   ): string {
-    const characters = selectCurrentScene(state)?.characters || []
+    const scene = selectCurrentScene(state)
+    const characters = scene?.characters || []
     const characterTemplates = characters
       .filter(({ characterId }) => characterId !== currentCharacterId)
       .map(({ characterId }) => `{{${characterId}}}`)
-    const { persona, attributes, sampleChat, scenario } =
-      this.getCharacterSpecs(
-        state.novel.characters.find(({ id }) => id === currentCharacterId)
-          ?.card || EMPTY_MIKU_CARD
-      )
+    const { persona, attributes, sampleChat } = this.getCharacterSpecs(
+      state.novel.characters.find(({ id }) => id === currentCharacterId)
+        ?.card || EMPTY_MIKU_CARD
+    )
     const formattedAttributes = attributes
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .filter(([_key, value]) => value)
@@ -29,8 +29,8 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
       characterTemplates.length ? characterTemplates.join(', ') + ' and ' : ''
     }{{user}}.`
     template += `\n\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.`
-    template += `\nYou MUST NOT impersonate other characters, ONLY describe {{char}}'s actions and dialogue.`
-    template += `\n\nYou must also indicate {{char}}'s reaction in the response.`
+    template += `\nDO NOT describe {{user}}'s actions or dialogues, ONLY describe {{char}}'s actions and dialogue.`
+    template += `\nYou must also indicate {{char}}'s reaction in the response.`
     template += `\nYou MUST not repeat the same reaction too many times.`
     template += `\nThe reaction MUST be one of: ${emotionStrings}.`
     if (persona || formattedAttributes) {
@@ -48,7 +48,16 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
       ...characterTemplates,
       '{{user}}',
     ].join(', ')} and {{char}} begins.\n\n`
-    template += scenario ? `${scenario}\n` : ''
+
+    if (scene?.prompt) {
+      template += `\nSCENE: \n${scene.prompt}\n`
+    }
+
+    scene?.characters.forEach((char) => {
+      if (char.objective) {
+        template += `\n{{${char.characterId}}}'s OBJECTIVE: \n${char.objective}\n`
+      }
+    })
 
     return template
   }

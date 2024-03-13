@@ -73,6 +73,7 @@
   }
 
   &__scene-selection-item {
+    min-width: 150px;
     flex: 1;
     opacity: 0.5;
     transition: all 0.2s ease-out;
