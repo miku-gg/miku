@@ -132,7 +132,7 @@ function PanelExplorer() {
               try {
                 await downloadNovelState(
                   cloneDeep(novel),
-                  config.genAssetLink,
+                  false,
                   (text: string) => {
                     dispatch(
                       openModal({

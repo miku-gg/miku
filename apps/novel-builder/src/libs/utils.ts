@@ -38,7 +38,7 @@ export const downloadAssetAsBase64URI = async (
 
 export const downloadNovelState = async (
   _novel: NovelV3.NovelState,
-  getAssetUrl: (asset: string) => string,
+  getAssetUrl: ((asset: string) => string) | false,
   onUpdate: (text: string) => void,
   asBuild = false
 ) => {
@@ -64,7 +64,7 @@ export const downloadNovelState = async (
   for (let i = 0; i < allAssets.length; i += BATCH_SIZE) {
     const batch = allAssets.slice(i, i + BATCH_SIZE);
     const promises = batch.map(async ([key, value]) => {
-      if (value && !value.startsWith("data:")) {
+      if (value && !value.startsWith("data:") && getAssetUrl) {
         const base64 = await downloadAssetAsBase64URI(getAssetUrl(value));
         onUpdate(`Downloading assets ${++dl}/${allAssets.length}...`);
         return base64;

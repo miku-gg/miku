@@ -159,6 +159,91 @@ export default function CharacterOutfitsEdit({
     }
   };
 
+  const uploadEmotionFile = async ({
+    file,
+    groupIndex,
+    emotionId,
+    isAudio,
+    outfits: _outfits,
+  }: {
+    file: File;
+    groupIndex: number;
+    emotionId: string;
+    isAudio?: boolean;
+    outfits: MikuCardV2["data"]["extensions"]["mikugg_v2"]["outfits"];
+  }): Promise<MikuCardV2["data"]["extensions"]["mikugg_v2"]["outfits"]> => {
+    const { assetId, success } = await config.uploadAsset(file);
+    if (!success) {
+      toast.warn("Failed to upload asset");
+      return _outfits;
+    }
+    const newGroups = [..._outfits];
+    const emotionTemplate = emotionTemplates.find(
+      (template) => template.id === newGroups[groupIndex].template
+    );
+
+    if (emotionTemplate?.emotionIds.includes(emotionId) === false) {
+      console.warn(`Invalid emotion id: ${emotionId}`);
+      return _outfits;
+    }
+
+    const emotions = [...newGroups[groupIndex].emotions] || [];
+    const emotionIndex = emotions.findIndex((img) => img.id === emotionId);
+
+    if (isAudio) {
+      if (emotionIndex >= 0) {
+        emotions[emotionIndex] = {
+          ...emotions[emotionIndex],
+          sources: {
+            ...emotions[emotionIndex].sources,
+            sound: assetId,
+          },
+        };
+      }
+    } else if (file.type === "video/webm") {
+      if (emotionIndex >= 0) {
+        emotions[emotionIndex] = {
+          ...emotions[emotionIndex],
+          sources: {
+            ...emotions[emotionIndex].sources,
+            webm: assetId,
+          },
+        };
+      } else {
+        emotions.push({
+          id: emotionId,
+          sources: {
+            png: "",
+            webm: assetId,
+          },
+        });
+      }
+    } else {
+      if (emotionIndex >= 0) {
+        emotions[emotionIndex] = {
+          ...emotions[emotionIndex],
+          sources: {
+            ...emotions[emotionIndex].sources,
+            png: assetId,
+          },
+        };
+      } else {
+        emotions.push({
+          id: emotionId,
+          sources: {
+            png: assetId,
+          },
+        });
+      }
+    }
+
+    newGroups[groupIndex] = {
+      ...newGroups[groupIndex],
+      emotions,
+    };
+    return newGroups;
+  };
+
   const handleImageChange = async (
     file: File,
     groupIndex: number,
@@ -166,90 +251,35 @@ export default function CharacterOutfitsEdit({
     isAudio?: boolean
   ) => {
     if (file) {
-      const { assetId, success } = await config.uploadAsset(file);
-      if (!success) {
-        toast.warn("Failed to upload asset");
-        return;
-      }
-      const newGroups = [...outfits];
-      const emotionTemplate = emotionTemplates.find(
-        (template) => template.id === newGroups[groupIndex].template
-      );
-
-      if (emotionTemplate?.emotionIds.includes(emotionId) === false) {
-        console.warn(`Invalid emotion id: ${emotionId}`);
-        return;
-      }
-
-      const emotions = [...newGroups[groupIndex].emotions] || [];
-      const emotionIndex = emotions.findIndex((img) => img.id === emotionId);
-
-      if (isAudio) {
-        if (emotionIndex >= 0) {
-          emotions[emotionIndex] = {
-            ...emotions[emotionIndex],
-            sources: {
-              ...emotions[emotionIndex].sources,
-              sound: assetId,
-            },
-          };
-        }
-      } else if (file.type === "video/webm") {
-        if (emotionIndex >= 0) {
-          emotions[emotionIndex] = {
-            ...emotions[emotionIndex],
-            sources: {
-              ...emotions[emotionIndex].sources,
-              webm: assetId,
-            },
-          };
-        } else {
-          emotions.push({
-            id: emotionId,
-            sources: {
-              png: "",
-              webm: assetId,
-            },
-          });
-        }
-      } else {
-        if (emotionIndex >= 0) {
-          emotions[emotionIndex] = {
-            ...emotions[emotionIndex],
-            sources: {
-              ...emotions[emotionIndex].sources,
-              png: assetId,
-            },
-          };
-        } else {
-          emotions.push({
-            id: emotionId,
-            sources: {
-              png: assetId,
-            },
-          });
-        }
-      }
-
-      newGroups[groupIndex] = {
-        ...newGroups[groupIndex],
-        emotions,
-      };
-
+      const newGroups = await uploadEmotionFile({
+        file,
+        groupIndex,
+        emotionId,
+        isAudio,
+        outfits,
+      });
       dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
     }
   };
-  const handleMultipleImageChange = (
+  const handleMultipleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
     groupIndex: number
   ) => {
     const files = event.target.files;
+    let newGroups = outfits;
 
     if (files) {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const emotionId = file.name.split(".")[0];
-        handleImageChange(file, groupIndex, emotionId);
+        newGroups = await uploadEmotionFile({
+          file,
+          groupIndex,
+          emotionId,
+          isAudio: false,
+          outfits: newGroups,
+        });
+        dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
       }
     }
   };
@@ -274,6 +304,7 @@ export default function CharacterOutfitsEdit({
                 size="sm"
                 dragAreaLabel={emotionId}
                 handleChange={(file) => {
+                  console.log("wesa");
                   handleImageChange(
                     file,
                     groupIndex,
@@ -289,14 +320,24 @@ export default function CharacterOutfitsEdit({
                     : undefined
                 }
                 placeHolder="(1024x1024)"
-                onFileValidate={(file) =>
-                  checkFileType(file, [
+                onFileValidate={(file) => {
+                  console.log(
+                    "validate",
+                    file,
+                    checkFileType(file, [
+                      "image/png",
+                      "image/gif",
+                      "video/webm",
+                      "audio/mpeg",
+                    ])
+                  );
+                  return checkFileType(file, [
                     "image/png",
                     "image/gif",
                     "video/webm",
                     "audio/mpeg",
-                  ])
-                }
+                  ]);
+                }}
               />
               {emotion?.sources.sound ? (
                 <div className="CharacterOutfitsEdit__audioPreview">

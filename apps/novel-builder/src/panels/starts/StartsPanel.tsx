@@ -123,7 +123,7 @@ export default function StartsPanel() {
                               })) || []
                             }
                             selectedIndex={selectedEmotionIndex}
-                            onChange={(index) =>
+                            onChange={(indexEmotion) => {
                               dispatch(
                                 updateStart({
                                   ...start,
@@ -132,13 +132,14 @@ export default function StartsPanel() {
                                       ? {
                                           ...char,
                                           emotion:
-                                            outfit?.emotions[index].id || "",
+                                            outfit?.emotions[indexEmotion].id ||
+                                            "",
                                         }
                                       : char
                                   ),
                                 })
-                              )
-                            }
+                              );
+                            }}
                           />
                         </div>
                       </div>
