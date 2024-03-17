@@ -79,6 +79,9 @@ export async function loadNovelFromSingleCard({
       if (_card.spec === 'chara_card_v2') {
         novel = tavernCardToNovelState(_card)
       }
+      if (_card?.starts?.length) {
+        novel = _card as NovelState
+      }
     }
 
     if (!novel) {
