@@ -93,16 +93,16 @@ export default function Backgrounds({
             loading: backgroundUploading,
             disabled: backgroundUploading,
           },
-          {
-            id: "search",
-            highlighted: false,
-            content: {
-              icon: <MdSearch />,
-              text: "Search",
-            },
-            onClick: () =>
-              dispatch(openModal({ modalType: "backgroundSearch" })),
-          },
+          // {
+          //   id: "search",
+          //   highlighted: false,
+          //   content: {
+          //     icon: <MdSearch />,
+          //     text: "Search",
+          //   },
+          //   onClick: () =>
+          //     dispatch(openModal({ modalType: "backgroundSearch" })),
+          // },
         ]}
       />
       <input

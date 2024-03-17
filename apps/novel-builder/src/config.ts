@@ -69,7 +69,7 @@ interface BuilderConfig {
   };
 }
 
-const configs: Map<"development" | "stating" | "production", BuilderConfig> =
+const configs: Map<"development" | "staging" | "production", BuilderConfig> =
   new Map([
     [
       "development",
@@ -170,7 +170,129 @@ const configs: Map<"development" | "stating" | "production", BuilderConfig> =
         },
       },
     ],
+    [
+      "staging",
+      {
+        genAssetLink: (asset: string, lowres?: boolean) => {
+          if (asset.startsWith("data")) {
+            return asset;
+          } else {
+            return `https://assets.miku.gg/${lowres ? `480p_${asset}` : asset}`;
+          }
+        },
+        uploadAsset: async (file: File | string) => {
+          if (typeof file === "string") {
+            file = await dataURItoFile(file, "asset");
+          }
+
+          const result = await uploadAsset(
+            import.meta.env.VITE_ASSET_UPLOAD_URL || "",
+            file
+          );
+
+          return {
+            success: !!result.fileName,
+            assetId: result.fileName,
+          };
+        },
+        previewIframe: "https://alpha.miku.gg",
+        search: {
+          characters: async (query) => {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return {
+              success: true,
+              result: {
+                public: [],
+                private: [],
+              },
+            };
+          },
+          backgrounds: async (query) => {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return {
+              success: true,
+              result: {
+                public: [],
+                private: [],
+              },
+            };
+          },
+          songs: async (query) => {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return {
+              success: true,
+              result: {
+                public: [],
+                private: [],
+              },
+            };
+          },
+        },
+      },
+    ],
+    [
+      "production",
+      {
+        genAssetLink: (asset: string, lowres?: boolean) => {
+          if (asset.startsWith("data")) {
+            return asset;
+          } else {
+            return `https://assets.miku.gg/${lowres ? `480p_${asset}` : asset}`;
+          }
+        },
+        uploadAsset: async (file: File | string) => {
+          if (typeof file === "string") {
+            file = await dataURItoFile(file, "asset");
+          }
+
+          const result = await uploadAsset(
+            import.meta.env.VITE_ASSET_UPLOAD_URL || "",
+            file
+          );
+
+          return {
+            success: !!result.fileName,
+            assetId: result.fileName,
+          };
+        },
+        previewIframe: "https://interactor.miku.gg",
+        search: {
+          characters: async (query) => {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return {
+              success: true,
+              result: {
+                public: [],
+                private: [],
+              },
+            };
+          },
+          backgrounds: async (query) => {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return {
+              success: true,
+              result: {
+                public: [],
+                private: [],
+              },
+            };
+          },
+          songs: async (query) => {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return {
+              success: true,
+              result: {
+                public: [],
+                private: [],
+              },
+            };
+          },
+        },
+      },
+    ],
   ]);
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export default configs.get("development")!;
+export default configs.get(
+  import.meta.env.PROD ? "production" : "development"
+)!;

@@ -78,15 +78,15 @@ export default function Characters({
       },
       onClick: handleCreateCharacter,
     },
-    {
-      id: "search",
-      highlighted: false,
-      content: {
-        icon: <MdSearch />,
-        text: "Search",
-      },
-      onClick: () => dispatch(openModal({ modalType: "characterSearch" })),
-    },
+    // {
+    //   id: "search",
+    //   highlighted: false,
+    //   content: {
+    //     icon: <MdSearch />,
+    //     text: "Search",
+    //   },
+    //   onClick: () => dispatch(openModal({ modalType: "characterSearch" })),
+    // },
   ];
 
   if (showNone) {

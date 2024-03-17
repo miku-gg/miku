@@ -82,14 +82,14 @@ export default function Songs({
               loading: songUploading,
               disabled: songUploading,
             },
-            {
-              id: "search",
-              content: {
-                icon: <MdSearch />,
-                text: "Search",
-              },
-              onClick: () => dispatch(openModal({ modalType: "songSearch" })),
-            },
+            // {
+            //   id: "search",
+            //   content: {
+            //     icon: <MdSearch />,
+            //     text: "Search",
+            //   },
+            //   onClick: () => dispatch(openModal({ modalType: "songSearch" })),
+            // },
           ]}
         />
         <input
