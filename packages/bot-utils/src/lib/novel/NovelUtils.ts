@@ -126,7 +126,9 @@ export const tavernCardToNovelState = (
           outfit: scenario.emotion_group,
         },
       ],
-      children: scenario.children_scenarios,
+      children: scenario.children_scenarios.map(
+        (child) => child || "default-scenario"
+      ),
       musicId: scenario.music || "",
       prompt: scenario.context,
       parentMapId: null,
