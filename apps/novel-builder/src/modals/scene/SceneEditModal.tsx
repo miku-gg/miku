@@ -289,7 +289,8 @@ export default function SceneEditModal() {
                   name="context"
                   placeHolder="{{user}} should have invited Nino to the classroom."
                   label="Condition"
-                  description="OPTIONAL. This condition must be met for the scene to be suggested."
+                  // description="OPTIONAL. This condition must be met for the scene to be suggested."
+                  description="OPTIONAL. This field has no effect at the moment."
                   value={scene.condition || ""}
                   onChange={(e) => {
                     dispatch(
