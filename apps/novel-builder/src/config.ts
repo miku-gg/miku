@@ -186,7 +186,7 @@ const configs: Map<"development" | "staging" | "production", BuilderConfig> =
           }
 
           const result = await uploadAsset(
-            import.meta.env.VITE_ASSET_UPLOAD_URL || "",
+            import.meta.env.VITE_ASSETS_UPLOAD_URL || "",
             file
           );
 
@@ -246,7 +246,7 @@ const configs: Map<"development" | "staging" | "production", BuilderConfig> =
           }
 
           const result = await uploadAsset(
-            import.meta.env.VITE_ASSET_UPLOAD_URL || "",
+            import.meta.env.VITE_ASSETS_UPLOAD_URL || "",
             file
           );
 
