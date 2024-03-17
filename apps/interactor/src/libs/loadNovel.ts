@@ -5,6 +5,10 @@ import { NarrationState } from '../state/slices/narrationSlice'
 import { v4 as randomUUID } from 'uuid'
 import { NarrationResponse, VersionId } from '../state/versioning'
 import { toast } from 'react-toastify'
+import {
+  NovelState as DeprecatedNovelV2,
+  NarrationState as DeprecatedNarrationV2,
+} from '../state/versioning/v2.state'
 
 export async function loadNovelFromSingleCard({
   cardId,
@@ -23,7 +27,47 @@ export async function loadNovelFromSingleCard({
     let novel: NovelState | null = null
     if (_card.version) {
       if (_card.version === 'v2') {
-        novel = migrateNovelV2ToV3(_card.novel)
+        const v2 = {
+          novel: _card.novel as DeprecatedNovelV2,
+          narration: _card.narration as DeprecatedNarrationV2,
+        }
+        novel = migrateNovelV2ToV3(v2.novel)
+
+        /* Add default start if not exists */
+        const roleToCharacterID = new Map<string, string>()
+        Object.values(v2.novel.characters).forEach((character) => {
+          if (character) {
+            Object.keys(character.roles).forEach((role) => {
+              roleToCharacterID.set(role, character.id)
+            })
+          }
+        })
+        const startScene =
+          v2.novel.scenes.find((scene) => scene.id === v2.novel.startSceneId) ||
+          v2.novel.scenes[0]
+
+        const firstResponseId = Object.keys(v2.narration.responses).find(
+          (key) => !v2.narration.responses[key]?.parentInteractionId
+        )
+        const firstResponse = v2.narration.responses[firstResponseId!]
+        const start = {
+          id: firstResponseId || '',
+          title: 'Default Start',
+          description: '',
+          sceneId: startScene.id,
+          characters:
+            firstResponse?.characters?.map((character) => {
+              const characterId = roleToCharacterID.get(character.role) || ''
+              return {
+                characterId,
+                text: character.text,
+                pose: character.pose || 'standing',
+                emotion: character.emotion,
+              }
+            }) || [],
+        }
+        novel.starts = [start]
+        /* [END] Add default start if not exists */
       } else if (_card.version !== VersionId) {
         toast.error('Unsupported card version')
         throw new Error('Unsupported card version')
