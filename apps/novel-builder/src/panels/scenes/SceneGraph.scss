@@ -1,0 +1,146 @@
+@import "../../styles/variables";
+
+.SceneGraph {
+  width: 100%;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+
+  &__graph {
+    width: 100%;
+    height: 70vh;
+    background: #222222;
+    margin-top: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px 0px rgb(205 95 234);
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+  }
+}
+
+.SceneNode {
+  width: 150px;
+  height: 70px;
+  background-size: cover;
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 0px 0px 5px 0px rgb(205 95 234);
+  transition: all 0.2s ease-out;
+  user-select: none;
+
+  &:hover {
+    box-shadow: 0px 0px 10px 0px rgb(205 95 234);
+  }
+
+  &__title {
+    font-size: 0.7rem;
+    text-align: center;
+    position: absolute;
+    top: -18px;
+    // padding: 5px 10px;
+    // background-color: $background-2;
+    // border-top-right-radius: 10px;
+    // border-top-left-radius: 10px;
+  }
+
+  &__characters {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  &__character {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+}
+
+.customHandleSource {
+  width: 100%;
+  height: 100%;
+  background: blue;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 0;
+  opacity: 0;
+  transform: none;
+  border: none;
+}
+
+.customHandleTarget {
+  width: 100%;
+  height: 100%;
+  background: red;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  border-radius: 0;
+  transform: none;
+  border: none;
+}
+
+.SceneNode__start-icon {
+  position: absolute;
+  top: -20px;
+  right: 0px;
+  color: gray;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  opacity: 0;
+}
+
+.SceneNode__start-icon:hover {
+  color: lightgray;
+  opacity: 1;
+}
+
+.SceneNode__start-icon.selected {
+  color: #9747ff;
+  opacity: 1;
+}
+
+// Styles for the delete scene button
+.SceneNode__edit-icon {
+  position: absolute;
+  bottom: -20px;
+  right: 0px;
+  color: #4978fa;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  opacity: 0;
+
+  &:hover {
+    color: #2c4a9b;
+    opacity: 1;
+  }
+}
+
+.SceneNode:hover {
+  .SceneNode__edit-icon {
+    opacity: 0.8;
+  }
+  .SceneNode__start-icon {
+    opacity: 0.8;
+  }
+}
+
+// Add the following styles
+
+.react-flow__edge-path {
+  cursor: pointer;
+}
+
+.react-flow__edge-path:hover {
+  stroke: red;
+}
+
+.react-flow__edge-path.selected {
+  stroke: #9747ff;
+}

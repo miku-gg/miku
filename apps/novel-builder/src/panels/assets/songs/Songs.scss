@@ -1,0 +1,23 @@
+.Characters {
+  &__list {
+    display: flex;
+    gap: 20px;
+  }
+
+  &__item {
+    width: 100px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    height: 100px;
+    border-radius: 10px;
+    transition: all 0.2s ease-out;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid transparent;
+    color: #fff;
+    background-color: #25284b;
+    outline: none;
+  }
+}

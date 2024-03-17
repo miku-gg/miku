@@ -61,9 +61,9 @@ const InputBox = (): JSX.Element | null => {
       interactionStart({
         text,
         sceneId: scene?.id || '',
-        roles: scene?.roles.map((r) => r.role) || [],
+        characters: scene?.characters.map((r) => r.characterId) || [],
         servicesEndpoint,
-        selectedRole: lastResponse?.selectedRole || '',
+        selectedCharacterId: lastResponse?.selectedCharacterId || '',
       })
     )
   }

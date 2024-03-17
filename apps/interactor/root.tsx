@@ -11,7 +11,7 @@ import { decodeText } from '@mikugg/bot-utils'
 import queryString from 'query-string'
 import mergeWith from 'lodash.mergewith'
 import { toast } from 'react-toastify'
-import { migrateV1toV2 } from './src/state/versioning/migrations'
+import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
 import { uploadAsset } from './src/libs/assetUpload'
 import {
   listSearch,
@@ -113,6 +113,16 @@ function getCongurationFromParams(): {
 
 const params = getCongurationFromParams()
 
+const assetLinkLoader = (asset: string, lowres?: boolean) => {
+  if (asset.startsWith('data')) {
+    return asset
+  }
+  if (lowres) {
+    return `${params.assetsEndpoint}/480p_${asset}`
+  }
+  return `${params.assetsEndpoint}/${asset}`
+}
+
 const narrationData: Promise<RootState> = new Promise((resolve) => {
   window.addEventListener('message', (event) => {
     const { type, payload } = event.data
@@ -130,7 +140,15 @@ export const loadNarration = async (): Promise<RootState> => {
           return {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            ...migrateV1toV2(data),
+            ...migrateV2toV3(migrateV1toV2(data)),
+            creation: initialCreationState,
+            settings: params.settings,
+          }
+        } else if (data.version === 'v2') {
+          return {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            ...migrateV2toV3(data),
             creation: initialCreationState,
             settings: params.settings,
           }
@@ -148,7 +166,7 @@ export const loadNarration = async (): Promise<RootState> => {
     const { novel, narration } = await loadNovelFromSingleCard({
       cardId: params.cardId,
       cardEndpoint: params.cardEndpoint,
-      assetsEndpoint: params.assetsEndpoint,
+      assetLinkLoader,
     })
     return {
       novel,
@@ -173,12 +191,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       assetUploader={(base64String: string) =>
         uploadAsset(params.assetsUploadEndpoint, base64String)
       }
-      assetLinkLoader={(asset: string, lowres?: boolean) => {
-        if (lowres) {
-          return `${params.assetsEndpoint}/480p_${asset}`
-        }
-        return `${params.assetsEndpoint}/${asset}`
-      }}
+      assetLinkLoader={assetLinkLoader}
       backgroundSearcher={(_params: {
         search: string
         take: number

@@ -22,3 +22,13 @@ export function encodeText(text: string): string {
 export function decodeText(encodedText: string): string {
   return utf8.decode(base64.decode(encodedText));
 }
+
+export function replaceStringsInObject(
+  obj: any,
+  find: string,
+  replace: string
+): object {
+  const objString = JSON.stringify(obj);
+  const replaced = objString.split(find).join(replace);
+  return JSON.parse(replaced);
+}

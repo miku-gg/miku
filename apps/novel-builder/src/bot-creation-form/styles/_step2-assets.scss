@@ -1,0 +1,117 @@
+@import "../../styles/variables";
+
+.step2Assets {
+  h2 {
+    color: #fffef9;
+    margin-bottom: 1rem;
+  }
+
+  .step2Assets__group {
+    .step2Assets__groupHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h3 {
+        color: #fffef9;
+        margin: 0;
+      }
+
+      .step2Assets__removeGroupButton {
+        width: 1rem;
+        height: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: transparent;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .step2Assets__formGroup {
+    margin-bottom: 1rem;
+
+    &__textarea {
+      padding: 0;
+
+      & textArea {
+        background-color: transparent;
+        margin: 0;
+        height: 2.5rem;
+        max-height: 2.5rem;
+        min-height: 2.5rem;
+
+        &:focus {
+          border: unset;
+          box-shadow: unset;
+        }
+      }
+    }
+  }
+
+  .step2Assets__controls {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .step2Assets__emotions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.875rem;
+    justify-content: center;
+    border: 1px dashed $node-conector-color;
+    padding: 1.5rem;
+    border-radius: 1rem;
+  }
+
+  .step2Assets__emotion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 128px;
+    margin-bottom: 0.625rem;
+
+    label {
+      display: block;
+      color: #6f7396;
+      margin-bottom: 5px;
+    }
+
+    .step2Assets__emotionPreview {
+      width: 128px;
+      height: 128px;
+      object-fit: contain;
+      border-radius: 3px;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  .step2Assets__emotionDropzone {
+    border: 1px dashed #ccc;
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .step2Assets__emotionDropzone.drag-over {
+    border-color: #333;
+  }
+
+  .step2Assets__emotionPreview {
+    max-width: 100%;
+    position: relative;
+  }
+
+  .step2Assets__audioPreview {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+}

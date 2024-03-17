@@ -43,10 +43,6 @@ export const initialState: SettingsState = {
       opened: false,
       id: '',
     },
-    deleteNodeConfirmation: {
-      opened: false,
-      id: '',
-    },
   },
 }
 
@@ -111,12 +107,6 @@ export const settingSlice = createSlice({
     ) => {
       state.modals.edit = action.payload
     },
-    setDeleteNodeConfirmationModal: (
-      state,
-      action: PayloadAction<{ opened: boolean; id: string }>
-    ) => {
-      state.modals.deleteNodeConfirmation = action.payload
-    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -145,7 +135,6 @@ export const {
   setAboutModal,
   setHistoryModal,
   setEditModal,
-  setDeleteNodeConfirmationModal,
 } = settingSlice.actions
 
 export default settingSlice.reducer

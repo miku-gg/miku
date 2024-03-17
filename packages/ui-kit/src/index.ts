@@ -1,6 +1,6 @@
 import Accordion from './components/Accordion';
 import AccordionItem from './components/AccordionItem';
-import AreYouSure from './components/AreYouSure';
+import * as AreYouSure from './components/AreYouSure';
 import Modal from './components/Modal';
 import Button from './components/Button';
 import Carousel from './components/Carousel';
@@ -18,6 +18,8 @@ import Tooltip from './components/Tooltip';
 import TagAutocomplete from './components/TagAutocomplete';
 import Slider from './components/Slider';
 import MusicSelector from './components/MusicSelector';
+import Loader from './components/Loader';
+import Blocks from './components/Blocks';
 import * as Icons from './assets/svg';
 
 export {
@@ -43,4 +45,6 @@ export {
   Colors,
   Slider,
   MusicSelector,
+  Loader,
+  Blocks,
 };

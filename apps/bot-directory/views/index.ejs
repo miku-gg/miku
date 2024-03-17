@@ -1,301 +1,349 @@
 <html>
+  <head>
+    <link rel="stylesheet" href="/public/semantic.min.css" />
+    <link rel="stylesheet" href="/public/form.min.css" />
+    <link rel="icon" href="/public/favicon.ico" type="image/x-icon" />
+    <script src="/public/tailwind.js"></script>
+    <title>Bot directory | Miku</title>
+    <style>
+      .ui.inverted.form .field textarea,
+      .ui.inverted.form .dropdown,
+      .ui.inverted.form .dropdown .item,
+      .ui.inverted.form .field input {
+        background-color: #1a202c;
+        color: #fff;
+      }
 
-<head>
-  <link rel="stylesheet" href="/public/semantic.min.css">
-  <link rel="stylesheet" href="/public/form.min.css">
-  <link rel="icon" href="/public/favicon.ico" type="image/x-icon">
-  <script src="/public/tailwind.js"></script>
-  <title>Bot directory | Miku</title>
-  <style>
-    .ui.inverted.form .field textarea,
-    .ui.inverted.form .dropdown,
-    .ui.inverted.form .dropdown .item,
-    .ui.inverted.form .field input {
-      background-color: #1a202c;
-      color: #fff;
-    }
+      .ui.menu.inverted .item.disabled {
+        color: #fff !important;
+      }
 
-    .ui.menu.inverted .item.disabled {
-      color: #fff !important;
-    }
+      .ui.card.inverted {
+        background-color: #1a202c;
+      }
 
-    .ui.card.inverted {
-      background-color: #1a202c;
-    }
+      .ui.card.inverted .content .header,
+      .ui.card.inverted .content .meta,
+      .ui.card.inverted .content .description,
+      .ui.card.inverted .extra.content {
+        color: white;
+      }
 
-    .ui.card.inverted .content .header,
-    .ui.card.inverted .content .meta,
-    .ui.card.inverted .content .description,
-    .ui.card.inverted .extra.content {
-      color: white;
-    }
+      .nsfw {
+        position: absolute;
+        z-index: 1;
+        color: white;
+        background-color: #ff4e67;
+      }
 
-    .nsfw {
-      position: absolute;
-      z-index: 1;
-      color: white;
-      background-color: #FF4E67;
-    }
+      .scenarios-box {
+        position: absolute;
+        z-index: 1;
+        color: white;
+        background-color: #9747ff;
+      }
 
-    .scenarios-box {
-      position: absolute;
-      z-index: 1;
-      color: white;
-      background-color: #9747ff;
-    }
+      .blocker {
+        background-color: #000;
+        opacity: 50%;
+        height: 100%;
+        width: 100%;
+        left: 0;
+        top: 0;
+        margin: 0;
+        position: absolute;
+        z-index: 2;
+      }
 
-    .blocker {
-      background-color: #000;
-      opacity: 50%;
-      height: 100%;
-      width: 100%;
-      left: 0;
-      top: 0;
-      margin: 0;
-      position: absolute;
-      z-index: 2;
-    }
+      .modal-close {
+        color: #888888;
+      }
 
-    .modal-close {
-      color: #888888;
-    }
+      .modal {
+        position: absolute;
+        z-index: 3;
+        top: 35%;
+        left: 30%;
+        background-color: #1b1c1d;
+      }
 
-    .modal {
-      position: absolute;
-      z-index: 3;
-      top: 35%;
-      left: 30%;
-      background-color: #1b1c1d;
-    }
+      .save-button {
+        margin: 0 auto !important;
+        display: block !important;
+      }
+    </style>
+  </head>
 
-    .save-button {
-      margin: 0 auto !important;
-      display: block !important;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="basic segment">
-    <%- include('header', {active: '/'}); %>
-    <div class="flex px-8 py-2 gap-6 flex-wrap">
-      <% bots.forEach(function(bot){ %>
-      <div class="w-60 <%= bot.data.tags.includes("NSFW") ? 'nsfw-bot invisible' : '' %>">
-        <div class="ui card">
-          <%if (bot.data.tags.includes("NSFW")) { %>
-          <span class="nsfw w-18 rounded-lg p-1">NSFW</span>
-          <% } %>
-          <%if (bot.data.extensions.mikugg.scenarios.length > 1) { %>
-          <span class="scenarios-box w-18 rounded-lg p-1 right-0"><%= bot.data.extensions.mikugg.scenarios.length %> scenes</span>
-          <% } %>
-          <div class="image">
-            <img src="/s3/assets/<%= bot.data.extensions.mikugg.profile_pic %>" style="object-fit: scale-down; width: 200px; height: 200px;">
-          </div>
-          <div class="content">
-            <a class="header" href="http://localhost:5173/?cardId=<%= bot.hash%>" target="_blank"><%= bot.data.name %></a>
-            <div class="description h-12 overflow-auto">
-              <%= bot.data.extensions.mikugg.short_description || 'No description' %>
+  <body>
+    <div class="basic segment">
+      <%- include('header', {active: '/'}); %>
+      <div class="flex px-8 py-2 gap-6 flex-wrap">
+        <% novels.forEach(function({novel, hash}){ %>
+        <div class="w-60">
+          <div class="ui card">
+            <%if (novel.tags.includes("NSFW")) { %>
+            <span class="nsfw w-18 rounded-lg p-1">NSFW</span>
+            <% } %> <%if (novel.scenes.length > 1) { %>
+            <span class="scenarios-box w-18 rounded-lg p-1 right-0"
+              ><%= novel.scenes.length %> scenes</span
+            >
+            <% } %>
+            <div class="image">
+              <img
+                src="/s3/assets/<%= novel.logoPic %>"
+                style="object-fit: scale-down; width: 200px; height: 200px"
+              />
+            </div>
+            <div class="content">
+              <a
+                class="header"
+                href="http://localhost:5173/?cardId=<%= hash%>"
+                target="_blank"
+                ><%= novel.title %></a
+              >
+              <div class="description h-12 overflow-auto">
+                <%= novel.description || 'No description' %>
+              </div>
+            </div>
+            <div class="extra content">
+              <p>Author: <%= novel.author || 'Unknown' %></p>
+            </div>
+            <div>
+              <form
+                action="/bot/delete/<%= hash %>"
+                method="POST"
+                onsubmit="return confirm('Do you really want to delete <%= novel.title %>?');"
+              >
+                <button
+                  type="submit"
+                  class="absolute text-red-600 right-2 bottom-4"
+                >
+                  <i class="trash icon"></i>
+                </button>
+              </form>
             </div>
           </div>
-          <div class="extra content">
-            <p>
-              Version <%= bot.data.character_version %>
-            </p>
-            <p>
-              Author: <%= bot.data.creator || 'Unknown' %>
-            </p>
-          </div>
-          <div>
-            <form action="/bot/delete/<%= bot.hash %>" method="POST" onsubmit="return confirm('Do you really want to delete <%= bot.data.name %>?');">
-              <button type="submit" class="absolute text-red-600 right-2 bottom-4">
-                <i class="trash icon"></i>
-              </button>
-            </form>
-          </div>
         </div>
+        <% }); %>
       </div>
-      <% }); %>
-    </div>
 
-    <div class="blocker invisible">
-    </div>
+      <div class="blocker invisible"></div>
 
-    <div class="modal upload-modal px-8 pt-6 pb-4 w-5/12 invisible">
-      <form action="/bot" method="post" enctype="multipart/form-data" class="ui form">
-        <label>
-          <div class="flex">
-            <h3 class="ui header">Upload a bot</h3>
-            <button class="pb-8 ml-auto" onclick="toggle_open_modal(false)">
-              <i class="modal-close close icon"></i>
-            </button>
+      <div class="modal upload-modal px-8 pt-6 pb-4 w-5/12 invisible">
+        <form
+          action="/bot"
+          method="post"
+          enctype="multipart/form-data"
+          class="ui form"
+        >
+          <label>
+            <div class="flex">
+              <h3 class="ui header">Upload a bot</h3>
+              <button class="pb-8 ml-auto" onclick="toggle_open_modal(false)">
+                <i class="modal-close close icon"></i>
+              </button>
+            </div>
+            <input
+              type="file"
+              value="file"
+              required
+              accept=".json"
+              name="file"
+              id="file"
+            />
+          </label>
+          <div class="mt-6">
+            <button class="ui button" type="submit">Upload</button>
           </div>
-          <input type="file" value="file" required accept=".json" name="file" id="file" />
-        </label>
-        <div class="mt-6">
-          <button class="ui button" type="submit">Upload</button>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
 
-    <div class="modal backend-modal px-8 pt-6 pb-4 w-5/12 invisible">
-      <div class="flex">
-        <h3 class="ui header">Configure Backend</h3>
-        <button class="pb-8 ml-auto" onclick="toggle_backend_modal(false)">
-          <i class="modal-close close icon"></i>
+      <div class="modal backend-modal px-8 pt-6 pb-4 w-5/12 invisible">
+        <div class="flex">
+          <h3 class="ui header">Configure Backend</h3>
+          <button class="pb-8 ml-auto" onclick="toggle_backend_modal(false)">
+            <i class="modal-close close icon"></i>
+          </button>
+        </div>
+        <div class="flex gap-2">
+          <p class="text-white w-24">API URL</p>
+          <input
+            class="mb-8 w-full mr-8"
+            type="text"
+            value=""
+            placeholder="https://students-appears-injured-alto.trycloudflare.com/v1"
+            required
+            name="apiUrl"
+            id="apiUrl"
+          />
+        </div>
+        <div class="flex gap-2">
+          <p class="text-white w-24">API Key</p>
+          <input
+            class="mb-8 w-full mr-8"
+            type="text"
+            value=""
+            placeholder="sk-EMPTY"
+            required
+            name="apiKey"
+            id="apiKey"
+          />
+        </div>
+        <div class="flex gap-2">
+          <p class="text-white w-24">Prompt Strategy</p>
+          <select class="ui dropdown" id="strategy">
+            <option value="alpacarp">Alpacarp</option>
+            <option value="metharmerp">Metharmerp</option>
+          </select>
+        </div>
+        <div class="flex gap-2">
+          <p class="text-white w-24">Tokenizer</p>
+          <select class="ui dropdown" id="tokenizer">
+            <option value="llama">LLaMA</option>
+            <option value="mistral">Mistral</option>
+          </select>
+        </div>
+        <div class="flex gap-2">
+          <p class="text-white w-24">Truncation Length</p>
+          <input
+            class="mb-8 w-full mr-8"
+            type="text"
+            value=""
+            placeholder="4096"
+            required
+            name="truncation_length"
+            id="truncation_length"
+          />
+        </div>
+        <div class="flex gap-2">
+          <p class="text-white w-24">Max new tokens</p>
+          <input
+            class="mb-8 w-full mr-8"
+            type="text"
+            value=""
+            placeholder="100"
+            required
+            name="max_new_tokens"
+            id="max_new_tokens"
+          />
+        </div>
+        <button
+          class="ui button save-button w-64"
+          onclick="save_backend_config(); toggle_backend_modal(false)"
+        >
+          Save
         </button>
       </div>
-      <div class="flex gap-2">
-        <p class="text-white w-24">API URL</p>
-        <input class="mb-8 w-full mr-8" type="text" value="" placeholder="https://students-appears-injured-alto.trycloudflare.com/v1" required name="apiUrl" id="apiUrl" />
-      </div>
-      <div class="flex gap-2">
-        <p class="text-white w-24">API Key</p>
-        <input class="mb-8 w-full mr-8" type="text" value="" placeholder="sk-EMPTY" required name="apiKey" id="apiKey" />
-      </div>
-      <div class="flex gap-2">
-        <p class="text-white w-24">Prompt Strategy</p>
-        <select class="ui dropdown" id="strategy">
-          <option value="alpacarp">Alpacarp</option>
-          <option value="metharmerp">Metharmerp</option>
-        </select>
-      </div>
-      <div class="flex gap-2">
-        <p class="text-white w-24">Tokenizer</p>
-        <select class="ui dropdown" id="tokenizer">
-          <option value="llama">LLaMA</option>
-          <option value="mistral">Mistral</option>
-        </select>
-      </div>
-      <div class="flex gap-2">
-        <p class="text-white w-24">Truncation Length</p>
-        <input class="mb-8 w-full mr-8" type="text" value="" placeholder="4096" required name="truncation_length" id="truncation_length" />
-      </div>
-      <div class="flex gap-2">
-        <p class="text-white w-24">Max new tokens</p>
-        <input class="mb-8 w-full mr-8" type="text" value="" placeholder="100" required name="max_new_tokens" id="max_new_tokens" />
-      </div>
-      <button class="ui button save-button w-64" onclick="save_backend_config(); toggle_backend_modal(false)">Save</button>
     </div>
-  </div>
 
-  <!-- LIBS -->
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
-  <script src="/public/semantic.min.js"></script>
-  <script src="/public/form.min.js"></script>
-  <script>
-    $(document).ready(async function() {
-      $('.dropdown').dropdown();
+    <!-- LIBS -->
+    <script
+      src="https://code.jquery.com/jquery-3.6.4.min.js"
+      integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+      crossorigin="anonymous"
+    ></script>
+    <script src="/public/semantic.min.js"></script>
+    <script src="/public/form.min.js"></script>
+    <script>
+      $(document).ready(async function () {
+        $(".dropdown").dropdown();
 
-      // toggle button formatting
-      $(".ui.checkbox").checkbox();
+        // toggle button formatting
+        $(".ui.checkbox").checkbox();
 
-      // listen for changes to dark mode toggle buttons
-      $(".dark_mode_toggle:checkbox").on("change", function() {
-        change_theme($(this).is(":checked"));
+        // listen for changes to dark mode toggle buttons
+        $(".dark_mode_toggle:checkbox").on("change", function () {
+          change_theme($(this).is(":checked"));
+        });
+
+        const getResult = await fetch("/get", {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+          },
+        });
+        const data = await getResult.json();
+
+        document.getElementById("apiUrl").value = data.apiUrl;
+        document.getElementById("apiKey").value = data.apiKey;
+        $("#strategy").dropdown("set selected", data.strategy);
+        $("#tokenizer").dropdown("set selected", data.tokenizer);
+        document.getElementById("truncation_length").value =
+          data.truncation_length;
+        document.getElementById("max_new_tokens").value = data.max_new_tokens;
       });
 
-      $(".nsfw_toggle:checkbox").on("change", function() {
-        toggle_nsfw($(this).is(":checked"));
-      });
-
-      const getResult = await fetch("/get", {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json"
+      function change_theme(dark_mode) {
+        if (dark_mode) {
+          // for contrast with child segments
+          $("body").css("background-color", "#282c34");
+          // most Semantic UI elements have the "ui" class
+          // useful to skip over elements with some class, such as "ignore_dark_mode"
+          $(".ui").not(".ignore_dark_mode").addClass("inverted");
+          // change the state of all dark mode toggle buttons
+          $(".dark_mode_toggle:checkbox").prop("checked", true);
+        } else {
+          $("body").css("background-color", "");
+          $(".inverted").not(".ignore_dark_mode").removeClass("inverted");
+          $(".dark_mode_toggle:checkbox").prop("checked", false);
         }
-      });
-      const data = await getResult.json()
-
-
-      document.getElementById('apiUrl').value = data.apiUrl
-      document.getElementById('apiKey').value = data.apiKey
-      $('#strategy').dropdown('set selected', data.strategy);
-      $('#tokenizer').dropdown('set selected', data.tokenizer);
-      document.getElementById('truncation_length').value = data.truncation_length
-      document.getElementById('max_new_tokens').value = data.max_new_tokens
-    });
-
-    function change_theme(dark_mode) {
-      if (dark_mode) {
-        // for contrast with child segments
-        $("body").css("background-color", "#282c34");
-        // most Semantic UI elements have the "ui" class
-        // useful to skip over elements with some class, such as "ignore_dark_mode"
-        $(".ui").not(".ignore_dark_mode").addClass("inverted");
-        // change the state of all dark mode toggle buttons
-        $(".dark_mode_toggle:checkbox").prop("checked", true);
-      } else {
-        $("body").css("background-color", "");
-        $(".inverted").not(".ignore_dark_mode").removeClass("inverted");
-        $(".dark_mode_toggle:checkbox").prop("checked", false);
       }
-    }
 
-    function toggle_nsfw(nsfw) {
-      if (nsfw) {
-        $(".nsfw-bot").removeClass("invisible");
-        $(".nsfw-bot").addClass("visible");
-      } else {
-        $(".nsfw-bot").removeClass("visible");
-        $(".nsfw-bot").addClass("invisible");
-      }
-    }
-
-    function toggle_open_modal(open) {
-      if (open) {
-        $(".upload-modal").removeClass("invisible");
-        $(".upload-modal").addClass("visible");
-        $(".blocker").removeClass("invisible");
-        $(".blocker").addClass("visible");
-      } else {
-        $(".upload-modal").removeClass("visible");
-        $(".upload-modal").addClass("invisible");
-        $(".blocker").removeClass("visible");
-        $(".blocker").addClass("invisible");
-      }
-    }
-
-    function toggle_backend_modal(open) {
-      if (open) {
-        $(".backend-modal").removeClass("invisible");
-        $(".backend-modal").addClass("visible");
-        $(".blocker").removeClass("invisible");
-        $(".blocker").addClass("visible");
-      } else {
-        $(".backend-modal").removeClass("visible");
-        $(".backend-modal").addClass("invisible");
-        $(".blocker").removeClass("visible");
-        $(".blocker").addClass("invisible");
-      }
-    }
-
-    function save_backend_config() {
-      const apiUrl = document.getElementById('apiUrl').value
-      const apiKey = document.getElementById('apiKey').value
-      const strategy = document.getElementById('strategy').value
-      const tokenizer = document.getElementById('tokenizer').value
-      const truncation_length = document.getElementById('truncation_length').value
-      const max_new_tokens = document.getElementById('max_new_tokens').value
-
-      const config = {
-        apiUrl: apiUrl,
-        apiKey: apiKey,
-        strategy: strategy,
-        tokenizer: tokenizer,
-        truncation_length: Number(truncation_length || 0) || 0,
-        max_new_tokens: Number(max_new_tokens || 0) || 0
-      }
-      fetch("/save", {
-        method: "POST",
-        body: JSON.stringify(config),
-        headers: {
-          "Content-type": "application/json"
+      function toggle_open_modal(open) {
+        if (open) {
+          $(".upload-modal").removeClass("invisible");
+          $(".upload-modal").addClass("visible");
+          $(".blocker").removeClass("invisible");
+          $(".blocker").addClass("visible");
+        } else {
+          $(".upload-modal").removeClass("visible");
+          $(".upload-modal").addClass("invisible");
+          $(".blocker").removeClass("visible");
+          $(".blocker").addClass("invisible");
         }
-      });
-    }
+      }
 
-    change_theme(true);
-  </script>
-</body>
+      function toggle_backend_modal(open) {
+        if (open) {
+          $(".backend-modal").removeClass("invisible");
+          $(".backend-modal").addClass("visible");
+          $(".blocker").removeClass("invisible");
+          $(".blocker").addClass("visible");
+        } else {
+          $(".backend-modal").removeClass("visible");
+          $(".backend-modal").addClass("invisible");
+          $(".blocker").removeClass("visible");
+          $(".blocker").addClass("invisible");
+        }
+      }
 
+      function save_backend_config() {
+        const apiUrl = document.getElementById("apiUrl").value;
+        const apiKey = document.getElementById("apiKey").value;
+        const strategy = document.getElementById("strategy").value;
+        const tokenizer = document.getElementById("tokenizer").value;
+        const truncation_length =
+          document.getElementById("truncation_length").value;
+        const max_new_tokens = document.getElementById("max_new_tokens").value;
+
+        const config = {
+          apiUrl: apiUrl,
+          apiKey: apiKey,
+          strategy: strategy,
+          tokenizer: tokenizer,
+          truncation_length: Number(truncation_length || 0) || 0,
+          max_new_tokens: Number(max_new_tokens || 0) || 0,
+        };
+        fetch("/save", {
+          method: "POST",
+          body: JSON.stringify(config),
+          headers: {
+            "Content-type": "application/json",
+          },
+        });
+      }
+
+      change_theme(true);
+    </script>
+  </body>
 </html>

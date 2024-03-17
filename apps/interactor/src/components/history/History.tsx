@@ -1,20 +1,15 @@
-import { AreYouSure, Modal, Tooltip } from '@mikugg/ui-kit'
+import { Modal, Tooltip } from '@mikugg/ui-kit'
 import { GrHistory } from 'react-icons/gr'
 import { BiCloudUpload, BiCloudDownload } from 'react-icons/bi'
 import { FaTimes } from 'react-icons/fa'
 import { ReactElement } from 'react'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import {
-  setDeleteNodeConfirmationModal,
-  setEditModal,
-  setHistoryModal,
-} from '../../state/slices/settingsSlice'
-import ReactFlow, { Position, Node, Edge } from 'reactflow'
+import { setEditModal, setHistoryModal } from '../../state/slices/settingsSlice'
+import ReactFlow, { Position, Node, Edge, NodeTypes } from 'reactflow'
 import DialogueNode from './DialogueNode'
 import { NodeEditor } from './NodeEditor'
 import {
   NarrationResponse,
-  deleteNode,
   swipeResponse,
 } from '../../state/slices/narrationSlice'
 import { DialogueNodeData, setAllNodesPosition } from './utils'
@@ -24,7 +19,11 @@ import { toast } from 'react-toastify'
 import './History.scss'
 import 'reactflow/dist/style.css'
 import { VersionId as V1VersionId } from '../../state/versioning/v1.state'
-import { migrateV1toV2 } from '../../state/versioning/migrations'
+import { VersionId as V2VersionId } from '../../state/versioning/v2.state'
+import { VersionId as V3VersionId } from '../../state/versioning/v3.state'
+import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
+import { initialState as initialSettingsState } from '../../state/slices/settingsSlice'
+import { initialState as initialCreationState } from '../../state/slices/creationSlice'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -55,14 +54,27 @@ const HistoryActions = () => {
       return
     }
     const reader = new FileReader()
-    reader.onload = () => {
+    reader.onload = async () => {
       try {
         const stateJsonString = reader.result as string
         let stateJson = JSON.parse(stateJsonString)
         if (stateJson.version === V1VersionId) {
-          stateJson = migrateV1toV2(stateJson)
+          stateJson = migrateV2toV3(migrateV1toV2(stateJson))
+        } else if (stateJson.version === V2VersionId) {
+          stateJson = migrateV2toV3(stateJson)
         }
-        dispatch(replaceState(stateJson))
+
+        if (stateJson.version !== V3VersionId) {
+          throw new Error('Narration version mismatch')
+        }
+
+        dispatch(
+          replaceState({
+            ...stateJson,
+            creation: initialCreationState,
+            settings: initialSettingsState,
+          })
+        )
       } catch (e) {
         toast.error('Error reading history file')
       }
@@ -106,47 +118,15 @@ const HistoryActions = () => {
     </div>
   )
 }
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
+  // eslint-disable-next-line
+  // @ts-ignore
   dialogueNode: DialogueNode,
 }
 const HistoryModal = (): ReactElement => {
   const dispatch = useAppDispatch()
   const narration = useAppSelector((state) => state.narration)
   const novel = useAppSelector((state) => state.novel)
-
-  const { opened: confirmDeleteNodeOpened, id: confirmDeleteNodeId } =
-    useAppSelector((state) => state.settings.modals.deleteNodeConfirmation)
-
-  const onNodeDelete = () => {
-    const response = narration.responses[confirmDeleteNodeId]
-    if (response) {
-      const parentInteractionID = response.parentInteractionId
-      if (parentInteractionID) {
-        const parentInteraction = narration.interactions[parentInteractionID]
-        if (parentInteraction) {
-          let index =
-            parentInteraction.responsesId.indexOf(confirmDeleteNodeId) - 1
-          if (index === -1)
-            index =
-              parentInteraction.responsesId.indexOf(confirmDeleteNodeId) + 1
-
-          dispatch(swipeResponse(parentInteraction.responsesId[index]))
-          dispatch(deleteNode(confirmDeleteNodeId))
-        }
-      }
-    }
-
-    const interaction = narration.interactions[confirmDeleteNodeId]
-    if (interaction) {
-      const parentResponseId = interaction.parentResponseId
-      if (parentResponseId) {
-        dispatch(swipeResponse(parentResponseId))
-        dispatch(deleteNode(confirmDeleteNodeId))
-      }
-    }
-
-    dispatch(setDeleteNodeConfirmationModal({ opened: false, id: '' }))
-  }
 
   const [nodes, edges, startPos] = (() => {
     const parentIds = (() => {
@@ -171,17 +151,18 @@ const HistoryModal = (): ReactElement => {
       // get parent scene
       const parentSceneId = response.parentInteractionId
         ? narration.interactions[response.parentInteractionId]?.sceneId
-        : novel.startSceneId
+        : novel.starts.find((start) => start.id === response.id)?.sceneId
 
       const parentScene = novel.scenes.find(
         (scene) => scene.id === parentSceneId
       )
 
-      const avatars = response.characters.map(({ role }) => {
+      const avatars = response.characters.map(({ characterId }) => {
         const id =
-          parentScene?.roles.find(({ role: _role }) => _role === role)
-            ?.characterId || ''
-        return novel.characters[id]?.profile_pic || ''
+          parentScene?.characters.find(
+            ({ characterId: _characterId }) => _characterId === characterId
+          )?.characterId || ''
+        return novel.characters.find((c) => c.id === id)?.profile_pic || ''
       })
 
       const isLastResponse = parentIds[0] === response.id
@@ -269,14 +250,6 @@ const HistoryModal = (): ReactElement => {
 
   return (
     <div className="History__modal">
-      <AreYouSure
-        onClose={() =>
-          dispatch(setDeleteNodeConfirmationModal({ opened: false, id: '' }))
-        }
-        onSubmit={onNodeDelete}
-        isShowingPupUp={confirmDeleteNodeOpened}
-        modalMessage="Are you sure you want to delete this node?"
-      />
       {/* eslint-disable-next-line */}
       {/* @ts-ignore */}
       <ReactFlow

@@ -1,0 +1,85 @@
+@import "../styles/variables";
+
+.ItemSearch {
+  margin-top: 20px;
+
+  &__modal {
+    box-shadow: 0px 0px 20px 0px rgb(205 95 234);
+  }
+
+  &__input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  &__input-text {
+    position: relative;
+    width: 100%;
+
+    .Loader {
+      position: absolute;
+      top: 10.5px;
+      left: initial;
+      right: 14px;
+    }
+  }
+
+  &__input-checkbox {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 20px;
+    min-width: 120px;
+  }
+
+  &__load-more {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__list {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  &__item {
+    display: flex;
+    padding: 10px;
+    background-color: $background-1;
+    border-radius: 10px;
+    flex: 6;
+    transition: all 0.2s ease-out;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background-color: lighten($background-1, 7%);
+    }
+
+    img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    &__content {
+      margin-left: 1rem;
+    }
+
+    &__description {
+      font-size: 0.7rem;
+      color: $text-2;
+      font-style: italic;
+      max-height: 2rem;
+      overflow: auto;
+    }
+
+    &__tags {
+    }
+  }
+}

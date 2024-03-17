@@ -1,0 +1,10 @@
+.AssetsPanel {
+  &__header {
+    margin-bottom: 10px;
+  }
+  &__groups {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

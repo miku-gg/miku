@@ -1,0 +1,40 @@
+$background-color-light: #25284b;
+$secondary-color: #9747ff;
+
+.ButtonGroup {
+  display: flex;
+  overflow: auto;
+  gap: 1rem;
+  padding-bottom: 10px;
+
+  &__button {
+    color: white;
+    background-color: $background-color-light;
+    padding: 0.25rem 1rem;
+    border-radius: 4px;
+    transition: all 0.2s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+
+    &.selected {
+      background-color: $secondary-color;
+
+      &:hover {
+        background-color: $secondary-color;
+      }
+    }
+
+    &[disabled] {
+      background-color: gray;
+      &:hover {
+        background-color: gray;
+      }
+    }
+
+    &:hover {
+      background-color: lighten($background-color-light, 10%);
+    }
+  }
+}

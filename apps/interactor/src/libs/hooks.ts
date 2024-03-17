@@ -12,8 +12,9 @@ export const useFillTextTemplate = (text: string) => {
   return fillTextTemplate(text, {
     user: userName,
     bot: characterName,
-    roles: scene?.roles.reduce((prev, { role, characterId }) => {
-      prev[role] = characters[characterId]?.name || ''
+    characters: scene?.characters.reduce((prev, { characterId }) => {
+      prev[characterId] =
+        characters.find(({ id }) => id === characterId)?.name || ''
       return prev
     }, {} as Record<string, string>),
   })
