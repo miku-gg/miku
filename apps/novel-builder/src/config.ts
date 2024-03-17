@@ -293,6 +293,4 @@ const configs: Map<"development" | "staging" | "production", BuilderConfig> =
   ]);
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export default configs.get(
-  import.meta.env.PROD ? "production" : "development"
-)!;
+export default configs.get(import.meta.env.VITE_STAGE || "development")!;

@@ -55,7 +55,7 @@ jobs:
           VITE_GTM_ID: ${{ secrets.VITE_GTM_ID}}
           VITE_ASSETS_DIRECTORY_ENDPOINT: ${{ secrets.VITE_ASSETS_DIRECTORY_ENDPOINT}}
           VITE_ASSETS_UPLOAD_URL: ${{ secrets.VITE_ASSETS_UPLOAD_URL }}
-          NODE_ENV: production
+          VITE_STAGE: production
       - name: Deploy to S3
         run: aws s3 sync apps/novel-builder/dist ${{ secrets.S3_BUCKET_BUILD }} --delete
       - name: Set Cache-Control
