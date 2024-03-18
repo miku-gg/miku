@@ -106,10 +106,41 @@ const NODE_WIDTH = 150;
 const NODE_HEIGHT = 70;
 const SIBLINGS_DISTANCE_GAP = 20;
 const PARENT_DISTANCE_GAP = 50;
+
+export function graphToTree(startNodes: string[], edges: Edge[]): Edge[] {
+  const visited = new Set<string>();
+  const queue: Array<{ node: string; parent: string | null }> = [];
+  const treeEdges: Edge[] = [];
+
+  // Mark start nodes as visited and enqueue them
+  for (const startNode of startNodes) {
+    visited.add(startNode);
+    queue.push({ node: startNode, parent: null });
+  }
+
+  while (queue.length > 0) {
+    const { node, parent } = queue.shift()!;
+
+    for (const edge of edges) {
+      if (edge.source === node) {
+        if (!visited.has(edge.target)) {
+          if (parent === null || edge.target !== parent) {
+            visited.add(edge.target);
+            queue.push({ node: edge.target, parent: node });
+            treeEdges.push(edge);
+          }
+        }
+      }
+    }
+  }
+
+  return treeEdges;
+}
+
 export const setAllNodesPosition = (
   nodes: Node[],
   edges: Edge[],
-  starts: string[]
+  startNodes: string[]
 ): { x: number; y: number } => {
   const nodeMap = new Map<
     string,
@@ -119,7 +150,6 @@ export const setAllNodesPosition = (
       children: string[];
     }
   >();
-  const visitedNodes = new Set<string>(); // Added to track visited nodes
   // populate nodeMap
   nodes.forEach((node) => {
     nodeMap.set(node.id, { nativeNode: node, subtreeWidth: 0, children: [] });
@@ -136,7 +166,6 @@ export const setAllNodesPosition = (
   const startPos = { x: 0, y: 0 };
 
   function calculateSubtreeWidth(nodeId: string): number {
-    if (visitedNodes.has(nodeId)) return 0; // Check if visited
     const node = nodeMap.get(nodeId);
     if (!node) return NODE_WIDTH;
     if (node.subtreeWidth) return node.subtreeWidth;
@@ -152,14 +181,7 @@ export const setAllNodesPosition = (
     return node.subtreeWidth;
   }
 
-  function setPosition(
-    nodeId: string,
-    depth: number,
-    offsetX = 0
-  ): number | undefined {
-    if (visitedNodes.has(nodeId)) return offsetX; // Check if visited before processing
-    visitedNodes.add(nodeId); // Mark as visited
-
+  function setPosition(nodeId: string, depth: number, offsetX = 0) {
     const node = nodeMap.get(nodeId);
     if (!node) return offsetX;
     const subtreeWidth = calculateSubtreeWidth(nodeId);
@@ -174,13 +196,14 @@ export const setAllNodesPosition = (
       setPosition(child, depth + 1, currentX);
       currentX += childSubtreeWidth + SIBLINGS_DISTANCE_GAP;
     });
+
     return node.children.length
       ? currentX
       : currentX + NODE_WIDTH + SIBLINGS_DISTANCE_GAP;
   }
-  // Set position for each start node
+
   let prevResult = 0;
-  starts.forEach((start) => {
+  startNodes.forEach((start) => {
     prevResult = setPosition(start, 0, prevResult) || 0;
   });
   return startPos;

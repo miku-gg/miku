@@ -31,7 +31,7 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
-import { getEdgeParams, setAllNodesPosition } from "./utils.js";
+import { getEdgeParams, graphToTree, setAllNodesPosition } from "./utils.js";
 import { RiDragMove2Line, RiEdit2Line } from "react-icons/ri";
 
 function FloatingEdge({ id, source, target, markerEnd, style }: Edge) {
@@ -200,14 +200,22 @@ export default function SceneGraph() {
       });
 
       // get scenes with no children or parent
-      const topScenes = new Set<string>([]);
+      const _topScenes = new Set<string>([]);
       scenes.forEach((scene) => {
         if (!scenes.some((s) => s.children.includes(scene.id))) {
-          topScenes.add(scene.id);
+          _topScenes.add(scene.id);
         }
       });
+      startScenes.forEach((sceneId) => {
+        _topScenes.add(sceneId);
+      });
+      const topScenes = Array.from(_topScenes);
 
-      setAllNodesPosition(_nodes, edgesConfig, Array.from(topScenes));
+      setAllNodesPosition(
+        _nodes,
+        graphToTree(topScenes, edgesConfig),
+        topScenes
+      );
 
       return _nodes;
     });
