@@ -63,12 +63,22 @@ async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
   const { assetLinkLoader, assetUploader, servicesEndpoint } = useAppContext()
+  const songs = useAppSelector((state) =>
+    state.novel.songs.filter((song) =>
+      state.novel.scenes.find((scene) => scene.musicId === song.id)
+    )
+  )
 
-  const musicList: { name: string; source: string }[] =
-    DEFAULT_MUSIC.sort().map((_name) => ({
+  const musicList: { name: string; source: string }[] = [
+    ...songs.map((song) => ({
+      name: song.name,
+      source: assetLinkLoader(song.source),
+    })),
+    ...DEFAULT_MUSIC.sort().map((_name) => ({
       name: _name,
       source: assetLinkLoader(_name),
-    }))
+    })),
+  ]
 
   const dispatch = useAppDispatch()
 
@@ -416,8 +426,8 @@ const SearchBackgroundModal = () => {
                 : `url(${backgroundURL})`,
             }}
             onClick={() => {
-              dispatch(setBackground(backgroundURL))
-              dispatch(addImportedBackground(backgroundURL))
+              dispatch(setBackground(result.asset))
+              dispatch(addImportedBackground(result.asset))
               dispatch(
                 setModalOpened({
                   id: 'background-search',
