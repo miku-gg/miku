@@ -56,7 +56,8 @@ const MusicPlayer: React.FC = () => {
   const songs = useAppSelector((state) => state.novel.songs)
   const scene = useAppSelector(selectCurrentScene)
   const audioRef = useRef<HTMLAudioElement>(null)
-  const _src = songs.find((s) => s.id === scene?.musicId)?.source
+  const _src =
+    songs.find((s) => s.id === scene?.musicId)?.source || scene?.musicId
   const src = _src ? assetLinkLoader(_src) : ''
 
   const volume = enabled ? _volume : 0
