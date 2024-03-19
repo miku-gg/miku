@@ -54,6 +54,12 @@ const selectSelectableCharacters = createSelector(
     })
 )
 
+async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
+  const response = await fetch(dataURI)
+  const blob = await response.blob()
+  return new File([blob], filename, { type: blob.type })
+}
+
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
   const { assetLinkLoader, assetUploader, servicesEndpoint } = useAppContext()
@@ -72,12 +78,13 @@ const CreateScene = () => {
   const backgroundSelectedId = useAppSelector(
     (state) => state.creation.scene.background.selected
   )
-  const backgroundSelected = useAppSelector((state) => {
-    const background = state.novel.backgrounds.find(
-      (b) => b.id === backgroundSelectedId
-    )
-    return background ? background.source.jpg : ''
-  })
+  const backgroundSelected =
+    useAppSelector((state) => {
+      const background = state.novel.backgrounds.find(
+        (b) => b.id === backgroundSelectedId
+      )
+      return background ? background.source.jpg : ''
+    }) || backgroundSelectedId
   const characters = useAppSelector(selectSelectableCharacters)
   const selectedMusic = useAppSelector((state) => ({
     name: state.creation.scene.music.selected,
@@ -127,10 +134,18 @@ const CreateScene = () => {
       try {
         dispatch(setSubmitting(true))
         _background = backgroundSelected.startsWith('data:image')
-          ? (await assetUploader(backgroundSelected)).fileName
+          ? (
+              await assetUploader(
+                await dataURItoFile(backgroundSelected, 'asset')
+              )
+            ).fileName
           : backgroundSelected
         _music = selectedMusic.source.startsWith('data:audio')
-          ? (await assetUploader(selectedMusic.source)).fileName
+          ? (
+              await assetUploader(
+                await dataURItoFile(selectedMusic.source, 'asset')
+              )
+            ).fileName
           : selectedMusic.name
         dispatch(removeImportedBackground(backgroundSelected))
         dispatch(setBackground(_background))
@@ -167,6 +182,7 @@ const CreateScene = () => {
     dispatch(setModalOpened({ id: 'scene', opened: false }))
     dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
   }
+  console.log('backgroundSelected', backgroundSelected)
 
   return (
     <div className="CreateScene">

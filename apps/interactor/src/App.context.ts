@@ -11,7 +11,7 @@ export interface AppProps {
   freeSmart: boolean
   novelLoader: () => Promise<RootState>
   assetLinkLoader: (asset: string, lowres?: boolean) => string
-  assetUploader: (data: string) => Promise<{
+  assetUploader: (data: File) => Promise<{
     fileName: string
     fileSize: number
   }>

@@ -7,12 +7,11 @@ import { initialState as initialSettingsState } from './src/state/slices/setting
 import { initialState as initialCreationState } from './src/state/slices/creationSlice'
 import { RootState } from './src/state/store'
 import { VersionId } from './src/state/versioning'
-import { decodeText } from '@mikugg/bot-utils'
+import { decodeText, uploadAsset } from '@mikugg/bot-utils'
 import queryString from 'query-string'
 import mergeWith from 'lodash.mergewith'
 import { toast } from 'react-toastify'
 import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
-import { uploadAsset } from './src/libs/assetUpload'
 import {
   listSearch,
   BackgroundResult,
@@ -188,8 +187,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       freeSmart={params.freeSmart}
       freeTTS={params.freeTTS}
       novelLoader={loadNarration}
-      assetUploader={(base64String: string) =>
-        uploadAsset(params.assetsUploadEndpoint, base64String)
+      assetUploader={(file: File) =>
+        uploadAsset(params.assetsUploadEndpoint, file)
       }
       assetLinkLoader={assetLinkLoader}
       backgroundSearcher={(_params: {
