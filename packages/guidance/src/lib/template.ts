@@ -8,11 +8,14 @@ export enum TEMPLATE_METHODS {
   GEN = "GEN", // generation of a string
 }
 
-export class TemplateProcessor {
+export class TemplateProcessor<TRequestOptions = undefined> {
   private tokenizer: AbstractTokenizer;
-  private generator: AbstractTokenGenerator;
+  private generator: AbstractTokenGenerator<TRequestOptions>;
 
-  constructor(tokenizer: AbstractTokenizer, generator: AbstractTokenGenerator) {
+  constructor(
+    tokenizer: AbstractTokenizer,
+    generator: AbstractTokenGenerator<TRequestOptions>
+  ) {
     this.tokenizer = tokenizer;
     this.generator = generator;
   }
@@ -21,18 +24,20 @@ export class TemplateProcessor {
     this.tokenizer = tokenizer;
   }
 
-  public setGenerator(generator: AbstractTokenGenerator) {
+  public setGenerator(generator: AbstractTokenGenerator<TRequestOptions>) {
     this.generator = generator;
   }
 
   public async processTemplate(
     template: string,
-    variables: Map<string, string | string[]>
+    variables: Map<string, string | string[]>,
+    reqOptions?: TRequestOptions
   ): Promise<Map<string, string>> {
     let finalResult = new Map<string, string>();
     for await (const partialResult of this.processTemplateStream(
       template,
-      variables
+      variables,
+      reqOptions
     )) {
       finalResult = partialResult;
     }
@@ -42,7 +47,8 @@ export class TemplateProcessor {
 
   public async *processTemplateStream(
     template: string,
-    variables: Map<string, string | string[]>
+    variables: Map<string, string | string[]>,
+    reqOptions?: TRequestOptions
   ): AsyncGenerator<Map<string, string>, void> {
     const result = new Map<string, string>();
 
@@ -76,7 +82,11 @@ export class TemplateProcessor {
 
       switch (method) {
         case TEMPLATE_METHODS.GEN:
-          const stream = this.generator.generateString(prompt, methodArgs);
+          const stream = this.generator.generateString(
+            prompt,
+            methodArgs,
+            reqOptions
+          );
           for await (const chunk of stream) {
             completion = chunk;
             result.set(variableName, completion);
@@ -125,7 +135,8 @@ export class TemplateProcessor {
               }, {} as Record<string, number>);
               const top_logprobs = await this.generator.generateTokenLogProgs(
                 prompt,
-                logit_bias
+                logit_bias,
+                reqOptions
               );
 
               // get max top_logpobs that is in logit_bias
