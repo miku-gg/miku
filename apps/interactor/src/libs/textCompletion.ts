@@ -22,11 +22,13 @@ const textCompletion = async function* ({
   template,
   model,
   variables,
+  identifier,
 }: {
   serviceBaseUrl: string
   template: string
   model: ModelType
   variables: Record<string, string[] | string>
+  identifier: string
 }): AsyncGenerator<Map<string, string>> {
   try {
     const response = await fetch(serviceBaseUrl + '/text', {
@@ -38,6 +40,7 @@ const textCompletion = async function* ({
       }),
       headers: {
         'Content-Type': 'application/json',
+        Identifier: identifier,
       },
       credentials: 'include',
     })

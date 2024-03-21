@@ -16,6 +16,18 @@ import { AbstractRoleplayStrategy } from '../../libs/prompts/strategies'
 import { getRoleplayStrategyFromSlug } from '../../libs/prompts/strategies/roleplay'
 import { selectAllParentDialogues } from '../selectors'
 
+// a simple hash function to generate a unique identifier for the narration
+function simpleHash(str: string): string {
+  let hash = 0
+  if (str.length === 0) return `${hash}`
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash = hash & hash // Convert to 32bit integer
+  }
+  return `${hash}`
+}
+
 const interactionEffect = async (
   dispatch: Dispatch,
   state: RootState,
@@ -55,6 +67,10 @@ const interactionEffect = async (
       ...completionQuery,
       model: state.settings.model,
       serviceBaseUrl: servicesEndpoint,
+      // indentifer is used to always use the server for this narration, saving KV cache.
+      identifier: simpleHash(
+        state.settings.user.name + '_' + state.narration.id
+      ),
     })
 
     for await (const result of stream) {

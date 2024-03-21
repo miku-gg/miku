@@ -86,7 +86,7 @@ export const modelsMetadata = new Map<
 
 const templateProcessors = new Map<
   ModelType,
-  Guidance.Template.TemplateProcessor
+  Guidance.Template.TemplateProcessor<unknown>
 >([
   [
     ModelType.RP,
@@ -139,7 +139,12 @@ export default async (req: Request<string>, res: Response) => {
     .get(guidanceQuery.model)
     ?.processTemplateStream(
       guidanceQuery.template,
-      new Map(Object.entries(guidanceQuery.variables || {}))
+      new Map(Object.entries(guidanceQuery.variables || {})),
+      {
+        headers: {
+          chatid: req.headers.identifier || Date.now().toString(),
+        },
+      }
     );
   if (!stream) {
     throw { message: "Error completing guidance.", status: 500 };
