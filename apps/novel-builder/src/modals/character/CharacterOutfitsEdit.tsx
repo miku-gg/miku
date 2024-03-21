@@ -20,6 +20,7 @@ import { MikuCardV2 } from "@mikugg/bot-utils";
 import config from "../../config";
 import "./CharacterOutfitsEdit.scss";
 import { toast } from "react-toastify";
+import { BsStars } from "react-icons/bs";
 
 interface EmotionGroup {
   id: string;
@@ -419,9 +420,16 @@ export default function CharacterOutfitsEdit({
       >
         {renderEmotionGroups()}
       </Accordion>
-      <Button theme="gradient" onClick={handleAddGroup}>
-        + Add Outfit
-      </Button>
+      <div className="CharacterOutfitsEdit__buttons">
+        <Button theme="secondary" onClick={handleAddGroup}>
+          + Add Outfit
+        </Button>
+        <a href="https://emotions.miku.gg" target="_blank">
+          <Button theme="gradient">
+            <BsStars /> Generate
+          </Button>
+        </a>
+      </div>
     </div>
   );
 }

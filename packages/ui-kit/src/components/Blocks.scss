@@ -35,6 +35,10 @@
     &--highlighted {
       border: 2px solid #9747ff;
     }
+
+    &--clickable {
+      cursor: pointer;
+    }
   }
 
   &__item-edit {
@@ -47,9 +51,5 @@
     &:hover {
       color: $secondary-color;
     }
-  }
-
-  &--clickable {
-    cursor: pointer;
   }
 }

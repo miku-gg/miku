@@ -45,25 +45,29 @@ export default function CharacterEditModal() {
             },
           ]}
         />
-        <div className="CharacterEditModal__delete">
-          <Button
-            theme="primary"
-            onClick={() =>
-              openModal({
-                description: "Are you sure you want to delete this character?",
-                onYes: () => {
-                  dispatch(closeModal({ modalType: "character" }));
-                  dispatch(deleteCharacter(editId || ""));
-                },
-              })
-            }
-          >
-            Delete character
-          </Button>
-        </div>
       </div>
       {selected === "prompt" ? (
-        <CharacterDescriptionEdit characterId={editId} />
+        <>
+          <CharacterDescriptionEdit characterId={editId} />
+          <div className="CharacterEditModal__delete">
+            <Button
+              theme="primary"
+              onClick={() =>
+                openModal({
+                  description:
+                    "Are you sure you want to delete this character?",
+                  onYes: () => {
+                    dispatch(closeModal({ modalType: "character" }));
+                    dispatch(deleteCharacter(editId || ""));
+                  },
+                  yesLabel: "Delete",
+                })
+              }
+            >
+              Delete character
+            </Button>
+          </div>
+        </>
       ) : null}
       {selected === "outfits" ? (
         <CharacterOutfitsEdit characterId={editId} />

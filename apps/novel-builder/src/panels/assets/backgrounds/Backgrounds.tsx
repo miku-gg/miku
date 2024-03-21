@@ -12,6 +12,7 @@ import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { openModal } from "../../../state/slices/inputSlice";
 import { FaPencil } from "react-icons/fa6";
+import { BsStars } from "react-icons/bs";
 
 export default function Backgrounds({
   selected,
@@ -90,6 +91,21 @@ export default function Backgrounds({
               text: "Upload",
             },
             onClick: () => uploadBackground?.current?.click(),
+            loading: backgroundUploading,
+            disabled: backgroundUploading,
+          },
+          {
+            id: "generate",
+            highlighted: false,
+            content: {
+              icon: <BsStars />,
+              text: "Gen",
+            },
+            onClick: () =>
+              window.open(
+                "https://emotions.miku.gg/background-generation",
+                "_blank"
+              ),
             loading: backgroundUploading,
             disabled: backgroundUploading,
           },
