@@ -101,6 +101,7 @@ const InputBox = (): JSX.Element | null => {
         variables: prompt.variables,
         model: state.settings.model,
         serviceBaseUrl: servicesEndpoint,
+        identifier: `${Date.now()}`,
       })
 
       let response: string[] = []
