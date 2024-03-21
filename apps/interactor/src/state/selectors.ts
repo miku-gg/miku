@@ -141,9 +141,10 @@ export const selectAvailableScenes = createSelector(
   [
     (state: RootState) => state.novel.scenes,
     (state: RootState) => state.novel.characters,
+    (state: RootState) => state.settings.user.nsfw,
     selectCurrentScene,
   ],
-  (scenes, characters, currentScene) => {
+  (scenes, characters, nsfw, currentScene) => {
     if (scenes.length === 1) return []
     return scenes
       .filter(
@@ -151,6 +152,9 @@ export const selectAvailableScenes = createSelector(
           !currentScene?.children.length ||
           currentScene?.children.includes(scene.id)
       )
+      .filter((scene) => {
+        return nsfw >= scene.nsfw
+      })
       .map((scene) => {
         const outfits = selectCharacterOutfits(
           { novel: { characters } } as RootState,

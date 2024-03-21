@@ -628,6 +628,7 @@ const CreateSceneCharacterModal = () => {
   )
   const characters = useAppSelector(selectSelectableCharacters)
   const selectedChar = charactersSelected[characterOpenedIndex] || null
+  const nsfw = useAppSelector((state) => state.settings.user.nsfw)
 
   return (
     <Modal
@@ -688,33 +689,35 @@ const CreateSceneCharacterModal = () => {
                   {character?.name}
                 </div>
                 <div className="CreateScene__selector__list scrollbar">
-                  {character?.outfits.map((outfit) => {
-                    return (
-                      <div
-                        className={classNames('CreateScene__selector__item', {
-                          'CreateScene__selector__item--selected':
-                            selectedChar?.id === character?.id &&
-                            selectedChar?.outfit === outfit?.id,
-                        })}
-                        key={`character-selector-${character?.id}-${outfit?.id}`}
-                        onClick={() => {
-                          dispatch(
-                            selectCharacter({
-                              id: character?.id || '',
-                              outfit: outfit?.id || '',
-                              index: characterOpenedIndex,
-                            })
-                          )
-                          dispatch(setCharacterModalOpened(-1))
-                        }}
-                      >
-                        <EmotionRenderer
-                          assetLinkLoader={assetLinkLoader}
-                          assetUrl={outfit?.emotions[0].sources.png || ''}
-                        />
-                      </div>
-                    )
-                  })}
+                  {character?.outfits
+                    .filter((outfit) => nsfw >= (outfit.nsfw || 0))
+                    .map((outfit) => {
+                      return (
+                        <div
+                          className={classNames('CreateScene__selector__item', {
+                            'CreateScene__selector__item--selected':
+                              selectedChar?.id === character?.id &&
+                              selectedChar?.outfit === outfit?.id,
+                          })}
+                          key={`character-selector-${character?.id}-${outfit?.id}`}
+                          onClick={() => {
+                            dispatch(
+                              selectCharacter({
+                                id: character?.id || '',
+                                outfit: outfit?.id || '',
+                                index: characterOpenedIndex,
+                              })
+                            )
+                            dispatch(setCharacterModalOpened(-1))
+                          }}
+                        >
+                          <EmotionRenderer
+                            assetLinkLoader={assetLinkLoader}
+                            assetUrl={outfit?.emotions[0].sources.png || ''}
+                          />
+                        </div>
+                      )
+                    })}
                 </div>
               </div>
             )

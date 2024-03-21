@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   FontSize,
   ModelType,
+  NovelNSFW,
   SettingsState,
   Speed,
   Voices,
@@ -16,6 +17,7 @@ export const initialState: SettingsState = {
   user: {
     name: 'Anon',
     isPremium: false,
+    nsfw: NovelNSFW.EXPLICIT,
   },
   prompt: {
     systemPrompt: '',

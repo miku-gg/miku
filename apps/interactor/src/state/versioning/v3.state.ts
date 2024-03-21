@@ -91,6 +91,7 @@ export interface SettingsState {
   user: {
     name: string
     isPremium: boolean
+    nsfw: NovelNSFW
   }
   prompt: {
     systemPrompt: string
