@@ -119,7 +119,9 @@ export const tavernCardToNovelState = (
       actionText: scenario.trigger_action,
       name: scenario.name,
       condition: "",
-      nsfw: 0,
+      nsfw:
+        mikugg_v2.outfits.find((o) => o.id == scenario.emotion_group)?.nsfw ||
+        0,
       characters: [
         {
           characterId: defaultCharacterId,
@@ -196,22 +198,38 @@ export const migrateNovelV2ToV3 = (
     })),
     songs: [],
     maps: [],
-    scenes: novel.scenes.map((scene) => ({
-      id: scene.id,
-      actionText: "",
-      condition: "",
-      children: scene.children,
-      name: scene.name,
-      parentMapId: null,
-      prompt: scene.prompt,
-      characters: scene.roles.map(({ role, characterId }) => ({
-        characterId: characterId,
-        outfit: novel.characters[characterId]?.roles[role] || "",
-      })),
-      backgroundId: scene.background,
-      musicId: "",
-      nsfw: NovelV3.NovelNSFW.NONE,
-    })),
+    scenes: novel.scenes.map((scene) => {
+      const hasNSFWCharacterOutfit = scene.roles.some(
+        ({ characterId, role }) => {
+          const char = novel.characters[characterId];
+          if (char?.roles[role]) {
+            return (
+              char?.outfits[char?.roles[role] || ""]?.template ===
+              "lewd-emotions"
+            );
+          }
+          return false;
+        }
+      );
+      return {
+        id: scene.id,
+        actionText: "",
+        condition: "",
+        children: scene.children,
+        name: scene.name,
+        parentMapId: null,
+        prompt: scene.prompt,
+        characters: scene.roles.map(({ role, characterId }) => ({
+          characterId: characterId,
+          outfit: novel.characters[characterId]?.roles[role] || "",
+        })),
+        backgroundId: scene.background,
+        musicId: "",
+        nsfw: hasNSFWCharacterOutfit
+          ? NovelV3.NovelNSFW.NUDITY
+          : NovelV3.NovelNSFW.NONE,
+      };
+    }),
     starts: [],
   };
   return novelV3;

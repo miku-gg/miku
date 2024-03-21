@@ -54,7 +54,7 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
     ].join(', ')} and {{char}} begins.\n\n`
 
     if (scene?.prompt) {
-      template += `\nSCENE: \n${scene.prompt}\n`
+      template += `\nSCENE: ${scene.prompt}\n`
     }
 
     scene?.characters.forEach((char) => {
