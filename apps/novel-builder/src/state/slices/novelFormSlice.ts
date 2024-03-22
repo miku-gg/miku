@@ -227,6 +227,13 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.starts[index] = action.payload;
     },
+    deleteStart: (state, action: PayloadAction<string>) => {
+      const index = state.starts.findIndex(
+        (start) => start.id === action.payload
+      );
+      if (index === -1) return;
+      state.starts.splice(index, 1);
+    },
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;
     },
@@ -261,6 +268,7 @@ export const {
   updateScene,
   createStart,
   updateStart,
+  deleteStart,
   loadCompleteState,
   updateDetails,
   clearNovelState,

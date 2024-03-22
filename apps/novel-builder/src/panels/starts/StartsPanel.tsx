@@ -1,6 +1,10 @@
 import { Button, Dropdown, Input, AreYouSure, Modal } from "@mikugg/ui-kit";
 import { useAppDispatch, useAppSelector } from "../../state/store";
-import { createStart, updateStart } from "../../state/slices/novelFormSlice";
+import {
+  createStart,
+  deleteStart,
+  updateStart,
+} from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
 import "./StartsPanel.scss";
@@ -168,7 +172,14 @@ export default function StartsPanel() {
                 <Button
                   theme="primary"
                   onClick={() => {
-                    // openAreYouSureModal
+                    openAreYouSureModal({
+                      onYes: () => {
+                        dispatch(deleteStart(start.id));
+                      },
+                      description:
+                        "Are you sure you want to remove this start?",
+                      yesLabel: "Remove",
+                    });
                   }}
                 >
                   Remove
