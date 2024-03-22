@@ -37,6 +37,7 @@ export function generateAlphaLink({
           settings: {
             user: {
               isPremium: false,
+              nsfw: 2,
             },
           },
         })
