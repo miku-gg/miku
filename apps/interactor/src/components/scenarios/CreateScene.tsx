@@ -112,8 +112,8 @@ const CreateScene = () => {
     const characters = charactersSelected
       .filter(({ id, outfit }) => id && outfit)
       .map(({ id, outfit }) => ({ id, outfit }))
-    const charactersToImport = importedCharacters.filter(
-      (c) => charactersSelected.find((c2) => c2.id === c.id) === undefined
+    const charactersToImport = importedCharacters.filter((c) =>
+      charactersSelected.find((c2) => c2.id === c.id)
     )
 
     if (!characters.length) {
