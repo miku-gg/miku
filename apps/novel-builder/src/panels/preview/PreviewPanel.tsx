@@ -1,5 +1,5 @@
 import { Button, Loader } from "@mikugg/ui-kit";
-import config from "../../config";
+import config, { STAGE } from "../../config";
 import { useEffect, useMemo, useRef, useState } from "react";
 import base64 from "base-64";
 import utf8 from "utf8";
@@ -29,9 +29,15 @@ export function generateAlphaLink({
           assetUploadEndpoint: "http://localhost:8585/s3/asset-upload",
           characterSearchEndpoint: "",
           backgroundSearchEndpoint: "",
-          assetsEndpoint: "http://localhost:8585/s3/assets",
+          assetsEndpoint:
+            STAGE === "development"
+              ? "http://localhost:8585/s3/assets"
+              : "https://assets.miku.gg",
           cardEndpoint: "http://localhost:8585/s3/bots",
-          servicesEndpoint: "http://localhost:8484",
+          servicesEndpoint:
+            STAGE === "development"
+              ? "http://localhost:8484"
+              : "https://services2.miku.gg",
           freeTTS: false,
           freeSmart: false,
           settings: {
