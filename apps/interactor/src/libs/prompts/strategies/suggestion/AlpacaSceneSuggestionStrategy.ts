@@ -1,5 +1,8 @@
 import { AbstractPromptStrategy } from '../AbstractPromptStrategy'
-import { selectChatHistory } from '../../../../state/selectors'
+import {
+  selectChatHistory,
+  selectCurrentScene,
+} from '../../../../state/selectors'
 import { RootState } from '../../../../state/store'
 
 export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
@@ -20,6 +23,7 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
       .filter(Boolean)
       .join('\n')
     const messages = this.getMessagesPrompt(input, memorySize)
+    const scene = selectCurrentScene(input)
     let template = `You're a writing assistance that will suggest possible next scenarios for a story.\n`
     template += `### Instruction:\n`
     template += `Given an input of the current scene and conversation. You MUST suggest 3 possible next scenes, give it a score of how probable it should be and describe a text explaining what should happen next. Also, describe an "action" for a button that the user can click.\n`
@@ -34,9 +38,45 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
       "\nFor food and drinks, we could offer a variety of hors d'oeuvres and cocktails. Some popular options among nobility include caviar, oysters, and champagne. However, we should also consider offering vegetarian and non-alcoholic options to accommodate guests with dietary restrictions. Additionally, we could arrange for live music, perhaps a string quartet or jazz band, to provide entertainment throughout the evening." +
       '\nAnon: very good.'
     template += `\n### Response:\n`
-    template += `Smart Reply: ${input.settings.user.name}: "{{GEN smart max_tokens=${maxNewTokens} stop=["\\n", "\\""]}}"\n`
-    template += `Funny Reply: ${input.settings.user.name}: "{{GEN funny max_tokens=${maxNewTokens} stop=["\\n", "\\""]}}"\n`
-    template += `Flirty Reply: ${input.settings.user.name}: "{{GEN flirt max_tokens=${maxNewTokens} stop=["\\n", "\\""]}}"\n`
+    template +=
+      '### Response:' +
+      '\nSCENE 1:\n' +
+      '  ACTION: Plan the party together.\n' +
+      '  PROBABILITY: 90%\n' +
+      '  DESCRIPTION: *Anon and Nala sit down together at a large table in the study, spreading out papers and notes. They begin to discuss the details of the party, including the guest list, menu, decorations, and music.*\n' +
+      '  PLACE: A hall with a long table filled with various papers, books, and party supplies.\n' +
+      '\nSCENE 2:\n' +
+      '  ACTION:  Have a heart-to-heart moment.\n' +
+      '  PROBABILITY: 50%\n' +
+      '  DESCRIPTION: *As they work together, Nala begins to open up to Anon about her past experiences with her previous master. Anon listens empathetically, and assures Nala that she will never be treated like that again.*\n' +
+      '  PLACE:  A hall with a long table filled with various papers, books, and party supplies.\n' +
+      '\nSCENE 3:\n' +
+      '  ACTION: Practice serving skills.\n' +
+      '  PROBABILITY: 70%\n' +
+      "  DESCRIPTION: *With the party fast approaching, Anon decides to test Nala's serving skills. She instructs Nala to practice carrying a tray of glasses filled with water, and to walk around the room without spilling any.*\n" +
+      '  PLACE: A mansion room with tables and chairs with no people.\n'
+    template += `\n### Input:\n`
+    template += `${personas}\n`
+    if (scene?.prompt) template += `SCENE:\n${scene.prompt}\n`
+    template += `CONVERSATION:\n${messages}\n`
+    template += `### Response:\n`
+    template += `SCENE 1:\n`
+    template += `  ACTION:{{GEN action_1 max_tokens=10 stop=["\\n", "\\""]}}"\n`
+    template += `  PROBABILITY:{{GEN prob_1 max_tokens=2 stop=["\\n", "\\"", "%"]}}"\n`
+    template += `  DESCRIPTION:{{GEN desc_1 max_tokens=50 stop=["\\n", "\\""]}}"\n`
+    template += `  PLACE:{{GEN place_1 max_tokens=20 stop=["\\n", "\\""]}}"\n`
+
+    template += `SCENE 2:\n`
+    template += `  ACTION:{{GEN action_2 max_tokens=10 stop=["\\n", "\\""]}}"\n`
+    template += `  PROBABILITY:{{GEN prob_2 max_tokens=2 stop=["\\n", "\\"", "%"]}}"\n`
+    template += `  DESCRIPTION:{{GEN desc_2 max_tokens=50 stop=["\\n", "\\""]}}"\n`
+    template += `  PLACE:{{GEN place_2 max_tokens=20 stop=["\\n", "\\""]}}"\n`
+
+    template += `SCENE 3:\n`
+    template += `  ACTION:{{GEN action_3 max_tokens=10 stop=["\\n", "\\""]}}"\n`
+    template += `  PROBABILITY:{{GEN prob_3 max_tokens=2 stop=["\\n", "\\"", "%"]}}"\n`
+    template += `  DESCRIPTION:{{GEN desc_3 max_tokens=50 stop=["\\n", "\\""]}}"\n`
+    template += `  PLACE:{{GEN place_3 max_tokens=20 stop=["\\n", "\\""]}}"\n`
 
     return {
       template,
@@ -50,9 +90,18 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     response: string[],
     variables: Map<string, string>
   ): string[] {
-    response[0] = variables.get('funny') || ''
-    response[1] = variables.get('smart') || ''
-    response[2] = variables.get('flirt') || ''
+    response[0] = variables.get('action_1') || ''
+    response[1] = variables.get('prob_1') || ''
+    response[2] = variables.get('desc_1') || ''
+    response[3] = variables.get('place_1') || ''
+    response[4] = variables.get('action_2') || ''
+    response[5] = variables.get('prob_2') || ''
+    response[6] = variables.get('desc_2') || ''
+    response[7] = variables.get('place_2') || ''
+    response[8] = variables.get('action_3') || ''
+    response[9] = variables.get('prob_3') || ''
+    response[10] = variables.get('desc_3') || ''
+    response[11] = variables.get('place_3') || ''
     return response
   }
 
