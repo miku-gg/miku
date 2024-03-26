@@ -1,9 +1,9 @@
-import express, { Request, Response } from "express";
-import cors from "cors";
 import bodyParser from "body-parser";
-import textHandler, { modelsMetadata } from "./services/text";
-import audioHandler from "./services/audio";
+import cors from "cors";
+import express, { Request, Response } from "express";
 import jwtPermissionMiddleware from "./lib/verifyJWT";
+import audioHandler from "./services/audio";
+import textHandler, { modelsMetadata } from "./services/text";
 import { ModelType } from "./services/text/lib/queryValidation";
 
 const PORT = process.env.SERVICES_PORT || 8484;
@@ -14,6 +14,7 @@ app.use(
     credentials: true,
     origin: [
       "http://localhost:5173",
+      "http://localhost:5174",
       "http://localhost:5100",
       "https://miku.gg",
       "https://dev.miku.gg",
@@ -27,6 +28,24 @@ app.use(bodyParser.json());
 if (process.env.JWT_SECRET) {
   app.use(jwtPermissionMiddleware);
 }
+
+app.post("/summarize", async (req: Request, res: Response) => {
+  try {
+    const text = req.body.text || "";
+    const response = await fetch("http://localhost:5174/summarize", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text }),
+    });
+    const data = await response.json();
+    const summary = data[0]["summary_text"];
+    res.json({ summary });
+  } catch (error) {
+    res.status(500).send("Error summarizing text");
+  }
+});
 
 app.post("/text", async (req: Request<string>, res: Response) => {
   try {

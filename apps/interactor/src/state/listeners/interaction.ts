@@ -1,20 +1,21 @@
 import { Dispatch, createListenerMiddleware } from '@reduxjs/toolkit'
-import {
-  interactionStart,
-  interactionFailure,
-  interactionSuccess,
-  regenerationStart,
-  NarrationResponse,
-  continueResponse,
-  characterResponseStart,
-} from '../slices/narrationSlice'
-import { RootState } from '../store'
-import textCompletion from '../../libs/textCompletion'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
-import { retrieveModelMetadata } from '../../libs/retrieveMetadata'
 import { AbstractRoleplayStrategy } from '../../libs/prompts/strategies'
 import { getRoleplayStrategyFromSlug } from '../../libs/prompts/strategies/roleplay'
+import { retrieveModelMetadata } from '../../libs/retrieveMetadata'
+import textCompletion from '../../libs/textCompletion'
 import { selectAllParentDialogues } from '../selectors'
+import {
+  NarrationResponse,
+  characterResponseStart,
+  continueResponse,
+  interactionFailure,
+  interactionStart,
+  interactionSuccess,
+  regenerationStart,
+  setSummary,
+} from '../slices/narrationSlice'
+import { RootState } from '../store'
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -49,6 +50,43 @@ const interactionEffect = async (
       tokenizer: 'llama',
       truncation_length: 4096,
     }
+
+    const conversationForSummarize = () => {
+      let prompt: string = ''
+      selectAllParentDialogues(state).map((int) => {
+        const { item, type } = int
+        if (type === 'interaction') {
+          prompt += '{{User}}:' + item.query + '\n'
+        } else if (type === 'response') {
+          item.characters.forEach((character) => {
+            prompt += '{{Char}}:' + character.text + '\n'
+          })
+        }
+      })
+      return prompt
+    }
+    const summarizeConversation = async () => {
+      try {
+        const response = await fetch('http://localhost:5174/summarize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: conversationForSummarize() }),
+        })
+
+        const { summary } = await response.json()
+        return summary
+      } catch (error) {
+        console.error('Error:', error)
+      }
+    }
+    summarizeConversation()
+      .then((summary) => {
+        dispatch(setSummary(summary))
+      })
+      .catch((error) => {
+        console.error('Error:', error)
+      })
+
     const maxMessages = selectAllParentDialogues(state).length
     const promptBuilder = new PromptBuilder<AbstractRoleplayStrategy>({
       maxNewTokens: 200,

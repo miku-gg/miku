@@ -48,6 +48,10 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
       template += `\n${state.settings.prompt.systemPrompt}\n`
     }
 
+    if (state.narration.summary) {
+      template += `\n${state.narration.summary}\n`
+    }
+
     template += `\nThen the roleplay chat between ${[
       ...characterTemplates,
       '{{user}}',

@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import trim from 'lodash.trim'
+import { toast } from 'react-toastify'
 import { v4 as randomUUID } from 'uuid'
 import {
-  NarrationState,
   NarrationInteraction,
   NarrationResponse,
+  NarrationState,
 } from '../versioning'
-import { toast } from 'react-toastify'
-import trim from 'lodash.trim'
 
 export type {
-  NarrationState,
   NarrationInteraction,
   NarrationResponse,
+  NarrationState,
 } from '../versioning'
 
 const initialState: NarrationState = {
@@ -25,6 +25,7 @@ const initialState: NarrationState = {
   },
   interactions: {},
   responses: {},
+  summary: '',
 }
 
 const narrationSlice = createSlice({
@@ -39,6 +40,9 @@ const narrationSlice = createSlice({
     },
     setSuggestions(state, action: PayloadAction<string[]>) {
       state.input.suggestions = action.payload
+    },
+    setSummary(state, action: PayloadAction<string>) {
+      state.summary = action.payload
     },
     interactionStart(
       state,
@@ -374,6 +378,7 @@ const narrationSlice = createSlice({
 export const {
   setNarration,
   setInputText,
+  setSummary,
   setSuggestions,
   interactionFailure,
   interactionStart,
