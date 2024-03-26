@@ -67,7 +67,7 @@ const interactionEffect = async (
     }
     const summarizeConversation = async () => {
       try {
-        const response = await fetch('http://localhost:5174/summarize', {
+        const response = await fetch('http://localhost:7300/summarize', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: conversationForSummarize() }),

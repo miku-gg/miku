@@ -42,7 +42,7 @@ export interface NarrationState {
   responses: {
     [id: string]: NarrationResponse | undefined
   }
-  summary: string
+  summary?: string
 }
 
 export interface NovelScene extends NovelV3.NovelScene {}

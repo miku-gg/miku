@@ -14,7 +14,7 @@ app.use(
     credentials: true,
     origin: [
       "http://localhost:5173",
-      "http://localhost:5174",
+      "http://localhost:7300",
       "http://localhost:5100",
       "https://miku.gg",
       "https://dev.miku.gg",
@@ -32,7 +32,7 @@ if (process.env.JWT_SECRET) {
 app.post("/summarize", async (req: Request, res: Response) => {
   try {
     const text = req.body.text || "";
-    const response = await fetch("http://localhost:5174/summarize", {
+    const response = await fetch("http://localhost:7300/summarize", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
