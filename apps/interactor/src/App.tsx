@@ -15,6 +15,7 @@ function App(props: AppProps) {
     freeTTS: props.freeTTS,
     isInteractionDisabled: props.isInteractionDisabled,
     servicesEndpoint: props.servicesEndpoint,
+    apiEndpoint: props.apiEndpoint,
     cardEndpoint: props.cardEndpoint,
     characterSearcher: props.characterSearcher,
     backgroundSearcher: props.backgroundSearcher,

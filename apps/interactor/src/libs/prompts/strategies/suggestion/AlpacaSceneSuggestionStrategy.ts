@@ -7,7 +7,12 @@ import { RootState } from '../../../../state/store'
 
 export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
   RootState,
-  string[]
+  {
+    actionText: string
+    probability: string
+    prompt: string
+    sdPrompt: string
+  }[]
 > {
   public buildGuidancePrompt(
     maxNewTokens: number,
@@ -62,19 +67,19 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     template += `### Response:\n`
     template += `SCENE 1:\n`
     template += `  ACTION:{{GEN action_1 max_tokens=10 stop=["\\n", "\\""]}}"\n`
-    template += `  PROBABILITY:{{GEN prob_1 max_tokens=2 stop=["\\n", "\\"", "%"]}}"\n`
+    template += `  PROBABILITY:{{GEN prob_1 max_tokens=3 stop=["\\n", "\\"", "%"]}}"\n`
     template += `  DESCRIPTION:{{GEN desc_1 max_tokens=50 stop=["\\n", "\\""]}}"\n`
     template += `  PLACE:{{GEN place_1 max_tokens=20 stop=["\\n", "\\""]}}"\n`
 
     template += `SCENE 2:\n`
     template += `  ACTION:{{GEN action_2 max_tokens=10 stop=["\\n", "\\""]}}"\n`
-    template += `  PROBABILITY:{{GEN prob_2 max_tokens=2 stop=["\\n", "\\"", "%"]}}"\n`
+    template += `  PROBABILITY:{{GEN prob_2 max_tokens=3 stop=["\\n", "\\"", "%"]}}"\n`
     template += `  DESCRIPTION:{{GEN desc_2 max_tokens=50 stop=["\\n", "\\""]}}"\n`
     template += `  PLACE:{{GEN place_2 max_tokens=20 stop=["\\n", "\\""]}}"\n`
 
     template += `SCENE 3:\n`
     template += `  ACTION:{{GEN action_3 max_tokens=10 stop=["\\n", "\\""]}}"\n`
-    template += `  PROBABILITY:{{GEN prob_3 max_tokens=2 stop=["\\n", "\\"", "%"]}}"\n`
+    template += `  PROBABILITY:{{GEN prob_3 max_tokens=3 stop=["\\n", "\\"", "%"]}}"\n`
     template += `  DESCRIPTION:{{GEN desc_3 max_tokens=50 stop=["\\n", "\\""]}}"\n`
     template += `  PLACE:{{GEN place_3 max_tokens=20 stop=["\\n", "\\""]}}"\n`
 
@@ -87,22 +92,39 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
 
   public completeResponse(
     _input: RootState,
-    response: string[],
+    response: {
+      actionText: string
+      probability: string
+      prompt: string
+      sdPrompt: string
+    }[],
     variables: Map<string, string>
-  ): string[] {
-    response[0] = variables.get('action_1') || ''
-    response[1] = variables.get('prob_1') || ''
-    response[2] = variables.get('desc_1') || ''
-    response[3] = variables.get('place_1') || ''
-    response[4] = variables.get('action_2') || ''
-    response[5] = variables.get('prob_2') || ''
-    response[6] = variables.get('desc_2') || ''
-    response[7] = variables.get('place_2') || ''
-    response[8] = variables.get('action_3') || ''
-    response[9] = variables.get('prob_3') || ''
-    response[10] = variables.get('desc_3') || ''
-    response[11] = variables.get('place_3') || ''
-    return response
+  ): {
+    actionText: string
+    probability: string
+    prompt: string
+    sdPrompt: string
+  }[] {
+    return [
+      {
+        actionText: variables.get('action_1') || '',
+        probability: variables.get('prob_1') || '',
+        prompt: variables.get('desc_1') || '',
+        sdPrompt: variables.get('place_1') || '',
+      },
+      {
+        actionText: variables.get('action_2') || '',
+        probability: variables.get('prob_2') || '',
+        prompt: variables.get('desc_2') || '',
+        sdPrompt: variables.get('place_2') || '',
+      },
+      {
+        actionText: variables.get('action_3') || '',
+        probability: variables.get('prob_3') || '',
+        prompt: variables.get('desc_3') || '',
+        sdPrompt: variables.get('place_3') || '',
+      },
+    ]
   }
 
   public getMessagesPrompt(state: RootState, memorySize: number): string {

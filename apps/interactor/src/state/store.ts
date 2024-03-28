@@ -13,6 +13,7 @@ import {
 } from './listeners/interaction'
 import { stateReplacementMiddleware } from './slices/replaceState'
 import updateStateMiddleware from './updateState.middleware'
+import { inferenceListenerMiddleware } from './listeners/inference'
 
 export const store = configureStore({
   reducer: {
@@ -29,6 +30,7 @@ export const store = configureStore({
       regenerationListenerMiddleware.middleware,
       continueListenerMiddleware.middleware,
       characterResponseListenerMiddleware.middleware,
+      inferenceListenerMiddleware.middleware,
       stateReplacementMiddleware,
     ]),
 })

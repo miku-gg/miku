@@ -94,6 +94,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     return {
       template,
       variables: {
+        scene_opt: [' Yes', ' No'],
         emotions: emotions
           .filter((emotion) =>
             emotions.length > 1 ? emotion !== parentEmotion : true
@@ -127,6 +128,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     characterResponse.text = parseLLMResponse(
       variables.get('text')?.trim() || ''
     )
+    console.log(variables.get('scene'))
 
     const index = response.characters.findIndex(
       ({ characterId }) => characterId === input.currentCharacterId
@@ -134,6 +136,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
 
     return {
       ...response,
+      suggestedScenes: variables.get('scene') === ' Yes' ? ['Yes'] : [],
       characters: [
         ...response.characters.slice(
           0,
@@ -246,6 +249,9 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       (char) => char.characterId === characterId
     )
     const scene = selectCurrentScene(state)
+    // const background = state.novel.backgrounds.find(
+    //   (bg) => bg.id === scene?.backgroundId
+    // )
     const existingEmotion = currentCharacterResponse?.emotion || ''
     const existingText = currentCharacterResponse?.text || ''
     const charStops = scene?.characters
@@ -261,7 +267,10 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
           ? ' ' + existingEmotion
           : '{{SEL emotion options=emotions}}'
       }\n` +
-      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{user}}:",${charStops}]}}`
+      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{user}}:",${charStops}]}}` +
+      `\n\n${temp.instruction}OOC: Did the character changed scene in the last message?` +
+      ` Answer with Yes or No` +
+      `\n${temp.response}Based on the last message:{{SEL scene options=scene_opt}}`
     )
   }
 

@@ -15,6 +15,9 @@ interface CreationState {
       search: {
         opened: boolean
       }
+      gen: {
+        opened: boolean
+      }
     }
     characters: {
       openedIndex: number
@@ -36,6 +39,24 @@ interface CreationState {
       source: string
     }
   }
+  inference: {
+    backgrounds: {
+      id: string
+      inferenceId?: string
+      prompt: string
+      queuePosition: number
+    }[]
+  }
+  sceneSugestions: {
+    opened: boolean
+    loading: boolean
+    suggestions: {
+      actionText: string
+      probability: string
+      prompt: string
+      sdPrompt: string
+    }[]
+  }
 }
 
 export const initialState: CreationState = {
@@ -50,6 +71,9 @@ export const initialState: CreationState = {
       opened: false,
       selected: '',
       search: {
+        opened: false,
+      },
+      gen: {
         opened: false,
       },
     },
@@ -79,6 +103,14 @@ export const initialState: CreationState = {
       source: '',
     },
   },
+  inference: {
+    backgrounds: [],
+  },
+  sceneSugestions: {
+    opened: false,
+    loading: false,
+    suggestions: [],
+  },
 }
 
 export const creationSlice = createSlice({
@@ -95,6 +127,8 @@ export const creationSlice = createSlice({
           | 'music'
           | 'background-search'
           | 'characters-search'
+          | 'background-gen'
+          | 'scene-suggestions'
         opened: boolean
       }>
     ) => {
@@ -106,6 +140,10 @@ export const creationSlice = createSlice({
         state.scene.background.search.opened = action.payload.opened
       } else if (action.payload.id === 'characters-search') {
         state.scene.characters.search.opened = action.payload.opened
+      } else if (action.payload.id === 'background-gen') {
+        state.scene.background.gen.opened = action.payload.opened
+      } else if (action.payload.id === 'scene-suggestions') {
+        state.sceneSugestions.opened = action.payload.opened
       } else {
         state.scene[action.payload.id].opened = action.payload.opened
       }
@@ -172,6 +210,90 @@ export const creationSlice = createSlice({
     clearImportedCharacters: (state) => {
       state.importedCharacters = []
     },
+    backgroundInferenceStart: (
+      state,
+      action: PayloadAction<{
+        id: string
+        prompt: string
+        APIEndpoint: string
+      }>
+    ) => {
+      state.inference.backgrounds.push({
+        id: action.payload.id,
+        prompt: action.payload.prompt,
+        queuePosition: 0,
+      })
+    },
+    backgroundInferenceUpdate: (
+      state,
+      action: PayloadAction<{
+        id: string
+        inferenceId: string
+        queuePosition: number
+      }>
+    ) => {
+      state.inference.backgrounds = state.inference.backgrounds.map(
+        (background) => {
+          if (background.id === action.payload.id) {
+            return {
+              ...background,
+              queuePosition: action.payload.queuePosition,
+              inferenceId: action.payload.inferenceId,
+            }
+          }
+          return background
+        }
+      )
+    },
+    backgroundInferenceEnd: (
+      state,
+      action: PayloadAction<{
+        id: string
+        result: string
+      }>
+    ) => {
+      const background = state.inference.backgrounds.find(
+        (background) => background.id === action.payload.id
+      )
+      if (!background) {
+        return
+      }
+      state.importedBackgrounds.push({
+        id: action.payload.result,
+        name: 'background',
+        attributes: [],
+        description: background.prompt,
+        source: {
+          jpg: action.payload.result,
+        },
+      })
+      state.inference.backgrounds = state.inference.backgrounds.filter(
+        (background) => background.id !== action.payload.id
+      )
+    },
+    backgroundInferenceFailure: (state, action: PayloadAction<string>) => {
+      state.inference.backgrounds = state.inference.backgrounds.filter(
+        (background) => background.id !== action.payload
+      )
+    },
+    sceneSuggestionsStart: (state) => {
+      state.sceneSugestions.opened = true
+      state.sceneSugestions.loading = true
+    },
+    sceneSuggestionsEnd: (
+      state,
+      action: PayloadAction<{
+        suggestions: {
+          actionText: string
+          probability: string
+          prompt: string
+          sdPrompt: string
+        }[]
+      }>
+    ) => {
+      state.sceneSugestions.loading = false
+      state.sceneSugestions.suggestions = action.payload.suggestions
+    },
   },
 })
 
@@ -188,6 +310,12 @@ export const {
   removeImportedBackground,
   addImportedCharacter,
   clearImportedCharacters,
+  backgroundInferenceStart,
+  backgroundInferenceUpdate,
+  backgroundInferenceEnd,
+  backgroundInferenceFailure,
+  sceneSuggestionsStart,
+  sceneSuggestionsEnd,
 } = creationSlice.actions
 
 export default creationSlice.reducer

@@ -5,6 +5,7 @@ import { BackgroundResult, CharacterResult } from './libs/listSearch'
 export interface AppProps {
   isProduction: boolean
   isInteractionDisabled: boolean
+  apiEndpoint: string
   cardEndpoint: string
   servicesEndpoint: string
   freeTTS: boolean
@@ -30,6 +31,7 @@ export interface AppProps {
 const AppContext = createContext<AppProps>({
   isProduction: false,
   isInteractionDisabled: false,
+  apiEndpoint: '',
   cardEndpoint: '',
   servicesEndpoint: '',
   freeTTS: false,

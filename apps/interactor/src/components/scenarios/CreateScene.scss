@@ -193,4 +193,42 @@
       justify-content: center;
     }
   }
+
+  &__generator {
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    &__title {
+      font-size: 1.1rem;
+    }
+
+    &__header-coins {
+      color: $color-gold;
+    }
+
+    &__text-area {
+      margin: 30px 0;
+    }
+
+    &__button {
+      display: flex;
+      justify-content: right;
+    }
+
+    &__buy-more {
+      display: inline-flex;
+      margin-right: 15px;
+      color: $text-3;
+      transition: all 0.2s ease-out;
+
+      &:hover {
+        color: $text-2;
+      }
+    }
+  }
 }

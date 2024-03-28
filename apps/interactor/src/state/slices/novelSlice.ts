@@ -34,6 +34,7 @@ const novelSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string
+        name: string
         prompt: string
         background: string
         newChars?: NovelCharacter[]
@@ -79,7 +80,7 @@ const novelSlice = createSlice({
 
       state.scenes.push({
         id: action.payload.id,
-        name: action.payload.prompt,
+        name: action.payload.name,
         prompt: action.payload.prompt,
         backgroundId,
         musicId,
