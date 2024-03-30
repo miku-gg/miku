@@ -8,12 +8,26 @@ export interface NarrationInteraction {
   responsesId: string[]
 }
 
+export interface NarrationSceneSuggestion {
+  actionText: string
+  textPrompt: string
+  sdPrompt: string
+  characters: {
+    characterId: string
+    outfitPrompt: string
+  }[]
+  sceneId?: string
+  probability?: number
+}
+
 export interface NarrationResponse {
   id: string
   selected: boolean
   fetching: boolean
   parentInteractionId: string | null
-  suggestedScenes: string[]
+  fetchingSuggestions?: boolean
+  shouldSuggestScenes?: boolean
+  suggestedScenes: NarrationSceneSuggestion[]
   selectedCharacterId: string | null
   characters: {
     characterId: string
@@ -92,6 +106,8 @@ export interface SettingsState {
     name: string
     isPremium: boolean
     nsfw: NovelNSFW
+    credits: number
+    loading: boolean
   }
   prompt: {
     systemPrompt: string

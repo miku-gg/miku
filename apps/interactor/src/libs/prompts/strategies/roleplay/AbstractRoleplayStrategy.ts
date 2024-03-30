@@ -136,7 +136,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
 
     return {
       ...response,
-      suggestedScenes: variables.get('scene') === ' Yes' ? ['Yes'] : [],
+      shouldSuggestScenes: variables.get('scene') === ' Yes',
       characters: [
         ...response.characters.slice(
           0,

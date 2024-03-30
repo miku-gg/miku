@@ -40,7 +40,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { BackgroundResult, CharacterResult } from '../../libs/listSearch'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { loadNovelFromSingleCard } from '../../libs/loadNovel'
-import axios from 'axios'
+import { userDataFetchStart } from '../../state/slices/settingsSlice'
 
 const selectSelectableCharacters = createSelector(
   [
@@ -760,25 +760,25 @@ const CreateSceneCharacterModal = () => {
   )
 }
 
-const GEN_BACKGROUND_COST = 20
+export const GEN_BACKGROUND_COST = 20
 const GenerateBackgroundModal = () => {
   const dispatch = useAppDispatch()
   const [prompt, setPrompt] = useState<string>('')
-  const [remainingCredits, setRemainingCredits] = useState<number>(-1)
   const { apiEndpoint } = useAppContext()
   const opened = useAppSelector(
     (state) => state.creation.scene.background.gen.opened
   )
+  const { credits, loading } = useAppSelector((state) => state.settings.user)
 
   useEffect(() => {
-    axios
-      .get<{ credits: number }>(`${apiEndpoint}/user`, {
-        withCredentials: true,
-      })
-      .then(({ data: { credits } }) => {
-        setRemainingCredits(credits)
-      })
-  }, [opened, apiEndpoint])
+    if (opened) {
+      dispatch(
+        userDataFetchStart({
+          apiEndpoint,
+        })
+      )
+    }
+  }, [opened, apiEndpoint, dispatch])
 
   return (
     <Modal
@@ -799,7 +799,7 @@ const GenerateBackgroundModal = () => {
           </div>
           <div>
             <span>
-              {remainingCredits === -1 ? (
+              {loading ? (
                 <Loader />
               ) : (
                 <span>
@@ -810,7 +810,7 @@ const GenerateBackgroundModal = () => {
                   >
                     Buy more
                   </a>
-                  {remainingCredits}{' '}
+                  {credits}{' '}
                   <span className="CreateScene__generator__header-coins">
                     <FaCoins />
                   </span>
@@ -830,7 +830,7 @@ const GenerateBackgroundModal = () => {
         <div className="CreateScene__generator__button">
           <Button
             theme="gradient"
-            disabled={!prompt || remainingCredits < GEN_BACKGROUND_COST}
+            disabled={!prompt || credits < GEN_BACKGROUND_COST}
             onClick={async () => {
               dispatch(
                 backgroundInferenceStart({

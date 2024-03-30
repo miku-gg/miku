@@ -1,74 +1,38 @@
 import { GiFallingStar } from 'react-icons/gi'
 import { useSwipeable } from 'react-swipeable'
 import './SceneSuggestion.scss'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import classNames from 'classnames'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import textCompletion from '../../libs/textCompletion'
-import PromptBuilder from '../../libs/prompts/PromptBuilder'
-import { AlpacaSceneSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSceneSuggestionStrategy'
+import { setModalOpened } from '../../state/slices/creationSlice'
+import { Button, Loader, Modal } from '@mikugg/ui-kit'
+import { GEN_BACKGROUND_COST } from '../scenarios/CreateScene'
+import { FaCoins } from 'react-icons/fa'
+import { sceneSuggestionsStart } from '../../state/slices/narrationSlice'
 import { useAppContext } from '../../App.context'
-import {
-  sceneSuggestionsEnd,
-  sceneSuggestionsStart,
-  setModalOpened,
-} from '../../state/slices/creationSlice'
-import { Modal } from '@mikugg/ui-kit'
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false)
   const { servicesEndpoint } = useAppContext()
   const dispatch = useAppDispatch()
-  const currentRespose = useAppSelector(
-    (state) => state.narration.responses[state.narration.currentResponseId]
+  const shouldSuggestScenes = useAppSelector(
+    (state) =>
+      state.narration.responses[state.narration.currentResponseId]
+        ?.shouldSuggestScenes
   )
-  const state = useAppSelector((state) => state)
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
       console.log('Swiped left')
       setButtonOpened(false)
     },
   })
+  console.log('shouldSuggestScenes', shouldSuggestScenes)
 
   useEffect(() => {
-    if (currentRespose?.suggestedScenes.length) {
+    if (shouldSuggestScenes) {
       setButtonOpened(true)
     }
-  }, [currentRespose?.id, currentRespose?.suggestedScenes.length])
-
-  const inferenceSuggestions = useCallback(async (): Promise<
-    {
-      actionText: string
-      probability: string
-      prompt: string
-      sdPrompt: string
-    }[]
-  > => {
-    const promptBuilder = new PromptBuilder<AlpacaSceneSuggestionStrategy>({
-      maxNewTokens: 35,
-      strategy: new AlpacaSceneSuggestionStrategy('llama'),
-      trucationLength: 4096,
-    })
-    const prompt = promptBuilder.buildPrompt(state, 6)
-    const stream = textCompletion({
-      template: prompt.template,
-      variables: prompt.variables,
-      model: state.settings.model,
-      serviceBaseUrl: servicesEndpoint,
-      identifier: `${Date.now()}`,
-    })
-
-    let response: {
-      actionText: string
-      probability: string
-      prompt: string
-      sdPrompt: string
-    }[] = []
-    for await (const result of stream) {
-      response = promptBuilder.completeResponse([], result, state)
-    }
-    return response
-  }, [servicesEndpoint, state])
+  }, [shouldSuggestScenes])
 
   return (
     <>
@@ -83,10 +47,17 @@ export default function SceneSuggestion() {
             {...swipeHandlers}
             className="SceneSuggestion__button"
             onClick={async () => {
-              dispatch(sceneSuggestionsStart())
-              const suggestions = await inferenceSuggestions()
-              dispatch(sceneSuggestionsEnd({ suggestions }))
-              console.log('suggestions', suggestions)
+              dispatch(
+                setModalOpened({
+                  id: 'scene-suggestions',
+                  opened: true,
+                })
+              )
+              dispatch(
+                sceneSuggestionsStart({
+                  servicesEndpoint,
+                })
+              )
             }}
           >
             <div className="SceneSuggestion__text">
@@ -102,9 +73,20 @@ export default function SceneSuggestion() {
 }
 
 const SceneSuggestionModal = () => {
-  const { opened, loading } = useAppSelector(
-    (state) => state.creation.sceneSugestions
+  const { opened } = useAppSelector(
+    (state) => state.creation.scene.sceneSugestions
   )
+  const { suggestedScenes, fetchingSuggestions } = useAppSelector(
+    (state) => state.narration.responses[state.narration.currentResponseId]!
+  )
+  console.log('fetchingSuggestions', fetchingSuggestions)
+  const lastSuggestedIndex = !fetchingSuggestions
+    ? suggestedScenes.length
+    : [...suggestedScenes, { actionText: '' }].findIndex((suggestion) => {
+        return !suggestion.actionText.length
+      }) - 1
+  console.log('lastSuggestedIndex', lastSuggestedIndex)
+
   return (
     <Modal
       opened={opened}
@@ -114,16 +96,46 @@ const SceneSuggestionModal = () => {
           opened: false,
         })
       }
+      shouldCloseOnOverlayClick
     >
       <div className="SceneSuggestionModal">
         <div className="SceneSuggestionModal__header">
           <h2>Scene suggestions</h2>
         </div>
         <div className="SceneSuggestionModal__content">
-          {loading && (
+          {fetchingSuggestions && !suggestedScenes.length ? (
             <div className="SceneSuggestionModal__loading">Loading...</div>
+          ) : (
+            <div className="SceneSuggestionModal__suggestions">
+              {suggestedScenes.map((suggestion, index) => {
+                const loading = index >= lastSuggestedIndex
+                return (
+                  <div key={index} className="SceneSuggestionModal__suggestion">
+                    <div className="SceneSuggestionModal__suggestion-header">
+                      <h3>{suggestion.actionText}</h3>
+                    </div>
+                    <div className="SceneSuggestionModal__suggestion-prompt scrollbar">
+                      <p>{suggestion.textPrompt}</p>
+                    </div>
+                    <div className="SceneSuggestionModal__suggestion-button">
+                      <Button theme="gradient" disabled={loading}>
+                        {loading ? (
+                          <Loader />
+                        ) : (
+                          <>
+                            Generate Scene{' '}
+                            <span>
+                              {GEN_BACKGROUND_COST} <FaCoins />
+                            </span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           )}
-          <div className="SceneSuggestionModal__suggestions"></div>
         </div>
       </div>
     </Modal>

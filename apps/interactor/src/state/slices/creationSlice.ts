@@ -38,6 +38,9 @@ interface CreationState {
       selected: string
       source: string
     }
+    sceneSugestions: {
+      opened: boolean
+    }
   }
   inference: {
     backgrounds: {
@@ -45,16 +48,6 @@ interface CreationState {
       inferenceId?: string
       prompt: string
       queuePosition: number
-    }[]
-  }
-  sceneSugestions: {
-    opened: boolean
-    loading: boolean
-    suggestions: {
-      actionText: string
-      probability: string
-      prompt: string
-      sdPrompt: string
     }[]
   }
 }
@@ -102,14 +95,12 @@ export const initialState: CreationState = {
       selected: '',
       source: '',
     },
+    sceneSugestions: {
+      opened: false,
+    },
   },
   inference: {
     backgrounds: [],
-  },
-  sceneSugestions: {
-    opened: false,
-    loading: false,
-    suggestions: [],
   },
 }
 
@@ -143,7 +134,7 @@ export const creationSlice = createSlice({
       } else if (action.payload.id === 'background-gen') {
         state.scene.background.gen.opened = action.payload.opened
       } else if (action.payload.id === 'scene-suggestions') {
-        state.sceneSugestions.opened = action.payload.opened
+        state.scene.sceneSugestions.opened = action.payload.opened
       } else {
         state.scene[action.payload.id].opened = action.payload.opened
       }
@@ -276,24 +267,6 @@ export const creationSlice = createSlice({
         (background) => background.id !== action.payload
       )
     },
-    sceneSuggestionsStart: (state) => {
-      state.sceneSugestions.opened = true
-      state.sceneSugestions.loading = true
-    },
-    sceneSuggestionsEnd: (
-      state,
-      action: PayloadAction<{
-        suggestions: {
-          actionText: string
-          probability: string
-          prompt: string
-          sdPrompt: string
-        }[]
-      }>
-    ) => {
-      state.sceneSugestions.loading = false
-      state.sceneSugestions.suggestions = action.payload.suggestions
-    },
   },
 })
 
@@ -314,8 +287,6 @@ export const {
   backgroundInferenceUpdate,
   backgroundInferenceEnd,
   backgroundInferenceFailure,
-  sceneSuggestionsStart,
-  sceneSuggestionsEnd,
 } = creationSlice.actions
 
 export default creationSlice.reducer

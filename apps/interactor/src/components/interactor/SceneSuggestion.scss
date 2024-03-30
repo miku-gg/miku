@@ -1,12 +1,14 @@
+@import '../../variables';
+
 .SceneSuggestion {
+  overflow: hidden;
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 100px;
   z-index: 1;
 
   &__button {
-    display: flex;
-    position: absolute;
-    left: 0;
-    top: 100px;
-
     transition: all 0.2s ease-out;
     display: inline-flex;
     align-items: center;
@@ -69,5 +71,39 @@
   }
   100% {
     transform: translateX(-100%);
+  }
+}
+
+.SceneSuggestionModal {
+  &__suggestion {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    background: $background-2;
+    border-radius: 0.25rem;
+    color: white;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    margin: 10px 0;
+
+    &-header {
+    }
+
+    &-prompt {
+      font-size: 1rem;
+      height: 60px;
+      overflow: auto;
+    }
+
+    &-button {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+
+      .Button {
+        width: 187.57px;
+      }
+    }
   }
 }
