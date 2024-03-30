@@ -19,10 +19,6 @@ const sceneSuggestionEffect = async (
   const currentResponse =
     state.narration.responses[state.narration.currentResponseId]
   try {
-    if (currentResponse?.suggestedScenes.length) {
-      return
-    }
-
     const currentSelectedCharacter = selectCharactersInCurrentScene(state) || []
     const promptBuilder = new PromptBuilder<AlpacaSceneSuggestionStrategy>({
       maxNewTokens: 35,

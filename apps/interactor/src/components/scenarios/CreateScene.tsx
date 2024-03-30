@@ -41,6 +41,7 @@ import { BackgroundResult, CharacterResult } from '../../libs/listSearch'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { loadNovelFromSingleCard } from '../../libs/loadNovel'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
+import CreditsDisplayer from './CreditsDisplayer'
 
 const selectSelectableCharacters = createSelector(
   [
@@ -768,7 +769,7 @@ const GenerateBackgroundModal = () => {
   const opened = useAppSelector(
     (state) => state.creation.scene.background.gen.opened
   )
-  const { credits, loading } = useAppSelector((state) => state.settings.user)
+  const { credits } = useAppSelector((state) => state.settings.user)
 
   useEffect(() => {
     if (opened) {
@@ -797,27 +798,7 @@ const GenerateBackgroundModal = () => {
           <div className="CreateScene__generator__title">
             Generate a background
           </div>
-          <div>
-            <span>
-              {loading ? (
-                <Loader />
-              ) : (
-                <span>
-                  <a
-                    className="CreateScene__generator__buy-more"
-                    href="https://emotions.miku.gg"
-                    target="_blank"
-                  >
-                    Buy more
-                  </a>
-                  {credits}{' '}
-                  <span className="CreateScene__generator__header-coins">
-                    <FaCoins />
-                  </span>
-                </span>
-              )}
-            </span>
-          </div>
+          <CreditsDisplayer />
         </div>
         <div className="CreateScene__generator__text-area">
           <Input

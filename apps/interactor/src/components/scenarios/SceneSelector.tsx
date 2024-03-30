@@ -3,19 +3,32 @@ import { BiCameraMovie } from 'react-icons/bi'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { selectAvailableScenes } from '../../state/selectors'
 import { useAppContext } from '../../App.context'
-import { interactionStart } from '../../state/slices/narrationSlice'
+import {
+  interactionStart,
+  sceneSuggestionsStart,
+} from '../../state/slices/narrationSlice'
 import './SceneSelector.scss'
 import SlidePanel from './SlidePanel'
 import CreateScene from './CreateScene'
 import { setModalOpened } from '../../state/slices/creationSlice'
 import { toast } from 'react-toastify'
+import { BsStars } from 'react-icons/bs'
+import { userDataFetchStart } from '../../state/slices/settingsSlice'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
   const backgrounds = useAppSelector((state) => state.novel.backgrounds)
   const scenes = useAppSelector(selectAvailableScenes)
-  const { assetLinkLoader, servicesEndpoint, isInteractionDisabled } =
-    useAppContext()
+  const {
+    assetLinkLoader,
+    servicesEndpoint,
+    isInteractionDisabled,
+    apiEndpoint,
+  } = useAppContext()
+  const { suggestedScenes, fetchingSuggestions } = useAppSelector(
+    (state) => state.narration.responses[state.narration.currentResponseId]!
+  )
+
   const slidePanelOpened = useAppSelector(
     (state) => state.creation.scene.slidePanelOpened
   )
@@ -133,10 +146,52 @@ export default function SceneSelector(): JSX.Element | null {
                 />
                 <div className="SceneSelector__item-text">Create new scene</div>
               </button>
+              <button
+                className="SceneSelector__item"
+                onClick={() => {
+                  if (isInteractionDisabled) {
+                    toast.warn('Please log in to interact.', {
+                      position: 'top-center',
+                      style: {
+                        top: 10,
+                      },
+                    })
+                    return
+                  }
+                  dispatch(
+                    setModalOpened({
+                      id: 'scene-suggestions',
+                      opened: true,
+                    })
+                  )
+                  if (!fetchingSuggestions && !suggestedScenes.length) {
+                    dispatch(sceneSuggestionsStart({ servicesEndpoint }))
+                    dispatch(userDataFetchStart({ apiEndpoint }))
+                  }
+                }}
+              >
+                <div className="SceneSelector__item-background SceneSelector__item-background--aero">
+                  <StarsEffect />
+                </div>
+                <div className="SceneSelector__item-text">
+                  Generate Scene <BsStars />
+                </div>
+              </button>
             </div>
           )}
         </div>
       </SlidePanel>
+    </div>
+  )
+}
+
+const StarsEffect = () => {
+  const stars = Array.from({ length: 50 }, (_, i) => i)
+  return (
+    <div className="StarsEffect">
+      {stars.map((_, i) => (
+        <div className="StarsEffect__star" key={`star-${i}`} />
+      ))}
     </div>
   )
 }

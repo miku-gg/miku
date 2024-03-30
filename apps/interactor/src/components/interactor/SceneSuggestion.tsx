@@ -10,23 +10,22 @@ import { GEN_BACKGROUND_COST } from '../scenarios/CreateScene'
 import { FaCoins } from 'react-icons/fa'
 import { sceneSuggestionsStart } from '../../state/slices/narrationSlice'
 import { useAppContext } from '../../App.context'
+import { userDataFetchStart } from '../../state/slices/settingsSlice'
+import CreditsDisplayer from '../scenarios/CreditsDisplayer'
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false)
-  const { servicesEndpoint } = useAppContext()
+  const { servicesEndpoint, apiEndpoint } = useAppContext()
   const dispatch = useAppDispatch()
-  const shouldSuggestScenes = useAppSelector(
-    (state) =>
-      state.narration.responses[state.narration.currentResponseId]
-        ?.shouldSuggestScenes
-  )
+  const { suggestedScenes, fetchingSuggestions, shouldSuggestScenes } =
+    useAppSelector(
+      (state) => state.narration.responses[state.narration.currentResponseId]!
+    )
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
-      console.log('Swiped left')
       setButtonOpened(false)
     },
   })
-  console.log('shouldSuggestScenes', shouldSuggestScenes)
 
   useEffect(() => {
     if (shouldSuggestScenes) {
@@ -53,11 +52,10 @@ export default function SceneSuggestion() {
                   opened: true,
                 })
               )
-              dispatch(
-                sceneSuggestionsStart({
-                  servicesEndpoint,
-                })
-              )
+              if (!fetchingSuggestions && !suggestedScenes.length) {
+                dispatch(sceneSuggestionsStart({ servicesEndpoint }))
+                dispatch(userDataFetchStart({ apiEndpoint }))
+              }
             }}
           >
             <div className="SceneSuggestion__text">
@@ -73,34 +71,37 @@ export default function SceneSuggestion() {
 }
 
 const SceneSuggestionModal = () => {
+  const dispatch = useAppDispatch()
   const { opened } = useAppSelector(
     (state) => state.creation.scene.sceneSugestions
   )
   const { suggestedScenes, fetchingSuggestions } = useAppSelector(
     (state) => state.narration.responses[state.narration.currentResponseId]!
   )
-  console.log('fetchingSuggestions', fetchingSuggestions)
   const lastSuggestedIndex = !fetchingSuggestions
     ? suggestedScenes.length
     : [...suggestedScenes, { actionText: '' }].findIndex((suggestion) => {
         return !suggestion.actionText.length
       }) - 1
-  console.log('lastSuggestedIndex', lastSuggestedIndex)
+  const { credits } = useAppSelector((state) => state.settings.user)
 
   return (
     <Modal
       opened={opened}
-      onCloseModal={() =>
-        setModalOpened({
-          id: 'scene-suggestions',
-          opened: false,
-        })
-      }
+      onCloseModal={() => {
+        dispatch(
+          setModalOpened({
+            id: 'scene-suggestions',
+            opened: false,
+          })
+        )
+      }}
       shouldCloseOnOverlayClick
     >
       <div className="SceneSuggestionModal">
         <div className="SceneSuggestionModal__header">
           <h2>Scene suggestions</h2>
+          <CreditsDisplayer />
         </div>
         <div className="SceneSuggestionModal__content">
           {fetchingSuggestions && !suggestedScenes.length ? (
@@ -118,7 +119,10 @@ const SceneSuggestionModal = () => {
                       <p>{suggestion.textPrompt}</p>
                     </div>
                     <div className="SceneSuggestionModal__suggestion-button">
-                      <Button theme="gradient" disabled={loading}>
+                      <Button
+                        theme="gradient"
+                        disabled={loading || credits < GEN_BACKGROUND_COST}
+                      >
                         {loading ? (
                           <Loader />
                         ) : (

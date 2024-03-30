@@ -74,5 +74,9 @@
     border-color: #272727;
     font-style: italic;
     cursor: default;
+
+    &:hover {
+      background: #474747;
+    }
   }
 }

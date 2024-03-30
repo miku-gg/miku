@@ -370,7 +370,6 @@ const narrationSlice = createSlice({
     ) => {
       const response = state.responses[state.currentResponseId]
       if (response) {
-        console.log('setto true')
         response.fetchingSuggestions = true
       }
     },
@@ -395,7 +394,6 @@ const narrationSlice = createSlice({
     ) => {
       const response = state.responses[action.payload.responseId]
       if (response) {
-        console.log('setto false')
         response.fetchingSuggestions = false
         response.suggestedScenes = action.payload.suggestions
       }

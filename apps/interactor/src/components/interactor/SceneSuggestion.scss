@@ -75,6 +75,24 @@
 }
 
 .SceneSuggestionModal {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  &__credits {
+    display: flex;
+    gap: 0.5rem;
+    font-style: italic;
+    svg {
+      color: $color-gold;
+    }
+  }
+
   &__suggestion {
     display: flex;
     flex-direction: column;
@@ -86,9 +104,6 @@
     font-size: 0.9rem;
     border-radius: 10px;
     margin: 10px 0;
-
-    &-header {
-    }
 
     &-prompt {
       font-size: 1rem;

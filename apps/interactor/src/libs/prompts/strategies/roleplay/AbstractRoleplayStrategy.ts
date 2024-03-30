@@ -128,7 +128,6 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     characterResponse.text = parseLLMResponse(
       variables.get('text')?.trim() || ''
     )
-    console.log(variables.get('scene'))
 
     const index = response.characters.findIndex(
       ({ characterId }) => characterId === input.currentCharacterId
