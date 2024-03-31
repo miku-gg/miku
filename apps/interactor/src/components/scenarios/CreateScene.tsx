@@ -765,7 +765,7 @@ export const GEN_BACKGROUND_COST = 20
 const GenerateBackgroundModal = () => {
   const dispatch = useAppDispatch()
   const [prompt, setPrompt] = useState<string>('')
-  const { apiEndpoint } = useAppContext()
+  const { apiEndpoint, servicesEndpoint } = useAppContext()
   const opened = useAppSelector(
     (state) => state.creation.scene.background.gen.opened
   )
@@ -817,7 +817,8 @@ const GenerateBackgroundModal = () => {
                 backgroundInferenceStart({
                   id: randomUUID(),
                   prompt,
-                  APIEndpoint: apiEndpoint,
+                  apiEndpoint,
+                  servicesEndpoint,
                 })
               )
               dispatch(

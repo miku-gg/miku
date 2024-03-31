@@ -4,7 +4,10 @@ import './SceneSuggestion.scss'
 import { useEffect, useState } from 'react'
 import classNames from 'classnames'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import { setModalOpened } from '../../state/slices/creationSlice'
+import {
+  backgroundInferenceStart,
+  setModalOpened,
+} from '../../state/slices/creationSlice'
 import { Button, Loader, Modal } from '@mikugg/ui-kit'
 import { GEN_BACKGROUND_COST } from '../scenarios/CreateScene'
 import { FaCoins } from 'react-icons/fa'
@@ -12,6 +15,7 @@ import { sceneSuggestionsStart } from '../../state/slices/narrationSlice'
 import { useAppContext } from '../../App.context'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
 import CreditsDisplayer from '../scenarios/CreditsDisplayer'
+import { NarrationSceneSuggestion } from '../../state/versioning/v3.state'
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false)
@@ -84,6 +88,18 @@ const SceneSuggestionModal = () => {
         return !suggestion.actionText.length
       }) - 1
   const { credits } = useAppSelector((state) => state.settings.user)
+  const { apiEndpoint, servicesEndpoint } = useAppContext()
+
+  const generateScene = (sceneSuggestion: NarrationSceneSuggestion) => {
+    dispatch(
+      backgroundInferenceStart({
+        id: sceneSuggestion.sceneId,
+        prompt: sceneSuggestion.sdPrompt,
+        apiEndpoint,
+        servicesEndpoint,
+      })
+    )
+  }
 
   return (
     <Modal
@@ -122,6 +138,7 @@ const SceneSuggestionModal = () => {
                       <Button
                         theme="gradient"
                         disabled={loading || credits < GEN_BACKGROUND_COST}
+                        onClick={() => generateScene(suggestion)}
                       >
                         {loading ? (
                           <Loader />

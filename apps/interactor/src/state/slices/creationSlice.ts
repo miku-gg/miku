@@ -40,9 +40,11 @@ interface CreationState {
     }
     sceneSugestions: {
       opened: boolean
+      inferencing: boolean
     }
   }
   inference: {
+    fetching: boolean
     backgrounds: {
       id: string
       inferenceId?: string
@@ -97,9 +99,11 @@ export const initialState: CreationState = {
     },
     sceneSugestions: {
       opened: false,
+      inferencing: false,
     },
   },
   inference: {
+    fetching: false,
     backgrounds: [],
   },
 }
@@ -206,7 +210,8 @@ export const creationSlice = createSlice({
       action: PayloadAction<{
         id: string
         prompt: string
-        APIEndpoint: string
+        apiEndpoint: string
+        servicesEndpoint: string
       }>
     ) => {
       state.inference.backgrounds.push({
@@ -214,6 +219,7 @@ export const creationSlice = createSlice({
         prompt: action.payload.prompt,
         queuePosition: 0,
       })
+      state.inference.fetching = true
     },
     backgroundInferenceUpdate: (
       state,
@@ -241,6 +247,7 @@ export const creationSlice = createSlice({
       action: PayloadAction<{
         id: string
         result: string
+        servicesEndpoint: string
       }>
     ) => {
       const background = state.inference.backgrounds.find(
@@ -261,6 +268,7 @@ export const creationSlice = createSlice({
       state.inference.backgrounds = state.inference.backgrounds.filter(
         (background) => background.id !== action.payload.id
       )
+      state.inference.fetching = false
     },
     backgroundInferenceFailure: (state, action: PayloadAction<string>) => {
       state.inference.backgrounds = state.inference.backgrounds.filter(

@@ -3,13 +3,20 @@ import {
   sceneSuggestionsStart,
   sceneSuggestionsUpdate,
   sceneSuggestionsEnd,
+  interactionStart,
 } from '../slices/narrationSlice'
 import { RootState } from '../store'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { AlpacaSceneSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSceneSuggestionStrategy'
 import textCompletion from '../../libs/textCompletion'
-import { selectCharactersInCurrentScene } from '../selectors'
+import {
+  selectCharactersInCurrentScene,
+  selectCurrentScene,
+} from '../selectors'
 import { NarrationSceneSuggestion } from '../versioning/v3.state'
+import { v4 as randomUUID } from 'uuid'
+import { backgroundInferenceEnd, setModalOpened } from '../slices/creationSlice'
+import { addScene } from '../slices/novelSlice'
 
 const sceneSuggestionEffect = async (
   dispatch: Dispatch,
@@ -35,10 +42,12 @@ const sceneSuggestionEffect = async (
     })
 
     let suggestions: NarrationSceneSuggestion[] = []
+    const ids = Array.from({ length: 6 }, () => randomUUID())
     for await (const result of stream) {
       const _response = promptBuilder.completeResponse([], result, state)
-      suggestions = _response.map((suggestion) => {
+      suggestions = _response.map((suggestion, suggestionIndex) => {
         return {
+          sceneId: ids[suggestionIndex],
           actionText: suggestion.actionText,
           probability: Number(suggestion.probability) || 0,
           textPrompt: suggestion.prompt,
@@ -77,6 +86,56 @@ const sceneSuggestionEffect = async (
   }
 }
 
+const promptSelectedSuggestedScene = async (
+  dispatch: Dispatch,
+  state: RootState,
+  servicesEndpoint: string,
+  sceneId: string
+) => {
+  const response = state.narration.responses[state.narration.currentResponseId]
+  const suggestion = response?.suggestedScenes.find(
+    (s) => s.sceneId === sceneId
+  )
+
+  // TODO: Fix outfit prompt
+  const currentScene = selectCurrentScene(state)
+
+  dispatch(
+    addScene({
+      id: sceneId,
+      characters:
+        currentScene?.characters.map((c) => ({
+          id: c.characterId,
+          outfit: c.outfit,
+        })) || [],
+      background: sceneId,
+      music: currentScene?.musicId || '',
+      name: suggestion?.actionText || '',
+      prompt: suggestion?.textPrompt || '',
+    })
+  )
+  dispatch(
+    interactionStart({
+      sceneId: sceneId,
+      text: `OOC: Describe the following scene and add dialogue: ${
+        suggestion?.textPrompt || ''
+      }`,
+      characters: suggestion?.characters.map((r) => r.characterId) || [],
+      servicesEndpoint,
+      selectedCharacterId:
+        suggestion?.characters[
+          Math.floor(Math.random() * (suggestion?.characters.length || 0))
+        ].characterId || '',
+    })
+  )
+  dispatch(
+    setModalOpened({
+      id: 'scene-suggestions',
+      opened: false,
+    })
+  )
+}
+
 export const sceneSugestionMiddleware = createListenerMiddleware()
 
 sceneSugestionMiddleware.startListening({
@@ -87,6 +146,19 @@ sceneSugestionMiddleware.startListening({
       listenerApi.dispatch,
       state,
       action.payload.servicesEndpoint
+    )
+  },
+})
+
+sceneSugestionMiddleware.startListening({
+  actionCreator: backgroundInferenceEnd,
+  effect: async (action, listenerApi) => {
+    const state = listenerApi.getState() as RootState
+    await promptSelectedSuggestedScene(
+      listenerApi.dispatch,
+      state,
+      action.payload.servicesEndpoint,
+      action.payload.id
     )
   },
 })

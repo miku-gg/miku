@@ -64,7 +64,9 @@ const novelSlice = createSlice({
       }
 
       const music = state.songs.find(
-        (song) => song.source === action.payload.music
+        (song) =>
+          song.source === action.payload.music ||
+          song.id === action.payload.music
       )
       let musicId = music?.id || ''
       if (!music) {

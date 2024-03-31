@@ -16,7 +16,7 @@ export interface NarrationSceneSuggestion {
     characterId: string
     outfitPrompt: string
   }[]
-  sceneId?: string
+  sceneId: string
   probability?: number
 }
 

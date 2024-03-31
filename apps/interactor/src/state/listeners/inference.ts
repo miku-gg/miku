@@ -21,6 +21,7 @@ export interface InferenceStatus {
 const inferenceEffect = async (
   dispatch: Dispatch,
   apiEndpont: string,
+  servicesEndpoint: string,
   id: string,
   prompt: string
 ) => {
@@ -94,6 +95,7 @@ const inferenceEffect = async (
           backgroundInferenceEnd({
             id,
             result: inferenceStatus.result[0],
+            servicesEndpoint,
           })
         )
       } else {
@@ -121,7 +123,8 @@ inferenceListenerMiddleware.startListening({
   effect: async (action, listenerApi) => {
     await inferenceEffect(
       listenerApi.dispatch,
-      action.payload.APIEndpoint,
+      action.payload.apiEndpoint,
+      action.payload.servicesEndpoint,
       action.payload.id,
       action.payload.prompt
     )
