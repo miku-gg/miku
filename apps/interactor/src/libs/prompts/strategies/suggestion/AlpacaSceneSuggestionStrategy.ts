@@ -35,6 +35,7 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     let template = `You're a writing assistance that will suggest possible next scenarios for a story.\n`
     template += `### Instruction:\n`
     template += `Given an input of the current scene and conversation. You MUST suggest 3 possible next scenes, give it a score of how probable it should be and describe a text explaining what should happen next. Also, describe an "action" for a button that the user can click.\n`
+    template += `Each of the 3 scenes MUST indicate a change in the background, so you MUST describe a different environment.`
     // SHOTS: START
     template += `### Input:\n`
     template +=
@@ -109,22 +110,22 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     template += `CONVERSATION:\n${messages}\n`
     template += `### Response:\n`
     template += `SCENE 1:\n`
-    template += `  ACTION:{{GEN action_1 max_tokens=10 stop=["\\n", "\\""]}}"\n`
+    template += `  ACTION:{{GEN action_1 max_tokens=15 stop=[".", "\\n", "\\""]}}"\n`
     template += `  PROBABILITY:{{GEN prob_1 max_tokens=3 stop=["\\n", "\\"", "%"]}}"\n`
-    template += `  DESCRIPTION:{{GEN desc_1 max_tokens=50 stop=["\\n", "\\""]}}"\n`
-    template += `  BACKGROUND:{{GEN place_1 max_tokens=20 stop=["\\n", "\\"", "."]}}"\n`
+    template += `  DESCRIPTION:{{GEN desc_1 max_tokens=150 stop=["\\n", "\\""]}}"\n`
+    template += `  BACKGROUND:{{GEN place_1 max_tokens=50 stop=["\\n", "\\"", "."]}}"\n`
 
     template += `SCENE 2:\n`
-    template += `  ACTION:{{GEN action_2 max_tokens=10 stop=["\\n", "\\""]}}\n`
+    template += `  ACTION:{{GEN action_2 max_tokens=15 stop=[".", "\\n", "\\""]}}"\n`
     template += `  PROBABILITY:{{GEN prob_2 max_tokens=3 stop=["\\n", "\\"", "%"]}}\n`
-    template += `  DESCRIPTION:{{GEN desc_2 max_tokens=50 stop=["\\n", "\\""]}}\n`
-    template += `  BACKGROUND:{{GEN place_2 max_tokens=20 stop=["\\n", "\\"", "."]}}\n`
+    template += `  DESCRIPTION:{{GEN desc_2 max_tokens=100 stop=["\\n", "\\""]}}\n`
+    template += `  BACKGROUND:{{GEN place_2 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`
 
     template += `SCENE 3:\n`
-    template += `  ACTION:{{GEN action_3 max_tokens=10 stop=["\\n", "\\""]}}\n`
+    template += `  ACTION:{{GEN action_3 max_tokens=15 stop=[".", "\\n", "\\""]}}"\n`
     template += `  PROBABILITY:{{GEN prob_3 max_tokens=3 stop=["\\n", "\\"", "%"]}}\n`
-    template += `  DESCRIPTION:{{GEN desc_3 max_tokens=50 stop=["\\n", "\\""]}}\n`
-    template += `  BACKGROUND:{{GEN place_3 max_tokens=20 stop=["\\n", "\\"", "."]}}\n`
+    template += `  DESCRIPTION:{{GEN desc_3 max_tokens=100 stop=["\\n", "\\""]}}\n`
+    template += `  BACKGROUND:{{GEN place_3 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`
 
     template = fillTextTemplate(template, {
       user: input.settings.user.name,
