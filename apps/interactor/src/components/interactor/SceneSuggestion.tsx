@@ -89,6 +89,12 @@ const SceneSuggestionModal = () => {
       }) - 1
   const { credits } = useAppSelector((state) => state.settings.user)
   const { apiEndpoint, servicesEndpoint } = useAppContext()
+  const { fetching: fetchingBackground, backgrounds } = useAppSelector(
+    (state) => state.creation.inference
+  )
+  const fetchingScene =
+    fetchingBackground &&
+    !!suggestedScenes.find((s) => s.sceneId === backgrounds[0]?.id)
 
   const generateScene = (sceneSuggestion: NarrationSceneSuggestion) => {
     dispatch(
@@ -120,8 +126,14 @@ const SceneSuggestionModal = () => {
           <CreditsDisplayer />
         </div>
         <div className="SceneSuggestionModal__content">
-          {fetchingSuggestions && !suggestedScenes.length ? (
-            <div className="SceneSuggestionModal__loading">Loading...</div>
+          {fetchingScene ? (
+            <div className="SceneSuggestionModal__loading">
+              Generating background...
+            </div>
+          ) : fetchingSuggestions && !suggestedScenes.length ? (
+            <div className="SceneSuggestionModal__loading">
+              Fetching suggestions...
+            </div>
           ) : (
             <div className="SceneSuggestionModal__suggestions">
               {suggestedScenes.map((suggestion, index) => {

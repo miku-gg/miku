@@ -257,7 +257,7 @@ export const creationSlice = createSlice({
         return
       }
       state.importedBackgrounds.push({
-        id: action.payload.result,
+        id: background.id,
         name: 'background',
         attributes: [],
         description: background.prompt,

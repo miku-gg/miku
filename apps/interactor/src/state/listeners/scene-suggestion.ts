@@ -15,7 +15,11 @@ import {
 } from '../selectors'
 import { NarrationSceneSuggestion } from '../versioning/v3.state'
 import { v4 as randomUUID } from 'uuid'
-import { backgroundInferenceEnd, setModalOpened } from '../slices/creationSlice'
+import {
+  backgroundInferenceEnd,
+  removeImportedBackground,
+  setModalOpened,
+} from '../slices/creationSlice'
 import { addScene } from '../slices/novelSlice'
 
 const sceneSuggestionEffect = async (
@@ -96,10 +100,14 @@ const promptSelectedSuggestedScene = async (
   const suggestion = response?.suggestedScenes.find(
     (s) => s.sceneId === sceneId
   )
+  const background = state.creation.importedBackgrounds.find(
+    (bg) => bg.id === sceneId
+  )
 
   // TODO: Fix outfit prompt
   const currentScene = selectCurrentScene(state)
 
+  dispatch(removeImportedBackground(sceneId))
   dispatch(
     addScene({
       id: sceneId,
@@ -108,7 +116,7 @@ const promptSelectedSuggestedScene = async (
           id: c.characterId,
           outfit: c.outfit,
         })) || [],
-      background: sceneId,
+      background: background?.source.jpg || '',
       music: currentScene?.musicId || '',
       name: suggestion?.actionText || '',
       prompt: suggestion?.textPrompt || '',
