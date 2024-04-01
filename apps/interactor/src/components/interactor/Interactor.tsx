@@ -9,6 +9,7 @@ import {
 } from '../../state/selectors'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { useAppContext } from '../../App.context'
+import SceneSuggestion from './SceneSuggestion'
 import InteractorHeader from './InteractorHeader'
 import ChatBox from '../chat-box/ChatBox'
 import classNames from 'classnames'
@@ -30,6 +31,7 @@ const Interactor = () => {
       <div className="Interactor">
         <div className="Interactor__content">
           <InteractorHeader />
+          <SceneSuggestion />
           <div className="Interactor__main-image-container">
             <ProgressiveImage
               src={

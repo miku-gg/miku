@@ -7,6 +7,8 @@ import {
   Tooltip,
 } from '@mikugg/ui-kit'
 import { MdOutlineImageSearch } from 'react-icons/md'
+import { BsStars } from 'react-icons/bs'
+import { FaCoins } from 'react-icons/fa6'
 import { DEFAULT_MUSIC } from '@mikugg/bot-utils'
 import debounce from 'lodash.debounce'
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
@@ -26,6 +28,7 @@ import {
   setMusic,
   addImportedCharacter,
   clearImportedCharacters,
+  backgroundInferenceStart,
 } from '../../state/slices/creationSlice'
 import classNames from 'classnames'
 import { interactionStart } from '../../state/slices/narrationSlice'
@@ -37,6 +40,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { BackgroundResult, CharacterResult } from '../../libs/listSearch'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { loadNovelFromSingleCard } from '../../libs/loadNovel'
+import { userDataFetchStart } from '../../state/slices/settingsSlice'
+import CreditsDisplayer from './CreditsDisplayer'
 
 const selectSelectableCharacters = createSelector(
   [
@@ -173,6 +178,7 @@ const CreateScene = () => {
     dispatch(
       addScene({
         id: sceneId,
+        name: title || prompt,
         background: _background,
         newChars: charactersToImport,
         characters,
@@ -192,7 +198,6 @@ const CreateScene = () => {
     dispatch(setModalOpened({ id: 'scene', opened: false }))
     dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
   }
-  console.log('backgroundSelected', backgroundSelected)
 
   return (
     <div className="CreateScene">
@@ -304,6 +309,7 @@ const CreateScene = () => {
       <CreateSceneCharacterModal />
       <SearchBackgroundModal />
       <SearchCharacterModal />
+      <GenerateBackgroundModal />
     </div>
   )
 }
@@ -533,6 +539,10 @@ const CreateSceneBackgroundModal = () => {
     )
   )
 
+  const backgroundsInferecing = useAppSelector(
+    (state) => state.creation.inference.backgrounds
+  )
+
   return (
     <Modal
       opened={backgroundSelectorOpened}
@@ -555,7 +565,7 @@ const CreateSceneBackgroundModal = () => {
                   'CreateScene__selector__item--selected':
                     backgroundSelected === background?.id,
                 })}
-                key={`background-selector-${index}`}
+                key={`background-selector-${background?.id || index}`}
                 style={{
                   backgroundImage: `url(${
                     background
@@ -575,6 +585,16 @@ const CreateSceneBackgroundModal = () => {
                   )
                 }}
               />
+            )
+          })}
+          {backgroundsInferecing.map((background) => {
+            return (
+              <div
+                className={classNames('CreateScene__selector__item')}
+                key={`background-selector-inferencing-${background.id}`}
+              >
+                <Loader />
+              </div>
             )
           })}
           <div
@@ -609,6 +629,20 @@ const CreateSceneBackgroundModal = () => {
                 }
               }}
             />
+          </div>
+          <div
+            className="CreateScene__selector__item CreateScene__selector__item--upload"
+            onClick={() => {
+              dispatch(
+                setModalOpened({
+                  id: 'background-gen',
+                  opened: true,
+                })
+              )
+            }}
+          >
+            <BsStars />
+            <p>Generate</p>
           </div>
         </div>
       </div>
@@ -722,6 +756,85 @@ const CreateSceneCharacterModal = () => {
               </div>
             )
           })}
+      </div>
+    </Modal>
+  )
+}
+
+export const GEN_BACKGROUND_COST = 20
+const GenerateBackgroundModal = () => {
+  const dispatch = useAppDispatch()
+  const [prompt, setPrompt] = useState<string>('')
+  const { apiEndpoint, servicesEndpoint } = useAppContext()
+  const opened = useAppSelector(
+    (state) => state.creation.scene.background.gen.opened
+  )
+  const { credits } = useAppSelector((state) => state.settings.user)
+
+  useEffect(() => {
+    if (opened) {
+      dispatch(
+        userDataFetchStart({
+          apiEndpoint,
+        })
+      )
+    }
+  }, [opened, apiEndpoint, dispatch])
+
+  return (
+    <Modal
+      opened={opened}
+      onCloseModal={() =>
+        dispatch(
+          setModalOpened({
+            id: 'background-gen',
+            opened: false,
+          })
+        )
+      }
+    >
+      <div className="CreateScene__generator">
+        <div className="CreateScene__generator__header">
+          <div className="CreateScene__generator__title">
+            Generate a background
+          </div>
+          <CreditsDisplayer />
+        </div>
+        <div className="CreateScene__generator__text-area">
+          <Input
+            placeHolder="Write a prompt..."
+            isTextArea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+          />
+        </div>
+        <div className="CreateScene__generator__button">
+          <Button
+            theme="gradient"
+            disabled={!prompt || credits < GEN_BACKGROUND_COST}
+            onClick={async () => {
+              dispatch(
+                backgroundInferenceStart({
+                  id: randomUUID(),
+                  prompt,
+                  apiEndpoint,
+                  servicesEndpoint,
+                })
+              )
+              dispatch(
+                setModalOpened({
+                  id: 'background-gen',
+                  opened: false,
+                })
+              )
+            }}
+          >
+            Generate Background{' '}
+            <span>
+              {GEN_BACKGROUND_COST} <FaCoins />
+            </span>
+          </Button>
+        </div>
       </div>
     </Modal>
   )

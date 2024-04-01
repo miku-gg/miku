@@ -7,6 +7,7 @@ import {
 } from '../versioning'
 import { toast } from 'react-toastify'
 import trim from 'lodash.trim'
+import { NarrationSceneSuggestion } from '../versioning/v3.state'
 
 export type {
   NarrationState,
@@ -132,17 +133,31 @@ const narrationSlice = createSlice({
     interactionSuccess(
       state,
       action: PayloadAction<{
+        shouldSuggestScenes?: boolean
         completed: boolean
         characters: NarrationResponse['characters']
-        suggestedScenes?: string[]
       }>
     ) {
-      const { characters, suggestedScenes = [] } = action.payload
+      const { characters } = action.payload
       const response = state.responses[state.currentResponseId]
+      const interaction =
+        state.interactions[response?.parentInteractionId || '']
+      const currentScene = interaction?.sceneId
+      const previousScene =
+        state.interactions[
+          state.responses[interaction?.parentResponseId || '']
+            ?.parentInteractionId || ''
+        ]?.sceneId
+
       if (response) {
         response.childrenInteractions = []
         response.characters = characters
-        response.suggestedScenes = suggestedScenes
+        if (currentScene && previousScene && previousScene === currentScene) {
+          response.shouldSuggestScenes = action.payload.shouldSuggestScenes
+        } else {
+          response.shouldSuggestScenes = false
+        }
+        response.suggestedScenes = []
         response.fetching = characters.every((char) => !char.text)
         response.selected = true
       }
@@ -361,6 +376,41 @@ const narrationSlice = createSlice({
         response.selectedCharacterId = characterId
       }
     },
+    sceneSuggestionsStart: (
+      state,
+      // eslint-disable-next-line
+      _action: PayloadAction<{ servicesEndpoint: string }>
+    ) => {
+      const response = state.responses[state.currentResponseId]
+      if (response) {
+        response.fetchingSuggestions = true
+      }
+    },
+    sceneSuggestionsUpdate: (
+      state,
+      action: PayloadAction<{
+        suggestions: NarrationSceneSuggestion[]
+        responseId: string
+      }>
+    ) => {
+      const response = state.responses[action.payload.responseId]
+      if (response) {
+        response.suggestedScenes = action.payload.suggestions
+      }
+    },
+    sceneSuggestionsEnd: (
+      state,
+      action: PayloadAction<{
+        suggestions: NarrationSceneSuggestion[]
+        responseId: string
+      }>
+    ) => {
+      const response = state.responses[action.payload.responseId]
+      if (response) {
+        response.fetchingSuggestions = false
+        response.suggestedScenes = action.payload.suggestions
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -386,6 +436,9 @@ export const {
   updateInteraction,
   selectCharacterOfResponse,
   characterResponseStart,
+  sceneSuggestionsStart,
+  sceneSuggestionsUpdate,
+  sceneSuggestionsEnd,
 } = narrationSlice.actions
 
 export default narrationSlice.reducer

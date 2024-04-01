@@ -67,4 +67,16 @@
   &.right {
     flex-direction: row-reverse;
   }
+
+  &:disabled {
+    background: #474747;
+    color: #a1a1a1;
+    border-color: #272727;
+    font-style: italic;
+    cursor: default;
+
+    &:hover {
+      background: #474747;
+    }
+  }
 }

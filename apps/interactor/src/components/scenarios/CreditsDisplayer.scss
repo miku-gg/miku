@@ -1,0 +1,18 @@
+@import '../../variables';
+
+.CreditsDisplayer {
+  &__buy-more {
+    display: inline-flex;
+    margin-right: 15px;
+    color: $text-3;
+    transition: all 0.2s ease-out;
+
+    &:hover {
+      color: $text-2;
+    }
+  }
+
+  &__coins {
+    color: $color-gold;
+  }
+}

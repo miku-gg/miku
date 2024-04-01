@@ -35,6 +35,8 @@ const BACKGROUND_SEARCH_ENDPOINT =
 const CHARACTER_SEARCH_ENDPOINT =
   import.meta.env.VITE_CHARACTER_SEARCH_ENDPOINT ||
   'http://localhost:8080/characters'
+const API_ENDPOINT =
+  import.meta.env.VITE_API_ENDPOINT || 'http://localhost:8080'
 
 function getCongurationFromParams(): {
   production: boolean
@@ -47,6 +49,7 @@ function getCongurationFromParams(): {
   characterSearchEndpoint: string
   assetsUploadEndpoint: string
   assetsEndpoint: string
+  apiEndpoint: string
   cardEndpoint: string
   servicesEndpoint: string
   settings: RootState['settings']
@@ -63,6 +66,7 @@ function getCongurationFromParams(): {
       backgroundSearchEndpoint: string
       assetsUploadEndpoint: string
       assetsEndpoint: string
+      apiEndpoint: string
       cardEndpoint: string
       servicesEndpoint: string
       freeTTS: boolean
@@ -84,7 +88,8 @@ function getCongurationFromParams(): {
       assetsUploadEndpoint:
         configurationJson.assetsUploadEndpoint || ASSETS_UPLOAD_ENDPOINT,
       assetsEndpoint: configurationJson.assetsEndpoint || ASSETS_ENDPOINT,
-      cardEndpoint: configurationJson.cardEndpoint || CARD_ENDPOINT,
+      apiEndpoint: configurationJson.apiEndpoint || '',
+      cardEndpoint: configurationJson.cardEndpoint || API_ENDPOINT,
       servicesEndpoint: configurationJson.servicesEndpoint || SERVICES_ENDPOINT,
       settings: mergeWith(
         mergeWith({}, initialSettingsState),
@@ -103,6 +108,7 @@ function getCongurationFromParams(): {
       backgroundSearchEndpoint: BACKGROUND_SEARCH_ENDPOINT,
       assetsUploadEndpoint: ASSETS_UPLOAD_ENDPOINT,
       assetsEndpoint: ASSETS_ENDPOINT,
+      apiEndpoint: '',
       cardEndpoint: CARD_ENDPOINT,
       servicesEndpoint: SERVICES_ENDPOINT,
       settings: initialSettingsState,
@@ -183,6 +189,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       isProduction={params.production}
       isInteractionDisabled={params.disabled}
       servicesEndpoint={params.servicesEndpoint}
+      apiEndpoint={params.apiEndpoint}
       cardEndpoint={params.cardEndpoint}
       freeSmart={params.freeSmart}
       freeTTS={params.freeTTS}

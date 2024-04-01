@@ -327,3 +327,23 @@ export const selectChatHistory = createSelector(
       .flat()
   }
 )
+
+export const selectCharactersInCurrentScene = createSelector(
+  [(state: RootState) => state.novel.characters, selectCurrentScene],
+  (characters, scene) => {
+    return scene?.characters.map(({ characterId, outfit: outfitId }) => {
+      const character = characters.find(
+        (character) => character.id === characterId
+      )
+      const outfits = selectCharacterOutfits(
+        { novel: { characters } } as RootState,
+        characterId
+      )
+      const outfit = outfits.find((outfit) => outfit.id === outfitId)
+      return {
+        ...character,
+        outfit,
+      }
+    })
+  }
+)

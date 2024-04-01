@@ -13,6 +13,9 @@ import {
 } from './listeners/interaction'
 import { stateReplacementMiddleware } from './slices/replaceState'
 import updateStateMiddleware from './updateState.middleware'
+import { inferenceListenerMiddleware } from './listeners/inference'
+import { sceneSugestionMiddleware } from './listeners/scene-suggestion'
+import { userDataMiddleware } from './listeners/user-data'
 
 export const store = configureStore({
   reducer: {
@@ -25,10 +28,13 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend([
       updateStateMiddleware,
+      userDataMiddleware.middleware,
+      sceneSugestionMiddleware.middleware,
       interactionListenerMiddleware.middleware,
       regenerationListenerMiddleware.middleware,
       continueListenerMiddleware.middleware,
       characterResponseListenerMiddleware.middleware,
+      inferenceListenerMiddleware.middleware,
       stateReplacementMiddleware,
     ]),
 })

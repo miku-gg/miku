@@ -20,7 +20,7 @@ export class AlpacaSuggestionStrategy extends AbstractPromptStrategy<
       .filter(Boolean)
       .join('\n')
     const messages = this.getMessagesPrompt(input, memorySize)
-    let template = `You are a writing assistant that will help you write a story. By suggestion cotinuations to a narration.\n`
+    let template = `You are a writing assistant that will help you write a story. You suggest replies to a conversation.\n`
     template += `### Input:\n`
     template += `${personas}\n${messages}`
     template += `### Instruction:\n`

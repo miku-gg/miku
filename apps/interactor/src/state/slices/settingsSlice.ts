@@ -18,6 +18,8 @@ export const initialState: SettingsState = {
     name: 'Anon',
     isPremium: false,
     nsfw: NovelNSFW.EXPLICIT,
+    credits: 0,
+    loading: false,
   },
   prompt: {
     systemPrompt: '',
@@ -109,6 +111,24 @@ export const settingSlice = createSlice({
     ) => {
       state.modals.edit = action.payload
     },
+    userDataFetchStart: (
+      state,
+      // eslint-disable-next-line
+      _action: PayloadAction<{ apiEndpoint: string }>
+    ) => {
+      state.user.loading = true
+    },
+    userDataFetchEnd: (
+      state,
+      action: PayloadAction<{
+        isPremium: boolean
+        credits: number
+      }>
+    ) => {
+      state.user.loading = false
+      state.user.isPremium = action.payload.isPremium
+      state.user.credits = action.payload.credits
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -137,6 +157,8 @@ export const {
   setAboutModal,
   setHistoryModal,
   setEditModal,
+  userDataFetchStart,
+  userDataFetchEnd,
 } = settingSlice.actions
 
 export default settingSlice.reducer
