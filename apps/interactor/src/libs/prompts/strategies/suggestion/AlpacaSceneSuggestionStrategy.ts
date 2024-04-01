@@ -145,7 +145,7 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
 
   public completeResponse(
     _input: RootState,
-    response: {
+    _response: {
       actionText: string
       probability: string
       prompt: string

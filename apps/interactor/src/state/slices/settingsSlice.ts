@@ -114,7 +114,7 @@ export const settingSlice = createSlice({
     userDataFetchStart: (
       state,
       // eslint-disable-next-line
-      action: PayloadAction<{ apiEndpoint: string }>
+      _action: PayloadAction<{ apiEndpoint: string }>
     ) => {
       state.user.loading = true
     },

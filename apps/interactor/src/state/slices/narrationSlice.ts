@@ -379,7 +379,7 @@ const narrationSlice = createSlice({
     sceneSuggestionsStart: (
       state,
       // eslint-disable-next-line
-      action: PayloadAction<{ servicesEndpoint: string }>
+      _action: PayloadAction<{ servicesEndpoint: string }>
     ) => {
       const response = state.responses[state.currentResponseId]
       if (response) {

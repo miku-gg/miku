@@ -16,7 +16,7 @@ export default function CreditsDisplayer() {
             href="https://emotions.miku.gg"
             target="_blank"
           >
-            Buy more
+            Buy credits
           </a>
           {credits}{' '}
           <span className="CreditsDisplayer__coins">

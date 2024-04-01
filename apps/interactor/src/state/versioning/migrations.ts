@@ -124,6 +124,7 @@ export const migrateV2toV3 = (v2: {
                 ...rest,
               })
             ),
+            suggestedScenes: [],
           } as V3_NarrationResponse,
         }
       }, {}),
