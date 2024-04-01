@@ -69,7 +69,7 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
   protected override template() {
     return {
       askLine:
-        '### Response (2 paragraphs, engaging, natural, authentic, descriptive, creative):\n',
+        '### Response (Reaction + 2 paragraphs, engaging, natural, authentic, descriptive, creative):\n',
       instruction: '### Instruction:\n',
       response: '### Response:\n',
       stops: ['###'],

@@ -140,10 +140,23 @@ const narrationSlice = createSlice({
     ) {
       const { characters } = action.payload
       const response = state.responses[state.currentResponseId]
+      const interaction =
+        state.interactions[response?.parentInteractionId || '']
+      const currentScene = interaction?.sceneId
+      const previousScene =
+        state.interactions[
+          state.responses[interaction?.parentResponseId || '']
+            ?.parentInteractionId || ''
+        ]?.sceneId
+
       if (response) {
         response.childrenInteractions = []
         response.characters = characters
-        response.shouldSuggestScenes = action.payload.shouldSuggestScenes
+        if (currentScene && previousScene && previousScene === currentScene) {
+          response.shouldSuggestScenes = action.payload.shouldSuggestScenes
+        } else {
+          response.shouldSuggestScenes = false
+        }
         response.suggestedScenes = []
         response.fetching = characters.every((char) => !char.text)
         response.selected = true

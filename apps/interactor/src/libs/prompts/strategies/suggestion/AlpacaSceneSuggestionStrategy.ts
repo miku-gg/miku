@@ -35,7 +35,7 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     let template = `You're a writing assistance that will suggest possible next scenarios for a story.\n`
     template += `### Instruction:\n`
     template += `Given an input of the current scene and conversation. You MUST suggest 3 possible next scenes, give it a score of how probable it should be and describe a text explaining what should happen next. Also, describe an "action" for a button that the user can click.\n`
-    template += `Each of the 3 scenes MUST indicate a change in the background, so you MUST describe a different environment.`
+    template += `Each of the 3 scenes MUST indicate a change in the background, so you MUST describe a different environment.\n`
     // SHOTS: START
     template += `### Input:\n`
     template +=
@@ -50,20 +50,20 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     template +=
       '\n### Response:' +
       '\nSCENE 1:\n' +
+      '  BACKGROUND: masion hall, long table, papers, books, party supplies, afternoon.\n' +
       '  ACTION: Plan the party together.\n' +
       '  PROBABILITY: 90%\n' +
       '  DESCRIPTION: *{{user}} and Nala sit down together at a large table in the study, spreading out papers and notes. They begin to discuss the details of the party, including the guest list, menu, decorations, and music.*\n' +
-      '  BACKGROUND: masion hall, long table, papers, books, party supplies, afternoon.\n' +
       'SCENE 2:\n' +
+      '  BACKGROUND: kitchen, window, white marble, vegetables, cakes, luxury\n' +
       '  ACTION:  Have a heart-to-heart moment.\n' +
       '  PROBABILITY: 50%\n' +
       '  DESCRIPTION: *As they prepare cooking in the kitchen, Nala begins to open up to {{user}} about her past experiences with her previous master. {{user}} listens empathetically, and assures Nala that she will never be treated like that again.*\n' +
-      '  BACKGROUND: kitchen, window, white marble, vegetables, cakes, luxury\n' +
       'SCENE 3:\n' +
+      '  BACKGROUND: mansion room, tables, chairs, empty with no people, paltes, dinner, candles\n' +
       '  ACTION: Practice serving skills.\n' +
       '  PROBABILITY: 70%\n' +
-      "  DESCRIPTION: *With the party fast approaching, {{user}} decides to test Nala's serving skills. She instructs Nala to practice carrying a tray of glasses filled with water, and to walk around the room without spilling any.*\n" +
-      '  BACKGROUND: mansion room, tables, chairs, empty with no people, paltes, dinner, candles\n'
+      "  DESCRIPTION: *With the party fast approaching, {{user}} decides to test Nala's serving skills. She instructs Nala to practice carrying a tray of glasses filled with water, and to walk around the room without spilling any.*\n"
     template +=
       `### Input:\n` +
       `Roxy = [Calm, Collected, Headstrong, Wise, Gentle, Intelligent, Rational, Clumsy, Slightly Reserved., Sleepy]` +
@@ -88,20 +88,20 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     template +=
       '\n### Response:' +
       '\nSCENE 1:\n' +
+      '  BACKGROUND: forest, trees, grenery, daylight, forest, 4k, trending in artstation\n' +
       '  ACTION: Start practicing elemental magic.\n' +
       '  PROBABILITY: 85%\n' +
       '  DESCRIPTION: *Roxy takes out different types of crystals and explains their properties related to each element. She then demonstrates simple spells using these crystals, encouraging {{user}} to try casting them as well.*\n' +
-      '  BACKGROUND: forest, trees, grenery, daylight, forest, 4k, trending in artstation\n' +
       'SCENE 2:\n' +
+      '  BACKGROUND: wonders, path, forest, 4k, road, bench\n' +
       '  ACTION: Share stories while resting.\n' +
       '  PROBABILITY: 60%\n' +
       '  DESCRIPTION: *After practicing for a while, both Roxy and {{user}} take a break. During this time, Roxy shares tales of her own adventures and experiences as a traveling tutor, providing valuable insights and advice for {{user}}.*\n' +
-      '  BACKGROUND: wonders, path, forest, 4k, road, bench\n' +
       'SCENE 3:\n' +
+      '  BACKGROUND: forest, dark, magical, mystical, afternoon, sunlight, digital art\n' +
       '  ACTION: Encounter a magical creature.\n' +
       '  PROBABILITY: 40%\n' +
-      '  DESCRIPTION: *While exploring the forest during their lesson, Roxy and {{user}} come across a mysterious magical creature. Roxy helps {{user}} approach and interact with the creature safely, teaching {{user}} about its unique abilities and characteristics.*\n' +
-      '  BACKGROUND: forest, dark, magical, mystical, afternoon, sunlight, digital art\n'
+      '  DESCRIPTION: *While exploring the forest during their lesson, Roxy and {{user}} come across a mysterious magical creature. Roxy helps {{user}} approach and interact with the creature safely, teaching {{user}} about its unique abilities and characteristics.*\n'
     // SHOTS: END
 
     template += `\n### Input:\n`
@@ -110,22 +110,22 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     template += `CONVERSATION:\n${messages}\n`
     template += `### Response:\n`
     template += `SCENE 1:\n`
-    template += `  ACTION:{{GEN action_1 max_tokens=15 stop=[".", "\\n", "\\""]}}"\n`
+    template += `  BACKGROUND:{{GEN place_1 max_tokens=50 stop=["\\n", "\\"", "."]}}"\n`
+    template += `  ACTION:{{GEN action_1 max_tokens=15 stop=["\\n", "\\""]}}"\n`
     template += `  PROBABILITY:{{GEN prob_1 max_tokens=3 stop=["\\n", "\\"", "%"]}}"\n`
     template += `  DESCRIPTION:{{GEN desc_1 max_tokens=150 stop=["\\n", "\\""]}}"\n`
-    template += `  BACKGROUND:{{GEN place_1 max_tokens=50 stop=["\\n", "\\"", "."]}}"\n`
 
     template += `SCENE 2:\n`
-    template += `  ACTION:{{GEN action_2 max_tokens=15 stop=[".", "\\n", "\\""]}}"\n`
+    template += `  BACKGROUND:{{GEN place_2 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`
+    template += `  ACTION:{{GEN action_2 max_tokens=15 stop=["\\n", "\\""]}}"\n`
     template += `  PROBABILITY:{{GEN prob_2 max_tokens=3 stop=["\\n", "\\"", "%"]}}\n`
     template += `  DESCRIPTION:{{GEN desc_2 max_tokens=100 stop=["\\n", "\\""]}}\n`
-    template += `  BACKGROUND:{{GEN place_2 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`
 
     template += `SCENE 3:\n`
-    template += `  ACTION:{{GEN action_3 max_tokens=15 stop=[".", "\\n", "\\""]}}"\n`
+    template += `  BACKGROUND:{{GEN place_3 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`
+    template += `  ACTION:{{GEN action_3 max_tokens=15 stop=["\\n", "\\""]}}"\n`
     template += `  PROBABILITY:{{GEN prob_3 max_tokens=3 stop=["\\n", "\\"", "%"]}}\n`
     template += `  DESCRIPTION:{{GEN desc_3 max_tokens=100 stop=["\\n", "\\""]}}\n`
-    template += `  BACKGROUND:{{GEN place_3 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`
 
     template = fillTextTemplate(template, {
       user: input.settings.user.name,

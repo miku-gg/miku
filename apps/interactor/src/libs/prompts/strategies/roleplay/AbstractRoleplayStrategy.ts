@@ -267,9 +267,9 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
           : '{{SEL emotion options=emotions}}'
       }\n` +
       `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{user}}:",${charStops}]}}` +
-      `\n\n${temp.instruction}OOC: Did the character changed scene in the last message?` +
+      `\n\n${temp.instruction}OOC: Did the characters changed scene in the last messages?` +
       ` Answer with Yes or No` +
-      `\n${temp.response}Based on the last message:{{SEL scene options=scene_opt}}`
+      `\n${temp.response}Based on the last two messages:{{SEL scene options=scene_opt}}`
     )
   }
 
