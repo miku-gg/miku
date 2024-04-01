@@ -122,6 +122,11 @@ const promptSelectedSuggestedScene = async (
       prompt: suggestion?.textPrompt || '',
     })
   )
+
+  if (state.creation.inference.lastBackgroundForNewSceneId !== sceneId) {
+    return
+  }
+
   dispatch(
     interactionStart({
       sceneId: sceneId,

@@ -121,4 +121,24 @@
       }
     }
   }
+
+  &__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    font-size: 1.1rem;
+
+    i {
+      font-size: 0.9rem;
+      color: gray;
+    }
+
+    .Loader__spin {
+      width: 40px;
+      height: 40px;
+      border-width: 4px;
+    }
+  }
 }

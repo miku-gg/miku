@@ -6,9 +6,10 @@ import classNames from 'classnames'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import {
   backgroundInferenceStart,
+  backgroundInferenceUpdate,
   setModalOpened,
 } from '../../state/slices/creationSlice'
-import { Button, Loader, Modal } from '@mikugg/ui-kit'
+import { Button, Loader, Modal, Tooltip } from '@mikugg/ui-kit'
 import { GEN_BACKGROUND_COST } from '../scenarios/CreateScene'
 import { FaCoins } from 'react-icons/fa'
 import { sceneSuggestionsStart } from '../../state/slices/narrationSlice'
@@ -34,6 +35,8 @@ export default function SceneSuggestion() {
   useEffect(() => {
     if (shouldSuggestScenes) {
       setButtonOpened(true)
+    } else {
+      setButtonOpened(false)
     }
   }, [shouldSuggestScenes])
 
@@ -103,6 +106,22 @@ const SceneSuggestionModal = () => {
         prompt: sceneSuggestion.sdPrompt,
         apiEndpoint,
         servicesEndpoint,
+        forNewScene: true,
+      })
+    )
+  }
+
+  const handleCancelBackground = () => {
+    dispatch(
+      backgroundInferenceUpdate({
+        id: backgrounds[0]?.id,
+        forNewScene: false,
+      })
+    )
+    dispatch(
+      setModalOpened({
+        id: 'scene-suggestions',
+        opened: false,
       })
     )
   }
@@ -118,7 +137,7 @@ const SceneSuggestionModal = () => {
           })
         )
       }}
-      shouldCloseOnOverlayClick
+      shouldCloseOnOverlayClick={!fetchingScene}
     >
       <div className="SceneSuggestionModal">
         <div className="SceneSuggestionModal__header">
@@ -128,10 +147,25 @@ const SceneSuggestionModal = () => {
         <div className="SceneSuggestionModal__content">
           {fetchingScene ? (
             <div className="SceneSuggestionModal__loading">
+              <Loader />
               Generating background...
+              <i>It can take over 1 minute</i>
+              <Button
+                theme="transparent"
+                onClick={handleCancelBackground}
+                data-tooltip-id={`cancel-background-tooltip`}
+                data-tooltip-html={
+                  "The scene will generate anyways, but you won't move automatically there."
+                }
+                data-tooltip-varaint="light"
+              >
+                Cancel
+              </Button>
+              <Tooltip id="cancel-background-tooltip" place="top" />
             </div>
           ) : fetchingSuggestions && !suggestedScenes.length ? (
             <div className="SceneSuggestionModal__loading">
+              <Loader />
               Fetching suggestions...
             </div>
           ) : (

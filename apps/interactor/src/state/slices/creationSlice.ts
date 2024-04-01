@@ -45,11 +45,13 @@ interface CreationState {
   }
   inference: {
     fetching: boolean
+    lastBackgroundForNewSceneId?: string
     backgrounds: {
       id: string
       inferenceId?: string
       prompt: string
       queuePosition: number
+      forNewScene?: boolean
     }[]
   }
 }
@@ -212,12 +214,14 @@ export const creationSlice = createSlice({
         prompt: string
         apiEndpoint: string
         servicesEndpoint: string
+        forNewScene?: boolean
       }>
     ) => {
       state.inference.backgrounds.push({
         id: action.payload.id,
         prompt: action.payload.prompt,
         queuePosition: 0,
+        forNewScene: action.payload.forNewScene || false,
       })
       state.inference.fetching = true
     },
@@ -225,8 +229,9 @@ export const creationSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string
-        inferenceId: string
-        queuePosition: number
+        inferenceId?: string
+        queuePosition?: number
+        forNewScene?: boolean
       }>
     ) => {
       state.inference.backgrounds = state.inference.backgrounds.map(
@@ -234,8 +239,18 @@ export const creationSlice = createSlice({
           if (background.id === action.payload.id) {
             return {
               ...background,
-              queuePosition: action.payload.queuePosition,
-              inferenceId: action.payload.inferenceId,
+              queuePosition:
+                action.payload.queuePosition !== undefined
+                  ? action.payload.queuePosition
+                  : background.queuePosition,
+              inferenceId:
+                action.payload.inferenceId !== undefined
+                  ? action.payload.inferenceId
+                  : background.inferenceId,
+              forNewScene:
+                action.payload.forNewScene !== undefined
+                  ? action.payload.forNewScene
+                  : background.forNewScene,
             }
           }
           return background
@@ -269,11 +284,15 @@ export const creationSlice = createSlice({
         (background) => background.id !== action.payload.id
       )
       state.inference.fetching = false
+      state.inference.lastBackgroundForNewSceneId = background.forNewScene
+        ? background.id
+        : undefined
     },
     backgroundInferenceFailure: (state, action: PayloadAction<string>) => {
       state.inference.backgrounds = state.inference.backgrounds.filter(
         (background) => background.id !== action.payload
       )
+      state.inference.lastBackgroundForNewSceneId = undefined
     },
   },
 })
