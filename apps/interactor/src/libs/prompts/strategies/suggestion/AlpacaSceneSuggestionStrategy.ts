@@ -64,44 +64,44 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
       '  ACTION: Practice serving skills.\n' +
       '  PROBABILITY: 70%\n' +
       "  DESCRIPTION: *With the party fast approaching, {{user}} decides to test Nala's serving skills. She instructs Nala to practice carrying a tray of glasses filled with water, and to walk around the room without spilling any.*\n"
-    template +=
-      `### Input:\n` +
-      `Roxy = [Calm, Collected, Headstrong, Wise, Gentle, Intelligent, Rational, Clumsy, Slightly Reserved., Sleepy]` +
-      `Roxy's background = [Born to a demon Race of the Mirgurd Tribe, she was born without her race's special ability to communicate telepathically. Due to this, she was always an outcast, and felt very isolated at her home, despite her parents always being kind to her. Due to this isolation, she ended up running away from them to escape from that. After being an adventurer for a handful of years and attending a prestigious magic university, she became a traveling tutor to make ends meet.]` +
-      `Roxy's desire = [Roxy is always looking to improve herself. She will go through leaps and bounds to achieve something new, usually in the field of magic, and has been seen to work and push herself very far for the sake of others, with no need to compensation. She has a fantasy about being saved by a hero in a dungeon and falling in love with him.]` +
-      `Roxy's body = [Roxy has the appearance of a petite young girl and is short, and somewhat self conscious about it. She is 44 years old, and her race lives on average to about 200, making her rather young. She has pale skin, and long, water blue colored hair tied into two braids reaching below her waist. Her eyes are the same color and described to be sleepy looking. She usually wears a brown, white, and black magicians hat, and robe. Can often be seen carrying a large white and blue staff to amplify her water magic.]` +
-      `What Roxy Likes = [Teaching, Adventuring, Heroes, ]\nWhat Roxy Loves = [Magic, Learning, Sweets, Self Improvement]\nWhat Roxy hates = [Green peppers, superds, non sweetened alcohol, slavery, rape, bitter foods.]` +
-      `SCENE:\nAnon and Roxy are outside learning about magic.` +
-      `CONVERSATION:` +
-      `{{user}}: Oh, are you my teacher?\n
-    Roxy: "Yes, indeed. Your mother told me you were interested in learning some magic. I'm Roxy, your new tutor. It's nice to finally meet you."\n
-    *As I extend my hand forward for a polite greeting, I notice {{user}}'s hesitation. Perhaps {{user}} weren't expecting someone so young to be your instructor. Nevertheless, I maintain a calm demeanor and reassure {{user}} with a gentle smile.*\n
-    *My gaze lingers on {{user}}'s face, trying to gauge {{user}}'s thoughts and feelings. Despite my lack of telepathic abilities, I've learned to read people quite well over the years.*\n
-    {{user}}: *I look at her, being the same size as me, looks very young.* "nice to meet you, Roxy-sama, where should we start our lessons?"\n
-    Roxy: "Nice to meet you too. And please, there's no need for such formalities; simply calling me 'Roxy' would suffice. Now, regarding our first lesson, I believe starting with basic elemental magic would be ideal. Would you happen to have any preference among fire, earth, air, or water?"\n
-    *I glance around the area, spotting a few trees and bushes that would serve as perfect targets for practice. My fingers lightly tap against my staff, eager to begin the session.*\n
-    {{user}}: alright lest go to that forest\n
-    Roxy: "Excellent choice! The forest provides us with plenty of opportunities to learn and practice various spells. Plus, it's always more enjoyable to study amidst nature than within the confines of four walls."\n
-    *With a spring in my step, I follow closely behind {{user}}, taking in the fresh scents of the woods and listening to the harmony of chirping birds overhead. As we venture deeper into the forest, I can't help but feel invigorated by the energy surrounding us. This environment is truly conducive to honing one's magical skills.*\n
-    *Once we find a suitable clearing, I set down my bag and retrieve several items necessary for today's lesson: a collection of crystals, a small cauldron, and a worn-out spellbook filled with annotations and notes.*
-    `
-    template +=
-      '\n### Response:' +
-      '\nSCENE 1:\n' +
-      '  BACKGROUND: forest, trees, grenery, daylight, forest, 4k, trending in artstation\n' +
-      '  ACTION: Start practicing elemental magic.\n' +
-      '  PROBABILITY: 85%\n' +
-      '  DESCRIPTION: *Roxy takes out different types of crystals and explains their properties related to each element. She then demonstrates simple spells using these crystals, encouraging {{user}} to try casting them as well.*\n' +
-      'SCENE 2:\n' +
-      '  BACKGROUND: wonders, path, forest, 4k, road, bench\n' +
-      '  ACTION: Share stories while resting.\n' +
-      '  PROBABILITY: 60%\n' +
-      '  DESCRIPTION: *After practicing for a while, both Roxy and {{user}} take a break. During this time, Roxy shares tales of her own adventures and experiences as a traveling tutor, providing valuable insights and advice for {{user}}.*\n' +
-      'SCENE 3:\n' +
-      '  BACKGROUND: forest, dark, magical, mystical, afternoon, sunlight, digital art\n' +
-      '  ACTION: Encounter a magical creature.\n' +
-      '  PROBABILITY: 40%\n' +
-      '  DESCRIPTION: *While exploring the forest during their lesson, Roxy and {{user}} come across a mysterious magical creature. Roxy helps {{user}} approach and interact with the creature safely, teaching {{user}} about its unique abilities and characteristics.*\n'
+    // template +=
+    //   `### Input:\n` +
+    //   `Roxy = [Calm, Collected, Headstrong, Wise, Gentle, Intelligent, Rational, Clumsy, Slightly Reserved., Sleepy]` +
+    //   `Roxy's background = [Born to a demon Race of the Mirgurd Tribe, she was born without her race's special ability to communicate telepathically. Due to this, she was always an outcast, and felt very isolated at her home, despite her parents always being kind to her. Due to this isolation, she ended up running away from them to escape from that. After being an adventurer for a handful of years and attending a prestigious magic university, she became a traveling tutor to make ends meet.]` +
+    //   `Roxy's desire = [Roxy is always looking to improve herself. She will go through leaps and bounds to achieve something new, usually in the field of magic, and has been seen to work and push herself very far for the sake of others, with no need to compensation. She has a fantasy about being saved by a hero in a dungeon and falling in love with him.]` +
+    //   `Roxy's body = [Roxy has the appearance of a petite young girl and is short, and somewhat self conscious about it. She is 44 years old, and her race lives on average to about 200, making her rather young. She has pale skin, and long, water blue colored hair tied into two braids reaching below her waist. Her eyes are the same color and described to be sleepy looking. She usually wears a brown, white, and black magicians hat, and robe. Can often be seen carrying a large white and blue staff to amplify her water magic.]` +
+    //   `What Roxy Likes = [Teaching, Adventuring, Heroes, ]\nWhat Roxy Loves = [Magic, Learning, Sweets, Self Improvement]\nWhat Roxy hates = [Green peppers, superds, non sweetened alcohol, slavery, rape, bitter foods.]` +
+    //   `SCENE:\nAnon and Roxy are outside learning about magic.` +
+    //   `CONVERSATION:` +
+    //   `{{user}}: Oh, are you my teacher?\n
+    // Roxy: "Yes, indeed. Your mother told me you were interested in learning some magic. I'm Roxy, your new tutor. It's nice to finally meet you."\n
+    // *As I extend my hand forward for a polite greeting, I notice {{user}}'s hesitation. Perhaps {{user}} weren't expecting someone so young to be your instructor. Nevertheless, I maintain a calm demeanor and reassure {{user}} with a gentle smile.*\n
+    // *My gaze lingers on {{user}}'s face, trying to gauge {{user}}'s thoughts and feelings. Despite my lack of telepathic abilities, I've learned to read people quite well over the years.*\n
+    // {{user}}: *I look at her, being the same size as me, looks very young.* "nice to meet you, Roxy-sama, where should we start our lessons?"\n
+    // Roxy: "Nice to meet you too. And please, there's no need for such formalities; simply calling me 'Roxy' would suffice. Now, regarding our first lesson, I believe starting with basic elemental magic would be ideal. Would you happen to have any preference among fire, earth, air, or water?"\n
+    // *I glance around the area, spotting a few trees and bushes that would serve as perfect targets for practice. My fingers lightly tap against my staff, eager to begin the session.*\n
+    // {{user}}: alright lest go to that forest\n
+    // Roxy: "Excellent choice! The forest provides us with plenty of opportunities to learn and practice various spells. Plus, it's always more enjoyable to study amidst nature than within the confines of four walls."\n
+    // *With a spring in my step, I follow closely behind {{user}}, taking in the fresh scents of the woods and listening to the harmony of chirping birds overhead. As we venture deeper into the forest, I can't help but feel invigorated by the energy surrounding us. This environment is truly conducive to honing one's magical skills.*\n
+    // *Once we find a suitable clearing, I set down my bag and retrieve several items necessary for today's lesson: a collection of crystals, a small cauldron, and a worn-out spellbook filled with annotations and notes.*
+    // `
+    // template +=
+    //   '\n### Response:' +
+    //   '\nSCENE 1:\n' +
+    //   '  BACKGROUND: forest, trees, grenery, daylight, forest, 4k, trending in artstation\n' +
+    //   '  ACTION: Start practicing elemental magic.\n' +
+    //   '  PROBABILITY: 85%\n' +
+    //   '  DESCRIPTION: *Roxy takes out different types of crystals and explains their properties related to each element. She then demonstrates simple spells using these crystals, encouraging {{user}} to try casting them as well.*\n' +
+    //   'SCENE 2:\n' +
+    //   '  BACKGROUND: wonders, path, forest, 4k, road, bench\n' +
+    //   '  ACTION: Share stories while resting.\n' +
+    //   '  PROBABILITY: 60%\n' +
+    //   '  DESCRIPTION: *After practicing for a while, both Roxy and {{user}} take a break. During this time, Roxy shares tales of her own adventures and experiences as a traveling tutor, providing valuable insights and advice for {{user}}.*\n' +
+    //   'SCENE 3:\n' +
+    //   '  BACKGROUND: forest, dark, magical, mystical, afternoon, sunlight, digital art\n' +
+    //   '  ACTION: Encounter a magical creature.\n' +
+    //   '  PROBABILITY: 40%\n' +
+    //   '  DESCRIPTION: *While exploring the forest during their lesson, Roxy and {{user}} come across a mysterious magical creature. Roxy helps {{user}} approach and interact with the creature safely, teaching {{user}} about its unique abilities and characteristics.*\n'
     // SHOTS: END
 
     template += `\n### Input:\n`
