@@ -119,13 +119,13 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     template += `  BACKGROUND:{{GEN place_2 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`
     template += `  ACTION:{{GEN action_2 max_tokens=15 stop=["\\n", "\\""]}}"\n`
     template += `  PROBABILITY:{{GEN prob_2 max_tokens=3 stop=["\\n", "\\"", "%"]}}\n`
-    template += `  DESCRIPTION:{{GEN desc_2 max_tokens=100 stop=["\\n", "\\""]}}\n`
+    template += `  DESCRIPTION:{{GEN desc_2 max_tokens=150 stop=["\\n", "\\""]}}\n`
 
     template += `SCENE 3:\n`
     template += `  BACKGROUND:{{GEN place_3 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`
     template += `  ACTION:{{GEN action_3 max_tokens=15 stop=["\\n", "\\""]}}"\n`
     template += `  PROBABILITY:{{GEN prob_3 max_tokens=3 stop=["\\n", "\\"", "%"]}}\n`
-    template += `  DESCRIPTION:{{GEN desc_3 max_tokens=100 stop=["\\n", "\\""]}}\n`
+    template += `  DESCRIPTION:{{GEN desc_3 max_tokens=150 stop=["\\n", "\\""]}}\n`
 
     template = fillTextTemplate(template, {
       user: input.settings.user.name,
