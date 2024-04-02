@@ -55,58 +55,63 @@ const inferenceEffect = async (
 
     // calls /inferences/statuses every 5 seconds with setTimeout loop
     const checkStatus = async () => {
-      const status: AxiosResponse<
-        { status: InferenceStatus; inferenceId: string }[]
-      > = await axios.get(
-        `${apiEndpont}/inferences/statuses?inferenceIds[]=${inferenceId}`,
-        { withCredentials: true }
-      )
-      if (status.data.length === 0) {
-        throw new Error('Inference not found')
-      }
-      const inferenceStatus = status.data[0].status
-
-      if (inferenceStatus.status === 'done') {
-        try {
-          await axios.post(
-            `${apiEndpont}/inference/migrate-results-to-mikugg`,
-            {
-              inferenceId,
-            },
-            {
-              withCredentials: true,
-            }
-          )
-          await axios.post(
-            `${apiEndpont}/background`,
-            {
-              description: prompt,
-              sdPrompt: prompt,
-              asset: inferenceStatus.result[0],
-            },
-            {
-              withCredentials: true,
-            }
-          )
-        } catch (error) {
-          console.error(error)
+      try {
+        const status: AxiosResponse<
+          { status: InferenceStatus; inferenceId: string }[]
+        > = await axios.get(
+          `${apiEndpont}/inferences/statuses?inferenceIds[]=${inferenceId}`,
+          { withCredentials: true }
+        )
+        if (status.data.length === 0) {
+          throw new Error('Inference not found')
         }
-        dispatch(
-          backgroundInferenceEnd({
-            id,
-            result: inferenceStatus.result[0],
-            servicesEndpoint,
-          })
-        )
-      } else {
-        dispatch(
-          backgroundInferenceUpdate({
-            id,
-            inferenceId,
-            queuePosition: inferenceStatus.wait,
-          })
-        )
-        setTimeout(checkStatus, 1000)
+        const inferenceStatus = status.data[0].status
+
+        if (inferenceStatus.status === 'done') {
+          try {
+            await axios.post(
+              `${apiEndpont}/inference/migrate-results-to-mikugg`,
+              {
+                inferenceId,
+              },
+              {
+                withCredentials: true,
+              }
+            )
+            await axios.post(
+              `${apiEndpont}/background`,
+              {
+                description: prompt,
+                sdPrompt: prompt,
+                asset: inferenceStatus.result[0],
+              },
+              {
+                withCredentials: true,
+              }
+            )
+          } catch (e) {
+            console.error(e)
+          }
+          dispatch(
+            backgroundInferenceEnd({
+              id,
+              result: inferenceStatus.result[0],
+              servicesEndpoint,
+            })
+          )
+        } else {
+          dispatch(
+            backgroundInferenceUpdate({
+              id,
+              inferenceId,
+              queuePosition: inferenceStatus.wait,
+            })
+          )
+          setTimeout(checkStatus, 5000)
+        }
+      } catch (error) {
+        console.error(error)
+        setTimeout(checkStatus, 5000)
       }
     }
     setTimeout(checkStatus, 1000)
