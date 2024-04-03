@@ -10,6 +10,7 @@
   "scripts": {
     "build": "tsc",
     "demo": "ts-node demo/index.ts",
+    "demo-agent": "ts-node demo/agent.ts",
     "lint": "eslint . --ext .ts",
     "prepare": "npm run build",
     "test": "jest"
