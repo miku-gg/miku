@@ -16,7 +16,7 @@ import {
   selectAllParentDialogues,
 } from '../../../../state/selectors'
 
-const EMOTION_TOKEN_OFFSET = 4
+const PROMPT_TOKEN_OFFSET = 50
 
 export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
   {
@@ -84,7 +84,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     })
 
     const totalTokens =
-      this.countTokens(template) + maxNewTokens + EMOTION_TOKEN_OFFSET
+      this.countTokens(template) + maxNewTokens + PROMPT_TOKEN_OFFSET
 
     const parentEmotion =
       selectLastLoadedCharacters(input.state).find(
@@ -95,6 +95,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       template,
       variables: {
         scene_opt: [' Yes', ' No'],
+        cond_opt: Array.from({ length: 10 }, (_, i) => ' ' + i.toString()),
         emotions: emotions
           .filter((emotion) =>
             emotions.length > 1 ? emotion !== parentEmotion : true
@@ -133,8 +134,15 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       ({ characterId }) => characterId === input.currentCharacterId
     )
 
+    const currentScene = selectCurrentScene(input.state)
+    const conditionIndex = Number(variables.get('cond_opt')?.trim())
+    const nextScene = conditionIndex
+      ? currentScene?.children[conditionIndex]
+      : ''
+
     return {
       ...response,
+      nextScene,
       shouldSuggestScenes: variables.get('scene') === ' Yes',
       characters: [
         ...response.characters.slice(
@@ -248,6 +256,10 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       (char) => char.characterId === characterId
     )
     const scene = selectCurrentScene(state)
+    const childConditions = state.novel.scenes.filter(
+      (_scene) => scene?.children.includes(_scene.id) && !!_scene.condition
+    )
+
     // const background = state.novel.backgrounds.find(
     //   (bg) => bg.id === scene?.backgroundId
     // )
@@ -259,6 +271,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       })
       .concat(temp.stops.map((stop) => `"${stop}"`))
       .join(',')
+
     return (
       temp.askLine +
       `{{char}}'s reaction:${
@@ -267,9 +280,15 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
           : '{{SEL emotion options=emotions}}'
       }\n` +
       `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{user}}:",${charStops}]}}` +
-      `\n\n${temp.instruction}OOC: Did the characters changed scene in the last messages?` +
-      ` Answer with Yes or No` +
-      `\n${temp.response}Based on the last two messages:{{SEL scene options=scene_opt}}`
+      (childConditions.length
+        ? `\n${temp.instruction}OOC: Does any of the following condition met?\n` +
+          ` ${childConditions.map((scene, index) => {
+            return `COND ${index + 1}: ${scene.condition}\n`
+          })}Answer the most unique condition number or 0 in case of it didn't met any conditions.` +
+          `\n${temp.response}Response:{{SEL cond options=cond_opt}}`
+        : `\n${temp.instruction}OOC: Did the characters changed scene in the last messages?` +
+          ` Answer with Yes or No` +
+          `\n${temp.response}Based on the last two messages:{{SEL scene options=scene_opt}}`)
     )
   }
 

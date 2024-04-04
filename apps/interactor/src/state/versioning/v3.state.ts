@@ -26,6 +26,7 @@ export interface NarrationResponse {
   fetching: boolean
   parentInteractionId: string | null
   fetchingSuggestions?: boolean
+  nextScene?: string
   shouldSuggestScenes?: boolean
   suggestedScenes: NarrationSceneSuggestion[]
   selectedCharacterId: string | null
