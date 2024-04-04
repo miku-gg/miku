@@ -5,7 +5,7 @@ function replaceTemplate(template: string, key: string, value: string): string {
   return template.replace(regex, value);
 }
 
-interface AgentConfiguration<
+export interface AgentPromptConfiguration<
   // extends type array of constant strings
   AgentInputs extends string[],
   AgentOutputs extends string[]
@@ -28,11 +28,11 @@ interface AgentConfiguration<
   };
 }
 
-export class Agent<
+export class AgentPrompt<
   AgentInputs extends string[],
   AgentOutputs extends string[]
 > {
-  private configuration: AgentConfiguration<AgentInputs, AgentOutputs> & {
+  private configuration: AgentPromptConfiguration<AgentInputs, AgentOutputs> & {
     instructSettings: {
       system: string;
       instruction: string;
@@ -41,7 +41,9 @@ export class Agent<
     };
   };
 
-  constructor(configuration: AgentConfiguration<AgentInputs, AgentOutputs>) {
+  constructor(
+    configuration: AgentPromptConfiguration<AgentInputs, AgentOutputs>
+  ) {
     this.configuration = {
       ...configuration,
       instructSettings: {

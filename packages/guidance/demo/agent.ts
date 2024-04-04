@@ -1,6 +1,6 @@
-import { Agent } from "../src/lib/Agent";
+import { AgentPrompt } from "../src/lib/Agent";
 
-const agent = new Agent({
+const agent = new AgentPrompt({
   description:
     "You're a writing assistance that will suggest possible next characters for a story.",
   instruction:
