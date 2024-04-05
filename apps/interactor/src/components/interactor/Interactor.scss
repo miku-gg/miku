@@ -122,3 +122,14 @@
     transform: translateY(2px);
   }
 }
+
+@media (max-width: 768px) {
+  .Interactor {
+    box-shadow: unset;
+
+    &__main-image-container,
+    &__background-image {
+      border-radius: 0;
+    }
+  }
+}
