@@ -11,7 +11,7 @@ interface CharacterGenerationProps {
   characterID: string;
 }
 const SERVICES_ENDPOINT =
-  import.meta.env.VITE_SERVICES_ENDPOINT || "http://127.0.0.1:7100";
+  import.meta.env.VITE_SERVICES_ENDPOINT || "http://localhost:8484";
 
 export const CharacterGeneration = ({
   characterID,
@@ -36,9 +36,8 @@ export const CharacterGeneration = ({
       });
 
       for await (const result of stream) {
-        let prompt: string = "1";
-        prompt = Array.from(result.values()).join("");
-        console.log(prompt);
+        const prompt = Array.from(result.values()).join("");
+        console.log(prompt)
       }
     } catch (error) {
       console.error(error);
