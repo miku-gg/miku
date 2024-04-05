@@ -5,6 +5,7 @@ import { Agent, ModelType } from "../../libs/utils";
 import { updateCharacter } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 
+import { useState } from "react";
 import { closeModal } from "../../state/slices/inputSlice";
 import "./CharacterGeneration.scss";
 
@@ -17,6 +18,7 @@ const SERVICES_ENDPOINT =
 export const CharacterGeneration = ({
   characterID,
 }: CharacterGenerationProps) => {
+  const [isGeneration, setIsGeneration] = useState(false);
   const dispatch = useAppDispatch();
   const character = useAppSelector((state) =>
     state.novel.characters.find((c) => c.id === characterID)
@@ -34,18 +36,20 @@ export const CharacterGeneration = ({
       personality: "",
       body: "",
     };
-    newObj.description = `${character.name}' Description=${
+    newObj.description = `[${character.name}'s Description=${
       Object.values(obj)[0]
-    }`;
-    newObj.personality = `${character.name}' Personality=${
+    }]`;
+    newObj.personality = `[${character.name}'s Personality=${
       Object.values(obj)[1]
-    }`;
-    newObj.body = `${character.name}' Body=${Object.values(obj)[2]}`;
+    }]`;
+    newObj.body = `[${character.name}'s Body=${Object.values(obj)[2]}]`;
     return newObj;
   };
   const generatePrompt = async () => {
     try {
       let response = {};
+      setIsGeneration(true);
+
       const stream = textCompletion({
         template: Agent.generatePrompt({
           input_description: character.short_description,
@@ -69,12 +73,17 @@ export const CharacterGeneration = ({
             data: {
               ...character.card.data,
               description:
-                result.description + result.personality + result.body,
+                result.description +
+                "\n" +
+                result.personality +
+                "\n" +
+                result.body,
             },
           },
         })
       );
       dispatch(closeModal({ modalType: "characterGeneration" }));
+      setIsGeneration(false);
     } catch (error) {
       console.error(error);
     }
@@ -103,18 +112,24 @@ export const CharacterGeneration = ({
       </div>
       <div
         className={`CharacterGenerationModal__button ${
-          !character.short_description && "disabled"
+          !character.short_description || isGeneration === true
+            ? "disabled"
+            : ""
         }`}
       >
         <Button
-          theme={!character.short_description ? "primary" : "gradient"}
-          disabled={!character.short_description}
+          theme={
+            !character.short_description && isGeneration === true
+              ? "secondary"
+              : "gradient"
+          }
+          disabled={!character.short_description && !isGeneration}
           onClick={() => {
             generatePrompt();
           }}
         >
           <BsStars />
-          Generate
+          {isGeneration ? "Generating..." : "Generate"}
         </Button>
       </div>
     </div>
