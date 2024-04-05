@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 
 import { ToastContainer } from 'react-toastify'
@@ -29,10 +30,14 @@ function App(props: AppProps) {
     novelLoader: props.novelLoader,
   }
 
+  useEffect(() => {
+    document.body.classList.add('mobile-app')
+  }, [])
+
   return (
     <Provider store={store}>
       <AppProvider value={contextValue}>
-        <div className={`App${props.isMobileApp ? ' mobile-app' : ''}`}>
+        <div className="App">
           {/* eslint-disable-next-line */}
           {/*@ts-ignore */}
           <ToastContainer theme="dark" position="bottom-right" />

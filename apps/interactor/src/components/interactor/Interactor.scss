@@ -122,17 +122,3 @@
     transform: translateY(2px);
   }
 }
-
-@media (max-width: 400px) {
-  .mobile-app {
-    .Interactor {
-      box-shadow: unset;
-      border-radius: 0;
-
-      &__main-image-container,
-      &__background-image {
-        border-radius: 0;
-      }
-    }
-  }
-}

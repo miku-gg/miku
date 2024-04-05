@@ -98,19 +98,3 @@
     display: none !important;
   }
 }
-
-@media screen and (max-width: 400px) and (max-height: 667px) {
-  .mobile-app {
-    .InteractorHeader {
-      margin-top: 1.25rem;
-    }
-  }
-}
-
-@media screen and (max-width: 400px) and (min-height: 668px) {
-  .mobile-app {
-    .InteractorHeader {
-      margin-top: 2.5rem;
-    }
-  }
-}
