@@ -34,6 +34,28 @@
 
   &__description {
     margin-bottom: 20px;
+
+    &__label {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      font-weight: 500;
+
+      & button {
+        display: flex;
+        align-items: center;
+        gap: 0.1rem;
+        background: linear-gradient(90deg, #9747ff, transparent) #ff4e67;
+        border-radius: 0.5rem;
+        transition: ease-in-out 0.2s;
+
+        &:hover {
+          background-color: #9747ff;
+        }
+      }
+    }
   }
 
   &__personality {

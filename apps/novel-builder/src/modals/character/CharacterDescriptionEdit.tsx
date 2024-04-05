@@ -1,16 +1,18 @@
 import {
-  Container,
   DragAndDropImages,
   Input,
+  Modal,
   TagAutocomplete,
-  TextHeading,
 } from "@mikugg/ui-kit";
-import { checkFileType } from "../../libs/utils";
-import { useAppDispatch, useAppSelector } from "../../state/store";
-import config from "../../config";
+import { BsStars } from "react-icons/bs";
 import { toast } from "react-toastify";
+import config from "../../config";
+import { checkFileType } from "../../libs/utils";
+import { closeModal, openModal } from "../../state/slices/inputSlice";
 import { updateCharacter } from "../../state/slices/novelFormSlice";
+import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./CharacterDescriptionEdit.scss";
+import { CharacterGeneration } from "./CharacterGeneration";
 
 const DEFAULT_TAGS = [
   { value: "Male" },
@@ -46,6 +48,9 @@ export default function CharacterDescriptionEdit({
   if (!character || !characterId) {
     return null;
   }
+  const GenerateCharacterModal = useAppSelector(
+    (state) => state.input.modals.characterGeneration.opened
+  );
 
   const handleAvatarChange = async (file: File) => {
     if (file) {
@@ -232,9 +237,29 @@ export default function CharacterDescriptionEdit({
       </div>
 
       <div className="CharacterDescriptionEdit__description">
+        <div className="CharacterDescriptionEdit__description__label">
+          <label className="Input__label">Character Complete Description</label>
+          <button
+            className="Input__label"
+            onClick={() => {
+              dispatch(openModal({ modalType: "characterGeneration" }));
+            }}
+          >
+            <BsStars />
+            Generate
+          </button>
+          <Modal
+            opened={GenerateCharacterModal}
+            onCloseModal={() =>
+              dispatch(closeModal({ modalType: "characterGeneration" }))
+            }
+            className="CharacterEditModal CharacterDescriptionEdit__modal"
+          >
+            <CharacterGeneration characterID={characterId} />
+          </Modal>
+        </div>
         <Input
           isTextArea
-          label="Character Complete Description"
           placeHolder="Aqua is a beautiful goddess of water who is selfish and arrogant. Aqua often acts superior to others and looks down on those who worship other gods. Aqua does not miss an opportunity to boast about her status. Aqua is also a crybaby who easily breaks down in tears when things don't go her way. Aqua is not very smart or lucky, and often causes trouble for herself and her party with her poor decisions and actions. Aqua has a habit of spending all her money on alcohol and parties, leaving her in debt and unable to pay for basic necessities. Aqua also has a low work ethic and prefers to slack off or avoid doing any tasks that require effort or responsibility. Aqua acts very cowardly against tough monsters, often making up lame excuses on why she cannot fight. Aqua has a very negative opinion of the undead and demons and will be very cold and aggressive to them. Aqua is incapable of lying convincingly. Aqua has a kind heart and will help those in need, especially if they are her followers or friends. Aqua has a strong sense of justice and will fight against evil with her powerful water, healing, and purification magic. Aqua also has a playful and cheerful side, and enjoys having fun with her party and performing party tricks. Aqua is worshipped by the Axis Order in this world, who are generally considered by everyone as strange overbearing cultists. Aqua currently lives in the city of Axel, a place for beginner adventurers."
           id="description"
           name="description"
