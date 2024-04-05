@@ -1,22 +1,28 @@
 import React from 'react'
+
 import ReactDOM from 'react-dom/client'
-import App from './src/App'
-import { loadNovelFromSingleCard } from './src/libs/loadNovel'
-import './root.scss'
-import { initialState as initialSettingsState } from './src/state/slices/settingsSlice'
-import { initialState as initialCreationState } from './src/state/slices/creationSlice'
-import { RootState } from './src/state/store'
-import { VersionId } from './src/state/versioning'
-import { decodeText, uploadAsset } from '@mikugg/bot-utils'
-import queryString from 'query-string'
-import mergeWith from 'lodash.mergewith'
+
 import { toast } from 'react-toastify'
-import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
+import App from './src/App'
+
+import './root.scss'
+
+import { decodeText, uploadAsset } from '@mikugg/bot-utils'
+import mergeWith from 'lodash.mergewith'
+import queryString from 'query-string'
+
 import {
-  listSearch,
   BackgroundResult,
   CharacterResult,
+  listSearch,
 } from './src/libs/listSearch'
+import { loadNovelFromSingleCard } from './src/libs/loadNovel'
+
+import { initialState as initialCreationState } from './src/state/slices/creationSlice'
+import { initialState as initialSettingsState } from './src/state/slices/settingsSlice'
+import { RootState } from './src/state/store'
+import { VersionId } from './src/state/versioning'
+import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
 
 const ASSETS_ENDPOINT =
   import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets'
@@ -43,6 +49,7 @@ function getCongurationFromParams(): {
   disabled: boolean
   freeTTS: boolean
   freeSmart: boolean
+  isMobileApp: boolean
   cardId: string
   narrationId: string
   backgroundSearchEndpoint: string
@@ -60,6 +67,8 @@ function getCongurationFromParams(): {
   const production = queryParams.production === 'true'
   const disabled = queryParams.disabled === 'true'
   const configuration = queryParams.configuration as string
+  const isMobileApp = queryParams.isMobileApp === 'true'
+
   try {
     const configurationJson = JSON.parse(decodeText(configuration)) as {
       characterSearchEndpoint: string
@@ -73,9 +82,11 @@ function getCongurationFromParams(): {
       freeSmart: boolean
       settings?: RootState['settings']
     }
+
     return {
       production,
       disabled,
+      isMobileApp,
       freeTTS: configurationJson.freeTTS || false,
       freeSmart: configurationJson.freeSmart || false,
       cardId: cardId || CARD_ID,
@@ -99,6 +110,7 @@ function getCongurationFromParams(): {
   } catch (e) {
     return {
       production,
+      isMobileApp,
       disabled,
       freeTTS: false,
       freeSmart: false,
@@ -192,6 +204,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       apiEndpoint={params.apiEndpoint}
       cardEndpoint={params.cardEndpoint}
       freeSmart={params.freeSmart}
+      isMobileApp={params.isMobileApp}
       freeTTS={params.freeTTS}
       novelLoader={loadNarration}
       assetUploader={(file: File) =>
