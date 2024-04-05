@@ -5,6 +5,7 @@ import { Agent, ModelType } from "../../libs/utils";
 import { updateCharacter } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 
+import { closeModal } from "../../state/slices/inputSlice";
 import "./CharacterGeneration.scss";
 
 interface CharacterGenerationProps {
@@ -23,8 +24,28 @@ export const CharacterGeneration = ({
   if (!character || !characterID) {
     return null;
   }
+  const convertStreamToObject = (obj: { [k: string]: string }) => {
+    const newObj: {
+      description: string;
+      personality: string;
+      body: string;
+    } = {
+      description: "",
+      personality: "",
+      body: "",
+    };
+    newObj.description = `${character.name}' Description=${
+      Object.values(obj)[0]
+    }`;
+    newObj.personality = `${character.name}' Personality=${
+      Object.values(obj)[1]
+    }`;
+    newObj.body = `${character.name}' Body=${Object.values(obj)[2]}`;
+    return newObj;
+  };
   const generatePrompt = async () => {
     try {
+      let response = {};
       const stream = textCompletion({
         template: Agent.generatePrompt({
           input_description: character.short_description,
@@ -32,13 +53,28 @@ export const CharacterGeneration = ({
         model: ModelType.RP,
         variables: {},
         serviceBaseUrl: SERVICES_ENDPOINT,
-        identifier: "",
+        identifier: character.name + "-" + characterID,
       });
 
       for await (const result of stream) {
-        const prompt = Array.from(result.values()).join("");
-        console.log(prompt)
+        const resultObject = Object.fromEntries(result);
+        response = resultObject;
       }
+      const result = convertStreamToObject(response);
+      dispatch(
+        updateCharacter({
+          ...character,
+          card: {
+            ...character.card,
+            data: {
+              ...character.card.data,
+              description:
+                result.description + result.personality + result.body,
+            },
+          },
+        })
+      );
+      dispatch(closeModal({ modalType: "characterGeneration" }));
     } catch (error) {
       console.error(error);
     }
