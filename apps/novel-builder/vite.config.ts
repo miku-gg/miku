@@ -1,6 +1,6 @@
+import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
 import plainText from "vite-plugin-plain-text";
 
 // https://vitejs.dev/config/
@@ -13,7 +13,7 @@ export default defineConfig({
     setImmediate: "setTimeout.bind(null)",
   },
   optimizeDeps: {
-    include: ["@mikugg/bot-utils", "@mikugg/ui-kit"],
+    include: ["@mikugg/bot-utils", "@mikugg/ui-kit", "@mikugg/guidance"],
   },
   build: {
     commonjsOptions: {
