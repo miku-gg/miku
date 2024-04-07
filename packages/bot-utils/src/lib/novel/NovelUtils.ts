@@ -25,7 +25,8 @@ export const tavernCardToMikuCardV2 = (
 };
 
 export const tavernCardToNovelState = (
-  card: TavernCardV2
+  card: TavernCardV2,
+  defaultCharacterId: string = randomString()
 ): NovelV3.NovelState => {
   let oldMikuCard: MikuCard | null = null;
   let cardV2: MikuCardV2 | null = null;
@@ -42,8 +43,6 @@ export const tavernCardToNovelState = (
 
   const mikugg = oldMikuCard?.data.extensions.mikugg;
   const mikugg_v2 = cardV2?.data.extensions.mikugg_v2;
-
-  const defaultCharacterId = randomString();
 
   return {
     author: cardV2.data.creator,
