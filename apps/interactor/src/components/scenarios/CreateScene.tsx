@@ -508,9 +508,8 @@ const SearchCharacterModal = () => {
     />
   )
 }
-
 const CreateSceneBackgroundModal = () => {
-  const { assetLinkLoader } = useAppContext()
+  const { assetLinkLoader, isMobileApp } = useAppContext()
 
   const dispatch = useAppDispatch()
 
@@ -630,20 +629,22 @@ const CreateSceneBackgroundModal = () => {
               }}
             />
           </div>
-          <div
-            className="CreateScene__selector__item CreateScene__selector__item--upload"
-            onClick={() => {
-              dispatch(
-                setModalOpened({
-                  id: 'background-gen',
-                  opened: true,
-                })
-              )
-            }}
-          >
-            <BsStars />
-            <p>Generate</p>
-          </div>
+          {!isMobileApp && (
+            <div
+              className="CreateScene__selector__item CreateScene__selector__item--upload"
+              onClick={() => {
+                dispatch(
+                  setModalOpened({
+                    id: 'background-gen',
+                    opened: true,
+                  })
+                )
+              }}
+            >
+              <BsStars />
+              <p>Generate</p>
+            </div>
+          )}
         </div>
       </div>
     </Modal>
