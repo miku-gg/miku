@@ -4,10 +4,17 @@ import {
   Modal,
   TagAutocomplete,
 } from "@mikugg/ui-kit";
+import { useState } from "react";
 import { BsStars } from "react-icons/bs";
 import { toast } from "react-toastify";
 import config from "../../config";
-import { checkFileType } from "../../libs/utils";
+import textCompletion from "../../libs/textCompletion";
+import {
+  ModelType,
+  SERVICES_ENDPOINT,
+  checkFileType,
+  conversationAgent,
+} from "../../libs/utils";
 import { closeModal, openModal } from "../../state/slices/inputSlice";
 import { updateCharacter } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
@@ -41,6 +48,8 @@ export default function CharacterDescriptionEdit({
 }: {
   characterId?: string;
 }) {
+  const [isGeneration, setIsGeneration] = useState(false);
+
   const dispatch = useAppDispatch();
   const character = useAppSelector((state) =>
     state.novel.characters.find((c) => c.id === characterId)
@@ -66,6 +75,46 @@ export default function CharacterDescriptionEdit({
         toast.error("Error uploading the image");
         console.error(e);
       }
+    }
+  };
+
+  // prompt generation
+
+  const generatePrompt = async () => {
+    try {
+      let response = "";
+      setIsGeneration(true);
+
+      const stream = textCompletion({
+        template: conversationAgent.generatePrompt({
+          input_description: character.card.data.description,
+        }),
+        model: ModelType.RP,
+        variables: {},
+        serviceBaseUrl: SERVICES_ENDPOINT,
+        identifier: character.name + "-" + character.id,
+      });
+
+      for await (const result of stream) {
+        const resultObject = Object.fromEntries(result);
+        response = `${resultObject}`;
+        console.log(response);
+      }
+      // dispatch(
+      //   updateCharacter({
+      //     ...character,
+      //     card: {
+      //       ...character.card,
+      //       data: {
+      //         ...character.card.data,
+      //         mes_example: response
+      //       },
+      //     },
+      //   })
+      // );
+      setIsGeneration(false);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -307,9 +356,22 @@ export default function CharacterDescriptionEdit({
         />
       </div>
       <div className="CharacterDescriptionEdit__examples">
+        <div className="CharacterDescriptionEdit__examples__label">
+          <label className="Input__label">
+            Character Reference Conversation
+          </label>
+          <button
+            className="Input__label"
+            onClick={() => {
+              generatePrompt();
+            }}
+          >
+            <BsStars />
+            Generate
+          </button>
+        </div>
         <Input
           isTextArea
-          label="Reference Conversations"
           description="Reference conversations that the AI will use to generate responses."
           placeHolder={`<START>\n'Aqua: "You there! You look like you know what's what. What sect are you from?"\nAnon: "I’m not really religious, but I guess I respect all the gods?"\nAqua: "All the gods? Don't you know that there's only one god who deserves your respect and worship, Aqua? I'm the most beautiful, powerful, and benevolent being in this world! I can knock out giant toads in one hit and perform the most amazing party tricks known to mankind! Did I mention how amazing I am?"\nAnon: "Huh...? Wait a minute... You're an Axis Order cultist. Everyone knows you're all weirdos... And isn't it terrible to pretend to be a god?"\nAqua: "What? Weirdos?! That's a lie spread by jealous people! Me and my followers are perfect in every way! How dare you insult me! And I'm not pretending!!"\nAnon: "Hey, calm down. I'm just telling you what I heard."\nAqua: "No, you're wrong! You're so wrong that it hurts my ears! You need to repent and join the Axis Order right now! Or else you'll face my wrath!"\nAnon: "We're brand-new adventurers who don’t even have any decent gear. What kind of 'allies' would join our party?"\nAqua: "Did you forget that I'M here? When word gets out we want party members, they'll come. I am an Arch-priest, you know—an advanced class! I can use all kinds of healing magic; I can cure paralysis and poisoning, even revive the dead! What party wouldn't want me? I’m the great Aqua, aren't I? Pretty soon they'll be knocking at our door. 'Please let us join you!' they'll say. Get it?!"\nAnon: "I want some cash..."\nAqua: "So does everybody. Myself included, of course! ...Think about it. Isn't this completely pathetic? Let’s say I— a goddess, remember!—was willing to live in a stable for the rest of my life; why would you let me? Wouldn't you be ashamed to do that? If you understand, then make with the goods! Baby me!"'`}
           id={`mes_example`}

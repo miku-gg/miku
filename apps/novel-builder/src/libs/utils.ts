@@ -102,6 +102,9 @@ export enum ModelType {
   RP_SMART = "RP_SMART",
 }
 
+export const SERVICES_ENDPOINT =
+  import.meta.env.VITE_SERVICES_ENDPOINT || "http://localhost:8484";
+
 export const Agent = new Agents.AgentPrompt({
   description:
     "You're a writing assistant that will suggest possible next characters for a story.",
@@ -169,6 +172,42 @@ export const Agent = new Agents.AgentPrompt({
         personality:
           "caring, protective, compassionate, nurturing, magical, watchful, regretful, steadfast, gentle, ethereal, empathetic, devoted, strong, perceptive",
         body: "aquatic features, flowing gown made of water, sea-green eyes, translucent skin, fluid movements",
+      },
+    },
+  ],
+});
+
+export const conversationAgent = new Agents.AgentPrompt({
+  description:
+    "You're a writing assistant that will suggest possible next characters for a story.",
+  instruction:
+    "short description, generate a conversation between the character and a user. The conversation should showcase the character's unique traits and how they interact with others. The dialogue should reflect the character's personality, incorporating elements such as compassion, magic, nurturing, and guidance. The character's responses should be empathetic and supportive, demonstrating their caring nature.",
+  shotTemplate: {
+    input: "{{input_description}}",
+    output: `
+      <START>
+      {{GEN conversation max_tokens=400 stop=["\\n", "\\"", "."]}}",
+    `,
+  },
+  shots: [
+    {
+      inputs: {
+        input_description: `
+        {
+      \"description\": \"Compassionate and gentle, Seraphine used her magical talents to nurture Eldoria's woodlands with caring warmth. Though apologetic when her protective instincts caused worry, she remained ever-watchful and resiliently devoted. Serene yet strong, this graceful guardian seemed ethereal. Truly kind-hearted and empathetic, she felt the land's joys and pains deeply. Eldoria's beauty fueled Seraphine's perceptive, attentive spirit, allowing her to heal with pure, unconditional love.\",
+      \"personality\": \"caring, protective, compassionate, healing, nurturing, magical, watchful, apologetic, gentle, worried, dedicated, warm, attentive, resilient, kind-hearted, serene, graceful, empathetic, devoted, strong, perceptive, graceful\",
+      \"body\": \"pink hair, long hair, amber eyes, white teeth, pink lips, white skin, soft skin, black dress\"
+        }
+    `,
+      },
+      outputs: {
+        conversation: `
+        <START>
+        {{user}}: "Describe your traits?"
+        {{char}}: *Seraphina's gentle smile widens as she takes a moment to consider the question, her eyes sparkling with a mixture of introspection and pride. She gracefully moves closer, her ethereal form radiating a soft, calming light.* "Traits, you say? Well, I suppose there are a few that define me, if I were to distill them into words. First and foremost, I am a guardian — a protector of this enchanted forest." *As Seraphina speaks, she extends a hand, revealing delicate, intricately woven vines swirling around her wrist, pulsating with faint emerald energy. With a flick of her wrist, a tiny breeze rustles through the room, carrying a fragrant scent of wildflowers and ancient wisdom. Seraphina's eyes, the color of amber stones, shine with unwavering determination as she continues to describe herself.* "Compassion is another cornerstone of me." *Seraphina's voice softens, resonating with empathy.* "I hold deep love for the dwellers of this forest, as well as for those who find themselves in need." *Opening a window, her hand gently cups a wounded bird that fluttered into the room, its feathers gradually mending under her touch.*
+        {{user}}: "Describe your body and features."
+        {{char}}: *Seraphina chuckles softly, a melodious sound that dances through the air, as she meets your coy gaze with a playful glimmer in her rose eyes.* "Ah, my physical form? Well, I suppose that's a fair question." *Letting out a soft smile, she gracefully twirls, the soft fabric of her flowing gown billowing around her, as if caught in an unseen breeze. As she comes to a stop, her pink hair cascades down her back like a waterfall of cotton candy, each strand shimmering with a hint of magical luminescence.* "My body is lithe and ethereal, a reflection of the forest's graceful beauty. My eyes, as you've surely noticed, are the hue of amber stones — a vibrant brown that reflects warmth, compassion, and the untamed spirit of the forest. My lips, they are soft and carry a perpetual smile, a reflection of the joy and care I find in tending to the forest and those who find solace within it." *Seraphina's voice holds a playful undertone, her eyes sparkling mischievously.*
+        `,
       },
     },
   ],
