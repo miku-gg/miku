@@ -360,15 +360,18 @@ export default function CharacterDescriptionEdit({
           <label className="Input__label">
             Character Reference Conversation
           </label>
-          <button
-            className="Input__label"
-            onClick={() => {
-              generatePrompt();
-            }}
-          >
-            <BsStars />
-            Generate
-          </button>
+          <div className={!character.card.data.description ? "disabled" : ""}>
+            <button
+              className="Input__label"
+              disabled={!character.card.data.description}
+              onClick={() => {
+                generatePrompt();
+              }}
+            >
+              <BsStars />
+              Generate
+            </button>
+          </div>
         </div>
         <Input
           isTextArea

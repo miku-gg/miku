@@ -15,15 +15,16 @@
     display: flex;
     justify-content: flex-end;
   }
-
-  .disabled {
-    & button {
+}
+.disabled {
+  & button {
+    background-color: #808080;
+    background: #808080;
+    color: #515050;
+    border-color: #515050;
+    cursor: default;
+    &:hover {
       background-color: #808080;
-      color: #515050;
-      border-color: #515050;
-      &:hover {
-        background-color: #808080;
-      }
     }
   }
 }
