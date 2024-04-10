@@ -80,8 +80,10 @@ export default function CharacterDescriptionEdit({
 
   // prompt generation
   const replaceTags = (inputString: string) => {
-    let formattedString = inputString.replace(/"user"/g, '"{{user}}"');
-    formattedString = formattedString.replace(/"char"/g, '"{{char}}"');
+    let formattedString = inputString.replace(/\n\s*/g, "\n");
+    formattedString = inputString.replace(/"user"/g, "{{user}}");
+    formattedString = formattedString.replace(/"char"/g, "{{char}}");
+    formattedString = formattedString.replace(/"char1"/g, "{{char}}");
     return formattedString;
   };
 
