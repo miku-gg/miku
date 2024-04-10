@@ -54,12 +54,12 @@ export default function CharacterDescriptionEdit({
   const character = useAppSelector((state) =>
     state.novel.characters.find((c) => c.id === characterId)
   );
-  if (!character || !characterId) {
-    return null;
-  }
   const GenerateCharacterModal = useAppSelector(
     (state) => state.input.modals.characterGeneration.opened
   );
+  if (!character || !characterId) {
+    return null;
+  }
 
   const handleAvatarChange = async (file: File) => {
     if (file) {
