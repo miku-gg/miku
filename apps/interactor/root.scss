@@ -1,2 +1,82 @@
 body {
 }
+
+@media screen and (max-width: 400px) and (max-height: 667px) {
+  .mobile-app {
+    .InteractorHeader {
+      margin-top: 1.25rem;
+    }
+
+    .SceneSelector__list-container {
+      margin-top: 0.625rem;
+    }
+
+    .SlidePanel__close-btn {
+      top: 2.15rem;
+    }
+
+    .History__modal-container {
+      h2 {
+        margin-left: 1.5rem;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 400px) and (min-height: 668px) {
+  .mobile-app {
+    .InteractorHeader {
+      margin-top: 2.5rem;
+    }
+
+    .SlidePanel__close-btn {
+      top: 3.5rem;
+    }
+
+    .SceneSelector__list-container {
+      margin-top: 2rem;
+    }
+
+    .History__modal-container {
+      top: 2.3rem !important;
+
+      h2 {
+        margin-left: 1.75rem;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .mobile-app {
+    .Interactor {
+      box-shadow: unset;
+      border-radius: 0;
+
+      &__main-image-container,
+      &__background-image {
+        border-radius: 0;
+      }
+    }
+
+    .SlidePanel__close-btn {
+      width: 32px;
+      height: 32px;
+    }
+
+    .SettingsModal {
+      &__title {
+        margin-left: 1.75rem;
+      }
+
+      &__navigation {
+        margin-left: 1.5rem;
+      }
+    }
+
+    .CreateScene__form,
+    .SceneSuggestionModal {
+      margin-left: 2rem;
+    }
+  }
+}

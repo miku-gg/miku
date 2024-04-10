@@ -1,11 +1,14 @@
 import { createContext, useContext } from 'react'
+
 import { RootState } from './state/store'
+
 import { BackgroundResult, CharacterResult } from './libs/listSearch'
 
 export interface AppProps {
   isProduction: boolean
   isInteractionDisabled: boolean
   apiEndpoint: string
+  isMobileApp: boolean
   cardEndpoint: string
   servicesEndpoint: string
   freeTTS: boolean
@@ -33,6 +36,7 @@ const AppContext = createContext<AppProps>({
   isInteractionDisabled: false,
   apiEndpoint: '',
   cardEndpoint: '',
+  isMobileApp: false,
   servicesEndpoint: '',
   freeTTS: false,
   freeSmart: false,
