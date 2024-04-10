@@ -31,7 +31,9 @@ function App(props: AppProps) {
   }
 
   useEffect(() => {
-    document.body.classList.add('mobile-app')
+    if (props.isMobileApp) {
+      document.body.classList.add('mobile-app')
+    }
   }, [])
 
   return (
