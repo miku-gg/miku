@@ -79,11 +79,16 @@ export default function CharacterDescriptionEdit({
   };
 
   // prompt generation
+  const replaceTags = (inputString: string) => {
+    let formattedString = inputString.replace(/"user"/g, '"{{user}}"');
+    formattedString = formattedString.replace(/"char"/g, '"{{char}}"');
+    return formattedString;
+  };
 
   const generatePrompt = async () => {
     try {
-      let response = "";
       setIsGeneration(true);
+      let response = "";
 
       const stream = textCompletion({
         template: conversationAgent.generatePrompt({
@@ -97,21 +102,20 @@ export default function CharacterDescriptionEdit({
 
       for await (const result of stream) {
         const resultObject = Object.fromEntries(result);
-        response = `${resultObject}`;
-        console.log(response);
+        response = Object.values(resultObject)[0];
       }
-      // dispatch(
-      //   updateCharacter({
-      //     ...character,
-      //     card: {
-      //       ...character.card,
-      //       data: {
-      //         ...character.card.data,
-      //         mes_example: response
-      //       },
-      //     },
-      //   })
-      // );
+      dispatch(
+        updateCharacter({
+          ...character,
+          card: {
+            ...character.card,
+            data: {
+              ...character.card.data,
+              mes_example: replaceTags(response),
+            },
+          },
+        })
+      );
       setIsGeneration(false);
     } catch (error) {
       console.error(error);
@@ -360,16 +364,24 @@ export default function CharacterDescriptionEdit({
           <label className="Input__label">
             Character Reference Conversation
           </label>
-          <div className={!character.card.data.description ? "disabled" : ""}>
+          <div
+            className={
+              !character.card.data.description || isGeneration === true
+                ? "disabled"
+                : ""
+            }
+          >
             <button
               className="Input__label"
-              disabled={!character.card.data.description}
+              disabled={
+                !character.card.data.description || isGeneration === true
+              }
               onClick={() => {
                 generatePrompt();
               }}
             >
               <BsStars />
-              Generate
+              {isGeneration ? "Generating..." : "Generate"}
             </button>
           </div>
         </div>

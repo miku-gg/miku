@@ -112,18 +112,18 @@ export const CharacterGeneration = ({
       </div>
       <div
         className={`CharacterGenerationModal__button ${
-          !character.short_description || isGeneration === true
+          !character.short_description || isGeneration
             ? "disabled"
             : ""
         }`}
       >
         <Button
           theme={
-            !character.short_description && isGeneration === true
-              ? "secondary"
+            !character.short_description || isGeneration
+              ? "primary"
               : "gradient"
           }
-          disabled={!character.short_description && !isGeneration}
+          disabled={!character.short_description || isGeneration}
           onClick={() => {
             generatePrompt();
           }}
