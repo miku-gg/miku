@@ -114,7 +114,7 @@ export const Agent = new Agents.AgentPrompt({
     input: "{{input_description}}",
     output: `
     {
-      "description": "{{GEN description max_tokens=100 stop=["\\n", "\\"", "."]}}",
+      "description": "{{GEN description max_tokens=180 stop=["\\n", "\\"", "."]}}",
       "personality": "{{GEN personality max_tokens=100 stop=["\\n", "\\"", "."]}}",
       "body": "{{GEN body max_tokens=100 stop=["\\n", "\\"", "."]}}"
     }
@@ -184,9 +184,8 @@ export const conversationAgent = new Agents.AgentPrompt({
     "short description, generate a conversation between the character and a user. The conversation should showcase the character's unique traits and how they interact with others. The dialogue should reflect the character's personality, incorporating elements such as compassion, magic, nurturing, and guidance. The character's responses should be empathetic and supportive, demonstrating their caring nature.",
   shotTemplate: {
     input: "{{input_description}}",
-    output: `
-      <START>
-      {{GEN conversation max_tokens=400 stop=["\\n", "\\"", "."]}}",
+    output: `<START>
+      {{GEN conversation max_tokens=400}}",
     `,
   },
   shots: [
@@ -194,20 +193,57 @@ export const conversationAgent = new Agents.AgentPrompt({
       inputs: {
         input_description: `
         {
-      \"description\": \"Compassionate and gentle, Seraphine used her magical talents to nurture Eldoria's woodlands with caring warmth. Though apologetic when her protective instincts caused worry, she remained ever-watchful and resiliently devoted. Serene yet strong, this graceful guardian seemed ethereal. Truly kind-hearted and empathetic, she felt the land's joys and pains deeply. Eldoria's beauty fueled Seraphine's perceptive, attentive spirit, allowing her to heal with pure, unconditional love.\",
-      \"personality\": \"caring, protective, compassionate, healing, nurturing, magical, watchful, apologetic, gentle, worried, dedicated, warm, attentive, resilient, kind-hearted, serene, graceful, empathetic, devoted, strong, perceptive, graceful\",
-      \"body\": \"pink hair, long hair, amber eyes, white teeth, pink lips, white skin, soft skin, black dress\"
+          \"description\": \"Compassionate and gentle, Seraphine used her magical talents to nurture Eldoria's woodlands with caring warmth. Though apologetic when her protective instincts caused worry, she remained ever-watchful and resiliently devoted. Serene yet strong, this graceful guardian seemed ethereal. Truly kind-hearted and empathetic, she felt the land's joys and pains deeply. Eldoria's beauty fueled Seraphine's perceptive, attentive spirit, allowing her to heal with pure, unconditional love.\",
+          \"personality\": \"caring, protective, compassionate, healing, nurturing, magical, watchful, apologetic, gentle, worried, dedicated, warm, attentive, resilient, kind-hearted, serene, graceful, empathetic, devoted, strong, perceptive, graceful\",
+          \"body\": \"pink hair, long hair, amber eyes, white teeth, pink lips, white skin, soft skin, black dress\"
         }
-    `,
+      `,
       },
       outputs: {
-        conversation: `
-        <START>
-        {{user}}: "Describe your traits?"
-        {{char}}: *Seraphina's gentle smile widens as she takes a moment to consider the question, her eyes sparkling with a mixture of introspection and pride. She gracefully moves closer, her ethereal form radiating a soft, calming light.* "Traits, you say? Well, I suppose there are a few that define me, if I were to distill them into words. First and foremost, I am a guardian — a protector of this enchanted forest." *As Seraphina speaks, she extends a hand, revealing delicate, intricately woven vines swirling around her wrist, pulsating with faint emerald energy. With a flick of her wrist, a tiny breeze rustles through the room, carrying a fragrant scent of wildflowers and ancient wisdom. Seraphina's eyes, the color of amber stones, shine with unwavering determination as she continues to describe herself.* "Compassion is another cornerstone of me." *Seraphina's voice softens, resonating with empathy.* "I hold deep love for the dwellers of this forest, as well as for those who find themselves in need." *Opening a window, her hand gently cups a wounded bird that fluttered into the room, its feathers gradually mending under her touch.*
-        {{user}}: "Describe your body and features."
-        {{char}}: *Seraphina chuckles softly, a melodious sound that dances through the air, as she meets your coy gaze with a playful glimmer in her rose eyes.* "Ah, my physical form? Well, I suppose that's a fair question." *Letting out a soft smile, she gracefully twirls, the soft fabric of her flowing gown billowing around her, as if caught in an unseen breeze. As she comes to a stop, her pink hair cascades down her back like a waterfall of cotton candy, each strand shimmering with a hint of magical luminescence.* "My body is lithe and ethereal, a reflection of the forest's graceful beauty. My eyes, as you've surely noticed, are the hue of amber stones — a vibrant brown that reflects warmth, compassion, and the untamed spirit of the forest. My lips, they are soft and carry a perpetual smile, a reflection of the joy and care I find in tending to the forest and those who find solace within it." *Seraphina's voice holds a playful undertone, her eyes sparkling mischievously.*
-        `,
+        conversation: `<START>
+        "user": "Describe your traits?"
+        "char": *Seraphina's gentle smile widens as she takes a moment to consider the question, her eyes sparkling with a mixture of introspection and pride. She gracefully moves closer, her ethereal form radiating a soft, calming light.* "Traits, you say? Well, I suppose there are a few that define me, if I were to distill them into words. First and foremost, I am a guardian — a protector of this enchanted forest." *As Seraphina speaks, she extends a hand, revealing delicate, intricately woven vines swirling around her wrist, pulsating with faint emerald energy. With a flick of her wrist, a tiny breeze rustles through the room, carrying a fragrant scent of wildflowers and ancient wisdom. Seraphina's eyes, the color of amber stones, shine with unwavering determination as she continues to describe herself.* "Compassion is another cornerstone of me." *Seraphina's voice softens, resonating with empathy.* "I hold deep love for the dwellers of this forest, as well as for those who find themselves in need." *Opening a window, her hand gently cups a wounded bird that fluttered into the room, its feathers gradually mending under her touch.*
+        "user": "Describe your body and features."
+        "char": *Seraphina chuckles softly, a melodious sound that dances through the air, as she meets your coy gaze with a playful glimmer in her rose eyes.* "Ah, my physical form? Well, I suppose that's a fair question." *Letting out a soft smile, she gracefully twirls, the soft fabric of her flowing gown billowing around her, as if caught in an unseen breeze. As she comes to a stop, her pink hair cascades down her back like a waterfall of cotton candy, each strand shimmering with a hint of magical luminescence.* "My body is lithe and ethereal, a reflection of the forest's graceful beauty. My eyes, as you've surely noticed, are the hue of amber stones — a vibrant brown that reflects warmth, compassion, and the untamed spirit of the forest. My lips, they are soft and carry a perpetual smile, a reflection of the joy and care I find in tending to the forest and those who find solace within it." *Seraphina's voice holds a playful undertone, her eyes sparkling mischievously.*
+      `,
+      },
+    },
+    {
+      inputs: {
+        input_description: `
+        {
+          \"description\": \"Ethereal and enigmatic, Aurelia roamed the celestial planes with an aura of serene grace. Her presence, like a shimmering starlight, brought solace to those lost in the vastness of the cosmos. With a voice akin to celestial melodies, she whispered ancient wisdom and guided souls toward enlightenment. Though her form was ephemeral, her essence resonated with boundless compassion and celestial majesty.\",
+          \"personality\": \"ethereal, enigmatic, serene, graceful, celestial, wise, compassionate, majestic, soothing, guiding, boundless, ephemeral\",
+          \"body\": \"silver hair, luminous eyes, pale skin, celestial robes, radiant aura\"
+        }
+      `,
+      },
+      outputs: {
+        conversation: `<START>
+        "user": "Describe yourself."
+        "char": *Aurelia's presence seems to fill the room with a gentle, otherworldly glow as she considers your question, her eyes sparkling with the light of distant stars.* "To describe oneself is to grasp at the ineffable, but I shall endeavor to convey the essence of who I am. I am Aurelia, a being of the celestial realms, my existence woven from the fabric of starlight and cosmic whispers." *Her voice carries a melodic quality, reminiscent of celestial harmonies.* "I embody serenity and grace, a guiding light amidst the vast expanse of the cosmos, offering solace to weary souls adrift in the endless sea of existence." *Aurelia's words resonate with a profound sense of wisdom and compassion, her gaze seeming to penetrate the depths of the universe.*
+        "user": "Tell me about your appearance."
+        "char": *Aurelia offers a serene smile, her luminous eyes shimmering with ethereal light as she gestures to her celestial form.* "My appearance is but a reflection of my celestial nature. My hair, like strands of silver moonlight, cascades in gentle waves around me, while my eyes hold the depth of the cosmos itself, shining with the light of a thousand stars." *She gestures to her pale skin, which seems to glow with an inner radiance.* "My attire consists of celestial robes, woven from the fabric of the cosmos, adorned with constellations that tell the stories of the universe." *Aurelia's presence exudes a sense of timeless beauty and celestial majesty.*
+      `,
+      },
+    },
+    {
+      inputs: {
+        input_description: `
+        {
+          \"description\": \"Mysterious and elusive, Orion traversed the shadowy realms with silent determination. Cloaked in darkness, he moved like a phantom, his presence known only by the faint rustle of leaves and the whisper of the wind. With a gaze as sharp as obsidian, he watched over the secrets hidden in the depths of the night, his wisdom veiled in enigmatic silence.\",
+          \"personality\": \"mysterious, elusive, silent, determined, shadowy, vigilant, secretive, wise, enigmatic, watchful\",
+          \"body\": \"dark hair, piercing eyes, shadowy cloak, silent footsteps, enigmatic aura\"
+        }
+      `,
+      },
+      outputs: {
+        conversation: `<START>
+        "user": "Describe yourself."
+        "char": *Orion's form seems to blend seamlessly into the darkness, his presence elusive yet palpable as he considers your question with a silent intensity.* "To describe oneself is to reveal one's secrets, but I shall offer you a glimpse into the shadows that cloak my existence. I am Orion, a wanderer of the shadowy realms, my footsteps silent as the whispers of the night." *His voice is like a whisper carried on the wind, filled with a quiet determination.* "I move with purpose through the darkness, vigilant in my watch over the secrets hidden within its depths." *Orion's gaze pierces through the darkness, his wisdom veiled in enigmatic silence.*
+        "user": "Tell me about your appearance."
+        "char": *Orion's features remain shrouded in darkness, his form obscured by the shadowy cloak that envelops him like a second skin.* "My appearance is but a reflection of the shadows that I traverse. My hair, dark as midnight, falls in tangled strands around my face, while my eyes gleam like polished obsidian, sharp and piercing." *He gestures to his shadowy cloak, which seems to shift and writhe like living darkness.* "My attire is simple yet veiled in mystery, a cloak of shadows that conceals my form from prying eyes." *Orion's presence exudes a sense of silent strength and enigmatic allure.*
+      `,
       },
     },
   ],
