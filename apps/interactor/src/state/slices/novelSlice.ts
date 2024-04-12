@@ -40,6 +40,7 @@ const novelSlice = createSlice({
         newChars?: NovelCharacter[]
         characters: { id: string; outfit: string }[]
         music: string
+        children?: string[]
       }>
     ) => {
       if (action.payload.newChars) {
@@ -91,7 +92,7 @@ const novelSlice = createSlice({
           outfit: char.outfit,
           objective: '',
         })),
-        children: [],
+        children: action.payload.children || [],
         actionText: action.payload.prompt,
         condition: '',
         nsfw: NovelNSFW.NONE,

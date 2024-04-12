@@ -281,7 +281,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       }\n` +
       `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{user}}:",${charStops}]}}` +
       (childConditions.length
-        ? `\n${temp.instruction}OOC: Does any of the following condition met?\n` +
+        ? `\n${temp.instruction}OOC: Did any of the following conditions meet?\n` +
           ` ${childConditions.map((scene, index) => {
             return `COND ${index + 1}: ${scene.condition}\n`
           })}Answer the most unique condition number or 0 in case of it didn't met any conditions.` +

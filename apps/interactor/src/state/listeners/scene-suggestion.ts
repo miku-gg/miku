@@ -120,6 +120,7 @@ const promptSelectedSuggestedScene = async (
       music: currentScene?.musicId || '',
       name: suggestion?.actionText || '',
       prompt: suggestion?.textPrompt || '',
+      children: currentScene?.children || [],
     })
   )
 
