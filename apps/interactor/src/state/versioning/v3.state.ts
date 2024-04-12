@@ -17,7 +17,7 @@ export interface NarrationSceneSuggestion {
     outfitPrompt: string
   }[]
   sceneId: string
-  probability?: number
+  music?: string
 }
 
 export interface NarrationResponse {
@@ -26,6 +26,7 @@ export interface NarrationResponse {
   fetching: boolean
   parentInteractionId: string | null
   fetchingSuggestions?: boolean
+  nextScene?: string
   shouldSuggestScenes?: boolean
   suggestedScenes: NarrationSceneSuggestion[]
   selectedCharacterId: string | null

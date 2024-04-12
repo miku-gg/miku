@@ -42,6 +42,7 @@ import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { loadNovelFromSingleCard } from '../../libs/loadNovel'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
 import CreditsDisplayer from './CreditsDisplayer'
+import { selectCurrentScene } from '../../state/selectors'
 
 const selectSelectableCharacters = createSelector(
   [
@@ -68,6 +69,7 @@ async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
   const { assetLinkLoader, assetUploader, servicesEndpoint } = useAppContext()
+  const currentScene = useAppSelector(selectCurrentScene)
   const songs = useAppSelector((state) =>
     state.novel.songs.filter((song) =>
       state.novel.scenes.find((scene) => scene.musicId === song.id)
@@ -184,6 +186,7 @@ const CreateScene = () => {
         characters,
         prompt,
         music: _music,
+        children: currentScene?.children || [],
       })
     )
     dispatch(

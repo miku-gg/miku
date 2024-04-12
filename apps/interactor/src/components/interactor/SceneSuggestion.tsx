@@ -12,7 +12,11 @@ import {
 import { Button, Loader, Modal, Tooltip } from '@mikugg/ui-kit'
 import { GEN_BACKGROUND_COST } from '../scenarios/CreateScene'
 import { FaCoins } from 'react-icons/fa'
-import { sceneSuggestionsStart } from '../../state/slices/narrationSlice'
+import { TbPlayerTrackNextFilled } from 'react-icons/tb'
+import {
+  interactionStart,
+  sceneSuggestionsStart,
+} from '../../state/slices/narrationSlice'
 import { useAppContext } from '../../App.context'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
 import CreditsDisplayer from '../scenarios/CreditsDisplayer'
@@ -22,23 +26,31 @@ export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false)
   const { servicesEndpoint, apiEndpoint } = useAppContext()
   const dispatch = useAppDispatch()
-  const { suggestedScenes, fetchingSuggestions, shouldSuggestScenes } =
-    useAppSelector(
-      (state) => state.narration.responses[state.narration.currentResponseId]!
-    )
+  const {
+    suggestedScenes,
+    fetchingSuggestions,
+    shouldSuggestScenes,
+    nextScene: nextSceneId,
+  } = useAppSelector(
+    (state) => state.narration.responses[state.narration.currentResponseId]!
+  )
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
       setButtonOpened(false)
     },
   })
 
+  const nextScene = useAppSelector((state) =>
+    state.novel.scenes.find((s) => s.id === nextSceneId)
+  )
+
   useEffect(() => {
-    if (shouldSuggestScenes) {
+    if (shouldSuggestScenes || nextScene) {
       setButtonOpened(true)
     } else {
       setButtonOpened(false)
     }
-  }, [shouldSuggestScenes])
+  }, [shouldSuggestScenes, nextScene])
 
   return (
     <>
@@ -49,27 +61,56 @@ export default function SceneSuggestion() {
         )}
       >
         <div className="SceneSuggestion__button-container">
-          <button
-            {...swipeHandlers}
-            className="SceneSuggestion__button"
-            onClick={async () => {
-              dispatch(
-                setModalOpened({
-                  id: 'scene-suggestions',
-                  opened: true,
-                })
-              )
-              if (!fetchingSuggestions && !suggestedScenes.length) {
-                dispatch(sceneSuggestionsStart({ servicesEndpoint }))
-                dispatch(userDataFetchStart({ apiEndpoint }))
-              }
-            }}
-          >
-            <div className="SceneSuggestion__text">
-              <span>Generate next scene</span>
-            </div>
-            <GiFallingStar />
-          </button>
+          {shouldSuggestScenes ? (
+            <button
+              {...swipeHandlers}
+              className="SceneSuggestion__button"
+              onClick={async () => {
+                dispatch(
+                  setModalOpened({
+                    id: 'scene-suggestions',
+                    opened: true,
+                  })
+                )
+                if (!fetchingSuggestions && !suggestedScenes.length) {
+                  dispatch(sceneSuggestionsStart({ servicesEndpoint }))
+                  dispatch(userDataFetchStart({ apiEndpoint }))
+                }
+              }}
+            >
+              <div className="SceneSuggestion__text">
+                <span>Generate next scene</span>
+              </div>
+              <GiFallingStar />
+            </button>
+          ) : nextScene ? (
+            <button
+              {...swipeHandlers}
+              className="SceneSuggestion__button"
+              onClick={async () => {
+                dispatch(
+                  interactionStart({
+                    sceneId: nextScene.id,
+                    text: nextScene.prompt,
+                    characters:
+                      nextScene?.characters.map((r) => r.characterId) || [],
+                    servicesEndpoint,
+                    selectedCharacterId:
+                      nextScene?.characters[
+                        Math.floor(
+                          Math.random() * (nextScene?.characters.length || 0)
+                        )
+                      ].characterId || '',
+                  })
+                )
+              }}
+            >
+              <div className="SceneSuggestion__text">
+                <span>Go to next scene</span>
+              </div>
+              <TbPlayerTrackNextFilled />
+            </button>
+          ) : null}
         </div>
       </div>
       <SceneSuggestionModal />

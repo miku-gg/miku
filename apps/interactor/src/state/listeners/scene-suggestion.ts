@@ -53,7 +53,7 @@ const sceneSuggestionEffect = async (
         return {
           sceneId: ids[suggestionIndex],
           actionText: suggestion.actionText,
-          probability: Number(suggestion.probability) || 0,
+          music: suggestion.music,
           textPrompt: suggestion.prompt,
           sdPrompt: suggestion.sdPrompt,
           characters: [
@@ -120,6 +120,7 @@ const promptSelectedSuggestedScene = async (
       music: currentScene?.musicId || '',
       name: suggestion?.actionText || '',
       prompt: suggestion?.textPrompt || '',
+      children: currentScene?.children || [],
     })
   )
 
