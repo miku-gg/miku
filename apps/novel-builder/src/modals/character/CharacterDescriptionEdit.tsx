@@ -19,7 +19,7 @@ import { closeModal, openModal } from "../../state/slices/inputSlice";
 import { updateCharacter } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./CharacterDescriptionEdit.scss";
-import { CharacterGeneration } from "./CharacterGeneration";
+import { CharacterDescriptionGeneration } from "./CharacterDescriptionGeneration";
 
 const DEFAULT_TAGS = [
   { value: "Male" },
@@ -48,7 +48,7 @@ export default function CharacterDescriptionEdit({
 }: {
   characterId?: string;
 }) {
-  const [isGeneration, setIsGeneration] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const dispatch = useAppDispatch();
   const character = useAppSelector((state) =>
@@ -78,19 +78,9 @@ export default function CharacterDescriptionEdit({
     }
   };
 
-  // prompt generation
-  const replaceTags = (inputString: string) => {
-    let formattedString = inputString.replace(/\n\s*/g, "\n");
-    formattedString = inputString.replace(/"user"/g, "{{user}}");
-    formattedString = formattedString.replace(/"char"/g, "{{char}}");
-    formattedString = formattedString.replace(/"char1"/g, "{{char}}");
-    return formattedString;
-  };
-
   const generatePrompt = async () => {
     try {
-      setIsGeneration(true);
-      let response = "";
+      setIsGenerating(true);
 
       const stream = textCompletion({
         template: conversationAgent.generatePrompt({
@@ -99,28 +89,33 @@ export default function CharacterDescriptionEdit({
         model: ModelType.RP,
         variables: {},
         serviceBaseUrl: SERVICES_ENDPOINT,
-        identifier: character.name + "-" + character.id,
+        identifier: "character-conversation-generation",
       });
 
       for await (const result of stream) {
-        const resultObject = Object.fromEntries(result);
-        response = Object.values(resultObject)[0];
-      }
-      dispatch(
-        updateCharacter({
-          ...character,
-          card: {
-            ...character.card,
-            data: {
-              ...character.card.data,
-              mes_example: replaceTags(response),
+        dispatch(
+          updateCharacter({
+            ...character,
+            card: {
+              ...character.card,
+              data: {
+                ...character.card.data,
+                mes_example: `<START>\n{{user}}: "${result.get(
+                  "question_1"
+                )}"\n{{char}}: "${result.get(
+                  "answer_1"
+                )}"\n{{user}}: "${result.get(
+                  "question_2"
+                )}"\n{{char}}: "${result.get("answer_2")}"`,
+              },
             },
-          },
-        })
-      );
-      setIsGeneration(false);
+          })
+        );
+      }
+      setIsGenerating(false);
     } catch (error) {
       console.error(error);
+      setIsGenerating(false);
     }
   };
 
@@ -310,7 +305,7 @@ export default function CharacterDescriptionEdit({
             }
             className="CharacterEditModal CharacterDescriptionEdit__modal"
           >
-            <CharacterGeneration characterID={characterId} />
+            <CharacterDescriptionGeneration characterID={characterId} />
           </Modal>
         </div>
         <Input
@@ -368,7 +363,7 @@ export default function CharacterDescriptionEdit({
           </label>
           <div
             className={
-              !character.card.data.description || isGeneration === true
+              !character.card.data.description || isGenerating === true
                 ? "disabled"
                 : ""
             }
@@ -376,14 +371,14 @@ export default function CharacterDescriptionEdit({
             <button
               className="Input__label"
               disabled={
-                !character.card.data.description || isGeneration === true
+                !character.card.data.description || isGenerating === true
               }
               onClick={() => {
                 generatePrompt();
               }}
             >
               <BsStars />
-              {isGeneration ? "Generating..." : "Generate"}
+              {isGenerating ? "Generating..." : "Generate"}
             </button>
           </div>
         </div>

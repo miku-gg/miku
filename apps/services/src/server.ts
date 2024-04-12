@@ -20,6 +20,7 @@ app.use(
       "https://dev.miku.gg",
       "https://alpha.miku.gg",
       "https://interactor.miku.gg",
+      "https://build.miku.gg",
     ],
   })
 );

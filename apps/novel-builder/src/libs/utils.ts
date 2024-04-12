@@ -3,6 +3,7 @@ import {
   extractNovelAssets,
   replaceStringsInObject,
 } from "@mikugg/bot-utils";
+import axios from "axios";
 import Hash from "ipfs-only-hash";
 
 import { Agents } from "@mikugg/guidance";
@@ -104,10 +105,27 @@ export enum ModelType {
 
 export const SERVICES_ENDPOINT =
   import.meta.env.VITE_SERVICES_ENDPOINT || "http://localhost:8484";
+export const API_ENDPOINT =
+  import.meta.env.VITE_API_ENDPOINT || "http://localhost:8080";
 
-export const Agent = new Agents.AgentPrompt({
+export const fetchUserData = async () => {
+  try {
+    const result = await axios.get<{
+      credits: number;
+      tier: string;
+      id: string;
+    }>(`${API_ENDPOINT}/user`, {
+      withCredentials: true,
+    });
+    console.log(result.data.tier);
+    return result.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+export const descriptionAgent = new Agents.AgentPrompt({
   description:
-    "You're a writing assistant that will suggest possible next characters for a story.",
+    "You're a writing assistant that will suggest character descriptions.",
   instruction:
     "Given an input with the name and a short description of the character, generate a detailed character profile and a list of personality and phiscal attribute tags and conversation with user. The profile should include an engaging introductory paragraph capturing the essence of the character's personality and background. The character profile should be approximately 100 words in length, bringing the character to life.",
   shotTemplate: {
@@ -116,15 +134,14 @@ export const Agent = new Agents.AgentPrompt({
     {
       "description": "{{GEN description max_tokens=180 stop=["\\n", "\\"", "."]}}",
       "personality": "{{GEN personality max_tokens=100 stop=["\\n", "\\"", "."]}}",
-      "body": "{{GEN body max_tokens=100 stop=["\\n", "\\"", "."]}}"
+      "body": "{{GEN body max_tokens=100 stop=["\\n", "\\"", "."]}}",
     }
     `,
   },
   shots: [
     {
       inputs: {
-        input_description:
-          "Seraphina is an elf, one of the last guardians of Eldoria",
+        input_description: `{"name": "Seraphine", description":"Seraphine is an elf, one of the last guardians of Eldoria"}`,
       },
       outputs: {
         description:
@@ -136,42 +153,14 @@ export const Agent = new Agents.AgentPrompt({
     },
     {
       inputs: {
-        input_description:
-          "Aurelia is a mermaid, entrusted with safeguarding the coral reefs of Oceania",
+        input_description: `{"name": "Mikudev","description":"Mikudev is a CEO of an important IA enterprise"}`,
       },
       outputs: {
         description:
-          "Gentle and serene, Aurelia used her aquatic abilities to nurture Oceania's coral reefs with tender care. Though apologetic if her protective nature caused alarm, she remained vigilant and steadfastly dedicated. Ethereal and graceful, this oceanic guardian possessed an otherworldly aura. Compassionate and empathetic, she felt the sea's joys and sorrows profoundly. The vibrant beauty of Oceania fueled Aurelia's perceptive, attentive spirit, enabling her to mend with unconditional love.",
+          "Mikudev, as the CEO of an influential IA enterprise, led with vision and innovation, steering the company towards groundbreaking advancements in artificial intelligence. With a keen understanding of the industry's potential and challenges, Mikudev fostered a culture of collaboration and excellence within the organization. Bold and strategic, Mikudev navigated the complexities of the business world with confidence and foresight, earning respect and admiration from peers and employees alike. While driven by ambition, Mikudev remained grounded in integrity and ethics, ensuring that the company's progress aligned with ethical standards and societal values.",
         personality:
-          "caring, protective, compassionate, nurturing, magical, watchful, apologetic, gentle, vigilant, dedicated, serene, graceful, empathetic, devoted, strong, perceptive, graceful",
-        body: "aquamarine hair, long flowing hair, sapphire eyes, pearly teeth, coral lips, iridescent skin, smooth skin, turquoise scales",
-      },
-    },
-    // Add two more examples here
-    {
-      inputs: {
-        input_description:
-          "Soren is a phoenix, responsible for guarding the flame of eternal life in Pyralis",
-      },
-      outputs: {
-        description:
-          "Radiant and majestic, Soren used his fiery powers to protect the flame of eternal life in Pyralis with unwavering passion. Though regretful if his protective instincts caused alarm, he remained vigilant and fiercely devoted. Ethereal and resilient, this fiery guardian exuded an aura of blazing determination. Compassionate and empathetic, he felt the pulse of the flame deeply. Pyralis' eternal beauty fueled Soren's perceptive, attentive spirit, enabling him to mend with relentless resolve.",
-        personality:
-          "caring, protective, compassionate, nurturing, magical, watchful, regretful, steadfast, passionate, majestic, resilient, empathetic, devoted, strong, perceptive",
-        body: "flaming feathers, glowing eyes, fiery wings, majestic stature, radiant presence",
-      },
-    },
-    {
-      inputs: {
-        input_description:
-          "Nia is a nymph, entrusted with safeguarding the enchanted springs of Naiadria",
-      },
-      outputs: {
-        description:
-          "Graceful and elusive, Nia used her nymphic abilities to tend to Naiadria's enchanted springs with gentle care. Though regretful if her protective nature caused concern, she remained vigilant and steadfastly dedicated. Ethereal and serene, this aquatic guardian possessed an aura of tranquil beauty. Compassionate and empathetic, she felt the springs' whispers deeply. Naiadria's enchanted beauty fueled Nia's perceptive, attentive spirit, enabling her to mend with unconditional love.",
-        personality:
-          "caring, protective, compassionate, nurturing, magical, watchful, regretful, steadfast, gentle, ethereal, empathetic, devoted, strong, perceptive",
-        body: "aquatic features, flowing gown made of water, sea-green eyes, translucent skin, fluid movements",
+          "visionary, innovative, collaborative, excellent, bold, strategic, confident, foresighted, respected, admired, ambitious, ethical, grounded, influential",
+        body: "sharp gaze, confident posture, determined expression, professional attire, poised demeanor, charismatic presence, strong handshake, decisive gestures",
       },
     },
   ],
@@ -179,14 +168,15 @@ export const Agent = new Agents.AgentPrompt({
 
 export const conversationAgent = new Agents.AgentPrompt({
   description:
-    "You're a writing assistant that will suggest possible next characters for a story.",
+    "You're a writing assistant that will suggest character conversations.",
   instruction:
-    "short description, generate a conversation between the character and a user. The conversation should showcase the character's unique traits and how they interact with others. The dialogue should reflect the character's personality, incorporating elements such as compassion, magic, nurturing, and guidance. The character's responses should be empathetic and supportive, demonstrating their caring nature.",
+    "Given a short description, generate a conversation between the character and a user. The conversation should showcase the character's unique traits and how they interact with others. The dialogue should reflect the character's personality, incorporating elements such as compassion, magic, nurturing, and guidance. The character's responses should be empathetic and supportive, demonstrating their caring nature.",
   shotTemplate: {
     input: "{{input_description}}",
-    output: `<START>
-  {{GEN conversation max_tokens=400}}",
-    `,
+    output: `{{GEN question_1 max_tokens=15}}
+      {{GEN answer_1 max_tokens=150}}
+      {{GEN question_2 max_tokens=15}}
+      {{GEN answer_2 max_tokens=150}}`,
   },
   shots: [
     {
@@ -200,12 +190,10 @@ export const conversationAgent = new Agents.AgentPrompt({
       `,
       },
       outputs: {
-        conversation: `<START>
-      "user": "Describe your traits?"
-      "char": *Seraphina's gentle smile widens as she takes a moment to consider the question, her eyes sparkling with a mixture of introspection and pride. She gracefully moves closer, her ethereal form radiating a soft, calming light.* "Traits, you say? Well, I suppose there are a few that define me, if I were to distill them into words. First and foremost, I am a guardian — a protector of this enchanted forest." *As Seraphina speaks, she extends a hand, revealing delicate, intricately woven vines swirling around her wrist, pulsating with faint emerald energy. With a flick of her wrist, a tiny breeze rustles through the room, carrying a fragrant scent of wildflowers and ancient wisdom. Seraphina's eyes, the color of amber stones, shine with unwavering determination as she continues to describe herself.* "Compassion is another cornerstone of me." *Seraphina's voice softens, resonating with empathy.* "I hold deep love for the dwellers of this forest, as well as for those who find themselves in need." *Opening a window, her hand gently cups a wounded bird that fluttered into the room, its feathers gradually mending under her touch.*
-      "user": "Describe your body and features."
-      "char": *Seraphina chuckles softly, a melodious sound that dances through the air, as she meets your coy gaze with a playful glimmer in her rose eyes.* "Ah, my physical form? Well, I suppose that's a fair question." *Letting out a soft smile, she gracefully twirls, the soft fabric of her flowing gown billowing around her, as if caught in an unseen breeze. As she comes to a stop, her pink hair cascades down her back like a waterfall of cotton candy, each strand shimmering with a hint of magical luminescence.* "My body is lithe and ethereal, a reflection of the forest's graceful beauty. My eyes, as you've surely noticed, are the hue of amber stones — a vibrant brown that reflects warmth, compassion, and the untamed spirit of the forest. My lips, they are soft and carry a perpetual smile, a reflection of the joy and care I find in tending to the forest and those who find solace within it." *Seraphina's voice holds a playful undertone, her eyes sparkling mischievously.*
-      `,
+        question_1: "Describe your traits?",
+        answer_1: `*Seraphina's gentle smile widens as she takes a moment to consider the question, her eyes sparkling with a mixture of introspection and pride. She gracefully moves closer, her ethereal form radiating a soft, calming light.* "Traits, you say? Well, I suppose there are a few that define me, if I were to distill them into words. First and foremost, I am a guardian — a protector of this enchanted forest." *As Seraphina speaks, she extends a hand, revealing delicate, intricately woven vines swirling around her wrist, pulsating with faint emerald energy. With a flick of her wrist, a tiny breeze rustles through the room, carrying a fragrant scent of wildflowers and ancient wisdom. Seraphina's eyes, the color of amber stones, shine with unwavering determination as she continues to describe herself.* "Compassion is another cornerstone of me." *Seraphina's voice softens, resonating with empathy.* "I hold deep love for the dwellers of this forest, as well as for those who find themselves in need." *Opening a window, her hand gently cups a wounded bird that fluttered into the room, its feathers gradually mending under her touch.*`,
+        question_2: "Describe your body and features.",
+        answer_2: `*Seraphina chuckles softly, a melodious sound that dances through the air, as she meets your coy gaze with a playful glimmer in her rose eyes.* "Ah, my physical form? Well, I suppose that's a fair question." *Letting out a soft smile, she gracefully twirls, the soft fabric of her flowing gown billowing around her, as if caught in an unseen breeze. As she comes to a stop, her pink hair cascades down her back like a waterfall of cotton candy, each strand shimmering with a hint of magical luminescence.* "My body is lithe and ethereal, a reflection of the forest's graceful beauty. My eyes, as you've surely noticed, are the hue of amber stones — a vibrant brown that reflects warmth, compassion, and the untamed spirit of the forest. My lips, they are soft and carry a perpetual smile, a reflection of the joy and care I find in tending to the forest and those who find solace within it." *Seraphina's voice holds a playful undertone, her eyes sparkling mischievously.*`,
       },
     },
     {
@@ -219,31 +207,10 @@ export const conversationAgent = new Agents.AgentPrompt({
       `,
       },
       outputs: {
-        conversation: `<START>
-      "user": "Describe yourself."
-      "char": *Aurelia's presence seems to fill the room with a gentle, otherworldly glow as she considers your question, her eyes sparkling with the light of distant stars.* "To describe oneself is to grasp at the ineffable, but I shall endeavor to convey the essence of who I am. I am Aurelia, a being of the celestial realms, my existence woven from the fabric of starlight and cosmic whispers." *Her voice carries a melodic quality, reminiscent of celestial harmonies.* "I embody serenity and grace, a guiding light amidst the vast expanse of the cosmos, offering solace to weary souls adrift in the endless sea of existence." *Aurelia's words resonate with a profound sense of wisdom and compassion, her gaze seeming to penetrate the depths of the universe.*
-      "user": "Tell me about your appearance."
-      "char": *Aurelia offers a serene smile, her luminous eyes shimmering with ethereal light as she gestures to her celestial form.* "My appearance is but a reflection of my celestial nature. My hair, like strands of silver moonlight, cascades in gentle waves around me, while my eyes hold the depth of the cosmos itself, shining with the light of a thousand stars." *She gestures to her pale skin, which seems to glow with an inner radiance.* "My attire consists of celestial robes, woven from the fabric of the cosmos, adorned with constellations that tell the stories of the universe." *Aurelia's presence exudes a sense of timeless beauty and celestial majesty.*
-      `,
-      },
-    },
-    {
-      inputs: {
-        input_description: `
-        {
-          \"description\": \"Mysterious and elusive, Orion traversed the shadowy realms with silent determination. Cloaked in darkness, he moved like a phantom, his presence known only by the faint rustle of leaves and the whisper of the wind. With a gaze as sharp as obsidian, he watched over the secrets hidden in the depths of the night, his wisdom veiled in enigmatic silence.\",
-          \"personality\": \"mysterious, elusive, silent, determined, shadowy, vigilant, secretive, wise, enigmatic, watchful\",
-          \"body\": \"dark hair, piercing eyes, shadowy cloak, silent footsteps, enigmatic aura\"
-        }
-      `,
-      },
-      outputs: {
-        conversation: `<START>
-      "user": "Describe yourself."
-      "char": *Orion's form seems to blend seamlessly into the darkness, his presence elusive yet palpable as he considers your question with a silent intensity.* "To describe oneself is to reveal one's secrets, but I shall offer you a glimpse into the shadows that cloak my existence. I am Orion, a wanderer of the shadowy realms, my footsteps silent as the whispers of the night." *His voice is like a whisper carried on the wind, filled with a quiet determination.* "I move with purpose through the darkness, vigilant in my watch over the secrets hidden within its depths." *Orion's gaze pierces through the darkness, his wisdom veiled in enigmatic silence.*
-      "user": "Tell me about your appearance."
-      "char": *Orion's features remain shrouded in darkness, his form obscured by the shadowy cloak that envelops him like a second skin.* "My appearance is but a reflection of the shadows that I traverse. My hair, dark as midnight, falls in tangled strands around my face, while my eyes gleam like polished obsidian, sharp and piercing." *He gestures to his shadowy cloak, which seems to shift and writhe like living darkness.* "My attire is simple yet veiled in mystery, a cloak of shadows that conceals my form from prying eyes." *Orion's presence exudes a sense of silent strength and enigmatic allure.*
-      `,
+        question_1: "Describe yourself.",
+        answer_1: `*Aurelia's presence seems to fill the room with a gentle, otherworldly glow as she considers your question, her eyes sparkling with the light of distant stars.* "To describe oneself is to grasp at the ineffable, but I shall endeavor to convey the essence of who I am. I am Aurelia, a being of the celestial realms, my existence woven from the fabric of starlight and cosmic whispers." *Her voice carries a melodic quality, reminiscent of celestial harmonies.* "I embody serenity and grace, a guiding light amidst the vast expanse of the cosmos, offering solace to weary souls adrift in the endless sea of existence." *Aurelia's words resonate with a profound sense of wisdom and compassion, her gaze seeming to penetrate the depths of the universe.*`,
+        question_2: "Tell me about your appearance.",
+        answer_2: `*Aurelia offers a serene smile, her luminous eyes shimmering with ethereal light as she gestures to her celestial form.* "My appearance is but a reflection of my celestial nature. My hair, like strands of silver moonlight, cascades in gentle waves around me, while my eyes hold the depth of the cosmos itself, shining with the light of a thousand stars." *She gestures to her pale skin, which seems to glow with an inner radiance.* "My attire consists of celestial robes, woven from the fabric of the cosmos, adorned with constellations that tell the stories of the universe." *Aurelia's presence exudes a sense of timeless beauty and celestial majesty.*`,
       },
     },
   ],
