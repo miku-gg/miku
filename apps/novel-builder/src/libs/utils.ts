@@ -249,20 +249,21 @@ export const conversationAgent = new Agents.AgentPrompt({
   ],
 });
 
-export const archivementsAgent = new Agents.AgentPrompt({
+export const achievementsAgent = new Agents.AgentPrompt({
   description:
     "Your task is to act as a conversational evaluator, analyzing dialogue summaries and achievement lists to determine which achievements have been met during the conversation.",
-  instruction: `You will be provided with a summary of a conversation and a list of achievements. You must generate a response that identifies the achievements that are met during the conversation. If an achievement is met, you should list which ones are those achievements. If no achievement is met, the response should be 'none'.`,
+  instruction: `You will be provided with a response of a conversation and a list of achievements. You must generate a response that identifies the achievements that are met during the conversation. If an achievement is met, you should list which ones are those achievements. If no achievement is met, the response should be 'none'.`,
   shotTemplate: {
-    input: "{{input_chat_summary}} {{input_achievement_list}}",
-    output: `{{GEN archivement-list max_tokens=400}}",
-    `,
+    input: `{{input_response}}`,
+    output: `{{GEN achievements max_tokens=300}}`,
   },
   shots: [
     {
       inputs: {
-        input_summary: `{ "summary": "During the conversation, John successfully completed his project on time and received positive feedback from the client.",
-      "achievements": ["Completed project on time", "Received positive feedback from client", "Met all project requirements"]}`,
+        input_response: `{ 
+          "response": "John: Hey, just wanted to let you know that I successfully completed the project on time and the client loved it!",
+          "achievements":["Completed project on time", "Received positive feedback from client", "Met all project requirements"]
+        }`,
       },
       outputs: {
         achievements: `["Completed project on time", "Received positive feedback from client"]`,
@@ -270,8 +271,10 @@ export const archivementsAgent = new Agents.AgentPrompt({
     },
     {
       inputs: {
-        input_summary: `{ "summary": "In the meeting, Sarah exceeded sales targets for the month and secured a new client.",
-      "achievements": ["Exceeded sales targets", "Secured new client", "Received recognition from manager"]}`,
+        input_response: `{
+          "response": "Sarah: Guess what? I exceeded our sales targets for the month and I even secured a new client during the meeting!",
+          "achievements":["Exceeded sales targets", "Secured new client", "Received recognition from manager"]
+        }`,
       },
       outputs: {
         achievements: `["Exceeded sales targets", "Secured new client"]`,
@@ -279,8 +282,10 @@ export const archivementsAgent = new Agents.AgentPrompt({
     },
     {
       inputs: {
-        input_summary: `{ "summary": "Despite his efforts, Alex was unable to complete the project within the deadline.",
-      "achievements": ["Completed project on time", "Received positive feedback from client", "Met all project requirements"]}`,
+        input_response: `{ 
+          "response": "Alex: Unfortunately, despite all my efforts, I couldn't finish the project on time.",
+          "achievements":["Completed project on time", "Received positive feedback from client", "Met all project requirements"]
+        }`,
       },
       outputs: {
         achievements: `["none"]`,
