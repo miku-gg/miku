@@ -32,7 +32,7 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     const messages = this.getMessagesPrompt(input, memorySize)
     const characters = selectCharactersInCurrentScene(input)
     const scene = selectCurrentScene(input)
-    let template = `You're a writing assistance that will suggest possible next scenarios for a story.\n`
+    let template = `You're a writing assistant that will suggest possible next scenarios for a story.\n`
     template += `### Instruction:\n`
     template += `Given an input of the current scene and conversation. You MUST suggest 3 possible next scenes, describe a text explaining what should happen next. Also, describe an "action" for a button that the user can click.\n`
     template += `Each of the 3 scenes MUST indicate a change in the background, so you MUST describe a different environment.\n`
