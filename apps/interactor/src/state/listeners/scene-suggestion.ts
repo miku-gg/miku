@@ -13,7 +13,7 @@ import {
   selectCharactersInCurrentScene,
   selectCurrentScene,
 } from '../selectors'
-import { NarrationSceneSuggestion } from '../versioning/v3.state'
+import { ModelType, NarrationSceneSuggestion } from '../versioning/v3.state'
 import { v4 as randomUUID } from 'uuid'
 import {
   backgroundInferenceEnd,
@@ -34,7 +34,8 @@ const sceneSuggestionEffect = async (
     const promptBuilder = new PromptBuilder<AlpacaSceneSuggestionStrategy>({
       maxNewTokens: 35,
       strategy: new AlpacaSceneSuggestionStrategy('llama'),
-      trucationLength: 4096,
+      trucationLength:
+        state.settings.model === ModelType.RP_SMART ? 8192 : 4096,
     })
     const prompt = promptBuilder.buildPrompt(state, 3)
     const stream = textCompletion({
