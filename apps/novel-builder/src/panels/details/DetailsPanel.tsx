@@ -14,7 +14,6 @@ export default function DetailsPanel() {
   );
 
   const handleLogoPicChange = async (file: File) => {
-    console.log("file", file);
     if (file) {
       try {
         const asset = await config.uploadAsset(file);
@@ -100,31 +99,17 @@ export default function DetailsPanel() {
             previewImage={logoPic && config.genAssetLink(logoPic)}
             placeHolder="(256x256)"
             onFileValidate={async (file) => {
-              if (file.size > 1000000) {
+              if (file.size > 2 * 1024 * 1024) {
                 toast.error("File size should be less than 1MB");
                 return false;
               }
-              if (!checkFileType(file)) {
+              if (!checkFileType(file, ["image/png", "image/jpeg"])) {
                 toast.error(
                   "Invalid file type. Please upload a valid image file"
                 );
                 return false;
               }
-              // check size
-              return new Promise((resolve) => {
-                const img = new Image();
-                img.src = URL.createObjectURL(file);
-                img.onload = function () {
-                  if (img.width !== 256 || img.height !== 256) {
-                    toast.error(
-                      "Please upload an image with dimensions of 256x256 pixels."
-                    );
-                    resolve(false);
-                  } else {
-                    resolve(true);
-                  }
-                };
-              });
+              return true;
             }}
           />
         </div>
