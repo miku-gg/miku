@@ -21,19 +21,17 @@ import { useAppContext } from '../../App.context'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
 import CreditsDisplayer from '../scenarios/CreditsDisplayer'
 import { NarrationSceneSuggestion } from '../../state/versioning/v3.state'
+import { selectCurrentNextScene } from '../../state/selectors'
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false)
   const { servicesEndpoint, apiEndpoint } = useAppContext()
   const dispatch = useAppDispatch()
-  const {
-    suggestedScenes,
-    fetchingSuggestions,
-    shouldSuggestScenes,
-    nextScene: nextSceneId,
-  } = useAppSelector(
-    (state) => state.narration.responses[state.narration.currentResponseId]!
-  )
+  const { suggestedScenes, fetchingSuggestions, shouldSuggestScenes } =
+    useAppSelector(
+      (state) => state.narration.responses[state.narration.currentResponseId]!
+    )
+  const nextSceneId = useAppSelector(selectCurrentNextScene)
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
       setButtonOpened(false)

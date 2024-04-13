@@ -133,6 +133,7 @@ const narrationSlice = createSlice({
     interactionSuccess(
       state,
       action: PayloadAction<{
+        nextScene?: string
         shouldSuggestScenes?: boolean
         completed: boolean
         characters: NarrationResponse['characters']
@@ -160,6 +161,10 @@ const narrationSlice = createSlice({
         response.suggestedScenes = []
         response.fetching = characters.every((char) => !char.text)
         response.selected = true
+
+        if (action.payload.nextScene) {
+          response.nextScene = action.payload.nextScene
+        }
       }
       if (action.payload.completed) {
         state.input.disabled = false

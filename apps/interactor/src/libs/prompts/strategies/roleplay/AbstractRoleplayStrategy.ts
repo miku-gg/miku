@@ -135,9 +135,9 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     )
 
     const currentScene = selectCurrentScene(input.state)
-    const conditionIndex = Number(variables.get('cond_opt')?.trim())
+    const conditionIndex = Number(variables.get('cond')?.trim())
     const nextScene = conditionIndex
-      ? currentScene?.children[conditionIndex]
+      ? currentScene?.children[conditionIndex - 1]
       : ''
 
     return {

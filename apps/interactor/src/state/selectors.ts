@@ -347,3 +347,22 @@ export const selectCharactersInCurrentScene = createSelector(
     })
   }
 )
+
+export const selectCurrentNextScene = createSelector(
+  [selectAllParentDialogues, selectCurrentScene],
+  (dialogues, scene) => {
+    if (scene?.id && dialogues.length) {
+      const findFirstCurrentSceneIndex = dialogues.findIndex(
+        (d) => d.type == 'interaction' && d.item.sceneId === scene.id
+      )
+      const currentDialogues = dialogues.slice(0, findFirstCurrentSceneIndex)
+      const _responseOfSuggestion = currentDialogues.find(
+        (d) => d.type === 'response' && d.item.nextScene
+      )
+      return _responseOfSuggestion?.type === 'response'
+        ? _responseOfSuggestion.item.nextScene || null
+        : null
+    }
+    return null
+  }
+)
