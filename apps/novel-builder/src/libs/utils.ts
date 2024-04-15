@@ -173,10 +173,11 @@ export const conversationAgent = new Agents.AgentPrompt({
     "Given a short description, generate a conversation between the character and a user. The conversation should showcase the character's unique traits and how they interact with others. The dialogue should reflect the character's personality, incorporating elements such as compassion, magic, nurturing, and guidance. The character's responses should be empathetic and supportive, demonstrating their caring nature.",
   shotTemplate: {
     input: "{{input_description}}",
-    output: `{{GEN question_1 max_tokens=15}}
-      {{GEN answer_1 max_tokens=150}}
-      {{GEN question_2 max_tokens=15}}
-      {{GEN answer_2 max_tokens=150}}`,
+    output: `
+      question_1: "{{GEN question_1 max_tokens=15 stop=["\\"", "."]}}"
+      answer_1: "{{GEN answer_1 max_tokens=150 stop=["\\"", "."]}}"
+      question_2: "{{GEN question_2 max_tokens=15 stop=["\\"", "."]}}"
+      answer_2: "{{GEN answer_2 max_tokens=150 stop=["\\"", "."]}}"`,
   },
   shots: [
     {
@@ -211,6 +212,18 @@ export const conversationAgent = new Agents.AgentPrompt({
         answer_1: `*Aurelia's presence seems to fill the room with a gentle, otherworldly glow as she considers your question, her eyes sparkling with the light of distant stars.* "To describe oneself is to grasp at the ineffable, but I shall endeavor to convey the essence of who I am. I am Aurelia, a being of the celestial realms, my existence woven from the fabric of starlight and cosmic whispers." *Her voice carries a melodic quality, reminiscent of celestial harmonies.* "I embody serenity and grace, a guiding light amidst the vast expanse of the cosmos, offering solace to weary souls adrift in the endless sea of existence." *Aurelia's words resonate with a profound sense of wisdom and compassion, her gaze seeming to penetrate the depths of the universe.*`,
         question_2: "Tell me about your appearance.",
         answer_2: `*Aurelia offers a serene smile, her luminous eyes shimmering with ethereal light as she gestures to her celestial form.* "My appearance is but a reflection of my celestial nature. My hair, like strands of silver moonlight, cascades in gentle waves around me, while my eyes hold the depth of the cosmos itself, shining with the light of a thousand stars." *She gestures to her pale skin, which seems to glow with an inner radiance.* "My attire consists of celestial robes, woven from the fabric of the cosmos, adorned with constellations that tell the stories of the universe." *Aurelia's presence exudes a sense of timeless beauty and celestial majesty.*`,
+      },
+    },
+    {
+      inputs: {
+        input_description:
+          '{ "description": "Whispers of ancient lore echoed through the primordial mists as Zephyria, the embodiment of timeless wisdom, wandered the realms of legend. Her ethereal form, cloaked in shimmering veils of stardust, carried the weight of eons long past. Zephyria\'s voice, a melodic tapestry of knowledge and prophecy, guided those seeking enlightenment, revealing the secrets woven into the very fabric of existence itself. With a serene presence that belied her boundless depths, she was the living chronicle of the cosmos.", "personality": "ancient, wise, ethereal, legendary, mystical, melodic, prophetic, serene, boundless, enlightening, cosmic", "body": "shimmering form, stardust veils, ageless face, piercing eyes, resonant voice" }',
+      },
+      outputs: {
+        question_1: "Describe yourself.",
+        answer_1: `*A sense of timeless reverence seems to permeate the air as Zephyria\'s shimmering form coalesces before you, her piercing eyes holding the weight of untold eons.* "I am Zephyria, a living embodiment of ancient wisdom and cosmic lore. My existence spans the vast expanse of time itself, a chronicle of the universe\'s secrets woven into the very fabric of my being." *Her resonant voice, carrying echoes of melodic prophecies, fills the space around you with a sense of profound mystery.* "I have wandered the realms of legend since before the first stars ignited, bearing witness to the cosmic dance of creation and destruction, guiding those who seek enlightenment through the boundless depths of existence." *Zephyria\'s serene presence belies the unfathomable depths of her knowledge and the cosmic truths she embodies.*`,
+        question_2: "Tell me about your appearance.",
+        answer_2: `*Zephyria's form seems to shimmer and shift like the very stardust from which she is formed, her ageless face betraying no hint of the eons she has witnessed.* "My appearance is an outward reflection of the timeless mysteries I embody. I am cloaked in shimmering veils of stardust, remnants of long-extinct celestial bodies that have borne witness to the cosmic cycles of life and death." *Her piercing eyes seem to hold the depths of the universe itself, ancient and unfathomable.* "My resonant voice echoes with the melodies of creation\'s first harmonies, carrying the weight of primordial truths and prophetic visions yet to unfold." *Zephyria\'s ethereal form exudes an aura of profound reverence and unearthly majesty.*`,
       },
     },
   ],
