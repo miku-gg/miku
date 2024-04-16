@@ -100,13 +100,11 @@ export default function CharacterDescriptionEdit({
               ...character.card,
               data: {
                 ...character.card.data,
-                mes_example: `<START>\n{{user}}: "${result.get(
+                mes_example: `<START>\n{{user}}: ${result.get(
                   "question_1"
-                )}"\n{{char}}: "${result.get(
-                  "answer_1"
-                )}"\n{{user}}: "${result.get(
+                )}\n{{char}}: ${result.get("answer_1")}\n{{user}}: ${result.get(
                   "question_2"
-                )}"\n{{char}}: "${result.get("answer_2")}"`,
+                )}\n{{char}}: ${result.get("answer_2")}`,
               },
             },
           })
