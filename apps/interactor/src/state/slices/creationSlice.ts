@@ -263,6 +263,7 @@ export const creationSlice = createSlice({
         id: string
         result: string
         servicesEndpoint: string
+        apiEndpoint: string
       }>
     ) => {
       const background = state.inference.backgrounds.find(

@@ -34,16 +34,43 @@ export interface CharacterResult {
   tags: string[]
 }
 
-export const listSearch = async <T extends BackgroundResult | CharacterResult>(
+export interface SongResult {
+  id: string
+  description: string
+  title: string
+  asset: string
+  tags: string[]
+  authorId: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export enum SearchType {
+  CHARACTER = '/characters',
+  BACKGROUND = '/backgrounds',
+  BACKGROUND_VECTORS = '/backgrounds/vector-search',
+  SONG = '/songs',
+  SONG_VECTOR = '/songs/vector-search',
+}
+
+export const listSearch = async <
+  T extends BackgroundResult | CharacterResult | SongResult
+>(
   apiEndpont: string,
+  searchType: T extends BackgroundResult
+    ? SearchType.BACKGROUND | SearchType.BACKGROUND_VECTORS
+    : T extends CharacterResult
+    ? SearchType.CHARACTER
+    : SearchType.SONG | SearchType.SONG_VECTOR,
   params: {
     search: string
     take: number
     skip: number
   }
 ): Promise<T[]> => {
-  const response = await axios.get<T[]>(apiEndpont, {
+  const response = await axios.get<T[]>(apiEndpont + searchType, {
     params,
+    withCredentials: true,
     headers: {
       Accept: 'application/json',
     },
