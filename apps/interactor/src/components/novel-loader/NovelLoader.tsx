@@ -14,8 +14,11 @@ const NovelLoader = (): JSX.Element => {
   useEffect(() => {
     novelLoader().then((state: RootState) => {
       dispatch(replaceState(state))
-      dispatch(setSystemPrompt(persona.description!))
-      dispatch(setName(persona.name!))
+
+      if (persona && persona.description) {
+        dispatch(setSystemPrompt(persona.description))
+        dispatch(setName(persona.name))
+      }
     })
   }, [dispatch, novelLoader])
 
