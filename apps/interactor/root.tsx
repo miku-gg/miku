@@ -14,6 +14,7 @@ import queryString from 'query-string'
 import {
   BackgroundResult,
   CharacterResult,
+  PersonaResult,
   listSearch,
 } from './src/libs/listSearch'
 import { loadNovelFromSingleCard } from './src/libs/loadNovel'
@@ -59,6 +60,7 @@ function getCongurationFromParams(): {
   apiEndpoint: string
   cardEndpoint: string
   servicesEndpoint: string
+  persona: PersonaResult
   settings: RootState['settings']
 } {
   const queryParams = queryString.parse(window.location.search)
@@ -80,6 +82,7 @@ function getCongurationFromParams(): {
       servicesEndpoint: string
       freeTTS: boolean
       freeSmart: boolean
+      persona: PersonaResult
       settings?: RootState['settings']
     }
 
@@ -102,6 +105,7 @@ function getCongurationFromParams(): {
       apiEndpoint: configurationJson.apiEndpoint || '',
       cardEndpoint: configurationJson.cardEndpoint || API_ENDPOINT,
       servicesEndpoint: configurationJson.servicesEndpoint || SERVICES_ENDPOINT,
+      persona: configurationJson.persona,
       settings: mergeWith(
         mergeWith({}, initialSettingsState),
         configurationJson.settings || {}
@@ -123,6 +127,19 @@ function getCongurationFromParams(): {
       apiEndpoint: '',
       cardEndpoint: CARD_ENDPOINT,
       servicesEndpoint: SERVICES_ENDPOINT,
+      persona: {
+        id: '',
+        name: '',
+        description: '',
+        profilePic: '',
+        isDefault: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        user: {
+          id: '',
+          username: '',
+        },
+      },
       settings: initialSettingsState,
     }
   }
@@ -206,6 +223,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       freeSmart={params.freeSmart}
       isMobileApp={params.isMobileApp}
       freeTTS={params.freeTTS}
+      persona={params.persona}
       novelLoader={loadNarration}
       assetUploader={(file: File) =>
         uploadAsset(params.assetsUploadEndpoint, file)
