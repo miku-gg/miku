@@ -23,8 +23,6 @@ function App(props: AppProps) {
     servicesEndpoint: props.servicesEndpoint,
     apiEndpoint: props.apiEndpoint,
     cardEndpoint: props.cardEndpoint,
-    characterSearcher: props.characterSearcher,
-    backgroundSearcher: props.backgroundSearcher,
     assetUploader: props.assetUploader,
     assetLinkLoader: props.assetLinkLoader,
     novelLoader: props.novelLoader,

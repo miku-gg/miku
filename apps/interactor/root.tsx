@@ -11,11 +11,6 @@ import { decodeText, uploadAsset } from '@mikugg/bot-utils'
 import mergeWith from 'lodash.mergewith'
 import queryString from 'query-string'
 
-import {
-  BackgroundResult,
-  CharacterResult,
-  listSearch,
-} from './src/libs/listSearch'
 import { loadNovelFromSingleCard } from './src/libs/loadNovel'
 
 import { initialState as initialCreationState } from './src/state/slices/creationSlice'
@@ -211,20 +206,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         uploadAsset(params.assetsUploadEndpoint, file)
       }
       assetLinkLoader={assetLinkLoader}
-      backgroundSearcher={(_params: {
-        search: string
-        take: number
-        skip: number
-      }) =>
-        listSearch<BackgroundResult>(params.backgroundSearchEndpoint, _params)
-      }
-      characterSearcher={(_params: {
-        search: string
-        take: number
-        skip: number
-      }) =>
-        listSearch<CharacterResult>(params.characterSearchEndpoint, _params)
-      }
     />
   </React.StrictMode>
 )

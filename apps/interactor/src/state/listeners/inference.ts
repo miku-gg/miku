@@ -20,14 +20,14 @@ export interface InferenceStatus {
 
 const inferenceEffect = async (
   dispatch: Dispatch,
-  apiEndpont: string,
+  apiEndpoint: string,
   servicesEndpoint: string,
   id: string,
   prompt: string
 ) => {
   try {
     const inference: AxiosResponse<string> = await axios.post(
-      `${apiEndpont}/inference`,
+      `${apiEndpoint}/inference`,
       {
         workflowId: 'backgrounds',
         prompt,
@@ -59,7 +59,7 @@ const inferenceEffect = async (
         const status: AxiosResponse<
           { status: InferenceStatus; inferenceId: string }[]
         > = await axios.get(
-          `${apiEndpont}/inferences/statuses?inferenceIds[]=${inferenceId}`,
+          `${apiEndpoint}/inferences/statuses?inferenceIds[]=${inferenceId}`,
           { withCredentials: true }
         )
         if (status.data.length === 0) {
@@ -70,7 +70,7 @@ const inferenceEffect = async (
         if (inferenceStatus.status === 'done') {
           try {
             await axios.post(
-              `${apiEndpont}/inference/migrate-results-to-mikugg`,
+              `${apiEndpoint}/inference/migrate-results-to-mikugg`,
               {
                 inferenceId,
               },
@@ -79,7 +79,7 @@ const inferenceEffect = async (
               }
             )
             await axios.post(
-              `${apiEndpont}/background`,
+              `${apiEndpoint}/background`,
               {
                 description: prompt,
                 sdPrompt: prompt,
@@ -96,6 +96,7 @@ const inferenceEffect = async (
             backgroundInferenceEnd({
               id,
               result: inferenceStatus.result[0],
+              apiEndpoint,
               servicesEndpoint,
             })
           )

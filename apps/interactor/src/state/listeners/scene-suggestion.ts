@@ -21,6 +21,8 @@ import {
   setModalOpened,
 } from '../slices/creationSlice'
 import { addScene } from '../slices/novelSlice'
+import { listSearch, SearchType, SongResult } from '../../libs/listSearch'
+import trim from 'lodash.trim'
 
 const sceneSuggestionEffect = async (
   dispatch: Dispatch,
@@ -95,6 +97,7 @@ const promptSelectedSuggestedScene = async (
   dispatch: Dispatch,
   state: RootState,
   servicesEndpoint: string,
+  apiEndpoint: string,
   sceneId: string
 ) => {
   const response = state.narration.responses[state.narration.currentResponseId]
@@ -105,8 +108,17 @@ const promptSelectedSuggestedScene = async (
     (bg) => bg.id === sceneId
   )
 
-  // TODO: Fix outfit prompt
   const currentScene = selectCurrentScene(state)
+
+  const music = suggestion?.music
+    ? await listSearch<SongResult>(apiEndpoint, SearchType.SONG_VECTOR, {
+        search: trim(suggestion?.music),
+        take: 1,
+        skip: 0,
+      }).then((result) => (result.length ? result[0] : null))
+    : null
+
+  // TODO: Fix outfit prompt
 
   dispatch(removeImportedBackground(sceneId))
   dispatch(
@@ -118,7 +130,7 @@ const promptSelectedSuggestedScene = async (
           outfit: c.outfit,
         })) || [],
       background: background?.source.jpg || '',
-      music: currentScene?.musicId || '',
+      music: music?.asset || currentScene?.musicId || '',
       name: suggestion?.actionText || '',
       prompt: suggestion?.textPrompt || '',
       children: currentScene?.children || [],
@@ -173,6 +185,7 @@ sceneSugestionMiddleware.startListening({
       listenerApi.dispatch,
       state,
       action.payload.servicesEndpoint,
+      action.payload.apiEndpoint,
       action.payload.id
     )
   },
