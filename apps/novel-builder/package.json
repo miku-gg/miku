@@ -48,6 +48,7 @@
     "@aws-crypto/crc32": "^4.0.0",
     "@ipld/dag-pb": "^4.0.2",
     "@mikugg/bot-utils": "workspace:^",
+    "@mikugg/guidance": "workspace:^",
     "@mikugg/ui-kit": "workspace:^",
     "@primer/octicons-react": "^17.12.0",
     "@reactflow/node-resizer": "^2.2.9",

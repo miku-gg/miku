@@ -1,9 +1,9 @@
-import express, { Request, Response } from "express";
-import cors from "cors";
 import bodyParser from "body-parser";
-import textHandler, { modelsMetadata } from "./services/text";
-import audioHandler from "./services/audio";
+import cors from "cors";
+import express, { Request, Response } from "express";
 import jwtPermissionMiddleware from "./lib/verifyJWT";
+import audioHandler from "./services/audio";
+import textHandler, { modelsMetadata } from "./services/text";
 import { ModelType } from "./services/text/lib/queryValidation";
 
 const PORT = process.env.SERVICES_PORT || 8484;
@@ -15,10 +15,12 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5100",
+      "http://localhost:8586",
       "https://miku.gg",
       "https://dev.miku.gg",
       "https://alpha.miku.gg",
       "https://interactor.miku.gg",
+      "https://build.miku.gg",
     ],
   })
 );
