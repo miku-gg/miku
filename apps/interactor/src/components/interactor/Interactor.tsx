@@ -13,6 +13,7 @@ import SceneSuggestion from './SceneSuggestion'
 import InteractorHeader from './InteractorHeader'
 import ChatBox from '../chat-box/ChatBox'
 import classNames from 'classnames'
+import Inventory from './Inventory'
 
 const Interactor = () => {
   const { assetLinkLoader } = useAppContext()
@@ -87,6 +88,7 @@ const Interactor = () => {
             </div>
           </div>
           <ChatBox />
+          <Inventory />
         </div>
       </div>
     </AreYouSure.AreYouSureProvider>

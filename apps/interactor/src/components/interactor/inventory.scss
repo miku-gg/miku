@@ -1,0 +1,168 @@
+@import '../../variables';
+
+.Inventory {
+  height: 470px;
+  width: 262px;
+
+  background-color: #0c1225;
+  box-shadow: 0 0 10px #cd5fea;
+
+  margin-top: 50px;
+  border-radius: 0 10px 10px 0;
+  z-index: 1;
+
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  &__header {
+    padding: 1rem;
+    font-size: 1.4rem;
+    text-align: left;
+    background-color: $background-1;
+
+    border-top-right-radius: 10px;
+  }
+
+  &__items {
+    overflow-y: auto;
+
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    gap: 10px;
+    height: 404px;
+  }
+
+  &__item {
+    width: 74px;
+    height: 74px;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+
+    opacity: 0.5;
+    background-color: $background-1;
+
+    border-radius: 10px;
+    border: 2px solid transparent;
+
+    transition: all 0.2s ease-out;
+
+    &-image {
+      width: 100%;
+      height: 100%;
+    }
+
+    &-name {
+      min-width: 100%;
+      bottom: 5%;
+
+      font-size: 0.75rem;
+      white-space: nowrap;
+      position: absolute;
+      text-align: center;
+
+      background-color: rgba(0, 0, 0, 0.65);
+      opacity: 0;
+
+      animation: infiniteSlide var(--animation-duration) linear infinite;
+
+      transition: all 0.2s ease-out;
+    }
+
+    &-price {
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      background-color: $background-1;
+      border-bottom-right-radius: 10px;
+
+      font-size: 0.7rem;
+      padding: 0.2rem;
+
+      transition: all 0.2s ease-out;
+    }
+
+    &.selected {
+      border: 2px solid #aaa1ff;
+      opacity: 1;
+
+      .Inventory__item-price {
+        background-color: #aaa1ff;
+      }
+
+      .Inventory__item-name {
+        opacity: 1;
+      }
+    }
+
+    &:hover {
+      border: 2px solid #aaa1ff;
+      opacity: 1;
+
+      .Inventory__item-price {
+        background-color: #aaa1ff;
+      }
+
+      .Inventory__item-name {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.InventoryItemModal {
+  position: absolute;
+  right: -150px;
+  top: 3.612rem;
+  width: 150px;
+  height: 350px;
+  z-index: 0;
+
+  background-color: $background-1;
+  border-radius: 0 10px 10px 0;
+  box-shadow: 5px 0 10px #cd5fea;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &__image {
+    width: 100px;
+    height: 100px;
+  }
+
+  &__name {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+  }
+
+  &__price {
+    font-size: 1rem;
+    margin-top: 1rem;
+  }
+
+  &__button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    background-color: #aaa1ff;
+    color: white;
+    cursor: pointer;
+  }
+}
+
+@keyframes infiniteSlide {
+  0% {
+    text-indent: var(--initial-text-position);
+  }
+  100% {
+    text-indent: var(--ending-text-position);
+  }
+}
