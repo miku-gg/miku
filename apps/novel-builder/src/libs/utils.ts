@@ -108,21 +108,6 @@ export const SERVICES_ENDPOINT =
 export const API_ENDPOINT =
   import.meta.env.VITE_API_ENDPOINT || "http://localhost:8080";
 
-export const fetchUserData = async () => {
-  try {
-    const result = await axios.get<{
-      credits: number;
-      tier: string;
-      id: string;
-    }>(`${API_ENDPOINT}/user`, {
-      withCredentials: true,
-    });
-    console.log(result.data.tier);
-    return result.data;
-  } catch (error) {
-    console.error(error);
-  }
-};
 export const descriptionAgent = new Agents.AgentPrompt({
   description:
     "You're a writing assistant that will suggest character descriptions.",
