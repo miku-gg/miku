@@ -15,7 +15,7 @@ import { updateCharacter } from "../state/slices/novelFormSlice";
 
 const DEFAULT_TAGS = [
   { value: "Male" },
-  { value: "Famale" },
+  { value: "Female" },
   { value: "OC" },
   { value: "NSFW" },
   { value: "RPG" },
