@@ -82,4 +82,10 @@
     &__tags {
     }
   }
+
+  &__footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
 }
