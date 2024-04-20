@@ -136,8 +136,8 @@ export default function StartsPanel() {
                                       ? {
                                           ...char,
                                           emotion:
-                                            outfit?.emotions[indexEmotion].id ||
-                                            "",
+                                            outfit?.emotions[indexEmotion]
+                                              ?.id || "",
                                         }
                                       : char
                                   ),
@@ -235,7 +235,7 @@ export default function StartsPanel() {
                       );
                     return {
                       characterId: character.id || "",
-                      emotion: outfit?.emotions[0].id || "",
+                      emotion: outfit?.emotions[0]?.id || "",
                       text: "",
                       pose: "standing",
                     };

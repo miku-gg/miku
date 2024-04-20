@@ -120,14 +120,21 @@ export default function SceneEditModal() {
                     ),
                     0
                   );
-                  const selectedEmotion =
-                    outfits[selectedOutfitIndex].emotions.find(
-                      (emotion) =>
-                        emotion.id ===
-                        (characterIndex === 0
-                          ? showingEmotionChar1
-                          : showingEmotionChar2)
-                    ) || outfits[selectedOutfitIndex].emotions[0];
+                  const selectedEmotion = outfits[
+                    selectedOutfitIndex
+                  ].emotions.find(
+                    (emotion) =>
+                      emotion.id ===
+                      (characterIndex === 0
+                        ? showingEmotionChar1
+                        : showingEmotionChar2)
+                  ) ||
+                    outfits[selectedOutfitIndex].emotions[0] || {
+                      id: "neutral",
+                      sources: {
+                        png: "",
+                      },
+                    };
                   return (
                     <div
                       key={character.id}
@@ -185,11 +192,11 @@ export default function SceneEditModal() {
                           characterIndex === 0
                             ? setShowingEmotionChar1(
                                 outfits[selectedOutfitIndex].emotions[index]
-                                  .id || ""
+                                  ?.id || ""
                               )
                             : setShowingEmotionChar2(
                                 outfits[selectedOutfitIndex].emotions[index]
-                                  .id || ""
+                                  ?.id || ""
                               );
                         }}
                       />

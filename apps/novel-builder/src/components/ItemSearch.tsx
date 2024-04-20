@@ -128,7 +128,7 @@ export default function ItemSearch<T>(props: {
               )}
               <div className="ItemSearch__item__content">
                 <div className="ItemSearch__item__title">{result.name}</div>
-                <div className="ItemSearch__item__description">
+                <div className="ItemSearch__item__description scrollbar">
                   {result.description}
                 </div>
                 {/* <div className="ItemSearch__item__tags">
