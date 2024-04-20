@@ -59,7 +59,11 @@ export default function ItemSearch<T>(props: {
           props.onError && props.onError("Error searching");
           return;
         }
-        setResults([...result.private, ...result.public]);
+        setResults((existingResults) => [
+          ...existingResults,
+          ...result.private,
+          ...result.public,
+        ]);
         setHasMore(result.private.length + result.public.length === take);
       } catch (e) {
         setLoading(false);
@@ -102,13 +106,13 @@ export default function ItemSearch<T>(props: {
             {loading ? <Loader /> : null}
           </div>
         </div>
-        <div className="ItemSearch__input-checkbox">
+        {/* <div className="ItemSearch__input-checkbox">
           <CheckBox
             label="Only mine"
             value={onlyPrivate}
             onChange={(e) => setOnlyPrivate(e.target.checked)}
           />
-        </div>
+        </div> */}
         <div className="ItemSearch__list">
           {results.map((result) => (
             <div
@@ -118,7 +122,7 @@ export default function ItemSearch<T>(props: {
               onClick={() => props.onSelect(result.value)}
             >
               {isAudioFile(result.previewAssetUrl) ? (
-                <audio src={result.previewAssetUrl} controls />
+                <audio src={result.previewAssetUrl} controls preload="none" />
               ) : (
                 <img src={result.previewAssetUrl} alt={result.name} />
               )}

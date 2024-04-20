@@ -1,4 +1,11 @@
 import { NovelV3, uploadAsset } from "@mikugg/bot-utils";
+import {
+  BackgroundResult,
+  listSearch,
+  SearchType,
+  SongResult,
+} from "./libs/listSearch";
+import { API_ENDPOINT } from "./libs/utils";
 
 async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
   const response = await fetch(dataURI);
@@ -208,21 +215,55 @@ const configs: Map<"development" | "staging" | "production", BuilderConfig> =
             };
           },
           backgrounds: async (query) => {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            const result = await listSearch<BackgroundResult>(
+              "https://apidev.miku.gg",
+              SearchType.BACKGROUND,
+              {
+                search: query.text,
+                take: query.take,
+                skip: query.skip,
+              }
+            );
             return {
               success: true,
               result: {
-                public: [],
+                public: result
+                  .map((bg) => ({
+                    id: bg.id,
+                    name: bg.description.slice(0, 5) + "...",
+                    description: bg.description,
+                    attributes: [],
+                    source: {
+                      jpg: bg.asset,
+                    },
+                  }))
+                  .filter((bg) => bg.id && bg.source),
                 private: [],
               },
             };
           },
           songs: async (query) => {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            const result = await listSearch<SongResult>(
+              "https://apidev.miku.gg",
+              SearchType.SONG,
+              {
+                search: query.text,
+                take: query.take,
+                skip: query.skip,
+              }
+            );
             return {
               success: true,
               result: {
-                public: [],
+                public: result
+                  .map((song) => ({
+                    id: song.id,
+                    name: song.title,
+                    description: song.description,
+                    tags: song.tags || [],
+                    source: song.asset,
+                  }))
+                  .filter((song) => song.id && song.source),
                 private: [],
               },
             };
@@ -268,21 +309,55 @@ const configs: Map<"development" | "staging" | "production", BuilderConfig> =
             };
           },
           backgrounds: async (query) => {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            const result = await listSearch<BackgroundResult>(
+              "https://api.miku.gg",
+              SearchType.BACKGROUND,
+              {
+                search: query.text,
+                take: query.take,
+                skip: query.skip,
+              }
+            );
             return {
               success: true,
               result: {
-                public: [],
+                public: result
+                  .map((bg) => ({
+                    id: bg.id,
+                    name: bg.description.slice(0, 5) + "...",
+                    description: bg.description,
+                    attributes: [],
+                    source: {
+                      jpg: bg.asset,
+                    },
+                  }))
+                  .filter((bg) => bg.id && bg.source),
                 private: [],
               },
             };
           },
           songs: async (query) => {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            const result = await listSearch<SongResult>(
+              "https://api.miku.gg",
+              SearchType.SONG,
+              {
+                search: query.text,
+                take: query.take,
+                skip: query.skip,
+              }
+            );
             return {
               success: true,
               result: {
-                public: [],
+                public: result
+                  .map((song) => ({
+                    id: song.id,
+                    name: song.title,
+                    description: song.description,
+                    tags: song.tags || [],
+                    source: song.asset,
+                  }))
+                  .filter((song) => song.id && song.source),
                 private: [],
               },
             };
