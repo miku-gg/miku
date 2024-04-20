@@ -61,14 +61,22 @@
     }
 
     img {
+      min-width: 100px;
       width: 100px;
       height: 100px;
       object-fit: cover;
       border-radius: 10px;
     }
 
+    audio {
+      &::-webkit-media-controls-panel {
+        padding: 0;
+      }
+    }
+
     &__content {
       margin-left: 1rem;
+      width: 100%;
     }
 
     &__description {
