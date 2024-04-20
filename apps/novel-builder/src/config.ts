@@ -136,8 +136,9 @@ const configs: Map<"development" | "staging" | "production", BuilderConfig> =
                 private: [
                   {
                     id: "2",
-                    name: "Background 2",
-                    description: "A background",
+                    name: "Background Relaxing, storytelling",
+                    description:
+                      "A background. relaxing, storytelling, fantasy, adventure, relaxing, storytelling, fantasy, adventure",
                     attributes: [["tag", "value"]],
                     source: {
                       jpg: "QmRKvMSTVnQti536ZXqS6EkwwaZMMVRXZJXd3T5vv2BfoL.png",
@@ -156,7 +157,8 @@ const configs: Map<"development" | "staging" | "production", BuilderConfig> =
                   {
                     id: "3",
                     name: "Song 3",
-                    description: "relaxing",
+                    description:
+                      "relaxing, storytelling, fantasy, adventure, relaxing, storytelling, fantasy, adventure",
                     tags: ["relaxing"],
                     source:
                       "QmfCftjWFfC9BohLrmYXuQCzWnv91qoAi64SJUPnxYJzes.mpeg",

@@ -10,6 +10,7 @@ export type ModalType =
   | "characterGeneration"
   | "characterSearch"
   | "loading"
+  | "errors"
   | "scene";
 
 export type PanelType = "details" | "assets" | "scenes" | "starts" | "preview";
@@ -61,6 +62,9 @@ const initialState: InputState = {
       opened: false,
     },
     scene: {
+      opened: false,
+    },
+    errors: {
       opened: false,
     },
   },

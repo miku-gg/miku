@@ -3,7 +3,6 @@ import {
   extractNovelAssets,
   replaceStringsInObject,
 } from "@mikugg/bot-utils";
-import axios from "axios";
 import Hash from "ipfs-only-hash";
 
 import { Agents } from "@mikugg/guidance";
@@ -240,3 +239,15 @@ export const achievementsAgent = new Agents.AgentPrompt({
     },
   ],
 });
+
+export const allowUntilStep = (novel: NovelV3.NovelState): number => {
+  if (
+    novel.backgrounds.length === 0 ||
+    novel.characters.length === 0 ||
+    novel.songs.length === 0
+  )
+    return 0;
+  if (novel.scenes.length === 0) return 1;
+  if (novel.starts.length === 0) return 2;
+  return 3;
+};

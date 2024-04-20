@@ -16,5 +16,10 @@
   &__header {
     display: flex;
     justify-content: space-between;
+
+    &-left {
+      display: flex;
+      gap: 10px;
+    }
   }
 }
