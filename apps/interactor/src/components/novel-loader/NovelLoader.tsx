@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { useAppContext } from '../../App.context'
 import { replaceState } from '../../state/slices/replaceState'
 import './NovelLoader.scss'
+import { registerTrackSessionData } from '../../libs/analytics'
 
 const NovelLoader = (): JSX.Element => {
   const { novelLoader } = useAppContext()
@@ -13,6 +14,11 @@ const NovelLoader = (): JSX.Element => {
   useEffect(() => {
     novelLoader().then((state: RootState) => {
       dispatch(replaceState(state))
+      registerTrackSessionData({
+        name: state.novel.title,
+        isPremium: state.settings.user.isPremium,
+        nsfw: state.settings.user.nsfw,
+      })
     })
   }, [dispatch, novelLoader])
 
