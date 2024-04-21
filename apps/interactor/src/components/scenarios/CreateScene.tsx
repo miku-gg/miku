@@ -48,6 +48,7 @@ import { loadNovelFromSingleCard } from '../../libs/loadNovel'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
 import CreditsDisplayer from './CreditsDisplayer'
 import { selectCurrentScene } from '../../state/selectors'
+import { trackEvent } from '../../libs/analytics'
 
 const selectSelectableCharacters = createSelector(
   [
@@ -205,6 +206,7 @@ const CreateScene = () => {
     )
     dispatch(setModalOpened({ id: 'scene', opened: false }))
     dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
+    trackEvent('scene-create-successful')
   }
 
   return (

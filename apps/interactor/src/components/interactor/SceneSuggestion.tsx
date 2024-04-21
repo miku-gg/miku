@@ -22,6 +22,7 @@ import { userDataFetchStart } from '../../state/slices/settingsSlice'
 import CreditsDisplayer from '../scenarios/CreditsDisplayer'
 import { NarrationSceneSuggestion } from '../../state/versioning/v3.state'
 import { selectCurrentNextScene } from '../../state/selectors'
+import { trackEvent } from '../../libs/analytics'
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false)
@@ -74,6 +75,7 @@ export default function SceneSuggestion() {
                   dispatch(sceneSuggestionsStart({ servicesEndpoint }))
                   dispatch(userDataFetchStart({ apiEndpoint }))
                 }
+                trackEvent('scene-generate-suggestion-click')
               }}
             >
               <div className="SceneSuggestion__text">
@@ -101,6 +103,7 @@ export default function SceneSuggestion() {
                       ].characterId || '',
                   })
                 )
+                trackEvent('scene-advance-suggestion-click')
               }}
             >
               <div className="SceneSuggestion__text">
@@ -148,6 +151,7 @@ const SceneSuggestionModal = () => {
         forNewScene: true,
       })
     )
+    trackEvent('scene-generate-successful')
   }
 
   const handleCancelBackground = () => {

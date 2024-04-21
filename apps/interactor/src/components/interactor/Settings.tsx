@@ -17,6 +17,7 @@ import {
 } from '../../state/slices/settingsSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import './Settings.scss'
+import { trackEvent } from '../../libs/analytics'
 const audio = new Audio()
 
 const Settings = (): JSX.Element => {
@@ -65,7 +66,10 @@ const Settings = (): JSX.Element => {
     <div className="Settings">
       <button
         className="Settings__button icon-button"
-        onClick={() => dispatch(setSettingsModal(true))}
+        onClick={() => {
+          dispatch(setSettingsModal(true))
+          trackEvent('settings-click')
+        }}
       >
         <SlSettings />
       </button>
