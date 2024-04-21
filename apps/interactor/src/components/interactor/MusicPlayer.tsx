@@ -7,6 +7,7 @@ import {
   setMusicEnabled,
   setMusicVolume,
 } from '../../state/slices/settingsSlice'
+import { trackEvent } from '../../libs/analytics'
 
 export const Music = () => {
   return (
@@ -68,6 +69,7 @@ const MusicPlayer: React.FC = () => {
     } else {
       dispatch(setMusicEnabled(true))
     }
+    trackEvent('music-toggle-click', { enabledMusic: !volume })
   }
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {

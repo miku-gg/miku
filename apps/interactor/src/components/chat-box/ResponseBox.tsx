@@ -44,14 +44,11 @@ const ResponseBox = (): JSX.Element | null => {
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
   const swipes = useAppSelector(selectCurrentSwipeResponses)
   const { disabled } = useAppSelector((state) => state.narration.input)
-  const novelTitle = useAppSelector((state) => state.novel.title)
   const displayCharacter = useAppSelector(selectLastSelectedCharacter)
   const displayText = useFillTextTemplate(displayCharacter.text)
 
   const handleRegenerateClick = () => {
-    trackEvent('bot_regenerate', {
-      bot: novelTitle,
-    })
+    trackEvent('interaction_regenerate')
     const characterIndex = Math.floor(
       Math.random() * (scene?.characters.length || 0)
     )
@@ -82,9 +79,7 @@ const ResponseBox = (): JSX.Element | null => {
   }
 
   const handleContinueClick = () => {
-    trackEvent('bot_continue', {
-      bot: novelTitle,
-    })
+    trackEvent('interaction_continue')
     dispatch(
       continueResponse({
         servicesEndpoint,
