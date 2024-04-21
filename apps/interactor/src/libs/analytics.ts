@@ -30,15 +30,17 @@ export const registerTrackSessionData = (
 // eslint-disable-next-line
 export const trackEvent = (event: TrackableEvent, data: any = {}) => {
   try {
-    // eslint-disable-next-line
-    // @ts-ignore
-    const dataLayer = window?.parent?.dataLayer || []
-
-    dataLayer.push({
-      ...sessionData,
-      event,
-      ...data,
-    })
+    window.parent?.postMessage(
+      {
+        type: 'TRACK_EVENT',
+        payload: {
+          ...sessionData,
+          event,
+          ...data,
+        },
+      },
+      '*'
+    )
   } catch (e) {
     return
   }
