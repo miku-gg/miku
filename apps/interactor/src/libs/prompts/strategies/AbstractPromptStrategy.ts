@@ -27,7 +27,12 @@ export abstract class AbstractPromptStrategy<Input, Output> {
   ): Output
 
   protected countTokens(template: string): number {
+    let maxTokens: number = 0
+    template.replace(/max_tokens=(\d+)/g, (_, _maxTokens) => {
+      maxTokens += parseInt(_maxTokens) || 0
+      return ''
+    })
     const _template = template.replace(/{{.*?}}/g, '')
-    return this.tokenizer.encode(_template).length
+    return this.tokenizer.encode(_template).length + maxTokens
   }
 }

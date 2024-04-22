@@ -7,7 +7,15 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      ".mock.ts$"
+    ]
   },
   "dependencies": {
     "@mikugg/bot-utils": "workspace:^",
@@ -33,6 +41,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.8",
     "@types/lodash.debounce": "^4.0.9",
     "@types/lodash.mergewith": "^4.6.9",
     "@types/lodash.trim": "^4.5.7",
@@ -49,6 +58,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "prettier": "^2.8.7",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.2.2",
     "vite": "^5.0.8"
   }
