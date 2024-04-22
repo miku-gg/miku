@@ -8,6 +8,7 @@ import App from './src/App'
 import './root.scss'
 
 import { decodeText, uploadAsset } from '@mikugg/bot-utils'
+import * as Sentry from '@sentry/react'
 import mergeWith from 'lodash.mergewith'
 import queryString from 'query-string'
 
@@ -18,6 +19,12 @@ import { initialState as initialSettingsState } from './src/state/slices/setting
 import { RootState } from './src/state/store'
 import { VersionId } from './src/state/versioning'
 import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
+
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+  })
+}
 
 const ASSETS_ENDPOINT =
   import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets'
