@@ -211,7 +211,7 @@ const novelFormSlice = createSlice({
               );
             return {
               characterId: character.characterId,
-              emotion: characterOutfit?.emotions[0].id || "neutral",
+              emotion: characterOutfit?.emotions[0]?.id || "neutral",
               pose: "standing",
               text: "Hello!",
             };

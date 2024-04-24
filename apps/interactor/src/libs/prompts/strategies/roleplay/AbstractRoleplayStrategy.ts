@@ -83,8 +83,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       }, {} as Record<string, string>),
     })
 
-    const totalTokens =
-      this.countTokens(template) + maxNewTokens + PROMPT_TOKEN_OFFSET
+    const totalTokens = this.countTokens(template) + PROMPT_TOKEN_OFFSET
 
     const parentEmotion =
       selectLastLoadedCharacters(input.state).find(

@@ -5,11 +5,6 @@ export enum StateEventType {
   UPDATE_STATE = 'UPDATE_STATE',
 }
 
-export enum AnalyticsEvents {
-  INTERACTION = 'novel_interaction',
-  REGENERATION = 'novel_regeneration',
-}
-
 const postMessage = (
   type: StateEventType,
   payload: {

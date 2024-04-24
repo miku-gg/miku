@@ -206,7 +206,7 @@ export default function CharacterOutfitsEdit({
         emotions[emotionIndex] = {
           ...emotions[emotionIndex],
           sources: {
-            ...emotions[emotionIndex].sources,
+            ...emotions[emotionIndex]?.sources,
             webm: assetId,
           },
         };
@@ -224,7 +224,7 @@ export default function CharacterOutfitsEdit({
         emotions[emotionIndex] = {
           ...emotions[emotionIndex],
           sources: {
-            ...emotions[emotionIndex].sources,
+            ...emotions[emotionIndex]?.sources,
             png: assetId,
           },
         };
@@ -305,7 +305,6 @@ export default function CharacterOutfitsEdit({
                 size="sm"
                 dragAreaLabel={emotionId}
                 handleChange={(file) => {
-                  console.log("wesa");
                   handleImageChange(
                     file,
                     groupIndex,
@@ -322,16 +321,6 @@ export default function CharacterOutfitsEdit({
                 }
                 placeHolder="(1024x1024)"
                 onFileValidate={(file) => {
-                  console.log(
-                    "validate",
-                    file,
-                    checkFileType(file, [
-                      "image/png",
-                      "image/gif",
-                      "video/webm",
-                      "audio/mpeg",
-                    ])
-                  );
                   return checkFileType(file, [
                     "image/png",
                     "image/gif",

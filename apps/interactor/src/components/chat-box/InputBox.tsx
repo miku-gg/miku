@@ -14,7 +14,6 @@ import { useAppContext } from '../../App.context'
 
 import './InputBox.scss'
 import { toast } from 'react-toastify'
-import { trackEvent } from '../../libs/analytics'
 import classNames from 'classnames'
 import { Tooltip } from '@mikugg/ui-kit'
 import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSuggestionStrategy'
@@ -25,12 +24,10 @@ import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { FaStore } from 'react-icons/fa6'
 import { setInventoryVisibility } from '../../state/slices/inventorySlice'
 
-let lastInteractionTime = Date.now()
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
   const { servicesEndpoint, isInteractionDisabled } = useAppContext()
   const { text, disabled } = useAppSelector((state) => state.narration.input)
-  const novelTitle = useAppSelector((state) => state.novel.title)
   const state = useAppSelector((state) => state)
   const scene = useAppSelector(selectCurrentScene)
   const lastResponse = useAppSelector(selectLastLoadedResponse)
@@ -54,11 +51,6 @@ const InputBox = (): JSX.Element | null => {
   }, [triggeredAction])
 
   const sendMessage = (text: string) => {
-    trackEvent('bot_interact', {
-      bot: novelTitle,
-      time: Date.now() - lastInteractionTime,
-      prevented: isInteractionDisabled,
-    })
     if (isInteractionDisabled) {
       toast.warn('Please log in to interact.', {
         position: 'top-center',
@@ -68,7 +60,6 @@ const InputBox = (): JSX.Element | null => {
       })
       return
     }
-    lastInteractionTime = Date.now()
     dispatch(
       interactionStart({
         text,

@@ -99,6 +99,8 @@ export default function PreviewPanel() {
 
       const start = novel.starts[0];
 
+      if (!start) return;
+
       iframe?.contentWindow?.postMessage(
         {
           type: "NARRATION_DATA",

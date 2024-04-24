@@ -1,5 +1,6 @@
-import * as Tokenizer from "./lib/tokenizer";
-import * as TokenGenerator from "./lib/token-generator";
+import * as Agents from "./lib/Agent";
 import * as Template from "./lib/template";
+import * as TokenGenerator from "./lib/token-generator";
+import * as Tokenizer from "./lib/tokenizer";
 
-export { Tokenizer, TokenGenerator, Template };
+export { Agents, Template, TokenGenerator, Tokenizer };

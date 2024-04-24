@@ -14,6 +14,7 @@ import { setModalOpened } from '../../state/slices/creationSlice'
 import { toast } from 'react-toastify'
 import { BsStars } from 'react-icons/bs'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
+import { trackEvent } from '../../libs/analytics'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
@@ -64,6 +65,7 @@ export default function SceneSelector(): JSX.Element | null {
           ].characterId || '',
       })
     )
+    trackEvent('scene-select')
   }
   return (
     <div
@@ -74,9 +76,10 @@ export default function SceneSelector(): JSX.Element | null {
       <button
         className="SceneSelector__trigger icon-button"
         disabled={inputDisabled}
-        onClick={() =>
+        onClick={() => {
           dispatch(setModalOpened({ id: 'slidepanel', opened: true }))
-        }
+          trackEvent('scene-sidebar-open')
+        }}
       >
         <BiCameraMovie />
       </button>
@@ -139,6 +142,7 @@ export default function SceneSelector(): JSX.Element | null {
                       opened: true,
                     })
                   )
+                  trackEvent('scene-create')
                 }}
               >
                 <div
@@ -170,6 +174,7 @@ export default function SceneSelector(): JSX.Element | null {
                       dispatch(sceneSuggestionsStart({ servicesEndpoint }))
                       dispatch(userDataFetchStart({ apiEndpoint }))
                     }
+                    trackEvent('scene-generate')
                   }}
                 >
                   <div className="SceneSelector__item-background SceneSelector__item-background--aero">

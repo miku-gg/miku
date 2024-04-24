@@ -32,8 +32,32 @@
     margin-bottom: 20px;
   }
 
-  &__description {
+  &__description,
+  &__examples {
     margin-bottom: 20px;
+
+    &__label {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      font-weight: 500;
+
+      & button {
+        display: flex;
+        align-items: center;
+        color: #fff;
+        gap: 0.1rem;
+        background: linear-gradient(90deg, #9747ff, transparent) #ff4e67;
+        border-radius: 0.5rem;
+        transition: ease-in-out 0.2s;
+
+        &:hover {
+          background-color: #9747ff;
+        }
+      }
+    }
   }
 
   &__personality {
@@ -42,5 +66,17 @@
 
   .Input__textArea {
     height: 4em;
+  }
+}
+.disabled {
+  & button {
+    background-color: #808080;
+    background: #808080;
+    color: #515050;
+    border-color: #515050;
+    cursor: default;
+    &:hover {
+      background-color: #808080;
+    }
   }
 }

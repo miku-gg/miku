@@ -7,6 +7,7 @@ import { Tooltip } from '@mikugg/ui-kit'
 import classNames from 'classnames'
 import { Speed } from '../../state/versioning'
 import { useAppContext } from '../../App.context'
+import { trackEvent } from '../../libs/analytics'
 
 // eslint-disable-next-line
 // @ts-ignore
@@ -205,6 +206,7 @@ const TTSPlayer2: React.FC = () => {
             !isPremium && !freeTTS && !isFirstMessage,
         })}
         onClick={() => {
+          trackEvent('voice-gen-click')
           if (isFirstMessage && audioRef.current) {
             setAudioSpeed(audioRef, playSpeed)
             audioRef.current.play()
