@@ -109,6 +109,7 @@ export interface SettingsState {
     nsfw: NovelNSFW
     credits: number
     loading: boolean
+    sceneSuggestionsLeft: number
   }
   prompt: {
     systemPrompt: string

@@ -5,13 +5,11 @@ import { useEffect, useState } from 'react'
 import classNames from 'classnames'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import {
-  backgroundInferenceStart,
-  backgroundInferenceUpdate,
+  endInferencingScene,
   setModalOpened,
+  startInferencingScene,
 } from '../../state/slices/creationSlice'
-import { Button, Loader, Modal, Tooltip } from '@mikugg/ui-kit'
-import { GEN_BACKGROUND_COST } from '../scenarios/CreateScene'
-import { FaCoins } from 'react-icons/fa'
+import { Button, Input, Loader, Modal, Tooltip } from '@mikugg/ui-kit'
 import { TbPlayerTrackNextFilled } from 'react-icons/tb'
 import {
   interactionStart,
@@ -19,10 +17,22 @@ import {
 } from '../../state/slices/narrationSlice'
 import { useAppContext } from '../../App.context'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
-import CreditsDisplayer from '../scenarios/CreditsDisplayer'
 import { NarrationSceneSuggestion } from '../../state/versioning/v3.state'
-import { selectCurrentNextScene } from '../../state/selectors'
+import {
+  selectCurrentNextScene,
+  selectCurrentScene,
+} from '../../state/selectors'
 import { trackEvent } from '../../libs/analytics'
+import {
+  BackgroundResult,
+  SearchType,
+  SongResult,
+  listSearch,
+} from '../../libs/listSearch'
+import trim from 'lodash.trim'
+import { addScene } from '../../state/slices/novelSlice'
+import { BsStars } from 'react-icons/bs'
+import { CustomEventType, postMessage } from '../../libs/stateEvents'
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false)
@@ -124,6 +134,7 @@ const SceneSuggestionModal = () => {
   const { opened } = useAppSelector(
     (state) => state.creation.scene.sceneSugestions
   )
+  const currentScene = useAppSelector(selectCurrentScene)
   const { suggestedScenes, fetchingSuggestions } = useAppSelector(
     (state) => state.narration.responses[state.narration.currentResponseId]!
   )
@@ -132,33 +143,75 @@ const SceneSuggestionModal = () => {
     : [...suggestedScenes, { actionText: '' }].findIndex((suggestion) => {
         return !suggestion.actionText.length
       }) - 1
-  const { credits } = useAppSelector((state) => state.settings.user)
   const { apiEndpoint, servicesEndpoint } = useAppContext()
-  const { fetching: fetchingBackground, backgrounds } = useAppSelector(
-    (state) => state.creation.inference
+  const fetchingScene = useAppSelector(
+    (state) => state.creation.scene.sceneSugestions.inferencing
   )
-  const fetchingScene =
-    fetchingBackground &&
-    !!suggestedScenes.find((s) => s.sceneId === backgrounds[0]?.id)
+  const [promptForSuggestion, setPromptForSuggestion] = useState<string>('')
+  const currentBackground = useAppSelector((state) =>
+    state.novel.backgrounds.find(({ id }) => id === currentScene?.backgroundId)
+  )
+  const { isPremium, sceneSuggestionsLeft } = useAppSelector(
+    (state) => state.settings.user
+  )
 
-  const generateScene = (sceneSuggestion: NarrationSceneSuggestion) => {
+  const generateScene = async (sceneSuggestion: NarrationSceneSuggestion) => {
+    dispatch(startInferencingScene())
+    const music = sceneSuggestion?.music
+      ? await listSearch<SongResult>(apiEndpoint, SearchType.SONG_VECTOR, {
+          search: trim(sceneSuggestion?.music),
+          take: 1,
+          skip: 0,
+        })
+          .then((result) => (result.length ? result[0] : null))
+          .catch((e) => {
+            console.error(e)
+            return null
+          })
+      : null
+    const background = sceneSuggestion?.sdPrompt
+      ? await listSearch<BackgroundResult>(apiEndpoint, SearchType.BACKGROUND, {
+          search: trim(sceneSuggestion?.sdPrompt),
+          take: 1,
+          skip: 0,
+        })
+          .then((result) => (result.length ? result[0] : null))
+          .catch((e) => {
+            console.error(e)
+            return null
+          })
+      : null
+
     dispatch(
-      backgroundInferenceStart({
+      addScene({
         id: sceneSuggestion.sceneId,
-        prompt: sceneSuggestion.sdPrompt,
-        apiEndpoint,
-        servicesEndpoint,
-        forNewScene: true,
+        characters:
+          currentScene?.characters.map((c) => ({
+            id: c.characterId,
+            outfit: c.outfit,
+          })) || [],
+        background: background?.asset || currentBackground?.source?.jpg || '',
+        music: music?.asset || currentScene?.musicId || '',
+        name: sceneSuggestion?.actionText || '',
+        prompt: sceneSuggestion?.textPrompt || '',
+        children: currentScene?.children || [],
       })
     )
-    trackEvent('scene-generate-successful')
-  }
 
-  const handleCancelBackground = () => {
     dispatch(
-      backgroundInferenceUpdate({
-        id: backgrounds[0]?.id,
-        forNewScene: false,
+      interactionStart({
+        sceneId: sceneSuggestion.sceneId,
+        text: `OOC: Describe the following scene and add dialogue: ${
+          sceneSuggestion?.textPrompt || ''
+        }`,
+        characters: sceneSuggestion?.characters.map((r) => r.characterId) || [],
+        servicesEndpoint,
+        selectedCharacterId:
+          sceneSuggestion?.characters[
+            Math.floor(
+              Math.random() * (sceneSuggestion?.characters.length || 0)
+            )
+          ].characterId || '',
       })
     )
     dispatch(
@@ -167,6 +220,9 @@ const SceneSuggestionModal = () => {
         opened: false,
       })
     )
+    dispatch(setModalOpened({ id: 'scene', opened: false }))
+    dispatch(endInferencingScene())
+    trackEvent('scene-generate-successful')
   }
 
   return (
@@ -185,26 +241,74 @@ const SceneSuggestionModal = () => {
       <div className="SceneSuggestionModal">
         <div className="SceneSuggestionModal__header">
           <h2>Scene suggestions</h2>
-          <CreditsDisplayer />
+          {!isPremium ? (
+            <div className="SceneSuggestionModal__countdown">
+              <div className="SceneSuggestionModal__countdown-amount">
+                {sceneSuggestionsLeft} scene generations left today.
+              </div>
+              <div className="SceneSuggestionModal__countdown-upgrade">
+                <Button
+                  theme="transparent"
+                  data-tooltip-id="upgrade-tooltip"
+                  data-tooltip-content="Get premium for unlimited scene generations."
+                  onClick={() =>
+                    postMessage(CustomEventType.OPEN_PREMIUM, null)
+                  }
+                >
+                  Upgrade
+                </Button>
+                <Tooltip id="upgrade-tooltip" place="bottom" />
+              </div>
+            </div>
+          ) : null}
         </div>
         <div className="SceneSuggestionModal__content">
-          {fetchingScene ? (
+          {!fetchingSuggestions && !suggestedScenes.length ? (
+            <div className="SceneSuggestionModal__options">
+              <div className="SceneSuggestionModal__suggest">
+                <Button
+                  theme="gradient"
+                  onClick={() => {
+                    dispatch(sceneSuggestionsStart({ servicesEndpoint }))
+                    dispatch(userDataFetchStart({ apiEndpoint }))
+                  }}
+                >
+                  Suggest 3 scenes
+                </Button>
+              </div>
+              <div className="SceneSuggestionModal__single-suggest">
+                <div className="SceneSuggestionModal__single-suggest-text">
+                  or describe the new scene in your own words
+                </div>
+                <div className="SceneSuggestionModal__single-suggest-field">
+                  <Input
+                    value={promptForSuggestion}
+                    onChange={(e) => setPromptForSuggestion(e.target.value)}
+                  />
+                  <Button
+                    theme="secondary"
+                    onClick={() => {
+                      dispatch(
+                        sceneSuggestionsStart({
+                          servicesEndpoint,
+                          singleScenePrompt: promptForSuggestion,
+                        })
+                      )
+                      dispatch(userDataFetchStart({ apiEndpoint }))
+                    }}
+                    disabled={!promptForSuggestion}
+                  >
+                    <BsStars />
+                    {''}
+                    Generate
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : fetchingScene ? (
             <div className="SceneSuggestionModal__loading">
               <Loader />
-              Generating background...
-              <i>It can take over 1 minute</i>
-              <Button
-                theme="transparent"
-                onClick={handleCancelBackground}
-                data-tooltip-id={`cancel-background-tooltip`}
-                data-tooltip-html={
-                  "The scene will generate anyways, but you won't move automatically there."
-                }
-                data-tooltip-varaint="light"
-              >
-                Cancel
-              </Button>
-              <Tooltip id="cancel-background-tooltip" place="top" />
+              Generating scene...
             </div>
           ) : fetchingSuggestions && !suggestedScenes.length ? (
             <div className="SceneSuggestionModal__loading">
@@ -226,19 +330,15 @@ const SceneSuggestionModal = () => {
                     <div className="SceneSuggestionModal__suggestion-button">
                       <Button
                         theme="gradient"
-                        disabled={loading || credits < GEN_BACKGROUND_COST}
-                        onClick={() => generateScene(suggestion)}
+                        disabled={
+                          loading || (!sceneSuggestionsLeft && !isPremium)
+                        }
+                        onClick={() =>
+                          (sceneSuggestionsLeft || isPremium) &&
+                          generateScene(suggestion)
+                        }
                       >
-                        {loading ? (
-                          <Loader />
-                        ) : (
-                          <>
-                            Generate Scene{' '}
-                            <span>
-                              {GEN_BACKGROUND_COST} <FaCoins />
-                            </span>
-                          </>
-                        )}
+                        {loading ? <Loader /> : 'Go to scene'}
                       </Button>
                     </div>
                   </div>
