@@ -11,12 +11,14 @@ import { setModalOpened } from '../../state/slices/creationSlice'
 import { toast } from 'react-toastify'
 import { BsStars } from 'react-icons/bs'
 import { trackEvent } from '../../libs/analytics'
+import { userDataFetchStart } from '../../state/slices/settingsSlice'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
   const backgrounds = useAppSelector((state) => state.novel.backgrounds)
   const scenes = useAppSelector(selectAvailableScenes)
   const {
+    apiEndpoint,
     assetLinkLoader,
     servicesEndpoint,
     isInteractionDisabled,
@@ -160,6 +162,11 @@ export default function SceneSelector(): JSX.Element | null {
                       setModalOpened({
                         id: 'scene-suggestions',
                         opened: true,
+                      })
+                    )
+                    dispatch(
+                      userDataFetchStart({
+                        apiEndpoint,
                       })
                     )
                     trackEvent('scene-generate')

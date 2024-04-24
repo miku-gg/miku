@@ -222,7 +222,7 @@ const CreateScene = () => {
                   ? backgroundSelected.startsWith('data:image')
                     ? backgroundSelected
                     : assetLinkLoader(backgroundSelected, true)
-                  : './default_background.png'
+                  : assetLinkLoader('default_background.png')
               })`,
             }}
             onClick={() =>

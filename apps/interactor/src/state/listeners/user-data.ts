@@ -10,6 +10,7 @@ const userDataEffect = async (
 ) => {
   try {
     const result = await axios.get<{
+      sceneSuggestionsLeft: number
       credits: number
       tier: string
       id: string
@@ -20,6 +21,7 @@ const userDataEffect = async (
       userDataFetchEnd({
         credits: result.data.credits,
         isPremium: result.data.tier === 'PREMIUM',
+        sceneSuggestionsLeft: result.data.sceneSuggestionsLeft,
       })
     )
   } catch (error) {
@@ -28,6 +30,7 @@ const userDataEffect = async (
       userDataFetchEnd({
         credits: state.settings.user.credits,
         isPremium: state.settings.user.isPremium,
+        sceneSuggestionsLeft: 0,
       })
     )
   }

@@ -20,6 +20,7 @@ export const initialState: SettingsState = {
     nsfw: NovelNSFW.EXPLICIT,
     credits: 0,
     loading: false,
+    sceneSuggestionsLeft: 0,
   },
   prompt: {
     systemPrompt: '',
@@ -123,11 +124,13 @@ export const settingSlice = createSlice({
       action: PayloadAction<{
         isPremium: boolean
         credits: number
+        sceneSuggestionsLeft: number
       }>
     ) => {
       state.user.loading = false
       state.user.isPremium = action.payload.isPremium
       state.user.credits = action.payload.credits
+      state.user.sceneSuggestionsLeft = action.payload.sceneSuggestionsLeft
     },
   },
   extraReducers: (builder) => {

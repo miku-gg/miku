@@ -9,8 +9,7 @@ import {
   setModalOpened,
   startInferencingScene,
 } from '../../state/slices/creationSlice'
-import { Button, Input, Loader, Modal } from '@mikugg/ui-kit'
-import { GEN_BACKGROUND_COST } from '../scenarios/CreateScene'
+import { Button, Input, Loader, Modal, Tooltip } from '@mikugg/ui-kit'
 import { TbPlayerTrackNextFilled } from 'react-icons/tb'
 import {
   interactionStart,
@@ -18,7 +17,6 @@ import {
 } from '../../state/slices/narrationSlice'
 import { useAppContext } from '../../App.context'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
-import CreditsDisplayer from '../scenarios/CreditsDisplayer'
 import { NarrationSceneSuggestion } from '../../state/versioning/v3.state'
 import {
   selectCurrentNextScene,
@@ -33,6 +31,8 @@ import {
 } from '../../libs/listSearch'
 import trim from 'lodash.trim'
 import { addScene } from '../../state/slices/novelSlice'
+import { BsStars } from 'react-icons/bs'
+import { CustomEventType, postMessage } from '../../libs/stateEvents'
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false)
@@ -143,7 +143,6 @@ const SceneSuggestionModal = () => {
     : [...suggestedScenes, { actionText: '' }].findIndex((suggestion) => {
         return !suggestion.actionText.length
       }) - 1
-  const { credits } = useAppSelector((state) => state.settings.user)
   const { apiEndpoint, servicesEndpoint } = useAppContext()
   const fetchingScene = useAppSelector(
     (state) => state.creation.scene.sceneSugestions.inferencing
@@ -151,6 +150,9 @@ const SceneSuggestionModal = () => {
   const [promptForSuggestion, setPromptForSuggestion] = useState<string>('')
   const currentBackground = useAppSelector((state) =>
     state.novel.backgrounds.find(({ id }) => id === currentScene?.backgroundId)
+  )
+  const { isPremium, sceneSuggestionsLeft } = useAppSelector(
+    (state) => state.settings.user
   )
 
   const generateScene = async (sceneSuggestion: NarrationSceneSuggestion) => {
@@ -239,12 +241,31 @@ const SceneSuggestionModal = () => {
       <div className="SceneSuggestionModal">
         <div className="SceneSuggestionModal__header">
           <h2>Scene suggestions</h2>
-          <CreditsDisplayer />
+          {!isPremium ? (
+            <div className="SceneSuggestionModal__countdown">
+              <div className="SceneSuggestionModal__countdown-amount">
+                {sceneSuggestionsLeft} scene generations left.
+              </div>
+              <div className="SceneSuggestionModal__countdown-upgrade">
+                <Button
+                  theme="transparent"
+                  data-tooltip-id="upgrade-tooltip"
+                  data-tooltip-content="Get premium for unlimited scene generations."
+                  onClick={() =>
+                    postMessage(CustomEventType.OPEN_PREMIUM, null)
+                  }
+                >
+                  Upgrade
+                </Button>
+                <Tooltip id="upgrade-tooltip" place="bottom" />
+              </div>
+            </div>
+          ) : null}
         </div>
         <div className="SceneSuggestionModal__content">
           {!fetchingSuggestions && !suggestedScenes.length ? (
             <div className="SceneSuggestionModal__options">
-              <div>
+              <div className="SceneSuggestionModal__suggest">
                 <Button
                   theme="gradient"
                   onClick={() => {
@@ -255,9 +276,11 @@ const SceneSuggestionModal = () => {
                   Suggest 3 scenes
                 </Button>
               </div>
-              <div>
-                <div>or describe the new scene in your own words</div>
-                <div>
+              <div className="SceneSuggestionModal__single-suggest">
+                <div className="SceneSuggestionModal__single-suggest-text">
+                  or describe the new scene in your own words
+                </div>
+                <div className="SceneSuggestionModal__single-suggest-field">
                   <Input
                     value={promptForSuggestion}
                     onChange={(e) => setPromptForSuggestion(e.target.value)}
@@ -273,7 +296,10 @@ const SceneSuggestionModal = () => {
                       )
                       dispatch(userDataFetchStart({ apiEndpoint }))
                     }}
+                    disabled={!promptForSuggestion}
                   >
+                    <BsStars />
+                    {''}
                     Generate
                   </Button>
                 </div>
@@ -304,7 +330,7 @@ const SceneSuggestionModal = () => {
                     <div className="SceneSuggestionModal__suggestion-button">
                       <Button
                         theme="gradient"
-                        disabled={loading || credits < GEN_BACKGROUND_COST}
+                        disabled={loading || !sceneSuggestionsLeft}
                         onClick={() => generateScene(suggestion)}
                       >
                         {loading ? <Loader /> : 'Go to scene'}

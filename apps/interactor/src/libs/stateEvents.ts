@@ -5,12 +5,13 @@ export enum StateEventType {
   UPDATE_STATE = 'UPDATE_STATE',
 }
 
-const postMessage = (
-  type: StateEventType,
-  payload: {
-    state: RootState
-    isNewInteraction: boolean
-  }
+export enum CustomEventType {
+  OPEN_PREMIUM = 'OPEN_PREMIUM',
+}
+
+export const postMessage = (
+  type: StateEventType | CustomEventType,
+  payload?: unknown
 ) => {
   window.parent?.postMessage({ type, payload }, '*')
 }
