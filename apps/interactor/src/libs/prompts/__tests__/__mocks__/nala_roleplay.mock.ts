@@ -37,6 +37,7 @@ export default {
       nsfw: 0,
       credits: 0,
       loading: false,
+      sceneSuggestionsLeft: 0,
     },
     prompt: { systemPrompt: '' },
     text: { speed: 1, fontSize: 1, autoContinue: false },
