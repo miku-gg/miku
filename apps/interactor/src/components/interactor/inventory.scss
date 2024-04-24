@@ -44,6 +44,14 @@
 
     &-icon {
       color: $color-white;
+
+      &:hover {
+        color: $color-light-gray;
+      }
+
+      &:active {
+        color: $secondary-color;
+      }
     }
   }
 

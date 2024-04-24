@@ -45,6 +45,8 @@ const InputBox = (): JSX.Element | null => {
     (state) => state.inventory.triggeredAction
   )
 
+  const interactionsCount = Object.keys(state.narration.interactions).length
+
   useEffect(() => {
     if (triggeredAction) {
       sendMessage(triggeredAction.action.prompt)
@@ -135,6 +137,12 @@ const InputBox = (): JSX.Element | null => {
     }
   }
 
+  const onInventory = (e: React.MouseEvent<unknown>) => {
+    e.stopPropagation()
+    e.preventDefault()
+    dispatch(setInventoryVisibility(!showInventory))
+  }
+
   return (
     <div className="InputBox">
       <form
@@ -157,20 +165,18 @@ const InputBox = (): JSX.Element | null => {
           rows={1}
           placeholder="Type a message..."
         />
-        <button
-          className="InputBox__inventory"
-          data-tooltip-id="inventory-tooltip"
-          data-tooltip-content="Inventory"
-          data-tooltip-varaint="light"
-          disabled={disabled}
-          onClick={(e) => {
-            e.stopPropagation()
-            e.preventDefault()
-            dispatch(setInventoryVisibility(!showInventory))
-          }}
-        >
-          <FaStore />
-        </button>
+        {interactionsCount ? (
+          <button
+            className="InputBox__inventory"
+            data-tooltip-id="inventory-tooltip"
+            data-tooltip-content="Inventory"
+            data-tooltip-varaint="light"
+            disabled={disabled}
+            onClick={onInventory}
+          >
+            <FaStore />
+          </button>
+        ) : null}
         <button
           className={classNames({
             'InputBox__suggestion-trigger': true,
