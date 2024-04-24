@@ -244,7 +244,7 @@ const SceneSuggestionModal = () => {
           {!isPremium ? (
             <div className="SceneSuggestionModal__countdown">
               <div className="SceneSuggestionModal__countdown-amount">
-                {sceneSuggestionsLeft} scene generations left.
+                {sceneSuggestionsLeft} scene generations left today.
               </div>
               <div className="SceneSuggestionModal__countdown-upgrade">
                 <Button
@@ -330,8 +330,13 @@ const SceneSuggestionModal = () => {
                     <div className="SceneSuggestionModal__suggestion-button">
                       <Button
                         theme="gradient"
-                        disabled={loading || !sceneSuggestionsLeft}
-                        onClick={() => generateScene(suggestion)}
+                        disabled={
+                          loading || (!sceneSuggestionsLeft && !isPremium)
+                        }
+                        onClick={() =>
+                          (sceneSuggestionsLeft || isPremium) &&
+                          generateScene(suggestion)
+                        }
                       >
                         {loading ? <Loader /> : 'Go to scene'}
                       </Button>
