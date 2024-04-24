@@ -3,17 +3,13 @@ import { BiCameraMovie } from 'react-icons/bi'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { selectAvailableScenes } from '../../state/selectors'
 import { useAppContext } from '../../App.context'
-import {
-  interactionStart,
-  sceneSuggestionsStart,
-} from '../../state/slices/narrationSlice'
+import { interactionStart } from '../../state/slices/narrationSlice'
 import './SceneSelector.scss'
 import SlidePanel from './SlidePanel'
 import CreateScene from './CreateScene'
 import { setModalOpened } from '../../state/slices/creationSlice'
 import { toast } from 'react-toastify'
 import { BsStars } from 'react-icons/bs'
-import { userDataFetchStart } from '../../state/slices/settingsSlice'
 import { trackEvent } from '../../libs/analytics'
 
 export default function SceneSelector(): JSX.Element | null {
@@ -24,12 +20,8 @@ export default function SceneSelector(): JSX.Element | null {
     assetLinkLoader,
     servicesEndpoint,
     isInteractionDisabled,
-    apiEndpoint,
     isMobileApp,
   } = useAppContext()
-  const { suggestedScenes, fetchingSuggestions } = useAppSelector(
-    (state) => state.narration.responses[state.narration.currentResponseId]!
-  )
 
   const slidePanelOpened = useAppSelector(
     (state) => state.creation.scene.slidePanelOpened
@@ -170,10 +162,6 @@ export default function SceneSelector(): JSX.Element | null {
                         opened: true,
                       })
                     )
-                    if (!fetchingSuggestions && !suggestedScenes.length) {
-                      dispatch(sceneSuggestionsStart({ servicesEndpoint }))
-                      dispatch(userDataFetchStart({ apiEndpoint }))
-                    }
                     trackEvent('scene-generate')
                   }}
                 >
