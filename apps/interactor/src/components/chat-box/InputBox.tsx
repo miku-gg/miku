@@ -19,7 +19,7 @@ import classNames from 'classnames'
 import { Tooltip } from '@mikugg/ui-kit'
 import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSuggestionStrategy'
 import textCompletion from '../../libs/textCompletion'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Loader } from '../common/Loader'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { FaStore } from 'react-icons/fa6'
@@ -41,10 +41,17 @@ const InputBox = (): JSX.Element | null => {
   const [isAutocompleteLoading, setIsAutocompleteLoading] =
     useState<boolean>(false)
 
-  const onSubmit = (e: React.FormEvent<unknown>) => {
-    e.stopPropagation()
-    e.preventDefault()
-    if (!text || disabled) return
+  const triggeredAction = useAppSelector(
+    (state) => state.inventory.triggeredAction
+  )
+
+  useEffect(() => {
+    if (triggeredAction) {
+      sendMessage(triggeredAction.action.prompt)
+    }
+  }, [triggeredAction])
+
+  const sendMessage = (text: string) => {
     trackEvent('bot_interact', {
       bot: novelTitle,
       time: Date.now() - lastInteractionTime,
@@ -69,6 +76,14 @@ const InputBox = (): JSX.Element | null => {
         selectedCharacterId: lastResponse?.selectedCharacterId || '',
       })
     )
+  }
+
+  const onSubmit = (e: React.FormEvent<unknown>) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (!text || disabled) return
+
+    sendMessage(text)
   }
 
   const onAutocomplete = async (e: React.MouseEvent<unknown>) => {
@@ -147,7 +162,10 @@ const InputBox = (): JSX.Element | null => {
           data-tooltip-id="inventory-tooltip"
           data-tooltip-content="Inventory"
           data-tooltip-varaint="light"
-          onClick={() => {
+          disabled={disabled}
+          onClick={(e) => {
+            e.stopPropagation()
+            e.preventDefault()
             dispatch(setInventoryVisibility(!showInventory))
           }}
         >

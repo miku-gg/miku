@@ -1,7 +1,20 @@
+import {
+  NovelSellerInvetoryItem,
+  NovelSellerInvetoryItemAction,
+} from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
 import { createSlice } from '@reduxjs/toolkit'
 
-const initialState = {
+interface InventoryState {
+  showInventory: boolean
+  triggeredAction: {
+    item: NovelSellerInvetoryItem
+    action: NovelSellerInvetoryItemAction
+  } | null
+}
+
+const initialState: InventoryState = {
   showInventory: false,
+  triggeredAction: null,
 }
 
 const inventorySlice = createSlice({
@@ -11,9 +24,13 @@ const inventorySlice = createSlice({
     setInventoryVisibility: (state, action) => {
       state.showInventory = action.payload
     },
+    setTriggeredAction: (state, action) => {
+      state.triggeredAction = action.payload
+    },
   },
 })
 
-export const { setInventoryVisibility } = inventorySlice.actions
+export const { setInventoryVisibility, setTriggeredAction } =
+  inventorySlice.actions
 
 export default inventorySlice.reducer

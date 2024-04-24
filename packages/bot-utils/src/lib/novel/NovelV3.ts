@@ -140,6 +140,13 @@ export interface NovelQuest {
   reward: number;
 }
 
+export interface NovelSellerInvetoryItemAction {
+  name: string;
+  price: number;
+  prompt: string;
+  id: string;
+}
+
 export interface NovelSellerInvetoryItem {
   id: string;
   name: string;
@@ -151,12 +158,7 @@ export interface NovelSellerInvetoryItem {
     attribute: string;
     value: number;
   };
-  actions: {
-    name: string;
-    price: number;
-    prompt: string;
-    id: string;
-  }[];
+  actions: NovelSellerInvetoryItemAction[];
 }
 
 export interface NovelSeller {

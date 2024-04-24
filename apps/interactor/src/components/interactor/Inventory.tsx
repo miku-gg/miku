@@ -4,8 +4,12 @@ import { useEffect, useState } from 'react'
 import { Button, Tooltip } from '@mikugg/ui-kit'
 import { NovelSellerInvetoryItem } from '@mikugg/bot-utils/src/lib/novel/NovelV3'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import { setInventoryVisibility } from '../../state/slices/inventorySlice'
+import {
+  setInventoryVisibility,
+  setTriggeredAction,
+} from '../../state/slices/inventorySlice'
 import { FaTimes } from 'react-icons/fa'
+import { NovelSellerInvetoryItemAction } from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
@@ -59,19 +63,19 @@ export default function Inventory() {
         {
           name: 'Give',
           price: 30,
-          prompt: '',
+          prompt: '*XXD*',
           id: '17',
         },
         {
           name: 'Use',
           price: 10,
-          prompt: '',
+          prompt: '*IZI*',
           id: '18',
         },
         {
           name: 'Throw',
           price: 150,
-          prompt: '',
+          prompt: '*surrender*',
           id: '19',
         },
       ],
@@ -639,7 +643,7 @@ export default function Inventory() {
                     {
                       '--initial-text-position': `100%`,
                       '--ending-text-position': `${-position}ch`,
-                      '--animation-duration': `${animationDuration}s`, // Duration based on character count and reading speed
+                      '--animation-duration': `${animationDuration}s`,
                     } as React.CSSProperties
                   }
                 >
@@ -652,9 +656,14 @@ export default function Inventory() {
         <InventoryItemModal
           item={selectedItem}
           onClose={() => setSelectedItem(null)}
-          onBuy={() => {
-            console.log('buy', selectedItem)
-            setSelectedItem(null)
+          onUse={(action) => {
+            dispatch(setInventoryVisibility(false))
+            dispatch(
+              setTriggeredAction({
+                item: selectedItem,
+                action: action,
+              })
+            )
           }}
         />
       </div>
@@ -662,15 +671,14 @@ export default function Inventory() {
   )
 }
 
-export function InventoryItemModal({
+export const InventoryItemModal = ({
   item,
-  onClose,
-  onBuy,
+  onUse,
 }: {
   item: NovelSellerInvetoryItem | null
   onClose: () => void
-  onBuy: () => void
-}) {
+  onUse: (action: NovelSellerInvetoryItemAction) => void
+}) => {
   return (
     item && (
       <div className="InventoryItemModal">
@@ -699,7 +707,7 @@ export function InventoryItemModal({
               key={action.id}
               className="InventoryItemModal__button"
               theme="secondary"
-              onClick={onBuy}
+              onClick={() => onUse(action)}
             >
               {action.name} for {action.price} <GiTwoCoins />
             </Button>
