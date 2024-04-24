@@ -48,7 +48,7 @@ export interface SongResult {
 export enum SearchType {
   CHARACTER = '/characters',
   BACKGROUND = '/backgrounds',
-  BACKGROUND_VECTORS = '/backgrounds/vector-search',
+  BACKGROUND_VECTOR = '/backgrounds/vector-search',
   SONG = '/songs',
   SONG_VECTOR = '/songs/vector-search',
 }
@@ -58,7 +58,7 @@ export const listSearch = async <
 >(
   apiEndpont: string,
   searchType: T extends BackgroundResult
-    ? SearchType.BACKGROUND | SearchType.BACKGROUND_VECTORS
+    ? SearchType.BACKGROUND | SearchType.BACKGROUND_VECTOR
     : T extends CharacterResult
     ? SearchType.CHARACTER
     : SearchType.SONG | SearchType.SONG_VECTOR,

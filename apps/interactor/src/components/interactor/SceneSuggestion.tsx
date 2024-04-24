@@ -170,11 +170,15 @@ const SceneSuggestionModal = () => {
           })
       : null
     const background = sceneSuggestion?.sdPrompt
-      ? await listSearch<BackgroundResult>(apiEndpoint, SearchType.BACKGROUND, {
-          search: trim(sceneSuggestion?.sdPrompt),
-          take: 1,
-          skip: 0,
-        })
+      ? await listSearch<BackgroundResult>(
+          apiEndpoint,
+          SearchType.BACKGROUND_VECTOR,
+          {
+            search: trim(sceneSuggestion?.sdPrompt),
+            take: 1,
+            skip: 0,
+          }
+        )
           .then((result) => (result.length ? result[0] : null))
           .catch((e) => {
             console.error(e)
