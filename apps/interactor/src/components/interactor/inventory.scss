@@ -1,11 +1,14 @@
 @import '../../variables';
 
 .Inventory {
-  height: 470px;
-  width: 262px;
+  height: 480px;
+  min-width: 274px;
+  max-width: 423px;
 
-  background-color: #0c1225;
-  box-shadow: 0 0 10px #cd5fea;
+  background-color: #0c1225c2;
+
+  border: solid 1px #cd5feac2;
+  border-left: none;
 
   margin-top: 50px;
   border-radius: 0 10px 10px 0;
@@ -16,12 +19,16 @@
   top: 0;
 
   &__header {
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     font-size: 1.4rem;
     text-align: left;
-    background-color: $background-1;
+    background-color: #25284bc2;
 
     border-top-right-radius: 10px;
+  }
+
+  &__content {
+    display: flex;
   }
 
   &__items {
@@ -29,9 +36,11 @@
 
     display: flex;
     flex-wrap: wrap;
-    padding: 10px;
+    padding: 15px;
+    padding-bottom: 0;
     gap: 10px;
-    height: 404px;
+    height: 430px;
+    width: 272px;
   }
 
   &__item {
@@ -43,6 +52,7 @@
     overflow: hidden;
     position: relative;
     cursor: pointer;
+    user-select: none;
 
     opacity: 0.5;
     background-color: $background-1;
@@ -55,6 +65,7 @@
     &-image {
       width: 100%;
       height: 100%;
+      pointer-events: none;
     }
 
     &-name {
@@ -69,9 +80,7 @@
       background-color: rgba(0, 0, 0, 0.65);
       opacity: 0;
 
-      animation: infiniteSlide var(--animation-duration) linear infinite;
-
-      transition: all 0.2s ease-out;
+      // transition: all 0.001s ease-in-out;
     }
 
     &-price {
@@ -89,14 +98,16 @@
     }
 
     &.selected {
-      border: 2px solid #aaa1ff;
+      border: 2px solid #ffeb3b !important;
       opacity: 1;
+      box-shadow: 0 0 10px #ffeb3b;
 
       .Inventory__item-price {
-        background-color: #aaa1ff;
+        background-color: #ffeb3b !important;
       }
 
       .Inventory__item-name {
+        animation: infiniteSlide var(--animation-duration) linear infinite;
         opacity: 1;
       }
     }
@@ -110,6 +121,7 @@
       }
 
       .Inventory__item-name {
+        animation: infiniteSlide var(--animation-duration) linear infinite;
         opacity: 1;
       }
     }
@@ -117,30 +129,60 @@
 }
 
 .InventoryItemModal {
-  position: absolute;
-  right: -150px;
-  top: 3.612rem;
   width: 150px;
-  height: 350px;
-  z-index: 0;
-
-  background-color: $background-1;
-  border-radius: 0 10px 10px 0;
-  box-shadow: 5px 0 10px #cd5fea;
+  height: 100%;
+  padding: 0.5rem;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+
+  cursor: default;
+
+  &__content {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+  }
 
   &__image {
-    width: 100px;
-    height: 100px;
+    flex: 1;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    img {
+      border-radius: 10px;
+      border: 1px solid #ffeb3b;
+      box-shadow: 0 0 10px #ffeb3b;
+
+      pointer-events: none;
+    }
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
   }
 
   &__name {
-    font-size: 1.2rem;
-    margin-top: 1rem;
+    font-size: 1rem;
+    margin-top: 0.25rem;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: default;
+    width: 100%;
+  }
+
+  &__description {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    text-align: center;
   }
 
   &__price {
@@ -148,13 +190,29 @@
     margin-top: 1rem;
   }
 
-  &__button {
+  &__footer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  #item-name-tooltip {
+    background-color: $text-3;
+  }
+
+  button.InventoryItemModal__button {
     margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    background-color: #aaa1ff;
-    color: white;
-    cursor: pointer;
+
+    background-color: #ffeb3b;
+    color: $text-2;
+    font-size: 0.7rem;
+    padding: 0.35rem 0.1rem;
+
+    width: 100%;
+
+    &:hover {
+      color: $text-1;
+    }
   }
 }
 

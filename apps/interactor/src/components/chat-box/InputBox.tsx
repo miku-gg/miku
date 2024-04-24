@@ -22,6 +22,7 @@ import textCompletion from '../../libs/textCompletion'
 import React, { useState } from 'react'
 import { Loader } from '../common/Loader'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
+import { FaStore } from 'react-icons/fa6'
 
 let lastInteractionTime = Date.now()
 const InputBox = (): JSX.Element | null => {
@@ -140,6 +141,14 @@ const InputBox = (): JSX.Element | null => {
           placeholder="Type a message..."
         />
         <button
+          className="InputBox__inventory"
+          data-tooltip-id="inventory-tooltip"
+          data-tooltip-content="Inventory"
+          data-tooltip-varaint="light"
+        >
+          <FaStore />
+        </button>
+        <button
           className={classNames({
             'InputBox__suggestion-trigger': true,
             'InputBox__suggestion-trigger--disabled': disabled,
@@ -157,6 +166,7 @@ const InputBox = (): JSX.Element | null => {
           <FaPaperPlane />
         </button>
       </form>
+      <Tooltip id="inventory-tooltip" place="top" />
       <Tooltip id="suggestion-tooltip" place="top" />
     </div>
   )

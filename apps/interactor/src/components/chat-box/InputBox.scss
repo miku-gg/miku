@@ -62,6 +62,7 @@
   }
 
   &__submit,
+  &__inventory,
   &__suggestion-trigger {
     background-color: transparent;
     outline: none;
@@ -94,6 +95,7 @@
     }
   }
 
+  #inventory-tooltip,
   #suggestion-tooltip {
     background-color: $text-3;
   }
