@@ -23,6 +23,7 @@ import React, { useState } from 'react'
 import { Loader } from '../common/Loader'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { FaStore } from 'react-icons/fa6'
+import { setInventoryVisibility } from '../../state/slices/inventorySlice'
 
 let lastInteractionTime = Date.now()
 const InputBox = (): JSX.Element | null => {
@@ -36,6 +37,7 @@ const InputBox = (): JSX.Element | null => {
   const suggestions = useAppSelector(
     (state) => state.narration.input.suggestions
   )
+  const showInventory = useAppSelector((state) => state.inventory.showInventory)
   const [isAutocompleteLoading, setIsAutocompleteLoading] =
     useState<boolean>(false)
 
@@ -145,6 +147,9 @@ const InputBox = (): JSX.Element | null => {
           data-tooltip-id="inventory-tooltip"
           data-tooltip-content="Inventory"
           data-tooltip-varaint="light"
+          onClick={() => {
+            dispatch(setInventoryVisibility(!showInventory))
+          }}
         >
           <FaStore />
         </button>

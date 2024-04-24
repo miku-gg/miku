@@ -1,10 +1,16 @@
 import { GiTwoCoins } from 'react-icons/gi'
 import './Inventory.scss'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Tooltip } from '@mikugg/ui-kit'
 import { NovelSellerInvetoryItem } from '@mikugg/bot-utils/src/lib/novel/NovelV3'
+import { useAppDispatch, useAppSelector } from '../../state/store'
+import { setInventoryVisibility } from '../../state/slices/inventorySlice'
+import { FaTimes } from 'react-icons/fa'
 
 export default function Inventory() {
+  const dispatch = useAppDispatch()
+  const showInventory = useAppSelector((state) => state.inventory.showInventory)
+
   const items: NovelSellerInvetoryItem[] = [
     {
       id: '1',
@@ -584,13 +590,26 @@ export default function Inventory() {
     },
   ]
 
+  useEffect(() => {
+    if (showInventory) {
+      setSelectedItem(null)
+    }
+  }, [showInventory])
+
   const [selectedItem, setSelectedItem] =
     useState<NovelSellerInvetoryItem | null>(null)
 
   return (
-    <div className="Inventory">
-      <div className="Inventory__header" onClick={() => setSelectedItem(null)}>
+    <div className={`Inventory ${!showInventory ? 'hidden' : ''}`}>
+      <div className="Inventory__header">
         <div>Inventory</div>
+
+        <button
+          onClick={() => dispatch(setInventoryVisibility(false))}
+          className="Inventory__close-button"
+        >
+          <FaTimes className="Inventory__close-button-icon" size={14} />
+        </button>
       </div>
       <div className="Inventory__content">
         <div className="Inventory__items scrollbar">

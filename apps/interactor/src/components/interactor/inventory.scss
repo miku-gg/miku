@@ -18,13 +18,33 @@
   left: 0;
   top: 0;
 
+  transition: all 0.3s ease-out;
+
+  &.hidden {
+    opacity: 0;
+  }
+
   &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
     padding: 0.5rem 1rem;
     font-size: 1.4rem;
     text-align: left;
     background-color: #25284bc2;
 
     border-top-right-radius: 10px;
+  }
+
+  &__close-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &-icon {
+      color: $color-white;
+    }
   }
 
   &__content {
@@ -79,8 +99,6 @@
 
       background-color: rgba(0, 0, 0, 0.65);
       opacity: 0;
-
-      // transition: all 0.001s ease-in-out;
     }
 
     &-price {
