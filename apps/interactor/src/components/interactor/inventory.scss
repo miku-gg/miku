@@ -73,7 +73,8 @@
     padding: 15px;
     padding-bottom: 0;
     gap: 10px;
-    height: 430px;
+    max-height: 430px;
+    height: fit-content;
     width: 188px;
   }
 
@@ -139,8 +140,12 @@
       }
 
       .Inventory__item-name {
-        animation: infiniteSlide var(--animation-duration) linear infinite;
         opacity: 1;
+
+        &.animated-item-name {
+          animation: infiniteSlide var(--animation-duration) linear infinite;
+          opacity: 1;
+        }
       }
     }
 
@@ -153,8 +158,12 @@
       }
 
       .Inventory__item-name {
-        animation: infiniteSlide var(--animation-duration) linear infinite;
         opacity: 1;
+
+        &.animated-item-name {
+          animation: infiniteSlide var(--animation-duration) linear infinite;
+          opacity: 1;
+        }
       }
     }
   }

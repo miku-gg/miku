@@ -60,7 +60,9 @@ export default function Inventory() {
                   alt={item.name}
                 />
                 <div
-                  className="Inventory__item-name"
+                  className={`Inventory__item-name ${
+                    7 < item.name.length ? 'animated-item-name' : ''
+                  }`}
                   style={
                     {
                       '--initial-text-position': `100%`,
