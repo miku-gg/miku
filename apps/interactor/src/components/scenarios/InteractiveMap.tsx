@@ -5,6 +5,9 @@ import { GiPathDistance } from 'react-icons/gi'
 import './InteractiveMap.scss'
 import { Modal } from '@mikugg/ui-kit'
 import { setMapModal } from '../../state/slices/settingsSlice'
+import { trackEvent } from '../../libs/analytics'
+import { interactionStart } from '../../state/slices/narrationSlice'
+import { useAppContext } from '../../App.context'
 
 const InteractiveMapToggle = () => {
   const dispatch = useAppDispatch()
@@ -39,7 +42,9 @@ const InteractiveMapToggle = () => {
 }
 
 const InteractiveMapModal = () => {
+  const dispatch = useAppDispatch()
   const map = useAppSelector(selectCurrentMap)
+  const { servicesEndpoint } = useAppContext()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const offScreenCanvasRef = useRef(document.createElement('canvas'))
   const maskImagesRef = useRef(new Map<string, HTMLImageElement>())
@@ -49,7 +54,9 @@ const InteractiveMapModal = () => {
   const highlightedPlace = map?.places.find(
     (place) => place.id === highlightedPlaceId
   )
-  console.log('canvasRef', canvasRef)
+  const scene = useAppSelector((state) =>
+    state.novel.scenes.find((scene) => scene.id === highlightedPlace?.sceneId)
+  )
 
   useEffect(() => {
     if (map && canvasRef?.current) {
@@ -117,7 +124,6 @@ const InteractiveMapModal = () => {
             }
           }
         }
-        console.log('highlightedPlace', highlightedPlace)
 
         if (highlightedPlace) {
           if (canvas) canvas.style.cursor = 'pointer'
@@ -143,6 +149,24 @@ const InteractiveMapModal = () => {
     <div style={{ position: 'relative' }}>
       <img src={map?.source.png} alt="Map" />
       <canvas
+        onClick={() => {
+          if (highlightedPlace && scene) {
+            dispatch(setMapModal(false))
+            dispatch(
+              interactionStart({
+                sceneId: scene.id,
+                text: scene.prompt,
+                characters: scene?.characters.map((r) => r.characterId) || [],
+                servicesEndpoint,
+                selectedCharacterId:
+                  scene?.characters[
+                    Math.floor(Math.random() * (scene?.characters.length || 0))
+                  ].characterId || '',
+              })
+            )
+            trackEvent('scene-select')
+          }
+        }}
         ref={canvasRef}
         style={{
           position: 'absolute',
