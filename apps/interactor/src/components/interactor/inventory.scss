@@ -1,22 +1,22 @@
 @import '../../variables';
 
 .Inventory {
-  height: 480px;
+  display: flex;
+  flex-direction: column;
+  height: 70%;
   min-width: 200px;
   max-width: 423px;
 
-  background-color: #0c1225c2;
+  background-color: #0c1225ee;
 
-  border: solid 1px #cd5feac2;
+  border: solid 1px $secondary-color;
   border-left: none;
-
-  margin-top: 50px;
   border-radius: 0 10px 10px 0;
-  z-index: 1;
 
+  z-index: 1;
   position: absolute;
+  top: 15%;
   left: 0;
-  top: 0;
 
   &.initial {
     display: none;
@@ -38,7 +38,7 @@
     padding: 0.5rem 1rem;
     font-size: 1.4rem;
     text-align: left;
-    background-color: #25284bc2;
+    background-color: #25284bee;
 
     border-top-right-radius: 10px;
   }
@@ -62,38 +62,38 @@
   }
 
   &__content {
+    height: 100%;
     display: flex;
+    overflow: hidden;
   }
 
   &__items {
-    overflow-y: auto;
-
-    display: flex;
-    flex-wrap: wrap;
-    padding: 15px;
-    padding-bottom: 0;
-    gap: 10px;
-    max-height: 430px;
-    height: fit-content;
     width: 188px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+    grid-auto-rows: 74px;
+
+    padding: 8px 15px;
+    gap: 10px;
+
+    overflow-y: auto;
   }
 
   &__item {
     width: 74px;
     height: 74px;
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
-    position: relative;
-    cursor: pointer;
-    user-select: none;
 
     opacity: 0.5;
     background-color: $background-1;
 
     border-radius: 10px;
     border: 2px solid transparent;
+
+    cursor: pointer;
+    user-select: none;
+
+    position: relative;
+    overflow: hidden;
 
     transition: all 0.2s ease-out;
 
@@ -131,12 +131,12 @@
     }
 
     &.selected {
-      border: 2px solid #ffeb3b !important;
+      border: 2px solid $secondary-color !important;
       opacity: 1;
-      box-shadow: 0 0 10px #ffeb3b;
+      box-shadow: 0 0 10px $secondary-color;
 
       .Inventory__item-price {
-        background-color: #ffeb3b !important;
+        background-color: $secondary-color !important;
       }
 
       .Inventory__item-name {
@@ -170,15 +170,17 @@
 }
 
 .InventoryItemModal {
-  width: 150px;
+  width: 163px;
   height: 100%;
   padding: 0.5rem;
+  padding-right: 1rem;
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
   cursor: default;
+  overflow-y: auto;
 
   &__content {
     width: 100%;
@@ -196,8 +198,8 @@
 
     img {
       border-radius: 10px;
-      border: 1px solid #ffeb3b;
-      box-shadow: 0 0 10px #ffeb3b;
+      border: 1px solid $secondary-color;
+      box-shadow: 0 0 10px $secondary-color;
 
       pointer-events: none;
     }
@@ -211,7 +213,7 @@
 
   &__name {
     font-size: 1rem;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
 
     text-overflow: ellipsis;
     overflow: hidden;
@@ -244,8 +246,6 @@
   button.InventoryItemModal__button {
     margin-top: 1rem;
 
-    background-color: #ffeb3b;
-    color: $text-2;
     font-size: 0.7rem;
     padding: 0.35rem 0.1rem;
 

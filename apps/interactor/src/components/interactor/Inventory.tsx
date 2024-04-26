@@ -34,7 +34,7 @@ export default function Inventory() {
           onClick={() => dispatch(setInventoryVisibility('closed'))}
           className="Inventory__close-button"
         >
-          <FaTimes className="Inventory__close-button-icon" size={14} />
+          <FaTimes className="Inventory__close-button-icon" size={20} />
         </button>
       </div>
       <div className="Inventory__content">
@@ -43,16 +43,15 @@ export default function Inventory() {
             const speed = 5
             const position = Math.max(item.name.length + 10, 20)
             const animationDuration = Math.max(item.name.length / speed, 3)
+            const isSelectedItem = item.id === selectedItem?.id
 
             return (
               <div
                 key={item.id}
                 className={`Inventory__item ${
-                  item.name === selectedItem?.name ? 'selected' : ''
+                  isSelectedItem ? 'selected' : ''
                 }`}
-                onClick={() =>
-                  setSelectedItem(item.id === selectedItem?.id ? null : item)
-                }
+                onClick={() => setSelectedItem(isSelectedItem ? null : item)}
               >
                 <img
                   className="Inventory__item-image"
@@ -105,7 +104,7 @@ export const InventoryItemModal = ({
 }) => {
   return (
     item && (
-      <div className="InventoryItemModal">
+      <div className="InventoryItemModal scrollbar">
         <div className="InventoryItemModal__content">
           <div className="InventoryItemModal__image">
             <img src={`/src/assets/images/${item.image}`} alt={item.name} />
