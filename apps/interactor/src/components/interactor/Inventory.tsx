@@ -133,7 +133,7 @@ export const InventoryItemModal = ({
               theme="secondary"
               onClick={() => onUse(action)}
             >
-              {action.name} for {action.price} <GiTwoCoins />
+              {action.name}
             </Button>
           ))}
         </footer>
