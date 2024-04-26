@@ -41,9 +41,9 @@ export const items: NovelSellerInvetoryItem[] = [
   },
   {
     id: '2',
-    name: 'Stick',
+    name: 'Baseball Bat',
     description: 'A strong stick',
-    image: 'Stick.jpg',
+    image: 'BaseballBat.jpg',
     permanent: false,
     quantity: 1,
     boost: {
@@ -76,6 +76,38 @@ export const items: NovelSellerInvetoryItem[] = [
     name: 'Leather Whip',
     description: 'A leather whip',
     image: 'LeatherWhip.jpg',
+    permanent: false,
+    quantity: 1,
+    boost: {
+      attribute: 'strength',
+      value: 5,
+    },
+    actions: [
+      {
+        name: 'Give',
+        price: 30,
+        prompt: '',
+        id: '1',
+      },
+      {
+        name: 'Use',
+        price: 10,
+        prompt: '',
+        id: '2',
+      },
+      {
+        name: 'Throw',
+        price: 150,
+        prompt: '',
+        id: '3',
+      },
+    ],
+  },
+  {
+    id: '4',
+    name: 'Picnic Basket',
+    description: 'A leather whip',
+    image: 'PicnicBasket.jpg',
     permanent: false,
     quantity: 1,
     boost: {
