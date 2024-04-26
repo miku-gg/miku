@@ -77,6 +77,11 @@
 
     &:disabled {
       color: gray;
+      cursor: not-allowed;
+
+      &:hover {
+        color: gray;
+      }
     }
 
     &:hover {

@@ -1,5 +1,11 @@
 import { NovelSellerInvetoryItem } from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
 
+export const getItemByActionPrompt = (query: string) => {
+  return items.find((item) =>
+    item.actions.some((action) => action.prompt === query)
+  )
+}
+
 export const items: NovelSellerInvetoryItem[] = [
   {
     id: '1',

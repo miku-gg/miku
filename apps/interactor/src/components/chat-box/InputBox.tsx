@@ -131,7 +131,14 @@ const InputBox = (): JSX.Element | null => {
   const onInventory = (e: React.MouseEvent<unknown>) => {
     e.stopPropagation()
     e.preventDefault()
-    dispatch(setInventoryVisibility(!showInventory))
+
+    dispatch(
+      setInventoryVisibility(
+        showInventory === 'initial' || showInventory === 'closed'
+          ? 'open'
+          : 'closed'
+      )
+    )
   }
 
   return (

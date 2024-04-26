@@ -5,7 +5,7 @@ import {
 import { createSlice } from '@reduxjs/toolkit'
 
 interface InventoryState {
-  showInventory: boolean
+  showInventory: 'initial' | 'open' | 'closed'
   triggeredAction: {
     item: NovelSellerInvetoryItem
     action: NovelSellerInvetoryItemAction
@@ -13,7 +13,7 @@ interface InventoryState {
 }
 
 const initialState: InventoryState = {
-  showInventory: false,
+  showInventory: 'initial',
   triggeredAction: null,
 }
 

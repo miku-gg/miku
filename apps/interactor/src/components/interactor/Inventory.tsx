@@ -26,12 +26,12 @@ export default function Inventory() {
     useState<NovelSellerInvetoryItem | null>(null)
 
   return (
-    <div className={`Inventory ${!showInventory ? 'hidden' : ''}`}>
+    <div className={`Inventory ${showInventory}`}>
       <div className="Inventory__header">
         <div>Inventory</div>
 
         <button
-          onClick={() => dispatch(setInventoryVisibility(false))}
+          onClick={() => dispatch(setInventoryVisibility('closed'))}
           className="Inventory__close-button"
         >
           <FaTimes className="Inventory__close-button-icon" size={14} />
@@ -79,7 +79,7 @@ export default function Inventory() {
           item={selectedItem}
           onClose={() => setSelectedItem(null)}
           onUse={(action) => {
-            dispatch(setInventoryVisibility(false))
+            dispatch(setInventoryVisibility('closed'))
             dispatch(
               setTriggeredAction({
                 item: selectedItem,

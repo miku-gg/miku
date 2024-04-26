@@ -18,10 +18,16 @@
   left: 0;
   top: 0;
 
-  transition: all 0.3s ease-out;
+  &.initial {
+    display: none;
+  }
 
-  &.hidden {
-    opacity: 0;
+  &.open {
+    animation: inventoryOpenAnimation 0.3s ease-in-out;
+  }
+
+  &.closed {
+    animation: inventoryCloseAnimation 0.4s ease-in-out both;
   }
 
   &__header {
@@ -248,5 +254,28 @@
   }
   100% {
     text-indent: var(--ending-text-position);
+  }
+}
+
+@keyframes inventoryCloseAnimation {
+  0% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0;
+  }
+  100% {
+    display: none;
+    z-index: -1;
+    opacity: 0;
+  }
+}
+
+@keyframes inventoryOpenAnimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
