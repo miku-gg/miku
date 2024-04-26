@@ -1,29 +1,21 @@
-import { GiTwoCoins } from 'react-icons/gi'
-import './Inventory.scss'
-import { useEffect, useState } from 'react'
 import { Button, Tooltip } from '@mikugg/ui-kit'
 import { NovelSellerInvetoryItem } from '@mikugg/bot-utils/src/lib/novel/NovelV3'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import {
   setInventoryVisibility,
+  setItemModalVisibility,
+  setSelectedItem,
   setTriggeredAction,
 } from '../../state/slices/inventorySlice'
 import { FaTimes } from 'react-icons/fa'
 import { NovelSellerInvetoryItemAction } from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
 import { items } from '../../libs/itemsData'
+import './Inventory.scss'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
   const showInventory = useAppSelector((state) => state.inventory.showInventory)
-
-  useEffect(() => {
-    if (showInventory) {
-      setSelectedItem(null)
-    }
-  }, [showInventory])
-
-  const [selectedItem, setSelectedItem] =
-    useState<NovelSellerInvetoryItem | null>(null)
+  const selectedItem = useAppSelector((state) => state.inventory.selectedItem)
 
   return (
     <div className={`Inventory ${showInventory}`}>
@@ -31,7 +23,9 @@ export default function Inventory() {
         <div>Inventory</div>
 
         <button
-          onClick={() => dispatch(setInventoryVisibility('closed'))}
+          onClick={() => {
+            dispatch(setInventoryVisibility('closed'))
+          }}
           className="Inventory__close-button"
         >
           <FaTimes className="Inventory__close-button-icon" size={20} />
@@ -51,7 +45,18 @@ export default function Inventory() {
                 className={`Inventory__item ${
                   isSelectedItem ? 'selected' : ''
                 }`}
-                onClick={() => setSelectedItem(isSelectedItem ? null : item)}
+                onClick={() => {
+                  if (!isSelectedItem) {
+                    dispatch(setItemModalVisibility('open'))
+                    dispatch(setSelectedItem(item))
+                  } else {
+                    dispatch(setItemModalVisibility('closed'))
+
+                    setTimeout(() => {
+                      dispatch(setSelectedItem(null))
+                    }, 150)
+                  }
+                }}
               >
                 <img
                   className="Inventory__item-image"
@@ -78,9 +83,9 @@ export default function Inventory() {
         </div>
         <InventoryItemModal
           item={selectedItem}
-          onClose={() => setSelectedItem(null)}
           onUse={(action) => {
             dispatch(setInventoryVisibility('closed'))
+
             dispatch(
               setTriggeredAction({
                 item: selectedItem,
@@ -99,44 +104,43 @@ export const InventoryItemModal = ({
   onUse,
 }: {
   item: NovelSellerInvetoryItem | null
-  onClose: () => void
   onUse: (action: NovelSellerInvetoryItemAction) => void
 }) => {
+  const showItemModal = useAppSelector((state) => state.inventory.showItemModal)
+
   return (
-    item && (
-      <div className="InventoryItemModal scrollbar">
-        <div className="InventoryItemModal__content">
-          <div className="InventoryItemModal__image">
-            <img src={`/src/assets/images/${item.image}`} alt={item.name} />
-          </div>
+    <div className={`InventoryItemModal scrollbar ${showItemModal}`}>
+      <div className="InventoryItemModal__content">
+        <div className="InventoryItemModal__image">
+          <img src={`/src/assets/images/${item?.image}`} alt={item?.name} />
         </div>
-        <Tooltip id="item-name-tooltip" place="top" />
-        <header className="InventoryItemModal__header">
-          <div
-            className="InventoryItemModal__name"
-            data-tooltip-id="item-name-tooltip"
-            data-tooltip-varaint="light"
-            data-tooltip-content={item.name}
-          >
-            {item.name}
-          </div>
-          <div className="InventoryItemModal__description">
-            {item.description}
-          </div>
-        </header>
-        <footer className="InventoryItemModal__footer">
-          {item.actions.map((action) => (
-            <Button
-              key={action.id}
-              className="InventoryItemModal__button"
-              theme="secondary"
-              onClick={() => onUse(action)}
-            >
-              {action.name}
-            </Button>
-          ))}
-        </footer>
       </div>
-    )
+      <Tooltip id="item-name-tooltip" place="top" />
+      <header className="InventoryItemModal__header">
+        <div
+          className="InventoryItemModal__name"
+          data-tooltip-id="item-name-tooltip"
+          data-tooltip-varaint="light"
+          data-tooltip-content={item?.name}
+        >
+          {item?.name}
+        </div>
+        <div className="InventoryItemModal__description">
+          {item?.description}
+        </div>
+      </header>
+      <footer className="InventoryItemModal__footer">
+        {item?.actions.map((action) => (
+          <Button
+            key={action.id}
+            className="InventoryItemModal__button"
+            theme="transparent"
+            onClick={() => onUse(action)}
+          >
+            {action.name}
+          </Button>
+        ))}
+      </footer>
+    </div>
   )
 }

@@ -77,6 +77,7 @@
     gap: 10px;
 
     overflow-y: auto;
+    z-index: 3;
   }
 
   &__item {
@@ -170,6 +171,8 @@
 }
 
 .InventoryItemModal {
+  z-index: 1;
+
   width: 163px;
   height: 100%;
   padding: 0.5rem;
@@ -181,6 +184,18 @@
 
   cursor: default;
   overflow-y: auto;
+
+  &.initial {
+    display: none;
+  }
+
+  &.open {
+    animation: slideOpen 0.5s ease-in-out;
+  }
+
+  &.closed {
+    animation: slideClose 0.5s ease-in-out both;
+  }
 
   &__content {
     width: 100%;
@@ -247,12 +262,14 @@
     margin-top: 1rem;
 
     font-size: 0.7rem;
-    padding: 0.35rem 0.1rem;
+    padding: 0.1rem 0.1rem;
 
     width: 100%;
 
     &:hover {
       color: $text-1;
+      border-color: $secondary-color;
+      box-shadow: 0 0 10px $secondary-color;
     }
   }
 }
@@ -286,5 +303,33 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes slideOpen {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideClose {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  75% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+    display: none;
+    z-index: -1;
   }
 }
