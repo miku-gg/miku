@@ -1,0 +1,31 @@
+@import '../../variables';
+
+.InteractiveMap {
+  &__toggle {
+    font-size: 24px;
+    transition: color 0.2s ease-out;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+
+    &:hover {
+      color: $secondary-color;
+    }
+  }
+  &__place-info {
+    position: absolute;
+    top: 0;
+    right: -200px;
+    width: 200px;
+    // z-index:;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: black;
+  }
+
+  &__modal {
+    overflow: visible !important;
+  }
+}

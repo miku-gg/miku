@@ -6,8 +6,10 @@ function InteractiveMap() {
   const maskImageRef = useRef(new Image());
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    // eslint-disable-next-line
+    // @ts-ignore
+    const canvas = canvasRef.current as HTMLCanvasElement;
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     const offScreenCanvas = offScreenCanvasRef.current;
     const offScreenCtx = offScreenCanvas.getContext("2d");
     const maskImage = maskImageRef.current;
@@ -18,16 +20,16 @@ function InteractiveMap() {
       offScreenCanvas.width = maskImage.width;
       offScreenCanvas.height = maskImage.height;
       // Draw the mask on the off-screen canvas
-      offScreenCtx.drawImage(maskImage, 0, 0);
+      offScreenCtx?.drawImage(maskImage, 0, 0);
       ctx.drawImage(maskImage, 0, 0);
-      canvasRef.current.style.opacity = 0.1;
+      canvas.style.opacity = "0.1";
     };
 
     canvas.width = window.innerWidth; // Or set to the size of your map image if it's not full window
     canvas.height = window.innerHeight;
 
     // Function to check if the pixel is white
-    const isWhitePixel = (data) => {
+    const isWhitePixel = (data: Uint8ClampedArray) => {
       const tolerance = 10; // Tolerance for what is considered "white"
       return (
         data[0] > 255 - tolerance &&
@@ -40,15 +42,15 @@ function InteractiveMap() {
       const x = e.offsetX;
       const y = e.offsetY;
       // Use the off-screen canvas for pixel detection
-      const pixel = offScreenCtx.getImageData(x, y, 1, 1).data;
-      if (isWhitePixel(pixel)) {
+      const pixel = offScreenCtx?.getImageData(x, y, 1, 1).data;
+      if (pixel && isWhitePixel(pixel)) {
         canvas.style.cursor = "pointer";
-        canvas.style.opacity = 0.6;
+        canvas.style.opacity = "0.6";
         canvas.style.filter = "blur(5px)";
         // increase brightnest on the white area
       } else {
         canvas.style.cursor = "default";
-        canvas.style.opacity = 0.1;
+        canvas.style.opacity = "0.1";
       }
     });
 

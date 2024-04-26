@@ -44,6 +44,7 @@ export const initialState: SettingsState = {
     settingsTab: 'general',
     about: false,
     history: false,
+    map: false,
     edit: {
       opened: false,
       id: '',
@@ -106,6 +107,9 @@ export const settingSlice = createSlice({
     setHistoryModal: (state, action: PayloadAction<boolean>) => {
       state.modals.history = action.payload
     },
+    setMapModal: (state, action: PayloadAction<boolean>) => {
+      state.modals.map = action.payload
+    },
     setEditModal: (
       state,
       action: PayloadAction<{ opened: boolean; id: string }>
@@ -159,6 +163,7 @@ export const {
   setSettingsModal,
   setAboutModal,
   setHistoryModal,
+  setMapModal,
   setEditModal,
   userDataFetchStart,
   userDataFetchEnd,
