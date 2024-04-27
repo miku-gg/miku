@@ -1,0 +1,30 @@
+.CharacterGenerationModal {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+
+  &__textArea {
+    height: 4rem;
+    & textarea {
+      resize: none;
+    }
+  }
+
+  &__button {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+.disabled {
+  & button {
+    background-color: #808080;
+    background: #808080;
+    color: #515050;
+    border-color: #515050;
+    cursor: default;
+    &:hover {
+      background-color: #808080;
+    }
+  }
+}

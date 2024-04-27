@@ -3,16 +3,14 @@ import { BiCameraMovie } from 'react-icons/bi'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { selectAvailableScenes } from '../../state/selectors'
 import { useAppContext } from '../../App.context'
-import {
-  interactionStart,
-  sceneSuggestionsStart,
-} from '../../state/slices/narrationSlice'
+import { interactionStart } from '../../state/slices/narrationSlice'
 import './SceneSelector.scss'
 import SlidePanel from './SlidePanel'
 import CreateScene from './CreateScene'
 import { setModalOpened } from '../../state/slices/creationSlice'
 import { toast } from 'react-toastify'
 import { BsStars } from 'react-icons/bs'
+import { trackEvent } from '../../libs/analytics'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
 
 export default function SceneSelector(): JSX.Element | null {
@@ -20,15 +18,12 @@ export default function SceneSelector(): JSX.Element | null {
   const backgrounds = useAppSelector((state) => state.novel.backgrounds)
   const scenes = useAppSelector(selectAvailableScenes)
   const {
+    apiEndpoint,
     assetLinkLoader,
     servicesEndpoint,
     isInteractionDisabled,
-    apiEndpoint,
     isMobileApp,
   } = useAppContext()
-  const { suggestedScenes, fetchingSuggestions } = useAppSelector(
-    (state) => state.narration.responses[state.narration.currentResponseId]!
-  )
 
   const slidePanelOpened = useAppSelector(
     (state) => state.creation.scene.slidePanelOpened
@@ -64,6 +59,7 @@ export default function SceneSelector(): JSX.Element | null {
           ].characterId || '',
       })
     )
+    trackEvent('scene-select')
   }
   return (
     <div
@@ -74,9 +70,10 @@ export default function SceneSelector(): JSX.Element | null {
       <button
         className="SceneSelector__trigger icon-button"
         disabled={inputDisabled}
-        onClick={() =>
+        onClick={() => {
           dispatch(setModalOpened({ id: 'slidepanel', opened: true }))
-        }
+          trackEvent('scene-sidebar-open')
+        }}
       >
         <BiCameraMovie />
       </button>
@@ -139,6 +136,7 @@ export default function SceneSelector(): JSX.Element | null {
                       opened: true,
                     })
                   )
+                  trackEvent('scene-create')
                 }}
               >
                 <div
@@ -166,10 +164,12 @@ export default function SceneSelector(): JSX.Element | null {
                         opened: true,
                       })
                     )
-                    if (!fetchingSuggestions && !suggestedScenes.length) {
-                      dispatch(sceneSuggestionsStart({ servicesEndpoint }))
-                      dispatch(userDataFetchStart({ apiEndpoint }))
-                    }
+                    dispatch(
+                      userDataFetchStart({
+                        apiEndpoint,
+                      })
+                    )
+                    trackEvent('scene-generate')
                   }}
                 >
                   <div className="SceneSelector__item-background SceneSelector__item-background--aero">

@@ -8,15 +8,11 @@ import App from './src/App'
 import './root.scss'
 
 import { decodeText, uploadAsset } from '@mikugg/bot-utils'
+import * as Sentry from '@sentry/react'
 import mergeWith from 'lodash.mergewith'
 import queryString from 'query-string'
 
-import {
-  BackgroundResult,
-  CharacterResult,
-  PersonaResult,
-  listSearch,
-} from './src/libs/listSearch'
+import { PersonaResult } from './src/libs/listSearch'
 import { loadNovelFromSingleCard } from './src/libs/loadNovel'
 
 import { initialState as initialCreationState } from './src/state/slices/creationSlice'
@@ -24,6 +20,12 @@ import { initialState as initialSettingsState } from './src/state/slices/setting
 import { RootState } from './src/state/store'
 import { VersionId } from './src/state/versioning'
 import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
+
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+  })
+}
 
 const ASSETS_ENDPOINT =
   import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets'
@@ -229,20 +231,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         uploadAsset(params.assetsUploadEndpoint, file)
       }
       assetLinkLoader={assetLinkLoader}
-      backgroundSearcher={(_params: {
-        search: string
-        take: number
-        skip: number
-      }) =>
-        listSearch<BackgroundResult>(params.backgroundSearchEndpoint, _params)
-      }
-      characterSearcher={(_params: {
-        search: string
-        take: number
-        skip: number
-      }) =>
-        listSearch<CharacterResult>(params.characterSearchEndpoint, _params)
-      }
     />
   </React.StrictMode>
 )

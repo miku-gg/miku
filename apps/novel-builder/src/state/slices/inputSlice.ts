@@ -7,8 +7,10 @@ export type ModalType =
   | "song"
   | "songSearch"
   | "character"
+  | "characterGeneration"
   | "characterSearch"
   | "loading"
+  | "errors"
   | "scene";
 
 export type PanelType = "details" | "assets" | "scenes" | "starts" | "preview";
@@ -53,10 +55,16 @@ const initialState: InputState = {
     character: {
       opened: false,
     },
+    characterGeneration: {
+      opened: false,
+    },
     characterSearch: {
       opened: false,
     },
     scene: {
+      opened: false,
+    },
+    errors: {
       opened: false,
     },
   },

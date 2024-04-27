@@ -34,20 +34,6 @@ export interface CharacterResult {
   tags: string[]
 }
 
-export interface PersonaResult {
-  id: string
-  name: string
-  description: string | null
-  profilePic: string | null
-  isDefault: boolean
-  createdAt: Date
-  updatedAt: Date
-  user: {
-    id: string
-    username: string
-  }
-}
-
 export interface SongResult {
   id: string
   description: string
@@ -62,7 +48,7 @@ export interface SongResult {
 export enum SearchType {
   CHARACTER = '/characters',
   BACKGROUND = '/backgrounds',
-  BACKGROUND_VECTOR = '/backgrounds/vector-search',
+  BACKGROUND_VECTORS = '/backgrounds/vector-search',
   SONG = '/songs',
   SONG_VECTOR = '/songs/vector-search',
 }
@@ -72,7 +58,7 @@ export const listSearch = async <
 >(
   apiEndpont: string,
   searchType: T extends BackgroundResult
-    ? SearchType.BACKGROUND | SearchType.BACKGROUND_VECTOR
+    ? SearchType.BACKGROUND | SearchType.BACKGROUND_VECTORS
     : T extends CharacterResult
     ? SearchType.CHARACTER
     : SearchType.SONG | SearchType.SONG_VECTOR,

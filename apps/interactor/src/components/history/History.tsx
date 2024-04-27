@@ -24,6 +24,7 @@ import { VersionId as V3VersionId } from '../../state/versioning/v3.state'
 import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
 import { initialState as initialSettingsState } from '../../state/slices/settingsSlice'
 import { initialState as initialCreationState } from '../../state/slices/creationSlice'
+import { trackEvent } from '../../libs/analytics'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -45,6 +46,7 @@ const HistoryActions = () => {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+    trackEvent('download-history-click')
   }
 
   const handleLoad = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -292,7 +294,10 @@ const History = (): JSX.Element => {
     <div className="History">
       <button
         className="History__trigger icon-button"
-        onClick={() => dispatch(setHistoryModal(true))}
+        onClick={() => {
+          dispatch(setHistoryModal(true))
+          trackEvent('history-click')
+        }}
         disabled={inputDisabled}
       >
         <GrHistory />

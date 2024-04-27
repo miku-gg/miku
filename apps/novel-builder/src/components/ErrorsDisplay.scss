@@ -1,0 +1,58 @@
+.ErrorsDisplay {
+  &__button {
+    color: #c18e30;
+    background-color: rgba(gray, 0.2);
+
+    &:hover {
+      background-color: rgba(gray, 0.3);
+    }
+  }
+
+  &__content-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  &__content-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background-color: rgba(gray, 0.2);
+    padding: 0.4rem;
+    border-radius: 6px;
+    svg {
+      color: yellow;
+      width: 24px;
+      height: 24px;
+    }
+
+    &-text {
+      width: 100%;
+      max-height: 5rem;
+      overflow: auto;
+    }
+
+    &--error {
+      svg {
+        color: red;
+      }
+    }
+  }
+
+  &__trigger {
+    display: none;
+  }
+
+  &--has-warns {
+    .ErrorsDisplay__trigger {
+      display: block;
+    }
+  }
+
+  &--has-errors {
+    .ErrorsDisplay__button {
+      color: rgb(179, 64, 64);
+    }
+  }
+}

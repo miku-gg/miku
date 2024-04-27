@@ -37,12 +37,18 @@ import { toast } from 'react-toastify'
 import { createSelector } from '@reduxjs/toolkit'
 import { Loader } from '../common/Loader'
 import { useCallback, useEffect, useState } from 'react'
-import { BackgroundResult, CharacterResult } from '../../libs/listSearch'
+import {
+  BackgroundResult,
+  CharacterResult,
+  listSearch,
+  SearchType,
+} from '../../libs/listSearch'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { loadNovelFromSingleCard } from '../../libs/loadNovel'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
 import CreditsDisplayer from './CreditsDisplayer'
 import { selectCurrentScene } from '../../state/selectors'
+import { trackEvent } from '../../libs/analytics'
 
 const selectSelectableCharacters = createSelector(
   [
@@ -200,6 +206,7 @@ const CreateScene = () => {
     )
     dispatch(setModalOpened({ id: 'scene', opened: false }))
     dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
+    trackEvent('scene-create-successful')
   }
 
   return (
@@ -215,7 +222,7 @@ const CreateScene = () => {
                   ? backgroundSelected.startsWith('data:image')
                     ? backgroundSelected
                     : assetLinkLoader(backgroundSelected, true)
-                  : './default_background.png'
+                  : assetLinkLoader('default_background.png')
               })`,
             }}
             onClick={() =>
@@ -412,14 +419,16 @@ function SearchModal<T>({
 
 const SearchBackgroundModal = () => {
   const dispatch = useAppDispatch()
-  const { assetLinkLoader, backgroundSearcher } = useAppContext()
+  const { assetLinkLoader, apiEndpoint } = useAppContext()
   const backgroundSelected = useAppSelector(
     (state) => state.creation.scene.background.selected
   )
   return (
     <SearchModal<BackgroundResult>
       modalId="background"
-      searcher={backgroundSearcher}
+      searcher={(params) =>
+        listSearch<BackgroundResult>(apiEndpoint, SearchType.BACKGROUND, params)
+      }
       renderResult={(result: BackgroundResult, index) => {
         const backgroundURL = assetLinkLoader(result.asset, true)
         return (
@@ -453,7 +462,7 @@ const SearchBackgroundModal = () => {
 
 const SearchCharacterModal = () => {
   const dispatch = useAppDispatch()
-  const { assetLinkLoader, characterSearcher, cardEndpoint } = useAppContext()
+  const { assetLinkLoader, apiEndpoint, cardEndpoint } = useAppContext()
   const charactersSelected = useAppSelector(
     (state) => state.creation.scene.characters.selected
   )
@@ -462,8 +471,12 @@ const SearchCharacterModal = () => {
   return (
     <SearchModal<CharacterResult>
       modalId="characters"
-      searcher={(...args) =>
-        characterSearcher(...args).then((r) =>
+      searcher={(params) =>
+        listSearch<CharacterResult>(
+          apiEndpoint,
+          SearchType.CHARACTER,
+          params
+        ).then((r) =>
           r.filter(
             (c) => characters.find((c2) => c2?.id === c.card) === undefined
           )

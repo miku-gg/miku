@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react'
 
 import { RootState } from './state/store'
 
-import { BackgroundResult, CharacterResult, PersonaResult } from './libs/listSearch'
+import { PersonaResult } from './libs/listSearch'
 
 export interface AppProps {
   isProduction: boolean
@@ -20,16 +20,6 @@ export interface AppProps {
     fileName: string
     fileSize: number
   }>
-  characterSearcher: (params: {
-    search: string
-    take: number
-    skip: number
-  }) => Promise<CharacterResult[]>
-  backgroundSearcher: (params: {
-    search: string
-    take: number
-    skip: number
-  }) => Promise<BackgroundResult[]>
 }
 
 const AppContext = createContext<AppProps>({
@@ -49,8 +39,6 @@ const AppContext = createContext<AppProps>({
       fileName: '',
       fileSize: 0,
     }),
-  characterSearcher: () => Promise.resolve([]),
-  backgroundSearcher: () => Promise.resolve([]),
 })
 
 export const AppProvider = AppContext.Provider

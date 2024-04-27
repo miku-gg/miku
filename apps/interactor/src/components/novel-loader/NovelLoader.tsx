@@ -6,6 +6,7 @@ import { setName, setSystemPrompt } from '../../state/slices/settingsSlice'
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
 import { Loader } from '../common/Loader'
 import './NovelLoader.scss'
+import { registerTrackSessionData } from '../../libs/analytics'
 
 const NovelLoader = (): JSX.Element => {
   const { novelLoader, persona } = useAppContext()
@@ -14,11 +15,15 @@ const NovelLoader = (): JSX.Element => {
   useEffect(() => {
     novelLoader().then((state: RootState) => {
       dispatch(replaceState(state))
-
       if (persona && persona.description) {
         dispatch(setSystemPrompt(persona.description))
         dispatch(setName(persona.name))
       }
+      registerTrackSessionData({
+        name: state.novel.title,
+        isPremium: state.settings.user.isPremium,
+        nsfw: state.settings.user.nsfw,
+      })
     })
   }, [dispatch, novelLoader])
 

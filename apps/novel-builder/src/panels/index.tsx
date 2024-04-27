@@ -12,10 +12,8 @@ import {
   navigatePanel,
   openModal,
 } from "../state/slices/inputSlice";
-import { downloadNovelState } from "../libs/utils";
-import config from "../config";
+import { allowUntilStep, downloadNovelState } from "../libs/utils";
 import { toast } from "react-toastify";
-import { NovelV3 } from "@mikugg/bot-utils";
 import { MdOutlinePermMedia } from "react-icons/md";
 import { BiCameraMovie } from "react-icons/bi";
 import { TbBoxMultiple } from "react-icons/tb";
@@ -27,18 +25,7 @@ import "./PanelExplorer.scss";
 import { AreYouSure } from "@mikugg/ui-kit";
 import cloneDeep from "lodash.clonedeep";
 import { clearNovelState } from "../state/slices/novelFormSlice";
-
-const allowUntilStep = (novel: NovelV3.NovelState): number => {
-  if (
-    novel.backgrounds.length === 0 ||
-    novel.characters.length === 0 ||
-    novel.songs.length === 0
-  )
-    return 0;
-  if (novel.scenes.length === 0) return 1;
-  if (novel.starts.length === 0) return 2;
-  return 3;
-};
+import ErrorsDisplay from "../components/ErrorsDisplay";
 
 function PanelExplorer() {
   const novel = useAppSelector((state) => state.novel);
@@ -50,63 +37,66 @@ function PanelExplorer() {
   return (
     <div className="PanelExplorer">
       <div className="PanelExplorer__header">
-        <ButtonGroup
-          buttons={[
-            {
-              content: (
-                <>
-                  <LuTextQuote /> <span>Details</span>
-                </>
-              ),
-              value: "details",
-            },
-            {
-              content: (
-                <>
-                  <MdOutlinePermMedia /> <span>Assets</span>
-                </>
-              ),
-              value: "assets",
-            },
-            {
-              content: (
-                <>
-                  <BiCameraMovie /> <span>Scenes</span>
-                </>
-              ),
-              value: "scenes",
-              disabled: maxStep < 1,
-              tooltip:
-                maxStep < 1 ? "Please add at least one asset for each" : "",
-            },
-            {
-              content: (
-                <>
-                  <TbBoxMultiple /> <span>Starts</span>
-                </>
-              ),
-              value: "starts",
-              disabled: maxStep < 2,
-              tooltip: maxStep < 2 ? "Please add a scene" : "",
-            },
-            {
-              content: (
-                <>
-                  <LuMonitorPlay /> <span>Preview</span>
-                </>
-              ),
-              value: "preview",
-              disabled: maxStep < 3,
-              tooltip: maxStep < 3 ? "Please add a start" : "",
-            },
-          ]}
-          selected={selectedPanel}
-          onButtonClick={async (value) => {
-            if (isPanelType(value)) {
-              dispatch(navigatePanel(value));
-            }
-          }}
-        />
+        <div className="PanelExplorer__header-left">
+          <ButtonGroup
+            buttons={[
+              {
+                content: (
+                  <>
+                    <LuTextQuote /> <span>Details</span>
+                  </>
+                ),
+                value: "details",
+              },
+              {
+                content: (
+                  <>
+                    <MdOutlinePermMedia /> <span>Assets</span>
+                  </>
+                ),
+                value: "assets",
+              },
+              {
+                content: (
+                  <>
+                    <BiCameraMovie /> <span>Scenes</span>
+                  </>
+                ),
+                value: "scenes",
+                disabled: maxStep < 1,
+                tooltip:
+                  maxStep < 1 ? "Please add at least one asset for each" : "",
+              },
+              {
+                content: (
+                  <>
+                    <TbBoxMultiple /> <span>Starts</span>
+                  </>
+                ),
+                value: "starts",
+                disabled: maxStep < 2,
+                tooltip: maxStep < 2 ? "Please add a scene" : "",
+              },
+              {
+                content: (
+                  <>
+                    <LuMonitorPlay /> <span>Preview</span>
+                  </>
+                ),
+                value: "preview",
+                disabled: maxStep < 3,
+                tooltip: maxStep < 3 ? "Please add a start" : "",
+              },
+            ]}
+            selected={selectedPanel}
+            onButtonClick={async (value) => {
+              if (isPanelType(value)) {
+                dispatch(navigatePanel(value));
+              }
+            }}
+          />
+          <ErrorsDisplay />
+        </div>
         <ButtonGroup
           buttons={[
             {

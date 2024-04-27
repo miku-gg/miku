@@ -7,12 +7,21 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      ".mock.ts$"
+    ]
   },
   "dependencies": {
     "@mikugg/bot-utils": "workspace:^",
     "@mikugg/ui-kit": "workspace:^",
     "@reduxjs/toolkit": "^2.0.1",
+    "@sentry/react": "^7.111.0",
     "axios": "^1.2.4",
     "classnames": "^2.3.2",
     "lodash.debounce": "^4.0.8",
@@ -33,6 +42,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.8",
     "@types/lodash.debounce": "^4.0.9",
     "@types/lodash.mergewith": "^4.6.9",
     "@types/lodash.trim": "^4.5.7",
@@ -49,6 +59,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "prettier": "^2.8.7",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.2.2",
     "vite": "^5.0.8"
   }

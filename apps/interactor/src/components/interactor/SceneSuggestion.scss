@@ -79,7 +79,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     flex-wrap: wrap;
     gap: 1rem;
   }
@@ -139,6 +139,72 @@
       width: 40px;
       height: 40px;
       border-width: 4px;
+    }
+  }
+
+  &__suggest {
+    display: flex;
+    justify-content: center;
+
+    .Button {
+      width: 100%;
+      max-width: 200px;
+    }
+  }
+
+  &__single-suggest {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+
+    &-text {
+      font-size: 0.9rem;
+      color: $text-2;
+    }
+
+    &-field {
+      display: flex;
+      position: relative;
+
+      .Input {
+        width: 100%;
+      }
+
+      .Input__container {
+        padding-right: 120px;
+      }
+
+      .Button {
+        position: absolute;
+        right: 5px;
+        top: 6px;
+        padding: 0.194rem 0.4rem;
+        font-weight: normal;
+      }
+    }
+  }
+
+  &__countdown {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-style: italic;
+
+    &-amount {
+      color: $text-2;
+    }
+
+    &-upgrade {
+      button {
+        font-size: 0.9rem;
+        padding: 0.194rem 0.4rem;
+        font-weight: normal;
+        color: $text-3;
+        // font-style: italic;
+      }
     }
   }
 }

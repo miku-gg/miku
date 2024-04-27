@@ -24,8 +24,6 @@ function App(props: AppProps) {
     apiEndpoint: props.apiEndpoint,
     cardEndpoint: props.cardEndpoint,
     persona: props.persona,
-    characterSearcher: props.characterSearcher,
-    backgroundSearcher: props.backgroundSearcher,
     assetUploader: props.assetUploader,
     assetLinkLoader: props.assetLinkLoader,
     novelLoader: props.novelLoader,

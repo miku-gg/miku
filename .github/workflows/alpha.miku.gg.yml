@@ -59,6 +59,7 @@ jobs:
           VITE_BACKGROUND_SEARCH_ENDPOINT: ${{ secrets.VITE_BACKGROUND_SEARCH_ENDPOINT }}
           VITE_CHARACTER_SEARCH_ENDPOINT: ${{ secrets.VITE_CHARACTER_SEARCH_ENDPOINT }}
           VITE_GTM_ID: ${{ secrets.VITE_GTM_ID}}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN}}
       - name: Deploy to S3
         run: aws s3 sync apps/interactor/dist ${{ secrets.S3_BUCKET_ALPHA }} --delete
       - name: Set Cache-Control
