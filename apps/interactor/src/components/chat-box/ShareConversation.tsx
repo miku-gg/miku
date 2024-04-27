@@ -54,26 +54,68 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
         character.crossOrigin = 'anonymous'
         character.src = assetLinkLoader(data.character)
         character.onload = () => {
-          // Dibujar la imagen del personaje
-          ctx.drawImage(character, 0, 128, 384, 384)
+          const characterWidth = 256
+          const characterHeight = 448
+          const characterX = 0
+          const characterY = canvas.height - characterHeight
 
-          // Dibujar la caja a la derecha de la imagen
-          const boxWidth = 200
-          const boxHeight = 50
-          const boxX = canvas.width - boxWidth - 10 // 10px de margen a la derecha
-          const boxY = 10 // 10px de margen desde la parte superior
-          ctx.fillStyle = 'rgba(228, 228, 228, 0.6)'
-          ctx.fillRect(boxX, boxY, boxWidth, boxHeight)
+          ctx.drawImage(
+            character,
+            characterX,
+            characterY,
+            characterWidth,
+            characterHeight
+          )
 
-          // Dibujar el texto dentro de la caja
-          ctx.font = '20px Arial'
-          ctx.fillStyle = '#000000'
-          ctx.textAlign = 'center'
-          ctx.textBaseline = 'middle'
           const text = data.text
-          const textX = boxX + boxWidth / 2
-          const textY = boxY + boxHeight / 2
-          ctx.fillText(text, textX, textY)
+          const fontSize = 20
+          const padding = 10
+          const maxWidth = canvas.width - characterWidth - padding * 2
+
+          ctx.font = `${fontSize}px courier new`
+          ctx.textAlign = 'left'
+          ctx.textBaseline = 'top'
+          ctx.fillStyle = 'rgb(225, 138, 36)'
+          ctx.shadowColor = 'rgb(0, 0, 0)' // Color de la sombra
+          ctx.shadowOffsetX = 2 // Desplazamiento horizontal de la sombra
+          ctx.shadowOffsetY = 2 // Desplazamiento vertical de la sombra
+          ctx.shadowBlur = 4 // Difuminado de la sombra
+
+          let lines = []
+          let currentLine = ''
+          const textX = canvas.width / 2 + padding
+          let textY = padding
+
+          const words = text.split(' ')
+          for (const word of words) {
+            const testLine = currentLine + word + ' '
+            const metrics = ctx.measureText(testLine)
+            const testWidth = metrics.width
+
+            if (testWidth > maxWidth && currentLine.trim().length > 0) {
+              lines.push({ text: currentLine.trim(), x: textX, y: textY })
+              currentLine = word + ' '
+              textY += fontSize
+            } else {
+              currentLine = testLine
+            }
+          }
+          if (currentLine.trim().length > 0) {
+            lines.push({ text: currentLine.trim(), x: textX, y: textY })
+          }
+
+          for (const line of lines) {
+            const lineWidth = ctx.measureText(line.text).width
+            if (line.x + lineWidth > canvas.width - padding) {
+              ctx.fillText(
+                line.text,
+                canvas.width - padding - lineWidth,
+                line.y
+              )
+            } else {
+              ctx.fillText(line.text, line.x, line.y)
+            }
+          }
 
           resolve(canvas.toDataURL('image/png'))
         }
