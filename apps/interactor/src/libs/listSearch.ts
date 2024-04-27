@@ -34,6 +34,20 @@ export interface CharacterResult {
   tags: string[]
 }
 
+export interface PersonaResult {
+  id: string
+  name: string
+  description: string | null
+  profilePic: string | null
+  isDefault: boolean
+  createdAt: Date
+  updatedAt: Date
+  user: {
+    id: string
+    username: string
+  }
+}
+
 export interface SongResult {
   id: string
   description: string

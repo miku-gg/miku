@@ -1,26 +1,37 @@
 import { Modal } from '@mikugg/ui-kit'
-import { Loader } from '../common/Loader'
-import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
 import { useEffect } from 'react'
 import { useAppContext } from '../../App.context'
 import { replaceState } from '../../state/slices/replaceState'
+import { setName, setSystemPrompt } from '../../state/slices/settingsSlice'
+import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
+import { Loader } from '../common/Loader'
 import './NovelLoader.scss'
 import { registerTrackSessionData } from '../../libs/analytics'
 
 const NovelLoader = (): JSX.Element => {
-  const { novelLoader } = useAppContext()
+  const { novelLoader, persona } = useAppContext()
   const novelFetching = useAppSelector((state) => !state.novel.starts.length)
   const dispatch = useAppDispatch()
   useEffect(() => {
     novelLoader().then((state: RootState) => {
       dispatch(replaceState(state))
+      if (persona?.name) {
+        if (persona?.description) {
+          dispatch(
+            setSystemPrompt(
+              `${persona.name} Description: ${persona.description}`
+            )
+          )
+        }
+        dispatch(setName(persona.name))
+      }
       registerTrackSessionData({
         name: state.novel.title,
         isPremium: state.settings.user.isPremium,
         nsfw: state.settings.user.nsfw,
       })
     })
-  }, [dispatch, novelLoader])
+  }, [dispatch, novelLoader, persona.name, persona.description])
 
   return (
     <Modal opened={novelFetching}>
