@@ -163,6 +163,7 @@ const SceneSuggestionModal = () => {
   const { isPremium, sceneSuggestionsLeft } = useAppSelector(
     (state) => state.settings.user
   )
+  const [loadingEditIndex, setLoadingEditIndex] = useState<number>(-1)
 
   const loadSceneData = async (
     sceneSuggestion: NarrationSceneSuggestion
@@ -202,7 +203,11 @@ const SceneSuggestionModal = () => {
     return { music, background }
   }
 
-  const prefillScene = async (sceneSuggestion: NarrationSceneSuggestion) => {
+  const prefillScene = async (
+    sceneSuggestion: NarrationSceneSuggestion,
+    index: number
+  ) => {
+    setLoadingEditIndex(index)
     const { music, background } = await loadSceneData(sceneSuggestion)
     dispatch(
       setBackground(background?.asset || currentBackground?.source?.jpg || '')
@@ -236,6 +241,8 @@ const SceneSuggestionModal = () => {
     dispatch(setModalOpened({ id: 'scene', opened: true }))
     dispatch(setModalOpened({ id: 'scene-suggestions', opened: false }))
     await spendSceneSuggestion(apiEndpoint)
+    setLoadingEditIndex(-1)
+    dispatch(userDataFetchStart({ apiEndpoint }))
   }
 
   const generateScene = async (sceneSuggestion: NarrationSceneSuggestion) => {
@@ -283,6 +290,7 @@ const SceneSuggestionModal = () => {
     dispatch(endInferencingScene())
     await spendSceneSuggestion(apiEndpoint)
     trackEvent('scene-generate-successful')
+    dispatch(userDataFetchStart({ apiEndpoint }))
   }
 
   return (
@@ -392,12 +400,13 @@ const SceneSuggestionModal = () => {
                         <Button
                           onClick={async () => {
                             if (sceneSuggestionsLeft || isPremium) {
-                              prefillScene(suggestion)
+                              prefillScene(suggestion, index)
                             }
                           }}
                           theme="transparent"
+                          disabled={loadingEditIndex === index}
                         >
-                          Edit
+                          {loadingEditIndex === index ? <Loader /> : 'Edit'}
                         </Button>
                       ) : null}
                       <Button
