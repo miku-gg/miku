@@ -16,7 +16,9 @@ const NovelLoader = (): JSX.Element => {
     novelLoader().then((state: RootState) => {
       dispatch(replaceState(state))
       if (persona && persona.description) {
-        dispatch(setSystemPrompt(persona.description))
+        dispatch(
+          setSystemPrompt(`${persona.name} Description: ${persona.description}`)
+        )
         dispatch(setName(persona.name))
       }
       registerTrackSessionData({
