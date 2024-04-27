@@ -21,7 +21,7 @@ const userDataEffect = async (
       userDataFetchEnd({
         credits: result.data.credits,
         isPremium: result.data.tier === 'PREMIUM',
-        sceneSuggestionsLeft: result.data.sceneSuggestionsLeft,
+        sceneSuggestionsLeft: result.data.sceneSuggestionsLeft || 3,
       })
     )
   } catch (error) {
