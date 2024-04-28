@@ -1,13 +1,13 @@
 import {
   CharacterBook,
   EmotionTemplateSlug,
-  MikuCardV2
+  MikuCardV2,
 } from "../MikuCardValidator";
 
 export enum NovelNSFW {
   NONE = 0,
   NUDITY = 1,
-  EXPLICIT = 2
+  EXPLICIT = 2,
 }
 
 export interface NovelStart {
@@ -39,7 +39,6 @@ export interface NovelScene {
   children: string[];
   parentMapId: string | null;
   nsfw: NovelNSFW;
-  sceneRole: "battle" | "dialogue" | "shop" | "quest";
 }
 
 export interface NovelCharacterOutfit {
@@ -67,7 +66,6 @@ export interface NovelCharacter {
   tags: string[];
   card: MikuCardV2;
   nsfw: NovelNSFW;
-  rpgSpecs?: NovelCharacterRPG;
 }
 
 export interface NovelBackground {
@@ -109,63 +107,6 @@ export interface NovelMap {
   lorebook?: CharacterBook;
 }
 
-interface NovelCharacterRPG {
-  stats: {
-    role: string;
-    strength: number;
-    life: number;
-    intelligence: number;
-    mana: number;
-  };
-  skills: {
-    name: string;
-    description: string;
-    cost: number;
-    damage: {
-      min: number;
-      max: number;
-    };
-    cure: {
-      min: number;
-      max: number;
-    };
-  }[];
-  reward?: number;
-}
-
-export interface NovelQuest {
-  title: string;
-  description: string;
-  characterId: string;
-  reward: number;
-}
-
-export interface NovelSellerInvetoryItemAction {
-  name: string;
-  price: number;
-  prompt: string;
-  id: string;
-}
-
-export interface NovelSellerInvetoryItem {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  permanent: boolean;
-  quantity: number;
-  boost: {
-    attribute: string;
-    value: number;
-  };
-  actions: NovelSellerInvetoryItemAction[];
-}
-
-export interface NovelSeller {
-  characterId: string;
-  inventory: NovelSellerInvetoryItem[];
-}
-
 export interface NovelState {
   title: string;
   description: string;
@@ -178,6 +119,4 @@ export interface NovelState {
   maps: NovelMap[];
   scenes: NovelScene[];
   starts: NovelStart[];
-  quests?: NovelQuest[];
-  seller?: NovelSeller[];
 }

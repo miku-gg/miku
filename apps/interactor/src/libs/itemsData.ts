@@ -1,4 +1,4 @@
-import { NovelSellerInvetoryItem } from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
+import { InventoryItem } from '../state/slices/inventorySlice'
 
 export const getItemByActionPrompt = (query: string) => {
   return items.find((item) =>
@@ -6,7 +6,7 @@ export const getItemByActionPrompt = (query: string) => {
   )
 }
 
-export const items: NovelSellerInvetoryItem[] = [
+export const items: InventoryItem[] = [
   {
     id: '1',
     name: 'Rose',

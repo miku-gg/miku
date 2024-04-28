@@ -1,21 +1,30 @@
 import { Button, Tooltip } from '@mikugg/ui-kit'
-import { NovelSellerInvetoryItem } from '@mikugg/bot-utils/src/lib/novel/NovelV3'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import {
+  InventoryAction,
+  InventoryItem,
   setInventoryVisibility,
   setItemModalVisibility,
   setSelectedItem,
-  setTriggeredAction,
 } from '../../state/slices/inventorySlice'
 import { FaTimes } from 'react-icons/fa'
-import { NovelSellerInvetoryItemAction } from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
 import { items } from '../../libs/itemsData'
 import './Inventory.scss'
+import { useAppContext } from '../../App.context'
+import { interactionStart } from '../../state/slices/narrationSlice'
+import {
+  selectCurrentScene,
+  selectLastLoadedResponse,
+} from '../../state/selectors'
+import { toast } from 'react-toastify'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
   const showInventory = useAppSelector((state) => state.inventory.showInventory)
   const selectedItem = useAppSelector((state) => state.inventory.selectedItem)
+  const { servicesEndpoint, isInteractionDisabled } = useAppContext()
+  const scene = useAppSelector(selectCurrentScene)
+  const lastResponse = useAppSelector(selectLastLoadedResponse)
 
   return (
     <div className={`Inventory ${showInventory}`}>
@@ -60,7 +69,7 @@ export default function Inventory() {
               >
                 <img
                   className="Inventory__item-image"
-                  src={`/src/assets/images/${item.image}`}
+                  src={`/images/${item.image}`}
                   alt={item.name}
                 />
                 <div
@@ -86,10 +95,22 @@ export default function Inventory() {
           onUse={(action) => {
             dispatch(setInventoryVisibility('closed'))
 
+            if (isInteractionDisabled) {
+              toast.warn('Please log in to interact.', {
+                position: 'top-center',
+                style: {
+                  top: 10,
+                },
+              })
+              return
+            }
             dispatch(
-              setTriggeredAction({
-                item: selectedItem,
-                action: action,
+              interactionStart({
+                text: action.prompt,
+                sceneId: scene?.id || '',
+                characters: scene?.characters.map((r) => r.characterId) || [],
+                servicesEndpoint,
+                selectedCharacterId: lastResponse?.selectedCharacterId || '',
               })
             )
           }}
@@ -103,8 +124,8 @@ export const InventoryItemModal = ({
   item,
   onUse,
 }: {
-  item: NovelSellerInvetoryItem | null
-  onUse: (action: NovelSellerInvetoryItemAction) => void
+  item: InventoryItem | null
+  onUse: (action: InventoryAction) => void
 }) => {
   const showItemModal = useAppSelector((state) => state.inventory.showItemModal)
 
@@ -112,7 +133,7 @@ export const InventoryItemModal = ({
     <div className={`InventoryItemModal scrollbar ${showItemModal}`}>
       <div className="InventoryItemModal__content">
         <div className="InventoryItemModal__image">
-          <img src={`/src/assets/images/${item?.image}`} alt={item?.name} />
+          <img src={`/images/${item?.image}`} alt={item?.name} />
         </div>
       </div>
       <Tooltip id="item-name-tooltip" place="top" />

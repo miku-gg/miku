@@ -1,23 +1,35 @@
-import {
-  NovelSellerInvetoryItem,
-  NovelSellerInvetoryItemAction,
-} from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
 import { createSlice } from '@reduxjs/toolkit'
+
+export interface InventoryAction {
+  name: string
+  price: number
+  prompt: string
+  id: string
+}
+
+export interface InventoryItem {
+  id: string
+  name: string
+  description: string
+  image: string
+  permanent: boolean
+  quantity: number
+  boost: {
+    attribute: string
+    value: number
+  }
+  actions: InventoryAction[]
+}
 
 interface InventoryState {
   showItemModal: 'initial' | 'open' | 'closed'
   showInventory: 'initial' | 'open' | 'closed'
-  triggeredAction: {
-    item: NovelSellerInvetoryItem
-    action: NovelSellerInvetoryItemAction
-  } | null
-  selectedItem: NovelSellerInvetoryItem | null
+  selectedItem: InventoryItem | null
 }
 
 const initialState: InventoryState = {
   showItemModal: 'initial',
   showInventory: 'initial',
-  triggeredAction: null,
   selectedItem: null,
 }
 
@@ -42,9 +54,6 @@ const inventorySlice = createSlice({
     setItemModalVisibility: (state, action) => {
       state.showItemModal = action.payload
     },
-    setTriggeredAction: (state, action) => {
-      state.triggeredAction = action.payload
-    },
     setSelectedItem: (state, action) => {
       state.selectedItem = action.payload
     },
@@ -54,7 +63,6 @@ const inventorySlice = createSlice({
 export const {
   setInventoryVisibility,
   setItemModalVisibility,
-  setTriggeredAction,
   setSelectedItem,
 } = inventorySlice.actions
 

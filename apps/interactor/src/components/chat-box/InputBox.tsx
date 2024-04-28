@@ -18,7 +18,7 @@ import classNames from 'classnames'
 import { Tooltip } from '@mikugg/ui-kit'
 import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSuggestionStrategy'
 import textCompletion from '../../libs/textCompletion'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Loader } from '../common/Loader'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { FaStore } from 'react-icons/fa6'
@@ -38,17 +38,7 @@ const InputBox = (): JSX.Element | null => {
   const [isAutocompleteLoading, setIsAutocompleteLoading] =
     useState<boolean>(false)
 
-  const triggeredAction = useAppSelector(
-    (state) => state.inventory.triggeredAction
-  )
-
   const interactionsCount = Object.keys(state.narration.interactions).length
-
-  useEffect(() => {
-    if (triggeredAction) {
-      sendMessage(triggeredAction.action.prompt)
-    }
-  }, [triggeredAction])
 
   const sendMessage = (text: string) => {
     if (isInteractionDisabled) {
@@ -163,7 +153,7 @@ const InputBox = (): JSX.Element | null => {
           rows={1}
           placeholder="Type a message..."
         />
-        {interactionsCount ? (
+        {!interactionsCount ? (
           <button
             className="InputBox__inventory"
             data-tooltip-id="inventory-tooltip"
