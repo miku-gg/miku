@@ -31,7 +31,7 @@ const NovelLoader = (): JSX.Element => {
         nsfw: state.settings.user.nsfw,
       })
     })
-  }, [dispatch, novelLoader, persona.name, persona.description])
+  }, [dispatch, novelLoader, persona?.name, persona?.description])
 
   return (
     <Modal opened={novelFetching}>
