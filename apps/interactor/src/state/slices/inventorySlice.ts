@@ -2,9 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 export interface InventoryAction {
   name: string
-  price: number
   prompt: string
-  id: string
 }
 
 export interface InventoryItem {
@@ -12,12 +10,6 @@ export interface InventoryItem {
   name: string
   description: string
   image: string
-  permanent: boolean
-  quantity: number
-  boost: {
-    attribute: string
-    value: number
-  }
   actions: InventoryAction[]
 }
 

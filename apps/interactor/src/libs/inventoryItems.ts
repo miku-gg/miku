@@ -1,41 +1,29 @@
 import { InventoryItem } from '../state/slices/inventorySlice'
 
 export const getItemByActionPrompt = (query: string) => {
-  return items.find((item) =>
+  return inventoryItems.find((item) =>
     item.actions.some((action) => action.prompt === query)
   )
 }
 
-export const items: InventoryItem[] = [
+export const inventoryItems: InventoryItem[] = [
   {
     id: '1',
     name: 'Rose',
     description: 'A beautiful rose',
     image: 'RoseFlower.jpg',
-    permanent: false,
-    quantity: 1,
-    boost: {
-      attribute: 'life',
-      value: 20,
-    },
     actions: [
       {
         name: 'Give',
-        price: 10,
-        prompt: '',
-        id: '1',
+        prompt: '*{{user}} pull out a rose and give it to {{char}}*',
       },
       {
         name: 'Use',
-        price: 10,
-        prompt: '',
-        id: '2',
+        prompt: '*{{user}} use the rose*',
       },
       {
         name: 'Throw',
-        price: 10,
         prompt: '',
-        id: '3',
       },
     ],
   },
@@ -44,30 +32,18 @@ export const items: InventoryItem[] = [
     name: 'Baseball Bat',
     description: 'A strong stick',
     image: 'BaseballBat.jpg',
-    permanent: false,
-    quantity: 1,
-    boost: {
-      attribute: 'mana',
-      value: 20,
-    },
     actions: [
       {
         name: 'Give',
-        price: 30,
         prompt: '*XXD*',
-        id: '1',
       },
       {
         name: 'Use',
-        price: 10,
         prompt: '*IZI*',
-        id: '2',
       },
       {
         name: 'Throw',
-        price: 150,
         prompt: '*surrender*',
-        id: '3',
       },
     ],
   },
@@ -76,30 +52,18 @@ export const items: InventoryItem[] = [
     name: 'Leather Whip',
     description: 'A leather whip',
     image: 'LeatherWhip.jpg',
-    permanent: false,
-    quantity: 1,
-    boost: {
-      attribute: 'strength',
-      value: 5,
-    },
     actions: [
       {
         name: 'Give',
-        price: 30,
         prompt: '',
-        id: '1',
       },
       {
         name: 'Use',
-        price: 10,
         prompt: '',
-        id: '2',
       },
       {
         name: 'Throw',
-        price: 150,
         prompt: '',
-        id: '3',
       },
     ],
   },
@@ -108,30 +72,18 @@ export const items: InventoryItem[] = [
     name: 'Picnic Basket',
     description: 'A leather whip',
     image: 'PicnicBasket.jpg',
-    permanent: false,
-    quantity: 1,
-    boost: {
-      attribute: 'strength',
-      value: 5,
-    },
     actions: [
       {
         name: 'Give',
-        price: 30,
         prompt: '',
-        id: '1',
       },
       {
         name: 'Use',
-        price: 10,
         prompt: '',
-        id: '2',
       },
       {
         name: 'Throw',
-        price: 150,
         prompt: '',
-        id: '3',
       },
     ],
   },

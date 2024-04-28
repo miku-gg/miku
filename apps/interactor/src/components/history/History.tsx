@@ -25,7 +25,7 @@ import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
 import { initialState as initialSettingsState } from '../../state/slices/settingsSlice'
 import { initialState as initialCreationState } from '../../state/slices/creationSlice'
 import { trackEvent } from '../../libs/analytics'
-import { getItemByActionPrompt } from '../../libs/itemsData'
+import { getItemByActionPrompt } from '../../libs/inventoryItems'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()

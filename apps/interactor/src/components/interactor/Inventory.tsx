@@ -8,7 +8,7 @@ import {
   setSelectedItem,
 } from '../../state/slices/inventorySlice'
 import { FaTimes } from 'react-icons/fa'
-import { items } from '../../libs/itemsData'
+import { inventoryItems } from '../../libs/inventoryItems'
 import './Inventory.scss'
 import { useAppContext } from '../../App.context'
 import { interactionStart } from '../../state/slices/narrationSlice'
@@ -42,7 +42,7 @@ export default function Inventory() {
       </div>
       <div className="Inventory__content">
         <div className="Inventory__items scrollbar">
-          {items.map((item) => {
+          {inventoryItems.map((item) => {
             const speed = 5
             const position = Math.max(item.name.length + 10, 20)
             const animationDuration = Math.max(item.name.length / speed, 3)
@@ -153,7 +153,7 @@ export const InventoryItemModal = ({
       <footer className="InventoryItemModal__footer">
         {item?.actions.map((action) => (
           <Button
-            key={action.id}
+            key={`item-action-${item.id}-${action.name}`}
             className="InventoryItemModal__button"
             theme="transparent"
             onClick={() => onUse(action)}
