@@ -27,7 +27,7 @@ interface InventoryState {
   selectedItem: InventoryItem | null
 }
 
-const initialState: InventoryState = {
+export const initialState: InventoryState = {
   showItemModal: 'initial',
   showInventory: 'initial',
   selectedItem: null,
