@@ -17,6 +17,7 @@ import { loadNovelFromSingleCard } from './src/libs/loadNovel'
 
 import { initialState as initialCreationState } from './src/state/slices/creationSlice'
 import { initialState as initialSettingsState } from './src/state/slices/settingsSlice'
+import { initialState as initialInventoryState } from './src/state/slices/inventorySlice'
 import { RootState } from './src/state/store'
 import { VersionId } from './src/state/versioning'
 import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
@@ -177,6 +178,7 @@ export const loadNarration = async (): Promise<RootState> => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             ...migrateV2toV3(migrateV1toV2(data)),
+            inventory: initialInventoryState,
             creation: initialCreationState,
             settings: params.settings,
           }
@@ -185,6 +187,7 @@ export const loadNarration = async (): Promise<RootState> => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             ...migrateV2toV3(data),
+            inventory: initialInventoryState,
             creation: initialCreationState,
             settings: params.settings,
           }
@@ -194,6 +197,7 @@ export const loadNarration = async (): Promise<RootState> => {
       }
       return {
         ...data,
+        inventory: initialInventoryState,
         creation: initialCreationState,
         settings: params.settings,
       }
@@ -207,6 +211,7 @@ export const loadNarration = async (): Promise<RootState> => {
     return {
       novel,
       narration,
+      inventory: initialInventoryState,
       creation: initialCreationState,
       settings: params.settings,
       version: VersionId,

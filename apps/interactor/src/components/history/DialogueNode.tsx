@@ -110,11 +110,18 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
           />
         ))}
       </div>
-      <button className="DialogueNode__edit-btn" onClick={handleEdit}>
-        <FaPencil />
-      </button>
+      {!data.isItemAction && (
+        <button className="DialogueNode__edit-btn" onClick={handleEdit}>
+          <FaPencil />
+        </button>
+      )}
       {canDelete() && (
-        <button className="DialogueNode__delete-btn" onClick={handleDelete}>
+        <button
+          className={`DialogueNode__delete-btn ${
+            data.isItemAction ? 'is-item-action' : ''
+          }`}
+          onClick={handleDelete}
+        >
           <FaTrash />
         </button>
       )}
