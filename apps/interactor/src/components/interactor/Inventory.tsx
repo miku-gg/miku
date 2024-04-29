@@ -20,6 +20,7 @@ import { toast } from 'react-toastify'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
+  const { isPremium } = useAppSelector((state) => state.settings.user)
   const showInventory = useAppSelector((state) => state.inventory.showInventory)
   const selectedItem = useAppSelector((state) => state.inventory.selectedItem)
   const { servicesEndpoint, isInteractionDisabled } = useAppContext()
@@ -47,14 +48,17 @@ export default function Inventory() {
             const position = Math.max(item.name.length + 10, 20)
             const animationDuration = Math.max(item.name.length / speed, 3)
             const isSelectedItem = item.id === selectedItem?.id
+            const disabled = !isPremium && item.isPremium
 
             return (
               <div
                 key={item.id}
                 className={`Inventory__item ${
                   isSelectedItem ? 'selected' : ''
-                }`}
+                } ${disabled ? 'disabled' : ''}
+                `}
                 onClick={() => {
+                  if (disabled) return
                   if (!isSelectedItem) {
                     dispatch(setItemModalVisibility('open'))
                     dispatch(setSelectedItem(item))
@@ -66,6 +70,11 @@ export default function Inventory() {
                     }, 150)
                   }
                 }}
+                data-tooltip-id={disabled ? 'premium-item-invetory' : undefined}
+                data-tooltip-varaint="light"
+                data-tooltip-content={
+                  disabled ? 'This is a premium-only item' : undefined
+                }
               >
                 <img
                   className="Inventory__item-image"
@@ -90,6 +99,7 @@ export default function Inventory() {
             )
           })}
         </div>
+        <Tooltip id="premium-item-invetory" place="right" />
         <InventoryItemModal
           item={selectedItem}
           onUse={(action) => {
@@ -136,16 +146,8 @@ export const InventoryItemModal = ({
           <img src={`/images/${item?.image}`} alt={item?.name} />
         </div>
       </div>
-      <Tooltip id="item-name-tooltip" place="top" />
       <header className="InventoryItemModal__header">
-        <div
-          className="InventoryItemModal__name"
-          data-tooltip-id="item-name-tooltip"
-          data-tooltip-varaint="light"
-          data-tooltip-content={item?.name}
-        >
-          {item?.name}
-        </div>
+        <div className="InventoryItemModal__name">{item?.name}</div>
         <div className="InventoryItemModal__description">
           {item?.description}
         </div>

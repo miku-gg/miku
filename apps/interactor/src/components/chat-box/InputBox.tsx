@@ -153,7 +153,7 @@ const InputBox = (): JSX.Element | null => {
           rows={1}
           placeholder="Type a message..."
         />
-        {!interactionsCount ? (
+        {interactionsCount ? (
           <button
             className="InputBox__inventory"
             data-tooltip-id="inventory-tooltip"

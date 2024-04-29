@@ -15,75 +15,102 @@ export const inventoryItems: InventoryItem[] = [
     actions: [
       {
         name: 'Give',
-        prompt: '*{{user}} pull out a rose and give it to {{char}}*',
+        prompt: '*I pull out a rose flower and hand it over to {{char}}*',
       },
       {
-        name: 'Use',
-        prompt: '*{{user}} use the rose*',
+        name: 'Eat',
+        prompt: '*I pull out a rose flower and start to eat it.*',
       },
       {
         name: 'Throw',
-        prompt: '',
+        prompt: "*I pull out a rose flower and throw it at {{char}}'s face*",
       },
     ],
   },
   {
     id: '2',
-    name: 'Baseball Bat',
-    description: 'A strong stick',
-    image: 'BaseballBat.jpg',
+    name: 'Stick',
+    description: 'A wood stick',
+    image: 'stick.jpg',
     actions: [
       {
         name: 'Give',
-        prompt: '*XXD*',
+        prompt:
+          '*I open my bag and pull out a stick. I give the stick to {{char}}.*',
       },
       {
-        name: 'Use',
-        prompt: '*IZI*',
+        name: 'Bonk',
+        prompt: '*I pull out a stick and bonk {{char}} on the head.*',
       },
       {
-        name: 'Throw',
-        prompt: '*surrender*',
+        name: 'Poke',
+        prompt: "*I pull out a stick and poke {{char}}'s cheeks with it.*",
       },
     ],
   },
   {
     id: '3',
-    name: 'Leather Whip',
-    description: 'A leather whip',
-    image: 'LeatherWhip.jpg',
+    name: 'Vodka',
+    description: 'A bottle of vodka',
+    image: 'vodka.jpg',
     actions: [
       {
-        name: 'Give',
-        prompt: '',
+        name: 'Drink',
+        prompt: '*I open a bottle of vodka and start drinking it.*',
       },
       {
-        name: 'Use',
-        prompt: '',
+        name: 'Give',
+        prompt: '*I pull out a bottle of vodka and give it to {{char}}.*',
       },
       {
         name: 'Throw',
-        prompt: '',
+        prompt: '*I grab a bottle of vodka and throw it at {{char}}.*',
       },
     ],
   },
   {
     id: '4',
-    name: 'Picnic Basket',
-    description: 'A leather whip',
-    image: 'PicnicBasket.jpg',
+    name: 'Mate',
+    description: 'A cup of mate',
+    image: 'mate.jpg',
+    actions: [
+      {
+        name: 'Prepare',
+        prompt:
+          "*I take a mate cup and start preparing argentine mate.* OOC: Mate is a traditional argentine drink with green herbs and hot water. It's super hot and you need to suck on a metal straw to drink it. It sometimes sexy how people drink it.*",
+      },
+      {
+        name: 'Give',
+        prompt:
+          "*I pull out the mate cup and give it to {{char}} to try.* OOC: Mate is a traditional argentine drink with green herbs and hot water. It's super hot and you need to suck on a metal straw to drink it. It sometimes sexy how people drink it.*",
+      },
+      {
+        name: 'Sip',
+        prompt:
+          "*I take a sip of an argentine mate. It burns my tongue, but I continue to suck on the metal straw.* OOC: Mate is a traditional argentine drink with green herbs and hot water. It's super hot and you need to suck on a metal straw to drink it. It sometimes sexy how people drink it.",
+      },
+    ],
+  },
+  {
+    id: '5',
+    name: 'Teddy bear',
+    description: 'A cute teddy bear',
+    image: 'teddy.jpg',
+    isPremium: true,
     actions: [
       {
         name: 'Give',
-        prompt: '',
+        prompt: '*I pull out a teddy bear and give it to {{char}}.*',
       },
       {
-        name: 'Use',
-        prompt: '',
+        name: 'Evil Teddy',
+        prompt:
+          '*Suddeny, the place turns dark and a possesed teddy bear appears in the corner with a knife. He looks very angry.* OOC: Describe the teddy bear appearing.',
       },
       {
-        name: 'Throw',
-        prompt: '',
+        name: 'Destroy',
+        prompt:
+          '*I pull out a teddy bear and start to rip it apart. Stuffing flies everywhere.*',
       },
     ],
   },

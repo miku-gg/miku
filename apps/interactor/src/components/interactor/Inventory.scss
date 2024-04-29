@@ -150,6 +150,25 @@
       }
     }
 
+    &.disabled {
+      // back and white filter
+      filter: grayscale(100%);
+      opacity: 0.5;
+
+      &:hover {
+        border: 2px solid transparent;
+        opacity: 0.5;
+
+        .Inventory__item-price {
+          background-color: $background-1;
+        }
+
+        .Inventory__item-name {
+          opacity: 0;
+        }
+      }
+    }
+
     &:hover {
       border: 2px solid #aaa1ff;
       opacity: 1;
