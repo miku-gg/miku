@@ -287,6 +287,7 @@ const SceneSuggestionModal = () => {
       })
     )
     dispatch(setModalOpened({ id: 'scene', opened: false }))
+    dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
     dispatch(endInferencingScene())
     await spendSceneSuggestion(apiEndpoint)
     trackEvent('scene-generate-successful')
