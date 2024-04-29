@@ -2,6 +2,7 @@ import { Button, Modal } from '@mikugg/ui-kit'
 import { useState } from 'react'
 import { IoMdShare } from 'react-icons/io'
 import * as Selection from 'selection-popover'
+import quotationMarks from '../../../public/images/quotation-marks.png'
 import { useAppContext } from '../../App.context'
 import {
   selectCurrentScene,
@@ -9,11 +10,11 @@ import {
 } from '../../state/selectors'
 import { useAppSelector } from '../../state/store'
 import './ShareConversation.scss'
-
 interface ImageData {
   background: string
   character: string
   text: string
+  marks: string
 }
 
 export const ShareConversation = ({ children }: { children: JSX.Element }) => {
@@ -71,7 +72,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
           const leftMargin = 10
           const maxWidth =
             canvas.width - characterWidth - padding * 2 - leftMargin
-          const boxPadding = 10 // Add this constant for box padding
+          const boxPadding = 10
 
           ctx.font = `${fontSize}px courier new`
           ctx.textAlign = 'left'
@@ -103,42 +104,81 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
           }
 
           let totalTextHeight = 0
+          //tslint:disable-next-line
           for (const line of lines) {
             totalTextHeight += fontSize
           }
 
-          const textX = canvas.width - characterWidth - padding + leftMargin
+          const textX =
+            canvas.width - characterWidth - padding + leftMargin + 20
           let textY = (canvas.height - totalTextHeight) / 2
 
-          // Calculate the dimensions of the background box
           const boxX = canvas.width - characterWidth - padding
           const boxY = textY - boxPadding
           const boxWidth = maxWidth + leftMargin * 2
-          const boxHeight = totalTextHeight + boxPadding * 2
+          const boxHeight = totalTextHeight + boxPadding * 2 + 10
 
           // Draw the background box
           ctx.fillStyle = 'rgba(23, 23, 23, 0.55)'
           ctx.fillRect(boxX, boxY, boxWidth, boxHeight)
 
-          // Draw the text on top of the background box
-          ctx.fillStyle = 'rgb(225, 138, 36)'
-          textY += boxPadding // Adjust textY to account for the top padding
-          for (const line of lines) {
-            const x = textX
-            const y = textY
+          const quotationMarks = new Image()
+          quotationMarks.src = data.marks
+          quotationMarks.onload = () => {
+            const quotationMarksWidth = 20
+            const quotationMarksHeight = 20
 
-            ctx.fillText(line.text, x, y)
-            textY += fontSize
+            const startQuotationMarksX = textX - quotationMarksWidth - 5
+            const startQuotationMarksY = textY
+            ctx.drawImage(
+              quotationMarks,
+              startQuotationMarksX,
+              startQuotationMarksY,
+              quotationMarksWidth,
+              quotationMarksHeight
+            )
+
+            ctx.fillStyle = 'rgb(225, 138, 36)'
+            textY += boxPadding
+            for (const line of lines) {
+              const x = textX
+              const y = textY
+
+              ctx.fillText(line.text, x, y)
+              textY += fontSize
+            }
+
+            const endQuotationMarksX =
+              textX + ctx.measureText(lines[lines.length - 1].text).width + 5
+            const endQuotationMarksY = textY - fontSize
+
+            ctx.save()
+            ctx.translate(
+              endQuotationMarksX + quotationMarksWidth,
+              endQuotationMarksY
+            )
+            ctx.scale(-1, 1)
+            ctx.drawImage(
+              quotationMarks,
+              0,
+              0,
+              quotationMarksWidth,
+              quotationMarksHeight
+            )
+            ctx.restore()
+
+            resolve(canvas.toDataURL('image/png'))
           }
-
-          resolve(canvas.toDataURL('image/png'))
+          quotationMarks.onerror = () => {
+            reject(new Error('Error loading question marks image'))
+          }
         }
         character.onerror = () => {
-          reject(new Error('Error al cargar la imagen del personaje'))
+          reject(new Error('Error loading character image'))
         }
       }
       background.onerror = () => {
-        reject(new Error('Error al cargar la imagen de fondo'))
+        reject(new Error('Error loading background image'))
       }
     })
   }
@@ -149,6 +189,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
       background: backgroundImage?.source.jpg || '',
       character: displayCharacter.image || '',
       text: text || '',
+      marks: quotationMarks,
     })
     setGeneratedImage(image)
   }
@@ -165,6 +206,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
           </Modal>
         ) : null}
       </>
+
       <Selection.Trigger>{children}</Selection.Trigger>
       <Selection.Portal>
         <Selection.Content className="shareConversation">
