@@ -9,6 +9,7 @@ export type DialogueNodeData = {
   isLastResponse: boolean
   isLeaf: boolean
   isRoot: boolean
+  isItemAction: boolean
 }
 
 const NODE_WIDTH = 200

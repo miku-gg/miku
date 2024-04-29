@@ -12,10 +12,12 @@ import * as Sentry from '@sentry/react'
 import mergeWith from 'lodash.mergewith'
 import queryString from 'query-string'
 
+import { PersonaResult } from './src/libs/listSearch'
 import { loadNovelFromSingleCard } from './src/libs/loadNovel'
 
 import { initialState as initialCreationState } from './src/state/slices/creationSlice'
 import { initialState as initialSettingsState } from './src/state/slices/settingsSlice'
+import { initialState as initialInventoryState } from './src/state/slices/inventorySlice'
 import { RootState } from './src/state/store'
 import { VersionId } from './src/state/versioning'
 import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
@@ -61,6 +63,7 @@ function getCongurationFromParams(): {
   apiEndpoint: string
   cardEndpoint: string
   servicesEndpoint: string
+  persona: PersonaResult
   settings: RootState['settings']
 } {
   const queryParams = queryString.parse(window.location.search)
@@ -82,6 +85,7 @@ function getCongurationFromParams(): {
       servicesEndpoint: string
       freeTTS: boolean
       freeSmart: boolean
+      persona: PersonaResult
       settings?: RootState['settings']
     }
 
@@ -104,6 +108,7 @@ function getCongurationFromParams(): {
       apiEndpoint: configurationJson.apiEndpoint || '',
       cardEndpoint: configurationJson.cardEndpoint || API_ENDPOINT,
       servicesEndpoint: configurationJson.servicesEndpoint || SERVICES_ENDPOINT,
+      persona: configurationJson.persona,
       settings: mergeWith(
         mergeWith({}, initialSettingsState),
         configurationJson.settings || {}
@@ -125,6 +130,19 @@ function getCongurationFromParams(): {
       apiEndpoint: '',
       cardEndpoint: CARD_ENDPOINT,
       servicesEndpoint: SERVICES_ENDPOINT,
+      persona: {
+        id: '',
+        name: '',
+        description: '',
+        profilePic: '',
+        isDefault: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        user: {
+          id: '',
+          username: '',
+        },
+      },
       settings: initialSettingsState,
     }
   }
@@ -160,6 +178,7 @@ export const loadNarration = async (): Promise<RootState> => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             ...migrateV2toV3(migrateV1toV2(data)),
+            inventory: initialInventoryState,
             creation: initialCreationState,
             settings: params.settings,
           }
@@ -168,6 +187,7 @@ export const loadNarration = async (): Promise<RootState> => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             ...migrateV2toV3(data),
+            inventory: initialInventoryState,
             creation: initialCreationState,
             settings: params.settings,
           }
@@ -177,6 +197,7 @@ export const loadNarration = async (): Promise<RootState> => {
       }
       return {
         ...data,
+        inventory: initialInventoryState,
         creation: initialCreationState,
         settings: params.settings,
       }
@@ -190,6 +211,7 @@ export const loadNarration = async (): Promise<RootState> => {
     return {
       novel,
       narration,
+      inventory: initialInventoryState,
       creation: initialCreationState,
       settings: params.settings,
       version: VersionId,
@@ -208,6 +230,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       freeSmart={params.freeSmart}
       isMobileApp={params.isMobileApp}
       freeTTS={params.freeTTS}
+      persona={params.persona}
       novelLoader={loadNarration}
       assetUploader={(file: File) =>
         uploadAsset(params.assetsUploadEndpoint, file)

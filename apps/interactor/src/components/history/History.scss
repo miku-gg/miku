@@ -56,6 +56,10 @@
       padding-right: 10%;
       z-index: -1;
 
+      &.is-item-action {
+        padding-right: 0;
+      }
+
       &:hover {
         color: red;
       }

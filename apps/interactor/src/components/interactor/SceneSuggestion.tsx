@@ -6,7 +6,11 @@ import classNames from 'classnames'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import {
   endInferencingScene,
+  selectCharacter,
+  setBackground,
   setModalOpened,
+  setMusic,
+  setPromptValue,
   startInferencingScene,
 } from '../../state/slices/creationSlice'
 import { Button, Input, Loader, Modal, Tooltip } from '@mikugg/ui-kit'
@@ -33,6 +37,7 @@ import trim from 'lodash.trim'
 import { addScene } from '../../state/slices/novelSlice'
 import { BsStars } from 'react-icons/bs'
 import { CustomEventType, postMessage } from '../../libs/stateEvents'
+import { spendSceneSuggestion } from '../../libs/platformAPI'
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false)
@@ -130,11 +135,15 @@ export default function SceneSuggestion() {
 }
 
 const SceneSuggestionModal = () => {
+  const { assetLinkLoader } = useAppContext()
   const dispatch = useAppDispatch()
   const { opened } = useAppSelector(
     (state) => state.creation.scene.sceneSugestions
   )
   const currentScene = useAppSelector(selectCurrentScene)
+  const currentMusic = useAppSelector((state) =>
+    state.novel.songs.find(({ id }) => id === currentScene?.musicId)
+  )
   const { suggestedScenes, fetchingSuggestions } = useAppSelector(
     (state) => state.narration.responses[state.narration.currentResponseId]!
   )
@@ -154,9 +163,14 @@ const SceneSuggestionModal = () => {
   const { isPremium, sceneSuggestionsLeft } = useAppSelector(
     (state) => state.settings.user
   )
+  const [loadingEditIndex, setLoadingEditIndex] = useState<number>(-1)
 
-  const generateScene = async (sceneSuggestion: NarrationSceneSuggestion) => {
-    dispatch(startInferencingScene())
+  const loadSceneData = async (
+    sceneSuggestion: NarrationSceneSuggestion
+  ): Promise<{
+    music: SongResult | null
+    background: BackgroundResult | null
+  }> => {
     const music = sceneSuggestion?.music
       ? await listSearch<SongResult>(apiEndpoint, SearchType.SONG_VECTOR, {
           search: trim(sceneSuggestion?.music),
@@ -186,6 +200,54 @@ const SceneSuggestionModal = () => {
           })
       : null
 
+    return { music, background }
+  }
+
+  const prefillScene = async (
+    sceneSuggestion: NarrationSceneSuggestion,
+    index: number
+  ) => {
+    setLoadingEditIndex(index)
+    const { music, background } = await loadSceneData(sceneSuggestion)
+    dispatch(
+      setBackground(background?.asset || currentBackground?.source?.jpg || '')
+    )
+    dispatch(
+      setMusic({
+        name: music?.title || currentScene?.musicId || '',
+        source:
+          assetLinkLoader(music?.asset || currentMusic?.source || '') ||
+          currentScene?.musicId ||
+          '',
+      })
+    )
+    dispatch(
+      setPromptValue(
+        `OOC: Describe the following scene and add dialogue: ${
+          sceneSuggestion?.textPrompt || ''
+        }`
+      )
+    )
+    currentScene?.characters.forEach((c, index) => {
+      dispatch(
+        selectCharacter({
+          index: index,
+          id: c.characterId,
+          outfit: c.outfit,
+        })
+      )
+    })
+    dispatch(setModalOpened({ id: 'slidepanel', opened: true }))
+    dispatch(setModalOpened({ id: 'scene', opened: true }))
+    dispatch(setModalOpened({ id: 'scene-suggestions', opened: false }))
+    await spendSceneSuggestion(apiEndpoint)
+    setLoadingEditIndex(-1)
+    dispatch(userDataFetchStart({ apiEndpoint }))
+  }
+
+  const generateScene = async (sceneSuggestion: NarrationSceneSuggestion) => {
+    dispatch(startInferencingScene())
+    const { music, background } = await loadSceneData(sceneSuggestion)
     dispatch(
       addScene({
         id: sceneSuggestion.sceneId,
@@ -225,8 +287,11 @@ const SceneSuggestionModal = () => {
       })
     )
     dispatch(setModalOpened({ id: 'scene', opened: false }))
+    dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
     dispatch(endInferencingScene())
+    await spendSceneSuggestion(apiEndpoint)
     trackEvent('scene-generate-successful')
+    dispatch(userDataFetchStart({ apiEndpoint }))
   }
 
   return (
@@ -332,6 +397,19 @@ const SceneSuggestionModal = () => {
                       <p>{suggestion.textPrompt}</p>
                     </div>
                     <div className="SceneSuggestionModal__suggestion-button">
+                      {!loading && (sceneSuggestionsLeft || isPremium) ? (
+                        <Button
+                          onClick={async () => {
+                            if (sceneSuggestionsLeft || isPremium) {
+                              prefillScene(suggestion, index)
+                            }
+                          }}
+                          theme="transparent"
+                          disabled={loadingEditIndex === index}
+                        >
+                          {loadingEditIndex === index ? <Loader /> : 'Edit'}
+                        </Button>
+                      ) : null}
                       <Button
                         theme="gradient"
                         disabled={

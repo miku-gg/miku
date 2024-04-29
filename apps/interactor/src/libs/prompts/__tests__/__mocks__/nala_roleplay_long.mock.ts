@@ -1,6 +1,11 @@
 import { RootState } from '../../../../state/store'
 
 export default {
+  inventory: {
+    selectedItem: null,
+    showInventory: 'initial',
+    showItemModal: 'initial',
+  },
   creation: {
     importedBackgrounds: [],
     importedCharacters: [],
