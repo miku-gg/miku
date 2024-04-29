@@ -16,8 +16,6 @@ interface ImageData {
   text: string
 }
 
-// Ejemplo de uso
-
 export const ShareConversation = ({ children }: { children: JSX.Element }) => {
   const scene = useAppSelector(selectCurrentScene)
   const backgrounds = useAppSelector((state) => state.novel.backgrounds)
@@ -68,23 +66,23 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
           )
 
           const text = data.text
-          const fontSize = 20
+          const fontSize = 18
           const padding = 10
-          const maxWidth = canvas.width - characterWidth - padding * 2
+          const leftMargin = 10 // Added left margin
+          const maxWidth =
+            canvas.width - characterWidth - padding * 2 - leftMargin // Adjusted maxWidth
 
           ctx.font = `${fontSize}px courier new`
           ctx.textAlign = 'left'
           ctx.textBaseline = 'top'
           ctx.fillStyle = 'rgb(225, 138, 36)'
-          ctx.shadowColor = 'rgb(0, 0, 0)' // Color de la sombra
-          ctx.shadowOffsetX = 2 // Desplazamiento horizontal de la sombra
-          ctx.shadowOffsetY = 2 // Desplazamiento vertical de la sombra
-          ctx.shadowBlur = 4 // Difuminado de la sombra
+          ctx.shadowColor = 'rgb(0, 0, 0)'
+          ctx.shadowOffsetX = 2
+          ctx.shadowOffsetY = 2
+          ctx.shadowBlur = 4
 
           let lines = []
           let currentLine = ''
-          const textX = canvas.width / 2 + padding
-          let textY = padding
 
           const words = text.split(' ')
           for (const word of words) {
@@ -93,28 +91,30 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
             const testWidth = metrics.width
 
             if (testWidth > maxWidth && currentLine.trim().length > 0) {
-              lines.push({ text: currentLine.trim(), x: textX, y: textY })
+              lines.push({ text: currentLine.trim() })
               currentLine = word + ' '
-              textY += fontSize
             } else {
               currentLine = testLine
             }
           }
           if (currentLine.trim().length > 0) {
-            lines.push({ text: currentLine.trim(), x: textX, y: textY })
+            lines.push({ text: currentLine.trim() })
           }
 
+          let totalTextHeight = 0
           for (const line of lines) {
-            const lineWidth = ctx.measureText(line.text).width
-            if (line.x + lineWidth > canvas.width - padding) {
-              ctx.fillText(
-                line.text,
-                canvas.width - padding - lineWidth,
-                line.y
-              )
-            } else {
-              ctx.fillText(line.text, line.x, line.y)
-            }
+            totalTextHeight += fontSize
+          }
+
+          const textX = canvas.width - characterWidth - padding + leftMargin // Adjusted textX
+          let textY = (canvas.height - totalTextHeight) / 2
+
+          for (const line of lines) {
+            const x = textX
+            const y = textY
+
+            ctx.fillText(line.text, x, y)
+            textY += fontSize
           }
 
           resolve(canvas.toDataURL('image/png'))
@@ -143,6 +143,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
       <>
         {generatedImage ? (
           <Modal
+            className="shareConversation__modal"
             opened={!!generatedImage}
             onCloseModal={() => setGeneratedImage(null)}
           >
