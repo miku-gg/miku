@@ -1,3 +1,5 @@
+@import '../../variables';
+
 .shareConversation {
   z-index: 100;
 
@@ -6,9 +8,8 @@
     align-items: center;
     gap: 0.2rem;
     padding: 0.3rem 0.5rem;
-    background-color: #171717;
     border-radius: 0.5rem;
-
-    color: white;
+    font-family: poppins;
+    font-size: 1.1rem;
   }
 }

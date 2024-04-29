@@ -1,4 +1,4 @@
-import { Modal } from '@mikugg/ui-kit'
+import { Button, Modal } from '@mikugg/ui-kit'
 import { useState } from 'react'
 import { IoMdShare } from 'react-icons/io'
 import * as Selection from 'selection-popover'
@@ -66,11 +66,12 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
           )
 
           const text = data.text
-          const fontSize = 18
+          const fontSize = 20
           const padding = 10
-          const leftMargin = 10 // Added left margin
+          const leftMargin = 10
           const maxWidth =
-            canvas.width - characterWidth - padding * 2 - leftMargin // Adjusted maxWidth
+            canvas.width - characterWidth - padding * 2 - leftMargin
+          const boxPadding = 10 // Add this constant for box padding
 
           ctx.font = `${fontSize}px courier new`
           ctx.textAlign = 'left'
@@ -106,9 +107,22 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
             totalTextHeight += fontSize
           }
 
-          const textX = canvas.width - characterWidth - padding + leftMargin // Adjusted textX
+          const textX = canvas.width - characterWidth - padding + leftMargin
           let textY = (canvas.height - totalTextHeight) / 2
 
+          // Calculate the dimensions of the background box
+          const boxX = canvas.width - characterWidth - padding
+          const boxY = textY - boxPadding
+          const boxWidth = maxWidth + leftMargin * 2
+          const boxHeight = totalTextHeight + boxPadding * 2
+
+          // Draw the background box
+          ctx.fillStyle = 'rgba(23, 23, 23, 0.55)'
+          ctx.fillRect(boxX, boxY, boxWidth, boxHeight)
+
+          // Draw the text on top of the background box
+          ctx.fillStyle = 'rgb(225, 138, 36)'
+          textY += boxPadding // Adjust textY to account for the top padding
           for (const line of lines) {
             const x = textX
             const y = textY
@@ -154,11 +168,11 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
       <Selection.Trigger>{children}</Selection.Trigger>
       <Selection.Portal>
         <Selection.Content className="shareConversation">
-          <button onClick={() => handleShare()}>
+          <Button theme="gradient" onClick={() => handleShare()}>
             Share
             <IoMdShare />
-          </button>
-          <Selection.Arrow />
+          </Button>
+          <Selection.Arrow className="shareConversation__arrow" />
         </Selection.Content>
       </Selection.Portal>
     </Selection.Root>
