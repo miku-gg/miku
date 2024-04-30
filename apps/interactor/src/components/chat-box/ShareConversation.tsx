@@ -1,4 +1,4 @@
-import { Button, Modal } from '@mikugg/ui-kit'
+import { Button } from '@mikugg/ui-kit'
 import { useState } from 'react'
 import { IoMdShare } from 'react-icons/io'
 import * as Selection from 'selection-popover'
@@ -11,6 +11,7 @@ import {
 } from '../../state/selectors'
 import { useAppSelector } from '../../state/store'
 import './ShareConversation.scss'
+
 interface ImageData {
   background: string
   character: string
@@ -54,28 +55,23 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
         character.crossOrigin = 'anonymous'
         character.src = assetLinkLoader(data.character)
         character.onload = () => {
-          const characterWidth = 256
-          const characterHeight = 448
-          const characterX = 0
-          const characterY = canvas.height - characterHeight * 0.7
+          const characterHeight = character.naturalHeight
+          const characterWidth = character.naturalWidth
+          const ratio = characterHeight / characterWidth
+          const newheight = 697
+          const newwidth = newheight / ratio
+          const characterY = canvas.height - newheight / 4
 
-          ctx.save() // Guardar el estado actual del contexto
-          ctx.scale(0.8, 0.8) // Reducir la escala en un 20%
-          ctx.drawImage(
-            character,
-            characterX,
-            characterY,
-            characterWidth,
-            characterHeight
-          )
-          ctx.restore() // Restaurar el estado del contexto
+          ctx.save()
+          ctx.scale(0.5, 0.5)
+          ctx.drawImage(character, 0, characterY, newwidth, newheight)
+          ctx.restore()
 
           const text = data.text
-          const fontSize = 24
+          const fontSize = 32
           const padding = 10
           const leftMargin = 10
-          const maxWidth =
-            canvas.width - characterWidth - padding * 2 - leftMargin
+          const maxWidth = canvas.width - 256 - padding * 2 - leftMargin
           const boxPadding = 10
 
           ctx.font = `${fontSize}px courier new`
@@ -90,7 +86,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
           let lines = []
           let currentLine = ''
 
-          const words = text.split(' ').slice(0, 32)
+          const words = text.split(' ').slice(0, 20)
           for (const word of words) {
             const testLine = currentLine + word + ' '
             const metrics = ctx.measureText(testLine)
@@ -112,13 +108,16 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
             totalTextHeight += fontSize
           }
 
-          const textX =
-            canvas.width - characterWidth - padding + leftMargin + 20
-          const boxHeight = totalTextHeight + boxPadding * 4 + 30 * 2 // textHeight + paddingTop + marksHeight + paddingBottom
+          if (totalTextHeight === fontSize) {
+            totalTextHeight = fontSize + 10
+          }
+
+          const textX = canvas.width - 256 - padding + leftMargin + 20
+          const boxHeight = totalTextHeight + boxPadding * 4 // textHeight + paddingTop + marksHeight + paddingBottom
           const boxY = canvas.height / 2 - boxHeight / 2
 
           // Calculate the dimensions of the background box
-          const boxX = canvas.width - characterWidth - padding
+          const boxX = canvas.width - 256 - padding
           const boxWidth = maxWidth + leftMargin * 2
 
           // Draw the background box
@@ -129,12 +128,12 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
           const quotationMarks = new Image()
           quotationMarks.src = data.marks
           quotationMarks.onload = () => {
-            const quotationMarksWidth = 30
-            const quotationMarksHeight = 30
+            const quotationMarksWidth = 60
+            const quotationMarksHeight = 60
+            ctx.globalAlpha = 0.2
 
             // Draw the top quotation marks image centered horizontally within the box
-            const topQuotationMarksX =
-              textX + maxWidth / 2 - quotationMarksWidth
+            const topQuotationMarksX = textX - quotationMarksWidth + 40
             const topQuotationMarksY = boxY + boxPadding
             ctx.drawImage(
               quotationMarks,
@@ -144,20 +143,8 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
               quotationMarksHeight
             )
 
-            // Draw the text on top of the background box
-            ctx.fillStyle = 'rgb(225, 138, 36)'
-            let currentTextY = boxY + boxPadding * 2 + quotationMarksHeight
-            for (const line of lines) {
-              const x = textX
-              const y = currentTextY
-
-              ctx.fillText(line.text, x, y)
-              currentTextY += fontSize
-            }
-
-            // Draw the bottom quotation marks image centered horizontally within the box
             const bottomQuotationMarksX =
-              textX + maxWidth / 2 - quotationMarksWidth
+              textX + maxWidth - quotationMarksWidth - 20
             const bottomQuotationMarksY =
               boxY + boxHeight - boxPadding - quotationMarksHeight
             ctx.save() // Save the current context state
@@ -174,6 +161,25 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
               quotationMarksHeight
             )
             ctx.restore() // Restore the context to its previous state
+            // Draw the text on top of the background box
+            ctx.fillStyle = 'rgb(225, 138, 36)' // Color del texto (naranja)
+            let currentTextY = boxY + boxPadding * 2
+            ctx.strokeStyle = 'black' // Color del borde (negro)
+            ctx.lineWidth = 1 // Ancho del borde
+            ctx.globalAlpha = 1
+
+            // Iterar sobre las líneas de texto y dibujar cada línea con borde
+            for (const line of lines) {
+              const x = textX
+              const y = currentTextY
+
+              // Dibujar el texto con borde
+              ctx.strokeText(line.text, x, y)
+              ctx.fillText(line.text, x, y) // Relleno de texto
+
+              // Actualizar la posición Y para la siguiente línea
+              currentTextY += fontSize
+            }
 
             const DataURL = canvas.toDataURL('image/png')
 
@@ -207,7 +213,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
   }
   return (
     <Selection.Root>
-      <>
+      {/* <>
         {generatedImage ? (
           <Modal
             className="shareConversation__modal"
@@ -217,7 +223,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
             <img src={generatedImage} />
           </Modal>
         ) : null}
-      </>
+      </> */}
 
       <Selection.Trigger>{children}</Selection.Trigger>
       <Selection.Portal>
