@@ -5,7 +5,7 @@
   flex-direction: column;
   height: 70%;
   min-width: 200px;
-  max-width: 423px;
+  max-width: 95%;
 
   background-color: #0c1225ee;
 
@@ -193,6 +193,7 @@
   z-index: 1;
 
   width: 163px;
+  min-width: 163px;
   height: 100%;
   padding: 0.5rem;
   padding-right: 1rem;
