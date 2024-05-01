@@ -11,11 +11,11 @@ const ScreenSizer = () => {
     <button
       className="ScreenSizer icon-button"
       onClick={() => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen()
+        if (document?.fullscreenElement) {
+          document?.exitFullscreen()
           setFullscreen(false)
         } else {
-          document.documentElement.requestFullscreen()
+          document?.documentElement?.requestFullscreen()
           setFullscreen(true)
         }
       }}
