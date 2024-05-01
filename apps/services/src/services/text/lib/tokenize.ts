@@ -9,12 +9,15 @@ import MISTRAL__TOKENIZER from "../data/tokenizers/mistral/tokenizer.json";
 import MISTRAL__TOKENIZER_CONFIG from "../data/tokenizers/mistral/tokenizer_config.json";
 import SOLAR__TOKENIZER from "../data/tokenizers/solar/tokenizer.json";
 import SOLAR__TOKENIZER_CONFIG from "../data/tokenizers/solar/tokenizer_config.json";
+import COHERE__TOKENIZER from "../data/tokenizers/cohere/tokenizer.json";
+import COHERE__TOKENIZER_CONFIG from "../data/tokenizers/cohere/tokenizer_config.json";
 
 export enum TokenizerType {
   LLAMA_2 = "LLAMA_2",
   LLAMA_3 = "LLAMA_3",
   MISTRAL = "MISTRAL",
   SOLAR = "SOLAR",
+  COHERE = "COHERE",
 }
 
 interface ExternalTokenizerClass {
@@ -128,5 +131,20 @@ export async function loadTokenizer(
         );
       }
       return tokenizers.get(TokenizerType.SOLAR);
+    case TokenizerType.COHERE:
+      if (!tokenizers.has(TokenizerType.COHERE)) {
+        tokenizers.set(
+          TokenizerType.COHERE,
+          new AdapterTokenizerTokenizer(
+            await TokenizerLoader.fromPreTrained({
+              tokenizerJSON: COHERE__TOKENIZER,
+              tokenizerConfig: COHERE__TOKENIZER_CONFIG,
+            }),
+            COHERE__TOKENIZER_CONFIG.eos_token as string,
+            COHERE__TOKENIZER_CONFIG.bos_token as string
+          )
+        );
+      }
+      return tokenizers.get(TokenizerType.COHERE);
   }
 }
