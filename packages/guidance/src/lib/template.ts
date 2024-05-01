@@ -105,11 +105,13 @@ export class TemplateProcessor<TRequestOptions = undefined> {
             throw new Error(`${methodArgs["options"]} variable not found`);
           }
 
+          prompt = this.tokenizer.decodeString(
+            this.tokenizer.encodeString(prompt)
+          );
+
           // Add all options to trie
           options.forEach((option) => {
-            const prefix = this.tokenizer.encodeString(
-              prompt + option + this.tokenizer.getEOS()
-            );
+            const prefix = this.tokenizer.encodeString(prompt + option);
             trie.addPrefix(prefix);
           });
 
@@ -124,8 +126,7 @@ export class TemplateProcessor<TRequestOptions = undefined> {
               // If there is only one child, we complete
               completion = this.tokenizer
                 .decodeString(trie.getWord(currentPrefix))
-                .substring(prompt.length)
-                .replace(this.tokenizer.getEOS(), "");
+                .substring(prompt.length);
               break;
             } else {
               // If there is more than one child, we generate the next token
@@ -134,7 +135,7 @@ export class TemplateProcessor<TRequestOptions = undefined> {
                 return acc;
               }, {} as Record<string, number>);
               const top_logprobs = await this.generator.generateTokenLogProgs(
-                prompt,
+                currentPrefixPrompt,
                 logit_bias,
                 reqOptions
               );
