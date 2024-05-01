@@ -486,8 +486,11 @@ importers:
 
   apps/services:
     dependencies:
+      '@lenml/tokenizers':
+        specifier: ^1.0.2
+        version: 1.0.2
       '@mikugg/guidance':
-        specifier: 0.16.0
+        specifier: workspace:*
         version: link:../../packages/guidance
       '@types/body-parser':
         specifier: ^1.19.2
@@ -4345,6 +4348,10 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
+
+  /@lenml/tokenizers@1.0.2:
+    resolution: {integrity: sha512-EBNToaAgPBpF+qclwzOi1Znowp8sn2azMYEoxAnken9Wl1UCTuJH0HrMy02sJ08pX+BeG1KKVBRRaayCzbEAcw==}
+    dev: false
 
   /@lerna/add@6.4.1:
     resolution: {integrity: sha512-YSRnMcsdYnQtQQK0NSyrS9YGXvB3jzvx183o+JTH892MKzSlBqwpBHekCknSibyxga1HeZ0SNKQXgsHAwWkrRw==}
