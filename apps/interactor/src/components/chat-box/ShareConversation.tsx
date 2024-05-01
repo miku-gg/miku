@@ -61,17 +61,18 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
           const newheight = 697
           const newwidth = newheight / ratio
           const characterY = canvas.height - newheight / 4
+          const characterX = -newwidth / 8
 
           ctx.save()
           ctx.scale(0.5, 0.5)
-          ctx.drawImage(character, 0, characterY, newwidth, newheight)
+          ctx.drawImage(character, characterX, characterY, newwidth, newheight)
           ctx.restore()
 
           const text = data.text
           const fontSize = 32
           const padding = 10
           const leftMargin = 10
-          const maxWidth = canvas.width - 256 - padding * 2 - leftMargin
+          const maxWidth = canvas.width - 192 - padding * 2 - leftMargin
           const boxPadding = 10
 
           ctx.font = `${fontSize}px courier new`
@@ -86,7 +87,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
           let lines = []
           let currentLine = ''
 
-          const words = text.split(' ').slice(0, 20)
+          const words = text.split(' ').slice(0, 30)
           for (const word of words) {
             const testLine = currentLine + word + ' '
             const metrics = ctx.measureText(testLine)
@@ -112,12 +113,12 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
             totalTextHeight = fontSize + 10
           }
 
-          const textX = canvas.width - 256 - padding + leftMargin + 20
+          const textX = canvas.width - 320 - padding + leftMargin + 20
           const boxHeight = totalTextHeight + boxPadding * 4 // textHeight + paddingTop + marksHeight + paddingBottom
           const boxY = canvas.height / 2 - boxHeight / 2
 
           // Calculate the dimensions of the background box
-          const boxX = canvas.width - 256 - padding
+          const boxX = canvas.width - 320 - padding
           const boxWidth = maxWidth + leftMargin * 2
 
           // Draw the background box
