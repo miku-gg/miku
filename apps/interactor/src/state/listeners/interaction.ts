@@ -23,6 +23,7 @@ import {
   selectCurrentSceneObjectives,
 } from '../selectors'
 import { NovelObjectiveActionType } from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
+import { CustomEventType, postMessage } from '../../libs/stateEvents'
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -192,6 +193,11 @@ const interactionEffect = async (
                   completed: true,
                 })
               )
+              break
+            case NovelObjectiveActionType.ACHIEVEMENT_UNLOCK:
+              postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
+                achievementId: objective.action.params.achievementId,
+              })
               break
           }
         }

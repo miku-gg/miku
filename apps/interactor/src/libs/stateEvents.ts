@@ -7,6 +7,7 @@ export enum StateEventType {
 
 export enum CustomEventType {
   OPEN_PREMIUM = 'OPEN_PREMIUM',
+  ACHIEVEMENT_UNLOCKED = 'ACHIEVEMENT_UNLOCKED',
 }
 
 export const postMessage = (
