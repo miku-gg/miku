@@ -94,6 +94,7 @@ app.get("/get", async (req, res) => {
   res.send({
     apiUrl: data.apiUrl,
     apiKey: data.apiKey,
+    model: data.model,
     strategy: data.strategy,
     tokenizer: data.tokenizer,
     truncation_length: data.truncation_length,

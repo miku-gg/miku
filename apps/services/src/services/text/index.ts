@@ -15,7 +15,8 @@ const APHRODITE_API_URL =
   process.env.APHRODITE_API_URL ||
   backend_config?.apiUrl ||
   "http://localhost:2242/v1";
-const APHRODITE_API_MODEL = process.env.APHRODITE_API_MODEL || "default";
+const APHRODITE_API_MODEL =
+  process.env.APHRODITE_API_MODEL || backend_config?.model || "default";
 const APHRODITE_API_PRESET =
   (process.env.APHRODITE_API_PRESET as PresetType) ||
   PresetType.DIVINE_INTELECT;
