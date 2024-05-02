@@ -107,6 +107,20 @@ export interface NovelMap {
   lorebook?: CharacterBook;
 }
 
+export interface InventoryAction {
+  name: string;
+  prompt: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  isPremium?: boolean;
+  actions: InventoryAction[];
+}
+
 export enum NovelObjectiveActionType {
   SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
   SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
@@ -127,6 +141,7 @@ export type NovelObjectiveAction =
       type: NovelObjectiveActionType.ACHIEVEMENT_UNLOCK;
       params: {
         achievementId: string;
+        reward: InventoryItem | null;
       };
     };
 

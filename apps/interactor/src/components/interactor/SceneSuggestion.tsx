@@ -110,6 +110,7 @@ export default function SceneSuggestion() {
                     characters:
                       nextScene?.characters.map((r) => r.characterId) || [],
                     servicesEndpoint,
+                    apiEndpoint,
                     selectedCharacterId:
                       nextScene?.characters[
                         Math.floor(
@@ -272,6 +273,7 @@ const SceneSuggestionModal = () => {
         }`,
         characters: sceneSuggestion?.characters.map((r) => r.characterId) || [],
         servicesEndpoint,
+        apiEndpoint,
         selectedCharacterId:
           sceneSuggestion?.characters[
             Math.floor(

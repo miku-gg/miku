@@ -53,6 +53,7 @@ export default function SceneSelector(): JSX.Element | null {
         text: prompt,
         characters: scene?.characters.map((r) => r.characterId) || [],
         servicesEndpoint,
+        apiEndpoint,
         selectedCharacterId:
           scene?.characters[
             Math.floor(Math.random() * (scene?.characters.length || 0))

@@ -26,7 +26,8 @@ import { setInventoryVisibility } from '../../state/slices/inventorySlice'
 
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
-  const { servicesEndpoint, isInteractionDisabled } = useAppContext()
+  const { servicesEndpoint, isInteractionDisabled, apiEndpoint } =
+    useAppContext()
   const { text, disabled } = useAppSelector((state) => state.narration.input)
   const state = useAppSelector((state) => state)
   const scene = useAppSelector(selectCurrentScene)
@@ -56,6 +57,7 @@ const InputBox = (): JSX.Element | null => {
         sceneId: scene?.id || '',
         characters: scene?.characters.map((r) => r.characterId) || [],
         servicesEndpoint,
+        apiEndpoint,
         selectedCharacterId: lastResponse?.selectedCharacterId || '',
       })
     )

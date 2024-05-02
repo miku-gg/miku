@@ -24,6 +24,9 @@ import {
 } from '../selectors'
 import { NovelObjectiveActionType } from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
 import { CustomEventType, postMessage } from '../../libs/stateEvents'
+import { unlockAchievement } from '../../libs/platformAPI'
+import { addItem } from '../slices/inventorySlice'
+import { removeObjective } from '../slices/objectivesSlice'
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -41,6 +44,7 @@ const interactionEffect = async (
   dispatch: Dispatch,
   state: RootState,
   servicesEndpoint: string,
+  apiEndpoint: string,
   selectedCharacterId: string
 ) => {
   try {
@@ -147,62 +151,74 @@ const interactionEffect = async (
       })
     }
 
-    await Promise.all(
-      objectives.map(async (objective) => {
-        const condition = objective.condition
-        const conditionResultStream = textCompletion({
-          template: fillTextTemplate(
-            prefixConditionPrompt +
-              AbstractRoleplayStrategy.getConditionPrompt({
-                condition,
-                instructionPrefix: strategy.template().instruction,
-                responsePrefix: strategy.template().response,
-              }),
-            {
-              user: state.settings.user.name,
-              bot: currentCharacter?.card.data.name || '',
-            }
-          ),
-          model: state.settings.model,
-          serviceBaseUrl: servicesEndpoint,
-          identifier,
-          variables: {
-            cond_opt: [' Yes', ' No'],
-          },
-        })
-        let response = ''
-        for await (const result of conditionResultStream) {
-          response = result.get('cond') || ''
-        }
-        if (response === ' Yes') {
-          switch (objective.action.type) {
-            case NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE:
-              dispatch(
-                interactionSuccess({
-                  ...currentResponseState,
-                  nextScene: objective.action.params.sceneId,
-                  completed: true,
-                })
-              )
-              break
-            case NovelObjectiveActionType.SUGGEST_CREATE_SCENE:
-              dispatch(
-                interactionSuccess({
-                  ...currentResponseState,
-                  shouldSuggestScenes: true,
-                  completed: true,
-                })
-              )
-              break
-            case NovelObjectiveActionType.ACHIEVEMENT_UNLOCK:
-              postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
-                achievementId: objective.action.params.achievementId,
-              })
-              break
+    try {
+      await Promise.all(
+        objectives.map(async (objective) => {
+          const condition = objective.condition
+          const conditionResultStream = textCompletion({
+            template: fillTextTemplate(
+              prefixConditionPrompt +
+                AbstractRoleplayStrategy.getConditionPrompt({
+                  condition,
+                  instructionPrefix: strategy.template().instruction,
+                  responsePrefix: strategy.template().response,
+                }),
+              {
+                user: state.settings.user.name,
+                bot: currentCharacter?.card.data.name || '',
+              }
+            ),
+            model: state.settings.model,
+            serviceBaseUrl: servicesEndpoint,
+            identifier,
+            variables: {
+              cond_opt: [' Yes', ' No'],
+            },
+          })
+          let response = ''
+          for await (const result of conditionResultStream) {
+            response = result.get('cond') || ''
           }
-        }
-      })
-    )
+          if (response === ' Yes') {
+            switch (objective.action.type) {
+              case NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE:
+                dispatch(
+                  interactionSuccess({
+                    ...currentResponseState,
+                    nextScene: objective.action.params.sceneId,
+                    completed: true,
+                  })
+                )
+                break
+              case NovelObjectiveActionType.SUGGEST_CREATE_SCENE:
+                dispatch(
+                  interactionSuccess({
+                    ...currentResponseState,
+                    shouldSuggestScenes: true,
+                    completed: true,
+                  })
+                )
+                break
+              case NovelObjectiveActionType.ACHIEVEMENT_UNLOCK:
+                postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
+                  achievementId: objective.action.params.achievementId,
+                })
+                unlockAchievement(
+                  apiEndpoint,
+                  objective.action.params.achievementId
+                )
+                if (objective.action.params.reward) {
+                  dispatch(addItem(objective.action.params.reward))
+                }
+                break
+            }
+            dispatch(removeObjective(objective.id))
+          }
+        })
+      )
+    } catch (error) {
+      dispatch(interactionFailure('Failed to unlock achievement'))
+    }
   } catch (error) {
     console.error(error)
     dispatch(interactionFailure())
@@ -218,6 +234,7 @@ interactionListenerMiddleware.startListening({
       listenerApi.dispatch,
       listenerApi.getState() as RootState,
       action.payload.servicesEndpoint,
+      action.payload.apiEndpoint,
       action.payload.selectedCharacterId
     )
   },
@@ -233,6 +250,7 @@ regenerationListenerMiddleware.startListening({
       listenerApi.dispatch,
       state,
       action.payload.servicesEndpoint,
+      action.payload.apiEndpoint,
       action.payload.characterId
     )
   },
@@ -253,6 +271,7 @@ continueListenerMiddleware.startListening({
       listenerApi.dispatch,
       state,
       action.payload.servicesEndpoint,
+      action.payload.apiEndpoint,
       lastResponseCharacterId
     )
   },
@@ -268,6 +287,7 @@ characterResponseListenerMiddleware.startListening({
       listenerApi.dispatch,
       state,
       action.payload.servicesEndpoint,
+      action.payload.apiEndpoint,
       action.payload.characterId
     )
   },

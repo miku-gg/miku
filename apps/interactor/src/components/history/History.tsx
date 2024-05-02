@@ -130,6 +130,7 @@ const HistoryModal = (): ReactElement => {
   const dispatch = useAppDispatch()
   const narration = useAppSelector((state) => state.narration)
   const novel = useAppSelector((state) => state.novel)
+  const inventoryItems = useAppSelector((state) => state.inventory.items)
 
   const [nodes, edges, startPos] = (() => {
     const parentIds = (() => {
@@ -194,7 +195,7 @@ const HistoryModal = (): ReactElement => {
         const interaction = narration.interactions[interactionId]
 
         if (interaction?.id) {
-          const item = getItemByActionPrompt(interaction.query)
+          const item = getItemByActionPrompt(inventoryItems, interaction.query)
           let query = ''
           if (item) {
             query = `The user used the ${item.name} item.`

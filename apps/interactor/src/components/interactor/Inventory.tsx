@@ -1,14 +1,12 @@
 import { Button, Tooltip } from '@mikugg/ui-kit'
 import { useAppDispatch, useAppSelector } from '../../state/store'
+import { NovelV3 } from '@mikugg/bot-utils'
 import {
-  InventoryAction,
-  InventoryItem,
   setInventoryVisibility,
   setItemModalVisibility,
   setSelectedItem,
 } from '../../state/slices/inventorySlice'
 import { FaTimes } from 'react-icons/fa'
-import { inventoryItems } from '../../libs/inventoryItems'
 import './Inventory.scss'
 import { useAppContext } from '../../App.context'
 import { interactionStart } from '../../state/slices/narrationSlice'
@@ -21,9 +19,11 @@ import { toast } from 'react-toastify'
 export default function Inventory() {
   const dispatch = useAppDispatch()
   const { isPremium } = useAppSelector((state) => state.settings.user)
-  const showInventory = useAppSelector((state) => state.inventory.showInventory)
-  const selectedItem = useAppSelector((state) => state.inventory.selectedItem)
-  const { servicesEndpoint, isInteractionDisabled } = useAppContext()
+  const { showInventory, selectedItem, items } = useAppSelector(
+    (state) => state.inventory
+  )
+  const { servicesEndpoint, isInteractionDisabled, apiEndpoint } =
+    useAppContext()
   const scene = useAppSelector(selectCurrentScene)
   const lastResponse = useAppSelector(selectLastLoadedResponse)
 
@@ -43,7 +43,7 @@ export default function Inventory() {
       </div>
       <div className="Inventory__content">
         <div className="Inventory__items scrollbar">
-          {inventoryItems.map((item) => {
+          {items.map((item) => {
             const speed = 5
             const position = Math.max(item.name.length + 10, 20)
             const animationDuration = Math.max(item.name.length / speed, 3)
@@ -119,6 +119,7 @@ export default function Inventory() {
                 text: action.prompt,
                 sceneId: scene?.id || '',
                 characters: scene?.characters.map((r) => r.characterId) || [],
+                apiEndpoint,
                 servicesEndpoint,
                 selectedCharacterId: lastResponse?.selectedCharacterId || '',
               })
@@ -134,8 +135,8 @@ export const InventoryItemModal = ({
   item,
   onUse,
 }: {
-  item: InventoryItem | null
-  onUse: (action: InventoryAction) => void
+  item: NovelV3.InventoryItem | null
+  onUse: (action: NovelV3.InventoryAction) => void
 }) => {
   const showItemModal = useAppSelector((state) => state.inventory.showItemModal)
 

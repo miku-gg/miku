@@ -74,7 +74,8 @@ async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
 
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
-  const { assetLinkLoader, assetUploader, servicesEndpoint } = useAppContext()
+  const { assetLinkLoader, assetUploader, servicesEndpoint, apiEndpoint } =
+    useAppContext()
   const currentScene = useAppSelector(selectCurrentScene)
   const songs = useAppSelector((state) =>
     state.novel.songs.filter((song) =>
@@ -198,6 +199,7 @@ const CreateScene = () => {
     dispatch(
       interactionStart({
         servicesEndpoint,
+        apiEndpoint,
         text: prompt,
         sceneId,
         characters: characters.map(({ id }) => id),

@@ -30,8 +30,12 @@ import classNames from 'classnames'
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
-  const { servicesEndpoint, isInteractionDisabled, assetLinkLoader } =
-    useAppContext()
+  const {
+    servicesEndpoint,
+    apiEndpoint,
+    isInteractionDisabled,
+    assetLinkLoader,
+  } = useAppContext()
   const responseDiv = useRef<HTMLDivElement>(null)
   const lastReponse = useAppSelector(selectLastLoadedResponse)
   const isLastResponseFetching = useAppSelector(
@@ -71,6 +75,7 @@ const ResponseBox = (): JSX.Element | null => {
     const randomEmotion = outfit?.emotions[randomIndex].id || ''
     dispatch(
       regenerationStart({
+        apiEndpoint,
         servicesEndpoint,
         emotion: randomEmotion,
         characterId,
@@ -82,6 +87,7 @@ const ResponseBox = (): JSX.Element | null => {
     trackEvent('interaction_continue')
     dispatch(
       continueResponse({
+        apiEndpoint,
         servicesEndpoint,
       })
     )
@@ -172,6 +178,7 @@ const ResponseBox = (): JSX.Element | null => {
                               characterId,
                             })
                           : characterResponseStart({
+                              apiEndpoint,
                               servicesEndpoint,
                               characterId,
                             })

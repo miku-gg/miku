@@ -1,12 +1,15 @@
-import { InventoryItem } from '../state/slices/inventorySlice'
+import { NovelV3 } from '@mikugg/bot-utils'
 
-export const getItemByActionPrompt = (query: string) => {
+export const getItemByActionPrompt = (
+  inventoryItems: NovelV3.InventoryItem[],
+  query: string
+) => {
   return inventoryItems.find((item) =>
     item.actions.some((action) => action.prompt === query)
   )
 }
 
-export const inventoryItems: InventoryItem[] = [
+export const DEFAULT_INVENTORY: NovelV3.InventoryItem[] = [
   {
     id: '1',
     name: 'Rose',

@@ -22,6 +22,11 @@ import { RootState } from './src/state/store'
 import { VersionId } from './src/state/versioning'
 import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
 import { scenesToObjectives } from './src/state/slices/objectivesSlice'
+import {
+  getUnlockableAchievements,
+  getUnlockedItems,
+} from './src/libs/platformAPI'
+import { DEFAULT_INVENTORY } from './src/libs/inventoryItems'
 
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -168,6 +173,21 @@ const narrationData: Promise<RootState> = new Promise((resolve) => {
 })
 
 export const loadNarration = async (): Promise<RootState> => {
+  const achievements = await getUnlockableAchievements(
+    params.apiEndpoint,
+    params.cardId
+  ).catch((e) => {
+    console.error(e)
+    toast.warn('Failed to load achievements')
+    return []
+  })
+  const inventoryItems = await getUnlockedItems(params.apiEndpoint).catch(
+    (e) => {
+      console.error(e)
+      toast.warn('Failed to load items')
+      return []
+    }
+  )
   if (params.narrationId) {
     return narrationData.then((data) => {
       if (data.version !== VersionId) {
@@ -177,8 +197,14 @@ export const loadNarration = async (): Promise<RootState> => {
           const migrated = migrateV2toV3(migrateV1toV2(data))
           return {
             ...migrated,
-            objectives: scenesToObjectives(migrated.novel.scenes),
-            inventory: initialInventoryState,
+            objectives: [
+              ...scenesToObjectives(migrated.novel.scenes),
+              ...achievements,
+            ],
+            inventory: {
+              ...initialInventoryState,
+              items: [...inventoryItems, ...DEFAULT_INVENTORY],
+            },
             creation: initialCreationState,
             settings: mergeWith(
               mergeWith(
@@ -194,8 +220,14 @@ export const loadNarration = async (): Promise<RootState> => {
           const migrated = migrateV2toV3(data)
           return {
             ...migrated,
-            objectives: scenesToObjectives(migrated.novel.scenes),
-            inventory: initialInventoryState,
+            objectives: [
+              ...scenesToObjectives(migrated.novel.scenes),
+              ...achievements,
+            ],
+            inventory: {
+              ...initialInventoryState,
+              items: [...inventoryItems, ...DEFAULT_INVENTORY],
+            },
             creation: initialCreationState,
             settings: mergeWith(
               mergeWith(
@@ -211,8 +243,11 @@ export const loadNarration = async (): Promise<RootState> => {
       }
       return {
         ...data,
-        objectives: scenesToObjectives(data.novel.scenes),
-        inventory: initialInventoryState,
+        objectives: [...scenesToObjectives(data.novel.scenes), ...achievements],
+        inventory: {
+          ...initialInventoryState,
+          items: [...inventoryItems, ...DEFAULT_INVENTORY],
+        },
         creation: initialCreationState,
         settings: mergeWith(
           mergeWith(mergeWith({}, initialSettingsState), data.settings || {}),
@@ -229,8 +264,11 @@ export const loadNarration = async (): Promise<RootState> => {
     return {
       novel,
       narration,
-      objectives: scenesToObjectives(novel.scenes),
-      inventory: initialInventoryState,
+      objectives: [...scenesToObjectives(novel.scenes), ...achievements],
+      inventory: {
+        ...initialInventoryState,
+        items: [...inventoryItems, ...DEFAULT_INVENTORY],
+      },
       creation: initialCreationState,
       settings: mergeWith(
         mergeWith({}, initialSettingsState),
