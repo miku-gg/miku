@@ -22,7 +22,7 @@ import {
   selectCurrentScene,
   selectCurrentSceneObjectives,
 } from '../selectors'
-import { NovelObjectiveActionType } from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
+import { NovelV3 } from '@mikugg/bot-utils'
 import { CustomEventType, postMessage } from '../../libs/stateEvents'
 import { unlockAchievement } from '../../libs/platformAPI'
 import { addItem } from '../slices/inventorySlice'
@@ -137,7 +137,7 @@ const interactionEffect = async (
       objectives.some(
         (objective) =>
           objective.action.type ===
-          NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE
+          NovelV3.NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE
       )
     ) {
       objectives.push({
@@ -146,7 +146,7 @@ const interactionEffect = async (
         name: 'Generate a new scene',
         sceneId: currentScene?.id || '',
         action: {
-          type: NovelObjectiveActionType.SUGGEST_CREATE_SCENE,
+          type: NovelV3.NovelObjectiveActionType.SUGGEST_CREATE_SCENE,
         },
       })
     }
@@ -181,7 +181,7 @@ const interactionEffect = async (
           }
           if (response === ' Yes') {
             switch (objective.action.type) {
-              case NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE:
+              case NovelV3.NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE:
                 dispatch(
                   interactionSuccess({
                     ...currentResponseState,
@@ -190,7 +190,7 @@ const interactionEffect = async (
                   })
                 )
                 break
-              case NovelObjectiveActionType.SUGGEST_CREATE_SCENE:
+              case NovelV3.NovelObjectiveActionType.SUGGEST_CREATE_SCENE:
                 dispatch(
                   interactionSuccess({
                     ...currentResponseState,
@@ -199,7 +199,7 @@ const interactionEffect = async (
                   })
                 )
                 break
-              case NovelObjectiveActionType.ACHIEVEMENT_UNLOCK:
+              case NovelV3.NovelObjectiveActionType.ACHIEVEMENT_UNLOCK:
                 postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
                   achievementId: objective.action.params.achievementId,
                 })
