@@ -12,9 +12,17 @@ import { RootState } from '../store'
 import textCompletion from '../../libs/textCompletion'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata'
-import { AbstractRoleplayStrategy } from '../../libs/prompts/strategies'
+import {
+  AbstractRoleplayStrategy,
+  fillTextTemplate,
+} from '../../libs/prompts/strategies'
 import { getRoleplayStrategyFromSlug } from '../../libs/prompts/strategies/roleplay'
-import { selectAllParentDialogues } from '../selectors'
+import {
+  selectAllParentDialogues,
+  selectCurrentScene,
+  selectCurrentSceneObjectives,
+} from '../selectors'
+import { NovelObjectiveActionType } from '@mikugg/bot-utils/dist/lib/novel/NovelV3'
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -50,9 +58,10 @@ const interactionEffect = async (
       truncation_length: 4096,
     }
     const maxMessages = selectAllParentDialogues(state).length
+    const strategy = getRoleplayStrategyFromSlug(strategySlug, tokenizer)
     const promptBuilder = new PromptBuilder<AbstractRoleplayStrategy>({
       maxNewTokens: 200,
-      strategy: getRoleplayStrategyFromSlug(strategySlug, tokenizer),
+      strategy,
       trucationLength: truncation_length,
     })
     const startText =
@@ -63,17 +72,24 @@ const interactionEffect = async (
       { state, currentCharacterId: selectedCharacterId },
       maxMessages
     )
+    const currentCharacter = state.novel.characters.find(
+      (character) => character.id === selectedCharacterId
+    )
+    const identifier = simpleHash(
+      state.settings.user.name + '_' + state.narration.id
+    )
+    const currentScene = selectCurrentScene(state)
     const stream = textCompletion({
       ...completionQuery,
       model: state.settings.model,
       serviceBaseUrl: servicesEndpoint,
       // indentifer is used to always use the server for this narration, saving KV cache.
-      identifier: simpleHash(
-        state.settings.user.name + '_' + state.narration.id
-      ),
+      identifier,
     })
 
+    let finishedCompletionResult = new Map<string, string>()
     for await (const result of stream) {
+      finishedCompletionResult = result
       result.set('text', startText + (result.get('text') || ''))
       currentResponseState = promptBuilder.completeResponse(
         currentResponseState,
@@ -99,6 +115,86 @@ const interactionEffect = async (
       interactionSuccess({
         ...currentResponseState,
         completed: true,
+      })
+    )
+    let prefixConditionPrompt = completionQuery.template
+    finishedCompletionResult.get('text')
+    prefixConditionPrompt = prefixConditionPrompt.replace(
+      /{{GEN text (.*?)}}/g,
+      finishedCompletionResult.get('text') || ''
+    )
+    prefixConditionPrompt = prefixConditionPrompt.replace(
+      '{{SEL emotion options=emotions}}',
+      finishedCompletionResult.get('emotion') || ''
+    )
+    const objectives = selectCurrentSceneObjectives(state)
+    if (
+      objectives.some(
+        (objective) =>
+          objective.action.type ===
+          NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE
+      )
+    ) {
+      objectives.push({
+        id: 'temp_generate_scene_objective',
+        condition: '{{char}} and {{user}} are now in a different place',
+        name: 'Generate a new scene',
+        sceneId: currentScene?.id || '',
+        action: {
+          type: NovelObjectiveActionType.SUGGEST_CREATE_SCENE,
+        },
+      })
+    }
+
+    await Promise.all(
+      objectives.map(async (objective) => {
+        const condition = objective.condition
+        const conditionResultStream = textCompletion({
+          template: fillTextTemplate(
+            prefixConditionPrompt +
+              AbstractRoleplayStrategy.getConditionPrompt({
+                condition,
+                instructionPrefix: strategy.template().instruction,
+                responsePrefix: strategy.template().response,
+              }),
+            {
+              user: state.settings.user.name,
+              bot: currentCharacter?.card.data.name || '',
+            }
+          ),
+          model: state.settings.model,
+          serviceBaseUrl: servicesEndpoint,
+          identifier,
+          variables: {
+            cond_opt: [' Yes', ' No'],
+          },
+        })
+        let response = ''
+        for await (const result of conditionResultStream) {
+          response = result.get('cond') || ''
+        }
+        if (response === ' Yes') {
+          switch (objective.action.type) {
+            case NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE:
+              dispatch(
+                interactionSuccess({
+                  ...currentResponseState,
+                  nextScene: objective.action.params.sceneId,
+                  completed: true,
+                })
+              )
+              break
+            case NovelObjectiveActionType.SUGGEST_CREATE_SCENE:
+              dispatch(
+                interactionSuccess({
+                  ...currentResponseState,
+                  shouldSuggestScenes: true,
+                  completed: true,
+                })
+              )
+              break
+          }
+        }
       })
     )
   } catch (error) {

@@ -21,6 +21,7 @@ import { initialState as initialInventoryState } from './src/state/slices/invent
 import { RootState } from './src/state/store'
 import { VersionId } from './src/state/versioning'
 import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
+import { scenesToObjectives } from './src/state/slices/objectivesSlice'
 
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -171,10 +172,12 @@ export const loadNarration = async (): Promise<RootState> => {
     return narrationData.then((data) => {
       if (data.version !== VersionId) {
         if (data.version === 'v1') {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const migrated = migrateV2toV3(migrateV1toV2(data))
           return {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            ...migrateV2toV3(migrateV1toV2(data)),
+            ...migrated,
+            objectives: scenesToObjectives(migrated.novel.scenes),
             inventory: initialInventoryState,
             creation: initialCreationState,
             settings: mergeWith(
@@ -186,10 +189,12 @@ export const loadNarration = async (): Promise<RootState> => {
             ),
           }
         } else if (data.version === 'v2') {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const migrated = migrateV2toV3(data)
           return {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            ...migrateV2toV3(data),
+            ...migrated,
+            objectives: scenesToObjectives(migrated.novel.scenes),
             inventory: initialInventoryState,
             creation: initialCreationState,
             settings: mergeWith(
@@ -206,6 +211,7 @@ export const loadNarration = async (): Promise<RootState> => {
       }
       return {
         ...data,
+        objectives: scenesToObjectives(data.novel.scenes),
         inventory: initialInventoryState,
         creation: initialCreationState,
         settings: mergeWith(
@@ -223,6 +229,7 @@ export const loadNarration = async (): Promise<RootState> => {
     return {
       novel,
       narration,
+      objectives: scenesToObjectives(novel.scenes),
       inventory: initialInventoryState,
       creation: initialCreationState,
       settings: mergeWith(

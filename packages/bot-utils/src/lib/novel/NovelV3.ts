@@ -107,6 +107,37 @@ export interface NovelMap {
   lorebook?: CharacterBook;
 }
 
+export enum NovelObjectiveActionType {
+  SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
+  SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
+  ACHIEVEMENT_UNLOCK = "ACHIEVEMENT_UNLOCK",
+}
+
+export type NovelObjectiveAction =
+  | {
+      type: NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE;
+      params: {
+        sceneId: string;
+      };
+    }
+  | {
+      type: NovelObjectiveActionType.SUGGEST_CREATE_SCENE;
+    }
+  | {
+      type: NovelObjectiveActionType.ACHIEVEMENT_UNLOCK;
+      params: {
+        achievementId: string;
+      };
+    };
+
+export interface NovelObjective {
+  id: string;
+  name: string;
+  sceneId: string;
+  condition: string;
+  action: NovelObjectiveAction;
+}
+
 export interface NovelState {
   title: string;
   description: string;
@@ -119,4 +150,5 @@ export interface NovelState {
   maps: NovelMap[];
   scenes: NovelScene[];
   starts: NovelStart[];
+  objectives?: NovelObjective[];
 }
