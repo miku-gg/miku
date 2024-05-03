@@ -1,4 +1,5 @@
 import { Button } from '@mikugg/ui-kit'
+import { useCallback } from 'react'
 import { IoMdShare } from 'react-icons/io'
 import * as Selection from 'selection-popover'
 import quotationMarks from '../../../public/images/quotation-marks.png'
@@ -10,7 +11,6 @@ import {
 } from '../../state/selectors'
 import { useAppSelector } from '../../state/store'
 import './ShareConversation.scss'
-import { useCallback } from 'react'
 
 interface ImageData {
   background: string
@@ -214,7 +214,30 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
     }
   }, [backgroundImage?.source.jpg, displayCharacter.image, assetLinkLoader])
 
-  return isProduction && !isMobileApp ? (
+  // return isProduction && !isMobileApp ? (
+
+  //   <Selection.Root>
+  //     {/* eslint-disable-next-line */}
+  //     {/* @ts-ignore */}
+  //     <Selection.Trigger>{children}</Selection.Trigger>
+  //     <Selection.Portal>
+  //       {/* eslint-disable-next-line */}
+  //       {/* @ts-ignore */}
+  //       <Selection.Content className="shareConversation">
+  //         <Button theme="gradient" onClick={() => handleShare()}>
+  //           Share
+  //           <IoMdShare />
+  //         </Button>
+  //         {/* eslint-disable-next-line */}
+  //         {/* @ts-ignore */}
+  //         <Selection.Arrow className="shareConversation__arrow" />
+  //       </Selection.Content>
+  //     </Selection.Portal>
+  //   </Selection.Root>
+  // ) : (
+  //   children
+  // )
+  return (
     <Selection.Root>
       {/* eslint-disable-next-line */}
       {/* @ts-ignore */}
@@ -233,7 +256,5 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
         </Selection.Content>
       </Selection.Portal>
     </Selection.Root>
-  ) : (
-    children
   )
 }
