@@ -193,7 +193,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
   const scene = useAppSelector(selectCurrentScene)
   const backgrounds = useAppSelector((state) => state.novel.backgrounds)
   const displayCharacter = useAppSelector(selectLastSelectedCharacter)
-  const { assetLinkLoader } = useAppContext()
+  const { assetLinkLoader, isProduction, isMobileApp } = useAppContext()
 
   const backgroundImage = backgrounds.find((b) => b.id === scene?.backgroundId)
 
@@ -214,7 +214,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
     }
   }, [backgroundImage?.source.jpg, displayCharacter.image, assetLinkLoader])
 
-  return (
+  return isProduction && !isMobileApp ? (
     <Selection.Root>
       {/* eslint-disable-next-line */}
       {/* @ts-ignore */}
@@ -233,5 +233,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
         </Selection.Content>
       </Selection.Portal>
     </Selection.Root>
+  ) : (
+    children
   )
 }
