@@ -11,7 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mikugg/guidance": "0.16.0",
+    "@lenml/tokenizers": "^1.0.2",
+    "@mikugg/guidance": "^0.17.0",
     "@types/body-parser": "^1.19.2",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",

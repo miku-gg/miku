@@ -190,17 +190,32 @@
           />
         </div>
         <div class="flex gap-2">
+          <p class="text-white w-24">Model Name</p>
+          <input
+            class="mb-8 w-full mr-8"
+            type="text"
+            value=""
+            placeholder="default"
+            required
+            name="model"
+            id="model"
+          />
+        </div>
+        <div class="flex gap-2">
           <p class="text-white w-24">Prompt Strategy</p>
           <select class="ui dropdown" id="strategy">
-            <option value="alpacarp">Alpacarp</option>
-            <option value="metharmerp">Metharmerp</option>
+            <option value="alpacarp">Alpaca</option>
+            <option value="metharmerp">Metharme</option>
+            <option value="vicunarp">Vicuna</option>
           </select>
         </div>
         <div class="flex gap-2">
           <p class="text-white w-24">Tokenizer</p>
           <select class="ui dropdown" id="tokenizer">
-            <option value="llama">LLaMA</option>
+            <option value="llama">LLaMA 2</option>
+            <option value="llama3">LLaMA 3</option>
             <option value="mistral">Mistral</option>
+            <option value="solar">Solar</option>
           </select>
         </div>
         <div class="flex gap-2">
@@ -264,8 +279,9 @@
         });
         const data = await getResult.json();
 
-        document.getElementById("apiUrl").value = data.apiUrl;
-        document.getElementById("apiKey").value = data.apiKey;
+        document.getElementById("apiUrl").value = data.apiUrl || "";
+        document.getElementById("apiKey").value = data.apiKey || "";
+        document.getElementById("model").value = data.model || "";
         $("#strategy").dropdown("set selected", data.strategy);
         $("#tokenizer").dropdown("set selected", data.tokenizer);
         document.getElementById("truncation_length").value =
@@ -320,6 +336,7 @@
       function save_backend_config() {
         const apiUrl = document.getElementById("apiUrl").value;
         const apiKey = document.getElementById("apiKey").value;
+        const model = document.getElementById("model").value;
         const strategy = document.getElementById("strategy").value;
         const tokenizer = document.getElementById("tokenizer").value;
         const truncation_length =
@@ -329,6 +346,7 @@
         const config = {
           apiUrl: apiUrl,
           apiKey: apiKey,
+          model: model,
           strategy: strategy,
           tokenizer: tokenizer,
           truncation_length: Number(truncation_length || 0) || 0,
