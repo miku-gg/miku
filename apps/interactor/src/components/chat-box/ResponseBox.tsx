@@ -1,4 +1,8 @@
 import { useEffect, useRef } from 'react'
+
+import { FaDice, FaForward } from 'react-icons/fa'
+import { FaPencil } from 'react-icons/fa6'
+import { IoIosBookmarks } from 'react-icons/io'
 import {
   selectCharacterOutfits,
   selectCurrentScene,
@@ -7,26 +11,24 @@ import {
   selectLastLoadedResponse,
   selectLastSelectedCharacter,
 } from '../../state/selectors'
-import { FaDice, FaForward } from 'react-icons/fa'
-import { FaPencil } from 'react-icons/fa6'
-import { IoIosBookmarks } from 'react-icons/io'
 
-import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
-import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
-import TTSPlayer from './TTSPlayer'
+import classNames from 'classnames'
+import { useAppContext } from '../../App.context'
+import { trackEvent } from '../../libs/analytics'
+import { useFillTextTemplate } from '../../libs/hooks'
 import {
+  characterResponseStart,
   continueResponse,
   regenerationStart,
-  characterResponseStart,
   selectCharacterOfResponse,
   swipeResponse,
 } from '../../state/slices/narrationSlice'
-import './ResponseBox.scss'
 import { setEditModal } from '../../state/slices/settingsSlice'
-import { useFillTextTemplate } from '../../libs/hooks'
-import { useAppContext } from '../../App.context'
-import { trackEvent } from '../../libs/analytics'
-import classNames from 'classnames'
+import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
+import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
+import './ResponseBox.scss'
+import { ShareConversation } from './ShareConversation'
+import TTSPlayer from './TTSPlayer'
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
@@ -124,23 +126,25 @@ const ResponseBox = (): JSX.Element | null => {
         {isLastResponseFetching ? (
           <TextFormatterStatic text="*Typing...*" />
         ) : (
-          <TextFormatter
-            text={displayText}
-            children={
-              !disabled &&
-              !isInteractionDisabled &&
-              displayCharacter.id ===
-                lastCharacters[lastCharacters.length - 1].id ? (
-                <button
-                  className="ResponseBox__continue"
-                  onClick={handleContinueClick}
-                >
-                  continue
-                  <FaForward />
-                </button>
-              ) : null
-            }
-          />
+          <ShareConversation>
+            <TextFormatter
+              text={displayText}
+              children={
+                !disabled &&
+                !isInteractionDisabled &&
+                displayCharacter.id ===
+                  lastCharacters[lastCharacters.length - 1].id ? (
+                  <button
+                    className="ResponseBox__continue"
+                    onClick={handleContinueClick}
+                  >
+                    continue
+                    <FaForward />
+                  </button>
+                ) : null
+              }
+            />
+          </ShareConversation>
         )}
       </div>
       {(scene?.characters.length || 0) > 1 ? (
