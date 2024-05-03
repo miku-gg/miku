@@ -24,8 +24,15 @@ import { VersionId as V3VersionId } from '../../state/versioning/v3.state'
 import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
 import { initialState as initialSettingsState } from '../../state/slices/settingsSlice'
 import { initialState as initialCreationState } from '../../state/slices/creationSlice'
+import { initialState as initialInventoryState } from '../../state/slices/inventorySlice'
 import { trackEvent } from '../../libs/analytics'
-import { getItemByActionPrompt } from '../../libs/inventoryItems'
+import {
+  DEFAULT_INVENTORY,
+  getItemByActionPrompt,
+} from '../../libs/inventoryItems'
+import { scenesToObjectives } from '../../state/slices/objectivesSlice'
+import mergeWith from 'lodash.mergewith'
+import { getCongurationFromParams } from '../../../root'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -71,11 +78,25 @@ const HistoryActions = () => {
           throw new Error('Narration version mismatch')
         }
 
+        const params = getCongurationFromParams()
+
         dispatch(
           replaceState({
             ...stateJson,
+            objectives: [...scenesToObjectives(stateJson.novel.scenes)],
+            inventory: {
+              ...initialInventoryState,
+              ...(stateJson.inventory || {}),
+              items: stateJson.inventory.items || [...DEFAULT_INVENTORY],
+            },
             creation: initialCreationState,
-            settings: initialSettingsState,
+            settings: mergeWith(
+              mergeWith(
+                mergeWith({}, initialSettingsState),
+                stateJson.settings || {}
+              ),
+              params.settings || {}
+            ),
           })
         )
       } catch (e) {

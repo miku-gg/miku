@@ -32,6 +32,7 @@ export const getUnlockableAchievements = async (
   apiEndpoint: string,
   botId: string
 ): Promise<NovelV3.NovelObjective[]> => {
+  if (!apiEndpoint || !botId) return []
   const { data } = await axios.get(
     `${apiEndpoint}/achievements/unlockable/${botId}`,
     {
@@ -44,6 +45,7 @@ export const getUnlockableAchievements = async (
 export const getUnlockedItems = async (
   apiEndpoint: string
 ): Promise<NovelV3.InventoryItem[]> => {
+  if (!apiEndpoint) return []
   const { data } = await axios.get(`${apiEndpoint}/achievements/my-items`, {
     withCredentials: true,
   })

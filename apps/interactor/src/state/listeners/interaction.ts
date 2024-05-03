@@ -134,7 +134,7 @@ const interactionEffect = async (
     )
     const objectives = selectCurrentSceneObjectives(state)
     if (
-      objectives.some(
+      !objectives.some(
         (objective) =>
           objective.action.type ===
           NovelV3.NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE

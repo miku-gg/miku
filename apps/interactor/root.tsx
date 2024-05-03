@@ -54,7 +54,7 @@ const CHARACTER_SEARCH_ENDPOINT =
 const API_ENDPOINT =
   import.meta.env.VITE_API_ENDPOINT || 'http://localhost:8080'
 
-function getCongurationFromParams(): {
+export function getCongurationFromParams(): {
   production: boolean
   disabled: boolean
   freeTTS: boolean

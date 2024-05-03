@@ -43,6 +43,13 @@ const inventorySlice = createSlice({
       state.items.push(action.payload)
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase('global/replaceState', (_state, action) => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      return action.payload.inventory
+    })
+  },
 })
 
 export const {

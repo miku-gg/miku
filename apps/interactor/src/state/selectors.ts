@@ -352,10 +352,17 @@ export const selectCurrentNextScene = createSelector(
   [selectAllParentDialogues, selectCurrentScene],
   (dialogues, scene) => {
     if (scene?.id && dialogues.length) {
-      const findFirstCurrentSceneIndex = dialogues.findIndex(
-        (d) => d.type == 'interaction' && d.item.sceneId === scene.id
+      const findFirstCurrentSceneIndex =
+        dialogues.findIndex(
+          (d) => d.type == 'interaction' && d.item.sceneId !== scene.id
+        ) - 1
+
+      const currentDialogues = dialogues.slice(
+        0,
+        findFirstCurrentSceneIndex < 0
+          ? dialogues.length
+          : findFirstCurrentSceneIndex
       )
-      const currentDialogues = dialogues.slice(0, findFirstCurrentSceneIndex)
       const _responseOfSuggestion = currentDialogues.find(
         (d) => d.type === 'response' && d.item.nextScene
       )
