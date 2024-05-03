@@ -3,8 +3,13 @@ import cors from "cors";
 import express, { Request, Response } from "express";
 import jwtPermissionMiddleware from "./lib/verifyJWT";
 import audioHandler from "./services/audio";
-import textHandler, { modelsMetadata } from "./services/text";
+import textHandler, {
+  loadTemplateProccessors,
+  modelsMetadata,
+  tokenizeHandler,
+} from "./services/text";
 import { ModelType } from "./services/text/lib/queryValidation";
+import { TokenizerType, loadTokenizer } from "./services/text/lib/tokenize";
 
 const PORT = process.env.SERVICES_PORT || 8484;
 
@@ -33,6 +38,20 @@ if (process.env.JWT_SECRET) {
 app.post("/text", async (req: Request<string>, res: Response) => {
   try {
     await textHandler(req, res);
+  } catch (error) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      res.status(error.status || 500).send(error.message);
+    } catch (_error) {
+      res.end();
+    }
+  }
+});
+
+app.post("/text/tokenize", async (req: Request<string>, res: Response) => {
+  try {
+    await tokenizeHandler(req, res);
   } catch (error) {
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -82,7 +101,17 @@ app.get("/text/metadata/:model", async (req, res) => {
   }
 });
 
-// Start the Express server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+console.log("Loading tokenizers...");
+Promise.all([
+  loadTokenizer(TokenizerType.LLAMA_2),
+  loadTokenizer(TokenizerType.LLAMA_3),
+  loadTokenizer(TokenizerType.MISTRAL),
+  loadTokenizer(TokenizerType.SOLAR),
+  loadTokenizer(TokenizerType.COHERE),
+]).then(() => {
+  loadTemplateProccessors();
+  // Start the Express server
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 });

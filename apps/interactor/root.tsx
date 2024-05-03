@@ -64,7 +64,7 @@ function getCongurationFromParams(): {
   cardEndpoint: string
   servicesEndpoint: string
   persona: PersonaResult
-  settings: RootState['settings']
+  settings: object
 } {
   const queryParams = queryString.parse(window.location.search)
   const cardId = (queryParams.cardId || '') as string
@@ -109,10 +109,7 @@ function getCongurationFromParams(): {
       cardEndpoint: configurationJson.cardEndpoint || API_ENDPOINT,
       servicesEndpoint: configurationJson.servicesEndpoint || SERVICES_ENDPOINT,
       persona: configurationJson.persona,
-      settings: mergeWith(
-        mergeWith({}, initialSettingsState),
-        configurationJson.settings || {}
-      ),
+      settings: configurationJson.settings || {},
     }
   } catch (e) {
     return {
@@ -143,7 +140,7 @@ function getCongurationFromParams(): {
           username: '',
         },
       },
-      settings: initialSettingsState,
+      settings: mergeWith({}, initialSettingsState),
     }
   }
 }
@@ -180,7 +177,13 @@ export const loadNarration = async (): Promise<RootState> => {
             ...migrateV2toV3(migrateV1toV2(data)),
             inventory: initialInventoryState,
             creation: initialCreationState,
-            settings: params.settings,
+            settings: mergeWith(
+              mergeWith(
+                mergeWith({}, initialSettingsState),
+                data.settings || {}
+              ),
+              params.settings || {}
+            ),
           }
         } else if (data.version === 'v2') {
           return {
@@ -189,7 +192,13 @@ export const loadNarration = async (): Promise<RootState> => {
             ...migrateV2toV3(data),
             inventory: initialInventoryState,
             creation: initialCreationState,
-            settings: params.settings,
+            settings: mergeWith(
+              mergeWith(
+                mergeWith({}, initialSettingsState),
+                data.settings || {}
+              ),
+              params.settings || {}
+            ),
           }
         }
         toast.error('Narration version mismatch')
@@ -199,7 +208,10 @@ export const loadNarration = async (): Promise<RootState> => {
         ...data,
         inventory: initialInventoryState,
         creation: initialCreationState,
-        settings: params.settings,
+        settings: mergeWith(
+          mergeWith(mergeWith({}, initialSettingsState), data.settings || {}),
+          params.settings || {}
+        ),
       }
     })
   } else {
@@ -213,7 +225,10 @@ export const loadNarration = async (): Promise<RootState> => {
       narration,
       inventory: initialInventoryState,
       creation: initialCreationState,
-      settings: params.settings,
+      settings: mergeWith(
+        mergeWith({}, initialSettingsState),
+        params.settings || {}
+      ),
       version: VersionId,
     }
   }

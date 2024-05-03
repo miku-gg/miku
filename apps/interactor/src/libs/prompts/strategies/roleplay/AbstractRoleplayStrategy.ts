@@ -283,8 +283,8 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
         ? `\n${temp.instruction}OOC: Did any of the following conditions meet?\n` +
           ` ${childConditions.map((scene, index) => {
             return `COND ${index + 1}: ${scene.condition}\n`
-          })}Answer the most unique condition number or 0 in case of it didn't met any conditions.` +
-          `\n${temp.response}Response:{{SEL cond options=cond_opt}}`
+          })}Answer the condition number. If no condition is met, answer with 0.` +
+          `\n${temp.response}The number is{{SEL cond options=cond_opt}}`
         : `\n${temp.instruction}OOC: Did the characters changed scene in the last messages?` +
           ` Answer with Yes or No` +
           `\n${temp.response}Based on the last two messages:{{SEL scene options=scene_opt}}`)
