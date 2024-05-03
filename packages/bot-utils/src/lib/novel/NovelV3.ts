@@ -148,6 +148,7 @@ export type NovelObjectiveAction =
 export interface NovelObjective {
   id: string;
   name: string;
+  description?: string;
   sceneId: string;
   condition: string;
   action: NovelObjectiveAction;

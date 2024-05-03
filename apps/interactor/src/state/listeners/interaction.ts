@@ -201,7 +201,12 @@ const interactionEffect = async (
                 break
               case NovelV3.NovelObjectiveActionType.ACHIEVEMENT_UNLOCK:
                 postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
-                  achievementId: objective.action.params.achievementId,
+                  achievement: {
+                    id: objective.action.params.achievementId,
+                    name: objective.name,
+                    description: objective.description || '',
+                    itemReward: objective.action.params.reward,
+                  },
                 })
                 unlockAchievement(
                   apiEndpoint,
