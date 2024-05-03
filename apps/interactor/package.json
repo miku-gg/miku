@@ -39,6 +39,7 @@
     "react-toastify": "^9.1.1",
     "reactflow": "^11.10.1",
     "sass": "^1.59.3",
+    "selection-popover": "^0.3.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

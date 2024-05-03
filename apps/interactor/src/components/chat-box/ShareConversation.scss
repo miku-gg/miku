@@ -1,0 +1,15 @@
+@import '../../variables';
+
+.shareConversation {
+  z-index: 100;
+
+  & button {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.5rem;
+    font-family: poppins;
+    font-size: 1.1rem;
+  }
+}
