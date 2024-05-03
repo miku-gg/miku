@@ -66,7 +66,7 @@ export class RoleplayStrategyVicuna extends AbstractRoleplayStrategy {
     return template
   }
 
-  protected override template() {
+  public override template() {
     return {
       askLine: '</s>USER: ',
       instruction: 'USER: ',
