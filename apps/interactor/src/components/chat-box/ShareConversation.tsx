@@ -30,7 +30,7 @@ const generateImage = async (
     const ctx = canvas.getContext('2d')
 
     if (!ctx) {
-      reject(new Error('Error al obtener el contexto 2D del canvas'))
+      reject(new Error('Error obtaining the 2D context of the canvas'))
       return
     }
 
@@ -176,15 +176,15 @@ const generateImage = async (
           resolve(DataURL)
         }
         quotationMarks.onerror = () => {
-          reject(new Error('Error al cargar la imagen de las comillas'))
+          reject(new Error('Error loading quotation marks'))
         }
       }
       character.onerror = () => {
-        reject(new Error('Error al cargar la imagen del personaje'))
+        reject(new Error('Error loading character image'))
       }
     }
     background.onerror = () => {
-      reject(new Error('Error al cargar la imagen de fondo'))
+      reject(new Error('Error loading background image'))
     }
   })
 }
