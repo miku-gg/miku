@@ -71,7 +71,7 @@ export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
     return template
   }
 
-  protected override template() {
+  public override template() {
     return {
       askLine: '<|model|>',
       instruction: '<|user|>',
