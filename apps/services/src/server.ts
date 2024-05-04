@@ -108,6 +108,7 @@ Promise.all([
   loadTokenizer(TokenizerType.MISTRAL),
   loadTokenizer(TokenizerType.SOLAR),
   loadTokenizer(TokenizerType.COHERE),
+  loadTokenizer(TokenizerType.WIZARDLM2),
 ]).then(() => {
   loadTemplateProccessors();
   // Start the Express server

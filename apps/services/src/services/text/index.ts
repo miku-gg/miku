@@ -100,6 +100,11 @@ const getTokenizer = (
   if (_tokenizer === "solar") return tokenizers.get(TokenizerType.SOLAR)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (_tokenizer === "llama3") return tokenizers.get(TokenizerType.LLAMA_3)!;
+  if (_tokenizer === "wizardlm2")
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return tokenizers.get(TokenizerType.WIZARDLM2)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  if (_tokenizer === "cohere") return tokenizers.get(TokenizerType.COHERE)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return tokenizers.get(TokenizerType.LLAMA_2)!;
 };

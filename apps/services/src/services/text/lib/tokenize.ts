@@ -7,6 +7,8 @@ import LLAMA_3__TOKENIZER from "../data/tokenizers/llama3/tokenizer.json";
 import LLAMA_3__TOKENIZER_CONFIG from "../data/tokenizers/llama3/tokenizer_config.json";
 import MISTRAL__TOKENIZER from "../data/tokenizers/mistral/tokenizer.json";
 import MISTRAL__TOKENIZER_CONFIG from "../data/tokenizers/mistral/tokenizer_config.json";
+import WIZARDLM2__TOKENIZER from "../data/tokenizers/wizardlm-2/tokenizer.json";
+import WIZARDLM2__TOKENIZER_CONFIG from "../data/tokenizers/wizardlm-2/tokenizer_config.json";
 import SOLAR__TOKENIZER from "../data/tokenizers/solar/tokenizer.json";
 import SOLAR__TOKENIZER_CONFIG from "../data/tokenizers/solar/tokenizer_config.json";
 import COHERE__TOKENIZER from "../data/tokenizers/cohere/tokenizer.json";
@@ -18,6 +20,7 @@ export enum TokenizerType {
   MISTRAL = "MISTRAL",
   SOLAR = "SOLAR",
   COHERE = "COHERE",
+  WIZARDLM2 = "WIZARDLM2",
 }
 
 interface ExternalTokenizerClass {
@@ -146,5 +149,20 @@ export async function loadTokenizer(
         );
       }
       return tokenizers.get(TokenizerType.COHERE);
+    case TokenizerType.WIZARDLM2:
+      if (!tokenizers.has(TokenizerType.WIZARDLM2)) {
+        tokenizers.set(
+          TokenizerType.WIZARDLM2,
+          new AdapterTokenizerTokenizer(
+            await TokenizerLoader.fromPreTrained({
+              tokenizerJSON: WIZARDLM2__TOKENIZER,
+              tokenizerConfig: WIZARDLM2__TOKENIZER_CONFIG,
+            }),
+            WIZARDLM2__TOKENIZER_CONFIG.eos_token as string,
+            WIZARDLM2__TOKENIZER_CONFIG.bos_token as string
+          )
+        );
+      }
+      return tokenizers.get(TokenizerType.WIZARDLM2);
   }
 }
