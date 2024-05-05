@@ -6,6 +6,7 @@
     "docs": "lerna run start --scope=@mikugg/docs",
     "start": "lerna run start --parallel --ignore @mikugg/docs",
     "start:no-services": "lerna run start --parallel --ignore @mikugg/docs --ignore @mikugg/services",
+    "run-services": "cd apps/services && node --loader ts-node/esm src/server.mts",
     "test": "lerna run test --scope=@mikugg/extensions --scope=@mikugg/ui-kit",
     "pull": "git reset --hard HEAD && git pull origin master && pnpm install",
     "build": "npx lerna run build"
