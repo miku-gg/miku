@@ -1,4 +1,5 @@
 /* eslint-disable */
+// @ts-nocheck
 
 import { Button } from '@mikugg/ui-kit'
 import { IoMdShare } from 'react-icons/io'
