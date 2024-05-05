@@ -1,25 +1,5 @@
-// import * as transformers from "@xenova/transformers";
 import * as Guidance from "@mikugg/guidance";
-// import { fileURLToPath } from "url";
-// import path, { dirname } from "path";
-
-// import LLAMA_2__TOKENIZER from "../data/tokenizers/llama2/tokenizer.json";
-// import LLAMA_2__TOKENIZER_CONFIG from "../data/tokenizers/llama2/tokenizer_config.json" assert { type: "json" };
-// import LLAMA_3__TOKENIZER from "../data/tokenizers/llama3/tokenizer.json";
-// import LLAMA_3__TOKENIZER_CONFIG from "../data/tokenizers/llama3/tokenizer_config.json" assert { type: "json" };
-// import MISTRAL__TOKENIZER from "../data/tokenizers/mistral/tokenizer.json";
-// import MISTRAL__TOKENIZER_CONFIG from "../data/tokenizers/mistral/tokenizer_config.json" assert { type: "json" };
-// import WIZARDLM2__TOKENIZER from "../data/tokenizers/wizardlm-2/tokenizer.json";
-// import WIZARDLM2__TOKENIZER_CONFIG from "../data/tokenizers/wizardlm-2/tokenizer_config.json" assert { type: "json" };
-// import SOLAR__TOKENIZER from "../data/tokenizers/solar/tokenizer.json";
-// import SOLAR__TOKENIZER_CONFIG from "../data/tokenizers/solar/tokenizer_config.json" assert { type: "json" };
-// import COHERE__TOKENIZER from "../data/tokenizers/cohere/tokenizer.json";
-// import COHERE__TOKENIZER_CONFIG from "../data/tokenizers/cohere/tokenizer_config.json" assert { type: "json" };
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
-// transformers.env.localModelPath = path.join(__dirname, "../data/tokenizers");
-// transformers.env.allowRemoteModels = false;
+import llama3Tokenizer from "llama3-tokenizer-js";
 
 export enum TokenizerType {
   LLAMA_2 = "LLAMA_2",
@@ -30,35 +10,25 @@ export enum TokenizerType {
   WIZARDLM2 = "WIZARDLM2",
 }
 
-interface ExternalTokenizerClass {
-  encode: (text: string) => number[];
-  decode: (tokenIds: number[]) => string;
-}
-
-class AdapterTokenizerTokenizer extends Guidance.Tokenizer.AbstractTokenizer {
-  private tokenizer: ExternalTokenizerClass;
-  private eos: string;
-  private bos: string;
-  constructor(_tokenizer: ExternalTokenizerClass, _eos: string, _bos: string) {
-    super();
-    this.tokenizer = _tokenizer;
-    this.eos = _eos;
-    this.bos = _bos;
-  }
+export class LLaMA3Tokenizer extends Guidance.Tokenizer.AbstractTokenizer {
   override encodeString(str: string): number[] {
-    if (str.startsWith(this.getBOS() + " ")) {
-      str = str.substring(this.getBOS().length + 1);
+    if (str.startsWith(this.getBOS())) {
+      str = str.substring(this.getBOS().length);
     }
     if (str.endsWith(this.getEOS())) {
       str = str.substring(0, str.length - this.getEOS().length);
     }
-    return this.tokenizer.encode(str);
+    let result = llama3Tokenizer.encode(str);
+    if (result[result.length - 1] === 128001) {
+      result = result.slice(0, result.length - 1);
+    }
+    return result;
   }
 
   override decodeString(arr: number[]): string {
-    let result = this.tokenizer.decode(arr);
-    if (result.startsWith(this.getBOS() + " ")) {
-      result = result.substring(this.getBOS().length + 1);
+    let result = llama3Tokenizer.decode([...arr, 128001]);
+    if (result.startsWith(this.getBOS())) {
+      result = result.substring(this.getBOS().length);
     }
     if (result.endsWith(this.getEOS())) {
       result = result.substring(0, result.length - this.getEOS().length);
@@ -66,11 +36,11 @@ class AdapterTokenizerTokenizer extends Guidance.Tokenizer.AbstractTokenizer {
     return result;
   }
   override getEOS(): string {
-    return this.eos;
+    return "<|end_of_text|>";
   }
 
   getBOS(): string {
-    return this.bos;
+    return "<|begin_of_text|>";
   }
 }
 
@@ -93,10 +63,7 @@ export async function loadTokenizer(
       return tokenizers.get(TokenizerType.LLAMA_2);
     case TokenizerType.LLAMA_3:
       if (!tokenizers.has(TokenizerType.LLAMA_3)) {
-        tokenizers.set(
-          TokenizerType.LLAMA_3,
-          new Guidance.Tokenizer.LLaMATokenizer()
-        );
+        tokenizers.set(TokenizerType.LLAMA_3, new LLaMA3Tokenizer());
       }
       return tokenizers.get(TokenizerType.LLAMA_3);
     case TokenizerType.MISTRAL:
@@ -127,7 +94,7 @@ export async function loadTokenizer(
       if (!tokenizers.has(TokenizerType.WIZARDLM2)) {
         tokenizers.set(
           TokenizerType.WIZARDLM2,
-          new Guidance.Tokenizer.LLaMATokenizer()
+          new Guidance.Tokenizer.MistralTokenizer()
         );
       }
       return tokenizers.get(TokenizerType.WIZARDLM2);

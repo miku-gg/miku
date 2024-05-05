@@ -2,13 +2,15 @@ import {
   AbstractRoleplayStrategy,
   RoleplayStrategyAlpaca,
   RoleplayStrategyMetharme,
+  RoleplayStrategyLlama3,
+  RoleplayStrategyVicuna,
 } from '..'
-import { RoleplayStrategyVicuna } from './RoleplayStrategyVicuna'
 
 export const roleplayStrategySlugs = [
   'alpacarp',
   'metharmerp',
   'vicunarp',
+  'llama3rp',
 ] as const
 export type RoleplayStrategySlug = (typeof roleplayStrategySlugs)[number]
 export function isOfTypeStrategySlug(
@@ -28,6 +30,8 @@ export const getRoleplayStrategyFromSlug = (
       return new RoleplayStrategyAlpaca(tokenizerSlug)
     case 'metharmerp':
       return new RoleplayStrategyMetharme(tokenizerSlug)
+    case 'llama3rp':
+      return new RoleplayStrategyLlama3(tokenizerSlug)
     case 'vicunarp':
       return new RoleplayStrategyVicuna(tokenizerSlug)
     default:
