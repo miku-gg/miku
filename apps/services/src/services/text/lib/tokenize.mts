@@ -1,18 +1,25 @@
-import { TokenizerLoader } from "@lenml/tokenizers";
+import * as transformers from "@xenova/transformers";
 import * as Guidance from "@mikugg/guidance";
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
 
-import LLAMA_2__TOKENIZER from "../data/tokenizers/llama2/tokenizer.json";
-import LLAMA_2__TOKENIZER_CONFIG from "../data/tokenizers/llama2/tokenizer_config.json";
-import LLAMA_3__TOKENIZER from "../data/tokenizers/llama3/tokenizer.json";
-import LLAMA_3__TOKENIZER_CONFIG from "../data/tokenizers/llama3/tokenizer_config.json";
-import MISTRAL__TOKENIZER from "../data/tokenizers/mistral/tokenizer.json";
-import MISTRAL__TOKENIZER_CONFIG from "../data/tokenizers/mistral/tokenizer_config.json";
-import WIZARDLM2__TOKENIZER from "../data/tokenizers/wizardlm-2/tokenizer.json";
-import WIZARDLM2__TOKENIZER_CONFIG from "../data/tokenizers/wizardlm-2/tokenizer_config.json";
-import SOLAR__TOKENIZER from "../data/tokenizers/solar/tokenizer.json";
-import SOLAR__TOKENIZER_CONFIG from "../data/tokenizers/solar/tokenizer_config.json";
-import COHERE__TOKENIZER from "../data/tokenizers/cohere/tokenizer.json";
-import COHERE__TOKENIZER_CONFIG from "../data/tokenizers/cohere/tokenizer_config.json";
+// import LLAMA_2__TOKENIZER from "../data/tokenizers/llama2/tokenizer.json";
+import LLAMA_2__TOKENIZER_CONFIG from "../data/tokenizers/llama2/tokenizer_config.json" assert { type: "json" };
+// import LLAMA_3__TOKENIZER from "../data/tokenizers/llama3/tokenizer.json";
+import LLAMA_3__TOKENIZER_CONFIG from "../data/tokenizers/llama3/tokenizer_config.json" assert { type: "json" };
+// import MISTRAL__TOKENIZER from "../data/tokenizers/mistral/tokenizer.json";
+import MISTRAL__TOKENIZER_CONFIG from "../data/tokenizers/mistral/tokenizer_config.json" assert { type: "json" };
+// import WIZARDLM2__TOKENIZER from "../data/tokenizers/wizardlm-2/tokenizer.json";
+import WIZARDLM2__TOKENIZER_CONFIG from "../data/tokenizers/wizardlm-2/tokenizer_config.json" assert { type: "json" };
+// import SOLAR__TOKENIZER from "../data/tokenizers/solar/tokenizer.json";
+import SOLAR__TOKENIZER_CONFIG from "../data/tokenizers/solar/tokenizer_config.json" assert { type: "json" };
+// import COHERE__TOKENIZER from "../data/tokenizers/cohere/tokenizer.json";
+import COHERE__TOKENIZER_CONFIG from "../data/tokenizers/cohere/tokenizer_config.json" assert { type: "json" };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+transformers.env.localModelPath = path.join(__dirname, "../data/tokenizers");
+transformers.env.allowRemoteModels = false;
 
 export enum TokenizerType {
   LLAMA_2 = "LLAMA_2",
@@ -35,7 +42,6 @@ class AdapterTokenizerTokenizer extends Guidance.Tokenizer.AbstractTokenizer {
   constructor(_tokenizer: ExternalTokenizerClass, _eos: string, _bos: string) {
     super();
     this.tokenizer = _tokenizer;
-    // console.log("eos", _eos);
     this.eos = _eos;
     this.bos = _bos;
   }
@@ -79,10 +85,7 @@ export async function loadTokenizer(
         tokenizers.set(
           TokenizerType.LLAMA_2,
           new AdapterTokenizerTokenizer(
-            await TokenizerLoader.fromPreTrained({
-              tokenizerJSON: LLAMA_2__TOKENIZER,
-              tokenizerConfig: LLAMA_2__TOKENIZER_CONFIG,
-            }),
+            await transformers.AutoTokenizer.from_pretrained("llama2"),
             LLAMA_2__TOKENIZER_CONFIG.eos_token as string,
             LLAMA_2__TOKENIZER_CONFIG.bos_token as string
           )
@@ -94,10 +97,7 @@ export async function loadTokenizer(
         tokenizers.set(
           TokenizerType.LLAMA_3,
           new AdapterTokenizerTokenizer(
-            await TokenizerLoader.fromPreTrained({
-              tokenizerJSON: LLAMA_3__TOKENIZER,
-              tokenizerConfig: LLAMA_3__TOKENIZER_CONFIG,
-            }),
+            await transformers.AutoTokenizer.from_pretrained("llama3"),
             LLAMA_3__TOKENIZER_CONFIG.eos_token as string,
             LLAMA_3__TOKENIZER_CONFIG.bos_token as string
           )
@@ -109,10 +109,7 @@ export async function loadTokenizer(
         tokenizers.set(
           TokenizerType.MISTRAL,
           new AdapterTokenizerTokenizer(
-            await TokenizerLoader.fromPreTrained({
-              tokenizerJSON: MISTRAL__TOKENIZER,
-              tokenizerConfig: MISTRAL__TOKENIZER_CONFIG,
-            }),
+            await transformers.AutoTokenizer.from_pretrained("mistral"),
             MISTRAL__TOKENIZER_CONFIG.eos_token as string,
             MISTRAL__TOKENIZER_CONFIG.bos_token as string
           )
@@ -124,10 +121,7 @@ export async function loadTokenizer(
         tokenizers.set(
           TokenizerType.SOLAR,
           new AdapterTokenizerTokenizer(
-            await TokenizerLoader.fromPreTrained({
-              tokenizerJSON: SOLAR__TOKENIZER,
-              tokenizerConfig: SOLAR__TOKENIZER_CONFIG,
-            }),
+            await transformers.AutoTokenizer.from_pretrained("solar"),
             SOLAR__TOKENIZER_CONFIG.eos_token as string,
             SOLAR__TOKENIZER_CONFIG.bos_token as string
           )
@@ -139,10 +133,7 @@ export async function loadTokenizer(
         tokenizers.set(
           TokenizerType.COHERE,
           new AdapterTokenizerTokenizer(
-            await TokenizerLoader.fromPreTrained({
-              tokenizerJSON: COHERE__TOKENIZER,
-              tokenizerConfig: COHERE__TOKENIZER_CONFIG,
-            }),
+            await transformers.AutoTokenizer.from_pretrained("cohere"),
             COHERE__TOKENIZER_CONFIG.eos_token as string,
             COHERE__TOKENIZER_CONFIG.bos_token as string
           )
@@ -154,10 +145,7 @@ export async function loadTokenizer(
         tokenizers.set(
           TokenizerType.WIZARDLM2,
           new AdapterTokenizerTokenizer(
-            await TokenizerLoader.fromPreTrained({
-              tokenizerJSON: WIZARDLM2__TOKENIZER,
-              tokenizerConfig: WIZARDLM2__TOKENIZER_CONFIG,
-            }),
+            await transformers.AutoTokenizer.from_pretrained("wizardlm-2"),
             WIZARDLM2__TOKENIZER_CONFIG.eos_token as string,
             WIZARDLM2__TOKENIZER_CONFIG.bos_token as string
           )

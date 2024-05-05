@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { GuidanceQuery } from "../services/text/lib/queryValidation";
+import { GuidanceQuery } from "../services/text/lib/queryValidation.mjs";
 
 const verifyJWT = async (
   headers: Record<string, any>,

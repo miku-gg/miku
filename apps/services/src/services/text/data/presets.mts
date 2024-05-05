@@ -1,4 +1,4 @@
-import { OpenAIAphroditeConfig } from "../lib/aphroditeTokenGenerator";
+import { OpenAIAphroditeConfig } from "../lib/aphroditeTokenGenerator.mjs";
 
 export enum PresetType {
   DIVINE_INTELECT = "DIVINE_INTELECT",

@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import * as Guidance from "@mikugg/guidance";
-import { presets, PresetType } from "./data/presets";
+import { presets, PresetType } from "./data/presets.mjs";
 import {
   ModelType,
   GuidanceQuery,
   validateGuidanceQuery,
-} from "./lib/queryValidation";
-import * as backend_config from "../../../backend_config.json";
-import { TokenizerType, tokenizers } from "./lib/tokenize";
+} from "./lib/queryValidation.mjs";
+import backend_config from "../../../backend_config.json" assert { type: "json" };
+import { TokenizerType, tokenizers } from "./lib/tokenize.mjs";
 
 const APHRODITE_API_KEY =
   process.env.APHRODITE_API_KEY || backend_config?.apiKey || "";

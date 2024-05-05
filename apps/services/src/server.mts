@@ -1,16 +1,16 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Request, Response } from "express";
-import jwtPermissionMiddleware from "./lib/verifyJWT";
-import audioHandler from "./services/audio";
+import jwtPermissionMiddleware from "./lib/verifyJWT.mjs";
+import audioHandler from "./services/audio/index.mjs";
 import textHandler, {
   loadTemplateProccessors,
   modelsMetadata,
   tokenizeHandler,
-} from "./services/text";
-import { ModelType } from "./services/text/lib/queryValidation";
-import { TokenizerType, loadTokenizer } from "./services/text/lib/tokenize";
-
+} from "./services/text/index.mjs";
+import { ModelType } from "./services/text/lib/queryValidation.mjs";
+import { TokenizerType, loadTokenizer } from "./services/text/lib/tokenize.mjs";
+import monitor from "express-status-monitor";
 const PORT = process.env.SERVICES_PORT || 8484;
 
 const app: express.Application = express();
@@ -30,6 +30,7 @@ app.use(
   })
 );
 app.use(bodyParser.json());
+app.use(monitor());
 
 if (process.env.JWT_SECRET) {
   app.use(jwtPermissionMiddleware);
@@ -111,7 +112,6 @@ Promise.all([
   loadTokenizer(TokenizerType.WIZARDLM2),
 ]).then(() => {
   loadTemplateProccessors();
-  // Start the Express server
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
