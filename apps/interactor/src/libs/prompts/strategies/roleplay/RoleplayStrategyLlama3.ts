@@ -66,7 +66,7 @@ export class RoleplayStrategyLlama3 extends AbstractRoleplayStrategy {
     return template
   }
 
-  protected override template() {
+  public override template() {
     return {
       askLine:
         '<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n# Reaction + 2 paragraphs, engaging, natural, authentic, descriptive, creative.\n',
