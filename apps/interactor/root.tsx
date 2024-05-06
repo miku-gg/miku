@@ -21,6 +21,12 @@ import { initialState as initialInventoryState } from './src/state/slices/invent
 import { RootState } from './src/state/store'
 import { VersionId } from './src/state/versioning'
 import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
+import { scenesToObjectives } from './src/state/slices/objectivesSlice'
+import {
+  getUnlockableAchievements,
+  getUnlockedItems,
+} from './src/libs/platformAPI'
+import { DEFAULT_INVENTORY } from './src/libs/inventoryItems'
 
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -48,7 +54,7 @@ const CHARACTER_SEARCH_ENDPOINT =
 const API_ENDPOINT =
   import.meta.env.VITE_API_ENDPOINT || 'http://localhost:8080'
 
-function getCongurationFromParams(): {
+export function getCongurationFromParams(): {
   production: boolean
   disabled: boolean
   freeTTS: boolean
@@ -167,15 +173,38 @@ const narrationData: Promise<RootState> = new Promise((resolve) => {
 })
 
 export const loadNarration = async (): Promise<RootState> => {
+  const achievements = await getUnlockableAchievements(
+    params.apiEndpoint,
+    params.cardId
+  ).catch((e) => {
+    console.error(e)
+    toast.warn('Failed to load achievements')
+    return []
+  })
+  const inventoryItems = await getUnlockedItems(params.apiEndpoint).catch(
+    (e) => {
+      console.error(e)
+      toast.warn('Failed to load items')
+      return []
+    }
+  )
   if (params.narrationId) {
     return narrationData.then((data) => {
       if (data.version !== VersionId) {
         if (data.version === 'v1') {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const migrated = migrateV2toV3(migrateV1toV2(data))
           return {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            ...migrateV2toV3(migrateV1toV2(data)),
-            inventory: initialInventoryState,
+            ...migrated,
+            objectives: [
+              ...scenesToObjectives(migrated.novel.scenes),
+              ...achievements,
+            ],
+            inventory: {
+              ...initialInventoryState,
+              items: [...inventoryItems, ...DEFAULT_INVENTORY],
+            },
             creation: initialCreationState,
             settings: mergeWith(
               mergeWith(
@@ -186,11 +215,19 @@ export const loadNarration = async (): Promise<RootState> => {
             ),
           }
         } else if (data.version === 'v2') {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const migrated = migrateV2toV3(data)
           return {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            ...migrateV2toV3(data),
-            inventory: initialInventoryState,
+            ...migrated,
+            objectives: [
+              ...scenesToObjectives(migrated.novel.scenes),
+              ...achievements,
+            ],
+            inventory: {
+              ...initialInventoryState,
+              items: [...inventoryItems, ...DEFAULT_INVENTORY],
+            },
             creation: initialCreationState,
             settings: mergeWith(
               mergeWith(
@@ -206,7 +243,11 @@ export const loadNarration = async (): Promise<RootState> => {
       }
       return {
         ...data,
-        inventory: initialInventoryState,
+        objectives: [...scenesToObjectives(data.novel.scenes), ...achievements],
+        inventory: {
+          ...initialInventoryState,
+          items: [...inventoryItems, ...DEFAULT_INVENTORY],
+        },
         creation: initialCreationState,
         settings: mergeWith(
           mergeWith(mergeWith({}, initialSettingsState), data.settings || {}),
@@ -223,7 +264,11 @@ export const loadNarration = async (): Promise<RootState> => {
     return {
       novel,
       narration,
-      inventory: initialInventoryState,
+      objectives: [...scenesToObjectives(novel.scenes), ...achievements],
+      inventory: {
+        ...initialInventoryState,
+        items: [...inventoryItems, ...DEFAULT_INVENTORY],
+      },
       creation: initialCreationState,
       settings: mergeWith(
         mergeWith({}, initialSettingsState),

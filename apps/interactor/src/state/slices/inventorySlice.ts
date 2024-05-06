@@ -1,29 +1,18 @@
-import { createSlice } from '@reduxjs/toolkit'
-
-export interface InventoryAction {
-  name: string
-  prompt: string
-}
-
-export interface InventoryItem {
-  id: string
-  name: string
-  description: string
-  image: string
-  isPremium?: boolean
-  actions: InventoryAction[]
-}
+import { NovelV3 } from '@mikugg/bot-utils'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface InventoryState {
   showItemModal: 'initial' | 'open' | 'closed'
   showInventory: 'initial' | 'open' | 'closed'
-  selectedItem: InventoryItem | null
+  selectedItem: NovelV3.InventoryItem | null
+  items: NovelV3.InventoryItem[]
 }
 
 export const initialState: InventoryState = {
   showItemModal: 'initial',
   showInventory: 'initial',
   selectedItem: null,
+  items: [],
 }
 
 const inventorySlice = createSlice({
@@ -50,6 +39,16 @@ const inventorySlice = createSlice({
     setSelectedItem: (state, action) => {
       state.selectedItem = action.payload
     },
+    addItem: (state, action: PayloadAction<NovelV3.InventoryItem>) => {
+      state.items.push(action.payload)
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase('global/replaceState', (_state, action) => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      return action.payload.inventory
+    })
   },
 })
 
@@ -57,6 +56,7 @@ export const {
   setInventoryVisibility,
   setItemModalVisibility,
   setSelectedItem,
+  addItem,
 } = inventorySlice.actions
 
 export default inventorySlice.reducer

@@ -6,6 +6,7 @@ import novel from './slices/novelSlice'
 import version from './slices/versionSlice'
 import creation from './slices/creationSlice'
 import inventory from './slices/inventorySlice'
+import objectives from './slices/objectivesSlice'
 import {
   continueListenerMiddleware,
   interactionListenerMiddleware,
@@ -26,6 +27,7 @@ export const store = configureStore({
     novel,
     version,
     inventory,
+    objectives,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend([

@@ -47,6 +47,7 @@ export default function SceneSuggestion() {
     useAppSelector(
       (state) => state.narration.responses[state.narration.currentResponseId]!
     )
+  const { disabled } = useAppSelector((state) => state.narration.input)
   const nextSceneId = useAppSelector(selectCurrentNextScene)
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
@@ -75,7 +76,7 @@ export default function SceneSuggestion() {
         )}
       >
         <div className="SceneSuggestion__button-container">
-          {shouldSuggestScenes ? (
+          {!disabled && shouldSuggestScenes ? (
             <button
               {...swipeHandlers}
               className="SceneSuggestion__button"
@@ -98,7 +99,7 @@ export default function SceneSuggestion() {
               </div>
               <GiFallingStar />
             </button>
-          ) : nextScene ? (
+          ) : !disabled && nextScene ? (
             <button
               {...swipeHandlers}
               className="SceneSuggestion__button"
@@ -110,6 +111,7 @@ export default function SceneSuggestion() {
                     characters:
                       nextScene?.characters.map((r) => r.characterId) || [],
                     servicesEndpoint,
+                    apiEndpoint,
                     selectedCharacterId:
                       nextScene?.characters[
                         Math.floor(
@@ -272,6 +274,7 @@ const SceneSuggestionModal = () => {
         }`,
         characters: sceneSuggestion?.characters.map((r) => r.characterId) || [],
         servicesEndpoint,
+        apiEndpoint,
         selectedCharacterId:
           sceneSuggestion?.characters[
             Math.floor(
