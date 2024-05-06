@@ -2,6 +2,7 @@
 // @ts-nocheck
 
 import { Button } from '@mikugg/ui-kit'
+import { useCallback } from 'react'
 import { IoMdShare } from 'react-icons/io'
 import * as Selection from 'selection-popover'
 import quotationMarks from '../../../public/images/quotation-marks.png'
@@ -13,7 +14,6 @@ import {
 } from '../../state/selectors'
 import { useAppSelector } from '../../state/store'
 import './ShareConversation.scss'
-import { useCallback } from 'react'
 
 interface ImageData {
   background: string
@@ -104,18 +104,15 @@ const generateImage = async (
         }
 
         const textX = canvas.width - 320 - padding + leftMargin + 20
-        const boxHeight = totalTextHeight + boxPadding * 4 // textHeight + paddingTop + marksHeight + paddingBottom
+        const boxHeight = totalTextHeight + boxPadding * 4
         const boxY = canvas.height / 2 - boxHeight / 2
 
-        // Calculate the dimensions of the background box
         const boxX = canvas.width - 320 - padding
         const boxWidth = maxWidth + leftMargin * 2
 
-        // Draw the background box
         ctx.fillStyle = 'rgba(23, 23, 23, 0.55)'
         ctx.fillRect(boxX, boxY, boxWidth, boxHeight)
 
-        // Load and draw the quotation marks image
         const quotationMarks = new Image()
         quotationMarks.src = data.marks
         quotationMarks.onload = () => {
@@ -123,7 +120,6 @@ const generateImage = async (
           const quotationMarksHeight = 60
           ctx.globalAlpha = 0.2
 
-          // Draw the top quotation marks image centered horizontally within the box
           const topQuotationMarksX = textX - quotationMarksWidth + 40
           const topQuotationMarksY = boxY + boxPadding
           ctx.drawImage(
@@ -138,12 +134,12 @@ const generateImage = async (
             textX + maxWidth - quotationMarksWidth - 20
           const bottomQuotationMarksY =
             boxY + boxHeight - boxPadding - quotationMarksHeight
-          ctx.save() // Save the current context state
+          ctx.save()
           ctx.translate(
             bottomQuotationMarksX + quotationMarksWidth / 2,
             bottomQuotationMarksY + quotationMarksHeight / 2
-          ) // Move to the center of the bottom quotation marks
-          ctx.rotate(Math.PI) // Rotate 180 degrees
+          )
+          ctx.rotate(Math.PI)
           ctx.drawImage(
             quotationMarks,
             -quotationMarksWidth / 2,
@@ -151,24 +147,20 @@ const generateImage = async (
             quotationMarksWidth,
             quotationMarksHeight
           )
-          ctx.restore() // Restore the context to its previous state
-          // Draw the text on top of the background box
-          ctx.fillStyle = 'rgb(225, 138, 36)' // Color del texto (naranja)
+          ctx.restore()
+          ctx.fillStyle = 'rgb(225, 138, 36)'
           let currentTextY = boxY + boxPadding * 2
-          ctx.strokeStyle = 'black' // Color del borde (negro)
-          ctx.lineWidth = 1 // Ancho del borde
+          ctx.strokeStyle = 'black'
+          ctx.lineWidth = 1
           ctx.globalAlpha = 1
 
-          // Iterar sobre las líneas de texto y dibujar cada línea con borde
           for (const line of lines) {
             const x = textX
             const y = currentTextY
 
-            // Dibujar el texto con borde
             ctx.strokeText(line.text, x, y)
-            ctx.fillText(line.text, x, y) // Relleno de texto
+            ctx.fillText(line.text, x, y)
 
-            // Actualizar la posición Y para la siguiente línea
             currentTextY += fontSize
           }
 

@@ -1,8 +1,9 @@
+import classNames from 'classnames'
 import React, { useEffect, useState } from 'react'
-import './TextFormatter.scss'
 import { useAppSelector } from '../../state/store'
 import { FontSize, Speed } from '../../state/versioning'
-import classNames from 'classnames'
+import { ShareConversation } from '../chat-box/ShareConversation'
+import './TextFormatter.scss'
 
 interface TextFormatterProps {
   text: string
@@ -105,8 +106,12 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({
         }
       }}
     >
-      {elements}
-      {children}
+      <ShareConversation>
+        <>
+          {elements}
+          {children}
+        </>
+      </ShareConversation>
     </div>
   )
 }

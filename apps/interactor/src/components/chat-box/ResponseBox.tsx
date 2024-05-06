@@ -27,7 +27,6 @@ import { setEditModal } from '../../state/slices/settingsSlice'
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
 import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
 import './ResponseBox.scss'
-import { ShareConversation } from './ShareConversation'
 import TTSPlayer from './TTSPlayer'
 
 const ResponseBox = (): JSX.Element | null => {
@@ -120,25 +119,23 @@ const ResponseBox = (): JSX.Element | null => {
         {isLastResponseFetching ? (
           <TextFormatterStatic text="*Typing...*" />
         ) : (
-          <ShareConversation>
-            <TextFormatter
-              text={displayText}
-              children={
-                !disabled &&
-                !isInteractionDisabled &&
-                displayCharacter.id ===
-                  lastCharacters[lastCharacters.length - 1].id ? (
-                  <button
-                    className="ResponseBox__continue"
-                    onClick={handleContinueClick}
-                  >
-                    continue
-                    <FaForward />
-                  </button>
-                ) : null
-              }
-            />
-          </ShareConversation>
+          <TextFormatter
+            text={displayText}
+            children={
+              !disabled &&
+              !isInteractionDisabled &&
+              displayCharacter.id ===
+                lastCharacters[lastCharacters.length - 1].id ? (
+                <button
+                  className="ResponseBox__continue"
+                  onClick={handleContinueClick}
+                >
+                  continue
+                  <FaForward />
+                </button>
+              ) : null
+            }
+          />
         )}
       </div>
       {(scene?.characters.length || 0) > 1 ? (
