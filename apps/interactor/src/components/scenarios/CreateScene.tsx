@@ -74,7 +74,8 @@ async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
 
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
-  const { assetLinkLoader, assetUploader, servicesEndpoint } = useAppContext()
+  const { assetLinkLoader, assetUploader, servicesEndpoint, apiEndpoint } =
+    useAppContext()
   const currentScene = useAppSelector(selectCurrentScene)
   const songs = useAppSelector((state) =>
     state.novel.songs.filter((song) =>
@@ -103,9 +104,11 @@ const CreateScene = () => {
   )
   const backgroundSelected =
     useAppSelector((state) => {
-      const background = state.novel.backgrounds.find(
-        (b) => b.id === backgroundSelectedId
-      )
+      const background =
+        state.novel.backgrounds.find((b) => b.id === backgroundSelectedId) ||
+        state.creation.importedBackgrounds.find(
+          (b) => b.id === backgroundSelectedId
+        )
       return background ? background.source.jpg : ''
     }) || backgroundSelectedId
   const characters = useAppSelector(selectSelectableCharacters)
@@ -198,6 +201,7 @@ const CreateScene = () => {
     dispatch(
       interactionStart({
         servicesEndpoint,
+        apiEndpoint,
         text: prompt,
         sceneId,
         characters: characters.map(({ id }) => id),

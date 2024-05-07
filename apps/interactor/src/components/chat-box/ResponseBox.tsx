@@ -1,4 +1,8 @@
 import { useEffect, useRef } from 'react'
+
+import { FaDice, FaForward } from 'react-icons/fa'
+import { FaPencil } from 'react-icons/fa6'
+import { IoIosBookmarks } from 'react-icons/io'
 import {
   selectCharacterOutfits,
   selectCurrentScene,
@@ -7,31 +11,32 @@ import {
   selectLastLoadedResponse,
   selectLastSelectedCharacter,
 } from '../../state/selectors'
-import { FaDice, FaForward } from 'react-icons/fa'
-import { FaPencil } from 'react-icons/fa6'
-import { IoIosBookmarks } from 'react-icons/io'
 
-import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
-import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
-import TTSPlayer from './TTSPlayer'
+import classNames from 'classnames'
+import { useAppContext } from '../../App.context'
+import { trackEvent } from '../../libs/analytics'
+import { useFillTextTemplate } from '../../libs/hooks'
 import {
+  characterResponseStart,
   continueResponse,
   regenerationStart,
-  characterResponseStart,
   selectCharacterOfResponse,
   swipeResponse,
 } from '../../state/slices/narrationSlice'
-import './ResponseBox.scss'
 import { setEditModal } from '../../state/slices/settingsSlice'
-import { useFillTextTemplate } from '../../libs/hooks'
-import { useAppContext } from '../../App.context'
-import { trackEvent } from '../../libs/analytics'
-import classNames from 'classnames'
+import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
+import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
+import './ResponseBox.scss'
+import TTSPlayer from './TTSPlayer'
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
-  const { servicesEndpoint, isInteractionDisabled, assetLinkLoader } =
-    useAppContext()
+  const {
+    servicesEndpoint,
+    apiEndpoint,
+    isInteractionDisabled,
+    assetLinkLoader,
+  } = useAppContext()
   const responseDiv = useRef<HTMLDivElement>(null)
   const lastReponse = useAppSelector(selectLastLoadedResponse)
   const isLastResponseFetching = useAppSelector(
@@ -71,6 +76,7 @@ const ResponseBox = (): JSX.Element | null => {
     const randomEmotion = outfit?.emotions[randomIndex].id || ''
     dispatch(
       regenerationStart({
+        apiEndpoint,
         servicesEndpoint,
         emotion: randomEmotion,
         characterId,
@@ -82,6 +88,7 @@ const ResponseBox = (): JSX.Element | null => {
     trackEvent('interaction_continue')
     dispatch(
       continueResponse({
+        apiEndpoint,
         servicesEndpoint,
       })
     )
@@ -172,6 +179,7 @@ const ResponseBox = (): JSX.Element | null => {
                               characterId,
                             })
                           : characterResponseStart({
+                              apiEndpoint,
                               servicesEndpoint,
                               characterId,
                             })

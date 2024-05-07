@@ -2,6 +2,8 @@ import { createContext, useContext } from 'react'
 
 import { RootState } from './state/store'
 
+import { PersonaResult } from './libs/listSearch'
+
 export interface AppProps {
   isProduction: boolean
   isInteractionDisabled: boolean
@@ -11,6 +13,7 @@ export interface AppProps {
   servicesEndpoint: string
   freeTTS: boolean
   freeSmart: boolean
+  persona: PersonaResult
   novelLoader: () => Promise<RootState>
   assetLinkLoader: (asset: string, lowres?: boolean) => string
   assetUploader: (data: File) => Promise<{
@@ -28,6 +31,7 @@ const AppContext = createContext<AppProps>({
   servicesEndpoint: '',
   freeTTS: false,
   freeSmart: false,
+  persona: {} as PersonaResult,
   novelLoader: () => Promise.resolve({} as RootState),
   assetLinkLoader: () => '',
   assetUploader: () =>

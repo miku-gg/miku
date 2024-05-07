@@ -2,9 +2,16 @@ import {
   AbstractRoleplayStrategy,
   RoleplayStrategyAlpaca,
   RoleplayStrategyMetharme,
+  RoleplayStrategyLlama3,
+  RoleplayStrategyVicuna,
 } from '..'
 
-export const roleplayStrategySlugs = ['alpacarp', 'metharmerp'] as const
+export const roleplayStrategySlugs = [
+  'alpacarp',
+  'metharmerp',
+  'vicunarp',
+  'llama3rp',
+] as const
 export type RoleplayStrategySlug = (typeof roleplayStrategySlugs)[number]
 export function isOfTypeStrategySlug(
   slug: string | undefined
@@ -23,6 +30,10 @@ export const getRoleplayStrategyFromSlug = (
       return new RoleplayStrategyAlpaca(tokenizerSlug)
     case 'metharmerp':
       return new RoleplayStrategyMetharme(tokenizerSlug)
+    case 'llama3rp':
+      return new RoleplayStrategyLlama3(tokenizerSlug)
+    case 'vicunarp':
+      return new RoleplayStrategyVicuna(tokenizerSlug)
     default:
       throw new Error(`Invalid roleplay strategy slug: ${slug}`)
   }

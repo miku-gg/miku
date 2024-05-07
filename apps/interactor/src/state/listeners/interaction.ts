@@ -12,9 +12,21 @@ import { RootState } from '../store'
 import textCompletion from '../../libs/textCompletion'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata'
-import { AbstractRoleplayStrategy } from '../../libs/prompts/strategies'
+import {
+  AbstractRoleplayStrategy,
+  fillTextTemplate,
+} from '../../libs/prompts/strategies'
 import { getRoleplayStrategyFromSlug } from '../../libs/prompts/strategies/roleplay'
-import { selectAllParentDialogues } from '../selectors'
+import {
+  selectAllParentDialogues,
+  selectCurrentScene,
+  selectCurrentSceneObjectives,
+} from '../selectors'
+import { NovelV3 } from '@mikugg/bot-utils'
+import { CustomEventType, postMessage } from '../../libs/stateEvents'
+import { unlockAchievement } from '../../libs/platformAPI'
+import { addItem } from '../slices/inventorySlice'
+import { removeObjective } from '../slices/objectivesSlice'
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -32,6 +44,7 @@ const interactionEffect = async (
   dispatch: Dispatch,
   state: RootState,
   servicesEndpoint: string,
+  apiEndpoint: string,
   selectedCharacterId: string
 ) => {
   try {
@@ -50,9 +63,10 @@ const interactionEffect = async (
       truncation_length: 4096,
     }
     const maxMessages = selectAllParentDialogues(state).length
+    const strategy = getRoleplayStrategyFromSlug(strategySlug, tokenizer)
     const promptBuilder = new PromptBuilder<AbstractRoleplayStrategy>({
       maxNewTokens: 200,
-      strategy: getRoleplayStrategyFromSlug(strategySlug, tokenizer),
+      strategy,
       trucationLength: truncation_length,
     })
     const startText =
@@ -63,17 +77,24 @@ const interactionEffect = async (
       { state, currentCharacterId: selectedCharacterId },
       maxMessages
     )
+    const currentCharacter = state.novel.characters.find(
+      (character) => character.id === selectedCharacterId
+    )
+    const identifier = simpleHash(
+      state.settings.user.name + '_' + state.narration.id
+    )
+    const currentScene = selectCurrentScene(state)
     const stream = textCompletion({
       ...completionQuery,
       model: state.settings.model,
       serviceBaseUrl: servicesEndpoint,
       // indentifer is used to always use the server for this narration, saving KV cache.
-      identifier: simpleHash(
-        state.settings.user.name + '_' + state.narration.id
-      ),
+      identifier,
     })
 
+    let finishedCompletionResult = new Map<string, string>()
     for await (const result of stream) {
+      finishedCompletionResult = result
       result.set('text', startText + (result.get('text') || ''))
       currentResponseState = promptBuilder.completeResponse(
         currentResponseState,
@@ -101,6 +122,108 @@ const interactionEffect = async (
         completed: true,
       })
     )
+    let prefixConditionPrompt = completionQuery.template
+    finishedCompletionResult.get('text')
+    prefixConditionPrompt = prefixConditionPrompt.replace(
+      /{{GEN text (.*?)}}/g,
+      finishedCompletionResult.get('text') || ''
+    )
+    prefixConditionPrompt = prefixConditionPrompt.replace(
+      '{{SEL emotion options=emotions}}',
+      finishedCompletionResult.get('emotion') || ''
+    )
+    const objectives = selectCurrentSceneObjectives(state)
+    if (
+      !objectives.some(
+        (objective) =>
+          objective.action.type ===
+          NovelV3.NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE
+      )
+    ) {
+      objectives.push({
+        id: 'temp_generate_scene_objective',
+        condition: '{{char}} and {{user}} are now in a different place',
+        name: 'Generate a new scene',
+        sceneId: currentScene?.id || '',
+        action: {
+          type: NovelV3.NovelObjectiveActionType.SUGGEST_CREATE_SCENE,
+        },
+      })
+    }
+
+    try {
+      await Promise.all(
+        objectives.map(async (objective) => {
+          const condition = objective.condition
+          const conditionResultStream = textCompletion({
+            template: fillTextTemplate(
+              prefixConditionPrompt +
+                AbstractRoleplayStrategy.getConditionPrompt({
+                  condition,
+                  instructionPrefix: strategy.template().instruction,
+                  responsePrefix: strategy.template().response,
+                }),
+              {
+                user: state.settings.user.name,
+                bot: currentCharacter?.card.data.name || '',
+              }
+            ),
+            model: state.settings.model,
+            serviceBaseUrl: servicesEndpoint,
+            identifier,
+            variables: {
+              cond_opt: [' Yes', ' No'],
+            },
+          })
+          let response = ''
+          for await (const result of conditionResultStream) {
+            response = result.get('cond') || ''
+          }
+          if (response === ' Yes') {
+            switch (objective.action.type) {
+              case NovelV3.NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE:
+                dispatch(
+                  interactionSuccess({
+                    ...currentResponseState,
+                    nextScene: objective.action.params.sceneId,
+                    completed: true,
+                  })
+                )
+                break
+              case NovelV3.NovelObjectiveActionType.SUGGEST_CREATE_SCENE:
+                dispatch(
+                  interactionSuccess({
+                    ...currentResponseState,
+                    shouldSuggestScenes: true,
+                    completed: true,
+                  })
+                )
+                break
+              case NovelV3.NovelObjectiveActionType.ACHIEVEMENT_UNLOCK:
+                postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
+                  achievement: {
+                    id: objective.action.params.achievementId,
+                    name: objective.name,
+                    description: objective.description || '',
+                    itemReward: objective.action.params.reward,
+                  },
+                })
+                unlockAchievement(
+                  apiEndpoint,
+                  objective.action.params.achievementId
+                )
+                if (objective.action.params.reward) {
+                  dispatch(addItem(objective.action.params.reward))
+                }
+                break
+            }
+            dispatch(removeObjective(objective.id))
+          }
+        })
+      )
+    } catch (error) {
+      dispatch(interactionFailure('Failed to unlock achievement'))
+    }
   } catch (error) {
     console.error(error)
     dispatch(interactionFailure())
@@ -116,6 +239,7 @@ interactionListenerMiddleware.startListening({
       listenerApi.dispatch,
       listenerApi.getState() as RootState,
       action.payload.servicesEndpoint,
+      action.payload.apiEndpoint,
       action.payload.selectedCharacterId
     )
   },
@@ -131,6 +255,7 @@ regenerationListenerMiddleware.startListening({
       listenerApi.dispatch,
       state,
       action.payload.servicesEndpoint,
+      action.payload.apiEndpoint,
       action.payload.characterId
     )
   },
@@ -151,6 +276,7 @@ continueListenerMiddleware.startListening({
       listenerApi.dispatch,
       state,
       action.payload.servicesEndpoint,
+      action.payload.apiEndpoint,
       lastResponseCharacterId
     )
   },
@@ -166,6 +292,7 @@ characterResponseListenerMiddleware.startListening({
       listenerApi.dispatch,
       state,
       action.payload.servicesEndpoint,
+      action.payload.apiEndpoint,
       action.payload.characterId
     )
   },

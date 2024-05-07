@@ -107,6 +107,53 @@ export interface NovelMap {
   lorebook?: CharacterBook;
 }
 
+export interface InventoryAction {
+  name: string;
+  prompt: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  isPremium?: boolean;
+  actions: InventoryAction[];
+}
+
+export enum NovelObjectiveActionType {
+  SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
+  SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
+  ACHIEVEMENT_UNLOCK = "ACHIEVEMENT_UNLOCK",
+}
+
+export type NovelObjectiveAction =
+  | {
+      type: NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE;
+      params: {
+        sceneId: string;
+      };
+    }
+  | {
+      type: NovelObjectiveActionType.SUGGEST_CREATE_SCENE;
+    }
+  | {
+      type: NovelObjectiveActionType.ACHIEVEMENT_UNLOCK;
+      params: {
+        achievementId: string;
+        reward: InventoryItem | null;
+      };
+    };
+
+export interface NovelObjective {
+  id: string;
+  name: string;
+  description?: string;
+  sceneId: string;
+  condition: string;
+  action: NovelObjectiveAction;
+}
+
 export interface NovelState {
   title: string;
   description: string;
@@ -119,4 +166,5 @@ export interface NovelState {
   maps: NovelMap[];
   scenes: NovelScene[];
   starts: NovelStart[];
+  objectives?: NovelObjective[];
 }

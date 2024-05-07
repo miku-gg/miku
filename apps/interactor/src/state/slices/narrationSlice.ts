@@ -45,6 +45,7 @@ const narrationSlice = createSlice({
       state,
       action: PayloadAction<{
         servicesEndpoint: string
+        apiEndpoint: string
         text: string
         sceneId: string
         characters: string[]
@@ -93,11 +94,11 @@ const narrationSlice = createSlice({
       state.input.disabled = true
       state.input.suggestions = []
     },
-    interactionFailure(state) {
+    interactionFailure(state, action: PayloadAction<string | undefined>) {
       state.input.disabled = false
       const response = state.responses[state.currentResponseId]
       if (!response?.fetching) return state
-      toast.error('Error querying the AI')
+      toast.error(action.payload || 'Error querying the AI')
       const interaction =
         state.interactions[response?.parentInteractionId || '']
       const reponsesId = interaction?.responsesId
@@ -173,6 +174,7 @@ const narrationSlice = createSlice({
     regenerationStart(
       state,
       action: PayloadAction<{
+        apiEndpoint: string
         servicesEndpoint: string
         emotion: string
         characterId: string
@@ -217,6 +219,7 @@ const narrationSlice = createSlice({
       state,
       // eslint-disable-next-line
       _action: PayloadAction<{
+        apiEndpoint: string
         servicesEndpoint: string
       }>
     ) {
@@ -246,6 +249,7 @@ const narrationSlice = createSlice({
     characterResponseStart(
       state,
       action: PayloadAction<{
+        apiEndpoint: string
         servicesEndpoint: string
         characterId: string
       }>

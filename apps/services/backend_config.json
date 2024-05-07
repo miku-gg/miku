@@ -1,6 +1,7 @@
 {
   "apiUrl": "",
   "apiKey": "",
+  "model": "",
   "strategy": "alpacarp",
   "tokenizer": "llama",
   "truncation_length": 4096,

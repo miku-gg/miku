@@ -30,7 +30,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     currentCharacterId: string
   ): string
 
-  protected abstract template(): {
+  public abstract template(): {
     instruction: string
     response: string
     askLine: string
@@ -133,16 +133,8 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       ({ characterId }) => characterId === input.currentCharacterId
     )
 
-    const currentScene = selectCurrentScene(input.state)
-    const conditionIndex = Number(variables.get('cond')?.trim())
-    const nextScene = conditionIndex
-      ? currentScene?.children[conditionIndex - 1]
-      : ''
-
     return {
       ...response,
-      nextScene,
-      shouldSuggestScenes: variables.get('scene') === ' Yes',
       characters: [
         ...response.characters.slice(
           0,
@@ -255,9 +247,6 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       (char) => char.characterId === characterId
     )
     const scene = selectCurrentScene(state)
-    const childConditions = state.novel.scenes.filter(
-      (_scene) => scene?.children.includes(_scene.id) && !!_scene.condition
-    )
 
     // const background = state.novel.backgrounds.find(
     //   (bg) => bg.id === scene?.backgroundId
@@ -278,16 +267,23 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
           ? ' ' + existingEmotion
           : '{{SEL emotion options=emotions}}'
       }\n` +
-      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{user}}:",${charStops}]}}` +
-      (childConditions.length
-        ? `\n${temp.instruction}OOC: Did any of the following conditions meet?\n` +
-          ` ${childConditions.map((scene, index) => {
-            return `COND ${index + 1}: ${scene.condition}\n`
-          })}Answer the most unique condition number or 0 in case of it didn't met any conditions.` +
-          `\n${temp.response}Response:{{SEL cond options=cond_opt}}`
-        : `\n${temp.instruction}OOC: Did the characters changed scene in the last messages?` +
-          ` Answer with Yes or No` +
-          `\n${temp.response}Based on the last two messages:{{SEL scene options=scene_opt}}`)
+      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{user}}:",${charStops}]}}`
+    )
+  }
+
+  static getConditionPrompt({
+    condition,
+    instructionPrefix,
+    responsePrefix,
+  }: {
+    condition: string
+    instructionPrefix: string
+    responsePrefix: string
+  }) {
+    return (
+      `\n${instructionPrefix}OOC: In the current roleplay, has the following condition been met?: ${condition}` +
+      `\nAnswer with Yes or No` +
+      `\n${responsePrefix} Based on the last two messages:{{SEL cond options=cond_opt}}`
     )
   }
 

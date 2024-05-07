@@ -21,10 +21,13 @@ import textCompletion from '../../libs/textCompletion'
 import React, { useState } from 'react'
 import { Loader } from '../common/Loader'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
+import { FaStore } from 'react-icons/fa6'
+import { setInventoryVisibility } from '../../state/slices/inventorySlice'
 
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
-  const { servicesEndpoint, isInteractionDisabled } = useAppContext()
+  const { servicesEndpoint, isInteractionDisabled, apiEndpoint } =
+    useAppContext()
   const { text, disabled } = useAppSelector((state) => state.narration.input)
   const state = useAppSelector((state) => state)
   const scene = useAppSelector(selectCurrentScene)
@@ -32,13 +35,13 @@ const InputBox = (): JSX.Element | null => {
   const suggestions = useAppSelector(
     (state) => state.narration.input.suggestions
   )
+  const showInventory = useAppSelector((state) => state.inventory.showInventory)
   const [isAutocompleteLoading, setIsAutocompleteLoading] =
     useState<boolean>(false)
 
-  const onSubmit = (e: React.FormEvent<unknown>) => {
-    e.stopPropagation()
-    e.preventDefault()
-    if (!text || disabled) return
+  const interactionsCount = Object.keys(state.narration.interactions).length
+
+  const sendMessage = (text: string) => {
     if (isInteractionDisabled) {
       toast.warn('Please log in to interact.', {
         position: 'top-center',
@@ -54,9 +57,18 @@ const InputBox = (): JSX.Element | null => {
         sceneId: scene?.id || '',
         characters: scene?.characters.map((r) => r.characterId) || [],
         servicesEndpoint,
+        apiEndpoint,
         selectedCharacterId: lastResponse?.selectedCharacterId || '',
       })
     )
+  }
+
+  const onSubmit = (e: React.FormEvent<unknown>) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (!text || disabled) return
+
+    sendMessage(text)
   }
 
   const onAutocomplete = async (e: React.MouseEvent<unknown>) => {
@@ -108,6 +120,19 @@ const InputBox = (): JSX.Element | null => {
     }
   }
 
+  const onInventory = (e: React.MouseEvent<unknown>) => {
+    e.stopPropagation()
+    e.preventDefault()
+
+    dispatch(
+      setInventoryVisibility(
+        showInventory === 'initial' || showInventory === 'closed'
+          ? 'open'
+          : 'closed'
+      )
+    )
+  }
+
   return (
     <div className="InputBox">
       <form
@@ -130,6 +155,18 @@ const InputBox = (): JSX.Element | null => {
           rows={1}
           placeholder="Type a message..."
         />
+        {interactionsCount ? (
+          <button
+            className="InputBox__inventory"
+            data-tooltip-id="inventory-tooltip"
+            data-tooltip-content="Inventory"
+            data-tooltip-varaint="light"
+            disabled={disabled}
+            onClick={onInventory}
+          >
+            <FaStore />
+          </button>
+        ) : null}
         <button
           className={classNames({
             'InputBox__suggestion-trigger': true,
@@ -148,6 +185,7 @@ const InputBox = (): JSX.Element | null => {
           <FaPaperPlane />
         </button>
       </form>
+      <Tooltip id="inventory-tooltip" place="top" />
       <Tooltip id="suggestion-tooltip" place="top" />
     </div>
   )

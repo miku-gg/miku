@@ -54,7 +54,7 @@ export class OpenAITokenGenerator extends AbstractTokenGenerator<
         model: this.model,
         prompt,
         logit_bias,
-        logprobs: 10,
+        logprobs: 5,
         max_tokens: 1,
       },
       reqOptions

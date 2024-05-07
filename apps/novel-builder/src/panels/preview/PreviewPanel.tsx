@@ -37,7 +37,7 @@ export function generateAlphaLink({
           servicesEndpoint:
             STAGE === "development"
               ? "http://localhost:8484"
-              : "https://services2.miku.gg",
+              : "https://services.miku.gg",
           freeTTS: false,
           freeSmart: false,
           settings: {

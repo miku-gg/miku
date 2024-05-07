@@ -7,6 +7,8 @@ export enum StateEventType {
 
 export enum CustomEventType {
   OPEN_PREMIUM = 'OPEN_PREMIUM',
+  SHARE_CONVERSATION = 'SHARE_CONVERSATION',
+  ACHIEVEMENT_UNLOCKED = 'ACHIEVEMENT_UNLOCKED',
 }
 
 export const postMessage = (

@@ -24,7 +24,15 @@ import { VersionId as V3VersionId } from '../../state/versioning/v3.state'
 import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
 import { initialState as initialSettingsState } from '../../state/slices/settingsSlice'
 import { initialState as initialCreationState } from '../../state/slices/creationSlice'
+import { initialState as initialInventoryState } from '../../state/slices/inventorySlice'
 import { trackEvent } from '../../libs/analytics'
+import {
+  DEFAULT_INVENTORY,
+  getItemByActionPrompt,
+} from '../../libs/inventoryItems'
+import { scenesToObjectives } from '../../state/slices/objectivesSlice'
+import mergeWith from 'lodash.mergewith'
+import { getCongurationFromParams } from '../../../root'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -70,11 +78,25 @@ const HistoryActions = () => {
           throw new Error('Narration version mismatch')
         }
 
+        const params = getCongurationFromParams()
+
         dispatch(
           replaceState({
             ...stateJson,
+            objectives: [...scenesToObjectives(stateJson.novel.scenes)],
+            inventory: {
+              ...initialInventoryState,
+              ...(stateJson.inventory || {}),
+              items: stateJson.inventory.items || [...DEFAULT_INVENTORY],
+            },
             creation: initialCreationState,
-            settings: initialSettingsState,
+            settings: mergeWith(
+              mergeWith(
+                mergeWith({}, initialSettingsState),
+                stateJson.settings || {}
+              ),
+              params.settings || {}
+            ),
           })
         )
       } catch (e) {
@@ -129,6 +151,7 @@ const HistoryModal = (): ReactElement => {
   const dispatch = useAppDispatch()
   const narration = useAppSelector((state) => state.narration)
   const novel = useAppSelector((state) => state.novel)
+  const inventoryItems = useAppSelector((state) => state.inventory.items)
 
   const [nodes, edges, startPos] = (() => {
     const parentIds = (() => {
@@ -182,6 +205,7 @@ const HistoryModal = (): ReactElement => {
           isLeaf: response.childrenInteractions.length === 0,
           highlighted: parentIdsSet.has(response.id),
           text: (response.characters[0]?.text || '').substring(0, 100),
+          isItemAction: false,
         },
         type: 'dialogueNode',
         position: { x: 0, y: 0 },
@@ -190,25 +214,36 @@ const HistoryModal = (): ReactElement => {
 
       response.childrenInteractions.forEach(({ interactionId }) => {
         const interaction = narration.interactions[interactionId]
-        if (interaction?.id)
+
+        if (interaction?.id) {
+          const item = getItemByActionPrompt(inventoryItems, interaction.query)
+          let query = ''
+          if (item) {
+            query = `The user used the ${item.name} item.`
+          } else {
+            query = interaction.query.substring(0, 100) || ''
+          }
+
           nodes.push({
-            id: interaction?.id,
+            id: interaction.id,
             sourcePosition: Position.Bottom,
             targetPosition: Position.Top,
             type: 'dialogueNode',
             draggable: false,
             data: {
-              id: interaction?.id || '',
+              id: interaction.id || '',
               isUser: true,
               isLastResponse: false,
-              highlighted: parentIdsSet.has(interaction?.id || ''),
-              text: interaction?.query.substring(0, 100) || '',
-              isLeaf: interaction?.responsesId.length === 0,
+              highlighted: parentIdsSet.has(interaction.id || ''),
+              text: query || '',
+              isLeaf: interaction.responsesId.length === 0,
               isRoot: false,
               avatars: ['default-profile-pic.png'],
+              isItemAction: !!item,
             },
             position: { x: 0, y: 0 },
           })
+        }
         edges.push({
           id: `vertical_${response.id}_${interaction?.id}`,
           source: response.id,

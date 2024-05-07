@@ -1,0 +1,44 @@
+{
+  "add_bos_token": true,
+  "add_eos_token": false,
+  "added_tokens_decoder": {
+    "0": {
+      "content": "<unk>",
+      "lstrip": false,
+      "normalized": false,
+      "rstrip": false,
+      "single_word": false,
+      "special": true
+    },
+    "1": {
+      "content": "<s>",
+      "lstrip": false,
+      "normalized": false,
+      "rstrip": false,
+      "single_word": false,
+      "special": true
+    },
+    "2": {
+      "content": "</s>",
+      "lstrip": false,
+      "normalized": false,
+      "rstrip": false,
+      "single_word": false,
+      "special": true
+    }
+  },
+  "additional_special_tokens": [],
+  "bos_token": "<s>",
+  "chat_template": "{% if messages[0]['role'] == 'system' %}{% set loop_messages = messages[1:] %}{{ messages[0]['content'].strip() }}{% else %}{% set loop_messages = messages %}{{ 'A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user\\'s questions.' }}{% endif %}{% for message in loop_messages %}{% if loop.index0 == 0 %}{% if message['role'] == 'system' or message['role'] == 'user' %}{{ ' USER: ' + message['content'].strip() }}{% else %}{{ ' ASSISTANT: ' + message['content'].strip() + eos_token }}{% endif %}{% else %}{% if message['role'] == 'system' or message['role'] == 'user' %}{{ '\nUSER: ' + message['content'].strip() }}{% else %}{{ ' ASSISTANT: ' + message['content'].strip() + eos_token }}{% endif %}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ ' ASSISTANT:' }}{% endif %}",
+  "clean_up_tokenization_spaces": false,
+  "eos_token": "</s>",
+  "legacy": true,
+  "model_max_length": 1000000000000000019884624838656,
+  "pad_token": "<unk>",
+  "padding_side": "right",
+  "sp_model_kwargs": {},
+  "spaces_between_special_tokens": false,
+  "tokenizer_class": "LlamaTokenizer",
+  "unk_token": "<unk>",
+  "use_default_system_prompt": true
+}

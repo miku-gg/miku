@@ -1,0 +1,355 @@
+@import '../../variables';
+
+.Inventory {
+  display: flex;
+  flex-direction: column;
+  height: 70%;
+  min-width: 200px;
+  max-width: 95%;
+
+  background-color: #0c1225ee;
+
+  border: solid 1px $secondary-color;
+  border-left: none;
+  border-radius: 0 10px 10px 0;
+
+  z-index: 1;
+  position: absolute;
+  top: 15%;
+  left: 0;
+
+  &.initial {
+    display: none;
+  }
+
+  &.open {
+    animation: inventoryOpenAnimation 0.3s ease-in-out;
+  }
+
+  &.closed {
+    animation: inventoryCloseAnimation 0.4s ease-in-out both;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0.5rem 1rem;
+    font-size: 1.4rem;
+    text-align: left;
+    background-color: #25284bee;
+
+    border-top-right-radius: 10px;
+  }
+
+  &__close-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &-icon {
+      color: $color-white;
+
+      &:hover {
+        color: $color-light-gray;
+      }
+
+      &:active {
+        color: $secondary-color;
+      }
+    }
+  }
+
+  &__content {
+    height: 100%;
+    display: flex;
+    overflow: hidden;
+  }
+
+  &__items {
+    width: 188px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+    grid-auto-rows: 74px;
+
+    padding: 8px 15px;
+    gap: 10px;
+
+    overflow-y: auto;
+    z-index: 3;
+  }
+
+  &__item {
+    width: 74px;
+    height: 74px;
+
+    opacity: 0.5;
+    background-color: $background-1;
+
+    border-radius: 10px;
+    border: 2px solid transparent;
+
+    cursor: pointer;
+    user-select: none;
+
+    position: relative;
+    overflow: hidden;
+
+    transition: all 0.2s ease-out;
+
+    &-image {
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    &-name {
+      min-width: 100%;
+      bottom: 5%;
+
+      font-size: 0.75rem;
+      white-space: nowrap;
+      position: absolute;
+      text-align: center;
+
+      background-color: rgba(0, 0, 0, 0.65);
+      opacity: 0;
+    }
+
+    &-price {
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      background-color: $background-1;
+      border-bottom-right-radius: 10px;
+
+      font-size: 0.7rem;
+      padding: 0.2rem;
+
+      transition: all 0.2s ease-out;
+    }
+
+    &.selected {
+      border: 2px solid $secondary-color !important;
+      opacity: 1;
+      box-shadow: 0 0 10px $secondary-color;
+
+      .Inventory__item-price {
+        background-color: $secondary-color !important;
+      }
+
+      .Inventory__item-name {
+        opacity: 1;
+
+        &.animated-item-name {
+          animation: infiniteSlide var(--animation-duration) linear infinite;
+          opacity: 1;
+        }
+      }
+    }
+
+    &.disabled {
+      // back and white filter
+      filter: grayscale(100%);
+      opacity: 0.5;
+
+      &:hover {
+        border: 2px solid transparent;
+        opacity: 0.5;
+
+        .Inventory__item-price {
+          background-color: $background-1;
+        }
+
+        .Inventory__item-name {
+          opacity: 0;
+        }
+      }
+    }
+
+    &:hover {
+      border: 2px solid #aaa1ff;
+      opacity: 1;
+
+      .Inventory__item-price {
+        background-color: #aaa1ff;
+      }
+
+      .Inventory__item-name {
+        opacity: 1;
+
+        &.animated-item-name {
+          animation: infiniteSlide var(--animation-duration) linear infinite;
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+.InventoryItemModal {
+  z-index: 1;
+
+  width: 163px;
+  min-width: 163px;
+  height: 100%;
+  padding: 0.5rem;
+  padding-right: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  cursor: default;
+  overflow-y: auto;
+
+  &.initial {
+    display: none;
+  }
+
+  &.open {
+    animation: slideOpen 0.5s ease-in-out;
+  }
+
+  &.closed {
+    animation: slideClose 0.5s ease-in-out both;
+  }
+
+  &__content {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__image {
+    flex: 1;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    img {
+      border-radius: 10px;
+      border: 1px solid $secondary-color;
+      box-shadow: 0 0 10px $secondary-color;
+
+      pointer-events: none;
+    }
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  &__name {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: default;
+    width: 100%;
+  }
+
+  &__description {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    text-align: center;
+  }
+
+  &__price {
+    font-size: 1rem;
+    margin-top: 1rem;
+  }
+
+  &__footer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  #item-name-tooltip {
+    background-color: $text-3;
+  }
+
+  button.InventoryItemModal__button {
+    margin-top: 1rem;
+
+    font-size: 0.7rem;
+    padding: 0.1rem 0.1rem;
+
+    width: 100%;
+
+    &:hover {
+      color: $text-1;
+      border-color: $secondary-color;
+      box-shadow: 0 0 10px $secondary-color;
+    }
+  }
+}
+
+@keyframes infiniteSlide {
+  0% {
+    text-indent: var(--initial-text-position);
+  }
+  100% {
+    text-indent: var(--ending-text-position);
+  }
+}
+
+@keyframes inventoryCloseAnimation {
+  0% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0;
+  }
+  100% {
+    display: none;
+    z-index: -1;
+    opacity: 0;
+  }
+}
+
+@keyframes inventoryOpenAnimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideOpen {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideClose {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  75% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+    display: none;
+    z-index: -1;
+  }
+}

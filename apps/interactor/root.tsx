@@ -12,13 +12,21 @@ import * as Sentry from '@sentry/react'
 import mergeWith from 'lodash.mergewith'
 import queryString from 'query-string'
 
+import { PersonaResult } from './src/libs/listSearch'
 import { loadNovelFromSingleCard } from './src/libs/loadNovel'
 
 import { initialState as initialCreationState } from './src/state/slices/creationSlice'
 import { initialState as initialSettingsState } from './src/state/slices/settingsSlice'
+import { initialState as initialInventoryState } from './src/state/slices/inventorySlice'
 import { RootState } from './src/state/store'
 import { VersionId } from './src/state/versioning'
 import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
+import { scenesToObjectives } from './src/state/slices/objectivesSlice'
+import {
+  getUnlockableAchievements,
+  getUnlockedItems,
+} from './src/libs/platformAPI'
+import { DEFAULT_INVENTORY } from './src/libs/inventoryItems'
 
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -46,7 +54,7 @@ const CHARACTER_SEARCH_ENDPOINT =
 const API_ENDPOINT =
   import.meta.env.VITE_API_ENDPOINT || 'http://localhost:8080'
 
-function getCongurationFromParams(): {
+export function getCongurationFromParams(): {
   production: boolean
   disabled: boolean
   freeTTS: boolean
@@ -61,7 +69,8 @@ function getCongurationFromParams(): {
   apiEndpoint: string
   cardEndpoint: string
   servicesEndpoint: string
-  settings: RootState['settings']
+  persona: PersonaResult
+  settings: object
 } {
   const queryParams = queryString.parse(window.location.search)
   const cardId = (queryParams.cardId || '') as string
@@ -82,6 +91,7 @@ function getCongurationFromParams(): {
       servicesEndpoint: string
       freeTTS: boolean
       freeSmart: boolean
+      persona: PersonaResult
       settings?: RootState['settings']
     }
 
@@ -104,10 +114,8 @@ function getCongurationFromParams(): {
       apiEndpoint: configurationJson.apiEndpoint || '',
       cardEndpoint: configurationJson.cardEndpoint || API_ENDPOINT,
       servicesEndpoint: configurationJson.servicesEndpoint || SERVICES_ENDPOINT,
-      settings: mergeWith(
-        mergeWith({}, initialSettingsState),
-        configurationJson.settings || {}
-      ),
+      persona: configurationJson.persona,
+      settings: configurationJson.settings || {},
     }
   } catch (e) {
     return {
@@ -125,7 +133,20 @@ function getCongurationFromParams(): {
       apiEndpoint: '',
       cardEndpoint: CARD_ENDPOINT,
       servicesEndpoint: SERVICES_ENDPOINT,
-      settings: initialSettingsState,
+      persona: {
+        id: '',
+        name: '',
+        description: '',
+        profilePic: '',
+        isDefault: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        user: {
+          id: '',
+          username: '',
+        },
+      },
+      settings: mergeWith({}, initialSettingsState),
     }
   }
 }
@@ -152,24 +173,69 @@ const narrationData: Promise<RootState> = new Promise((resolve) => {
 })
 
 export const loadNarration = async (): Promise<RootState> => {
+  const achievements = await getUnlockableAchievements(
+    params.apiEndpoint,
+    params.cardId
+  ).catch((e) => {
+    console.error(e)
+    toast.warn('Failed to load achievements')
+    return []
+  })
+  const inventoryItems = await getUnlockedItems(params.apiEndpoint).catch(
+    (e) => {
+      console.error(e)
+      toast.warn('Failed to load items')
+      return []
+    }
+  )
   if (params.narrationId) {
     return narrationData.then((data) => {
       if (data.version !== VersionId) {
         if (data.version === 'v1') {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const migrated = migrateV2toV3(migrateV1toV2(data))
           return {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            ...migrateV2toV3(migrateV1toV2(data)),
+            ...migrated,
+            objectives: [
+              ...scenesToObjectives(migrated.novel.scenes),
+              ...achievements,
+            ],
+            inventory: {
+              ...initialInventoryState,
+              items: [...inventoryItems, ...DEFAULT_INVENTORY],
+            },
             creation: initialCreationState,
-            settings: params.settings,
+            settings: mergeWith(
+              mergeWith(
+                mergeWith({}, initialSettingsState),
+                data.settings || {}
+              ),
+              params.settings || {}
+            ),
           }
         } else if (data.version === 'v2') {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const migrated = migrateV2toV3(data)
           return {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            ...migrateV2toV3(data),
+            ...migrated,
+            objectives: [
+              ...scenesToObjectives(migrated.novel.scenes),
+              ...achievements,
+            ],
+            inventory: {
+              ...initialInventoryState,
+              items: [...inventoryItems, ...DEFAULT_INVENTORY],
+            },
             creation: initialCreationState,
-            settings: params.settings,
+            settings: mergeWith(
+              mergeWith(
+                mergeWith({}, initialSettingsState),
+                data.settings || {}
+              ),
+              params.settings || {}
+            ),
           }
         }
         toast.error('Narration version mismatch')
@@ -177,8 +243,16 @@ export const loadNarration = async (): Promise<RootState> => {
       }
       return {
         ...data,
+        objectives: [...scenesToObjectives(data.novel.scenes), ...achievements],
+        inventory: {
+          ...initialInventoryState,
+          items: [...inventoryItems, ...DEFAULT_INVENTORY],
+        },
         creation: initialCreationState,
-        settings: params.settings,
+        settings: mergeWith(
+          mergeWith(mergeWith({}, initialSettingsState), data.settings || {}),
+          params.settings || {}
+        ),
       }
     })
   } else {
@@ -190,8 +264,16 @@ export const loadNarration = async (): Promise<RootState> => {
     return {
       novel,
       narration,
+      objectives: [...scenesToObjectives(novel.scenes), ...achievements],
+      inventory: {
+        ...initialInventoryState,
+        items: [...inventoryItems, ...DEFAULT_INVENTORY],
+      },
       creation: initialCreationState,
-      settings: params.settings,
+      settings: mergeWith(
+        mergeWith({}, initialSettingsState),
+        params.settings || {}
+      ),
       version: VersionId,
     }
   }
@@ -208,6 +290,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       freeSmart={params.freeSmart}
       isMobileApp={params.isMobileApp}
       freeTTS={params.freeTTS}
+      persona={params.persona}
       novelLoader={loadNarration}
       assetUploader={(file: File) =>
         uploadAsset(params.assetsUploadEndpoint, file)
