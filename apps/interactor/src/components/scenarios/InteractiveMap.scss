@@ -17,15 +17,24 @@
     top: 0;
     right: -200px;
     width: 200px;
-    // z-index:;
-    background-color: white;
+    background-color: $background-1;
+    color: white;
     padding: 10px;
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    color: black;
+    box-shadow: 0 0 5px #cd5fea;
+    opacity: 0.8;
   }
 
   &__modal {
     overflow: visible !important;
+  }
+
+  &__modal-content {
+    margin-top: 10px;
+    position: relative;
+  }
+  &__background-image {
+    width: 100%;
+    object-fit: cover;
   }
 }

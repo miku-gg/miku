@@ -44,7 +44,8 @@ const InteractiveMapToggle = () => {
 const InteractiveMapModal = () => {
   const dispatch = useAppDispatch()
   const map = useAppSelector(selectCurrentMap)
-  const { servicesEndpoint } = useAppContext()
+  const { servicesEndpoint, apiEndpoint } = useAppContext()
+  const mapBackgroundRef = useRef<HTMLImageElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const offScreenCanvasRef = useRef(document.createElement('canvas'))
   const maskImagesRef = useRef(new Map<string, HTMLImageElement>())
@@ -59,7 +60,33 @@ const InteractiveMapModal = () => {
   )
 
   useEffect(() => {
-    if (map && canvasRef?.current) {
+    canvasRef.current?.addEventListener('mousemove', (event) => {
+      const rect = canvasRef.current?.getBoundingClientRect()
+      const x = event.clientX - (rect?.left || 0)
+      const y = event.clientY - (rect?.top || 0)
+      const placeDescription = document.getElementById(
+        'interactive-map-place-info'
+      )
+      if (placeDescription) {
+        placeDescription.style.top = y + 10 + 'px'
+        placeDescription.style.left = x + 10 + 'px'
+      }
+    })
+  }, [canvasRef.current])
+
+  useEffect(() => {
+    if (
+      map &&
+      canvasRef?.current &&
+      mapBackgroundRef?.current &&
+      mapBackgroundRef?.current?.height &&
+      mapBackgroundRef?.current?.width
+    ) {
+      console.log('Map loaded')
+      console.log(
+        mapBackgroundRef.current.height,
+        mapBackgroundRef.current.width
+      )
       // eslint-disable-next-line
       // @ts-ignore
       const canvas = canvasRef?.current as HTMLCanvasElement
@@ -73,21 +100,31 @@ const InteractiveMapModal = () => {
         const maskImage = new Image()
         maskImage.src = place.maskSource
         maskImages.set(place.id, maskImage)
-        offScreenCtx?.drawImage(maskImage, 0, 0)
-        ctx?.drawImage(maskImage, 0, 0)
+        offScreenCtx?.drawImage(
+          maskImage,
+          0,
+          0,
+          mapBackgroundRef.current?.width || 0,
+          mapBackgroundRef.current?.height || 0
+        )
+        ctx?.drawImage(
+          maskImage,
+          0,
+          0,
+          mapBackgroundRef.current?.width || 0,
+          mapBackgroundRef.current?.height || 0
+        )
         if (canvas) canvas.style.opacity = '0.1'
       })
       maskImagesRef.current = maskImages
 
-      // Set the off-screen canvas size to match the map image
-      const mapImage = new Image()
-      mapImage.src = map.source.png
-      mapImage.onload = () => {
-        offScreenCanvas.width = mapImage.width
-        offScreenCanvas.height = mapImage.height
-        if (canvas) canvas.width = mapImage.width
-        if (canvas) canvas.height = mapImage.height
-      }
+      console.log(mapBackgroundRef.current.width)
+      console.log(mapBackgroundRef.current.height)
+
+      offScreenCanvas.width = mapBackgroundRef.current.width
+      offScreenCanvas.height = mapBackgroundRef.current.height
+      if (canvas) canvas.width = mapBackgroundRef.current.width
+      if (canvas) canvas.height = mapBackgroundRef.current.height
 
       const isWhitePixel = (data: Uint8ClampedArray) => {
         const tolerance = 10
@@ -114,11 +151,26 @@ const InteractiveMapModal = () => {
         let highlightedPlace: (typeof map.places)[number] | undefined
         for (const place of map.places) {
           const maskImage = maskImagesRef.current.get(place.id)
+          console.log(`Checking ${place.id}`, maskImage)
           if (maskImage) {
-            offScreenCtx?.drawImage(maskImage, 0, 0)
+            offScreenCtx?.drawImage(
+              maskImage,
+              0,
+              0,
+              offScreenCanvas.width,
+              offScreenCanvas.height
+            )
             const pixel = offScreenCtx?.getImageData(x, y, 1, 1).data
+            console.log(pixel)
             if (pixel && isWhitePixel(pixel)) {
-              ctx?.drawImage(maskImage, 0, 0)
+              console.log(`Highlighting ${place.id}`)
+              ctx?.drawImage(
+                maskImage,
+                0,
+                0,
+                offScreenCanvas.width,
+                offScreenCanvas.height
+              )
               highlightedPlace = place
               break
             }
@@ -139,15 +191,23 @@ const InteractiveMapModal = () => {
       })
 
       window.addEventListener('resize', () => {
-        if (canvas) canvas.width = window.innerWidth
-        if (canvas) canvas.height = window.innerHeight
+        // if (canvas) canvas.width = window.innerWidth
+        // if (canvas) canvas.height = window.innerHeight
       })
     }
-  }, [map, canvasRef?.current])
+  }, [map, canvasRef?.current, mapBackgroundRef.current])
 
   return (
-    <div style={{ position: 'relative' }}>
-      <img src={map?.source.png} alt="Map" />
+    <div
+      className="InteractiveMap__modal-content"
+      id="interactive-map-modal-content"
+    >
+      <img
+        className="InteractiveMap__background-image"
+        src={map?.source.png}
+        alt="Map"
+        ref={mapBackgroundRef}
+      />
       <canvas
         onClick={() => {
           if (highlightedPlace && scene) {
@@ -156,6 +216,7 @@ const InteractiveMapModal = () => {
               interactionStart({
                 sceneId: scene.id,
                 text: scene.prompt,
+                apiEndpoint,
                 characters: scene?.characters.map((r) => r.characterId) || [],
                 servicesEndpoint,
                 selectedCharacterId:
@@ -176,7 +237,13 @@ const InteractiveMapModal = () => {
         }}
       ></canvas>
       {highlightedPlace ? (
-        <div className="InteractiveMap__place-info">
+        <div
+          className="InteractiveMap__place-info"
+          id="interactive-map-place-info"
+          style={{
+            position: 'absolute',
+          }}
+        >
           <div className="InteractiveMap__place-info__title">
             {highlightedPlace.name}
           </div>
