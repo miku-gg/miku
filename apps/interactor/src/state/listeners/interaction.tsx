@@ -27,6 +27,8 @@ import { CustomEventType, postMessage } from '../../libs/stateEvents'
 import { unlockAchievement } from '../../libs/platformAPI'
 import { addItem } from '../slices/inventorySlice'
 import { removeObjective } from '../slices/objectivesSlice'
+import { toast } from 'react-toastify'
+import { GiOpenChest } from 'react-icons/gi'
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -132,7 +134,7 @@ const interactionEffect = async (
       '{{SEL emotion options=emotions}}',
       finishedCompletionResult.get('emotion') || ''
     )
-    const objectives = selectCurrentSceneObjectives(state)
+    const objectives = [...selectCurrentSceneObjectives(state)]
     if (
       !objectives.some(
         (objective) =>
@@ -144,7 +146,7 @@ const interactionEffect = async (
         id: 'temp_generate_scene_objective',
         condition: '{{char}} and {{user}} are now in a different place',
         name: 'Generate a new scene',
-        sceneId: currentScene?.id || '',
+        sceneIds: [currentScene?.id || ''],
         action: {
           type: NovelV3.NovelObjectiveActionType.SUGGEST_CREATE_SCENE,
         },
@@ -215,9 +217,43 @@ const interactionEffect = async (
                 if (objective.action.params.reward) {
                   dispatch(addItem(objective.action.params.reward))
                 }
+                dispatch(removeObjective(objective.id))
+                break
+              case NovelV3.NovelObjectiveActionType.ITEM_RECEIVE:
+                dispatch(addItem(objective.action.params.item))
+                dispatch(removeObjective(objective.id))
+                toast(
+                  <div
+                    style={{
+                      textAlign: 'left',
+                      display: 'inline-flex',
+                      gap: 10,
+                    }}
+                  >
+                    <GiOpenChest />
+                    <span>
+                      <b>{objective.action.params.item.name}</b> added to the
+                      inventory
+                    </span>
+                  </div>,
+                  {
+                    position: 'top-left',
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    closeButton: false,
+                    theme: 'dark',
+                    style: {
+                      marginTop: 50,
+                      marginLeft: 10,
+                    },
+                  }
+                )
                 break
             }
-            dispatch(removeObjective(objective.id))
           }
         })
       )
