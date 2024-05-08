@@ -209,27 +209,26 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
     }
   }, [backgroundImage?.source.jpg, displayCharacter.image, assetLinkLoader])
 
-  return children
-  // return isProduction && !isMobileApp ? (
-  //   <Selection.Root>
-  //     {/* eslint-disable-next-line */}
-  //     {/* @ts-ignore */}
-  //     <Selection.Trigger>{children}</Selection.Trigger>
-  //     <Selection.Portal>
-  //       {/* eslint-disable-next-line */}
-  //       {/* @ts-ignore */}
-  //       <Selection.Content className="shareConversation">
-  //         <Button theme="gradient" onClick={() => handleShare()}>
-  //           Share
-  //           <IoMdShare />
-  //         </Button>
-  //         {/* eslint-disable-next-line */}
-  //         {/* @ts-ignore */}
-  //         <Selection.Arrow className="shareConversation__arrow" />
-  //       </Selection.Content>
-  //     </Selection.Portal>
-  //   </Selection.Root>
-  // ) : (
-  //   children
-  // )
+  return isProduction && !isMobileApp ? (
+    <Selection.Root>
+      {/* eslint-disable-next-line */}
+      {/* @ts-ignore */}
+      <Selection.Trigger>{children}</Selection.Trigger>
+      <Selection.Portal>
+        {/* eslint-disable-next-line */}
+        {/* @ts-ignore */}
+        <Selection.Content className="shareConversation">
+          <Button theme="gradient" onClick={() => handleShare()}>
+            Share
+            <IoMdShare />
+          </Button>
+          {/* eslint-disable-next-line */}
+          {/* @ts-ignore */}
+          <Selection.Arrow className="shareConversation__arrow" />
+        </Selection.Content>
+      </Selection.Portal>
+    </Selection.Root>
+  ) : (
+    children
+  )
 }
