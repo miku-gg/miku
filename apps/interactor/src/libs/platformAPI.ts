@@ -69,7 +69,7 @@ export const getUnlockableAchievements = async (
       id: achievement.id,
       name: achievement.name,
       description: achievement.description,
-      sceneId: achievement.scenes[0],
+      sceneIds: achievement.scenes,
       condition: achievement.condition,
       action: {
         type: NovelV3.NovelObjectiveActionType.ACHIEVEMENT_UNLOCK,
