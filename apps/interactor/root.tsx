@@ -60,6 +60,7 @@ export function getCongurationFromParams(): {
   freeTTS: boolean
   freeSmart: boolean
   isMobileApp: boolean
+  botId: string
   cardId: string
   narrationId: string
   backgroundSearchEndpoint: string
@@ -74,6 +75,7 @@ export function getCongurationFromParams(): {
 } {
   const queryParams = queryString.parse(window.location.search)
   const cardId = (queryParams.cardId || '') as string
+  const botId = (queryParams.botId || '') as string
   const narrationId = (queryParams.narrationId || '') as string
   const production = queryParams.production === 'true'
   const disabled = queryParams.disabled === 'true'
@@ -102,6 +104,7 @@ export function getCongurationFromParams(): {
       freeTTS: configurationJson.freeTTS || false,
       freeSmart: configurationJson.freeSmart || false,
       cardId: cardId || CARD_ID,
+      botId: botId || '',
       narrationId,
       characterSearchEndpoint:
         configurationJson.characterSearchEndpoint || CHARACTER_SEARCH_ENDPOINT,
@@ -125,6 +128,7 @@ export function getCongurationFromParams(): {
       freeTTS: false,
       freeSmart: false,
       cardId: cardId || CARD_ID,
+      botId: botId || '',
       narrationId,
       characterSearchEndpoint: CHARACTER_SEARCH_ENDPOINT,
       backgroundSearchEndpoint: BACKGROUND_SEARCH_ENDPOINT,
@@ -175,7 +179,7 @@ const narrationData: Promise<RootState> = new Promise((resolve) => {
 export const loadNarration = async (): Promise<RootState> => {
   const achievements = await getUnlockableAchievements(
     params.apiEndpoint,
-    params.cardId
+    params.botId
   ).catch((e) => {
     console.error(e)
     toast.warn('Failed to load achievements')
