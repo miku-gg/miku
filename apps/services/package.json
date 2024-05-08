@@ -5,7 +5,7 @@
   "description": "",
   "main": "src/server.ts",
   "scripts": {
-    "start": "nodemon --exec \"ts-node --esm\" ./src/server.mts"
+    "start": "node --loader ts-node/esm src/server.mts"
   },
   "type": "module",
   "keywords": [],
