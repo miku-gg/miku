@@ -125,6 +125,7 @@ export enum NovelObjectiveActionType {
   SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
   SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
   ACHIEVEMENT_UNLOCK = "ACHIEVEMENT_UNLOCK",
+  ITEM_RECEIVE = "ITEM_RECEIVE",
 }
 
 export type NovelObjectiveAction =
@@ -143,13 +144,19 @@ export type NovelObjectiveAction =
         achievementId: string;
         reward: InventoryItem | null;
       };
+    }
+  | {
+      type: NovelObjectiveActionType.ITEM_RECEIVE;
+      params: {
+        item: InventoryItem;
+      };
     };
 
 export interface NovelObjective {
   id: string;
   name: string;
   description?: string;
-  sceneId: string;
+  sceneIds: string[];
   condition: string;
   action: NovelObjectiveAction;
 }

@@ -378,7 +378,9 @@ export const selectCurrentSceneObjectives = createSelector(
   [(state: RootState) => state.objectives, selectCurrentScene],
   (objectives, scene) => {
     return objectives.filter(
-      (objective) => objective.sceneId === scene?.id || !objective.sceneId
+      (objective) =>
+        objective.sceneIds.includes(scene?.id || '') ||
+        !objective.sceneIds.length
     )
   }
 )
