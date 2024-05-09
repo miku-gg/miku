@@ -180,18 +180,8 @@ export const loadNarration = async (): Promise<RootState> => {
   const achievements = await getUnlockableAchievements(
     params.apiEndpoint,
     params.botId
-  ).catch((e) => {
-    console.error(e)
-    toast.warn('Failed to load achievements')
-    return []
-  })
-  const inventoryItems = await getUnlockedItems(params.apiEndpoint).catch(
-    (e) => {
-      console.error(e)
-      toast.warn('Failed to load items')
-      return []
-    }
   )
+  const inventoryItems = await getUnlockedItems(params.apiEndpoint)
   if (params.narrationId) {
     return narrationData.then((data) => {
       if (data.version !== VersionId) {
