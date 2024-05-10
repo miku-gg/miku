@@ -5,7 +5,7 @@ export const getItemByActionPrompt = (
   query: string
 ) => {
   return inventoryItems.find((item) =>
-    item.actions.some((action) => action.prompt === query)
+    item.actions?.some((action) => action.prompt === query)
   )
 }
 
