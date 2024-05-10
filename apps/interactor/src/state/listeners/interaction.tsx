@@ -207,7 +207,7 @@ const interactionEffect = async (
                     id: objective.action.params.achievementId,
                     name: objective.name,
                     description: objective.description || '',
-                    itemReward: objective.action.params.reward,
+                    inventoryItem: objective.action.params.reward,
                   },
                 })
                 unlockAchievement(

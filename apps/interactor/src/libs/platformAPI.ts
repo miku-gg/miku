@@ -80,7 +80,7 @@ export const getUnlockableAchievements = async (
               id: achievement.inventoryItem.id,
               name: achievement.inventoryItem.name,
               description: achievement.inventoryItem.description,
-              image: achievement.inventoryItem.icon,
+              icon: achievement.inventoryItem.icon,
               isPremium: achievement.inventoryItem.isPremium,
               actions: achievement.inventoryItem.actions.map((action) => {
                 return {
