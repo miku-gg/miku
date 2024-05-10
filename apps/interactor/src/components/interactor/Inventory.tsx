@@ -82,7 +82,7 @@ export default function Inventory() {
               >
                 <img
                   className="Inventory__item-image"
-                  src={assetLinkLoader(item.image || 'default_item.jpg')}
+                  src={assetLinkLoader(item.icon || 'default_item.jpg')}
                   alt={item.name}
                 />
                 <div
@@ -104,6 +104,7 @@ export default function Inventory() {
           })}
         </div>
         <Tooltip id="premium-item-invetory" place="right" />
+        <Tooltip id="item-name" place="top" />
         <InventoryItemModal
           item={selectedItem}
           onUse={(action) => {
@@ -150,13 +151,20 @@ export const InventoryItemModal = ({
       <div className="InventoryItemModal__content">
         <div className="InventoryItemModal__image">
           <img
-            src={assetLinkLoader(item?.image || 'default_item.jpg')}
+            src={assetLinkLoader(item?.icon || 'default_item.jpg')}
             alt={item?.name}
           />
         </div>
       </div>
       <header className="InventoryItemModal__header">
-        <div className="InventoryItemModal__name">{item?.name}</div>
+        <div
+          className="InventoryItemModal__name"
+          data-tooltip-id="item-name"
+          data-tooltip-varaint="light"
+          data-tooltip-content={item?.name}
+        >
+          {item?.name}
+        </div>
         <div className="InventoryItemModal__description">
           {item?.description}
         </div>

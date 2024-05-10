@@ -181,7 +181,8 @@ const interactionEffect = async (
           for await (const result of conditionResultStream) {
             response = result.get('cond') || ''
           }
-          if (response === ' Yes') {
+          // todo: revert
+          if (response) {
             switch (objective.action.type) {
               case NovelV3.NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE:
                 dispatch(
@@ -207,7 +208,7 @@ const interactionEffect = async (
                     id: objective.action.params.achievementId,
                     name: objective.name,
                     description: objective.description || '',
-                    itemReward: objective.action.params.reward,
+                    inventoryItem: objective.action.params.reward,
                   },
                 })
                 unlockAchievement(
