@@ -181,8 +181,7 @@ const interactionEffect = async (
           for await (const result of conditionResultStream) {
             response = result.get('cond') || ''
           }
-          // todo: revert
-          if (response) {
+          if (response === ' Yes') {
             switch (objective.action.type) {
               case NovelV3.NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE:
                 dispatch(
