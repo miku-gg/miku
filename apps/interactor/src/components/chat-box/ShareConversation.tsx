@@ -164,7 +164,7 @@ const generateImage = async (
             currentTextY += fontSize
           }
 
-          const DataURL = canvas.toDataURL('image/png')
+          const DataURL = canvas.toDataURL('image/jpeg')
 
           postMessage(CustomEventType.SHARE_CONVERSATION, DataURL)
 
