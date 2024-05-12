@@ -64,7 +64,7 @@ export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
 
     scene?.characters.forEach((char) => {
       if (char.objective) {
-        template += `\n{{${char.characterId}}}'s OBJECTIVE: \n${char.objective}\n`
+        template += `\n{{${char.characterId}}}'s OBJECTIVE: ${char.objective}\n`
       }
     })
 
