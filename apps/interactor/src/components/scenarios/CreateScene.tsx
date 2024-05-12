@@ -271,14 +271,22 @@ const CreateScene = () => {
         <div className="CreateScene__music">
           <div className="CreateScene__music__title">Music</div>
           <MusicSelector
-            musicList={musicList}
-            selectedMusic={selectedMusic}
+            musicList={musicList.map((m) => ({
+              name: m.name,
+              source: assetLinkLoader(m.source),
+            }))}
+            selectedMusic={{
+              name: selectedMusic.name,
+              source: assetLinkLoader(selectedMusic.source),
+            }}
             onChange={(value) => {
               dispatch(
-                setMusic({
-                  name: value.name,
-                  source: value.source,
-                })
+                setMusic(
+                  musicList.find((m) => m.name === value.name) || {
+                    name: value.name,
+                    source: value.source?.split('/')?.pop() || value.source,
+                  }
+                )
               )
             }}
           />
