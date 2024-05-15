@@ -13,7 +13,7 @@ import {
   selectCurrentScene,
   selectCurrentCharacterOutfits,
   selectLastLoadedCharacters,
-  selectAllParentDialogues,
+  selectAllParentDialoguesWhereCharacterIsPresent,
 } from '../../../../state/selectors'
 
 const PROMPT_TOKEN_OFFSET = 50
@@ -49,7 +49,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     variables: Record<string, string | string[]>
     totalTokens: number
   } {
-    const characters = selectCurrentScene(input.state)?.characters || []
+    const characters = input.state.novel.characters || []
     const currentCharacter = input.state.novel.characters.find(
       (character) => character.id === input.currentCharacterId
     )
@@ -75,10 +75,8 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     template = fillTextTemplate(template, {
       user: input.state.settings.user.name,
       bot: name,
-      characters: characters.reduce((prev, { characterId }) => {
-        prev[characterId] =
-          input.state.novel.characters.find(({ id }) => id === characterId)
-            ?.name || ''
+      characters: characters.reduce((prev, { id, card }) => {
+        prev[id] = card.data.name
         return prev
       }, {} as Record<string, string>),
     })
@@ -153,7 +151,10 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       id: string
     }
   ): string {
-    const messages = selectAllParentDialogues(state)
+    const messages = selectAllParentDialoguesWhereCharacterIsPresent(
+      state,
+      currentCharacter?.id || ''
+    )
     let prompt = ''
     for (const message of [...messages].reverse().slice(-maxLines)) {
       prompt += this.getDialogueLine(message, currentCharacter, prompt)
