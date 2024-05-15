@@ -220,7 +220,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
           return (
             (prevCharString ? `${temp.instruction}${prevCharString}\n` : '') +
             (currentCharacter.text
-              ? temp.response + currentCharacter.text
+              ? temp.response + `{{char}}: ${currentCharacter.text}\n`
               : '') +
             '\n' +
             (nextCharString ? `${temp.instruction}${nextCharString}\n` : '')

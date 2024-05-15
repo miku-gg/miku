@@ -212,8 +212,7 @@ export const selectAllParentDialogues = createSelector(
     while (responseIdPointer) {
       const response = responses[responseIdPointer]
       if (response) {
-        if (!response.fetching)
-          dialogues.push({ type: 'response', item: response })
+        dialogues.push({ type: 'response', item: response })
         if (response?.parentInteractionId) {
           const interaction = interactions[response?.parentInteractionId]
           if (interaction) {
