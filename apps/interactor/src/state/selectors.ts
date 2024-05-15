@@ -377,7 +377,7 @@ export const selectAllParentDialoguesWhereCharacterIsPresent = createSelector(
   [
     selectAllParentDialogues,
     (state: RootState) => state.novel.scenes,
-    (state: RootState, characterId: string) => characterId,
+    (_state: RootState, characterId: string) => characterId,
     (state: RootState) => state,
   ],
   (dialogues, scenes, characterId, state) => {
