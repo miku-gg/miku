@@ -212,8 +212,7 @@ export const selectAllParentDialogues = createSelector(
     while (responseIdPointer) {
       const response = responses[responseIdPointer]
       if (response) {
-        if (!response.fetching)
-          dialogues.push({ type: 'response', item: response })
+        dialogues.push({ type: 'response', item: response })
         if (response?.parentInteractionId) {
           const interaction = interactions[response?.parentInteractionId]
           if (interaction) {
@@ -371,6 +370,32 @@ export const selectCurrentNextScene = createSelector(
         : null
     }
     return null
+  }
+)
+
+export const selectAllParentDialoguesWhereCharacterIsPresent = createSelector(
+  [
+    selectAllParentDialogues,
+    (state: RootState) => state.novel.scenes,
+    (_state: RootState, characterId: string) => characterId,
+    (state: RootState) => state,
+  ],
+  (dialogues, scenes, characterId, state) => {
+    const result = []
+    for (let i = 0; i < dialogues.length; i++) {
+      const dialogue = dialogues[i]
+      const scene =
+        dialogue.type === 'interaction'
+          ? scenes.find((scene) => scene.id === dialogue.item.sceneId)
+          : selectSceneFromResponse(state, dialogue.item)
+      if (
+        scene &&
+        scene.characters.some((c) => c.characterId === characterId)
+      ) {
+        result.push(dialogue)
+      }
+    }
+    return result
   }
 )
 
