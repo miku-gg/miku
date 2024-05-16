@@ -157,7 +157,7 @@ const InputBox = (): JSX.Element | null => {
   }
 
   return (
-    <div className={`InputBox ${isMobileApp && 'IsMobileApp'}`}>
+    <div className={`InputBox ${isMobileApp ? 'IsMobileApp' : ''}`}>
       <form
         className={classNames({
           InputBox__form: true,

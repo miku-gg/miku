@@ -121,7 +121,7 @@ const ResponseBox = (): JSX.Element | null => {
       ?.characterId
 
   return (
-    <div className={`ResponseBox ${isMobileApp && 'MobileApp'}`}>
+    <div className={`ResponseBox ${isMobileApp ? 'MobileApp' : ''}`}>
       <div className="ResponseBox__text" ref={responseDiv}>
         {isLastResponseFetching ? (
           <TextFormatterStatic text="*Typing...*" />
