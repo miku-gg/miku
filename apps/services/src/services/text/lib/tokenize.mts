@@ -1,5 +1,23 @@
 import * as Guidance from "@mikugg/guidance";
 import llama3Tokenizer from "llama3-tokenizer-js";
+import { LlamaTokenizer as RawLlamaTokenizer } from "llama-tokenizer-js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
+
+const solarCustomVocab = fs
+  .readFileSync(
+    path.join(__dirname, "../data/tokenizers/solar/vocab_base64.txt")
+  )
+  .toString();
+const solarMergesBinary = fs
+  .readFileSync(
+    path.join(__dirname, "../data/tokenizers/solar/merges_binary.bin")
+  )
+  .toString();
 
 export enum TokenizerType {
   LLAMA_2 = "LLAMA_2",
@@ -8,6 +26,58 @@ export enum TokenizerType {
   SOLAR = "SOLAR",
   COHERE = "COHERE",
   WIZARDLM2 = "WIZARDLM2",
+}
+
+const solarRawTokenizer = new RawLlamaTokenizer(
+  solarCustomVocab,
+  solarMergesBinary
+);
+
+export class SolarTokenizer extends Guidance.Tokenizer.AbstractTokenizer {
+  override encodeString(
+    str: string,
+    add_bos_token?: boolean,
+    add_preceding_space?: boolean,
+    log_performance?: boolean
+  ): number[] {
+    if (str.endsWith(this.getEOS())) {
+      str = str.substring(0, str.length - this.getEOS().length);
+      return [
+        ...solarRawTokenizer.encode(
+          str,
+          add_bos_token,
+          add_preceding_space,
+          log_performance
+        ),
+        2, // EOS
+      ];
+    }
+    return solarRawTokenizer.encode(
+      str,
+      add_bos_token,
+      add_preceding_space,
+      log_performance
+    );
+  }
+
+  override decodeString(
+    arr: number[],
+    add_bos_token?: boolean,
+    add_preceding_space?: boolean
+  ): string {
+    if (arr[arr.length - 1] === 2) {
+      arr = arr.slice(0, arr.length - 1);
+      return (
+        solarRawTokenizer.decode(arr, add_bos_token, add_preceding_space) +
+        this.getEOS()
+      );
+    }
+    return solarRawTokenizer.decode(arr, add_bos_token, add_preceding_space);
+  }
+
+  override getEOS(): string {
+    return "</s>";
+  }
 }
 
 export class LLaMA3Tokenizer extends Guidance.Tokenizer.AbstractTokenizer {
@@ -76,10 +146,7 @@ export async function loadTokenizer(
       return tokenizers.get(TokenizerType.MISTRAL);
     case TokenizerType.SOLAR:
       if (!tokenizers.has(TokenizerType.SOLAR)) {
-        tokenizers.set(
-          TokenizerType.SOLAR,
-          new Guidance.Tokenizer.LLaMATokenizer()
-        );
+        tokenizers.set(TokenizerType.SOLAR, new SolarTokenizer());
       }
       return tokenizers.get(TokenizerType.SOLAR);
     case TokenizerType.COHERE:
