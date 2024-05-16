@@ -33,6 +33,8 @@ const InputBox = (): JSX.Element | null => {
   const [textAreaRows, setTextAreaRows] = useState<number>(1)
 
   const { text, disabled } = useAppSelector((state) => state.narration.input)
+  const { isMobileApp } = useAppContext()
+
   const state = useAppSelector((state) => state)
   const scene = useAppSelector(selectCurrentScene)
   const lastResponse = useAppSelector(selectLastLoadedResponse)
@@ -155,7 +157,7 @@ const InputBox = (): JSX.Element | null => {
   }
 
   return (
-    <div className="InputBox">
+    <div className={`InputBox ${isMobileApp && 'IsMobileApp'}`}>
       <form
         className={classNames({
           InputBox__form: true,

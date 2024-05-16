@@ -51,6 +51,7 @@ const ResponseBox = (): JSX.Element | null => {
   const { disabled } = useAppSelector((state) => state.narration.input)
   const displayCharacter = useAppSelector(selectLastSelectedCharacter)
   const displayText = useFillTextTemplate(displayCharacter.text)
+  const { isMobileApp } = useAppContext()
 
   const handleRegenerateClick = () => {
     trackEvent('interaction_regenerate')
@@ -120,7 +121,7 @@ const ResponseBox = (): JSX.Element | null => {
       ?.characterId
 
   return (
-    <div className="ResponseBox">
+    <div className={`ResponseBox ${isMobileApp && 'MobileApp'}`}>
       <div className="ResponseBox__text" ref={responseDiv}>
         {isLastResponseFetching ? (
           <TextFormatterStatic text="*Typing...*" />
