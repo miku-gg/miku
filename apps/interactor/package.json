@@ -35,6 +35,7 @@
     "react-modal": "^3.16.1",
     "react-progressive-graceful-image": "^0.7.0",
     "react-redux": "^9.0.4",
+    "react-rnd": "^10.4.10",
     "react-swipeable": "^7.0.1",
     "react-toastify": "^9.1.1",
     "reactflow": "^11.10.1",

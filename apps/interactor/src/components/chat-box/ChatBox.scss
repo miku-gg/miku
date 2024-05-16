@@ -11,4 +11,9 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+
+  &__Rnd {
+    border: 1px solid #7957d2;
+    width: fit-content;
+  }
 }
