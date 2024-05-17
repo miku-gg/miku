@@ -35,4 +35,17 @@ export const LANGUAGE_EN: i18nConfig = {
   SETTINGS__CUSTOM_SYSTEM_PROMPT: 'Custom System Prompt',
   SETTINGS__CUSTOM_SYSTEM_PROMPT_PLACEHOLDER:
     "Add information to always be remembered. For Example: Anon is Miku's student.",
+  SETTINGS__70B_MODEL_ONLY_AVAILABLE_FOR_PREMIUM_USERS:
+    '70B model is only available for premium users.',
+  SETTINGS__DEACTIVATE_70B_MODEL: 'Deactivate 70B',
+  SETTINGS__ACTIVATE_70B_MODEL_FREE_FOR_A_LIMITED_TIME:
+    'Activate 70B model. Free for a limited time.',
+  SETTINGS__ACTIVATE_70B_MODEL: 'Activate 70B model. Makes the AI smarter.',
+
+  HISTORY: 'History',
+  HISTORY__LOAD_NARRATION_HISTORY: 'Load narration history',
+  HISTORY__DOWNLOAD_NARRATION_HISTORY: 'Download narration history',
+
+  NODE_EDITOR__UPDATE_BUTTON_LABEL: 'Update',
+  NODE_EDITOR__CANCEL_BUTTON_LABEL: 'Cancel',
 }

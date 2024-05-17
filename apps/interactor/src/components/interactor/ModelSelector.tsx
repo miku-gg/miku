@@ -7,6 +7,7 @@ import { GiBrain } from 'react-icons/gi'
 import { setModel } from '../../state/slices/settingsSlice'
 import './ModelSelector.scss'
 import { trackEvent } from '../../libs/analytics'
+import { _i18n } from '../../libs/lang/i18n'
 
 const ModelSelector = () => {
   const dispatch = useAppDispatch()
@@ -22,15 +23,17 @@ const ModelSelector = () => {
   let tooltipMessage = ''
 
   if (!isPremium && !freeSmart) {
-    tooltipMessage = '70B model is only available for premium users.'
+    tooltipMessage = _i18n(
+      'SETTINGS__70B_MODEL_ONLY_AVAILABLE_FOR_PREMIUM_USERS'
+    )
   } else if (freeSmart) {
     tooltipMessage = isSmart
-      ? 'Deactivate 70B'
-      : 'Activate 70B model. Free for a limited time.'
+      ? _i18n('SETTINGS__DEACTIVATE_70B_MODEL')
+      : _i18n('SETTINGS__ACTIVATE_70B_MODEL_FREE_FOR_A_LIMITED_TIME')
   } else if (isPremium) {
     tooltipMessage = isSmart
-      ? 'Deactivate 70B'
-      : 'Activate 70B model. Makes the AI smarter.'
+      ? _i18n('SETTINGS__DEACTIVATE_70B_MODEL')
+      : _i18n('SETTINGS__ACTIVATE_70B_MODEL')
   }
 
   return (

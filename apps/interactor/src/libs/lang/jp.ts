@@ -35,4 +35,18 @@ export const LANGUAGE_JP: i18nConfig = {
   SETTINGS__CUSTOM_SYSTEM_PROMPT: 'カスタムシステムプロンプト',
   SETTINGS__CUSTOM_SYSTEM_PROMPT_PLACEHOLDER:
     '常に覚えておく情報を追加します。例: アノンはミクの生徒です。',
+  SETTINGS__70B_MODEL_ONLY_AVAILABLE_FOR_PREMIUM_USERS:
+    '70Bモデルはプレミアムユーザーのみ利用可能です。',
+  SETTINGS__DEACTIVATE_70B_MODEL: '70Bを無効にする',
+  SETTINGS__ACTIVATE_70B_MODEL_FREE_FOR_A_LIMITED_TIME:
+    '70Bモデルを有効にします。期間限定で無料。',
+  SETTINGS__ACTIVATE_70B_MODEL:
+    '70Bモデルを有効にします。AIをよりスマートにします。',
+
+  HISTORY: '履歴',
+  HISTORY__LOAD_NARRATION_HISTORY: 'ナレーション履歴を読み込む',
+  HISTORY__DOWNLOAD_NARRATION_HISTORY: 'ナレーション履歴をダウンロード',
+
+  NODE_EDITOR__UPDATE_BUTTON_LABEL: '更新',
+  NODE_EDITOR__CANCEL_BUTTON_LABEL: 'キャンセル',
 }

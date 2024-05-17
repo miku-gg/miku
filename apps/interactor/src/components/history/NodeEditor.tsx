@@ -8,6 +8,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import { NarrationInteraction, NarrationResponse } from '../../state/versioning'
 import { Button, Dropdown } from '@mikugg/ui-kit'
+import { _i18n } from '../../libs/lang/i18n'
 import {
   selectCharacterOutfits,
   selectSceneFromResponse,
@@ -46,7 +47,7 @@ const TextEditor = ({
       />
       <div className="NodeEditor__actions">
         <Button theme="secondary" type="submit">
-          Update
+          {_i18n('NODE_EDITOR__UPDATE_BUTTON_LABEL')}
         </Button>
         <Button
           theme="transparent"
@@ -55,7 +56,7 @@ const TextEditor = ({
             onCancel()
           }}
         >
-          Cancel
+          {_i18n('NODE_EDITOR__CANCEL_BUTTON_LABEL')}
         </Button>
       </div>
     </form>
