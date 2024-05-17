@@ -9,6 +9,8 @@ import { trackEvent } from '../../libs/analytics'
 import { interactionStart } from '../../state/slices/narrationSlice'
 import { useAppContext } from '../../App.context'
 
+const isTouchScreen = window.navigator.maxTouchPoints > 0
+
 const InteractiveMapToggle = () => {
   const dispatch = useAppDispatch()
   const opened = useAppSelector((state) => state.settings.modals.map)
@@ -43,8 +45,8 @@ const InteractiveMapToggle = () => {
 
 const InteractiveMapModal = () => {
   const dispatch = useAppDispatch()
-  const map = useAppSelector(selectCurrentMap)
   const { servicesEndpoint, apiEndpoint } = useAppContext()
+  const map = useAppSelector(selectCurrentMap)
   const mapBackgroundRef = useRef<HTMLImageElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const offScreenCanvasRef = useRef(document.createElement('canvas'))
@@ -55,9 +57,8 @@ const InteractiveMapModal = () => {
   const highlightedPlace = map?.places.find(
     (place) => place.id === highlightedPlaceId
   )
-  const scene = useAppSelector((state) =>
-    state.novel.scenes.find((scene) => scene.id === highlightedPlace?.sceneId)
-  )
+  const scenes = useAppSelector((state) => state.novel.scenes)
+  const scene = scenes.find((scene) => scene.id === highlightedPlace?.sceneId)
 
   useEffect(() => {
     canvasRef.current?.addEventListener('mousemove', (event) => {
@@ -75,127 +76,184 @@ const InteractiveMapModal = () => {
   }, [canvasRef.current])
 
   useEffect(() => {
-    if (
-      map &&
-      canvasRef?.current &&
-      mapBackgroundRef?.current &&
-      mapBackgroundRef?.current?.height &&
-      mapBackgroundRef?.current?.width
-    ) {
-      console.log('Map loaded')
-      console.log(
-        mapBackgroundRef.current.height,
-        mapBackgroundRef.current.width
-      )
-      // eslint-disable-next-line
-      // @ts-ignore
-      const canvas = canvasRef?.current as HTMLCanvasElement
-      const ctx = canvas?.getContext('2d') as CanvasRenderingContext2D
-      const offScreenCanvas = offScreenCanvasRef?.current
-      const offScreenCtx = offScreenCanvas?.getContext('2d')
-
-      // Load all mask images
-      const maskImages = new Map<string, HTMLImageElement>()
-      map.places.forEach((place) => {
-        const maskImage = new Image()
-        maskImage.src = place.maskSource
-        maskImages.set(place.id, maskImage)
-        offScreenCtx?.drawImage(
-          maskImage,
-          0,
-          0,
-          mapBackgroundRef.current?.width || 0,
-          mapBackgroundRef.current?.height || 0
+    const handleImageLoad = () => {
+      if (
+        map &&
+        canvasRef?.current &&
+        mapBackgroundRef?.current &&
+        mapBackgroundRef?.current?.height &&
+        mapBackgroundRef?.current?.width
+      ) {
+        console.log('Map loaded')
+        console.log(
+          mapBackgroundRef.current.height,
+          mapBackgroundRef.current.width
         )
-        ctx?.drawImage(
-          maskImage,
-          0,
-          0,
-          mapBackgroundRef.current?.width || 0,
-          mapBackgroundRef.current?.height || 0
-        )
-        if (canvas) canvas.style.opacity = '0.1'
-      })
-      maskImagesRef.current = maskImages
+        // eslint-disable-next-line
+        // @ts-ignore
+        const canvas = canvasRef?.current as HTMLCanvasElement
+        const ctx = canvas?.getContext('2d') as CanvasRenderingContext2D
+        const offScreenCanvas = offScreenCanvasRef?.current
+        const offScreenCtx = offScreenCanvas?.getContext('2d')
 
-      console.log(mapBackgroundRef.current.width)
-      console.log(mapBackgroundRef.current.height)
+        // Load all mask images
+        const maskImages = new Map<string, HTMLImageElement>()
+        map.places.forEach((place) => {
+          const maskImage = new Image()
+          maskImage.src = place.maskSource
+          maskImages.set(place.id, maskImage)
+          offScreenCtx?.drawImage(
+            maskImage,
+            0,
+            0,
+            mapBackgroundRef.current?.width || 0,
+            mapBackgroundRef.current?.height || 0
+          )
+          ctx?.drawImage(
+            maskImage,
+            0,
+            0,
+            mapBackgroundRef.current?.width || 0,
+            mapBackgroundRef.current?.height || 0
+          )
+          if (canvas) canvas.style.opacity = '0.1'
+        })
+        maskImagesRef.current = maskImages
 
-      offScreenCanvas.width = mapBackgroundRef.current.width
-      offScreenCanvas.height = mapBackgroundRef.current.height
-      if (canvas) canvas.width = mapBackgroundRef.current.width
-      if (canvas) canvas.height = mapBackgroundRef.current.height
+        console.log(mapBackgroundRef.current.width)
+        console.log(mapBackgroundRef.current.height)
 
-      const isWhitePixel = (data: Uint8ClampedArray) => {
-        const tolerance = 10
-        return (
-          data[0] > 255 - tolerance &&
-          data[1] > 255 - tolerance &&
-          data[2] > 255 - tolerance
-        )
-      }
+        offScreenCanvas.width = mapBackgroundRef.current.width
+        offScreenCanvas.height = mapBackgroundRef.current.height
+        if (canvas) canvas.width = mapBackgroundRef.current.width
+        if (canvas) canvas.height = mapBackgroundRef.current.height
 
-      canvas?.addEventListener('mousemove', (e) => {
-        const x = e.offsetX
-        const y = e.offsetY
+        const isWhitePixel = (data: Uint8ClampedArray) => {
+          const tolerance = 10
+          return (
+            data[0] > 255 - tolerance &&
+            data[1] > 255 - tolerance &&
+            data[2] > 255 - tolerance
+          )
+        }
 
-        // Clear the off-screen canvas
-        offScreenCtx?.clearRect(
-          0,
-          0,
-          offScreenCanvas.width,
-          offScreenCanvas.height
-        )
+        const highlightCoord = (x: number, y: number): string | null => {
+          // Clear the off-screen canvas
+          offScreenCtx?.clearRect(
+            0,
+            0,
+            offScreenCanvas.width,
+            offScreenCanvas.height
+          )
 
-        // Check each mask image
-        let highlightedPlace: (typeof map.places)[number] | undefined
-        for (const place of map.places) {
-          const maskImage = maskImagesRef.current.get(place.id)
-          console.log(`Checking ${place.id}`, maskImage)
-          if (maskImage) {
-            offScreenCtx?.drawImage(
-              maskImage,
-              0,
-              0,
-              offScreenCanvas.width,
-              offScreenCanvas.height
-            )
-            const pixel = offScreenCtx?.getImageData(x, y, 1, 1).data
-            console.log(pixel)
-            if (pixel && isWhitePixel(pixel)) {
-              console.log(`Highlighting ${place.id}`)
-              ctx?.drawImage(
+          // Check each mask image
+          let highlightedPlace: (typeof map.places)[number] | undefined
+          for (const place of map.places) {
+            const maskImage = maskImagesRef.current.get(place.id)
+            console.log(`Checking ${place.id}`, maskImage)
+            if (maskImage) {
+              offScreenCtx?.drawImage(
                 maskImage,
                 0,
                 0,
                 offScreenCanvas.width,
                 offScreenCanvas.height
               )
-              highlightedPlace = place
-              break
+              const pixel = offScreenCtx?.getImageData(x, y, 1, 1).data
+              console.log(pixel)
+              if (pixel && isWhitePixel(pixel)) {
+                console.log(`Highlighting ${place.id}`)
+                ctx?.drawImage(
+                  maskImage,
+                  0,
+                  0,
+                  offScreenCanvas.width,
+                  offScreenCanvas.height
+                )
+                highlightedPlace = place
+                break
+              }
             }
+          }
+
+          if (highlightedPlace) {
+            if (canvas) canvas.style.cursor = 'pointer'
+            if (canvas) canvas.style.opacity = '0.4'
+            if (canvas) canvas.style.filter = 'blur(5px)'
+            setHighlightedPlaceId(highlightedPlace.id)
+            return highlightedPlace.id
+          } else {
+            setHighlightedPlaceId(null)
+            if (canvas) canvas.style.cursor = 'default'
+            if (canvas) canvas.style.opacity = '0.1'
+            return null
           }
         }
 
-        if (highlightedPlace) {
-          if (canvas) canvas.style.cursor = 'pointer'
-          if (canvas) canvas.style.opacity = '0.4'
-          if (canvas) canvas.style.filter = 'blur(5px)'
-          setHighlightedPlaceId(highlightedPlace.id)
-          // Increase brightness on the highlighted area
-        } else {
-          setHighlightedPlaceId(null)
-          if (canvas) canvas.style.cursor = 'default'
-          if (canvas) canvas.style.opacity = '0.1'
-        }
-      })
+        canvas?.addEventListener('mousemove', (e) =>
+          highlightCoord(e.offsetX, e.offsetY)
+        )
+        // highlight on touch start
+        let currentlyHighlighted: string | null = null
+        canvas.addEventListener('ontouchend', (e) => {
+          // eslint-disable-next-line
+          // @ts-ignore
+          const touch = e.touches && e.touches[0]
+          const toHighLight = highlightCoord(touch?.clientX, touch?.clientY)
 
-      window.addEventListener('resize', () => {
-        // if (canvas) canvas.width = window.innerWidth
-        // if (canvas) canvas.height = window.innerHeight
-      })
+          alert(`${currentlyHighlighted} ${toHighLight}`)
+
+          if (
+            !(
+              currentlyHighlighted &&
+              toHighLight &&
+              currentlyHighlighted === toHighLight
+            )
+          ) {
+            e.preventDefault()
+          }
+
+          currentlyHighlighted = toHighLight
+        })
+
+        window.addEventListener('resize', () => {
+          // if (canvas) canvas.width = window.innerWidth
+          // if (canvas) canvas.height = window.innerHeight
+        })
+      }
     }
-  }, [map, canvasRef?.current, mapBackgroundRef.current])
+
+    const imgElement = mapBackgroundRef.current
+    if (imgElement) {
+      imgElement.addEventListener('load', handleImageLoad)
+    }
+
+    return () => {
+      if (imgElement) {
+        imgElement.removeEventListener('load', handleImageLoad)
+      }
+    }
+  }, [map])
+
+  const handleMapClick = () => {
+    if (highlightedPlace && scene) {
+      dispatch(setMapModal(false))
+      dispatch(
+        interactionStart({
+          sceneId: scene.id,
+          text: scene.prompt,
+          apiEndpoint,
+          characters: scene?.characters.map((r) => r.characterId) || [],
+          servicesEndpoint,
+          selectedCharacterId:
+            scene?.characters[
+              Math.floor(Math.random() * (scene?.characters.length || 0))
+            ].characterId || '',
+        })
+      )
+      trackEvent('scene-select')
+    }
+  }
 
   return (
     <div
@@ -209,25 +267,7 @@ const InteractiveMapModal = () => {
         ref={mapBackgroundRef}
       />
       <canvas
-        onClick={() => {
-          if (highlightedPlace && scene) {
-            dispatch(setMapModal(false))
-            dispatch(
-              interactionStart({
-                sceneId: scene.id,
-                text: scene.prompt,
-                apiEndpoint,
-                characters: scene?.characters.map((r) => r.characterId) || [],
-                servicesEndpoint,
-                selectedCharacterId:
-                  scene?.characters[
-                    Math.floor(Math.random() * (scene?.characters.length || 0))
-                  ].characterId || '',
-              })
-            )
-            trackEvent('scene-select')
-          }
-        }}
+        onClick={!isTouchScreen ? handleMapClick : undefined}
         ref={canvasRef}
         style={{
           position: 'absolute',
