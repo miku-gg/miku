@@ -9,6 +9,7 @@ import { store } from './state/store'
 
 import Interactor from './components/interactor/Interactor'
 import NovelLoader from './components/novel-loader/NovelLoader'
+import i18n from './libs/lang/i18n'
 
 import 'normalize.css'
 import './App.scss'
@@ -19,6 +20,7 @@ function App(props: AppProps) {
     freeSmart: props.freeSmart,
     freeTTS: props.freeTTS,
     isMobileApp: props.isMobileApp,
+    language: props.language,
     isInteractionDisabled: props.isInteractionDisabled,
     servicesEndpoint: props.servicesEndpoint,
     apiEndpoint: props.apiEndpoint,
@@ -33,6 +35,8 @@ function App(props: AppProps) {
     if (props.isMobileApp) {
       document.body.classList.add('mobile-app')
     }
+
+    i18n.changeLanguage(contextValue.language)
   }, [])
 
   return (

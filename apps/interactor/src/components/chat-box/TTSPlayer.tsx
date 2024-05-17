@@ -8,6 +8,7 @@ import classNames from 'classnames'
 import { Speed } from '../../state/versioning'
 import { useAppContext } from '../../App.context'
 import { trackEvent } from '../../libs/analytics'
+import { _i18n } from '../../libs/lang/i18n'
 
 // eslint-disable-next-line
 // @ts-ignore
@@ -197,7 +198,7 @@ const TTSPlayer2: React.FC = () => {
             : undefined
         }
       >
-        Your browser does not support the audio element.
+        {_i18n('YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT')}
       </audio>
       <button
         className={classNames({
@@ -219,14 +220,14 @@ const TTSPlayer2: React.FC = () => {
         data-tooltip-id="smart-tooltip"
         data-tooltip-content={
           !isPremium && !freeTTS && !isFirstMessage
-            ? 'This is a premium feature'
+            ? _i18n('THIS_IS_A_PREMIUM_FEATURE')
             : !isPremium && freeTTS
-            ? 'Free for a limited time'
+            ? _i18n('FREE_FOR_A_LIMITED_TIME')
             : ''
         }
       >
         <MdRecordVoiceOver />
-        <span>Listen</span>
+        <span>{_i18n('LISTEN')}</span>
       </button>
       <Tooltip id="audio-tooltip" place="top" />
     </>

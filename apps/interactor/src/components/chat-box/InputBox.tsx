@@ -24,6 +24,8 @@ import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { FaStore } from 'react-icons/fa6'
 import { setInventoryVisibility } from '../../state/slices/inventorySlice'
 
+import { _i18n } from '../../libs/lang/i18n'
+
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
   const { servicesEndpoint, isInteractionDisabled, apiEndpoint } =
@@ -153,7 +155,7 @@ const InputBox = (): JSX.Element | null => {
           }}
           autoComplete="off"
           rows={1}
-          placeholder="Type a message..."
+          placeholder={_i18n('INPUT_BOX_PLACE_HOLDER')}
         />
         {interactionsCount ? (
           <button
@@ -175,7 +177,9 @@ const InputBox = (): JSX.Element | null => {
           })}
           disabled={disabled || isAutocompleteLoading}
           data-tooltip-id={`suggestion-tooltip`}
-          data-tooltip-html={!suggestions.length ? 'Autocomplete' : ''}
+          data-tooltip-html={
+            !suggestions.length ? _i18n('TOOLTIP_AUTOCOMPLETE') : ''
+          }
           data-tooltip-varaint="light"
           onClick={onAutocomplete}
         >

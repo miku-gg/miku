@@ -18,6 +18,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import './Settings.scss'
 import { trackEvent } from '../../libs/analytics'
+import { _i18n } from '../../libs/lang/i18n'
 const audio = new Audio()
 
 const Settings = (): JSX.Element => {
@@ -79,7 +80,7 @@ const Settings = (): JSX.Element => {
         shouldCloseOnOverlayClick
       >
         <div className="SettingsModal__header">
-          <div className="SettingsModal__title">Settings</div>
+          <div className="SettingsModal__title">{_i18n('SETTINGS')}</div>
           <div className="SettingsModal__navigation">
             <button
               className={`SettingsModal__navigation__button ${
@@ -87,7 +88,7 @@ const Settings = (): JSX.Element => {
               }`}
               onClick={() => dispatch(setSettingsTab('general'))}
             >
-              General Settings
+              {_i18n('SETTINGS__GENERAL_SETTINGS')}
             </button>
             <button
               className={`SettingsModal__navigation__button ${
@@ -95,7 +96,7 @@ const Settings = (): JSX.Element => {
               }`}
               onClick={() => dispatch(setSettingsTab('prompt'))}
             >
-              Prompt Settings
+              {_i18n('SETTINGS__PROMPT_SETTINGS')}
             </button>
           </div>
         </div>
@@ -104,7 +105,7 @@ const Settings = (): JSX.Element => {
             <>
               <div className="SettingsModal__name">
                 <Input
-                  label="Your name"
+                  label={_i18n('SETTINGS__YOUR_NAME')}
                   value={settings.user.name}
                   onChange={(event) => dispatch(setName(event.target.value))}
                 />
@@ -114,8 +115,10 @@ const Settings = (): JSX.Element => {
                   className="SettingsModal__systemPrompt__input"
                   isTextArea
                   maxLength={systemPromptMaxLenght}
-                  label="Custom system prompt"
-                  placeHolder={`Add information to always be remembered. For Example: Anon is Miku's student.`}
+                  label={_i18n('SETTINGS__CUSTOM_SYSTEM_PROMPT')}
+                  placeHolder={_i18n(
+                    'SETTINGS__CUSTOM_SYSTEM_PROMPT_PLACEHOLDER'
+                  )}
                   value={settings.prompt.systemPrompt}
                   onChange={(event) =>
                     dispatch(setSystemPrompt(event.target.value))
@@ -130,46 +133,46 @@ const Settings = (): JSX.Element => {
           {settingsTab === 'general' && (
             <>
               <div className="SettingsModal__text-speed">
-                <p>Text Animation Speed</p>
+                <p>{_i18n('SETTINGS__TEXT_ANIMATION_SPEED')}</p>
                 <Slider
                   value={settings.text.speed}
                   onChange={(value) => dispatch(setSpeed(value as Speed))}
                   steps={[
                     {
-                      label: 'Slow',
+                      label: _i18n('SETTINGS__SLOW'),
                       value: Speed.Slow,
                     },
                     {
-                      label: 'Normal',
+                      label: _i18n('SETTINGS__NORMAL'),
                       value: Speed.Normal,
                     },
                     {
-                      label: 'Fast',
+                      label: _i18n('SETTINGS__FAST'),
                       value: Speed.Fast,
                     },
                     {
-                      label: 'Presto',
+                      label: _i18n('SETTINGS__PRESTO'),
                       value: Speed.Presto,
                     },
                   ]}
                 />
               </div>
               <div className="SettingsModal__text-font-size">
-                <p>Text Font Size</p>
+                <p>{_i18n('SETTINGS__TEXT_FONT_SIZE_LABEL')}</p>
                 <Slider
                   value={settings.text.fontSize}
                   onChange={(value) => dispatch(setFontSize(value as FontSize))}
                   steps={[
                     {
-                      label: 'Small',
+                      label: _i18n('SETTINGS__SMALL_FONT_SIZE'),
                       value: FontSize.Small,
                     },
                     {
-                      label: 'Normal',
+                      label: _i18n('SETTINGS__MEDIUM_FONT_SIZE'),
                       value: FontSize.Medium,
                     },
                     {
-                      label: 'Large',
+                      label: _i18n('SETTINGS__LARGE_FONT_SIZE'),
                       value: FontSize.Large,
                     },
                   ]}
@@ -179,17 +182,15 @@ const Settings = (): JSX.Element => {
                 <div className="SettingsModal__voice-header">
                   <div className="SettingsModal__voice-header-title">
                     <div className="SettingsModal__voice-title">
-                      Narration Voice
+                      {_i18n('SETTINGS__NARRATION_VOICE_LABEL')}
                     </div>
                     <div className="SettingsModal__voice-description">
-                      Enhances the experience by adding a narration voice audio
-                      to every response. This feature is only avalable for
-                      premium users.
+                      {_i18n('SETTINGS__VOICE_DESCRIPTION_LABEL')}
                     </div>
                   </div>
                   <div className="SettingsModal__voice-enabled">
                     <CheckBox
-                      label="Autoplay"
+                      label={_i18n('SETTINGS__AUTOPLAY')}
                       value={settings.voice.autoplay}
                       onChange={(event) =>
                         dispatch(setVoiceAutoplay(event.target.checked))
@@ -198,7 +199,7 @@ const Settings = (): JSX.Element => {
                   </div>
                 </div>
                 <div className="SettingsModal__voice-id">
-                  <p>Voice ID</p>
+                  <p>{_i18n('SETTINGS__VOICE_ID')}</p>
                   <div className="SettingsModal__voice-id-input">
                     <div
                       className="SettingsModal__voice-id-listen"
@@ -222,7 +223,7 @@ const Settings = (): JSX.Element => {
                   </div>
                 </div>
                 <div className="SettingsModal__voice-speed">
-                  <p>Reading speed</p>
+                  <p>{_i18n('SETTINGS__READING_SPEED')}</p>
                   <Slider
                     value={settings.voice.speed}
                     onChange={(value) =>
@@ -230,19 +231,19 @@ const Settings = (): JSX.Element => {
                     }
                     steps={[
                       {
-                        label: 'Slow',
+                        label: _i18n('SETTINGS__SLOW'),
                         value: Speed.Slow,
                       },
                       {
-                        label: 'Normal',
+                        label: _i18n('SETTINGS__NORMAL'),
                         value: Speed.Normal,
                       },
                       {
-                        label: 'Fast',
+                        label: _i18n('SETTINGS__FAST'),
                         value: Speed.Fast,
                       },
                       {
-                        label: 'Presto',
+                        label: _i18n('SETTINGS__PRESTO'),
                         value: Speed.Presto,
                       },
                     ]}
