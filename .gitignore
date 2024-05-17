@@ -5,3 +5,4 @@ node_modules/
 .DS_Store
 env/
 .aider*
+apps/services/backend_config.json

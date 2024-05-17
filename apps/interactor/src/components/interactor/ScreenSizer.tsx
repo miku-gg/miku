@@ -14,7 +14,7 @@ const ScreenSizer = () => {
         if (document?.fullscreenElement) {
           document?.exitFullscreen()
           setFullscreen(false)
-        } else {
+        } else if (document?.documentElement?.requestFullscreen) {
           document?.documentElement?.requestFullscreen()
           setFullscreen(true)
         }

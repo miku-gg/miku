@@ -1,13 +1,13 @@
 import {
   CharacterBook,
   EmotionTemplateSlug,
-  MikuCardV2,
+  MikuCardV2
 } from "../MikuCardValidator";
 
 export enum NovelNSFW {
   NONE = 0,
   NUDITY = 1,
-  EXPLICIT = 2,
+  EXPLICIT = 2
 }
 
 export interface NovelStart {
@@ -116,7 +116,7 @@ export interface InventoryItem {
   id: string;
   name: string;
   description: string;
-  image: string;
+  icon: string;
   isPremium?: boolean;
   actions: InventoryAction[];
 }
@@ -125,6 +125,7 @@ export enum NovelObjectiveActionType {
   SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
   SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
   ACHIEVEMENT_UNLOCK = "ACHIEVEMENT_UNLOCK",
+  ITEM_RECEIVE = "ITEM_RECEIVE"
 }
 
 export type NovelObjectiveAction =
@@ -143,13 +144,19 @@ export type NovelObjectiveAction =
         achievementId: string;
         reward: InventoryItem | null;
       };
+    }
+  | {
+      type: NovelObjectiveActionType.ITEM_RECEIVE;
+      params: {
+        item: InventoryItem;
+      };
     };
 
 export interface NovelObjective {
   id: string;
   name: string;
   description?: string;
-  sceneId: string;
+  sceneIds: string[];
   condition: string;
   action: NovelObjectiveAction;
 }

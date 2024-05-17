@@ -68,7 +68,7 @@
   }
 
   &__items {
-    width: 188px;
+    width: 220px;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
     grid-auto-rows: 74px;
@@ -187,11 +187,16 @@
       }
     }
   }
+
+  #item-name,
+  #premium-item-invetory {
+    background-color: $text-3;
+    opacity: 1;
+    z-index: 3;
+  }
 }
 
 .InventoryItemModal {
-  z-index: 1;
-
   width: 163px;
   min-width: 163px;
   height: 100%;

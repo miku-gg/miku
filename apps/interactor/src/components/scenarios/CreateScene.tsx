@@ -86,11 +86,11 @@ const CreateScene = () => {
   const musicList: { name: string; source: string }[] = [
     ...songs.map((song) => ({
       name: song.name,
-      source: assetLinkLoader(song.source),
+      source: song.source,
     })),
     ...DEFAULT_MUSIC.sort().map((_name) => ({
       name: _name,
-      source: assetLinkLoader(_name),
+      source: _name,
     })),
   ]
 
@@ -152,7 +152,7 @@ const CreateScene = () => {
     }
     // check if
     let _background = backgroundSelected
-    let _music = selectedMusic.name
+    let _music = selectedMusic.source
     if (
       backgroundSelected.startsWith('data:image') ||
       selectedMusic.source.startsWith('data:audio')
@@ -172,10 +172,10 @@ const CreateScene = () => {
                 await dataURItoFile(selectedMusic.source, 'asset')
               )
             ).fileName
-          : selectedMusic.name
+          : selectedMusic.source
         dispatch(removeImportedBackground(backgroundSelected))
         dispatch(setBackground(_background))
-        dispatch(setMusic({ name: _music, source: assetLinkLoader(_music) }))
+        dispatch(setMusic({ name: selectedMusic.name, source: _music }))
         dispatch(setSubmitting(false))
       } catch (e) {
         dispatch(setSubmitting(false))
@@ -271,14 +271,22 @@ const CreateScene = () => {
         <div className="CreateScene__music">
           <div className="CreateScene__music__title">Music</div>
           <MusicSelector
-            musicList={musicList}
-            selectedMusic={selectedMusic}
+            musicList={musicList.map((m) => ({
+              name: m.name,
+              source: assetLinkLoader(m.source),
+            }))}
+            selectedMusic={{
+              name: selectedMusic.name,
+              source: assetLinkLoader(selectedMusic.source),
+            }}
             onChange={(value) => {
               dispatch(
-                setMusic({
-                  name: value.name,
-                  source: value.source,
-                })
+                setMusic(
+                  musicList.find((m) => m.name === value.name) || {
+                    name: value.name,
+                    source: value.source?.split('/')?.pop() || value.source,
+                  }
+                )
               )
             }}
           />

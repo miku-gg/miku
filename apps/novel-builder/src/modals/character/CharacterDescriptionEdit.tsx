@@ -23,7 +23,7 @@ import { CharacterDescriptionGeneration } from "./CharacterDescriptionGeneration
 
 const DEFAULT_TAGS = [
   { value: "Male" },
-  { value: "Famale" },
+  { value: "Female" },
   { value: "OC" },
   { value: "NSFW" },
   { value: "RPG" },

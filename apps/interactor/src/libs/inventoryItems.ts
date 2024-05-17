@@ -5,7 +5,7 @@ export const getItemByActionPrompt = (
   query: string
 ) => {
   return inventoryItems.find((item) =>
-    item.actions.some((action) => action.prompt === query)
+    item.actions?.some((action) => action.prompt === query)
   )
 }
 
@@ -14,7 +14,7 @@ export const DEFAULT_INVENTORY: NovelV3.InventoryItem[] = [
     id: '1',
     name: 'Rose',
     description: 'A beautiful rose',
-    image: 'RoseFlower.jpg',
+    icon: 'RoseFlower.jpg',
     actions: [
       {
         name: 'Give',
@@ -34,7 +34,7 @@ export const DEFAULT_INVENTORY: NovelV3.InventoryItem[] = [
     id: '2',
     name: 'Stick',
     description: 'A wood stick',
-    image: 'stick.jpg',
+    icon: 'stick.jpg',
     actions: [
       {
         name: 'Give',
@@ -55,7 +55,7 @@ export const DEFAULT_INVENTORY: NovelV3.InventoryItem[] = [
     id: '3',
     name: 'Vodka',
     description: 'A bottle of vodka',
-    image: 'vodka.jpg',
+    icon: 'vodka.jpg',
     actions: [
       {
         name: 'Drink',
@@ -75,7 +75,7 @@ export const DEFAULT_INVENTORY: NovelV3.InventoryItem[] = [
     id: '4',
     name: 'Mate',
     description: 'A cup of mate',
-    image: 'mate.jpg',
+    icon: 'mate.jpg',
     actions: [
       {
         name: 'Prepare',
@@ -98,7 +98,7 @@ export const DEFAULT_INVENTORY: NovelV3.InventoryItem[] = [
     id: '5',
     name: 'Teddy bear',
     description: 'A cute teddy bear',
-    image: 'teddy.jpg',
+    icon: 'teddy.jpg',
     isPremium: true,
     actions: [
       {

@@ -22,8 +22,12 @@ export default function Inventory() {
   const { showInventory, selectedItem, items } = useAppSelector(
     (state) => state.inventory
   )
-  const { servicesEndpoint, isInteractionDisabled, apiEndpoint } =
-    useAppContext()
+  const {
+    servicesEndpoint,
+    isInteractionDisabled,
+    apiEndpoint,
+    assetLinkLoader,
+  } = useAppContext()
   const scene = useAppSelector(selectCurrentScene)
   const lastResponse = useAppSelector(selectLastLoadedResponse)
 
@@ -78,7 +82,7 @@ export default function Inventory() {
               >
                 <img
                   className="Inventory__item-image"
-                  src={`/images/${item.image}`}
+                  src={assetLinkLoader(item.icon || 'default_item.jpg')}
                   alt={item.name}
                 />
                 <div
@@ -100,6 +104,7 @@ export default function Inventory() {
           })}
         </div>
         <Tooltip id="premium-item-invetory" place="right" />
+        <Tooltip id="item-name" place="top" />
         <InventoryItemModal
           item={selectedItem}
           onUse={(action) => {
@@ -138,17 +143,28 @@ export const InventoryItemModal = ({
   item: NovelV3.InventoryItem | null
   onUse: (action: NovelV3.InventoryAction) => void
 }) => {
+  const { assetLinkLoader } = useAppContext()
   const showItemModal = useAppSelector((state) => state.inventory.showItemModal)
 
   return (
     <div className={`InventoryItemModal scrollbar ${showItemModal}`}>
       <div className="InventoryItemModal__content">
         <div className="InventoryItemModal__image">
-          <img src={`/images/${item?.image}`} alt={item?.name} />
+          <img
+            src={assetLinkLoader(item?.icon || 'default_item.jpg')}
+            alt={item?.name}
+          />
         </div>
       </div>
       <header className="InventoryItemModal__header">
-        <div className="InventoryItemModal__name">{item?.name}</div>
+        <div
+          className="InventoryItemModal__name"
+          data-tooltip-id="item-name"
+          data-tooltip-varaint="light"
+          data-tooltip-content={item?.name}
+        >
+          {item?.name}
+        </div>
         <div className="InventoryItemModal__description">
           {item?.description}
         </div>
