@@ -44,7 +44,9 @@ const ResponseBox = (): JSX.Element | null => {
       state.narration.responses[state.narration.currentResponseId]?.fetching ||
       false
   )
-  const isDraggable = useAppSelector((state) => state.settings.chatBox.isDraggable)
+  const isDraggable = useAppSelector(
+    (state) => state.settings.chatBox.isDraggable
+  )
   const scene = useAppSelector(selectCurrentScene)
   const characters = useAppSelector((state) => state.novel.characters)
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
@@ -216,10 +218,10 @@ const ResponseBox = (): JSX.Element | null => {
           </button>
         ) : null}
         {!disabled && !isInteractionDisabled ? (
-            <button className="ResponseBox__edit" onClick={handleEditClick}>
-              <FaPencil />
-              <span>Edit</span>
-            </button>
+          <button className="ResponseBox__edit" onClick={handleEditClick}>
+            <FaPencil />
+            <span>Edit</span>
+          </button>
         ) : null}
       </div>
       {!disabled && (swipes?.length || 0) > 1 ? (

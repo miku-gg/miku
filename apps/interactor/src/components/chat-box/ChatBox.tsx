@@ -7,7 +7,9 @@ import ResponseBox from './ResponseBox'
 
 const ChatBox = (): JSX.Element | null => {
   const { isMobileApp } = useAppContext()
-  const isDraggable = useAppSelector((state) => state.settings.chatBox.isDraggable)
+  const isDraggable = useAppSelector(
+    (state) => state.settings.chatBox.isDraggable
+  )
   const centeredPositionX = (window.innerWidth - window.innerWidth * 0.75) / 2
 
   if (isMobileApp || window.innerWidth < 820) {
@@ -18,6 +20,8 @@ const ChatBox = (): JSX.Element | null => {
       </div>
     )
   } else {
+    console.log('disable resizeing')
+    console.log(!isDraggable || isMobileApp)
     return (
       <div className="ChatBox">
         {/* eslint-disable-next-line  */}
@@ -31,7 +35,7 @@ const ChatBox = (): JSX.Element | null => {
             height: '200px',
           }}
           disableDragging={!isDraggable || isMobileApp}
-          disableResizing={!isDraggable || isMobileApp}
+          enableResizing={isDraggable && !isMobileApp}
         >
           <ResponseBox />
           <InputBox />
