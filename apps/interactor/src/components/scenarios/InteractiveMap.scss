@@ -23,6 +23,15 @@
     border-radius: 5px;
     box-shadow: 0 0 5px #cd5fea;
     opacity: 0.8;
+
+    &--mobile {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      position: static;
+    }
   }
 
   &__modal {

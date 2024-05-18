@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../state/store'
 import { selectCurrentMap } from '../../state/selectors'
 import { GiPathDistance } from 'react-icons/gi'
 import './InteractiveMap.scss'
-import { Modal } from '@mikugg/ui-kit'
+import { Button, Modal } from '@mikugg/ui-kit'
 import { setMapModal } from '../../state/slices/settingsSlice'
 import { trackEvent } from '../../libs/analytics'
 import { interactionStart } from '../../state/slices/narrationSlice'
@@ -84,11 +84,6 @@ const InteractiveMapModal = () => {
         mapBackgroundRef?.current?.height &&
         mapBackgroundRef?.current?.width
       ) {
-        console.log('Map loaded')
-        console.log(
-          mapBackgroundRef.current.height,
-          mapBackgroundRef.current.width
-        )
         // eslint-disable-next-line
         // @ts-ignore
         const canvas = canvasRef?.current as HTMLCanvasElement
@@ -120,9 +115,6 @@ const InteractiveMapModal = () => {
         })
         maskImagesRef.current = maskImages
 
-        console.log(mapBackgroundRef.current.width)
-        console.log(mapBackgroundRef.current.height)
-
         offScreenCanvas.width = mapBackgroundRef.current.width
         offScreenCanvas.height = mapBackgroundRef.current.height
         if (canvas) canvas.width = mapBackgroundRef.current.width
@@ -150,7 +142,6 @@ const InteractiveMapModal = () => {
           let highlightedPlace: (typeof map.places)[number] | undefined
           for (const place of map.places) {
             const maskImage = maskImagesRef.current.get(place.id)
-            console.log(`Checking ${place.id}`, maskImage)
             if (maskImage) {
               offScreenCtx?.drawImage(
                 maskImage,
@@ -160,9 +151,7 @@ const InteractiveMapModal = () => {
                 offScreenCanvas.height
               )
               const pixel = offScreenCtx?.getImageData(x, y, 1, 1).data
-              console.log(pixel)
               if (pixel && isWhitePixel(pixel)) {
-                console.log(`Highlighting ${place.id}`)
                 ctx?.drawImage(
                   maskImage,
                   0,
@@ -194,26 +183,12 @@ const InteractiveMapModal = () => {
           highlightCoord(e.offsetX, e.offsetY)
         )
         // highlight on touch start
-        let currentlyHighlighted: string | null = null
         canvas.addEventListener('ontouchend', (e) => {
+          e.preventDefault()
           // eslint-disable-next-line
           // @ts-ignore
           const touch = e.touches && e.touches[0]
-          const toHighLight = highlightCoord(touch?.clientX, touch?.clientY)
-
-          alert(`${currentlyHighlighted} ${toHighLight}`)
-
-          if (
-            !(
-              currentlyHighlighted &&
-              toHighLight &&
-              currentlyHighlighted === toHighLight
-            )
-          ) {
-            e.preventDefault()
-          }
-
-          currentlyHighlighted = toHighLight
+          highlightCoord(touch?.clientX, touch?.clientY)
         })
 
         window.addEventListener('resize', () => {
@@ -277,20 +252,33 @@ const InteractiveMapModal = () => {
         }}
       ></canvas>
       {highlightedPlace ? (
-        <div
-          className="InteractiveMap__place-info"
-          id="interactive-map-place-info"
-          style={{
-            position: 'absolute',
-          }}
-        >
-          <div className="InteractiveMap__place-info__title">
-            {highlightedPlace.name}
+        isTouchScreen ? (
+          <div className="InteractiveMap__place-info InteractiveMap__place-info--mobile">
+            <div className="InteractiveMap__place-info__title">
+              {highlightedPlace.name}
+            </div>
+            <div className="InteractiveMap__place-info__description">
+              {highlightedPlace.description}
+            </div>
+            <div>
+              <Button theme="secondary" onClick={handleMapClick}>
+                Go to scene
+              </Button>
+            </div>
           </div>
-          <div className="InteractiveMap__place-info__description">
-            {highlightedPlace.description}
+        ) : (
+          <div
+            className="InteractiveMap__place-info"
+            id="interactive-map-place-info"
+          >
+            <div className="InteractiveMap__place-info__title">
+              {highlightedPlace.name}
+            </div>
+            <div className="InteractiveMap__place-info__description">
+              {highlightedPlace.description}
+            </div>
           </div>
-        </div>
+        )
       ) : null}
     </div>
   )
