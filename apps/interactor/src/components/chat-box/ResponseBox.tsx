@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 
 import { FaDice, FaForward } from 'react-icons/fa'
 import { FaPencil } from 'react-icons/fa6'
-import { IoIosBookmarks } from 'react-icons/io'
+import { IoIosBookmarks, IoIosMove } from 'react-icons/io'
 import {
   selectCharacterOutfits,
   selectCurrentScene,
@@ -23,7 +23,7 @@ import {
   selectCharacterOfResponse,
   swipeResponse,
 } from '../../state/slices/narrationSlice'
-import { setEditModal } from '../../state/slices/settingsSlice'
+import { setEditModal, setIsDraggable } from '../../state/slices/settingsSlice'
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
 import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
 import './ResponseBox.scss'
@@ -44,6 +44,9 @@ const ResponseBox = (): JSX.Element | null => {
       state.narration.responses[state.narration.currentResponseId]?.fetching ||
       false
   )
+  const isDraggable = useAppSelector(
+    (state) => state.settings.chatBox.isDraggable
+  )
   const scene = useAppSelector(selectCurrentScene)
   const characters = useAppSelector((state) => state.novel.characters)
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
@@ -51,6 +54,7 @@ const ResponseBox = (): JSX.Element | null => {
   const { disabled } = useAppSelector((state) => state.narration.input)
   const displayCharacter = useAppSelector(selectLastSelectedCharacter)
   const displayText = useFillTextTemplate(displayCharacter.text)
+  const { isMobileApp } = useAppContext()
 
   const handleRegenerateClick = () => {
     trackEvent('interaction_regenerate')
@@ -120,7 +124,13 @@ const ResponseBox = (): JSX.Element | null => {
       ?.characterId
 
   return (
-    <div className="ResponseBox">
+    <div className={`ResponseBox ${isMobileApp ? 'MobileApp' : ''}`}>
+      <button
+        className={`ResponseBox__move ${isDraggable ? 'dragging' : ''}`}
+        onClick={() => dispatch(setIsDraggable(!isDraggable))}
+      >
+        <IoIosMove />
+      </button>
       <div className="ResponseBox__text" ref={responseDiv}>
         {isLastResponseFetching ? (
           <TextFormatterStatic text="*Typing...*" />

@@ -61,6 +61,9 @@ export default {
       history: false,
       edit: { opened: false, id: '' },
     },
+    chatBox: {
+      isDraggable: false,
+    },
   },
   narration: {
     fetching: false,

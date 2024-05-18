@@ -1,34 +1,40 @@
+import { FaPaperPlane } from 'react-icons/fa'
+import { GiFeather } from 'react-icons/gi'
+import { useAppContext } from '../../App.context'
+import {
+  selectCurrentScene,
+  selectLastLoadedResponse,
+} from '../../state/selectors'
 import {
   interactionStart,
   setInputText,
   setSuggestions,
 } from '../../state/slices/narrationSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import { FaPaperPlane } from 'react-icons/fa'
-import { GiFeather } from 'react-icons/gi'
-import {
-  selectCurrentScene,
-  selectLastLoadedResponse,
-} from '../../state/selectors'
-import { useAppContext } from '../../App.context'
 
-import './InputBox.scss'
-import { toast } from 'react-toastify'
-import classNames from 'classnames'
 import { Tooltip } from '@mikugg/ui-kit'
+import classNames from 'classnames'
+import React, { RefObject, useRef, useState } from 'react'
+import { FaStore } from 'react-icons/fa6'
+import { toast } from 'react-toastify'
+import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSuggestionStrategy'
 import textCompletion from '../../libs/textCompletion'
-import React, { useState } from 'react'
-import { Loader } from '../common/Loader'
-import PromptBuilder from '../../libs/prompts/PromptBuilder'
-import { FaStore } from 'react-icons/fa6'
 import { setInventoryVisibility } from '../../state/slices/inventorySlice'
+import { Loader } from '../common/Loader'
+import './InputBox.scss'
 
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
   const { servicesEndpoint, isInteractionDisabled, apiEndpoint } =
     useAppContext()
+
+  const textAreaRef: RefObject<HTMLTextAreaElement> = useRef(null)
+  const [textAreaRows, setTextAreaRows] = useState<number>(1)
+
   const { text, disabled } = useAppSelector((state) => state.narration.input)
+  const { isMobileApp } = useAppContext()
+
   const state = useAppSelector((state) => state)
   const scene = useAppSelector(selectCurrentScene)
   const lastResponse = useAppSelector(selectLastLoadedResponse)
@@ -133,8 +139,25 @@ const InputBox = (): JSX.Element | null => {
     )
   }
 
+  const TextAreaRowCalculator = (value: string) => {
+    if (textAreaRef.current) {
+      const newRows = Math.ceil(
+        value.length /
+          2 /
+          (textAreaRef.current.offsetWidth / textAreaRef.current.cols)
+      )
+      setTextAreaRows(newRows === 0 || value.length === 0 ? 1 : newRows)
+    }
+  }
+
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = e.target
+    !disabled && dispatch(setInputText(value))
+    TextAreaRowCalculator(value)
+  }
+
   return (
-    <div className="InputBox">
+    <div className={`InputBox ${isMobileApp ? 'IsMobileApp' : ''}`}>
       <form
         className={classNames({
           InputBox__form: true,
@@ -145,15 +168,16 @@ const InputBox = (): JSX.Element | null => {
         <textarea
           className="InputBox__input scrollbar"
           value={text}
-          onChange={(e) => !disabled && dispatch(setInputText(e.target.value))}
+          onChange={handleTextAreaChange}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               onSubmit(e)
             }
           }}
           autoComplete="off"
-          rows={1}
+          rows={textAreaRows <= 3 ? textAreaRows : 3}
           placeholder="Type a message..."
+          ref={textAreaRef}
         />
         {interactionsCount ? (
           <button
