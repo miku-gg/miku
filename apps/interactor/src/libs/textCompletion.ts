@@ -1,4 +1,5 @@
 import { ModelType } from '../state/versioning'
+import { _i18n } from './lang/i18n'
 
 function getLastJsonObject(jsonString: string): Record<string, string> {
   // Regular expression to match JSON objects
@@ -10,10 +11,10 @@ function getLastJsonObject(jsonString: string): Record<string, string> {
     try {
       return JSON.parse(matches[matches.length - 1])
     } catch (error) {
-      throw 'Error parsing JSON:'
+      throw _i18n('ERROR_PARSING_JSON') + ' ' + error
     }
   } else {
-    throw 'No JSON objects found'
+    throw _i18n('ERROR_PARSING_JSON')
   }
 }
 
@@ -61,7 +62,7 @@ const textCompletion = async function* ({
       }
     }
   } catch (error) {
-    throw 'Error fetching data:' + error
+    throw _i18n('ERROR_FETCHING_DATA') + error
   }
 }
 

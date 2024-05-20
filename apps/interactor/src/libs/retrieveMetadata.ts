@@ -1,4 +1,7 @@
 import { ModelType } from '../state/versioning'
+
+import { _i18n } from './lang/i18n'
+
 import {
   RoleplayStrategySlug,
   isOfTypeStrategySlug,
@@ -28,7 +31,7 @@ export async function retrieveModelMetadata(
         }
       )
       if (!response.ok || response.status != 200) {
-        throw new Error('Error getting prompt strategy')
+        throw new Error(_i18n('ERROR_GETTING_PROMPT_STRATEGY'))
       }
       const data = await response.json()
       cacheStrategy.set(model, data as ModelMetadata)

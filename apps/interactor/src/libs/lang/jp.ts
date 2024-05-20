@@ -63,6 +63,12 @@ export const LANGUAGE_JP: i18nConfig = {
   ERROR_OBTAINING_2D_CONTEXT: '2Dコンテキストの取得エラー',
   ERROR_MEDIA_SOURCE_API_NOT_SUPPORTED:
     'メディアソースAPIがサポートされていません',
+  ERROR_FETCHING_DATA: 'データの取得エラー',
+  ERROR_PARSING_JSON: 'JSONの解析エラー',
+  ERROR_NO_JSON_OBJECTS_FOUND: 'JSONオブジェクトが見つかりません',
+  ERROR_GETTING_PROMPT_STRATEGY: 'プロンプト戦略の取得エラー',
+  ERROR_UNSUPPORTED_CARD_VERSION: 'サポートされていないカードバージョン',
+  ERROR_INVALID_NOVEL: '無効な小説',
 
   WARNING__PLEASE_LOG_IN: 'ログインしてください',
   ARE_YOU_SURE__DELETE_NODE: 'ノードを削除してもよろしいですか？',

@@ -62,6 +62,12 @@ export const LANGUAGE_EN: i18nConfig = {
   ERROR_OBTAINING_2D_CONTEXT: 'Error obtaining the 2D context of the canvas',
   ERROR_MEDIA_SOURCE_API_NOT_SUPPORTED:
     'MediaSource API is not supported in this browser.',
+  ERROR_FETCHING_DATA: 'Error fetching data',
+  ERROR_PARSING_JSON: 'Error parsing JSON',
+  ERROR_NO_JSON_OBJECTS_FOUND: 'No JSON objects found',
+  ERROR_GETTING_PROMPT_STRATEGY: 'Error getting prompt strategy',
+  ERROR_UNSUPPORTED_CARD_VERSION: 'Unsupported card version',
+  ERROR_INVALID_NOVEL: 'Invalid novel',
 
   WARNING__PLEASE_LOG_IN: 'Please log in to interact.',
   ARE_YOU_SURE__DELETE_NODE: 'Are you sure you want to delete this node?',

@@ -9,6 +9,7 @@ import {
   NovelState as DeprecatedNovelV2,
   NarrationState as DeprecatedNarrationV2,
 } from '../state/versioning/v2.state'
+import { _i18n } from './lang/i18n'
 
 export async function loadNovelFromSingleCard({
   cardId,
@@ -69,8 +70,8 @@ export async function loadNovelFromSingleCard({
         novel.starts = [start]
         /* [END] Add default start if not exists */
       } else if (_card.version !== VersionId) {
-        toast.error('Unsupported card version')
-        throw new Error('Unsupported card version')
+        toast.error(_i18n('ERROR_UNSUPPORTED_CARD_VERSION'))
+        throw new Error(_i18n('ERROR_UNSUPPORTED_CARD_VERSION'))
       } else {
         novel = _card.novel as NovelState
       }
@@ -85,7 +86,7 @@ export async function loadNovelFromSingleCard({
     }
 
     if (!novel) {
-      throw new Error('Invalid novel')
+      throw new Error(_i18n('ERROR_INVALID_NOVEL'))
     }
 
     const assets = new Set<string>()
