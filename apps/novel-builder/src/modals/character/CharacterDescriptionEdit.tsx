@@ -1,4 +1,5 @@
 import {
+  Button,
   DragAndDropImages,
   Input,
   Modal,
@@ -16,10 +17,14 @@ import {
   conversationAgent,
 } from "../../libs/utils";
 import { closeModal, openModal } from "../../state/slices/inputSlice";
-import { updateCharacter } from "../../state/slices/novelFormSlice";
+import {
+  createLorebook,
+  updateCharacter,
+} from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./CharacterDescriptionEdit.scss";
 import { CharacterDescriptionGeneration } from "./CharacterDescriptionGeneration";
+import { CharacterLorebooks } from "./CharacterLorebooks";
 
 const DEFAULT_TAGS = [
   { value: "Male" },
@@ -56,6 +61,9 @@ export default function CharacterDescriptionEdit({
   );
   const GenerateCharacterModal = useAppSelector(
     (state) => state.input.modals.characterGeneration.opened
+  );
+  const lorebooksModal = useAppSelector(
+    (state) => state.input.modals.lorebooks.opened
   );
   if (!character || !characterId) {
     return null;
@@ -403,6 +411,21 @@ export default function CharacterDescriptionEdit({
           }
           className="step1Description__textarea"
         />
+        <Button
+          theme="secondary"
+          onClick={() => {
+            dispatch(openModal({ modalType: "lorebooks" }));
+            dispatch(createLorebook(characterId));
+          }}
+        >
+          Add Lorebooks
+        </Button>
+        <Modal
+          opened={lorebooksModal}
+          onCloseModal={() => dispatch(closeModal({ modalType: "lorebooks" }))}
+        >
+          <CharacterLorebooks characterId={characterId} />
+        </Modal>
       </div>
     </div>
   );

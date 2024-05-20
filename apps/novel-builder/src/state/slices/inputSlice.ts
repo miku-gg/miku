@@ -8,6 +8,7 @@ export type ModalType =
   | "songSearch"
   | "character"
   | "characterGeneration"
+  | "lorebooks"
   | "characterSearch"
   | "loading"
   | "errors"
@@ -56,6 +57,9 @@ const initialState: InputState = {
       opened: false,
     },
     characterGeneration: {
+      opened: false,
+    },
+    lorebooks: {
       opened: false,
     },
     characterSearch: {
