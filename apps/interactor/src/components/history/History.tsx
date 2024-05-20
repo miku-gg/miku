@@ -76,7 +76,7 @@ const HistoryActions = () => {
         }
 
         if (stateJson.version !== V3VersionId) {
-          throw new Error('Narration version mismatch')
+          throw new Error(_i18n('ERROR_NARRATION_VERSION_MISMATCH'))
         }
 
         const params = getCongurationFromParams()
@@ -101,7 +101,7 @@ const HistoryActions = () => {
           })
         )
       } catch (e) {
-        toast.error('Error reading history file')
+        toast.error(_i18n('ERROR_READING_HISTORY_FILE'))
       }
     }
     reader.readAsText(file)

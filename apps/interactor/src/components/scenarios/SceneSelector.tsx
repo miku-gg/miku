@@ -12,6 +12,7 @@ import { toast } from 'react-toastify'
 import { BsStars } from 'react-icons/bs'
 import { trackEvent } from '../../libs/analytics'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
+import { _i18n } from '../../libs/lang/i18n'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
@@ -37,7 +38,7 @@ export default function SceneSelector(): JSX.Element | null {
 
   const handleItemClick = (id: string, prompt: string) => {
     if (isInteractionDisabled) {
-      toast.warn('Please log in to interact.', {
+      toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
         position: 'top-center',
         style: {
           top: 10,
@@ -123,7 +124,7 @@ export default function SceneSelector(): JSX.Element | null {
                 className="SceneSelector__item"
                 onClick={() => {
                   if (isInteractionDisabled) {
-                    toast.warn('Please log in to interact.', {
+                    toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
                       position: 'top-center',
                       style: {
                         top: 10,
@@ -151,7 +152,7 @@ export default function SceneSelector(): JSX.Element | null {
                   className="SceneSelector__item"
                   onClick={() => {
                     if (isInteractionDisabled) {
-                      toast.warn('Please log in to interact.', {
+                      toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
                         position: 'top-center',
                         style: {
                           top: 10,

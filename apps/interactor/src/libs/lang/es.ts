@@ -6,6 +6,8 @@ export const LANGUAGE_ES: i18nConfig = {
   EDIT: 'Editar',
   CONTINUE: 'Continuar',
   REGENERATE: 'Regenerar',
+  DELETE: 'Eliminar',
+  CANCEL: 'Cancelar',
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'Tu navegador no soporta el elemento de audio.',
   THIS_IS_A_PREMIUM_FEATURE: 'Esta es una función premium',
@@ -49,4 +51,23 @@ export const LANGUAGE_ES: i18nConfig = {
 
   NODE_EDITOR__UPDATE_BUTTON_LABEL: 'Actualizar',
   NODE_EDITOR__CANCEL_BUTTON_LABEL: 'Cancelar',
+
+  ERROR_QUERYING_THE_AI: 'Error al consultar la IA',
+  ERROR_UNLOCKING_ACHIEVEMENT: 'Error al desbloquear logro',
+  ERROR_READING_HISTORY_FILE: 'Error al leer el archivo de historial',
+  ERROR_NARRATION_VERSION_MISMATCH: 'Versión de narración no coincide',
+  ERROR_INFERENCE_NOT_FOUND: 'Inferencia no encontrada',
+  ERROR_LOADING_QUOTATION_MARKS: 'Error al cargar las comillas',
+  ERROR_LOADING_BACKGROUND_IMAGE: 'Error al cargar la imagen de fondo',
+  ERROR_LOADING_CHARACTER_IMAGE: 'Error al cargar la imagen del personaje',
+  ERROR_OBTAINING_2D_CONTEXT: 'Error al obtener el contexto 2D del canvas',
+  ERROR_MEDIA_SOURCE_API_NOT_SUPPORTED:
+    'Tu navegador no soporta la API de Media Source',
+
+  WARNING__PLEASE_LOG_IN: 'Por favor inicia sesión para interactuar.',
+  ARE_YOU_SURE__DELETE_NODE: '¿Estás seguro de que quieres eliminar este nodo?',
+
+  RESPONSE_BOX__TYPING_PROMPT: '*Escribiendo...*',
+
+  SHARE_CONVERSATION_BUTTON_TEXT: 'Compartir',
 }

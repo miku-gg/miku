@@ -45,7 +45,7 @@ const InputBox = (): JSX.Element | null => {
 
   const sendMessage = (text: string) => {
     if (isInteractionDisabled) {
-      toast.warn('Please log in to interact.', {
+      toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
         position: 'top-center',
         style: {
           top: 10,
@@ -77,7 +77,7 @@ const InputBox = (): JSX.Element | null => {
     e.stopPropagation()
     e.preventDefault()
     if (isInteractionDisabled) {
-      toast.warn('Please log in to interact.', {
+      toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
         position: 'top-center',
         style: {
           top: 10,

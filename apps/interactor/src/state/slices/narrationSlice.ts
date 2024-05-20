@@ -8,6 +8,7 @@ import {
 import { toast } from 'react-toastify'
 import trim from 'lodash.trim'
 import { NarrationSceneSuggestion } from '../versioning/v3.state'
+import { _i18n } from '../../libs/lang/i18n'
 
 export type {
   NarrationState,
@@ -98,7 +99,7 @@ const narrationSlice = createSlice({
       state.input.disabled = false
       const response = state.responses[state.currentResponseId]
       if (!response?.fetching) return state
-      toast.error(action.payload || 'Error querying the AI')
+      toast.error(action.payload || _i18n('ERROR_QUERYING_THE_AI'))
       const interaction =
         state.interactions[response?.parentInteractionId || '']
       const reponsesId = interaction?.responsesId

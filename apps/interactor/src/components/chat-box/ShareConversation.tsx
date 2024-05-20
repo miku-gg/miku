@@ -13,6 +13,7 @@ import {
   selectLastSelectedCharacter,
 } from '../../state/selectors'
 import { useAppSelector } from '../../state/store'
+import { _i18n } from '../../libs/lang/i18n'
 import './ShareConversation.scss'
 
 interface ImageData {
@@ -33,7 +34,7 @@ const generateImage = async (
     const ctx = canvas.getContext('2d')
 
     if (!ctx) {
-      reject(new Error('Error obtaining the 2D context of the canvas'))
+      reject(new Error(_i18n('ERROR_OBTAINING_2D_CONTEXT')))
       return
     }
 
@@ -171,15 +172,15 @@ const generateImage = async (
           resolve(DataURL)
         }
         quotationMarks.onerror = () => {
-          reject(new Error('Error loading quotation marks'))
+          reject(new Error(_i18n('ERROR_LOADING_QUOTATION_MARKS')))
         }
       }
       character.onerror = () => {
-        reject(new Error('Error loading character image'))
+        reject(new Error(_i18n('ERROR_LOADING_CHARACTER_IMAGE')))
       }
     }
     background.onerror = () => {
-      reject(new Error('Error loading background image'))
+      reject(new Error(_i18n('ERROR_LOADING_BACKGROUND_IMAGE')))
     }
   })
 }
@@ -219,7 +220,7 @@ export const ShareConversation = ({ children }: { children: JSX.Element }) => {
         {/* @ts-ignore */}
         <Selection.Content className="shareConversation">
           <Button theme="gradient" onClick={() => handleShare()}>
-            Share
+            {_i18n('SHARE_CONVERSATION_BUTTON_TEXT')}
             <IoMdShare />
           </Button>
           {/* eslint-disable-next-line */}

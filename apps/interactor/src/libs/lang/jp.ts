@@ -6,6 +6,8 @@ export const LANGUAGE_JP: i18nConfig = {
   EDIT: '編集',
   CONTINUE: '続行',
   REGENERATE: '再生成',
+  DELETE: '削除',
+  CANCEL: 'キャンセル',
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'お使いのブラウザはオーディオ要素をサポートしていません。',
   THIS_IS_A_PREMIUM_FEATURE: 'これはプレミアム機能です',
@@ -49,4 +51,23 @@ export const LANGUAGE_JP: i18nConfig = {
 
   NODE_EDITOR__UPDATE_BUTTON_LABEL: '更新',
   NODE_EDITOR__CANCEL_BUTTON_LABEL: 'キャンセル',
+
+  ERROR_QUERYING_THE_AI: 'AIのクエリエラー',
+  ERROR_UNLOCKING_ACHIEVEMENT: '実績の解除に失敗しました',
+  ERROR_READING_HISTORY_FILE: '履歴ファイルの読み込みエラー',
+  ERROR_NARRATION_VERSION_MISMATCH: 'ナレーションバージョンの不一致',
+  ERROR_INFERENCE_NOT_FOUND: '推論が見つかりません',
+  ERROR_LOADING_QUOTATION_MARKS: '引用符の読み込みエラー',
+  ERROR_LOADING_BACKGROUND_IMAGE: '背景画像の読み込みエラー',
+  ERROR_LOADING_CHARACTER_IMAGE: 'キャラクター画像の読み込みエラー',
+  ERROR_OBTAINING_2D_CONTEXT: '2Dコンテキストの取得エラー',
+  ERROR_MEDIA_SOURCE_API_NOT_SUPPORTED:
+    'メディアソースAPIがサポートされていません',
+
+  WARNING__PLEASE_LOG_IN: 'ログインしてください',
+  ARE_YOU_SURE__DELETE_NODE: 'ノードを削除してもよろしいですか？',
+
+  RESPONSE_BOX__TYPING_PROMPT: '*入力中...*',
+
+  SHARE_CONVERSATION_BUTTON_TEXT: '会話を共有',
 }

@@ -15,6 +15,7 @@ import {
   selectLastLoadedResponse,
 } from '../../state/selectors'
 import { toast } from 'react-toastify'
+import { _i18n } from '../../libs/lang/i18n'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
@@ -111,7 +112,7 @@ export default function Inventory() {
             dispatch(setInventoryVisibility('closed'))
 
             if (isInteractionDisabled) {
-              toast.warn('Please log in to interact.', {
+              toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
                 position: 'top-center',
                 style: {
                   top: 10,

@@ -11,6 +11,7 @@ import { useFillTextTemplate } from '../../libs/hooks'
 import { useAppContext } from '../../App.context'
 import { FaTrash } from 'react-icons/fa'
 import { deleteNode, swipeResponse } from '../../state/slices/narrationSlice'
+import { _i18n } from '../../libs/lang/i18n'
 
 export default memo(({ data }: { data: DialogueNodeData }) => {
   const dispatch = useAppDispatch()
@@ -48,8 +49,9 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
           }
         }
       },
-      title: 'Are you sure you want to delete this node?',
-      yesLabel: 'Delete',
+      title: _i18n('ARE_YOU_SURE__DELETE_NODE'),
+      yesLabel: _i18n('DELETE'),
+      noLabel: _i18n('CANCEL'),
     })
   }
 

@@ -6,6 +6,8 @@ export const LANGUAGE_EN: i18nConfig = {
   EDIT: 'Edit',
   CONTINUE: 'Continue',
   REGENERATE: 'Regenerate',
+  DELETE: 'Delete',
+  CANCEL: 'Cancel',
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'Your browser does not support the audio element.',
   THIS_IS_A_PREMIUM_FEATURE: 'This is a premium feature',
@@ -48,4 +50,23 @@ export const LANGUAGE_EN: i18nConfig = {
 
   NODE_EDITOR__UPDATE_BUTTON_LABEL: 'Update',
   NODE_EDITOR__CANCEL_BUTTON_LABEL: 'Cancel',
+
+  ERROR_QUERYING_THE_AI: 'Error querying the AI',
+  ERROR_UNLOCKING_ACHIEVEMENT: 'Failed to unlock achievement',
+  ERROR_READING_HISTORY_FILE: 'Error reading history file',
+  ERROR_NARRATION_VERSION_MISMATCH: 'Narration version mismatch',
+  ERROR_INFERENCE_NOT_FOUND: 'Inference not found',
+  ERROR_LOADING_QUOTATION_MARKS: 'Error loading quotation marks',
+  ERROR_LOADING_BACKGROUND_IMAGE: 'Error loading background image',
+  ERROR_LOADING_CHARACTER_IMAGE: 'Error loading character image',
+  ERROR_OBTAINING_2D_CONTEXT: 'Error obtaining the 2D context of the canvas',
+  ERROR_MEDIA_SOURCE_API_NOT_SUPPORTED:
+    'MediaSource API is not supported in this browser.',
+
+  WARNING__PLEASE_LOG_IN: 'Please log in to interact.',
+  ARE_YOU_SURE__DELETE_NODE: 'Are you sure you want to delete this node?',
+
+  RESPONSE_BOX__TYPING_PROMPT: '*Typing...*',
+
+  SHARE_CONVERSATION_BUTTON_TEXT: 'Share',
 }

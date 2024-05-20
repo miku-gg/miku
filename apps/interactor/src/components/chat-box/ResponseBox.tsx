@@ -124,7 +124,7 @@ const ResponseBox = (): JSX.Element | null => {
     <div className="ResponseBox">
       <div className="ResponseBox__text" ref={responseDiv}>
         {isLastResponseFetching ? (
-          <TextFormatterStatic text="*Typing...*" />
+          <TextFormatterStatic text={_i18n('RESPONSE_BOX__TYPING_PROMPT')} />
         ) : (
           <TextFormatter
             text={displayText}

@@ -70,7 +70,7 @@ const TTSPlayer2: React.FC = () => {
 
   const inferAudio = useCallback(() => {
     if (!window.MediaSource) {
-      console.error('MediaSource API is not supported in this browser.')
+      console.error(_i18n('ERROR_MEDIA_SOURCE_API_NOT_SUPPORTED'))
       return
     }
 
