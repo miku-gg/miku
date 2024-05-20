@@ -123,15 +123,20 @@ const ResponseBox = (): JSX.Element | null => {
     !!lastReponse?.characters.find((r) => r.characterId === characterId)
       ?.characterId
 
+  const isMobile = isMobileApp || window.innerWidth < 820
+
   return (
-    <div className={`ResponseBox ${isMobileApp ? 'MobileApp' : ''}`}>
+    <div className={`ResponseBox ${isMobile ? 'MobileApp' : ''}`}>
       <button
         className={`ResponseBox__move ${isDraggable ? 'dragging' : ''}`}
         onClick={() => dispatch(setIsDraggable(!isDraggable))}
       >
         <IoIosMove />
       </button>
-      <div className="ResponseBox__text" ref={responseDiv}>
+      <div
+        className={`ResponseBox__text ${isMobile ? 'MobileApp__text' : ''}`}
+        ref={responseDiv}
+      >
         {isLastResponseFetching ? (
           <TextFormatterStatic text="*Typing...*" />
         ) : (

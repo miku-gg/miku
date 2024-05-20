@@ -263,6 +263,10 @@
 
 .MobileApp {
   width: 75%;
+
+  &__text {
+    background: linear-gradient(to top, rgba(#171717, 0.9), rgba(#171717, 0.6));
+  }
 }
 
 @media screen and (max-width: 590px) {
