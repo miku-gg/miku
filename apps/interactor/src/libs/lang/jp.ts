@@ -69,6 +69,7 @@ export const LANGUAGE_JP: i18nConfig = {
   ERROR_GETTING_PROMPT_STRATEGY: 'プロンプト戦略の取得エラー',
   ERROR_UNSUPPORTED_CARD_VERSION: 'サポートされていないカードバージョン',
   ERROR_INVALID_NOVEL: '無効な小説',
+  ERROR_AUTOPLAY: '自動再生エラー',
 
   WARNING__PLEASE_LOG_IN: 'ログインしてください',
   ARE_YOU_SURE__DELETE_NODE: 'ノードを削除してもよろしいですか？',
@@ -76,4 +77,6 @@ export const LANGUAGE_JP: i18nConfig = {
   RESPONSE_BOX__TYPING_PROMPT: '*入力中...*',
 
   SHARE_CONVERSATION_BUTTON_TEXT: '会話を共有',
+
+  INVENTORY: '在庫',
 }

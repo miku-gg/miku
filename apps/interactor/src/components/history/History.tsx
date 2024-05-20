@@ -220,6 +220,7 @@ const HistoryModal = (): ReactElement => {
           const item = getItemByActionPrompt(inventoryItems, interaction.query)
           let query = ''
           if (item) {
+            // TODO: Change to i18n
             query = `The user used the ${item.name} item.`
           } else {
             query = interaction.query.substring(0, 100) || ''

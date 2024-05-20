@@ -8,6 +8,7 @@ import {
   setMusicVolume,
 } from '../../state/slices/settingsSlice'
 import { trackEvent } from '../../libs/analytics'
+import { _i18n } from '../../libs/lang/i18n'
 
 export const Music = () => {
   return (
@@ -82,7 +83,7 @@ const MusicPlayer: React.FC = () => {
   useEffect(() => {
     if (audioRef.current && volume > 0) {
       audioRef.current.play().catch((error) => {
-        console.error('Autoplay error:', error)
+        console.error(_i18n('ERROR_AUTOPLAY'), ': ', error)
       })
     }
   }, [src, volume])

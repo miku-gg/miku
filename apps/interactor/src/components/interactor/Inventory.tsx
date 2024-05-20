@@ -35,7 +35,7 @@ export default function Inventory() {
   return (
     <div className={`Inventory ${showInventory}`}>
       <div className="Inventory__header">
-        <div>Inventory</div>
+        <div>{_i18n('INVENTORY')}</div>
 
         <button
           onClick={() => {

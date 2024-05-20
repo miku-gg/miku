@@ -69,6 +69,7 @@ export const LANGUAGE_ES: i18nConfig = {
   ERROR_GETTING_PROMPT_STRATEGY: 'Error al obtener la estrategia de prompt',
   ERROR_UNSUPPORTED_CARD_VERSION: 'Versión de tarjeta no soportada',
   ERROR_INVALID_NOVEL: 'Novela inválida',
+  ERROR_AUTOPLAY: 'Error de reproducción automática',
 
   WARNING__PLEASE_LOG_IN: 'Por favor inicia sesión para interactuar.',
   ARE_YOU_SURE__DELETE_NODE: '¿Estás seguro de que quieres eliminar este nodo?',
@@ -76,4 +77,6 @@ export const LANGUAGE_ES: i18nConfig = {
   RESPONSE_BOX__TYPING_PROMPT: '*Escribiendo...*',
 
   SHARE_CONVERSATION_BUTTON_TEXT: 'Compartir',
+
+  INVENTORY: 'Inventario',
 }
