@@ -87,7 +87,11 @@ export default function SceneSelector(): JSX.Element | null {
         }}
       >
         <div className="SceneSelector__list-container">
-          <h2>{createSceneOpened ? 'Create Scene' : 'Change Scene'}</h2>
+          <h2>
+            {createSceneOpened
+              ? _i18n('SCENE_SELECTOR_CREATE_SCENE')
+              : _i18n('SCENE_SELECTOR_CHANGE_SCENE')}
+          </h2>
           {createSceneOpened ? (
             <CreateScene />
           ) : (
@@ -145,7 +149,9 @@ export default function SceneSelector(): JSX.Element | null {
                   className="SceneSelector__item-background"
                   style={{ backgroundColor: 'gray' }}
                 />
-                <div className="SceneSelector__item-text">Create new scene</div>
+                <div className="SceneSelector__item-text">
+                  {_i18n('SCENE_SELECTOR_CREATE_NEW_SCENE')}
+                </div>
               </button>
               {!isMobileApp && (
                 <button
@@ -178,7 +184,7 @@ export default function SceneSelector(): JSX.Element | null {
                     <StarsEffect />
                   </div>
                   <div className="SceneSelector__item-text">
-                    Generate Scene <BsStars />
+                    {_i18n('SCENE_SELECTOR_GENERATE_SCENE')} <BsStars />
                   </div>
                 </button>
               )}

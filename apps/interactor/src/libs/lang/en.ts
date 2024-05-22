@@ -8,6 +8,8 @@ export const LANGUAGE_EN: i18nConfig = {
   REGENERATE: 'Regenerate',
   DELETE: 'Delete',
   CANCEL: 'Cancel',
+  UPGRADE: 'Upgrade',
+  GENERATE: 'Generate',
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'Your browser does not support the audio element.',
   THIS_IS_A_PREMIUM_FEATURE: 'This is a premium feature',
@@ -78,4 +80,22 @@ export const LANGUAGE_EN: i18nConfig = {
   SHARE_CONVERSATION_BUTTON_TEXT: 'Share',
 
   INVENTORY: 'Inventory',
+  INVENTORY_PREMIUM_ITEM: 'This is a premium-only item',
+
+  SCENE_SELECTOR_CREATE_SCENE: 'Create Scene',
+  SCENE_SELECTOR_CHANGE_SCENE: 'Change Scene',
+  SCENE_SELECTOR_GENERATE_SCENE: 'Generate Scene',
+  SCENE_SELECTOR_CREATE_NEW_SCENE: 'Create new scene',
+
+  SCENE_SUGGESTION_GENERATE_NEXT_SCENE: 'Generate next scene',
+  SCENE_SUGGESTION_GO_TO_NEXT_SCENE: 'Go to next scene',
+
+  SCENE_SUGGESTIONS_MODAL: 'Scene Suggestions',
+  SCENE_SUGGESTIONS_MODAL_SCENE_GENERATIONS_LEFT:
+    'Scene generations left today.',
+  SCENE_SUGGESTIONS_MODAL_DESCRIBE_SCENE:
+    'or describe the new scene in your own words',
+  SCENE_SUGGESTIONS_MODAL_SUGGEST_SCENES_BUTTON: 'Suggest 3 scenes',
+  SCENE_SUGGESTIONS_MODAL_GENERATING_SCENE: 'Generating scene...',
+  SCENE_SUGGESTIONS_MODAL_FETCHING_SUGGESTIONS: 'Fetching suggestions...',
 }

@@ -161,7 +161,7 @@ const InputBox = (): JSX.Element | null => {
           <button
             className="InputBox__inventory"
             data-tooltip-id="inventory-tooltip"
-            data-tooltip-content="Inventory"
+            data-tooltip-content={_i18n('INVENTORY')}
             data-tooltip-varaint="light"
             disabled={disabled}
             onClick={onInventory}

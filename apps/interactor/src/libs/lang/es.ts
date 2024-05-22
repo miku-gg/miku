@@ -8,6 +8,8 @@ export const LANGUAGE_ES: i18nConfig = {
   REGENERATE: 'Regenerar',
   DELETE: 'Eliminar',
   CANCEL: 'Cancelar',
+  UPGRADE: 'Mejorar',
+  GENERATE: 'Generar',
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'Tu navegador no soporta el elemento de audio.',
   THIS_IS_A_PREMIUM_FEATURE: 'Esta es una función premium',
@@ -79,4 +81,22 @@ export const LANGUAGE_ES: i18nConfig = {
   SHARE_CONVERSATION_BUTTON_TEXT: 'Compartir',
 
   INVENTORY: 'Inventario',
+  INVENTORY_PREMIUM_ITEM: 'Este es un artículo solo para premium',
+
+  SCENE_SELECTOR_CREATE_SCENE: 'Crear Escena',
+  SCENE_SELECTOR_CHANGE_SCENE: 'Cambiar Escena',
+  SCENE_SELECTOR_GENERATE_SCENE: 'Generar Escena',
+  SCENE_SELECTOR_CREATE_NEW_SCENE: 'Crear nueva escena',
+
+  SCENE_SUGGESTION_GENERATE_NEXT_SCENE: 'Generar siguiente escena',
+  SCENE_SUGGESTION_GO_TO_NEXT_SCENE: 'Ir a la siguiente escena',
+
+  SCENE_SUGGESTIONS_MODAL: 'Sugerencias de escena',
+  SCENE_SUGGESTIONS_MODAL_SCENE_GENERATIONS_LEFT:
+    'Generaciones de escena restantes hoy.',
+  SCENE_SUGGESTIONS_MODAL_DESCRIBE_SCENE:
+    'o describe la nueva escena con tus propias palabras',
+  SCENE_SUGGESTIONS_MODAL_SUGGEST_SCENES_BUTTON: 'Sugerir 3 escenas',
+  SCENE_SUGGESTIONS_MODAL_GENERATING_SCENE: 'Generando escena...',
+  SCENE_SUGGESTIONS_MODAL_FETCHING_SUGGESTIONS: 'Obteniendo sugerencias...',
 }

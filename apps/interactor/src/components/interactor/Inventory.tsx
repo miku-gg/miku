@@ -78,7 +78,7 @@ export default function Inventory() {
                 data-tooltip-id={disabled ? 'premium-item-invetory' : undefined}
                 data-tooltip-varaint="light"
                 data-tooltip-content={
-                  disabled ? 'This is a premium-only item' : undefined
+                  disabled ? _i18n('INVENTORY_PREMIUM_ITEM') : undefined
                 }
               >
                 <img
