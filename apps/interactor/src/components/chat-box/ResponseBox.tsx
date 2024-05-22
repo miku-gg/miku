@@ -159,75 +159,82 @@ const ResponseBox = (): JSX.Element | null => {
           />
         )}
       </div>
-      {(scene?.characters.length || 0) > 1 ? (
-        <div className="ResponseBox__characters">
-          {[
-            ...(lastReponse?.characters.map((c) => c.characterId) || []),
-            ...(scene?.characters
-              .filter(({ characterId }) => !isCharacterGenerated(characterId))
-              .map((c) => c.characterId) || []),
-          ]
-            .filter(
-              (characterId) =>
-                !!characters.find((c) => c.id === characterId) &&
-                !!characters.find((c) => c.id === characterId)?.profile_pic
-            )
-            .map((characterId) => {
-              const character = characters.find((c) => c.id === characterId)
-              const isGenerated = isCharacterGenerated(characterId)
-              return (
-                <div
-                  className={classNames({
-                    ResponseBox__character: true,
-                    generated: isGenerated,
-                    selected: displayCharacter?.id === characterId,
-                  })}
-                  key={`response-character-${characterId}`}
-                >
-                  <button
-                    className="ResponseBox__character-button"
-                    onClick={() =>
-                      dispatch(
-                        isGenerated
-                          ? selectCharacterOfResponse({
-                              responseId: lastReponse?.id || '',
-                              characterId,
-                            })
-                          : characterResponseStart({
-                              apiEndpoint,
-                              servicesEndpoint,
-                              characterId,
-                            })
-                      )
-                    }
-                    disabled={disabled}
-                  >
-                    <img src={assetLinkLoader(character?.profile_pic || '')} />
-                  </button>
-                </div>
-              )
-            })}
-        </div>
-      ) : null}
+
       <div className="ResponseBox__actions">
-        {!disabled ? <TTSPlayer /> : null}
-        {!disabled &&
-        lastReponse?.parentInteractionId &&
-        (swipes?.length || 0) < 8 ? (
-          <button
-            className="ResponseBox__regenerate"
-            onClick={handleRegenerateClick}
-          >
-            <FaDice />
-            <span>Regenerate</span>
-          </button>
+        {/* The next empty div is used for center the two character buttons */}
+        <div></div>
+        {(scene?.characters.length || 0) > 1 ? (
+          <div className="ResponseBox__characters">
+            {[
+              ...(lastReponse?.characters.map((c) => c.characterId) || []),
+              ...(scene?.characters
+                .filter(({ characterId }) => !isCharacterGenerated(characterId))
+                .map((c) => c.characterId) || []),
+            ]
+              .filter(
+                (characterId) =>
+                  !!characters.find((c) => c.id === characterId) &&
+                  !!characters.find((c) => c.id === characterId)?.profile_pic
+              )
+              .map((characterId) => {
+                const character = characters.find((c) => c.id === characterId)
+                const isGenerated = isCharacterGenerated(characterId)
+                return (
+                  <div
+                    className={classNames({
+                      ResponseBox__character: true,
+                      generated: isGenerated,
+                      selected: displayCharacter?.id === characterId,
+                    })}
+                    key={`response-character-${characterId}`}
+                  >
+                    <button
+                      className="ResponseBox__character-button"
+                      onClick={() =>
+                        dispatch(
+                          isGenerated
+                            ? selectCharacterOfResponse({
+                                responseId: lastReponse?.id || '',
+                                characterId,
+                              })
+                            : characterResponseStart({
+                                apiEndpoint,
+                                servicesEndpoint,
+                                characterId,
+                              })
+                        )
+                      }
+                      disabled={disabled}
+                    >
+                      <img
+                        src={assetLinkLoader(character?.profile_pic || '')}
+                      />
+                    </button>
+                  </div>
+                )
+              })}
+          </div>
         ) : null}
-        {!disabled && !isInteractionDisabled ? (
-          <button className="ResponseBox__edit" onClick={handleEditClick}>
-            <FaPencil />
-            <span>Edit</span>
-          </button>
-        ) : null}
+        <div>
+          {!disabled ? <TTSPlayer /> : null}
+          {!disabled &&
+          lastReponse?.parentInteractionId &&
+          (swipes?.length || 0) < 8 ? (
+            <button
+              className="ResponseBox__regenerate"
+              onClick={handleRegenerateClick}
+            >
+              <FaDice />
+              <span>Regenerate</span>
+            </button>
+          ) : null}
+          {!disabled && !isInteractionDisabled ? (
+            <button className="ResponseBox__edit" onClick={handleEditClick}>
+              <FaPencil />
+              <span>Edit</span>
+            </button>
+          ) : null}
+        </div>
       </div>
       {!disabled && (swipes?.length || 0) > 1 ? (
         <div className="ResponseBox__swipes">
