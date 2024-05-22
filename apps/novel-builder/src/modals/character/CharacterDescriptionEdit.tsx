@@ -19,6 +19,7 @@ import {
 import { closeModal, openModal } from "../../state/slices/inputSlice";
 import {
   createLorebook,
+  deleteLorebook,
   updateCharacter,
 } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
@@ -61,9 +62,6 @@ export default function CharacterDescriptionEdit({
   );
   const GenerateCharacterModal = useAppSelector(
     (state) => state.input.modals.characterGeneration.opened
-  );
-  const lorebooksModal = useAppSelector(
-    (state) => state.input.modals.lorebooks.opened
   );
   if (!character || !characterId) {
     return null;
@@ -411,21 +409,27 @@ export default function CharacterDescriptionEdit({
           }
           className="step1Description__textarea"
         />
-        <Button
-          theme="secondary"
-          onClick={() => {
-            dispatch(openModal({ modalType: "lorebooks" }));
-            dispatch(createLorebook(characterId));
-          }}
-        >
-          Add Lorebooks
-        </Button>
-        <Modal
-          opened={lorebooksModal}
-          onCloseModal={() => dispatch(closeModal({ modalType: "lorebooks" }))}
-        >
+      </div>
+      <div className="CharacterDescriptionEdit__lorebooks">
+        <div className="CharacterDescriptionEdit__lorebooks__input">
+          <label className="Input__label">Lorebook</label>
+
+          <Button
+            theme={!character.lorebook ? "secondary" : "primary"}
+            onClick={() => {
+              if (!character.lorebook) {
+                dispatch(createLorebook(characterId));
+              } else {
+                dispatch(deleteLorebook({ characterId }));
+              }
+            }}
+          >
+            {character.lorebook ? "Delete" : "Add"} Lorebook
+          </Button>
+        </div>
+        {!!character.lorebook && (
           <CharacterLorebooks characterId={characterId} />
-        </Modal>
+        )}
       </div>
     </div>
   );

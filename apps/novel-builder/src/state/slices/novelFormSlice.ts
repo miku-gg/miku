@@ -264,9 +264,9 @@ const novelFormSlice = createSlice({
       if (!character) return;
       character.lorebook = action.payload.lorebook;
     },
-    deleteLorebook: (state, action: PayloadAction<{ characterID: string }>) => {
+    deleteLorebook: (state, action: PayloadAction<{ characterId: string }>) => {
       const character = state.characters.find(
-        (char) => char.id === action.payload.characterID
+        (char) => char.id === action.payload.characterId
       );
       if (!character) return;
       character.lorebook = undefined;
@@ -278,6 +278,7 @@ const novelFormSlice = createSlice({
       if (!character || !character.lorebook) return;
       character.lorebook.entries.push({
         keys: [],
+        name: `Entry ${character.lorebook.entries.length + 1}`,
         content: "",
         extensions: {},
         enabled: false,
