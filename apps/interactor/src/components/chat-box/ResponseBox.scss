@@ -62,13 +62,14 @@
       color: rgba(225, 138, 36, 1);
     }
   }
-
   &__actions {
     opacity: 0;
     transition: all 0.2s ease-out;
+    width: 100%;
     position: absolute;
+    justify-content: space-between;
     top: -2.2em;
-    right: 1rem;
+    padding-right: 1rem;
     display: flex;
     gap: 0.5rem;
   }
@@ -204,20 +205,13 @@
   }
 
   &__characters {
-    position: absolute;
-    top: -43px;
-    margin: 0 auto;
-    margin-left: -32px;
     display: inline-flex;
     justify-content: center;
     z-index: 0;
     gap: 5px;
-    // background-color: rgba(#171717, 0.6);
-    // border-top-right-radius: 8px;
-    // border-top-left-radius: 8px;
-    align-items: center;
-    padding: 0 5px;
-    padding-top: 5px;
+    // The next two lines is for center it exactly in the middle
+    margin-top: -3px;
+    margin-left: 80px;
   }
 
   &__character {
