@@ -282,7 +282,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     responsePrefix: string
   }) {
     return (
-      `\n${instructionPrefix}OOC: In the current roleplay, has the thing happened?: ${condition}` +
+      `\n${instructionPrefix}OOC: In the current roleplay, has the following thing happened?: ${condition}` +
       `\nAnswer with Yes or No` +
       `\n${responsePrefix}Based on the last two messages, the answer is:{{SEL cond options=cond_opt}}`
     )
