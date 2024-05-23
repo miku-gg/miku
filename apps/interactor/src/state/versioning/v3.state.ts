@@ -50,6 +50,7 @@ export interface NarrationState {
     text: string
     suggestions: string[]
     disabled: boolean
+    lorebookEntryContent?: string
   }
   interactions: {
     [id: string]: NarrationInteraction | undefined

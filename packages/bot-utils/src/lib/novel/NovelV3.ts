@@ -1,13 +1,13 @@
 import {
   CharacterBook,
   EmotionTemplateSlug,
-  MikuCardV2
+  MikuCardV2,
 } from "../MikuCardValidator";
 
 export enum NovelNSFW {
   NONE = 0,
   NUDITY = 1,
-  EXPLICIT = 2
+  EXPLICIT = 2,
 }
 
 export interface NovelStart {
@@ -66,6 +66,7 @@ export interface NovelCharacter {
   tags: string[];
   card: MikuCardV2;
   nsfw: NovelNSFW;
+  lorebook?: CharacterBook;
 }
 
 export interface NovelBackground {
@@ -125,7 +126,7 @@ export enum NovelObjectiveActionType {
   SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
   SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
   ACHIEVEMENT_UNLOCK = "ACHIEVEMENT_UNLOCK",
-  ITEM_RECEIVE = "ITEM_RECEIVE"
+  ITEM_RECEIVE = "ITEM_RECEIVE",
 }
 
 export type NovelObjectiveAction =

@@ -7,6 +7,7 @@ import {
 } from '../../state/selectors'
 import {
   interactionStart,
+  setEntryContent,
   setInputText,
   setSuggestions,
 } from '../../state/slices/narrationSlice'
@@ -35,6 +36,44 @@ const InputBox = (): JSX.Element | null => {
   const { text, disabled } = useAppSelector((state) => state.narration.input)
   const { isMobileApp } = useAppContext()
 
+  const lorebooks = useAppSelector((state) =>
+    state.novel.characters.map((char) => {
+      return char.lorebook
+    })
+  )
+
+  const getEntryContent = () => {
+    const lorebookKeys = lorebooks
+      .map((lorebook) => {
+        let keys: string[] = []
+        lorebook?.entries.map((entry) =>
+          entry.keys.map((key) => keys.push(key))
+        )
+        return keys
+      })
+      .flat()
+
+    const textArray = text.split(' ')
+
+    const key = textArray.find((word) => lorebookKeys.includes(word))
+    if (key) {
+      const entryContent = lorebooks
+        .find((lorebook) =>
+          lorebook?.entries.find((entry) => entry.keys.includes(key))
+        )
+        ?.entries.find((entry) => entry.keys.includes(key))?.content
+
+      if (entryContent) {
+        dispatch(setEntryContent(entryContent))
+      } else {
+        dispatch(setEntryContent(''))
+        return
+      }
+    } else {
+      return
+    }
+  }
+
   const state = useAppSelector((state) => state)
   const scene = useAppSelector(selectCurrentScene)
   const lastResponse = useAppSelector(selectLastLoadedResponse)
@@ -57,6 +96,7 @@ const InputBox = (): JSX.Element | null => {
       })
       return
     }
+    getEntryContent()
     dispatch(
       interactionStart({
         text,
