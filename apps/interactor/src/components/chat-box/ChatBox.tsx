@@ -20,8 +20,6 @@ const ChatBox = (): JSX.Element | null => {
       </div>
     )
   } else {
-    console.log('disable resizeing')
-    console.log(!isDraggable || isMobileApp)
     return (
       <div className="ChatBox">
         {/* eslint-disable-next-line  */}
