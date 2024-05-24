@@ -88,7 +88,7 @@ const HistoryActions = () => {
             inventory: {
               ...initialInventoryState,
               ...(stateJson.inventory || {}),
-              items: stateJson.inventory.items || [...DEFAULT_INVENTORY],
+              items: stateJson.inventory?.items || [...DEFAULT_INVENTORY],
             },
             creation: initialCreationState,
             settings: mergeWith(
