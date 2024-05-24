@@ -127,12 +127,15 @@ const ResponseBox = (): JSX.Element | null => {
 
   return (
     <div className={`ResponseBox ${isMobile ? 'MobileApp' : ''}`}>
-      <button
-        className={`ResponseBox__move ${isDraggable ? 'dragging' : ''}`}
-        onClick={() => dispatch(setIsDraggable(!isDraggable))}
-      >
-        <IoIosMove />
-      </button>
+      {!isMobile ? (
+        <button
+          className={`ResponseBox__move ${isDraggable ? 'dragging' : ''}`}
+          onClick={() => dispatch(setIsDraggable(!isDraggable))}
+        >
+          <IoIosMove />
+        </button>
+      ) : null}
+
       <div
         className={`ResponseBox__text ${isMobile ? 'MobileApp__text' : ''}`}
         ref={responseDiv}
