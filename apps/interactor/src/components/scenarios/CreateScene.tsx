@@ -278,6 +278,28 @@ const CreateScene = () => {
         <div className="CreateScene__music">
           <div className="CreateScene__music__title">{_i18n('MUSIC')}</div>
           <MusicSelector
+            modalTitle={_i18n('CREATE_SCENE__MUSIC_SELECTOR__MODAL_TITLE')}
+            playButtonText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__PLAY_BUTTON_TEXT'
+            )}
+            selectButtonText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__SELECT_BUTTON_TEXT'
+            )}
+            noMusicSelectedText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__NO_MUSIC_SELECTED_TEXT'
+            )}
+            changeButtonText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__CHANGE_BUTTON_TEXT'
+            )}
+            clearButtonText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__CLEAR_BUTTON_TEXT'
+            )}
+            customMusicText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__CUSTOM_MUSIC_TEXT'
+            )}
+            fileSizeLimitExceededText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__FILE_SIZE_LIMIT_EXCEEDED_TEXT'
+            )}
             musicList={musicList.map((m) => ({
               name: m.name,
               source: assetLinkLoader(m.source),
@@ -303,7 +325,7 @@ const CreateScene = () => {
             {_i18n('CREATE_SCENE__SCENE_PROMPT')}
           </div>
           <Input
-            placeHolder="*{{user}} and Hina head to the swimming pool to have fun. It's a hot summer day but there's no people there.*"
+            placeHolder={_i18n('CREATE_SCENE__SCENE_PROMPT_PLACEHOLDER')}
             isTextArea
             value={prompt}
             onChange={(e) => dispatch(setPromptValue(e.target.value))}

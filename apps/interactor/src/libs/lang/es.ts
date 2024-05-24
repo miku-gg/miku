@@ -125,4 +125,18 @@ export const LANGUAGE_ES: i18nConfig = {
   CREATE_SCENE__SELECT_BACKGROUND: 'Seleccionar fondo',
   CREATE_SCENE__SEARCH_BACKGROUND: 'Buscar fondo',
   CREATE_SCENE__SEARCH_CHARACTERS: 'Buscar personajes',
+  CREATE_SCENE__SCENE_PROMPT_PLACEHOLDER:
+    '*{{user}} y Hina van a la piscina para divertirse. Es un día caluroso de verano pero no hay gente.*',
+
+  CREATE_SCENE__MUSIC_SELECTOR__MODAL_TITLE: 'Seleccionar música',
+  CREATE_SCENE__MUSIC_SELECTOR__PLAY_BUTTON_TEXT: 'Reproducir',
+  CREATE_SCENE__MUSIC_SELECTOR__SELECT_BUTTON_TEXT: 'Seleccionar',
+  CREATE_SCENE__MUSIC_SELECTOR__NO_MUSIC_SELECTED_TEXT:
+    'Ninguna música seleccionada',
+  CREATE_SCENE__MUSIC_SELECTOR__CHANGE_BUTTON_TEXT: 'Cambiar',
+  CREATE_SCENE__MUSIC_SELECTOR__CLEAR_BUTTON_TEXT: 'Limpiar',
+  CREATE_SCENE__MUSIC_SELECTOR__CUSTOM_MUSIC_TEXT:
+    'Música personalizada desde archivo',
+  CREATE_SCENE__MUSIC_SELECTOR__FILE_SIZE_LIMIT_EXCEEDED_TEXT:
+    'Tamaño de archivo excedido',
 }
