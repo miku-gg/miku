@@ -10,6 +10,10 @@ export const LANGUAGE_JP: i18nConfig = {
   CANCEL: 'キャンセル',
   UPGRADE: 'アップグレード',
   GENERATE: '生成',
+  BACKGROUND: '背景',
+  CHARACTERS: 'キャラクター',
+  MUSIC: '音楽',
+
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'お使いのブラウザはオーディオ要素をサポートしていません。',
   THIS_IS_A_PREMIUM_FEATURE: 'これはプレミアム機能です',
@@ -98,4 +102,7 @@ export const LANGUAGE_JP: i18nConfig = {
   SCENE_SUGGESTIONS_MODAL_SUGGEST_SCENES_BUTTON: '3つのシーンを提案',
   SCENE_SUGGESTIONS_MODAL_GENERATING_SCENE: 'シーンを生成しています...',
   SCENE_SUGGESTIONS_MODAL_FETCHING_SUGGESTIONS: '提案を取得しています...',
+
+  CREATE_SCENE_SCENE_PROMPT: 'シーンのプロンプト',
+  CREATE_SCENE_SCENE_TITLE: 'シーンのタイトル',
 }

@@ -10,6 +10,10 @@ export const LANGUAGE_ES: i18nConfig = {
   CANCEL: 'Cancelar',
   UPGRADE: 'Mejorar',
   GENERATE: 'Generar',
+  BACKGROUND: 'Fondo',
+  CHARACTERS: 'Personajes',
+  MUSIC: 'Música',
+
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'Tu navegador no soporta el elemento de audio.',
   THIS_IS_A_PREMIUM_FEATURE: 'Esta es una función premium',
@@ -99,4 +103,7 @@ export const LANGUAGE_ES: i18nConfig = {
   SCENE_SUGGESTIONS_MODAL_SUGGEST_SCENES_BUTTON: 'Sugerir 3 escenas',
   SCENE_SUGGESTIONS_MODAL_GENERATING_SCENE: 'Generando escena...',
   SCENE_SUGGESTIONS_MODAL_FETCHING_SUGGESTIONS: 'Obteniendo sugerencias...',
+
+  CREATE_SCENE_SCENE_PROMPT: 'Prompt de Escenario',
+  CREATE_SCENE_SCENE_TITLE: 'Título de Escenario',
 }

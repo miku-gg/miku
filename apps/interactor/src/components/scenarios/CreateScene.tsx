@@ -49,6 +49,7 @@ import { userDataFetchStart } from '../../state/slices/settingsSlice'
 import CreditsDisplayer from './CreditsDisplayer'
 import { selectCurrentScene } from '../../state/selectors'
 import { trackEvent } from '../../libs/analytics'
+import { _i18n } from '../../libs/lang/i18n'
 
 const selectSelectableCharacters = createSelector(
   [
@@ -217,7 +218,9 @@ const CreateScene = () => {
     <div className="CreateScene">
       <div className="CreateScene__form">
         <div className="CreateScene__background">
-          <div className="CreateScene__background__title">Background</div>
+          <div className="CreateScene__background__title">
+            {_i18n('BACKGROUND')}
+          </div>
           <button
             className="CreateScene__background__button"
             style={{
@@ -242,7 +245,9 @@ const CreateScene = () => {
           </button>
         </div>
         <div className="CreateScene__characters">
-          <div className="CreateScene__characters__title">Characters</div>
+          <div className="CreateScene__characters__title">
+            {_i18n('CHARACTERS')}
+          </div>
           <div className="CreateScene__characters__list scrollbar">
             {charactersSelected.map(({ id, outfit }, index) => {
               const character = characters.find((c) => c?.id === id)
@@ -269,7 +274,7 @@ const CreateScene = () => {
           </div>
         </div>
         <div className="CreateScene__music">
-          <div className="CreateScene__music__title">Music</div>
+          <div className="CreateScene__music__title">{_i18n('MUSIC')}</div>
           <MusicSelector
             musicList={musicList.map((m) => ({
               name: m.name,
@@ -292,7 +297,9 @@ const CreateScene = () => {
           />
         </div>
         <div className="CreateScene__prompt">
-          <div className="CreateScene__prompt__title">Scene prompt</div>
+          <div className="CreateScene__prompt__title">
+            {_i18n('CREATE_SCENE_SCENE_PROMPT')}
+          </div>
           <Input
             placeHolder="*{{user}} and Hina head to the swimming pool to have fun. It's a hot summer day but there's no people there.*"
             isTextArea
@@ -301,7 +308,9 @@ const CreateScene = () => {
           />
         </div>
         <div className="CreateScene__prompt">
-          <div className="CreateScene__prompt__title">Scene title</div>
+          <div className="CreateScene__prompt__title">
+            {_i18n('CREATE_SCENE_SCENE_TITLE')}
+          </div>
           <Input
             placeHolder="Go to the pool"
             value={title}

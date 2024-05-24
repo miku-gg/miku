@@ -10,6 +10,10 @@ export const LANGUAGE_EN: i18nConfig = {
   CANCEL: 'Cancel',
   UPGRADE: 'Upgrade',
   GENERATE: 'Generate',
+  BACKGROUND: 'Background',
+  CHARACTERS: 'Characters',
+  MUSIC: 'Music',
+
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'Your browser does not support the audio element.',
   THIS_IS_A_PREMIUM_FEATURE: 'This is a premium feature',
@@ -98,4 +102,7 @@ export const LANGUAGE_EN: i18nConfig = {
   SCENE_SUGGESTIONS_MODAL_SUGGEST_SCENES_BUTTON: 'Suggest 3 scenes',
   SCENE_SUGGESTIONS_MODAL_GENERATING_SCENE: 'Generating scene...',
   SCENE_SUGGESTIONS_MODAL_FETCHING_SUGGESTIONS: 'Fetching suggestions...',
+
+  CREATE_SCENE_SCENE_PROMPT: 'Scene Prompt',
+  CREATE_SCENE_SCENE_TITLE: 'Scene Title',
 }
