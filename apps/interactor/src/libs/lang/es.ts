@@ -13,6 +13,10 @@ export const LANGUAGE_ES: i18nConfig = {
   BACKGROUND: 'Fondo',
   CHARACTERS: 'Personajes',
   MUSIC: 'Música',
+  LOAD_MORE: 'Cargar más',
+  EMPTY: 'Vacío',
+  SEARCH: 'Buscar',
+  SELECT: 'Seleccionar',
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'Tu navegador no soporta el elemento de audio.',
   THIS_IS_A_PREMIUM_FEATURE: 'Esta es una función premium',
@@ -75,6 +79,12 @@ export const LANGUAGE_ES: i18nConfig = {
   ERROR__UNSUPPORTED_CARD_VERSION: 'Versión de tarjeta no soportada',
   ERROR__INVALID_NOVEL: 'Novela inválida',
   ERROR__AUTOPLAY: 'Error de reproducción automática',
+  ERROR__SELECT_AT_LEAST_ONE_CHARACTER: 'Selecciona al menos un personaje',
+  ERROR__SELECT_A_BACKGROUND: 'Necesitas seleccionar un fondo',
+  ERROR__WRITE_A_PROMPT: 'Necesitas escribir un prompt',
+  ERROR__UPLOADING_BACKGROUND: 'Error al subir el fondo',
+  ERROR__SEARCHING: 'Error al buscar',
+  ERROR__UPLOADING_IMAGE: 'Error al subir la imagen',
 
   WARNING__PLEASE_LOG_IN: 'Por favor inicia sesión para interactuar.',
   ARE_YOU_SURE__DELETE_NODE: '¿Estás seguro de que quieres eliminar este nodo?',
@@ -105,4 +115,14 @@ export const LANGUAGE_ES: i18nConfig = {
 
   CREATE_SCENE__SCENE_PROMPT: 'Prompt de Escenario',
   CREATE_SCENE__SCENE_TITLE: 'Título de Escenario',
+  CREATE_SCENE__SCENE_TITLE_PLACEHOLDER: 'Ir a la piscina',
+  CREATE_SCENE__START_SCENE_BUTTON_TEXT: 'Iniciar Escena',
+  CREATE_SCENE__SELECT_A_BACKGROUND: 'Selecciona un fondo',
+  CREATE_SCENE__UPLOAD_BACKGROUND: 'Subir fondo',
+  CREATE_SCENE__SELECT_A_CHARACTER: 'Selecciona un personaje',
+  CREATE_SCENE__GENERATE_A_BACKGROUND: 'Generar un fondo',
+  CREATE_SCENE__GENERATE_BACKGROUND: 'Generar fondo',
+  CREATE_SCENE__SELECT_BACKGROUND: 'Seleccionar fondo',
+  CREATE_SCENE__SEARCH_BACKGROUND: 'Buscar fondo',
+  CREATE_SCENE__SEARCH_CHARACTERS: 'Buscar personajes',
 }

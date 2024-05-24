@@ -13,6 +13,10 @@ export const LANGUAGE_JP: i18nConfig = {
   BACKGROUND: '背景',
   CHARACTERS: 'キャラクター',
   MUSIC: '音楽',
+  LOAD_MORE: 'さらに読み込む',
+  EMPTY: '空',
+  SEARCH: '検索',
+  SELECT: '選択',
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'お使いのブラウザはオーディオ要素をサポートしていません。',
   THIS_IS_A_PREMIUM_FEATURE: 'これはプレミアム機能です',
@@ -75,6 +79,13 @@ export const LANGUAGE_JP: i18nConfig = {
   ERROR__UNSUPPORTED_CARD_VERSION: 'サポートされていないカードバージョン',
   ERROR__INVALID_NOVEL: '無効な小説',
   ERROR__AUTOPLAY: '自動再生エラー',
+  ERROR__SELECT_AT_LEAST_ONE_CHARACTER:
+    '少なくとも1人のキャラクターを選択してください',
+  ERROR__SELECT_A_BACKGROUND: '背景を選択してください',
+  ERROR__WRITE_A_PROMPT: 'プロンプトを書いてください',
+  ERROR__UPLOADING_BACKGROUND: '背景のアップロードエラー',
+  ERROR__SEARCHING: '検索エラー',
+  ERROR__UPLOADING_IMAGE: '画像のアップロードエラー',
 
   WARNING__PLEASE_LOG_IN: 'ログインしてください',
   ARE_YOU_SURE__DELETE_NODE: 'ノードを削除してもよろしいですか？',
@@ -104,4 +115,14 @@ export const LANGUAGE_JP: i18nConfig = {
 
   CREATE_SCENE__SCENE_PROMPT: 'シーンのプロンプト',
   CREATE_SCENE__SCENE_TITLE: 'シーンのタイトル',
+  CREATE_SCENE__SCENE_TITLE_PLACEHOLDER: 'シーンのタイトルを入力してください',
+  CREATE_SCENE__START_SCENE_BUTTON_TEXT: 'シーンを開始',
+  CREATE_SCENE__SELECT_A_BACKGROUND: '背景を選択してください',
+  CREATE_SCENE__UPLOAD_BACKGROUND: '背景をアップロード',
+  CREATE_SCENE__SELECT_A_CHARACTER: 'キャラクターを選択してください',
+  CREATE_SCENE__GENERATE_A_BACKGROUND: '背景を生成',
+  CREATE_SCENE__GENERATE_BACKGROUND: '背景を生成',
+  CREATE_SCENE__SELECT_BACKGROUND: '背景を選択',
+  CREATE_SCENE__SEARCH_BACKGROUND: '背景を検索',
+  CREATE_SCENE__SEARCH_CHARACTERS: 'キャラクターを検索',
 }

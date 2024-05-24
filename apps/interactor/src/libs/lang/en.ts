@@ -13,6 +13,10 @@ export const LANGUAGE_EN: i18nConfig = {
   BACKGROUND: 'Background',
   CHARACTERS: 'Characters',
   MUSIC: 'Music',
+  LOAD_MORE: 'Load more',
+  EMPTY: 'Empty',
+  SEARCH: 'Search',
+  SELECT: 'Select',
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'Your browser does not support the audio element.',
   THIS_IS_A_PREMIUM_FEATURE: 'This is a premium feature',
@@ -74,6 +78,13 @@ export const LANGUAGE_EN: i18nConfig = {
   ERROR__UNSUPPORTED_CARD_VERSION: 'Unsupported card version',
   ERROR__INVALID_NOVEL: 'Invalid novel',
   ERROR__AUTOPLAY: 'Autoplay error',
+  ERROR__SELECT_AT_LEAST_ONE_CHARACTER:
+    'You need to select at least one character',
+  ERROR__SELECT_A_BACKGROUND: 'You need to select a background',
+  ERROR__WRITE_A_PROMPT: 'You need to write a prompt',
+  ERROR__UPLOADING_BACKGROUND: 'Error uploading background',
+  ERROR__SEARCHING: 'Error searching',
+  ERROR__UPLOADING_IMAGE: 'Error uploading image',
 
   WARNING__PLEASE_LOG_IN: 'Please log in to interact.',
   ARE_YOU_SURE__DELETE_NODE: 'Are you sure you want to delete this node?',
@@ -104,4 +115,14 @@ export const LANGUAGE_EN: i18nConfig = {
 
   CREATE_SCENE__SCENE_PROMPT: 'Scene Prompt',
   CREATE_SCENE__SCENE_TITLE: 'Scene Title',
+  CREATE_SCENE__SCENE_TITLE_PLACEHOLDER: 'Go to the pool',
+  CREATE_SCENE__START_SCENE_BUTTON_TEXT: 'Start Scene',
+  CREATE_SCENE__SELECT_A_BACKGROUND: 'Select a background',
+  CREATE_SCENE__UPLOAD_BACKGROUND: 'Upload Background',
+  CREATE_SCENE__SELECT_A_CHARACTER: 'Select a character',
+  CREATE_SCENE__GENERATE_A_BACKGROUND: 'Generate a background',
+  CREATE_SCENE__GENERATE_BACKGROUND: 'Generate Background',
+  CREATE_SCENE__SELECT_BACKGROUND: 'Select Background',
+  CREATE_SCENE__SEARCH_BACKGROUND: 'Search Background',
+  CREATE_SCENE__SEARCH_CHARACTERS: 'Search Characters',
 }
