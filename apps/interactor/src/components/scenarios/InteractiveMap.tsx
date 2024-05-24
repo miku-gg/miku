@@ -45,7 +45,7 @@ const InteractiveMapToggle = () => {
 
 const InteractiveMapModal = () => {
   const dispatch = useAppDispatch()
-  const { servicesEndpoint, apiEndpoint } = useAppContext()
+  const { servicesEndpoint, apiEndpoint, assetLinkLoader } = useAppContext()
   const map = useAppSelector(selectCurrentMap)
   const mapBackgroundRef = useRef<HTMLImageElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -95,7 +95,8 @@ const InteractiveMapModal = () => {
         const maskImages = new Map<string, HTMLImageElement>()
         map.places.forEach((place) => {
           const maskImage = new Image()
-          maskImage.src = place.maskSource
+          maskImage.crossOrigin = 'Anonymous'
+          maskImage.src = assetLinkLoader(place.maskSource)
           maskImages.set(place.id, maskImage)
           offScreenCtx?.drawImage(
             maskImage,
@@ -237,7 +238,7 @@ const InteractiveMapModal = () => {
     >
       <img
         className="InteractiveMap__background-image"
-        src={map?.source.png}
+        src={assetLinkLoader(map?.source.png || '')}
         alt="Map"
         ref={mapBackgroundRef}
       />
