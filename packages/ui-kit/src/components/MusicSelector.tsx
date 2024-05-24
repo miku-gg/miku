@@ -13,11 +13,27 @@ const MusicSelector = ({
   onChange,
   musicList,
   hideUpload,
+  modalTitle = 'Select music',
+  playButtonText = 'Play',
+  selectButtonText = 'Select',
+  noMusicSelectedText = 'No music selected',
+  changeButtonText = 'Change',
+  clearButtonText = 'Clear',
+  customMusicText = 'Custom music from file',
+  fileSizeLimitExceededText = 'File size is larger than',
 }: {
   selectedMusic: Music;
   onChange: (music: Music, isDefault: boolean) => void;
   musicList: Music[];
   hideUpload?: boolean;
+  modalTitle?: string;
+  playButtonText?: string;
+  selectButtonText?: string;
+  noMusicSelectedText?: string;
+  changeButtonText?: string;
+  clearButtonText?: string;
+  customMusicText?: string;
+  fileSizeLimitExceededText?: string;
 }): JSX.Element => {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [currentPlaying, setCurrentPlaying] = useState<string>('');
@@ -31,12 +47,12 @@ const MusicSelector = ({
       <div className="MusicSelector__form">
         <div className="MusicSelector__selected">
           <div className="MusicSelector__selected-name">
-            {selectedMusic.name || 'No music selected'}
+            {selectedMusic.name || noMusicSelectedText}
           </div>
         </div>
         <div className="MusicSelector__actions">
           <Button theme="secondary" onClick={() => setExpanded(true)}>
-            {selectedMusic.name ? 'Change' : 'Select'}
+            {selectedMusic.name ? changeButtonText : selectButtonText}
           </Button>
           {selectedMusic.name ? (
             <Button
@@ -51,7 +67,7 @@ const MusicSelector = ({
                 )
               }
             >
-              Clear
+              {clearButtonText}
             </Button>
           ) : null}
         </div>
@@ -66,7 +82,7 @@ const MusicSelector = ({
         </div>
       ) : null}
       <Modal
-        title="Select music"
+        title={modalTitle}
         opened={expanded}
         onCloseModal={() => {
           setExpanded(false);
@@ -88,7 +104,7 @@ const MusicSelector = ({
                     handlePlay(music.source);
                   }}
                 >
-                  Play
+                  {playButtonText}
                 </Button>
                 <Button
                   theme="transparent"
@@ -98,7 +114,7 @@ const MusicSelector = ({
                     setCurrentPlaying('');
                   }}
                 >
-                  Select
+                  {selectButtonText}
                 </Button>
               </div>
             ))}
@@ -114,7 +130,7 @@ const MusicSelector = ({
           {!hideUpload ? (
             <div className="MusicSelector__custom">
               <div className="MusicSelector__custom-title">
-                Custom music from file
+                {customMusicText}
               </div>
               <div className="MusicSelector__custom-input">
                 <input
@@ -128,7 +144,7 @@ const MusicSelector = ({
                         const result = e.target?.result as string;
                         // if size is more than 15MB, reject
                         if (file.size > 19.5 * 1024 * 1024) {
-                          alert('File size is larger than 15MB');
+                          alert(`${fileSizeLimitExceededText} 15MB`);
                           return;
                         }
 
