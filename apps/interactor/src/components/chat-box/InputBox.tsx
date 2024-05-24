@@ -42,7 +42,19 @@ const InputBox = (): JSX.Element | null => {
     })
   )
 
-  const getEntryContent = () => {
+  const state = useAppSelector((state) => state)
+  const scene = useAppSelector(selectCurrentScene)
+  const lastResponse = useAppSelector(selectLastLoadedResponse)
+  const suggestions = useAppSelector(
+    (state) => state.narration.input.suggestions
+  )
+  const showInventory = useAppSelector((state) => state.inventory.showInventory)
+  const [isAutocompleteLoading, setIsAutocompleteLoading] =
+    useState<boolean>(false)
+
+  const interactionsCount = Object.keys(state.narration.interactions).length
+
+  const getPromptWithEntryContent = (text: string) => {
     const lorebookKeys = lorebooks
       .map((lorebook) => {
         let keys: string[] = []
@@ -65,28 +77,18 @@ const InputBox = (): JSX.Element | null => {
 
       if (entryContent) {
         dispatch(setEntryContent(entryContent))
+        const prompt = `${text}.\nOOC: ${entryContent}`
+        return prompt
       } else {
         dispatch(setEntryContent(''))
-        return
+        return text
       }
     } else {
-      return
+      return text
     }
   }
 
-  const state = useAppSelector((state) => state)
-  const scene = useAppSelector(selectCurrentScene)
-  const lastResponse = useAppSelector(selectLastLoadedResponse)
-  const suggestions = useAppSelector(
-    (state) => state.narration.input.suggestions
-  )
-  const showInventory = useAppSelector((state) => state.inventory.showInventory)
-  const [isAutocompleteLoading, setIsAutocompleteLoading] =
-    useState<boolean>(false)
-
-  const interactionsCount = Object.keys(state.narration.interactions).length
-
-  const sendMessage = (text: string) => {
+  const sendMessage = (prompt: string) => {
     if (isInteractionDisabled) {
       toast.warn('Please log in to interact.', {
         position: 'top-center',
@@ -96,7 +98,8 @@ const InputBox = (): JSX.Element | null => {
       })
       return
     }
-    getEntryContent()
+    const text = getPromptWithEntryContent(prompt)
+
     dispatch(
       interactionStart({
         text,
