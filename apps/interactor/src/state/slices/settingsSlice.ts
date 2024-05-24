@@ -22,6 +22,9 @@ export const initialState: SettingsState = {
     loading: false,
     sceneSuggestionsLeft: 0,
   },
+  chatBox: {
+    isDraggable: false,
+  },
   prompt: {
     systemPrompt: '',
   },
@@ -73,6 +76,9 @@ export const settingSlice = createSlice({
     },
     setSystemPrompt: (state, action: PayloadAction<string>) => {
       state.prompt.systemPrompt = action.payload
+    },
+    setIsDraggable: (state, action: PayloadAction<boolean>) => {
+      state.chatBox.isDraggable = action.payload
     },
     setFontSize: (state, action: PayloadAction<FontSize>) => {
       state.text.fontSize = action.payload
@@ -150,6 +156,7 @@ export const {
   setSettings,
   setModel,
   setName,
+  setIsDraggable,
   setSystemPrompt,
   setFontSize,
   setSpeed,

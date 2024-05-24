@@ -114,6 +114,9 @@ export interface SettingsState {
   prompt: {
     systemPrompt: string
   }
+  chatBox: {
+    isDraggable: boolean
+  }
   text: {
     speed: Speed
     fontSize: FontSize
