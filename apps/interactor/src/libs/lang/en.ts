@@ -13,7 +13,6 @@ export const LANGUAGE_EN: i18nConfig = {
   BACKGROUND: 'Background',
   CHARACTERS: 'Characters',
   MUSIC: 'Music',
-
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'Your browser does not support the audio element.',
   THIS_IS_A_PREMIUM_FEATURE: 'This is a premium feature',
@@ -57,24 +56,24 @@ export const LANGUAGE_EN: i18nConfig = {
   NODE_EDITOR__UPDATE_BUTTON_LABEL: 'Update',
   NODE_EDITOR__CANCEL_BUTTON_LABEL: 'Cancel',
 
-  ERROR_QUERYING_THE_AI: 'Error querying the AI',
-  ERROR_UNLOCKING_ACHIEVEMENT: 'Failed to unlock achievement',
-  ERROR_READING_HISTORY_FILE: 'Error reading history file',
-  ERROR_NARRATION_VERSION_MISMATCH: 'Narration version mismatch',
-  ERROR_INFERENCE_NOT_FOUND: 'Inference not found',
-  ERROR_LOADING_QUOTATION_MARKS: 'Error loading quotation marks',
-  ERROR_LOADING_BACKGROUND_IMAGE: 'Error loading background image',
-  ERROR_LOADING_CHARACTER_IMAGE: 'Error loading character image',
-  ERROR_OBTAINING_2D_CONTEXT: 'Error obtaining the 2D context of the canvas',
-  ERROR_MEDIA_SOURCE_API_NOT_SUPPORTED:
+  ERROR__QUERYING_THE_AI: 'Error querying the AI',
+  ERROR__UNLOCKING_ACHIEVEMENT: 'Failed to unlock achievement',
+  ERROR__READING_HISTORY_FILE: 'Error reading history file',
+  ERROR__NARRATION_VERSION_MISMATCH: 'Narration version mismatch',
+  ERROR__INFERENCE_NOT_FOUND: 'Inference not found',
+  ERROR__LOADING_QUOTATION_MARKS: 'Error loading quotation marks',
+  ERROR__LOADING_BACKGROUND_IMAGE: 'Error loading background image',
+  ERROR__LOADING_CHARACTER_IMAGE: 'Error loading character image',
+  ERROR__OBTAINING_2D_CONTEXT: 'Error obtaining the 2D context of the canvas',
+  ERROR__MEDIA_SOURCE_API_NOT_SUPPORTED:
     'MediaSource API is not supported in this browser.',
-  ERROR_FETCHING_DATA: 'Error fetching data',
-  ERROR_PARSING_JSON: 'Error parsing JSON',
-  ERROR_NO_JSON_OBJECTS_FOUND: 'No JSON objects found',
-  ERROR_GETTING_PROMPT_STRATEGY: 'Error getting prompt strategy',
-  ERROR_UNSUPPORTED_CARD_VERSION: 'Unsupported card version',
-  ERROR_INVALID_NOVEL: 'Invalid novel',
-  ERROR_AUTOPLAY: 'Autoplay error',
+  ERROR__FETCHING_DATA: 'Error fetching data',
+  ERROR__PARSING_JSON: 'Error parsing JSON',
+  ERROR__NO_JSON_OBJECTS_FOUND: 'No JSON objects found',
+  ERROR__GETTING_PROMPT_STRATEGY: 'Error getting prompt strategy',
+  ERROR__UNSUPPORTED_CARD_VERSION: 'Unsupported card version',
+  ERROR__INVALID_NOVEL: 'Invalid novel',
+  ERROR__AUTOPLAY: 'Autoplay error',
 
   WARNING__PLEASE_LOG_IN: 'Please log in to interact.',
   ARE_YOU_SURE__DELETE_NODE: 'Are you sure you want to delete this node?',
@@ -86,23 +85,23 @@ export const LANGUAGE_EN: i18nConfig = {
   INVENTORY: 'Inventory',
   INVENTORY_PREMIUM_ITEM: 'This is a premium-only item',
 
-  SCENE_SELECTOR_CREATE_SCENE: 'Create Scene',
-  SCENE_SELECTOR_CHANGE_SCENE: 'Change Scene',
-  SCENE_SELECTOR_GENERATE_SCENE: 'Generate Scene',
-  SCENE_SELECTOR_CREATE_NEW_SCENE: 'Create new scene',
+  SCENE_SELECTOR__CREATE_SCENE: 'Create Scene',
+  SCENE_SELECTOR__CHANGE_SCENE: 'Change Scene',
+  SCENE_SELECTOR__GENERATE_SCENE: 'Generate Scene',
+  SCENE_SELECTOR__CREATE_NEW_SCENE: 'Create new scene',
 
-  SCENE_SUGGESTION_GENERATE_NEXT_SCENE: 'Generate next scene',
-  SCENE_SUGGESTION_GO_TO_NEXT_SCENE: 'Go to next scene',
+  SCENE_SUGGESTION__GENERATE_NEXT_SCENE: 'Generate next scene',
+  SCENE_SUGGESTION__GO_TO_NEXT_SCENE: 'Go to next scene',
 
   SCENE_SUGGESTIONS_MODAL: 'Scene Suggestions',
-  SCENE_SUGGESTIONS_MODAL_SCENE_GENERATIONS_LEFT:
+  SCENE_SUGGESTIONS_MODAL__SCENE_GENERATIONS_LEFT:
     'Scene generations left today.',
-  SCENE_SUGGESTIONS_MODAL_DESCRIBE_SCENE:
+  SCENE_SUGGESTIONS_MODAL__DESCRIBE_SCENE:
     'or describe the new scene in your own words',
-  SCENE_SUGGESTIONS_MODAL_SUGGEST_SCENES_BUTTON: 'Suggest 3 scenes',
-  SCENE_SUGGESTIONS_MODAL_GENERATING_SCENE: 'Generating scene...',
-  SCENE_SUGGESTIONS_MODAL_FETCHING_SUGGESTIONS: 'Fetching suggestions...',
+  SCENE_SUGGESTIONS_MODAL__SUGGEST_SCENES_BUTTON: 'Suggest 3 scenes',
+  SCENE_SUGGESTIONS_MODAL__GENERATING_SCENE: 'Generating scene...',
+  SCENE_SUGGESTIONS_MODAL__FETCHING_SUGGESTIONS: 'Fetching suggestions...',
 
-  CREATE_SCENE_SCENE_PROMPT: 'Scene Prompt',
-  CREATE_SCENE_SCENE_TITLE: 'Scene Title',
+  CREATE_SCENE__SCENE_PROMPT: 'Scene Prompt',
+  CREATE_SCENE__SCENE_TITLE: 'Scene Title',
 }

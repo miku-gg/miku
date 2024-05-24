@@ -34,7 +34,7 @@ const generateImage = async (
     const ctx = canvas.getContext('2d')
 
     if (!ctx) {
-      reject(new Error(_i18n('ERROR_OBTAINING_2D_CONTEXT')))
+      reject(new Error(_i18n('ERROR__OBTAINING_2D_CONTEXT')))
       return
     }
 
@@ -172,15 +172,15 @@ const generateImage = async (
           resolve(DataURL)
         }
         quotationMarks.onerror = () => {
-          reject(new Error(_i18n('ERROR_LOADING_QUOTATION_MARKS')))
+          reject(new Error(_i18n('ERROR__LOADING_QUOTATION_MARKS')))
         }
       }
       character.onerror = () => {
-        reject(new Error(_i18n('ERROR_LOADING_CHARACTER_IMAGE')))
+        reject(new Error(_i18n('ERROR__LOADING_CHARACTER_IMAGE')))
       }
     }
     background.onerror = () => {
-      reject(new Error(_i18n('ERROR_LOADING_BACKGROUND_IMAGE')))
+      reject(new Error(_i18n('ERROR__LOADING_BACKGROUND_IMAGE')))
     }
   })
 }

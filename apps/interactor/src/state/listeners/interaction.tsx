@@ -259,7 +259,7 @@ const interactionEffect = async (
         })
       )
     } catch (error) {
-      dispatch(interactionFailure(_i18n('ERROR_UNLOCKING_ACHIEVEMENT')))
+      dispatch(interactionFailure(_i18n('ERROR__UNLOCKING_ACHIEVEMENT')))
     }
   } catch (error) {
     console.error(error)

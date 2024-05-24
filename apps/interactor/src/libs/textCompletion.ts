@@ -11,10 +11,10 @@ function getLastJsonObject(jsonString: string): Record<string, string> {
     try {
       return JSON.parse(matches[matches.length - 1])
     } catch (error) {
-      throw _i18n('ERROR_PARSING_JSON') + ' ' + error
+      throw _i18n('ERROR__PARSING_JSON') + ' ' + error
     }
   } else {
-    throw _i18n('ERROR_PARSING_JSON')
+    throw _i18n('ERROR__PARSING_JSON')
   }
 }
 
@@ -62,7 +62,7 @@ const textCompletion = async function* ({
       }
     }
   } catch (error) {
-    throw _i18n('ERROR_FETCHING_DATA') + error
+    throw _i18n('ERROR__FETCHING_DATA') + error
   }
 }
 

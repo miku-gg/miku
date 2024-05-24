@@ -96,7 +96,7 @@ export default function SceneSuggestion() {
               }}
             >
               <div className="SceneSuggestion__text">
-                <span>{_i18n('SCENE_SUGGESTION_GENERATE_NEXT_SCENE')}</span>
+                <span>{_i18n('SCENE_SUGGESTION__GENERATE_NEXT_SCENE')}</span>
               </div>
               <GiFallingStar />
             </button>
@@ -125,7 +125,7 @@ export default function SceneSuggestion() {
               }}
             >
               <div className="SceneSuggestion__text">
-                <span>{_i18n('SCENE_SUGGESTION_GO_TO_NEXT_SCENE')}</span>
+                <span>{_i18n('SCENE_SUGGESTION__GO_TO_NEXT_SCENE')}</span>
               </div>
               <TbPlayerTrackNextFilled />
             </button>
@@ -318,7 +318,7 @@ const SceneSuggestionModal = () => {
             <div className="SceneSuggestionModal__countdown">
               <div className="SceneSuggestionModal__countdown-amount">
                 {sceneSuggestionsLeft}{' '}
-                {_i18n('SCENE_SUGGESTIONS_MODAL_SCENE_GENERATIONS_LEFT')}
+                {_i18n('SCENE_SUGGESTIONS_MODAL__SCENE_GENERATIONS_LEFT')}
               </div>
               <div className="SceneSuggestionModal__countdown-upgrade">
                 <Button
@@ -347,12 +347,12 @@ const SceneSuggestionModal = () => {
                     dispatch(userDataFetchStart({ apiEndpoint }))
                   }}
                 >
-                  {_i18n('SCENE_SUGGESTIONS_MODAL_SUGGEST_SCENES_BUTTON')}
+                  {_i18n('SCENE_SUGGESTIONS_MODAL__SUGGEST_SCENES_BUTTON')}
                 </Button>
               </div>
               <div className="SceneSuggestionModal__single-suggest">
                 <div className="SceneSuggestionModal__single-suggest-text">
-                  {_i18n('SCENE_SUGGESTIONS_MODAL_DESCRIBE_SCENE')}
+                  {_i18n('SCENE_SUGGESTIONS_MODAL__DESCRIBE_SCENE')}
                 </div>
                 <div className="SceneSuggestionModal__single-suggest-field">
                   <Input
@@ -381,12 +381,12 @@ const SceneSuggestionModal = () => {
           ) : fetchingScene ? (
             <div className="SceneSuggestionModal__loading">
               <Loader />
-              {_i18n('SCENE_SUGGESTIONS_MODAL_GENERATING_SCENE')}
+              {_i18n('SCENE_SUGGESTIONS_MODAL__GENERATING_SCENE')}
             </div>
           ) : fetchingSuggestions && !suggestedScenes.length ? (
             <div className="SceneSuggestionModal__loading">
               <Loader />
-              {_i18n('SCENE_SUGGESTIONS_MODAL_FETCHING_SUGGESTIONS')}
+              {_i18n('SCENE_SUGGESTIONS_MODAL__FETCHING_SUGGESTIONS')}
             </div>
           ) : (
             <div className="SceneSuggestionModal__suggestions">

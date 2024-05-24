@@ -13,7 +13,6 @@ export const LANGUAGE_ES: i18nConfig = {
   BACKGROUND: 'Fondo',
   CHARACTERS: 'Personajes',
   MUSIC: 'Música',
-
   YOUR_BROWSER_DOES_NOT_SUPPORT_THE_AUDIO_ELEMENT:
     'Tu navegador no soporta el elemento de audio.',
   THIS_IS_A_PREMIUM_FEATURE: 'Esta es una función premium',
@@ -58,24 +57,24 @@ export const LANGUAGE_ES: i18nConfig = {
   NODE_EDITOR__UPDATE_BUTTON_LABEL: 'Actualizar',
   NODE_EDITOR__CANCEL_BUTTON_LABEL: 'Cancelar',
 
-  ERROR_QUERYING_THE_AI: 'Error al consultar la IA',
-  ERROR_UNLOCKING_ACHIEVEMENT: 'Error al desbloquear logro',
-  ERROR_READING_HISTORY_FILE: 'Error al leer el archivo de historial',
-  ERROR_NARRATION_VERSION_MISMATCH: 'Versión de narración no coincide',
-  ERROR_INFERENCE_NOT_FOUND: 'Inferencia no encontrada',
-  ERROR_LOADING_QUOTATION_MARKS: 'Error al cargar las comillas',
-  ERROR_LOADING_BACKGROUND_IMAGE: 'Error al cargar la imagen de fondo',
-  ERROR_LOADING_CHARACTER_IMAGE: 'Error al cargar la imagen del personaje',
-  ERROR_OBTAINING_2D_CONTEXT: 'Error al obtener el contexto 2D del canvas',
-  ERROR_MEDIA_SOURCE_API_NOT_SUPPORTED:
+  ERROR__QUERYING_THE_AI: 'Error al consultar la IA',
+  ERROR__UNLOCKING_ACHIEVEMENT: 'Error al desbloquear logro',
+  ERROR__READING_HISTORY_FILE: 'Error al leer el archivo de historial',
+  ERROR__NARRATION_VERSION_MISMATCH: 'Versión de narración no coincide',
+  ERROR__INFERENCE_NOT_FOUND: 'Inferencia no encontrada',
+  ERROR__LOADING_QUOTATION_MARKS: 'Error al cargar las comillas',
+  ERROR__LOADING_BACKGROUND_IMAGE: 'Error al cargar la imagen de fondo',
+  ERROR__LOADING_CHARACTER_IMAGE: 'Error al cargar la imagen del personaje',
+  ERROR__OBTAINING_2D_CONTEXT: 'Error al obtener el contexto 2D del canvas',
+  ERROR__MEDIA_SOURCE_API_NOT_SUPPORTED:
     'Tu navegador no soporta la API de Media Source',
-  ERROR_FETCHING_DATA: 'Error al obtener datos',
-  ERROR_PARSING_JSON: 'Error al analizar JSON',
-  ERROR_NO_JSON_OBJECTS_FOUND: 'No se encontraron objetos JSON',
-  ERROR_GETTING_PROMPT_STRATEGY: 'Error al obtener la estrategia de prompt',
-  ERROR_UNSUPPORTED_CARD_VERSION: 'Versión de tarjeta no soportada',
-  ERROR_INVALID_NOVEL: 'Novela inválida',
-  ERROR_AUTOPLAY: 'Error de reproducción automática',
+  ERROR__FETCHING_DATA: 'Error al obtener datos',
+  ERROR__PARSING_JSON: 'Error al analizar JSON',
+  ERROR__NO_JSON_OBJECTS_FOUND: 'No se encontraron objetos JSON',
+  ERROR__GETTING_PROMPT_STRATEGY: 'Error al obtener la estrategia de prompt',
+  ERROR__UNSUPPORTED_CARD_VERSION: 'Versión de tarjeta no soportada',
+  ERROR__INVALID_NOVEL: 'Novela inválida',
+  ERROR__AUTOPLAY: 'Error de reproducción automática',
 
   WARNING__PLEASE_LOG_IN: 'Por favor inicia sesión para interactuar.',
   ARE_YOU_SURE__DELETE_NODE: '¿Estás seguro de que quieres eliminar este nodo?',
@@ -87,23 +86,23 @@ export const LANGUAGE_ES: i18nConfig = {
   INVENTORY: 'Inventario',
   INVENTORY_PREMIUM_ITEM: 'Este es un artículo solo para premium',
 
-  SCENE_SELECTOR_CREATE_SCENE: 'Crear Escena',
-  SCENE_SELECTOR_CHANGE_SCENE: 'Cambiar Escena',
-  SCENE_SELECTOR_GENERATE_SCENE: 'Generar Escena',
-  SCENE_SELECTOR_CREATE_NEW_SCENE: 'Crear nueva escena',
+  SCENE_SELECTOR__CREATE_SCENE: 'Crear Escena',
+  SCENE_SELECTOR__CHANGE_SCENE: 'Cambiar Escena',
+  SCENE_SELECTOR__GENERATE_SCENE: 'Generar Escena',
+  SCENE_SELECTOR__CREATE_NEW_SCENE: 'Crear nueva escena',
 
-  SCENE_SUGGESTION_GENERATE_NEXT_SCENE: 'Generar siguiente escena',
-  SCENE_SUGGESTION_GO_TO_NEXT_SCENE: 'Ir a la siguiente escena',
+  SCENE_SUGGESTION__GENERATE_NEXT_SCENE: 'Generar siguiente escena',
+  SCENE_SUGGESTION__GO_TO_NEXT_SCENE: 'Ir a la siguiente escena',
 
   SCENE_SUGGESTIONS_MODAL: 'Sugerencias de escena',
-  SCENE_SUGGESTIONS_MODAL_SCENE_GENERATIONS_LEFT:
+  SCENE_SUGGESTIONS_MODAL__SCENE_GENERATIONS_LEFT:
     'Generaciones de escena restantes hoy.',
-  SCENE_SUGGESTIONS_MODAL_DESCRIBE_SCENE:
+  SCENE_SUGGESTIONS_MODAL__DESCRIBE_SCENE:
     'o describe la nueva escena con tus propias palabras',
-  SCENE_SUGGESTIONS_MODAL_SUGGEST_SCENES_BUTTON: 'Sugerir 3 escenas',
-  SCENE_SUGGESTIONS_MODAL_GENERATING_SCENE: 'Generando escena...',
-  SCENE_SUGGESTIONS_MODAL_FETCHING_SUGGESTIONS: 'Obteniendo sugerencias...',
+  SCENE_SUGGESTIONS_MODAL__SUGGEST_SCENES_BUTTON: 'Sugerir 3 escenas',
+  SCENE_SUGGESTIONS_MODAL__GENERATING_SCENE: 'Generando escena...',
+  SCENE_SUGGESTIONS_MODAL__FETCHING_SUGGESTIONS: 'Obteniendo sugerencias...',
 
-  CREATE_SCENE_SCENE_PROMPT: 'Prompt de Escenario',
-  CREATE_SCENE_SCENE_TITLE: 'Título de Escenario',
+  CREATE_SCENE__SCENE_PROMPT: 'Prompt de Escenario',
+  CREATE_SCENE__SCENE_TITLE: 'Título de Escenario',
 }

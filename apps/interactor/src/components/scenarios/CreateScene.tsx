@@ -298,7 +298,7 @@ const CreateScene = () => {
         </div>
         <div className="CreateScene__prompt">
           <div className="CreateScene__prompt__title">
-            {_i18n('CREATE_SCENE_SCENE_PROMPT')}
+            {_i18n('CREATE_SCENE__SCENE_PROMPT')}
           </div>
           <Input
             placeHolder="*{{user}} and Hina head to the swimming pool to have fun. It's a hot summer day but there's no people there.*"
@@ -309,7 +309,7 @@ const CreateScene = () => {
         </div>
         <div className="CreateScene__prompt">
           <div className="CreateScene__prompt__title">
-            {_i18n('CREATE_SCENE_SCENE_TITLE')}
+            {_i18n('CREATE_SCENE__SCENE_TITLE')}
           </div>
           <Input
             placeHolder="Go to the pool"

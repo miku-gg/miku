@@ -99,7 +99,7 @@ const narrationSlice = createSlice({
       state.input.disabled = false
       const response = state.responses[state.currentResponseId]
       if (!response?.fetching) return state
-      toast.error(action.payload || _i18n('ERROR_QUERYING_THE_AI'))
+      toast.error(action.payload || _i18n('ERROR__QUERYING_THE_AI'))
       const interaction =
         state.interactions[response?.parentInteractionId || '']
       const reponsesId = interaction?.responsesId

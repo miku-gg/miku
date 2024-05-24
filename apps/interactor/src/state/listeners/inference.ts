@@ -64,7 +64,7 @@ const inferenceEffect = async (
           { withCredentials: true }
         )
         if (status.data.length === 0) {
-          throw new Error(_i18n('ERROR_INFERENCE_NOT_FOUND'))
+          throw new Error(_i18n('ERROR__INFERENCE_NOT_FOUND'))
         }
         const inferenceStatus = status.data[0].status
 

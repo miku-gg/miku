@@ -83,7 +83,7 @@ const MusicPlayer: React.FC = () => {
   useEffect(() => {
     if (audioRef.current && volume > 0) {
       audioRef.current.play().catch((error) => {
-        console.error(_i18n('ERROR_AUTOPLAY'), ': ', error)
+        console.error(_i18n('ERROR__AUTOPLAY'), ': ', error)
       })
     }
   }, [src, volume])

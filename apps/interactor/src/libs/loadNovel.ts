@@ -70,8 +70,8 @@ export async function loadNovelFromSingleCard({
         novel.starts = [start]
         /* [END] Add default start if not exists */
       } else if (_card.version !== VersionId) {
-        toast.error(_i18n('ERROR_UNSUPPORTED_CARD_VERSION'))
-        throw new Error(_i18n('ERROR_UNSUPPORTED_CARD_VERSION'))
+        toast.error(_i18n('ERROR__UNSUPPORTED_CARD_VERSION'))
+        throw new Error(_i18n('ERROR__UNSUPPORTED_CARD_VERSION'))
       } else {
         novel = _card.novel as NovelState
       }
@@ -86,7 +86,7 @@ export async function loadNovelFromSingleCard({
     }
 
     if (!novel) {
-      throw new Error(_i18n('ERROR_INVALID_NOVEL'))
+      throw new Error(_i18n('ERROR__INVALID_NOVEL'))
     }
 
     const assets = new Set<string>()

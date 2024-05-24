@@ -31,7 +31,7 @@ export async function retrieveModelMetadata(
         }
       )
       if (!response.ok || response.status != 200) {
-        throw new Error(_i18n('ERROR_GETTING_PROMPT_STRATEGY'))
+        throw new Error(_i18n('ERROR__GETTING_PROMPT_STRATEGY'))
       }
       const data = await response.json()
       cacheStrategy.set(model, data as ModelMetadata)
