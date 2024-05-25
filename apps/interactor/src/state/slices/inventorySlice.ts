@@ -42,6 +42,12 @@ const inventorySlice = createSlice({
     addItem: (state, action: PayloadAction<NovelV3.InventoryItem>) => {
       state.items.push(action.payload)
     },
+    removeItem: (state, action: PayloadAction<string>) => {
+      state.items = state.items.filter((item) => item.id !== action.payload)
+      if (state.selectedItem?.id === action.payload) {
+        state.selectedItem = null
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -57,6 +63,7 @@ export const {
   setItemModalVisibility,
   setSelectedItem,
   addItem,
+  removeItem,
 } = inventorySlice.actions
 
 export default inventorySlice.reducer

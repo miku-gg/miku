@@ -99,6 +99,21 @@ const novelSlice = createSlice({
         parentMapId: null,
       })
     },
+    addChildrenScenes: (
+      state,
+      action: PayloadAction<{ parentId: string; childIds: string[] }>
+    ) => {
+      const parent = state.scenes.find(
+        (scene) => scene.id === action.payload.parentId
+      )
+      if (parent) {
+        action.payload.childIds.forEach((childId) => {
+          if (!parent.children.includes(childId)) {
+            parent.children.push(childId)
+          }
+        })
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -109,6 +124,6 @@ const novelSlice = createSlice({
   },
 })
 
-export const { setNovel, addScene } = novelSlice.actions
+export const { setNovel, addScene, addChildrenScenes } = novelSlice.actions
 
 export default novelSlice.reducer

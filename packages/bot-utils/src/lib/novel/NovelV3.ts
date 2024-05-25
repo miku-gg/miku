@@ -1,13 +1,13 @@
 import {
   CharacterBook,
   EmotionTemplateSlug,
-  MikuCardV2
+  MikuCardV2,
 } from "../MikuCardValidator";
 
 export enum NovelNSFW {
   NONE = 0,
   NUDITY = 1,
-  EXPLICIT = 2
+  EXPLICIT = 2,
 }
 
 export interface NovelStart {
@@ -107,9 +107,41 @@ export interface NovelMap {
   lorebook?: CharacterBook;
 }
 
+export type StateMutation =
+  | {
+      type: "ADD_CHILDREN";
+      config: {
+        sceneId: string;
+        children: string[];
+      };
+    }
+  | {
+      type: "REMOVE_ITEM";
+      config: {
+        itemId: string;
+      };
+    }
+  | {
+      type: "SUGGEST_ADVANCE_SCENE";
+      config: {
+        sceneId: string;
+      };
+    };
+
+export type StateCondition = {
+  type: "IN_SCENE";
+  config: {
+    sceneIds: string[];
+  };
+};
+
 export interface InventoryAction {
   name: string;
   prompt: string;
+
+  // only for novel-specific items
+  usageCondition?: StateCondition;
+  usageMutations?: StateMutation[];
 }
 
 export interface InventoryItem {
@@ -125,7 +157,7 @@ export enum NovelObjectiveActionType {
   SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
   SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
   ACHIEVEMENT_UNLOCK = "ACHIEVEMENT_UNLOCK",
-  ITEM_RECEIVE = "ITEM_RECEIVE"
+  ITEM_RECEIVE = "ITEM_RECEIVE",
 }
 
 export type NovelObjectiveAction =

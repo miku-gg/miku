@@ -5,7 +5,7 @@ import {
   NarrationResponse,
 } from './slices/narrationSlice'
 import { createSelector } from '@reduxjs/toolkit'
-import { EmotionTemplateSlug } from '@mikugg/bot-utils'
+import { EmotionTemplateSlug, NovelV3 } from '@mikugg/bot-utils'
 import { NovelNSFW } from './versioning'
 
 export const selectLastLoadedResponse = (
@@ -426,3 +426,16 @@ export const selectCurrentSceneObjectives = createSelector(
     )
   }
 )
+
+export const selectConditionStatus = (
+  state: RootState,
+  condition: NovelV3.StateCondition
+) => {
+  switch (condition.type) {
+    case 'IN_SCENE':
+      return condition.config.sceneIds.includes(
+        selectCurrentScene(state)?.id || ''
+      )
+  }
+  return false
+}
