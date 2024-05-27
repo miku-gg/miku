@@ -70,15 +70,12 @@ export const LANGUAGE_JP: i18nConfig = {
   ERROR__LOADING_BACKGROUND_IMAGE: '背景画像の読み込みエラー',
   ERROR__LOADING_CHARACTER_IMAGE: 'キャラクター画像の読み込みエラー',
   ERROR__OBTAINING_2D_CONTEXT: '2Dコンテキストの取得エラー',
-  ERROR__MEDIA_SOURCE_API_NOT_SUPPORTED:
-    'メディアソースAPIがサポートされていません',
   ERROR__FETCHING_DATA: 'データの取得エラー',
   ERROR__PARSING_JSON: 'JSONの解析エラー',
   ERROR__NO_JSON_OBJECTS_FOUND: 'JSONオブジェクトが見つかりません',
   ERROR__GETTING_PROMPT_STRATEGY: 'プロンプト戦略の取得エラー',
   ERROR__UNSUPPORTED_CARD_VERSION: 'サポートされていないカードバージョン',
   ERROR__INVALID_NOVEL: '無効な小説',
-  ERROR__AUTOPLAY: '自動再生エラー',
   ERROR__SELECT_AT_LEAST_ONE_CHARACTER:
     '少なくとも1人のキャラクターを選択してください',
   ERROR__SELECT_A_BACKGROUND: '背景を選択してください',

@@ -69,15 +69,12 @@ export const LANGUAGE_EN: i18nConfig = {
   ERROR__LOADING_BACKGROUND_IMAGE: 'Error loading background image',
   ERROR__LOADING_CHARACTER_IMAGE: 'Error loading character image',
   ERROR__OBTAINING_2D_CONTEXT: 'Error obtaining the 2D context of the canvas',
-  ERROR__MEDIA_SOURCE_API_NOT_SUPPORTED:
-    'MediaSource API is not supported in this browser.',
   ERROR__FETCHING_DATA: 'Error fetching data',
   ERROR__PARSING_JSON: 'Error parsing JSON',
   ERROR__NO_JSON_OBJECTS_FOUND: 'No JSON objects found',
   ERROR__GETTING_PROMPT_STRATEGY: 'Error getting prompt strategy',
   ERROR__UNSUPPORTED_CARD_VERSION: 'Unsupported card version',
   ERROR__INVALID_NOVEL: 'Invalid novel',
-  ERROR__AUTOPLAY: 'Autoplay error',
   ERROR__SELECT_AT_LEAST_ONE_CHARACTER:
     'You need to select at least one character',
   ERROR__SELECT_A_BACKGROUND: 'You need to select a background',
