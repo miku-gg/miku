@@ -8,7 +8,6 @@ import {
   setMusicVolume,
 } from '../../state/slices/settingsSlice'
 import { trackEvent } from '../../libs/analytics'
-import { _i18n } from '../../libs/lang/i18n'
 
 export const Music = () => {
   return (
