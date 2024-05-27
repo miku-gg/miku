@@ -135,4 +135,6 @@ export const LANGUAGE_JP: i18nConfig = {
   CREATE_SCENE__MUSIC_SELECTOR__CUSTOM_MUSIC_TEXT: 'ファイルからカスタム音楽',
   CREATE_SCENE__MUSIC_SELECTOR__FILE_SIZE_LIMIT_EXCEEDED_TEXT:
     'ファイルサイズが大きすぎます',
+
+  NOVEL_LOADER__LOADING_NOVEL_TEXT: '小説を読み込んでいます',
 }

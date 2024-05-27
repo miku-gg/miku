@@ -7,6 +7,7 @@ import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
 import { Loader } from '../common/Loader'
 import './NovelLoader.scss'
 import { registerTrackSessionData } from '../../libs/analytics'
+import { _i18n } from '../../libs/lang/i18n'
 
 const NovelLoader = (): JSX.Element => {
   const { novelLoader, persona } = useAppContext()
@@ -36,7 +37,9 @@ const NovelLoader = (): JSX.Element => {
   return (
     <Modal opened={novelFetching}>
       <div className="NovelLoader">
-        <div className="NovelLoader__text">Loading Novel</div>
+        <div className="NovelLoader__text">
+          {_i18n('NOVEL_LOADER__LOADING_NOVEL_TEXT')}
+        </div>
         <div className="NovelLoader__loader">
           <Loader />
         </div>

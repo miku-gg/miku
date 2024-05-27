@@ -136,4 +136,6 @@ export const LANGUAGE_ES: i18nConfig = {
     'Música personalizada desde archivo',
   CREATE_SCENE__MUSIC_SELECTOR__FILE_SIZE_LIMIT_EXCEEDED_TEXT:
     'Tamaño de archivo excedido',
+
+  NOVEL_LOADER__LOADING_NOVEL_TEXT: 'Cargando Novela',
 }
