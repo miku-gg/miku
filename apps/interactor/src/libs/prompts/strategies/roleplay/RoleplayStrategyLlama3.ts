@@ -36,6 +36,9 @@ export class RoleplayStrategyLlama3 extends AbstractRoleplayStrategy {
     if (persona || formattedAttributes) {
       template += `<|eot_id|><|start_header_id|>user<|end_header_id|>\n${persona}\n${formattedAttributes}\n`
     }
+    if (state.narration.currentLorebookContent) {
+      template += `\n${state.narration.currentLorebookContent}\n`
+    }
 
     if (sampleChat.length) {
       template += `This is how {{char}} should talk\n`

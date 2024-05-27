@@ -41,6 +41,9 @@ export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
         formattedAttributes ? `${formattedAttributes}\n` : ''
       }`
     }
+    if (state.narration.currentLorebookContent) {
+      template += `\n${state.narration.currentLorebookContent}\n`
+    }
 
     if (sampleChat.length) {
       template += `\n\nThis is how {{char}} should talk:\n`
