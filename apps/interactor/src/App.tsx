@@ -9,7 +9,6 @@ import { store } from './state/store'
 
 import Interactor from './components/interactor/Interactor'
 import NovelLoader from './components/novel-loader/NovelLoader'
-import i18n from './libs/lang/i18n'
 
 import 'normalize.css'
 import './App.scss'
@@ -35,8 +34,6 @@ function App(props: AppProps) {
     if (props.isMobileApp) {
       document.body.classList.add('mobile-app')
     }
-
-    i18n.changeLanguage(contextValue.language)
   }, [])
 
   return (

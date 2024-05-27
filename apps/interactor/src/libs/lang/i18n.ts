@@ -1,8 +1,7 @@
-import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
 import { LANGUAGE_ES } from './es'
 import { LANGUAGE_EN } from './en'
 import { LANGUAGE_JP } from './jp'
+import queryString from 'query-string'
 
 export type i18nKey =
   | 'INPUT_BOX_PLACE_HOLDER'
@@ -120,19 +119,13 @@ export type i18nConfig = Record<i18nKey, string>
 
 export type i18nLanguage = 'en' | 'es' | 'jp'
 
-i18n.use(initReactI18next).init({
-  resources: {
-    en: { translation: LANGUAGE_EN },
-    es: { translation: LANGUAGE_ES },
-    jp: { translation: LANGUAGE_JP },
-  },
-  lng: 'en',
-  fallbackLng: 'en',
-  interpolation: {
-    escapeValue: false,
-  },
-})
+const i18n = {
+  en: LANGUAGE_EN,
+  es: LANGUAGE_ES,
+  jp: LANGUAGE_JP,
+}
 
-export const _i18n = (key: i18nKey) => i18n.t(key)
+const language = queryString.parse(window.location.search)
+  .language as i18nLanguage
 
-export default i18n
+export const _i18n = (key: i18nKey) => i18n[language][key]
