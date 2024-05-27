@@ -125,7 +125,7 @@ const i18n = {
   jp: LANGUAGE_JP,
 }
 
-const language = queryString.parse(window.location.search)
-  .language as i18nLanguage
+export const language =
+  (queryString.parse(window.location.search).language as i18nLanguage) || 'en'
 
 export const _i18n = (key: i18nKey) => i18n[language][key]
