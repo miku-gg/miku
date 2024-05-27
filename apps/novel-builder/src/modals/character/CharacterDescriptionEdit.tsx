@@ -415,19 +415,21 @@ export default function CharacterDescriptionEdit({
           <label className="Input__label">Lorebook</label>
 
           <Button
-            theme={!character.lorebook ? "secondary" : "primary"}
+            theme={
+              !character.card.data.character_book ? "secondary" : "primary"
+            }
             onClick={() => {
-              if (!character.lorebook) {
+              if (!character.card.data.character_book) {
                 dispatch(createLorebook(characterId));
               } else {
                 dispatch(deleteLorebook({ characterId }));
               }
             }}
           >
-            {character.lorebook ? "Delete" : "Add"} Lorebook
+            {character.card.data.character_book ? "Delete" : "Add"} Lorebook
           </Button>
         </div>
-        {!!character.lorebook && (
+        {!!character.card.data.character_book && (
           <CharacterLorebooks characterId={characterId} />
         )}
       </div>

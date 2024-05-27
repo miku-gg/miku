@@ -1,6 +1,6 @@
 import { DEFAULT_MUSIC } from "..";
 
-export type EntryType = Array<{
+export type LorebookEntry = Array<{
   keys: Array<string>;
   content: string;
   extensions: Record<string, any>;
@@ -28,7 +28,7 @@ export type CharacterBook = {
   token_budget?: number; // agnai: "Memory: Context Limit"
   recursive_scanning?: boolean; // no agnai equivalent. whether entry content can trigger other entries
   extensions: Record<string, any>;
-  entries: EntryType;
+  entries: LorebookEntry;
 };
 
 export type TavernCardV2 = {

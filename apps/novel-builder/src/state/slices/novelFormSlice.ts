@@ -240,13 +240,13 @@ const novelFormSlice = createSlice({
         (char) => char.id === characterId
       );
       if (!character) return;
-      character.lorebook = {
+      character.card.data.character_book = {
         extensions: {
           mikugg_v2: {
             entries: [],
           },
         },
-        name: "New lorebook",
+        name: `${character.name}'s Lorebook`,
         description: "",
         entries: [],
       };
@@ -262,23 +262,24 @@ const novelFormSlice = createSlice({
         (char) => char.id === action.payload.characterId
       );
       if (!character) return;
-      character.lorebook = action.payload.lorebook;
+      character.card.data.character_book = action.payload.lorebook;
     },
     deleteLorebook: (state, action: PayloadAction<{ characterId: string }>) => {
       const character = state.characters.find(
         (char) => char.id === action.payload.characterId
       );
       if (!character) return;
-      character.lorebook = undefined;
+      character.card.data.character_book = undefined;
     },
     createEntry: (state, action: PayloadAction<{ characterId: string }>) => {
       const character = state.characters.find(
         (char) => char.id === action.payload.characterId
       );
-      if (!character || !character.lorebook) return;
-      character.lorebook.entries.push({
+      if (!character || !character.card.data.character_book) return;
+      const { character_book } = character.card.data;
+      character_book?.entries.push({
         keys: [],
-        name: `Entry ${character.lorebook.entries.length + 1}`,
+        name: `Entry ${character_book.entries.length + 1}`,
         content: "",
         extensions: {},
         enabled: false,
@@ -296,9 +297,11 @@ const novelFormSlice = createSlice({
       const character = state.characters.find(
         (char) => char.id === action.payload.characterId
       );
-      if (!character || !character.lorebook) return;
-      character.lorebook.entries[action.payload.entryIndex] =
-        action.payload.entry;
+
+      if (!character || !character.card.data.character_book) return;
+      const { character_book } = character.card.data;
+
+      character_book.entries[action.payload.entryIndex] = action.payload.entry;
     },
     deleteEntry: (
       state,
@@ -310,8 +313,10 @@ const novelFormSlice = createSlice({
       const character = state.characters.find(
         (char) => char.id === action.payload.characterId
       );
-      if (!character || !character.lorebook) return;
-      character.lorebook.entries.splice(action.payload.entryIndex, 1);
+      if (!character || !character.card.data.character_book) return;
+      const { character_book } = character.card.data;
+
+      character_book.entries.splice(action.payload.entryIndex, 1);
     },
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;

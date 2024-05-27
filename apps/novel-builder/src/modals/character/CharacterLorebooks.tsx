@@ -30,7 +30,7 @@ export const CharacterLorebooks = ({
   if (!character || !characterId) {
     return null;
   }
-  const { lorebook } = character;
+  const { character_book } = character.card.data;
 
   return (
     <div className="CharacterLorebooks scrollbar">
@@ -38,12 +38,12 @@ export const CharacterLorebooks = ({
         <label>Book name</label>
         <Input
           placeHolder="Name for your memory book"
-          value={lorebook?.name}
+          value={character_book?.name}
           onChange={(e) =>
             dispatch(
               updateLorebook({
                 characterId,
-                lorebook: { ...lorebook!, name: e.target.value },
+                lorebook: { ...character_book!, name: e.target.value },
               })
             )
           }
@@ -53,12 +53,12 @@ export const CharacterLorebooks = ({
         <label>Book description</label>
         <Input
           placeHolder="Description of your memory book"
-          value={lorebook?.description}
+          value={character_book?.description}
           onChange={(e) =>
             dispatch(
               updateLorebook({
                 characterId,
-                lorebook: { ...lorebook!, description: e.target.value },
+                lorebook: { ...character_book!, description: e.target.value },
               })
             )
           }
@@ -88,8 +88,8 @@ export const CharacterLorebooks = ({
           dispatch(deleteEntry({ characterId, entryIndex: index }));
         }}
       >
-        {lorebook?.entries &&
-          lorebook?.entries.map((entry, index) => (
+        {character_book?.entries &&
+          character_book?.entries.map((entry, index) => (
             <AccordionItem
               title={entry.name ? entry.name : `Entry ${index + 1}`}
               key={`Entry-${index + 1}`}
