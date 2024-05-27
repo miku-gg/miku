@@ -3,18 +3,18 @@ import {
   EMPTY_MIKU_CARD,
   TavernCardV2,
 } from '@mikugg/bot-utils'
+import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..'
+import {
+  selectAllParentDialoguesWhereCharacterIsPresent,
+  selectCurrentCharacterOutfits,
+  selectCurrentScene,
+  selectLastLoadedCharacters,
+} from '../../../../state/selectors'
 import { RootState } from '../../../../state/store'
 import {
   NarrationInteraction,
   NarrationResponse,
 } from '../../../../state/versioning'
-import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..'
-import {
-  selectCurrentScene,
-  selectCurrentCharacterOutfits,
-  selectLastLoadedCharacters,
-  selectAllParentDialoguesWhereCharacterIsPresent,
-} from '../../../../state/selectors'
 
 const PROMPT_TOKEN_OFFSET = 50
 
@@ -331,5 +331,76 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       .split('<START>\n')
       .map((x) => x.trim())
       .filter((x) => x)
+  }
+
+  static getContextFromLorebookEntry(
+    state: RootState,
+    currentCharacterId: string
+  ) {
+    let content: string | null = null
+    const characterEntries = state.novel.characters
+      .map((character) => {
+        return character.lorebooks?.entries
+      })
+      .flat()
+    if (!characterEntries) return null
+
+    const maxEntryKeysLength = characterEntries.reduce((prev, entry) => {
+      if (entry) {
+        return entry.keys.length > prev ? entry.keys.length : prev
+      }
+      return prev
+    }, 0)
+
+    const lastMessagesWordsArray =
+      selectAllParentDialoguesWhereCharacterIsPresent(state, currentCharacterId)
+        .slice(-3)
+        .map((message) => {
+          let text = []
+          if (message.type === 'response') {
+            text.push(
+              message.item.characters.map((char) => char.text).join(' ')
+            )
+          } else if (message.type === 'interaction') {
+            text.push(message.item.query)
+          }
+          return text
+        })
+        .flat()
+
+    const getEntryKeys = (currentIndex: number = 0) => {
+      let entryKeys: string[] = []
+      characterEntries.map((entry) => {
+        if (entry) {
+          if (currentIndex > entry.keys.length) return
+          entryKeys.push(entry.keys[currentIndex])
+        }
+      })
+      return entryKeys
+    }
+
+    let allKeysOrdered: string[][] = []
+    for (let i = 0; i <= maxEntryKeysLength; i++) {
+      allKeysOrdered.push(getEntryKeys(i))
+    }
+
+    lastMessagesWordsArray.map((message) => {
+      const match = allKeysOrdered.find((keys) => {
+        return keys.includes(message)
+      })
+      if (match) {
+        const entry = characterEntries.find((entry) => {
+          entry?.keys.includes(match[0])
+        })
+        if (entry) {
+          content = entry.content
+        } else {
+          return (content = null)
+        }
+      } else {
+        return (content = null)
+      }
+    })
+    return content
   }
 }

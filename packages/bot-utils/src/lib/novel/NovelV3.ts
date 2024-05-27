@@ -66,6 +66,7 @@ export interface NovelCharacter {
   tags: string[];
   card: MikuCardV2;
   nsfw: NovelNSFW;
+  lorebooks?: CharacterBook;
 }
 
 export interface NovelBackground {
