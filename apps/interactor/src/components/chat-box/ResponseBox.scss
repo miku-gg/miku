@@ -5,8 +5,6 @@
   height: 100%;
   min-height: 168px;
   position: relative;
-  display: flex;
-  flex-direction: row-reverse;
 
   &:hover {
     .ResponseBox__actions,
@@ -207,7 +205,7 @@
     position: absolute;
     top: -43px;
     margin: 0 auto;
-    margin-left: -32px;
+    margin-left: -50px;
     display: inline-flex;
     justify-content: center;
     z-index: 0;
@@ -266,6 +264,10 @@
 
   &__text {
     background: linear-gradient(to top, rgba(#171717, 0.9), rgba(#171717, 0.6));
+  }
+
+  .ResponseBox__actions {
+    gap: 0.2rem;
   }
 }
 
