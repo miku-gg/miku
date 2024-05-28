@@ -340,7 +340,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     let content: string | null = null
     const characterEntries = state.novel.characters
       .map((character) => {
-        return character.lorebooks?.entries
+        return character.card.data.character_book?.entries
       })
       .flat()
     if (!characterEntries) return null
