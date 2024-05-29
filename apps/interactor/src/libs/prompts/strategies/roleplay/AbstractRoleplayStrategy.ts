@@ -63,6 +63,10 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     )
 
     let template = this.getContextPrompt(input.state, input.currentCharacterId)
+    template += this.getContextFromLorebookEntry(
+      input.state,
+      input.currentCharacterId
+    )
     template += this.getDialogueHistoryPrompt(input.state, memorySize, {
       name: currentCharacter?.name || '',
       id: currentCharacter?.id || '',
@@ -334,61 +338,67 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       .filter((x) => x)
   }
 
-  static getContextFromLorebookEntry(
+  private getContextFromLorebookEntry(
     state: RootState,
     currentCharacterId: string
   ) {
-    let content: string | null = null
-    const characterEntries = state.novel.characters
-      .map((character) => {
-        return character.card.data.character_book?.entries
-      })
-      .flat()
+    let content: string = ''
 
-    if (!characterEntries) return null
-    const formatedEntries = characterEntries.map((entry) => {
-      return {
-        keys: entry?.keys || [],
-        content: entry?.content || '',
-      }
-    })
-    const formatedTextArray = (text: string) => {
-      return text
-        .replace(/[.*+\-?^${}()|[\]\\]/g, ' ')
-        .toLocaleLowerCase()
-        .split(' ')
-    }
+    const charactersInScene = selectLastLoadedCharacters(state)
+    const characterEntries = charactersInScene
+      .map(
+        (character) =>
+          state.novel.characters.find((char) => char.id === character.id)?.card
+            .data.character_book?.entries || []
+      )
+      .flat()
 
     const lastMessages = selectAllParentDialoguesWhereCharacterIsPresent(
       state,
       currentCharacterId
-    ).slice(-3)
+    )
+      .slice(-3)
+      .reverse()
 
+    if (!characterEntries) return null
+
+    const fillTextTemplateWithCharacters = (text: string) =>
+      fillTextTemplate(text, {
+        user: state.settings.user.name,
+        bot:
+          state.novel.characters.find(
+            (character) => character.id === currentCharacterId
+          )?.name || '',
+        characters: state.novel.characters.reduce((prev, { id, card }) => {
+          prev[id] = card.data.name
+          return prev
+        }, {} as Record<string, string>),
+      })
     const lastMessagesWordsArray = lastMessages
       .map((message) => {
-        const array: string[] = []
         if (message.type === 'response') {
-          const currentCharacter = message.item.characters.find(
-            (char) => char.characterId === currentCharacterId
+          return message.item.characters.map((char) =>
+            fillTextTemplateWithCharacters(char.text)
           )
-          formatedTextArray(currentCharacter?.text || '').map((word) => {
-            array.push(word)
-          })
         } else {
-          formatedTextArray(message.item.query).map((word) => {
-            array.push(word)
-          })
+          return fillTextTemplateWithCharacters(message.item.query)
         }
-        return array
       })
       .flat()
+
     const currentLorebook = findLorebooks(
       lastMessagesWordsArray,
-      formatedEntries
+      characterEntries.map((entry) => ({
+        keys: entry?.keys || [],
+        content: entry?.content || '',
+      }))
     )
 
     if (currentLorebook.length > 0) {
       content = currentLorebook[0].content
+      if (currentLorebook.length > 1) {
+        content += '\n' + currentLorebook[1].content
+      }
     }
 
     return content

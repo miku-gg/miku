@@ -7,16 +7,32 @@ export const findLorebooks = (
   messages: string[],
   lorebooks: LorebookEntry[]
 ): LorebookEntry[] => {
-  const allKeys: string[] = lorebooks.map((lorebook) => lorebook.keys).flat()
-  let lorebookEntry: LorebookEntry[] = []
-  //match allKeys on messages and return lorebookEntry
-  for (let i = 0; i < messages.length; i++) {
-    if (allKeys.includes(messages[i])) {
-      lorebookEntry = lorebooks.filter((lorebook) =>
-        lorebook.keys.includes(messages[i])
-      )
-    }
+  const searchKeys = messages
+    .map((message) =>
+      message
+        .toLowerCase()
+        .replace(/[^a-z0-9\s']/g, '')
+        .split(' ')
+    )
+    .flat()
+  const maxKeys = lorebooks.reduce(
+    (prev, cur) => Math.max(prev, cur.keys.length),
+    0
+  )
+
+  const resultLorebooks: LorebookEntry[] = []
+
+  for (let i = 0; i < maxKeys; i++) {
+    const filteredLorebooks = lorebooks.filter(
+      (lorebook) => lorebook.keys[i] && searchKeys.includes(lorebook.keys[i])
+    )
+
+    resultLorebooks.push(...filteredLorebooks)
+
+    lorebooks = lorebooks.filter(
+      (lorebook) => !filteredLorebooks.includes(lorebook)
+    )
   }
 
-  return lorebookEntry
+  return resultLorebooks
 }

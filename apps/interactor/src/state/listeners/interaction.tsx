@@ -26,7 +26,6 @@ import {
   interactionStart,
   interactionSuccess,
   regenerationStart,
-  setCurrentLorebookContent,
 } from '../slices/narrationSlice'
 import { removeObjective } from '../slices/objectivesSlice'
 import { RootState } from '../store'
@@ -152,16 +151,6 @@ const interactionEffect = async (
           type: NovelV3.NovelObjectiveActionType.SUGGEST_CREATE_SCENE,
         },
       })
-    }
-    const currentLorebookContent =
-      AbstractRoleplayStrategy.getContextFromLorebookEntry(
-        state,
-        currentCharacter?.id || ''
-      )
-    if (currentLorebookContent) {
-      dispatch(setCurrentLorebookContent(currentLorebookContent))
-    } else {
-      dispatch(setCurrentLorebookContent(''))
     }
 
     try {

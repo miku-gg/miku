@@ -42,9 +42,6 @@ const narrationSlice = createSlice({
     setSuggestions(state, action: PayloadAction<string[]>) {
       state.input.suggestions = action.payload
     },
-    setCurrentLorebookContent(state, action: PayloadAction<string>) {
-      state.currentLorebookContent = action.payload
-    },
     interactionStart(
       state,
       action: PayloadAction<{
@@ -455,7 +452,6 @@ export const {
   sceneSuggestionsStart,
   sceneSuggestionsUpdate,
   sceneSuggestionsEnd,
-  setCurrentLorebookContent,
 } = narrationSlice.actions
 
 export default narrationSlice.reducer
