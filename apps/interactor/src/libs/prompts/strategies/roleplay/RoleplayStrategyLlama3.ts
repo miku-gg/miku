@@ -49,7 +49,7 @@ export class RoleplayStrategyLlama3 extends AbstractRoleplayStrategy {
         break
     }
 
-    template += i18nPrompt('LLAMA_TEMPLATE__AVOID_REPETITION')
+    template += `\n\n${i18nPrompt('LLAMA_TEMPLATE__AVOID_REPETITION')}`
     template += i18nPrompt('LLAMA_TEMPLATE__NO_USER_ACTION')
     template += i18nPrompt('LLAMA_TEMPLATE__REACTION')
     template += i18nPrompt('LLAMA_TEMPLATE__REPEAT_REACTION')
@@ -76,7 +76,7 @@ export class RoleplayStrategyLlama3 extends AbstractRoleplayStrategy {
     }
 
     if (sampleChat.length) {
-      template += i18nPrompt('LLAMA_TEMPLATE__TALK')
+      template += `${i18nPrompt('LLAMA_TEMPLATE__TALK')}\n`
       for (const example of sampleChat) {
         template += example + '\n'
       }

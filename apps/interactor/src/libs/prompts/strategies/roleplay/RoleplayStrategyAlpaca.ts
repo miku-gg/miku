@@ -49,7 +49,7 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
         break
     }
 
-    template += i18nPrompt('ALPACA_TEMPLATE__AVOID_REPETITION')
+    template += `\n\n${i18nPrompt('ALPACA_TEMPLATE__AVOID_REPETITION')}`
     template += i18nPrompt('ALPACA_TEMPLATE__NO_USER_ACTION')
     template += i18nPrompt('ALPACA_TEMPLATE__REACTION')
     template += i18nPrompt('ALPACA_TEMPLATE__REPEAT_REACTION')
@@ -62,7 +62,7 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
     }
 
     if (sampleChat.length) {
-      template += i18nPrompt('ALPACA_TEMPLATE__TALK')
+      template += `${i18nPrompt('ALPACA_TEMPLATE__TALK')}\n`
       for (const example of sampleChat) {
         template += example + '\n'
       }
@@ -85,7 +85,7 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
         )}と{{char}}のロールプレイチャットが始まります。\n\n`
         break
       case 'es':
-        template += `\nEntonces comienza el chat de rol entre ${[
+        template += `\nLuego comienza el chat de rol entre ${[
           ...characterTemplates,
           '{{user}}',
         ].join(', ')} y {{char}}.\n\n`
