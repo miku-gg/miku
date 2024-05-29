@@ -63,10 +63,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     )
 
     let template = this.getContextPrompt(input.state, input.currentCharacterId)
-    template += this.getContextFromLorebookEntry(
-      input.state,
-      input.currentCharacterId
-    )
+
     template += this.getDialogueHistoryPrompt(input.state, memorySize, {
       name: currentCharacter?.name || '',
       id: currentCharacter?.id || '',
@@ -338,7 +335,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       .filter((x) => x)
   }
 
-  private getContextFromLorebookEntry(
+  protected getContextForLorebookEntry(
     state: RootState,
     currentCharacterId: string
   ) {

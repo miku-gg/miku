@@ -37,6 +37,11 @@ export class RoleplayStrategyVicuna extends AbstractRoleplayStrategy {
       template += `\n\n${persona}\n${formattedAttributes}\n`
     }
 
+    const lorebook = this.getContextForLorebookEntry(state, currentCharacterId)
+    if (lorebook) {
+      template += `\n${lorebook}\n`
+    }
+
     if (sampleChat.length) {
       template += `This is how {{char}} should talk\n`
       for (const example of sampleChat) {
