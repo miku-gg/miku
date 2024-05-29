@@ -57,7 +57,6 @@ export interface NarrationState {
   responses: {
     [id: string]: NarrationResponse | undefined
   }
-  currentLorebookContent?: string
 }
 
 export interface NovelScene extends NovelV3.NovelScene {}

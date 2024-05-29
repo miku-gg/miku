@@ -26,7 +26,6 @@ const initialState: NarrationState = {
   },
   interactions: {},
   responses: {},
-  currentLorebookContent: '',
 }
 
 const narrationSlice = createSlice({
