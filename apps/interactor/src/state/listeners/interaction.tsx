@@ -1,34 +1,34 @@
-import { NovelV3 } from '@mikugg/bot-utils'
 import { Dispatch, createListenerMiddleware } from '@reduxjs/toolkit'
-import { GiOpenChest } from 'react-icons/gi'
-import { toast } from 'react-toastify'
-import { unlockAchievement } from '../../libs/platformAPI'
+import {
+  interactionStart,
+  interactionFailure,
+  interactionSuccess,
+  regenerationStart,
+  NarrationResponse,
+  continueResponse,
+  characterResponseStart,
+} from '../slices/narrationSlice'
+import { RootState } from '../store'
+import textCompletion from '../../libs/textCompletion'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
+import { retrieveModelMetadata } from '../../libs/retrieveMetadata'
 import {
   AbstractRoleplayStrategy,
   fillTextTemplate,
 } from '../../libs/prompts/strategies'
 import { getRoleplayStrategyFromSlug } from '../../libs/prompts/strategies/roleplay'
-import { retrieveModelMetadata } from '../../libs/retrieveMetadata'
-import { CustomEventType, postMessage } from '../../libs/stateEvents'
-import textCompletion from '../../libs/textCompletion'
 import {
   selectAllParentDialogues,
   selectCurrentScene,
   selectCurrentSceneObjectives,
 } from '../selectors'
+import { NovelV3 } from '@mikugg/bot-utils'
+import { CustomEventType, postMessage } from '../../libs/stateEvents'
+import { unlockAchievement } from '../../libs/platformAPI'
 import { addItem } from '../slices/inventorySlice'
-import {
-  NarrationResponse,
-  characterResponseStart,
-  continueResponse,
-  interactionFailure,
-  interactionStart,
-  interactionSuccess,
-  regenerationStart,
-} from '../slices/narrationSlice'
 import { removeObjective } from '../slices/objectivesSlice'
-import { RootState } from '../store'
+import { toast } from 'react-toastify'
+import { GiOpenChest } from 'react-icons/gi'
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {

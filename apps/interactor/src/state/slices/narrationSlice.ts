@@ -1,18 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import trim from 'lodash.trim'
-import { toast } from 'react-toastify'
 import { v4 as randomUUID } from 'uuid'
 import {
+  NarrationState,
   NarrationInteraction,
   NarrationResponse,
-  NarrationState,
 } from '../versioning'
+import { toast } from 'react-toastify'
+import trim from 'lodash.trim'
 import { NarrationSceneSuggestion } from '../versioning/v3.state'
 
 export type {
+  NarrationState,
   NarrationInteraction,
   NarrationResponse,
-  NarrationState,
 } from '../versioning'
 
 const initialState: NarrationState = {
