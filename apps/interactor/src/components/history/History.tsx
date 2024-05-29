@@ -1,39 +1,39 @@
 import { Modal, Tooltip } from '@mikugg/ui-kit'
-import { GrHistory } from 'react-icons/gr'
-import { BiCloudUpload, BiCloudDownload } from 'react-icons/bi'
-import { FaTimes } from 'react-icons/fa'
 import { ReactElement } from 'react'
-import { useAppDispatch, useAppSelector } from '../../state/store'
-import { setEditModal, setHistoryModal } from '../../state/slices/settingsSlice'
-import ReactFlow, { Position, Node, Edge, NodeTypes } from 'reactflow'
-import DialogueNode from './DialogueNode'
-import { NodeEditor } from './NodeEditor'
+import { BiCloudDownload, BiCloudUpload } from 'react-icons/bi'
+import { FaTimes } from 'react-icons/fa'
+import { GrHistory } from 'react-icons/gr'
+import { toast } from 'react-toastify'
+import ReactFlow, { Edge, Node, NodeTypes, Position } from 'reactflow'
 import {
   NarrationResponse,
   swipeResponse,
 } from '../../state/slices/narrationSlice'
-import { DialogueNodeData, setAllNodesPosition } from './utils'
 import { replaceState } from '../../state/slices/replaceState'
-import { toast } from 'react-toastify'
+import { setEditModal, setHistoryModal } from '../../state/slices/settingsSlice'
+import { useAppDispatch, useAppSelector } from '../../state/store'
+import DialogueNode from './DialogueNode'
+import { NodeEditor } from './NodeEditor'
+import { DialogueNodeData, setAllNodesPosition } from './utils'
 
-import './History.scss'
+import mergeWith from 'lodash.mergewith'
 import 'reactflow/dist/style.css'
-import { VersionId as V1VersionId } from '../../state/versioning/v1.state'
-import { VersionId as V2VersionId } from '../../state/versioning/v2.state'
-import { VersionId as V3VersionId } from '../../state/versioning/v3.state'
-import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
-import { initialState as initialSettingsState } from '../../state/slices/settingsSlice'
-import { initialState as initialCreationState } from '../../state/slices/creationSlice'
-import { initialState as initialInventoryState } from '../../state/slices/inventorySlice'
+import { getCongurationFromParams } from '../../../root'
 import { trackEvent } from '../../libs/analytics'
+import { exportToRenPy } from '../../libs/exportToRenpy'
 import {
   DEFAULT_INVENTORY,
   getItemByActionPrompt,
 } from '../../libs/inventoryItems'
+import { initialState as initialCreationState } from '../../state/slices/creationSlice'
+import { initialState as initialInventoryState } from '../../state/slices/inventorySlice'
 import { scenesToObjectives } from '../../state/slices/objectivesSlice'
-import mergeWith from 'lodash.mergewith'
-import { getCongurationFromParams } from '../../../root'
-import { exportToRenPy } from '../../libs/exportToRenpy'
+import { initialState as initialSettingsState } from '../../state/slices/settingsSlice'
+import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
+import { VersionId as V1VersionId } from '../../state/versioning/v1.state'
+import { VersionId as V2VersionId } from '../../state/versioning/v2.state'
+import { VersionId as V3VersionId } from '../../state/versioning/v3.state'
+import './History.scss'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -113,16 +113,17 @@ const HistoryActions = () => {
       <button
         style={{ color: 'white' }}
         onClick={() => {
-          const { script } = exportToRenPy(state)
-          const blob = new Blob([script], { type: 'text/plain' })
-          const a = document.createElement('a')
-          const url = URL.createObjectURL(blob)
-          a.href = url
-          a.download = `${state.novel.title}_script.rpy`
-          document.body.appendChild(a)
-          a.click()
-          document.body.removeChild(a)
-          URL.revokeObjectURL(url)
+          exportToRenPy(state)
+          // const { script } = exportToRenPy(state)
+          // const blob = new Blob([script], { type: 'text/plain' })
+          // const a = document.createElement('a')
+          // const url = URL.createObjectURL(blob)
+          // a.href = url
+          // a.download = `${state.novel.title}_script.rpy`
+          // document.body.appendChild(a)
+          // a.click()
+          // document.body.removeChild(a)
+          // URL.revokeObjectURL(url)
           // trackEvent('export-renpy-click')
         }}
       >

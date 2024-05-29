@@ -1,3 +1,4 @@
+import JSZip from 'jszip'
 import { selectAllParentDialogues } from '../state/selectors'
 import { RootState } from '../state/store'
 import { NovelCharacterOutfit } from '../state/versioning'
@@ -10,19 +11,20 @@ const sanitizeName = (name: string) => {
   return name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
 }
 
-export const exportToRenPy = (
-  state: RootState
-): {
-  script: string
-  // images: {
-  //   source: string
-  //   target: string
-  // }[]
-  // audio: {
-  //   source: string
-  //   target: string
-  // }[]
-} => {
+const clearProjectUrl = 'https://assets.miku.gg/renpy-project.zip'
+
+const fetchClearProject = async () => {
+  try {
+    const response = await fetch(clearProjectUrl)
+    const blob = await response.blob()
+    return blob
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export const exportToRenPy = (state: RootState) => {
   let script = ''
   script += `define m = Character("${state.settings.user.name}")\n`
   // define all characters
@@ -123,7 +125,49 @@ export const exportToRenPy = (
 
   script += '    return\n'
 
-  return {
-    script,
+  // return {
+  //   script,
+  // }
+  downloadRenPyProject(script, state)
+  // return {
+  //   script,
+  // }
+}
+
+export const downloadRenPyProject = async (
+  script: string,
+  state: RootState
+) => {
+  try {
+    const response = await fetch(clearProjectUrl)
+    const buffer = await response.arrayBuffer()
+    const zip = await JSZip.loadAsync(buffer)
+    const blob = new Blob([script], { type: 'text/plain' })
+
+    // Add a new file to the ZIP
+    const folder = zip
+      .folder('test-renpy')
+      ?.folder('renpyexport')
+      ?.folder('game')
+    folder?.file(`script.rpy`, blob)
+
+    // Generate the updated ZIP file
+    const updatedZipBlob = await zip.generateAsync({ type: 'blob' })
+    if (!updatedZipBlob) {
+      throw new Error('Failed to generate the updated ZIP file')
+    } else {
+      const a = document.createElement('a')
+      const url = URL.createObjectURL(updatedZipBlob)
+      a.href = url
+      a.download = `${state.novel.title.split(' ').join('-')}_script.zip`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }
+    // Do something with the updated ZIP file (e.g., send it back to the backend)
+    console.log('Updated ZIP file:', updatedZipBlob)
+  } catch (err) {
+    console.error('Error:', err)
   }
 }
