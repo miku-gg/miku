@@ -33,6 +33,7 @@ import {
 import { scenesToObjectives } from '../../state/slices/objectivesSlice'
 import mergeWith from 'lodash.mergewith'
 import { getCongurationFromParams } from '../../../root'
+import { exportToRenPy } from '../../libs/exportToRenpy'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -109,6 +110,24 @@ const HistoryActions = () => {
   return (
     <div className="History__actions">
       <Tooltip id="history-actions-tooltip" place="bottom" />
+      <button
+        style={{ color: 'white' }}
+        onClick={() => {
+          const { script } = exportToRenPy(state)
+          const blob = new Blob([script], { type: 'text/plain' })
+          const a = document.createElement('a')
+          const url = URL.createObjectURL(blob)
+          a.href = url
+          a.download = `${state.novel.title}_script.rpy`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+          // trackEvent('export-renpy-click')
+        }}
+      >
+        Export To Ren&apos;Py
+      </button>
       {!hasInteractions ? (
         <label
           className="icon-button"
