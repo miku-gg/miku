@@ -33,6 +33,7 @@ import {
 import { scenesToObjectives } from '../../state/slices/objectivesSlice'
 import mergeWith from 'lodash.mergewith'
 import { getCongurationFromParams } from '../../../root'
+import { _i18n } from '../../libs/lang/i18n'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -75,7 +76,7 @@ const HistoryActions = () => {
         }
 
         if (stateJson.version !== V3VersionId) {
-          throw new Error('Narration version mismatch')
+          throw new Error(_i18n('ERROR__NARRATION_VERSION_MISMATCH'))
         }
 
         const params = getCongurationFromParams()
@@ -100,7 +101,7 @@ const HistoryActions = () => {
           })
         )
       } catch (e) {
-        toast.error('Error reading history file')
+        toast.error(_i18n('ERROR__READING_HISTORY_FILE'))
       }
     }
     reader.readAsText(file)
@@ -113,7 +114,7 @@ const HistoryActions = () => {
         <label
           className="icon-button"
           data-tooltip-id="history-actions-tooltip"
-          data-tooltip-content="Load narration history"
+          data-tooltip-content={_i18n('HISTORY__LOAD_NARRATION_HISTORY')}
         >
           <input
             id="load-history-input"
@@ -128,7 +129,7 @@ const HistoryActions = () => {
       <button
         className="icon-button"
         data-tooltip-id="history-actions-tooltip"
-        data-tooltip-content="Download narration history"
+        data-tooltip-content={_i18n('HISTORY__DOWNLOAD_NARRATION_HISTORY')}
         onClick={handleSave}
       >
         <BiCloudDownload />
@@ -219,6 +220,7 @@ const HistoryModal = (): ReactElement => {
           const item = getItemByActionPrompt(inventoryItems, interaction.query)
           let query = ''
           if (item) {
+            // TODO: Change to i18n
             query = `The user used the ${item.name} item.`
           } else {
             query = interaction.query.substring(0, 100) || ''
@@ -339,7 +341,7 @@ const History = (): JSX.Element => {
       </button>
       <Modal
         opened={historyOpened}
-        title="History"
+        title={_i18n('HISTORY')}
         onCloseModal={() => dispatch(setHistoryModal(false))}
         shouldCloseOnOverlayClick
         overlayClassName="History__modal-overlay"
@@ -350,7 +352,7 @@ const History = (): JSX.Element => {
       </Modal>
       <Modal
         opened={editOpened}
-        title="Edit"
+        title={_i18n('EDIT')}
         className="History__edit-modal"
         shouldCloseOnOverlayClick
         onCloseModal={() => dispatch(setEditModal({ opened: false, id: '' }))}

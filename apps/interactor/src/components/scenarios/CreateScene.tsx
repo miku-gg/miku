@@ -49,6 +49,7 @@ import { userDataFetchStart } from '../../state/slices/settingsSlice'
 import CreditsDisplayer from './CreditsDisplayer'
 import { selectCurrentScene } from '../../state/selectors'
 import { trackEvent } from '../../libs/analytics'
+import { _i18n } from '../../libs/lang/i18n'
 
 const selectSelectableCharacters = createSelector(
   [
@@ -133,19 +134,19 @@ const CreateScene = () => {
     )
 
     if (!characters.length) {
-      toast.error('You need to select at least one character', {
+      toast.error(_i18n('ERROR__SELECT_AT_LEAST_ONE_CHARACTER'), {
         position: 'bottom-left',
       })
       return
     }
     if (!backgroundSelected) {
-      toast.error('You need to select a background', {
+      toast.error(_i18n('ERROR__SELECT_A_BACKGROUND'), {
         position: 'bottom-left',
       })
       return
     }
     if (!prompt) {
-      toast.error('You need to write a prompt', {
+      toast.error(_i18n('ERROR__WRITE_A_PROMPT'), {
         position: 'bottom-left',
       })
       return
@@ -179,7 +180,7 @@ const CreateScene = () => {
         dispatch(setSubmitting(false))
       } catch (e) {
         dispatch(setSubmitting(false))
-        toast.error(`Error uploading background: ${e}`, {
+        toast.error(`${_i18n('ERROR__UPLOADING_BACKGROUND')} ${e}`, {
           position: 'bottom-left',
         })
         return
@@ -217,7 +218,9 @@ const CreateScene = () => {
     <div className="CreateScene">
       <div className="CreateScene__form">
         <div className="CreateScene__background">
-          <div className="CreateScene__background__title">Background</div>
+          <div className="CreateScene__background__title">
+            {_i18n('BACKGROUND')}
+          </div>
           <button
             className="CreateScene__background__button"
             style={{
@@ -238,11 +241,15 @@ const CreateScene = () => {
               )
             }
           >
-            {!backgroundSelected ? 'Select background' : null}
+            {!backgroundSelected
+              ? _i18n('CREATE_SCENE__SELECT_BACKGROUND')
+              : null}
           </button>
         </div>
         <div className="CreateScene__characters">
-          <div className="CreateScene__characters__title">Characters</div>
+          <div className="CreateScene__characters__title">
+            {_i18n('CHARACTERS')}
+          </div>
           <div className="CreateScene__characters__list scrollbar">
             {charactersSelected.map(({ id, outfit }, index) => {
               const character = characters.find((c) => c?.id === id)
@@ -261,7 +268,7 @@ const CreateScene = () => {
                       }
                     />
                   ) : (
-                    'Select'
+                    _i18n('SELECT')
                   )}
                 </div>
               )
@@ -269,8 +276,30 @@ const CreateScene = () => {
           </div>
         </div>
         <div className="CreateScene__music">
-          <div className="CreateScene__music__title">Music</div>
+          <div className="CreateScene__music__title">{_i18n('MUSIC')}</div>
           <MusicSelector
+            modalTitle={_i18n('CREATE_SCENE__MUSIC_SELECTOR__MODAL_TITLE')}
+            playButtonText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__PLAY_BUTTON_TEXT'
+            )}
+            selectButtonText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__SELECT_BUTTON_TEXT'
+            )}
+            noMusicSelectedText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__NO_MUSIC_SELECTED_TEXT'
+            )}
+            changeButtonText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__CHANGE_BUTTON_TEXT'
+            )}
+            clearButtonText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__CLEAR_BUTTON_TEXT'
+            )}
+            customMusicText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__CUSTOM_MUSIC_TEXT'
+            )}
+            fileSizeLimitExceededText={_i18n(
+              'CREATE_SCENE__MUSIC_SELECTOR__FILE_SIZE_LIMIT_EXCEEDED_TEXT'
+            )}
             musicList={musicList.map((m) => ({
               name: m.name,
               source: assetLinkLoader(m.source),
@@ -292,18 +321,22 @@ const CreateScene = () => {
           />
         </div>
         <div className="CreateScene__prompt">
-          <div className="CreateScene__prompt__title">Scene prompt</div>
+          <div className="CreateScene__prompt__title">
+            {_i18n('CREATE_SCENE__SCENE_PROMPT')}
+          </div>
           <Input
-            placeHolder="*{{user}} and Hina head to the swimming pool to have fun. It's a hot summer day but there's no people there.*"
+            placeHolder={_i18n('CREATE_SCENE__SCENE_PROMPT_PLACEHOLDER')}
             isTextArea
             value={prompt}
             onChange={(e) => dispatch(setPromptValue(e.target.value))}
           />
         </div>
         <div className="CreateScene__prompt">
-          <div className="CreateScene__prompt__title">Scene title</div>
+          <div className="CreateScene__prompt__title">
+            {_i18n('CREATE_SCENE__SCENE_TITLE')}
+          </div>
           <Input
-            placeHolder="Go to the pool"
+            placeHolder={_i18n('CREATE_SCENE__SCENE_TITLE_PLACEHOLDER')}
             value={title}
             onChange={(e) => dispatch(setTitleValue(e.target.value))}
           />
@@ -315,7 +348,7 @@ const CreateScene = () => {
               dispatch(setModalOpened({ id: 'scene', opened: false }))
             }
           >
-            Cancel
+            {_i18n('CANCEL')}
           </Button>
           <Button
             className={submitting ? 'Loader__container' : ''}
@@ -323,7 +356,11 @@ const CreateScene = () => {
             onClick={submitScene}
             disabled={submitting}
           >
-            {submitting ? <Loader /> : 'Start scene'}
+            {submitting ? (
+              <Loader />
+            ) : (
+              _i18n('CREATE_SCENE__START_SCENE_BUTTON_TEXT')
+            )}
           </Button>
         </div>
       </div>
@@ -371,7 +408,7 @@ function SearchModal<T>({
         })
         .catch((e) => {
           setLoading(false)
-          toast.error(`Error searching ${modalId}`)
+          toast.error(`${_i18n('ERROR__SEARCHING')} ${modalId}`)
           console.error(e)
         })
     }, 500),
@@ -387,10 +424,15 @@ function SearchModal<T>({
     }
   }, [query, search, opened])
 
+  const modalI18NText =
+    modalId === 'background'
+      ? _i18n('CREATE_SCENE__SEARCH_BACKGROUND')
+      : _i18n(`CREATE_SCENE__SEARCH_CHARACTERS`)
+
   return (
     <Modal
       opened={opened}
-      title={`Search ${modalId}`}
+      title={modalI18NText}
       onCloseModal={() =>
         dispatch(
           setModalOpened({
@@ -403,7 +445,11 @@ function SearchModal<T>({
       <div className="CreateScene__background-search">
         <div className="CreateScene__background-search__input">
           <Input
-            placeHolder={`Search ${modalId}...`}
+            placeHolder={
+              modalId === 'background'
+                ? _i18n('CREATE_SCENE__SEARCH_BACKGROUND')
+                : _i18n(`CREATE_SCENE__SEARCH_CHARACTERS`)
+            }
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -420,7 +466,7 @@ function SearchModal<T>({
                 search(query, results.length)
               }}
             >
-              Load more
+              {_i18n('LOAD_MORE')}
             </Button>
           </div>
         ) : null}
@@ -583,7 +629,9 @@ const CreateSceneBackgroundModal = () => {
       }
     >
       <div className="CreateScene__selector">
-        <div className="CreateScene__selector__title">Select a background</div>
+        <div className="CreateScene__selector__title">
+          {_i18n('CREATE_SCENE__SELECT_A_BACKGROUND')}
+        </div>
         <div className="CreateScene__selector__list scrollbar">
           {backgrounds.map((background, index) => {
             return (
@@ -637,12 +685,12 @@ const CreateSceneBackgroundModal = () => {
             }}
           >
             <MdOutlineImageSearch />
-            <p>Search</p>
+            <p>{_i18n('SEARCH')}</p>
           </div>{' '}
           <div className="CreateScene__selector__item CreateScene__selector__item--upload">
             <DragAndDropImages
-              placeHolder="Upload background"
-              errorMessage="Error uploading images"
+              placeHolder={_i18n('CREATE_SCENE__UPLOAD_BACKGROUND')}
+              errorMessage={_i18n('ERROR__UPLOADING_IMAGE')}
               handleChange={(file: File) => {
                 // transform file to base64 string
                 const reader = new FileReader()
@@ -670,7 +718,7 @@ const CreateSceneBackgroundModal = () => {
               }}
             >
               <BsStars />
-              <p>Generate</p>
+              <p>{_i18n('GENERATE')}</p>
             </div>
           )}
         </div>
@@ -700,7 +748,9 @@ const CreateSceneCharacterModal = () => {
       shouldCloseOnOverlayClick
     >
       <div className="CreateScene__selector">
-        <div className="CreateScene__selector__title">Select a character</div>
+        <div className="CreateScene__selector__title">
+          {_i18n('CREATE_SCENE__SELECT_A_CHARACTER')}
+        </div>
         <div className="CreateScene__selector__list scrollbar">
           <div
             className={classNames('CreateScene__selector__item', {
@@ -717,7 +767,7 @@ const CreateSceneCharacterModal = () => {
               dispatch(setCharacterModalOpened(-1))
             }}
           >
-            Empty
+            {_i18n('EMPTY')}
           </div>
           <div
             className="CreateScene__selector__item CreateScene__selector__item--search"
@@ -732,7 +782,7 @@ const CreateSceneCharacterModal = () => {
             }}
           >
             <MdOutlineImageSearch />
-            <p>Search</p>
+            <p>{_i18n('SEARCH')}</p>
           </div>
         </div>
         {characters
@@ -825,7 +875,7 @@ const GenerateBackgroundModal = () => {
       <div className="CreateScene__generator">
         <div className="CreateScene__generator__header">
           <div className="CreateScene__generator__title">
-            Generate a background
+            {_i18n('CREATE_SCENE__GENERATE_A_BACKGROUND')}
           </div>
           <CreditsDisplayer />
         </div>
@@ -858,7 +908,7 @@ const GenerateBackgroundModal = () => {
               )
             }}
           >
-            Generate Background{' '}
+            {_i18n('CREATE_SCENE__GENERATE_BACKGROUND')}{' '}
             <span>
               {GEN_BACKGROUND_COST} <FaCoins />
             </span>

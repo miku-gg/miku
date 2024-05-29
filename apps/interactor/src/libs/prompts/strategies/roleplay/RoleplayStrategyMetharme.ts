@@ -2,6 +2,8 @@ import { EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
 import { selectCurrentScene } from '../../../../state/selectors'
 import { RootState } from '../../../../state/store'
 import { AbstractRoleplayStrategy } from './AbstractRoleplayStrategy'
+import { language } from '../../../lang/i18n'
+import { i18nPrompt } from '.'
 
 export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
   protected override getContextPrompt(
@@ -25,25 +27,47 @@ export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
     const emotions = this.getCharacterEmotions(state, currentCharacterId)
     const emotionStrings = emotions.join(', ')
 
-    let template = `<|system|>Below is an instruction that describes a task. Write a response that appropriately completes the request.`
+    let template = ''
 
-    template += `\n\nWrite {{char}}'s next reply in a fictional roleplay chat with ${
-      characterTemplates.length ? characterTemplates.join(', ') + ' and ' : ''
-    }{{user}}.`
-    template += `\n\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.`
-    template += `\nDO NOT describe {{user}}'s actions or dialogues, ONLY describe {{char}}'s actions and dialogue.`
-    template += `\nYou must also indicate {{char}}'s reaction in the response.`
-    template += `\nYou MUST not repeat the same reaction too many times.`
-    template += `\nThe reaction MUST be one of: ${emotionStrings}.`
+    switch (language) {
+      case 'en':
+        template = `<|system|>Below is an instruction that describes a task. Write a response that appropriately completes the request.`
+        template += `\n\nWrite {{char}}'s next reply in a fictional roleplay chat with ${
+          characterTemplates.length
+            ? characterTemplates.join(', ') + ' and '
+            : ''
+        }{{user}}.`
+        break
+      case 'es':
+        template = `<|system|>A continuación se muestra una instrucción que describe una tarea. Escribe una respuesta que complete adecuadamente la solicitud.`
+        template += `\n\nEscribe la siguiente respuesta de {{char}} en un chat de rol ficticio con ${
+          characterTemplates.length ? characterTemplates.join(', ') + ' y ' : ''
+        }{{user}}.`
+        break
+      case 'jp':
+        template = `<|system|>以下は、タスクを説明する指示です。適切にリクエストを完了する応答を書いてください。`
+        template += `\n\n{{char}}との架空のロールプレイチャットで、${
+          characterTemplates.length ? characterTemplates.join('と') + 'と' : ''
+        }{{user}}の次の返信を書いてください。`
+        break
+    }
+
+    template += `\n\n${i18nPrompt('METHARME_TEMPLATE__AVOID_REPETITION')}`
+    template += `\n${i18nPrompt('METHARME_TEMPLATE__NO_USER_ACTION')}`
+    template += `\n${i18nPrompt('METHARME_TEMPLATE__REACTION')}`
+    template += `\n${i18nPrompt('METHARME_TEMPLATE__REPEAT_REACTION')}`
+    template += `\n${i18nPrompt(
+      'METHARME_TEMPLATE__REACTION_MUST_BE_ONE_OF'
+    )} ${emotionStrings}.`
 
     if (persona || formattedAttributes) {
-      template += `\n\n{{char}}'s Persona: ${persona}\n${
-        formattedAttributes ? `${formattedAttributes}\n` : ''
-      }`
+      template += `\n\n${i18nPrompt(
+        'METHARME_TEMPLATE__PERSONA'
+      )} ${persona}\n${formattedAttributes ? `${formattedAttributes}\n` : ''}`
     }
 
     if (sampleChat.length) {
-      template += `\n\nThis is how {{char}} should talk:\n`
+      template += `\n\n${i18nPrompt('METHARME_TEMPLATE__TALK')}\n`
       for (const example of sampleChat) {
         template += example + '\n'
       }
@@ -53,10 +77,25 @@ export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
       template += `\n${state.settings.prompt.systemPrompt}\n`
     }
 
-    template += `\nThen the roleplay chat between ${[
-      ...characterTemplates,
-      '{{user}}',
-    ].join(', ')} and {{char}} begins.\n\n`
+    switch (language) {
+      case 'en':
+        template += `\nThen the roleplay chat between ${[
+          ...characterTemplates,
+          '{{user}}',
+        ].join(', ')} and {{char}} begins.\n\n`
+        break
+      case 'es':
+        template += `\nLuego comienza el chat de rol entre ${[
+          ...characterTemplates,
+          '{{user}}',
+        ].join(', ')} y {{char}}.\n\n`
+        break
+      case 'jp':
+        template += `\n${[...characterTemplates, '{{user}}'].join(
+          ', '
+        )}と{{char}}のロールプレイチャットが始まります。\n\n`
+        break
+    }
 
     if (scene?.prompt) {
       template += `\nSCENE: ${scene.prompt}\n`
@@ -64,7 +103,17 @@ export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
 
     scene?.characters.forEach((char) => {
       if (char.objective) {
-        template += `\n{{${char.characterId}}}'s OBJECTIVE: ${char.objective}\n`
+        switch (language) {
+          case 'en':
+            template += `\n{{${char.characterId}}}'s OBJECTIVE: ${char.objective}\n`
+            break
+          case 'es':
+            template += `\nOBJETIVO de {{${char.characterId}}}: ${char.objective}\n`
+            break
+          case 'jp':
+            template += `\n{{${char.characterId}}}の目標: ${char.objective}\n`
+            break
+        }
       }
     })
 

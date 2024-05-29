@@ -28,6 +28,7 @@ import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
 import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter'
 import './ResponseBox.scss'
 import TTSPlayer from './TTSPlayer'
+import { _i18n } from '../../libs/lang/i18n'
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
@@ -141,7 +142,7 @@ const ResponseBox = (): JSX.Element | null => {
         ref={responseDiv}
       >
         {isLastResponseFetching ? (
-          <TextFormatterStatic text="*Typing...*" />
+          <TextFormatterStatic text={_i18n('RESPONSE_BOX__TYPING_PROMPT')} />
         ) : (
           <TextFormatter
             text={displayText}
@@ -154,7 +155,7 @@ const ResponseBox = (): JSX.Element | null => {
                   className="ResponseBox__continue"
                   onClick={handleContinueClick}
                 >
-                  continue
+                  {_i18n('CONTINUE')}
                   <FaForward />
                 </button>
               ) : null
@@ -228,13 +229,13 @@ const ResponseBox = (): JSX.Element | null => {
               onClick={handleRegenerateClick}
             >
               <FaDice />
-              <span>Regenerate</span>
+              <span>{_i18n('REGENERATE')}</span>
             </button>
           ) : null}
           {!disabled && !isInteractionDisabled ? (
             <button className="ResponseBox__edit" onClick={handleEditClick}>
               <FaPencil />
-              <span>Edit</span>
+              <span>{_i18n('EDIT')}</span>
             </button>
           ) : null}
         </div>

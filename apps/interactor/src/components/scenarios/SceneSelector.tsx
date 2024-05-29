@@ -12,6 +12,7 @@ import { toast } from 'react-toastify'
 import { BsStars } from 'react-icons/bs'
 import { trackEvent } from '../../libs/analytics'
 import { userDataFetchStart } from '../../state/slices/settingsSlice'
+import { _i18n } from '../../libs/lang/i18n'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
@@ -37,7 +38,7 @@ export default function SceneSelector(): JSX.Element | null {
 
   const handleItemClick = (id: string, prompt: string) => {
     if (isInteractionDisabled) {
-      toast.warn('Please log in to interact.', {
+      toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
         position: 'top-center',
         style: {
           top: 10,
@@ -86,7 +87,11 @@ export default function SceneSelector(): JSX.Element | null {
         }}
       >
         <div className="SceneSelector__list-container">
-          <h2>{createSceneOpened ? 'Create Scene' : 'Change Scene'}</h2>
+          <h2>
+            {createSceneOpened
+              ? _i18n('SCENE_SELECTOR__CREATE_SCENE')
+              : _i18n('SCENE_SELECTOR__CHANGE_SCENE')}
+          </h2>
           {createSceneOpened ? (
             <CreateScene />
           ) : (
@@ -123,7 +128,7 @@ export default function SceneSelector(): JSX.Element | null {
                 className="SceneSelector__item"
                 onClick={() => {
                   if (isInteractionDisabled) {
-                    toast.warn('Please log in to interact.', {
+                    toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
                       position: 'top-center',
                       style: {
                         top: 10,
@@ -144,14 +149,16 @@ export default function SceneSelector(): JSX.Element | null {
                   className="SceneSelector__item-background"
                   style={{ backgroundColor: 'gray' }}
                 />
-                <div className="SceneSelector__item-text">Create new scene</div>
+                <div className="SceneSelector__item-text">
+                  {_i18n('SCENE_SELECTOR__CREATE_NEW_SCENE')}
+                </div>
               </button>
               {!isMobileApp && (
                 <button
                   className="SceneSelector__item"
                   onClick={() => {
                     if (isInteractionDisabled) {
-                      toast.warn('Please log in to interact.', {
+                      toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
                         position: 'top-center',
                         style: {
                           top: 10,
@@ -177,7 +184,7 @@ export default function SceneSelector(): JSX.Element | null {
                     <StarsEffect />
                   </div>
                   <div className="SceneSelector__item-text">
-                    Generate Scene <BsStars />
+                    {_i18n('SCENE_SELECTOR__GENERATE_SCENE')} <BsStars />
                   </div>
                 </button>
               )}

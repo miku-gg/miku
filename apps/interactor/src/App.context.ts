@@ -3,6 +3,7 @@ import { createContext, useContext } from 'react'
 import { RootState } from './state/store'
 
 import { PersonaResult } from './libs/listSearch'
+import { i18nLanguage } from './libs/lang/i18n'
 
 export interface AppProps {
   isProduction: boolean
@@ -10,6 +11,7 @@ export interface AppProps {
   apiEndpoint: string
   isMobileApp: boolean
   cardEndpoint: string
+  language: i18nLanguage
   servicesEndpoint: string
   freeTTS: boolean
   freeSmart: boolean
@@ -29,6 +31,7 @@ const AppContext = createContext<AppProps>({
   cardEndpoint: '',
   isMobileApp: false,
   servicesEndpoint: '',
+  language: 'en',
   freeTTS: false,
   freeSmart: false,
   persona: {} as PersonaResult,

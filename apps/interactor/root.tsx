@@ -27,6 +27,7 @@ import {
   getUnlockedItems,
 } from './src/libs/platformAPI'
 import { DEFAULT_INVENTORY } from './src/libs/inventoryItems'
+import { i18nLanguage } from './src/libs/lang/i18n'
 
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -60,6 +61,7 @@ export function getCongurationFromParams(): {
   freeTTS: boolean
   freeSmart: boolean
   isMobileApp: boolean
+  language: 'en' | 'jp' | 'es'
   botId: string
   cardId: string
   narrationId: string
@@ -81,6 +83,7 @@ export function getCongurationFromParams(): {
   const disabled = queryParams.disabled === 'true'
   const configuration = queryParams.configuration as string
   const isMobileApp = queryParams.isMobileApp === 'true'
+  const language = queryParams.language as i18nLanguage
 
   try {
     const configurationJson = JSON.parse(decodeText(configuration)) as {
@@ -101,6 +104,7 @@ export function getCongurationFromParams(): {
       production,
       disabled,
       isMobileApp,
+      language,
       freeTTS: configurationJson.freeTTS || false,
       freeSmart: configurationJson.freeSmart || false,
       cardId: cardId || CARD_ID,
@@ -124,6 +128,7 @@ export function getCongurationFromParams(): {
     return {
       production,
       isMobileApp,
+      language,
       disabled,
       freeTTS: false,
       freeSmart: false,
@@ -283,6 +288,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       cardEndpoint={params.cardEndpoint}
       freeSmart={params.freeSmart}
       isMobileApp={params.isMobileApp}
+      language={params.language}
       freeTTS={params.freeTTS}
       persona={params.persona}
       novelLoader={loadNarration}

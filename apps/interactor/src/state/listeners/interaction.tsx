@@ -29,6 +29,7 @@ import { addItem } from '../slices/inventorySlice'
 import { removeObjective } from '../slices/objectivesSlice'
 import { toast } from 'react-toastify'
 import { GiOpenChest } from 'react-icons/gi'
+import { _i18n } from '../../libs/lang/i18n'
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -232,8 +233,8 @@ const interactionEffect = async (
                   >
                     <GiOpenChest />
                     <span>
-                      <b>{objective.action.params.item.name}</b> added to the
-                      inventory
+                      <b>{objective.action.params.item.name}</b>{' '}
+                      {_i18n('ADDED_TO_INVENTORY')}
                     </span>
                   </div>,
                   {
@@ -258,7 +259,7 @@ const interactionEffect = async (
         })
       )
     } catch (error) {
-      dispatch(interactionFailure('Failed to unlock achievement'))
+      dispatch(interactionFailure(_i18n('ERROR__UNLOCKING_ACHIEVEMENT')))
     }
   } catch (error) {
     console.error(error)

@@ -15,6 +15,7 @@ import {
   selectLastLoadedResponse,
 } from '../../state/selectors'
 import { toast } from 'react-toastify'
+import { _i18n } from '../../libs/lang/i18n'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
@@ -34,7 +35,7 @@ export default function Inventory() {
   return (
     <div className={`Inventory ${showInventory}`}>
       <div className="Inventory__header">
-        <div>Inventory</div>
+        <div>{_i18n('INVENTORY')}</div>
 
         <button
           onClick={() => {
@@ -77,7 +78,7 @@ export default function Inventory() {
                 data-tooltip-id={disabled ? 'premium-item-invetory' : undefined}
                 data-tooltip-varaint="light"
                 data-tooltip-content={
-                  disabled ? 'This is a premium-only item' : undefined
+                  disabled ? _i18n('INVENTORY_PREMIUM_ITEM') : undefined
                 }
               >
                 <img
@@ -111,7 +112,7 @@ export default function Inventory() {
             dispatch(setInventoryVisibility('closed'))
 
             if (isInteractionDisabled) {
-              toast.warn('Please log in to interact.', {
+              toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
                 position: 'top-center',
                 style: {
                   top: 10,

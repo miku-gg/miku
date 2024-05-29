@@ -24,6 +24,8 @@ import { setInventoryVisibility } from '../../state/slices/inventorySlice'
 import { Loader } from '../common/Loader'
 import './InputBox.scss'
 
+import { _i18n } from '../../libs/lang/i18n'
+
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
   const { servicesEndpoint, isInteractionDisabled, apiEndpoint } =
@@ -49,7 +51,7 @@ const InputBox = (): JSX.Element | null => {
 
   const sendMessage = (text: string) => {
     if (isInteractionDisabled) {
-      toast.warn('Please log in to interact.', {
+      toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
         position: 'top-center',
         style: {
           top: 10,
@@ -81,7 +83,7 @@ const InputBox = (): JSX.Element | null => {
     e.stopPropagation()
     e.preventDefault()
     if (isInteractionDisabled) {
-      toast.warn('Please log in to interact.', {
+      toast.warn(_i18n('WARNING__PLEASE_LOG_IN'), {
         position: 'top-center',
         style: {
           top: 10,
@@ -176,14 +178,14 @@ const InputBox = (): JSX.Element | null => {
           }}
           autoComplete="off"
           rows={textAreaRows <= 3 ? textAreaRows : 3}
-          placeholder="Type a message..."
+          placeholder={_i18n('INPUT_BOX_PLACE_HOLDER')}
           ref={textAreaRef}
         />
         {interactionsCount ? (
           <button
             className="InputBox__inventory"
             data-tooltip-id="inventory-tooltip"
-            data-tooltip-content="Inventory"
+            data-tooltip-content={_i18n('INVENTORY')}
             data-tooltip-varaint="light"
             disabled={disabled}
             onClick={onInventory}
@@ -199,7 +201,9 @@ const InputBox = (): JSX.Element | null => {
           })}
           disabled={disabled || isAutocompleteLoading}
           data-tooltip-id={`suggestion-tooltip`}
-          data-tooltip-html={!suggestions.length ? 'Autocomplete' : ''}
+          data-tooltip-html={
+            !suggestions.length ? _i18n('TOOLTIP_AUTOCOMPLETE') : ''
+          }
           data-tooltip-varaint="light"
           onClick={onAutocomplete}
         >

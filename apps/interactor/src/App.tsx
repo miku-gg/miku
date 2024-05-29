@@ -19,6 +19,7 @@ function App(props: AppProps) {
     freeSmart: props.freeSmart,
     freeTTS: props.freeTTS,
     isMobileApp: props.isMobileApp,
+    language: props.language,
     isInteractionDisabled: props.isInteractionDisabled,
     servicesEndpoint: props.servicesEndpoint,
     apiEndpoint: props.apiEndpoint,
