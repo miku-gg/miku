@@ -18,6 +18,34 @@ const AssetsUrl = 'http://localhost:8585/s3/assets/'
 function removeFileExtension(filename: string): string {
   return filename.replace(/\.(png|jpeg)$/i, '')
 }
+function getSlicedStrings(str: string): string[] {
+  const slices = []
+  let startIndex = 0
+  let endIndex = 0
+
+  while (startIndex < str.length) {
+    endIndex = str.indexOf('*', startIndex)
+    if (endIndex === -1) {
+      slices.push(str.slice(startIndex) + '*')
+      break
+    }
+
+    slices.push(str.slice(startIndex, endIndex + 1))
+
+    startIndex = endIndex
+    endIndex = str.indexOf('*', startIndex + 1)
+    if (endIndex === -1) {
+      slices.push(str.slice(startIndex) + '*')
+      break
+    }
+
+    slices.push(str.slice(startIndex, endIndex + 1))
+
+    startIndex = endIndex + 1 // Move start index past the closing asterisk
+  }
+
+  return slices
+}
 
 export const exportToRenPy = (state: RootState) => {
   let script = ''
@@ -82,13 +110,23 @@ export const exportToRenPy = (state: RootState) => {
     (background) => background.id === currentScene.background
   )?.source.jpg
 
+  script += `\ntransform yoffset:
+    zoom 0.5
+    yalign 1.0
+    xalign 0.5`
+
+  script += `\ntransform scale:
+    zoom 1.25`
+
   script += '\n\nlabel start:\n'
 
   script += `    image bg ${removeFileExtension(
     currentBackgroundSrc || ''
   )} = "${currentBackgroundSrc}"\n`
 
-  script += `    scene bg ${removeFileExtension(currentBackgroundSrc || '')}\n`
+  script += `    scene bg ${removeFileExtension(
+    currentBackgroundSrc || ''
+  )}  at scale\n`
 
   for (const { item, type } of history) {
     if (type === 'interaction') {
@@ -100,7 +138,7 @@ export const exportToRenPy = (state: RootState) => {
         )?.source.jpg
         script += `    scene bg ${removeFileExtension(
           currentBackgroundSrc || ''
-        )}\n`
+        )} at scale\n`
       } else {
         script += `    m "${item.query}"\n`
       }
@@ -113,7 +151,7 @@ export const exportToRenPy = (state: RootState) => {
           (emotion) => emotion.id === characterResponse.emotion
         )?.sources.png
         script += `    image ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} = "${currentOutfitSrc}"\n`
-        script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion}`
+        script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} at yoffset`
         script +=
           item.characters.length > 1
             ? index === 0
@@ -121,17 +159,17 @@ export const exportToRenPy = (state: RootState) => {
               : ' at right'
             : ''
         script += '\n'
-        script += `    ${character?.slug} "${fillTextTemplate(
-          characterResponse.text,
-          {
+        const slicedTexts = getSlicedStrings(characterResponse.text)
+        slicedTexts.forEach((text) => {
+          script += `    ${character?.slug} "${fillTextTemplate(text, {
             user: state.settings.user.name,
             bot: character?.name || '',
             characters: currentScene.characters.reduce((acc, char) => {
               acc[char.id || ''] = char.name
               return acc
             }, {} as { [key: string]: string }),
-          }
-        )}"\n`
+          })}"\n`
+        })
       })
     }
   }
