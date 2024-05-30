@@ -12,16 +12,11 @@ const sanitizeName = (name: string) => {
 }
 
 const clearProjectUrl = 'https://assets.miku.gg/renpy-project.zip'
+const localClearProjectUrl = 'http://localhost:8585/s3/assets/RenPyExport.zip'
+const AssetsUrl = 'http://localhost:8585/s3/assets/'
 
-const fetchClearProject = async () => {
-  try {
-    const response = await fetch(clearProjectUrl)
-    const blob = await response.blob()
-    return blob
-  } catch (error) {
-    console.error(error)
-    return null
-  }
+function removeFileExtension(filename: string): string {
+  return filename.replace(/\.(png|jpeg)$/i, '')
 }
 
 export const exportToRenPy = (state: RootState) => {
@@ -35,7 +30,6 @@ export const exportToRenPy = (state: RootState) => {
       }")`
     })
     .join('\n')
-  script += '\n\nlabel start:\n'
 
   // get all history and separate it in scenes
   const history = selectAllParentDialogues(state).reverse()
@@ -84,14 +78,29 @@ export const exportToRenPy = (state: RootState) => {
     state.novel.starts.find((start) => start.id === history[0].item.id)
       ?.sceneId || 'INVALID_SCENE_ID'
   let currentScene = getSceneData(currentSceneId)
-  script += `    scene bg ${currentScene.background}\n`
+  let currentBackgroundSrc = state.novel.backgrounds.find(
+    (background) => background.id === currentScene.background
+  )?.source.jpg
+
+  script += '\n\nlabel start:\n'
+
+  script += `    image bg ${removeFileExtension(
+    currentBackgroundSrc || ''
+  )} = "${currentBackgroundSrc}"\n`
+
+  script += `    scene bg ${removeFileExtension(currentBackgroundSrc || '')}\n`
 
   for (const { item, type } of history) {
     if (type === 'interaction') {
       if (item.sceneId !== currentSceneId) {
         currentSceneId = item.sceneId
         currentScene = getSceneData(currentSceneId)
-        script += `    scene bg ${currentScene.background}\n`
+        let currentBackgroundSrc = state.novel.backgrounds.find(
+          (background) => background.id === currentScene.background
+        )?.source.jpg
+        script += `    scene bg ${removeFileExtension(
+          currentBackgroundSrc || ''
+        )}\n`
       } else {
         script += `    m "${item.query}"\n`
       }
@@ -100,6 +109,10 @@ export const exportToRenPy = (state: RootState) => {
         const character = currentScene.characters.find(
           (char) => char.id === characterResponse.characterId
         )
+        const currentOutfitSrc = character?.outfit.emotions.find(
+          (emotion) => emotion.id === characterResponse.emotion
+        )?.sources.png
+        script += `    image ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} = "${currentOutfitSrc}"\n`
         script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion}`
         script +=
           item.characters.length > 1
@@ -125,9 +138,6 @@ export const exportToRenPy = (state: RootState) => {
 
   script += '    return\n'
 
-  // return {
-  //   script,
-  // }
   downloadRenPyProject(script, state)
   // return {
   //   script,
@@ -139,19 +149,48 @@ export const downloadRenPyProject = async (
   state: RootState
 ) => {
   try {
-    const response = await fetch(clearProjectUrl)
+    const AssetsUrl = 'http://localhost:8585/s3/assets/'
+    const allBackgroundAssets = state.novel.backgrounds.map(
+      (background) => background.source.jpg
+    )
+    const allCharactersImages = state.novel.characters
+      .map((character) => {
+        return character.card.data.extensions.mikugg_v2.outfits.map(
+          (outfit) => {
+            return outfit.emotions.map((emotion) => {
+              return emotion.sources.png
+            })
+          }
+        )
+      })
+      .flat(2)
+
+    // const currentMusic = state.novel.scenes.map((scene) => {
+    //   return scene.musicId
+    // })
+
+    const response = await fetch(localClearProjectUrl)
     const buffer = await response.arrayBuffer()
     const zip = await JSZip.loadAsync(buffer)
     const blob = new Blob([script], { type: 'text/plain' })
 
-    // Add a new file to the ZIP
-    const folder = zip
-      .folder('test-renpy')
-      ?.folder('renpyexport')
-      ?.folder('game')
+    const folder = zip?.folder('game')
     folder?.file(`script.rpy`, blob)
 
-    // Generate the updated ZIP file
+    const imagesFolder = folder?.folder('images')
+
+    for (const backgroundAsset of allBackgroundAssets) {
+      const assetResponse = await fetch(`${AssetsUrl}${backgroundAsset}`)
+      const assetBlob = await assetResponse.blob()
+      imagesFolder?.file(backgroundAsset, assetBlob)
+    }
+
+    for (const characterAsset of allCharactersImages) {
+      const assetResponse = await fetch(`${AssetsUrl}${characterAsset}`)
+      const assetBlob = await assetResponse.blob()
+      imagesFolder?.file(characterAsset, assetBlob)
+    }
+
     const updatedZipBlob = await zip.generateAsync({ type: 'blob' })
     if (!updatedZipBlob) {
       throw new Error('Failed to generate the updated ZIP file')
@@ -159,14 +198,12 @@ export const downloadRenPyProject = async (
       const a = document.createElement('a')
       const url = URL.createObjectURL(updatedZipBlob)
       a.href = url
-      a.download = `${state.novel.title.split(' ').join('-')}_script.zip`
+      a.download = `${state.novel.title.split(' ').join('-')}RenPyExport.zip`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
     }
-    // Do something with the updated ZIP file (e.g., send it back to the backend)
-    console.log('Updated ZIP file:', updatedZipBlob)
   } catch (err) {
     console.error('Error:', err)
   }
