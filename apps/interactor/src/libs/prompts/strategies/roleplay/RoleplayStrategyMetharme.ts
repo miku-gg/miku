@@ -42,6 +42,11 @@ export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
       }`
     }
 
+    const lorebook = this.getContextForLorebookEntry(state, currentCharacterId)
+    if (lorebook) {
+      template += `\n${lorebook}\n`
+    }
+
     if (sampleChat.length) {
       template += `\n\nThis is how {{char}} should talk:\n`
       for (const example of sampleChat) {
