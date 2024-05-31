@@ -11,9 +11,7 @@ const sanitizeName = (name: string) => {
   return name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
 }
 
-const clearProjectUrl = 'https://assets.miku.gg/renpy-project.zip'
-const localClearProjectUrl = 'http://localhost:8585/s3/assets/RenPyExport.zip'
-const AssetsUrl = 'http://localhost:8585/s3/assets/'
+const clearProjectUrl = 'https://assets.miku.gg/RenPyExport.zip'
 
 function removeFileExtension(filename: string): string {
   return filename.replace(/\.(png|jpeg)$/i, '')
@@ -237,9 +235,6 @@ export const exportToRenPy = (state: RootState) => {
 
   script += '    return\n'
   downloadRenPyProject(script, state)
-  // return {
-  //   script,
-  // }
 }
 
 export const downloadRenPyProject = async (
@@ -247,7 +242,6 @@ export const downloadRenPyProject = async (
   state: RootState
 ) => {
   try {
-    // const AssetsUrl = 'http://localhost:8585/s3/assets/'
     const AssetsUrl = 'https://assets.miku.gg/'
     const allBackgroundAssets = state.novel.backgrounds.map(
       (background) => background.source.jpg
@@ -268,7 +262,7 @@ export const downloadRenPyProject = async (
     //   return scene.musicId
     // })
 
-    const response = await fetch(localClearProjectUrl)
+    const response = await fetch(clearProjectUrl)
     const buffer = await response.arrayBuffer()
     const zip = await JSZip.loadAsync(buffer)
     const blob = new Blob([script], { type: 'text/plain' })
