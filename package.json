@@ -1,6 +1,7 @@
 {
   "name": "mikugg",
   "private": true,
+  "main": "electron-main.js",
   "scripts": {
     "bootstrap": "npx lerna bootstrap --include-dependencies",
     "docs": "lerna run start --scope=@mikugg/docs",
@@ -9,7 +10,8 @@
     "run-services": "cd apps/services && node --loader ts-node/esm src/server.mts",
     "test": "lerna run test --scope=@mikugg/extensions --scope=@mikugg/ui-kit",
     "pull": "git reset --hard HEAD && git pull origin master && pnpm install",
-    "build": "npx lerna run build"
+    "build": "npx lerna run build",
+    "electron": "electron ."
   },
   "workspaces": [
     "packages/*",
@@ -18,6 +20,8 @@
   ],
   "devDependencies": {
     "dotenv": "^16.0.3",
+    "electron": "^16.0.0",
+    "cors": "^2.8.5",
     "lerna": "^6.4.1"
   },
   "publishConfig": {
