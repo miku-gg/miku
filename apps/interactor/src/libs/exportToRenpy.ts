@@ -19,32 +19,83 @@ function removeFileExtension(filename: string): string {
   return filename.replace(/\.(png|jpeg)$/i, '')
 }
 function getSlicedStrings(str: string): string[] {
-  const slices = []
+  const slices: string[] = []
   let startIndex = 0
   let endIndex = 0
+  const formattedText = str.replace(/\n/g, ' ')
 
-  while (startIndex < str.length) {
-    endIndex = str.indexOf('*', startIndex)
-    if (endIndex === -1) {
-      slices.push(str.slice(startIndex) + '*')
+  while (startIndex < formattedText.length) {
+    const nextAsteriskIndex = formattedText.indexOf('*', startIndex)
+    const nextQuoteIndex = formattedText.indexOf('"', startIndex)
+
+    // Check if a quote or asterisk was found
+    if (nextAsteriskIndex === -1 && nextQuoteIndex === -1) {
+      // If neither was found, add the remaining text and break
+      const remainingText = formattedText.slice(startIndex)
+      addTextToSlices(remainingText, slices)
       break
     }
 
-    slices.push(str.slice(startIndex, endIndex + 1))
+    // Find the nearest delimiter (quote or asterisk)
+    const nearestDelimiterIndex = Math.min(
+      nextAsteriskIndex !== -1 ? nextAsteriskIndex : Infinity,
+      nextQuoteIndex !== -1 ? nextQuoteIndex : Infinity
+    )
 
-    startIndex = endIndex
-    endIndex = str.indexOf('*', startIndex + 1)
-    if (endIndex === -1) {
-      slices.push(str.slice(startIndex) + '*')
-      break
+    if (nearestDelimiterIndex > startIndex) {
+      // Add the text before the delimiter
+      const textBeforeDelimiter = formattedText
+        .slice(startIndex, nearestDelimiterIndex)
+        .trim()
+      if (textBeforeDelimiter.length > 0) {
+        addTextToSlices(textBeforeDelimiter, slices)
+      }
     }
 
-    slices.push(str.slice(startIndex, endIndex + 1))
-
-    startIndex = endIndex + 1 // Move start index past the closing asterisk
+    // If the nearest delimiter is an asterisk
+    if (nearestDelimiterIndex === nextAsteriskIndex) {
+      endIndex = formattedText.indexOf('*', nearestDelimiterIndex + 1)
+      if (endIndex === -1) {
+        endIndex = formattedText.length
+      } else {
+        endIndex += 1
+      }
+      slices.push(formattedText.slice(nearestDelimiterIndex, endIndex))
+      startIndex = endIndex
+    } else {
+      // If the nearest delimiter is a quote
+      endIndex = formattedText.indexOf('"', nearestDelimiterIndex + 1)
+      if (endIndex === -1) {
+        endIndex = formattedText.length
+      }
+      slices.push(formattedText.slice(nearestDelimiterIndex + 1, endIndex))
+      startIndex = endIndex + 1
+    }
   }
 
-  return slices
+  // Split slices longer than 50 words into two parts
+  return slices.flatMap((slice) => {
+    const words = slice.split(' ')
+    if (words.length >= 50) {
+      const midIndex = Math.ceil(words.length / 2)
+      return [
+        words.slice(0, midIndex).join(' '),
+        words.slice(midIndex).join(' '),
+      ]
+    }
+    return [slice]
+  })
+}
+
+function addTextToSlices(text: string, slices: string[]) {
+  const words = text.split(' ')
+  if (words.length > 30) {
+    for (let i = 0; i < words.length; i += 30) {
+      slices.push(words.slice(i, i + 30).join(' '))
+    }
+  } else {
+    slices.push(text)
+  }
 }
 
 export const exportToRenPy = (state: RootState) => {
@@ -118,6 +169,16 @@ export const exportToRenPy = (state: RootState) => {
   script += `\ntransform scale:
     zoom 1.25`
 
+  script += `\nimage logo = "logo.png"
+  \nlabel splashscreen:
+    scene black
+    with Pause(1)\n
+    show logo with dissolve
+    with Pause(2)\n
+    scene black with dissolve
+    with Pause(1)\n
+    return`
+
   script += '\n\nlabel start:\n'
 
   script += `    image bg ${removeFileExtension(
@@ -175,7 +236,6 @@ export const exportToRenPy = (state: RootState) => {
   }
 
   script += '    return\n'
-
   downloadRenPyProject(script, state)
   // return {
   //   script,
@@ -187,7 +247,8 @@ export const downloadRenPyProject = async (
   state: RootState
 ) => {
   try {
-    const AssetsUrl = 'http://localhost:8585/s3/assets/'
+    // const AssetsUrl = 'http://localhost:8585/s3/assets/'
+    const AssetsUrl = 'https://assets.miku.gg/'
     const allBackgroundAssets = state.novel.backgrounds.map(
       (background) => background.source.jpg
     )
