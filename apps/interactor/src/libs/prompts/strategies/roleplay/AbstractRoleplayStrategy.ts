@@ -3,18 +3,19 @@ import {
   EMPTY_MIKU_CARD,
   TavernCardV2,
 } from '@mikugg/bot-utils'
+import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..'
+import {
+  selectAllParentDialoguesWhereCharacterIsPresent,
+  selectCurrentCharacterOutfits,
+  selectCurrentScene,
+  selectLastLoadedCharacters,
+} from '../../../../state/selectors'
 import { RootState } from '../../../../state/store'
 import {
   NarrationInteraction,
   NarrationResponse,
 } from '../../../../state/versioning'
-import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..'
-import {
-  selectCurrentScene,
-  selectCurrentCharacterOutfits,
-  selectLastLoadedCharacters,
-  selectAllParentDialoguesWhereCharacterIsPresent,
-} from '../../../../state/selectors'
+import { findLorebooks } from '../../../lorebookSearch'
 
 const PROMPT_TOKEN_OFFSET = 50
 
@@ -62,6 +63,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     )
 
     let template = this.getContextPrompt(input.state, input.currentCharacterId)
+
     template += this.getDialogueHistoryPrompt(input.state, memorySize, {
       name: currentCharacter?.name || '',
       id: currentCharacter?.id || '',
@@ -331,5 +333,71 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       .split('<START>\n')
       .map((x) => x.trim())
       .filter((x) => x)
+  }
+
+  protected getContextForLorebookEntry(
+    state: RootState,
+    currentCharacterId: string
+  ) {
+    let content: string = ''
+
+    const charactersInScene = selectLastLoadedCharacters(state)
+    const characterEntries = charactersInScene
+      .map(
+        (character) =>
+          state.novel.characters.find((char) => char.id === character.id)?.card
+            .data.character_book?.entries || []
+      )
+      .flat()
+
+    const lastMessages = selectAllParentDialoguesWhereCharacterIsPresent(
+      state,
+      currentCharacterId
+    )
+      .slice(-3)
+      .reverse()
+
+    if (!characterEntries) return null
+
+    const fillTextTemplateWithCharacters = (text: string) =>
+      fillTextTemplate(text, {
+        user: state.settings.user.name,
+        bot:
+          state.novel.characters.find(
+            (character) => character.id === currentCharacterId
+          )?.name || '',
+        characters: state.novel.characters.reduce((prev, { id, card }) => {
+          prev[id] = card.data.name
+          return prev
+        }, {} as Record<string, string>),
+      })
+    const lastMessagesWordsArray = lastMessages
+      .map((message) => {
+        if (message.type === 'response') {
+          return message.item.characters.map((char) =>
+            fillTextTemplateWithCharacters(char.text)
+          )
+        } else {
+          return fillTextTemplateWithCharacters(message.item.query)
+        }
+      })
+      .flat()
+
+    const currentLorebook = findLorebooks(
+      lastMessagesWordsArray,
+      characterEntries.map((entry) => ({
+        keys: entry?.keys || [],
+        content: entry?.content || '',
+      }))
+    )
+
+    if (currentLorebook.length > 0) {
+      content = currentLorebook[0].content
+      if (currentLorebook.length > 1) {
+        content += '\n' + currentLorebook[1].content
+      }
+    }
+
+    return content
   }
 }
