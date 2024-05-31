@@ -11,7 +11,7 @@ const testLorebooks = [
   },
 ]
 
-describe.only('test lorebook search', () => {
+describe('test lorebook search', () => {
   it('should return search result', () => {
     const result = findLorebooks(["I'm hungry"], testLorebooks)
     expect(result).toEqual([
