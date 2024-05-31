@@ -2,7 +2,6 @@ const http = require("http");
 const { exec } = require("child_process");
 
 const { app, BrowserWindow } = require("electron");
-const path = require("path");
 
 function createWindow() {
   console.log("Starting Vite server...");
@@ -48,13 +47,11 @@ function createWindow() {
             height: 600,
             webPreferences: {
               contextIsolation: true,
-              // preload: path.join(__dirname, "preload.js"),
               webSecurity: false // disable webSecurity
             }
           });
 
           win.loadURL("http://localhost:8585");
-          // win.webContents.openDevTools(); // Open DevTools
         }
       })
       .on("error", (err) => {
