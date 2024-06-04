@@ -110,6 +110,8 @@ export const exportToRenPy = (state: RootState) => {
 
   // get all history and separate it in scenes
   const history = selectAllParentDialogues(state).reverse()
+  const allInteractions = state.narration.interactions
+  const allResponses = state.narration.responses
 
   const getSceneData = (sceneId: string) => {
     const scene = state.novel.scenes.find((scene) => scene.id === sceneId)
@@ -150,6 +152,7 @@ export const exportToRenPy = (state: RootState) => {
       music: scene?.musicId,
     }
   }
+
   assert(history[0].type === 'response', 'First dialogue should be a response')
   let currentSceneId =
     state.novel.starts.find((start) => start.id === history[0].item.id)
@@ -160,7 +163,6 @@ export const exportToRenPy = (state: RootState) => {
   )?.source.jpg
 
   script += `\ntransform yoffset:
-    zoom 0.5
     yalign 1.0
     xalign 0.5`
 
@@ -187,23 +189,78 @@ export const exportToRenPy = (state: RootState) => {
     currentBackgroundSrc || ''
   )}  at scale\n`
 
-  for (const { item, type } of history) {
-    if (type === 'interaction') {
-      if (item.sceneId !== currentSceneId) {
-        currentSceneId = item.sceneId
-        currentScene = getSceneData(currentSceneId)
-        let currentBackgroundSrc = state.novel.backgrounds.find(
-          (background) => background.id === currentScene.background
-        )?.source.jpg
-        script += `    scene bg ${removeFileExtension(
-          currentBackgroundSrc || ''
-        )} at scale\n`
-      } else {
-        script += `    m "${item.query}"\n`
-      }
-    } else {
-      item.characters.forEach((characterResponse, index) => {
-        const character = currentScene.characters.find(
+  // for (const { item, type } of history) {
+  //   if (type === 'interaction') {
+  //     if (item.sceneId !== currentSceneId) {
+  //       currentSceneId = item.sceneId
+  //       currentScene = getSceneData(currentSceneId)
+  //       let currentBackgroundSrc = state.novel.backgrounds.find(
+  //         (background) => background.id === currentScene.background
+  //       )?.source.jpg
+
+  //       script += `    image bg ${removeFileExtension(
+  //         currentBackgroundSrc || ''
+  //       )} = ${currentBackgroundSrc}\n`
+
+  //       script += `    scene bg ${removeFileExtension(
+  //         currentBackgroundSrc || ''
+  //       )} at scale\n`
+  //     } else {
+  //       script += `    m "${item.query}"\n`
+  //     }
+  //   } else {
+  //     item.characters.forEach((characterResponse, index) => {
+  //       const character = currentScene.characters.find(
+  //         (char) => char.id === characterResponse.characterId
+  //       )
+  //       const currentOutfitSrc = character?.outfit.emotions.find(
+  //         (emotion) => emotion.id === characterResponse.emotion
+  //       )?.sources.png
+  //       script += `    image ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} = "${currentOutfitSrc}"\n`
+  //       script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} at yoffset`
+  //       script +=
+  //         item.characters.length > 1
+  //           ? index === 0
+  //             ? ' at left'
+  //             : ' at right'
+  //           : ''
+  //       script += '\n'
+  //       const slicedTexts = getSlicedStrings(characterResponse.text)
+  //       slicedTexts.forEach((text) => {
+  //         script += `    ${character?.slug} "${fillTextTemplate(text, {
+  //           user: state.settings.user.name,
+  //           bot: character?.name || '',
+  //           characters: currentScene.characters.reduce((acc, char) => {
+  //             acc[char.id || ''] = char.name
+  //             return acc
+  //           }, {} as { [key: string]: string }),
+  //         })}"\n`
+  //       })
+  //     })
+  //   }
+  // }
+
+  for (const responseID of Object.keys(allResponses)) {
+    const response = allResponses[responseID]
+    if (response) {
+      const currentSceneId =
+        allInteractions[response.parentInteractionId || 0]?.sceneId
+
+      const scene = getSceneData(currentSceneId!)
+      const backgroundSrc = state.novel.backgrounds.find(
+        (background) => background.id === scene.background
+      )?.source.jpg
+      script += `\n\nlabel ${response.id}:\n`
+      script += `    image bg ${removeFileExtension(
+        backgroundSrc || ''
+      )} = "${backgroundSrc}"\n`
+
+      script += `    scene bg ${removeFileExtension(
+        backgroundSrc || ''
+      )} at scale\n`
+
+      response.characters.forEach((characterResponse, index) => {
+        const character = scene.characters.find(
           (char) => char.id === characterResponse.characterId
         )
         const currentOutfitSrc = character?.outfit.emotions.find(
@@ -212,7 +269,7 @@ export const exportToRenPy = (state: RootState) => {
         script += `    image ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} = "${currentOutfitSrc}"\n`
         script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} at yoffset`
         script +=
-          item.characters.length > 1
+          response.characters.length > 1
             ? index === 0
               ? ' at left'
               : ' at right'
@@ -223,13 +280,47 @@ export const exportToRenPy = (state: RootState) => {
           script += `    ${character?.slug} "${fillTextTemplate(text, {
             user: state.settings.user.name,
             bot: character?.name || '',
-            characters: currentScene.characters.reduce((acc, char) => {
+            characters: scene.characters.reduce((acc, char) => {
               acc[char.id || ''] = char.name
               return acc
             }, {} as { [key: string]: string }),
           })}"\n`
         })
       })
+      if (response.childrenInteractions.length > 1) {
+        script += `    menu:\n`
+        for (const interactionID of response.childrenInteractions) {
+          const interaction = allInteractions[interactionID.interactionId]
+          script += `        "${interaction?.query}":\n`
+          script += `            jump ${interaction?.id}\n`
+        }
+      } else {
+        script += `    jump ${response.childrenInteractions[0]}\n`
+      }
+      script += `    return\n`
+    }
+  }
+
+  for (const interactionID of Object.keys(allInteractions)) {
+    const interaction = allInteractions[interactionID]
+    if (interaction) {
+      const sceneId = interaction.sceneId
+      const scene = getSceneData(sceneId)
+      const backgroundSrc = state.novel.backgrounds.find(
+        (background) => background.id === scene.background
+      )?.source.jpg
+      script += `\n\nlabel ${interaction.id}:\n`
+      script += `    image bg ${removeFileExtension(
+        backgroundSrc || ''
+      )} = "${backgroundSrc}"\n`
+
+      script += `    scene bg ${removeFileExtension(
+        backgroundSrc || ''
+      )} at scale\n`
+
+      script += `    m "${interaction.query}"\n`
+      script += `    jump ${interaction.responsesId[0]}\n`
+      script += `    return\n`
     }
   }
 
