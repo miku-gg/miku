@@ -16,6 +16,13 @@ const clearProjectUrl = 'https://assets.miku.gg/RenPyExport.zip'
 function removeFileExtension(filename: string): string {
   return filename.replace(/\.(png|jpeg)$/i, '')
 }
+
+const sanitizeId = (inputString: string): string => {
+  return inputString.includes('-')
+    ? inputString.replace(/-/g, '_')
+    : inputString
+}
+
 function getSlicedStrings(str: string): string[] {
   const slices: string[] = []
   let startIndex = 0
@@ -178,6 +185,29 @@ export const exportToRenPy = (state: RootState) => {
     scene black with dissolve
     with Pause(1)\n
     return`
+  
+  for (const interactionID of Object.keys(allInteractions)) {
+    const interaction = allInteractions[interactionID]
+    if (interaction) {
+      const sceneId = interaction.sceneId
+      const scene = getSceneData(sceneId)
+      const backgroundSrc = state.novel.backgrounds.find(
+        (background) => background.id === scene.background
+      )?.source.jpg
+      script += `\n\nlabel ${sanitizeId(interaction.id)}:\n`
+      script += `    image bg ${removeFileExtension(
+        backgroundSrc || ''
+      )} = "${backgroundSrc}"\n`
+
+      script += `    scene bg ${removeFileExtension(
+        backgroundSrc || ''
+      )} at scale\n`
+
+      script += `    m "${interaction.query}"\n`
+      script += `    jump ${sanitizeId(interaction.responsesId[0])}\n`
+      script += `    return\n`
+    }
+  }
 
   for (const responseID of Object.keys(allResponses)) {
     const response = allResponses[responseID]
@@ -189,7 +219,7 @@ export const exportToRenPy = (state: RootState) => {
       const backgroundSrc = state.novel.backgrounds.find(
         (background) => background.id === scene.background
       )?.source.jpg
-      script += `\n\nlabel ${response.id}:\n`
+      script += `\n\nlabel ${sanitizeId(response.id)}:\n`
       script += `    image bg ${removeFileExtension(
         backgroundSrc || ''
       )} = "${backgroundSrc}"\n`
@@ -231,38 +261,20 @@ export const exportToRenPy = (state: RootState) => {
         for (const interactionID of response.childrenInteractions) {
           const interaction = allInteractions[interactionID.interactionId]
           script += `        "${interaction?.query}":\n`
-          script += `            jump ${interaction?.id}\n`
+          script += `            jump ${sanitizeId(interaction?.id!)}\n`
         }
       } else {
-        script += `    jump ${response.childrenInteractions[0]}\n`
+        // TODO: Fix this, it's not working properly
+        script += `    jump ${sanitizeId(
+          response.childrenInteractions[0].interactionId
+        )}\n`
       }
       script += `    return\n`
     }
   }
 
-  for (const interactionID of Object.keys(allInteractions)) {
-    const interaction = allInteractions[interactionID]
-    if (interaction) {
-      const sceneId = interaction.sceneId
-      const scene = getSceneData(sceneId)
-      const backgroundSrc = state.novel.backgrounds.find(
-        (background) => background.id === scene.background
-      )?.source.jpg
-      script += `\n\nlabel ${interaction.id}:\n`
-      script += `    image bg ${removeFileExtension(
-        backgroundSrc || ''
-      )} = "${backgroundSrc}"\n`
-
-      script += `    scene bg ${removeFileExtension(
-        backgroundSrc || ''
-      )} at scale\n`
-
-      script += `    m "${interaction.query}"\n`
-      script += `    jump ${interaction.responsesId[0]}\n`
-      script += `    return\n`
-    }
-  }
-
+  
+  //TODO: Add start scene label
   script += '\n\nlabel start:\n'
 
   script += `    image bg ${removeFileExtension(
