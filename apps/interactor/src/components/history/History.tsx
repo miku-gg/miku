@@ -114,17 +114,6 @@ const HistoryActions = () => {
         style={{ color: 'white' }}
         onClick={() => {
           exportToRenPy(state)
-          // const { script } = exportToRenPy(state)
-          // const blob = new Blob([script], { type: 'text/plain' })
-          // const a = document.createElement('a')
-          // const url = URL.createObjectURL(blob)
-          // a.href = url
-          // a.download = `${state.novel.title}_script.rpy`
-          // document.body.appendChild(a)
-          // a.click()
-          // document.body.removeChild(a)
-          // URL.revokeObjectURL(url)
-          // trackEvent('export-renpy-click')
         }}
       >
         Export To Ren&apos;Py
@@ -304,7 +293,6 @@ const HistoryModal = (): ReactElement => {
       setAllNodesPosition(nodes, edges, topResponse?.id || ''),
     ]
   })()
-
   return (
     <div className="History__modal">
       {/* eslint-disable-next-line */}
