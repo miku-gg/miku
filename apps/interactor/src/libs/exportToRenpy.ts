@@ -179,74 +179,13 @@ export const exportToRenPy = (state: RootState) => {
     with Pause(1)\n
     return`
 
-  script += '\n\nlabel start:\n'
-
-  script += `    image bg ${removeFileExtension(
-    currentBackgroundSrc || ''
-  )} = "${currentBackgroundSrc}"\n`
-
-  script += `    scene bg ${removeFileExtension(
-    currentBackgroundSrc || ''
-  )}  at scale\n`
-
-  // for (const { item, type } of history) {
-  //   if (type === 'interaction') {
-  //     if (item.sceneId !== currentSceneId) {
-  //       currentSceneId = item.sceneId
-  //       currentScene = getSceneData(currentSceneId)
-  //       let currentBackgroundSrc = state.novel.backgrounds.find(
-  //         (background) => background.id === currentScene.background
-  //       )?.source.jpg
-
-  //       script += `    image bg ${removeFileExtension(
-  //         currentBackgroundSrc || ''
-  //       )} = ${currentBackgroundSrc}\n`
-
-  //       script += `    scene bg ${removeFileExtension(
-  //         currentBackgroundSrc || ''
-  //       )} at scale\n`
-  //     } else {
-  //       script += `    m "${item.query}"\n`
-  //     }
-  //   } else {
-  //     item.characters.forEach((characterResponse, index) => {
-  //       const character = currentScene.characters.find(
-  //         (char) => char.id === characterResponse.characterId
-  //       )
-  //       const currentOutfitSrc = character?.outfit.emotions.find(
-  //         (emotion) => emotion.id === characterResponse.emotion
-  //       )?.sources.png
-  //       script += `    image ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} = "${currentOutfitSrc}"\n`
-  //       script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} at yoffset`
-  //       script +=
-  //         item.characters.length > 1
-  //           ? index === 0
-  //             ? ' at left'
-  //             : ' at right'
-  //           : ''
-  //       script += '\n'
-  //       const slicedTexts = getSlicedStrings(characterResponse.text)
-  //       slicedTexts.forEach((text) => {
-  //         script += `    ${character?.slug} "${fillTextTemplate(text, {
-  //           user: state.settings.user.name,
-  //           bot: character?.name || '',
-  //           characters: currentScene.characters.reduce((acc, char) => {
-  //             acc[char.id || ''] = char.name
-  //             return acc
-  //           }, {} as { [key: string]: string }),
-  //         })}"\n`
-  //       })
-  //     })
-  //   }
-  // }
-
   for (const responseID of Object.keys(allResponses)) {
     const response = allResponses[responseID]
     if (response) {
-      const currentSceneId =
+      const sceneID =
         allInteractions[response.parentInteractionId || 0]?.sceneId
 
-      const scene = getSceneData(currentSceneId!)
+      const scene = getSceneData(sceneID ? sceneID : currentSceneId)
       const backgroundSrc = state.novel.backgrounds.find(
         (background) => background.id === scene.background
       )?.source.jpg
@@ -323,6 +262,67 @@ export const exportToRenPy = (state: RootState) => {
       script += `    return\n`
     }
   }
+
+  script += '\n\nlabel start:\n'
+
+  script += `    image bg ${removeFileExtension(
+    currentBackgroundSrc || ''
+  )} = "${currentBackgroundSrc}"\n`
+
+  script += `    scene bg ${removeFileExtension(
+    currentBackgroundSrc || ''
+  )}  at scale\n`
+
+  // for (const { item, type } of history) {
+  //   if (type === 'interaction') {
+  //     if (item.sceneId !== currentSceneId) {
+  //       currentSceneId = item.sceneId
+  //       currentScene = getSceneData(currentSceneId)
+  //       let currentBackgroundSrc = state.novel.backgrounds.find(
+  //         (background) => background.id === currentScene.background
+  //       )?.source.jpg
+
+  //       script += `    image bg ${removeFileExtension(
+  //         currentBackgroundSrc || ''
+  //       )} = ${currentBackgroundSrc}\n`
+
+  //       script += `    scene bg ${removeFileExtension(
+  //         currentBackgroundSrc || ''
+  //       )} at scale\n`
+  //     } else {
+  //       script += `    m "${item.query}"\n`
+  //     }
+  //   } else {
+  //     item.characters.forEach((characterResponse, index) => {
+  //       const character = currentScene.characters.find(
+  //         (char) => char.id === characterResponse.characterId
+  //       )
+  //       const currentOutfitSrc = character?.outfit.emotions.find(
+  //         (emotion) => emotion.id === characterResponse.emotion
+  //       )?.sources.png
+  //       script += `    image ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} = "${currentOutfitSrc}"\n`
+  //       script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} at yoffset`
+  //       script +=
+  //         item.characters.length > 1
+  //           ? index === 0
+  //             ? ' at left'
+  //             : ' at right'
+  //           : ''
+  //       script += '\n'
+  //       const slicedTexts = getSlicedStrings(characterResponse.text)
+  //       slicedTexts.forEach((text) => {
+  //         script += `    ${character?.slug} "${fillTextTemplate(text, {
+  //           user: state.settings.user.name,
+  //           bot: character?.name || '',
+  //           characters: currentScene.characters.reduce((acc, char) => {
+  //             acc[char.id || ''] = char.name
+  //             return acc
+  //           }, {} as { [key: string]: string }),
+  //         })}"\n`
+  //       })
+  //     })
+  //   }
+  // }
 
   script += '    return\n'
   downloadRenPyProject(script, state)
