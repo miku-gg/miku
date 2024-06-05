@@ -373,20 +373,23 @@ export const selectCurrentNextScene = createSelector(
   }
 )
 
-export const selectCurrentMap = createSelector(
+export const selectCurrentMaps = createSelector(
   [selectCurrentScene, (state: RootState) => state.novel.maps],
   (scene, maps) => {
-    const currentMap = scene?.parentMapId
-      ? maps.find((map) => map.id === scene?.parentMapId)
-      : null
-    if (!currentMap) return null
-    return {
-      ...currentMap,
-      places: currentMap.places.map((place) => ({
-        ...place,
-        isCurrentPlace: place.sceneId === scene?.id,
-      })),
-    }
+    const mapIds = scene?.parentMapIds
+    return (
+      mapIds
+        ?.map((mapId) => maps.find((map) => map.id === mapId) || null)
+        .filter((map) => map !== null)
+        .map((currentMap) => ({
+          ...(currentMap as NovelV3.NovelMap),
+          places:
+            currentMap?.places.map((place) => ({
+              ...place,
+              isCurrentPlace: place.sceneId === scene?.id,
+            })) || [],
+        })) || []
+    )
   }
 )
 

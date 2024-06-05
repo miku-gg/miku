@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import { selectCurrentMap } from '../../state/selectors'
+import { selectCurrentMaps } from '../../state/selectors'
 import { GiPathDistance } from 'react-icons/gi'
 import './InteractiveMap.scss'
 import { Button, Modal } from '@mikugg/ui-kit'
@@ -14,12 +14,26 @@ const isTouchScreen = window.navigator.maxTouchPoints > 0
 const InteractiveMapToggle = () => {
   const dispatch = useAppDispatch()
   const opened = useAppSelector((state) => state.settings.modals.map)
-  const map = useAppSelector(selectCurrentMap)
+  const maps = useAppSelector(selectCurrentMaps)
+  const [selectedMap, setSelectedMap] = useState<(typeof maps)[number] | null>(
+    null
+  )
+  const { disabled: inputDisabled } = useAppSelector(
+    (state) => state.narration.input
+  )
+
+  useEffect(() => {
+    if (maps.length) {
+      setSelectedMap(maps[0])
+    }
+  }, [maps])
+
   return (
     <>
-      {map ? (
+      {maps.length ? (
         <button
           className="InteractiveMap__toggle"
+          disabled={inputDisabled}
           onClick={() => {
             dispatch(setMapModal(true))
           }}
@@ -29,24 +43,59 @@ const InteractiveMapToggle = () => {
       ) : null}
       <Modal
         className="InteractiveMap__modal"
-        overlayClassName="InteractiveMap__overlay"
+        overlayClassName="InteractiveMap__overlay scrollbar"
         opened={opened}
-        title={map?.name || 'Map'}
+        title={selectedMap?.name || 'Map'}
         onCloseModal={() => {
           dispatch(setMapModal(false))
         }}
         shouldCloseOnOverlayClick
       >
-        <InteractiveMapModal />
+        {maps.length > 1 ? (
+          <div className="InteractiveMap__modal-map-selector">
+            {maps.map((map) => (
+              <div
+                key={map.id}
+                className="InteractiveMap__modal-map-selector__item"
+              >
+                <Button
+                  theme={
+                    selectedMap?.id === map.id ? 'secondary' : 'transparent'
+                  }
+                  onClick={() => setSelectedMap(map)}
+                >
+                  {map.name}
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        <InteractiveMapModal map={selectedMap} />
       </Modal>
     </>
   )
 }
 
-const InteractiveMapModal = () => {
+const InteractiveMapModal = ({
+  map,
+}: {
+  map: {
+    id: string
+    name: string
+    source: {
+      png: string
+    }
+    places: {
+      id: string
+      name: string
+      description: string
+      maskSource: string
+      sceneId: string
+    }[]
+  } | null
+}) => {
   const dispatch = useAppDispatch()
   const { servicesEndpoint, apiEndpoint, assetLinkLoader } = useAppContext()
-  const map = useAppSelector(selectCurrentMap)
   const mapBackgroundRef = useRef<HTMLImageElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const offScreenCanvasRef = useRef(document.createElement('canvas'))
@@ -61,21 +110,34 @@ const InteractiveMapModal = () => {
   const scene = scenes.find((scene) => scene.id === highlightedPlace?.sceneId)
 
   useEffect(() => {
-    canvasRef.current?.addEventListener('mousemove', (event) => {
-      const rect = canvasRef.current?.getBoundingClientRect()
-      const x = event.clientX - (rect?.left || 0)
-      const y = event.clientY - (rect?.top || 0)
-      const placeDescription = document.getElementById(
-        'interactive-map-place-info'
-      )
-      if (placeDescription) {
-        placeDescription.style.top = y + 10 + 'px'
-        placeDescription.style.left = x + 10 + 'px'
+    const canvas = canvasRef?.current
+    if (canvas) {
+      const handleMouseMove = (event: MouseEvent) => {
+        const rect = canvas.getBoundingClientRect()
+        const x = event.clientX - (rect?.left || 0)
+        const y = event.clientY - (rect?.top || 0)
+        const placeDescription = document.getElementById(
+          'interactive-map-place-info'
+        )
+        if (placeDescription) {
+          placeDescription.style.top = y + 10 + 'px'
+          placeDescription.style.left = x + 10 + 'px'
+        }
       }
-    })
+
+      canvas.addEventListener('mousemove', handleMouseMove)
+
+      return () => {
+        canvas.removeEventListener('mousemove', handleMouseMove)
+      }
+    }
   }, [canvasRef.current])
 
   useEffect(() => {
+    const cleanupFuncRef: {
+      current: (() => void) | null
+    } = { current: null }
+
     const handleImageLoad = () => {
       if (
         map &&
@@ -180,22 +242,23 @@ const InteractiveMapModal = () => {
           }
         }
 
-        canvas?.addEventListener('mousemove', (e) =>
+        const handleMouseMove = (e: MouseEvent) =>
           highlightCoord(e.offsetX, e.offsetY)
-        )
-        // highlight on touch start
-        canvas.addEventListener('ontouchend', (e) => {
+        const handleTouchEnd = (e: TouchEvent) => {
           e.preventDefault()
-          // eslint-disable-next-line
-          // @ts-ignore
           const touch = e.touches && e.touches[0]
           highlightCoord(touch?.clientX, touch?.clientY)
-        })
+        }
 
-        window.addEventListener('resize', () => {
-          // if (canvas) canvas.width = window.innerWidth
-          // if (canvas) canvas.height = window.innerHeight
-        })
+        canvas.addEventListener('mousemove', handleMouseMove)
+        canvas.addEventListener('touchend', handleTouchEnd)
+
+        cleanupFuncRef.current = () => {
+          canvas.removeEventListener('mousemove', handleMouseMove)
+          canvas.removeEventListener('touchend', handleTouchEnd)
+          maskImages.clear()
+          setHighlightedPlaceId(null)
+        }
       }
     }
 
@@ -208,8 +271,12 @@ const InteractiveMapModal = () => {
       if (imgElement) {
         imgElement.removeEventListener('load', handleImageLoad)
       }
+      if (cleanupFuncRef.current) {
+        cleanupFuncRef.current()
+        cleanupFuncRef.current = null
+      }
     }
-  }, [map])
+  }, [map, assetLinkLoader])
 
   const handleMapClick = () => {
     if (highlightedPlace && scene) {

@@ -37,7 +37,7 @@ export interface NovelScene {
     objective?: string;
   }[];
   children: string[];
-  parentMapId: string | null;
+  parentMapIds?: string[] | null;
   nsfw: NovelNSFW;
 }
 

@@ -54,7 +54,10 @@ export const selectScenes = createSelector(
           };
         }),
         music: songs.find((song) => song.id === scene.musicId),
-        parentMap: maps.find((map) => map.id === scene.parentMapId),
+        parentMaps:
+          scene.parentMapIds?.map((parentMapId) =>
+            maps.find((map) => map.id === parentMapId)
+          ) || [],
         starts: _starts,
       };
     });

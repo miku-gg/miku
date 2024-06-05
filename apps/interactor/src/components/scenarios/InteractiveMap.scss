@@ -11,6 +11,13 @@
     &:hover {
       color: $secondary-color;
     }
+
+    &:disabled {
+      svg {
+        color: gray;
+        cursor: default;
+      }
+    }
   }
   &__place-info {
     position: absolute;
@@ -39,11 +46,21 @@
   }
 
   &__modal-content {
-    margin-top: 10px;
+    margin-top: 30px;
     position: relative;
   }
+
   &__background-image {
     width: 100%;
     object-fit: cover;
+    border-radius: 10px;
+  }
+
+  &__modal-map-selector {
+    position: absolute;
+    display: flex;
+    gap: 10px;
+    right: 15px;
+    top: 15px;
   }
 }

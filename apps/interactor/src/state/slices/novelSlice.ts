@@ -96,7 +96,7 @@ const novelSlice = createSlice({
         actionText: action.payload.prompt,
         condition: '',
         nsfw: NovelNSFW.NONE,
-        parentMapId: null,
+        parentMapIds: null,
       })
     },
     addChildrenScenes: (
