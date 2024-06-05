@@ -77,11 +77,15 @@ export const downloadNovelState = async (
     });
     const base64s = await Promise.all(promises);
     batch.forEach(([key, value], index) => {
-      novelResult = replaceStringsInObject(
-        novelResult,
-        key,
-        base64s[index]
-      ) as NovelV3.NovelState;
+      if (key && base64s[index]) {
+        novelResult = replaceStringsInObject(
+          novelResult,
+          key,
+          base64s[index]
+        ) as NovelV3.NovelState;
+      } else {
+        console.error("Error downloading asset", key, value);
+      }
     });
   }
 

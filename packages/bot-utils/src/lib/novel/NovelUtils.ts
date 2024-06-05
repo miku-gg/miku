@@ -137,7 +137,7 @@ export const tavernCardToNovelState = (
       ),
       musicId: scenario.music || "",
       prompt: scenario.context,
-      parentMapId: null,
+      parentMapIds: null,
     })) || [
       {
         id: "default-scenario",
@@ -155,7 +155,7 @@ export const tavernCardToNovelState = (
         children: [],
         musicId: "default-music",
         prompt: "",
-        parentMapId: null,
+        parentMapIds: null,
       },
     ],
   };
@@ -221,7 +221,7 @@ export const migrateNovelV2ToV3 = (
         condition: "",
         children: scene.children,
         name: scene.name,
-        parentMapId: null,
+        parentMapIds: null,
         prompt: scene.prompt,
         characters: scene.roles.map(({ role, characterId }) => ({
           characterId: characterId,
@@ -353,7 +353,7 @@ export const extractNovelAssets = async (
         const placePreviewHash = await hashBase64URI(place.previewSource);
         images.set(placePreviewHash, place.previewSource);
         place.previewSource = placePreviewHash;
-      } else {
+      } else if (place.previewSource) {
         images.set(place.previewSource, place.previewSource);
       }
       if (place.maskSource.startsWith("data:")) {
@@ -795,16 +795,18 @@ export function validateNovelState(
       });
 
       // validate parentMapId
-      if (
-        scene.parentMapId &&
-        !novel.maps.some((map) => map.id === scene.parentMapId)
-      ) {
-        errors.push({
-          targetType: NovelValidationTargetType.SCENE,
-          targetId: scene.id,
-          severity: "error",
-          message: `Parent map ${scene.parentMapId} not found`,
-        });
+      if (scene.parentMapIds?.length) {
+        const erroredMap = scene.parentMapIds.find(
+          (parentMapId) => !novel.maps.some((map) => map.id === parentMapId)
+        );
+        if (erroredMap) {
+          errors.push({
+            targetType: NovelValidationTargetType.SCENE,
+            targetId: scene.id,
+            severity: "error",
+            message: `Parent map ${erroredMap} not found`,
+          });
+        }
       }
 
       // validate no scene name

@@ -136,6 +136,7 @@ export interface SettingsState {
     settingsTab: 'general' | 'prompt' | 'audio'
     about: boolean
     history: boolean
+    map: boolean
     edit: {
       opened: boolean
       id: string

@@ -7,6 +7,7 @@ import ScreenSizer from './ScreenSizer'
 import './InteractorHeader.scss'
 import Settings from './Settings'
 import ModelSelector from './ModelSelector'
+import InteractiveMap from '../scenarios/InteractiveMap'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
@@ -33,6 +34,7 @@ const InteractorHeader = () => {
         <div className="InteractorHeader__header-name">{title}</div>
         <SceneSelector />
         <History />
+        <InteractiveMap />
       </div>
       <div className="InteractorHeader__right">
         <ModelSelector />
