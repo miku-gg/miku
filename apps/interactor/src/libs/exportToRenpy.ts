@@ -174,7 +174,7 @@ export const exportToRenPy = (state: RootState) => {
     xalign 0.5`
 
   script += `\ntransform scale:
-    zoom 1.25`
+    xysize(1920,1080)`
 
   script += `\nimage logo = "logo.png"
   \nlabel splashscreen:
@@ -295,10 +295,7 @@ export const exportToRenPy = (state: RootState) => {
   downloadRenPyProject(script, state)
 }
 
-export const downloadRenPyProject = async (
-  script: string,
-  state: RootState
-) => {
+const downloadRenPyProject = async (script: string, state: RootState) => {
   try {
     const AssetsUrl = 'https://assets.miku.gg/'
     const allBackgroundAssets = state.novel.backgrounds.map(
@@ -315,10 +312,6 @@ export const downloadRenPyProject = async (
         )
       })
       .flat(2)
-
-    // const currentMusic = state.novel.scenes.map((scene) => {
-    //   return scene.musicId
-    // })
 
     const response = await fetch(clearProjectUrl)
     const buffer = await response.arrayBuffer()
@@ -359,3 +352,4 @@ export const downloadRenPyProject = async (
     console.error('Error:', err)
   }
 }
+
