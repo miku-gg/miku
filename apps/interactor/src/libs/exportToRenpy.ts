@@ -185,7 +185,20 @@ export const exportToRenPy = (state: RootState) => {
     scene black with dissolve
     with Pause(1)\n
     return`
-  
+
+  script += '\n\nlabel start:\n'
+
+  script += `    image bg ${removeFileExtension(
+    currentBackgroundSrc || ''
+  )} = "${currentBackgroundSrc}"\n`
+
+  script += `    scene bg ${removeFileExtension(
+    currentBackgroundSrc || ''
+  )}  at scale\n`
+
+  script += `    jump ${history[0].type}_${history[0].item.id}\n
+    return\n`
+
   for (const interactionID of Object.keys(allInteractions)) {
     const interaction = allInteractions[interactionID]
     if (interaction) {
@@ -194,7 +207,7 @@ export const exportToRenPy = (state: RootState) => {
       const backgroundSrc = state.novel.backgrounds.find(
         (background) => background.id === scene.background
       )?.source.jpg
-      script += `\n\nlabel ${sanitizeId(interaction.id)}:\n`
+      script += `\n\nlabel interaction_${sanitizeId(interaction.id)}:\n`
       script += `    image bg ${removeFileExtension(
         backgroundSrc || ''
       )} = "${backgroundSrc}"\n`
@@ -204,7 +217,7 @@ export const exportToRenPy = (state: RootState) => {
       )} at scale\n`
 
       script += `    m "${interaction.query}"\n`
-      script += `    jump ${sanitizeId(interaction.responsesId[0])}\n`
+      script += `    jump response_${sanitizeId(interaction.responsesId[0])}\n`
       script += `    return\n`
     }
   }
@@ -219,7 +232,7 @@ export const exportToRenPy = (state: RootState) => {
       const backgroundSrc = state.novel.backgrounds.find(
         (background) => background.id === scene.background
       )?.source.jpg
-      script += `\n\nlabel ${sanitizeId(response.id)}:\n`
+      script += `\n\nlabel response_${sanitizeId(response.id)}:\n`
       script += `    image bg ${removeFileExtension(
         backgroundSrc || ''
       )} = "${backgroundSrc}"\n`
@@ -261,80 +274,22 @@ export const exportToRenPy = (state: RootState) => {
         for (const interactionID of response.childrenInteractions) {
           const interaction = allInteractions[interactionID.interactionId]
           script += `        "${interaction?.query}":\n`
-          script += `            jump ${sanitizeId(interaction?.id!)}\n`
+          script += `            jump interaction_${sanitizeId(
+            interaction?.id!
+          )}\n`
         }
       } else {
-        // TODO: Fix this, it's not working properly
-        script += `    jump ${sanitizeId(
-          response.childrenInteractions[0].interactionId
-        )}\n`
+        script += `    jump ${
+          response.childrenInteractions.length > 0
+            ? `interaction_${sanitizeId(
+                response.childrenInteractions[0].interactionId
+              )}`
+            : 'splashscreen'
+        }\n`
       }
       script += `    return\n`
     }
   }
-
-  
-  //TODO: Add start scene label
-  script += '\n\nlabel start:\n'
-
-  script += `    image bg ${removeFileExtension(
-    currentBackgroundSrc || ''
-  )} = "${currentBackgroundSrc}"\n`
-
-  script += `    scene bg ${removeFileExtension(
-    currentBackgroundSrc || ''
-  )}  at scale\n`
-
-  // for (const { item, type } of history) {
-  //   if (type === 'interaction') {
-  //     if (item.sceneId !== currentSceneId) {
-  //       currentSceneId = item.sceneId
-  //       currentScene = getSceneData(currentSceneId)
-  //       let currentBackgroundSrc = state.novel.backgrounds.find(
-  //         (background) => background.id === currentScene.background
-  //       )?.source.jpg
-
-  //       script += `    image bg ${removeFileExtension(
-  //         currentBackgroundSrc || ''
-  //       )} = ${currentBackgroundSrc}\n`
-
-  //       script += `    scene bg ${removeFileExtension(
-  //         currentBackgroundSrc || ''
-  //       )} at scale\n`
-  //     } else {
-  //       script += `    m "${item.query}"\n`
-  //     }
-  //   } else {
-  //     item.characters.forEach((characterResponse, index) => {
-  //       const character = currentScene.characters.find(
-  //         (char) => char.id === characterResponse.characterId
-  //       )
-  //       const currentOutfitSrc = character?.outfit.emotions.find(
-  //         (emotion) => emotion.id === characterResponse.emotion
-  //       )?.sources.png
-  //       script += `    image ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} = "${currentOutfitSrc}"\n`
-  //       script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} at yoffset`
-  //       script +=
-  //         item.characters.length > 1
-  //           ? index === 0
-  //             ? ' at left'
-  //             : ' at right'
-  //           : ''
-  //       script += '\n'
-  //       const slicedTexts = getSlicedStrings(characterResponse.text)
-  //       slicedTexts.forEach((text) => {
-  //         script += `    ${character?.slug} "${fillTextTemplate(text, {
-  //           user: state.settings.user.name,
-  //           bot: character?.name || '',
-  //           characters: currentScene.characters.reduce((acc, char) => {
-  //             acc[char.id || ''] = char.name
-  //             return acc
-  //           }, {} as { [key: string]: string }),
-  //         })}"\n`
-  //       })
-  //     })
-  //   }
-  // }
 
   script += '    return\n'
   downloadRenPyProject(script, state)
@@ -394,7 +349,7 @@ export const downloadRenPyProject = async (
       const a = document.createElement('a')
       const url = URL.createObjectURL(updatedZipBlob)
       a.href = url
-      a.download = `${state.novel.title.split(' ').join('-')}RenPyExport.zip`
+      a.download = `${state.novel.title.split(' ').join('-')}-RenPyExport.zip`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
