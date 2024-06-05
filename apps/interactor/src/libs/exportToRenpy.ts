@@ -292,10 +292,13 @@ export const exportToRenPy = (state: RootState) => {
   }
 
   script += '    return\n'
-  downloadRenPyProject(script, state)
+  return script
 }
 
-const downloadRenPyProject = async (script: string, state: RootState) => {
+export const downloadRenPyProject = async (
+  script: string,
+  state: RootState
+) => {
   try {
     const AssetsUrl = 'https://assets.miku.gg/'
     const allBackgroundAssets = state.novel.backgrounds.map(
@@ -352,4 +355,3 @@ const downloadRenPyProject = async (script: string, state: RootState) => {
     console.error('Error:', err)
   }
 }
-

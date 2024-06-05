@@ -20,7 +20,6 @@ import mergeWith from 'lodash.mergewith'
 import 'reactflow/dist/style.css'
 import { getCongurationFromParams } from '../../../root'
 import { trackEvent } from '../../libs/analytics'
-import { exportToRenPy } from '../../libs/exportToRenpy'
 import {
   DEFAULT_INVENTORY,
   getItemByActionPrompt,
@@ -33,6 +32,7 @@ import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
 import { VersionId as V1VersionId } from '../../state/versioning/v1.state'
 import { VersionId as V2VersionId } from '../../state/versioning/v2.state'
 import { VersionId as V3VersionId } from '../../state/versioning/v3.state'
+import { RenPyExportButton } from './ExportToRenpy'
 import './History.scss'
 
 const HistoryActions = () => {
@@ -110,14 +110,7 @@ const HistoryActions = () => {
   return (
     <div className="History__actions">
       <Tooltip id="history-actions-tooltip" place="bottom" />
-      <button
-        style={{ color: 'white' }}
-        onClick={() => {
-          exportToRenPy(state)
-        }}
-      >
-        Export To Ren&apos;Py
-      </button>
+      <RenPyExportButton state={state} />
       {!hasInteractions ? (
         <label
           className="icon-button"
