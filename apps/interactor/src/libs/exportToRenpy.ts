@@ -81,7 +81,7 @@ function getSlicedStrings(str: string): string[] {
   // Split slices longer than 50 words into two parts
   return slices.flatMap((slice) => {
     const words = slice.split(' ')
-    if (words.length >= 50) {
+    if (words.length >= 40) {
       const midIndex = Math.ceil(words.length / 2)
       return [
         words.slice(0, midIndex).join(' '),
