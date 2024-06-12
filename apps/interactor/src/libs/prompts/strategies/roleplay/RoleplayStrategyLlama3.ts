@@ -38,20 +38,20 @@ export class RoleplayStrategyLlama3 extends AbstractRoleplayStrategy {
       template += `<|eot_id|><|start_header_id|>user<|end_header_id|>\n${persona}\n${formattedAttributes}\n`
     }
 
-    const lorebook = this.getContextForLorebookEntry(state, currentCharacterId)
-    if (lorebook) {
-      template += `\n${lorebook}\n`
+    if (state.settings.prompt.systemPrompt) {
+      template += `${state.settings.prompt.systemPrompt}\n`
     }
 
-    if (sampleChat.length) {
-      template += `This is how {{char}} should talk\n`
+    const lorebook = this.getContextForLorebookEntry(state, currentCharacterId)
+
+    if (sampleChat.length || lorebook) {
+      template += `\nThis is how {{char}} should talk:\n`
       for (const example of sampleChat) {
         template += example + '\n'
       }
-    }
-
-    if (state.settings.prompt.systemPrompt) {
-      template += `\n${state.settings.prompt.systemPrompt}\n`
+      if (lorebook) {
+        template += `${lorebook}\n`
+      }
     }
 
     template += `\nThen the roleplay chat between ${[

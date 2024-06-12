@@ -354,7 +354,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       state,
       currentCharacterId
     )
-      .slice(-3)
+      .slice(1, 4)
       .reverse()
 
     if (!characterEntries) return null
@@ -392,10 +392,10 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     )
 
     if (currentLorebook.length > 0) {
-      content = currentLorebook[0].content
-      if (currentLorebook.length > 1) {
-        content += '\n' + currentLorebook[1].content
-      }
+      // load the top 3 lorebooks
+      currentLorebook.slice(0, 3).forEach((entry, index) => {
+        content += (index ? '\n' : '') + entry.content
+      })
     }
 
     return content
