@@ -20,7 +20,10 @@ export const hashBase64URI = async (base64Content: string): Promise<string> => {
   return hashBase64(base64Content.split(",")[1]);
 };
 
-export const checkFileType = (file: File, types = ["image/png"]): boolean => {
+export const checkFileType = (
+  file: File,
+  types = ["image/png", "image/jpeg", "image/jpg"]
+): boolean => {
   return types.includes(file.type);
 };
 
@@ -77,11 +80,15 @@ export const downloadNovelState = async (
     });
     const base64s = await Promise.all(promises);
     batch.forEach(([key, value], index) => {
-      novelResult = replaceStringsInObject(
-        novelResult,
-        key,
-        base64s[index]
-      ) as NovelV3.NovelState;
+      if (key && base64s[index]) {
+        novelResult = replaceStringsInObject(
+          novelResult,
+          key,
+          base64s[index]
+        ) as NovelV3.NovelState;
+      } else {
+        console.error("Error downloading asset", key, value);
+      }
     });
   }
 

@@ -37,15 +37,20 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
       template += `\n\n### Input:\n${persona}\n${formattedAttributes}\n`
     }
 
-    if (sampleChat.length) {
-      template += `This is how {{char}} should talk\n`
+    if (state.settings.prompt.systemPrompt) {
+      template += `${state.settings.prompt.systemPrompt}\n`
+    }
+
+    const lorebook = this.getContextForLorebookEntry(state, currentCharacterId)
+
+    if (sampleChat.length || lorebook) {
+      template += `\nThis is how {{char}} should talk:\n`
       for (const example of sampleChat) {
         template += example + '\n'
       }
-    }
-
-    if (state.settings.prompt.systemPrompt) {
-      template += `\n${state.settings.prompt.systemPrompt}\n`
+      if (lorebook) {
+        template += `${lorebook}\n`
+      }
     }
 
     template += `\nThen the roleplay chat between ${[

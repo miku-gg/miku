@@ -423,6 +423,12 @@ const narrationSlice = createSlice({
         response.suggestedScenes = action.payload.suggestions
       }
     },
+    setNextSceneToCurrentResponse(state, action: PayloadAction<string>) {
+      const response = state.responses[state.currentResponseId]
+      if (response) {
+        response.nextScene = action.payload
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -451,6 +457,7 @@ export const {
   sceneSuggestionsStart,
   sceneSuggestionsUpdate,
   sceneSuggestionsEnd,
+  setNextSceneToCurrentResponse,
 } = narrationSlice.actions
 
 export default narrationSlice.reducer

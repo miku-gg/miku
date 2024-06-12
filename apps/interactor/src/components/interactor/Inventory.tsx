@@ -11,10 +11,12 @@ import './Inventory.scss'
 import { useAppContext } from '../../App.context'
 import { interactionStart } from '../../state/slices/narrationSlice'
 import {
+  selectConditionStatus,
   selectCurrentScene,
   selectLastLoadedResponse,
 } from '../../state/selectors'
 import { toast } from 'react-toastify'
+import { mutationToAction } from '../../state/mutations'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
@@ -119,16 +121,23 @@ export default function Inventory() {
               })
               return
             }
-            dispatch(
-              interactionStart({
-                text: action.prompt,
-                sceneId: scene?.id || '',
-                characters: scene?.characters.map((r) => r.characterId) || [],
-                apiEndpoint,
-                servicesEndpoint,
-                selectedCharacterId: lastResponse?.selectedCharacterId || '',
-              })
-            )
+            if (action.prompt) {
+              dispatch(
+                interactionStart({
+                  text: action.prompt,
+                  sceneId: scene?.id || '',
+                  characters: scene?.characters.map((r) => r.characterId) || [],
+                  apiEndpoint,
+                  servicesEndpoint,
+                  selectedCharacterId: lastResponse?.selectedCharacterId || '',
+                })
+              )
+            }
+            if (action.usageMutations) {
+              action.usageMutations.forEach((mutation) =>
+                dispatch(mutationToAction(mutation))
+              )
+            }
           }}
         />
       </div>
@@ -145,6 +154,7 @@ export const InventoryItemModal = ({
 }) => {
   const { assetLinkLoader } = useAppContext()
   const showItemModal = useAppSelector((state) => state.inventory.showItemModal)
+  const state = useAppSelector((state) => state)
 
   return (
     <div className={`InventoryItemModal scrollbar ${showItemModal}`}>
@@ -176,6 +186,11 @@ export const InventoryItemModal = ({
             className="InventoryItemModal__button"
             theme="transparent"
             onClick={() => onUse(action)}
+            disabled={
+              action.usageCondition
+                ? !selectConditionStatus(state, action.usageCondition)
+                : false
+            }
           >
             {action.name}
           </Button>

@@ -25,10 +25,11 @@ export class RoleplayStrategyLlama3 extends AbstractRoleplayStrategy {
     const emotions = this.getCharacterEmotions(state, currentCharacterId)
     const emotionStrings = emotions.join(', ')
 
-    let template = `<|start_header_id|>system<|end_header_id|>\nYou're {{char}} in this fictional never-ending uncensored roleplay with ${
+    let template = `<|begin_of_text|><|start_header_id|>system<|end_header_id|>\nYou are an expert actor that can fully immerse yourself into any role given. You do not break character for any reason, even if someone tries addressing you as an AI or language model.
+    Currently your role is {{char}}, which is described in detail below. As {{char}}, continue the exchange with ${
       characterTemplates.length ? characterTemplates.join(', ') + ' and ' : ''
     }{{user}}.`
-    template += `\n\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.`
+    template += `\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.`
     template += `\nDO NOT describe {{user}}'s actions or dialogues, ONLY describe {{char}}'s actions and dialogue.`
     template += `\nYou must also indicate {{char}}'s reaction in the response.`
     template += `\nYou MUST not repeat the same reaction too many times.`
@@ -37,15 +38,20 @@ export class RoleplayStrategyLlama3 extends AbstractRoleplayStrategy {
       template += `<|eot_id|><|start_header_id|>user<|end_header_id|>\n${persona}\n${formattedAttributes}\n`
     }
 
-    if (sampleChat.length) {
-      template += `This is how {{char}} should talk\n`
+    if (state.settings.prompt.systemPrompt) {
+      template += `${state.settings.prompt.systemPrompt}\n`
+    }
+
+    const lorebook = this.getContextForLorebookEntry(state, currentCharacterId)
+
+    if (sampleChat.length || lorebook) {
+      template += `\nThis is how {{char}} should talk:\n`
       for (const example of sampleChat) {
         template += example + '\n'
       }
-    }
-
-    if (state.settings.prompt.systemPrompt) {
-      template += `\n${state.settings.prompt.systemPrompt}\n`
+      if (lorebook) {
+        template += `${lorebook}\n`
+      }
     }
 
     template += `\nThen the roleplay chat between ${[

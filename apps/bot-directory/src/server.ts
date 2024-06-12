@@ -137,5 +137,5 @@ app.listen(process.env.PORT || 8585, () => {
       process.env.BOT_DIRECTORY_PORT || 8585
     }`
   );
-  open(`http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`);
+  // open(`http://localhost:${process.env.BOT_DIRECTORY_PORT || 8585}`);
 });

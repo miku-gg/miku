@@ -171,7 +171,7 @@ const novelFormSlice = createSlice({
         ],
         children: [],
         nsfw: NovelV3.NovelNSFW.NONE,
-        parentMapId: null,
+        parentMapIds: null,
         prompt: "",
       };
       state.scenes.push(newScene);

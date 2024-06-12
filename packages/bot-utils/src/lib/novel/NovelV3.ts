@@ -37,7 +37,7 @@ export interface NovelScene {
     objective?: string;
   }[];
   children: string[];
-  parentMapId: string | null;
+  parentMapIds?: string[] | null;
   nsfw: NovelNSFW;
 }
 
@@ -107,9 +107,41 @@ export interface NovelMap {
   lorebook?: CharacterBook;
 }
 
+export type StateMutation =
+  | {
+      type: "ADD_CHILDREN";
+      config: {
+        sceneId: string;
+        children: string[];
+      };
+    }
+  | {
+      type: "REMOVE_ITEM";
+      config: {
+        itemId: string;
+      };
+    }
+  | {
+      type: "SUGGEST_ADVANCE_SCENE";
+      config: {
+        sceneId: string;
+      };
+    };
+
+export type StateCondition = {
+  type: "IN_SCENE";
+  config: {
+    sceneIds: string[];
+  };
+};
+
 export interface InventoryAction {
   name: string;
   prompt: string;
+
+  // only for novel-specific items
+  usageCondition?: StateCondition;
+  usageMutations?: StateMutation[];
 }
 
 export interface InventoryItem {

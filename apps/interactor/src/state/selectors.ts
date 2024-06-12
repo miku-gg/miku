@@ -5,7 +5,7 @@ import {
   NarrationResponse,
 } from './slices/narrationSlice'
 import { createSelector } from '@reduxjs/toolkit'
-import { EmotionTemplateSlug } from '@mikugg/bot-utils'
+import { EmotionTemplateSlug, NovelV3 } from '@mikugg/bot-utils'
 import { NovelNSFW } from './versioning'
 
 export const selectLastLoadedResponse = (
@@ -373,6 +373,26 @@ export const selectCurrentNextScene = createSelector(
   }
 )
 
+export const selectCurrentMaps = createSelector(
+  [selectCurrentScene, (state: RootState) => state.novel.maps],
+  (scene, maps) => {
+    const mapIds = scene?.parentMapIds
+    return (
+      mapIds
+        ?.map((mapId) => maps.find((map) => map.id === mapId) || null)
+        .filter((map) => map !== null)
+        .map((currentMap) => ({
+          ...(currentMap as NovelV3.NovelMap),
+          places:
+            currentMap?.places.map((place) => ({
+              ...place,
+              isCurrentPlace: place.sceneId === scene?.id,
+            })) || [],
+        })) || []
+    )
+  }
+)
+
 export const selectAllParentDialoguesWhereCharacterIsPresent = createSelector(
   [
     selectAllParentDialogues,
@@ -409,3 +429,16 @@ export const selectCurrentSceneObjectives = createSelector(
     )
   }
 )
+
+export const selectConditionStatus = (
+  state: RootState,
+  condition: NovelV3.StateCondition
+) => {
+  switch (condition.type) {
+    case 'IN_SCENE':
+      return condition.config.sceneIds.includes(
+        selectCurrentScene(state)?.id || ''
+      )
+  }
+  return false
+}
