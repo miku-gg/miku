@@ -11,16 +11,17 @@ const sanitizeName = (name: string) => {
   return name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
 }
 
-const clearProjectUrl = 'https://assets.miku.gg/RenPyExport.zip'
-
-function removeFileExtension(filename: string): string {
-  return filename.replace(/\.(png|jpeg)$/i, '')
-}
+const cleanProjectFileName = 'RenPyExport.zip'
 
 const sanitizeId = (inputString: string): string => {
-  return inputString.includes('-')
-    ? inputString.replace(/-/g, '_')
-    : inputString
+  let hash = 0
+  if (inputString.length === 0) return 'id_' + hash.toString()
+  for (let i = 0; i < inputString.length; i++) {
+    const char = inputString.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash = hash & hash
+  }
+  return 'id_' + hash.toString().replace(/[^a-zA-Z0-9]/g, '')
 }
 
 function getSlicedStrings(str: string): string[] {
@@ -161,13 +162,14 @@ export const exportToRenPy = (state: RootState) => {
   }
 
   assert(history[0].type === 'response', 'First dialogue should be a response')
-  let currentSceneId =
+  const currentSceneId =
     state.novel.starts.find((start) => start.id === history[0].item.id)
       ?.sceneId || 'INVALID_SCENE_ID'
-  let currentScene = getSceneData(currentSceneId)
-  let currentBackgroundSrc = state.novel.backgrounds.find(
-    (background) => background.id === currentScene.background
-  )?.source.jpg
+  const currentScene = getSceneData(currentSceneId)
+  const currentBackgroundSrc =
+    state.novel.backgrounds.find(
+      (background) => background.id === currentScene.background
+    )?.source.jpg || ''
 
   script += `\ntransform yoffset:
     yalign 1.0
@@ -188,15 +190,13 @@ export const exportToRenPy = (state: RootState) => {
 
   script += '\n\nlabel start:\n'
 
-  script += `    image bg ${removeFileExtension(
-    currentBackgroundSrc || ''
-  )} = "${currentBackgroundSrc}"\n`
+  script += `    image bg ${sanitizeId(currentBackgroundSrc)} = "${sanitizeId(
+    currentBackgroundSrc
+  )}"\n`
 
-  script += `    scene bg ${removeFileExtension(
-    currentBackgroundSrc || ''
-  )}  at scale\n`
+  script += `    scene bg ${sanitizeId(currentBackgroundSrc)}  at scale\n`
 
-  script += `    jump ${history[0].type}_${history[0].item.id}\n
+  script += `    jump ${history[0].type}_${sanitizeId(history[0].item.id)}\n
     return\n`
 
   for (const interactionID of Object.keys(allInteractions)) {
@@ -204,17 +204,16 @@ export const exportToRenPy = (state: RootState) => {
     if (interaction) {
       const sceneId = interaction.sceneId
       const scene = getSceneData(sceneId)
-      const backgroundSrc = state.novel.backgrounds.find(
-        (background) => background.id === scene.background
-      )?.source.jpg
+      const backgroundSrc =
+        state.novel.backgrounds.find(
+          (background) => background.id === scene.background
+        )?.source.jpg || ''
       script += `\n\nlabel interaction_${sanitizeId(interaction.id)}:\n`
-      script += `    image bg ${removeFileExtension(
-        backgroundSrc || ''
-      )} = "${backgroundSrc}"\n`
+      script += `    image bg ${sanitizeId(backgroundSrc)} = "${sanitizeId(
+        backgroundSrc
+      )}"\n`
 
-      script += `    scene bg ${removeFileExtension(
-        backgroundSrc || ''
-      )} at scale\n`
+      script += `    scene bg ${sanitizeId(backgroundSrc)} at scale\n`
 
       script += `    m "${interaction.query}"\n`
       script += `    jump response_${sanitizeId(interaction.responsesId[0])}\n`
@@ -229,26 +228,28 @@ export const exportToRenPy = (state: RootState) => {
         allInteractions[response.parentInteractionId || 0]?.sceneId
 
       const scene = getSceneData(sceneID ? sceneID : currentSceneId)
-      const backgroundSrc = state.novel.backgrounds.find(
-        (background) => background.id === scene.background
-      )?.source.jpg
+      const backgroundSrc =
+        state.novel.backgrounds.find(
+          (background) => background.id === scene.background
+        )?.source.jpg || ''
       script += `\n\nlabel response_${sanitizeId(response.id)}:\n`
-      script += `    image bg ${removeFileExtension(
+      script += `    image bg ${sanitizeId(
         backgroundSrc || ''
-      )} = "${backgroundSrc}"\n`
+      )} = "${sanitizeId(backgroundSrc)}"\n`
 
-      script += `    scene bg ${removeFileExtension(
-        backgroundSrc || ''
-      )} at scale\n`
+      script += `    scene bg ${sanitizeId(backgroundSrc || '')} at scale\n`
 
       response.characters.forEach((characterResponse, index) => {
         const character = scene.characters.find(
           (char) => char.id === characterResponse.characterId
         )
-        const currentOutfitSrc = character?.outfit.emotions.find(
-          (emotion) => emotion.id === characterResponse.emotion
-        )?.sources.png
-        script += `    image ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} = "${currentOutfitSrc}"\n`
+        const currentOutfitSrc =
+          character?.outfit.emotions.find(
+            (emotion) => emotion.id === characterResponse.emotion
+          )?.sources.png || ''
+        script += `    image ${character?.slug} ${character?.outfitSlug} ${
+          characterResponse.emotion
+        } = "${sanitizeId(currentOutfitSrc)}"\n`
         script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} at yoffset`
         script +=
           response.characters.length > 1
@@ -258,15 +259,28 @@ export const exportToRenPy = (state: RootState) => {
             : ''
         script += '\n'
         const slicedTexts = getSlicedStrings(characterResponse.text)
-        slicedTexts.forEach((text) => {
-          script += `    ${character?.slug} "${fillTextTemplate(text, {
+        slicedTexts.forEach((_text) => {
+          let text = fillTextTemplate(_text, {
             user: state.settings.user.name,
             bot: character?.name || '',
             characters: scene.characters.reduce((acc, char) => {
               acc[char.id || ''] = char.name
               return acc
             }, {} as { [key: string]: string }),
-          })}"\n`
+          })
+
+          if (text.startsWith('*') && text.endsWith('*')) {
+            text = text.slice(1, -1)
+            text = '{i}' + text + '{/i}'
+          } else if (text.startsWith('*')) {
+            text = text.slice(1)
+            text = '{i}' + text + '{/i}'
+          } else if (text.endsWith('*')) {
+            text = text.slice(0, -1)
+            text = '{i}' + text + '{/i}'
+          }
+
+          script += `    ${character?.slug} "${text}"\n`
         })
       })
       if (response.childrenInteractions.length > 1) {
@@ -275,7 +289,7 @@ export const exportToRenPy = (state: RootState) => {
           const interaction = allInteractions[interactionID.interactionId]
           script += `        "${interaction?.query}":\n`
           script += `            jump interaction_${sanitizeId(
-            interaction?.id!
+            interaction?.id || ''
           )}\n`
         }
       } else {
@@ -297,10 +311,10 @@ export const exportToRenPy = (state: RootState) => {
 
 export const downloadRenPyProject = async (
   script: string,
-  state: RootState
+  state: RootState,
+  assetLinkLoader: (asset: string) => string
 ) => {
   try {
-    const AssetsUrl = 'https://assets.miku.gg/'
     const allBackgroundAssets = state.novel.backgrounds.map(
       (background) => background.source.jpg
     )
@@ -316,7 +330,7 @@ export const downloadRenPyProject = async (
       })
       .flat(2)
 
-    const response = await fetch(clearProjectUrl)
+    const response = await fetch(assetLinkLoader(cleanProjectFileName))
     const buffer = await response.arrayBuffer()
     const zip = await JSZip.loadAsync(buffer)
     const blob = new Blob([script], { type: 'text/plain' })
@@ -327,15 +341,15 @@ export const downloadRenPyProject = async (
     const imagesFolder = folder?.folder('images')
 
     for (const backgroundAsset of allBackgroundAssets) {
-      const assetResponse = await fetch(`${AssetsUrl}${backgroundAsset}`)
+      const assetResponse = await fetch(assetLinkLoader(backgroundAsset))
       const assetBlob = await assetResponse.blob()
-      imagesFolder?.file(backgroundAsset, assetBlob)
+      imagesFolder?.file(sanitizeId(backgroundAsset) + '.png', assetBlob)
     }
 
     for (const characterAsset of allCharactersImages) {
-      const assetResponse = await fetch(`${AssetsUrl}${characterAsset}`)
+      const assetResponse = await fetch(assetLinkLoader(characterAsset))
       const assetBlob = await assetResponse.blob()
-      imagesFolder?.file(characterAsset, assetBlob)
+      imagesFolder?.file(sanitizeId(characterAsset) + '.png', assetBlob)
     }
 
     const updatedZipBlob = await zip.generateAsync({ type: 'blob' })

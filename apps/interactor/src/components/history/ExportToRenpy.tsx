@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { downloadRenPyProject, exportToRenPy } from '../../libs/exportToRenpy'
 import { RootState } from '../../state/store'
 import './ExportToRenpy.scss'
+import { useAppContext } from '../../App.context'
 
 interface RenPyExportButtonProps {
   state: RootState
@@ -13,11 +14,12 @@ interface RenPyExportButtonProps {
 export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const { assetLinkLoader } = useAppContext()
   const handleButtonClick = async () => {
     setIsLoading(true)
     try {
       const script = exportToRenPy(state)
-      await downloadRenPyProject(script, state)
+      await downloadRenPyProject(script, state, assetLinkLoader)
     } catch (error) {
       toast.error(
         'An error occurred while generating the script, please try again.'
