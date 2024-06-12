@@ -91,6 +91,7 @@
     border-radius: 0;
     border-top-left-radius: 0.375rem;
     border-top-right-radius: 0.375rem;
+    margin-right: 4px;
     gap: 0.3rem;
 
     svg {
@@ -101,6 +102,11 @@
     &:hover {
       background: rgba(#171717, 1);
     }
+  }
+
+  &__edit,
+  &__move {
+    margin-right: 0;
   }
 
   &__move {
@@ -264,15 +270,22 @@
 }
 
 @media screen and (max-width: 590px) {
-  .ResponseBox__actions span {
-    display: none;
-  }
-  .ResponseBox__actions {
-    right: 0.2rem;
-  }
+  .ResponseBox {
+    &__regenerate,
+    &__voice,
+    &__move {
+      margin-right: 2px;
+    }
 
-  .ResponseBox__swipes {
-    left: 0.2rem;
+    &__actions {
+      right: 0.2rem;
+      & span {
+        display: none;
+      }
+    }
+    &__swipes {
+      left: 0.2rem;
+    }
   }
 }
 
