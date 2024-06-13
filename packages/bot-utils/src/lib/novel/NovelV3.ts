@@ -106,7 +106,6 @@ export interface NovelMap {
     previewSource: string;
     maskSource: string;
   }[];
-  lorebook?: CharacterBook;
 }
 
 export type StateMutation =
