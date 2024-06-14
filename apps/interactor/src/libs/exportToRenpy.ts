@@ -312,8 +312,8 @@ export const exportToRenPy = (state: RootState, linearStory = false) => {
         script +=
           response.characters.length > 1
             ? index === 0
-              ? ' at left'
-              : ' at right'
+              ? ', left'
+              : ', right'
             : ''
         script += '\n'
         const slicedTexts = getSlicedStrings(characterResponse.text)

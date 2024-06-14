@@ -51,7 +51,7 @@ export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
         {isLoading ? (
           <p className="RenPyExportButton__modal__loading">
             <Loader />
-            Generating script...
+            Generating project, this might take a while...
           </p>
         ) : (
           <div className="RenPyExportButton__modal__button">
