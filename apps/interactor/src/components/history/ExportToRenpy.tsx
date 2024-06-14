@@ -1,6 +1,5 @@
-import { Button, Loader, Modal, Tooltip } from '@mikugg/ui-kit'
+import { Button, CheckBox, Loader, Modal, Tooltip } from '@mikugg/ui-kit'
 import { useState } from 'react'
-import { SiRenpy } from 'react-icons/si'
 import { toast } from 'react-toastify'
 import { downloadRenPyProject, exportToRenPy } from '../../libs/exportToRenpy'
 import { RootState } from '../../state/store'
@@ -14,11 +13,12 @@ interface RenPyExportButtonProps {
 export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [linearStory, setLinearStory] = useState<boolean>(false)
   const { assetLinkLoader } = useAppContext()
   const handleButtonClick = async () => {
     setIsLoading(true)
     try {
-      const script = exportToRenPy(state)
+      const script = exportToRenPy(state, linearStory)
       await downloadRenPyProject(script, state, assetLinkLoader)
     } catch (error) {
       toast.error(
@@ -36,17 +36,24 @@ export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
         className="RenPyExportButton"
         onClick={() => setIsModalOpen(true)}
         data-tooltip-id="renpy-export-tooltip"
-        data-tooltip-content="Export For Ren'Py"
+        data-tooltip-content="Generate a Ren'Py project from the current narration."
         disabled={isLoading}
       >
-        {isLoading ? 'Generating script...' : <SiRenpy />}
+        <img src="/images/renpy.png" alt="Ren'Py" height={16} />
+        Export as Ren'Py
       </button>
       <Modal
         className="RenPyExportButton__modal"
         opened={isModalOpen}
         onCloseModal={() => setIsModalOpen(false)}
-        title={`Export For Ren'Py`}
+        title={`Export as a Ren'Py project`}
       >
+        <CheckBox
+          id="RenPyExportButton__modal__linear-Story"
+          label="Only current narration branch (linear story with no options)"
+          value={linearStory}
+          onChange={(e) => setLinearStory(e.target.checked)}
+        />
         {isLoading ? (
           <p className="RenPyExportButton__modal__loading">
             <Loader />

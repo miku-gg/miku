@@ -104,7 +104,7 @@ function addTextToSlices(text: string, slices: string[]) {
   }
 }
 
-export const exportToRenPy = (state: RootState) => {
+export const exportToRenPy = (state: RootState, linearStory = false) => {
   let script = ''
   script += `define m = Character("${state.settings.user.name}")\n`
   // define all characters
@@ -249,19 +249,31 @@ export const exportToRenPy = (state: RootState) => {
       script += `    scene bg ${sanitizeId(backgroundSrc)} at scale\n`
 
       script += `    m "${interaction.query}"\n`
-      if (interaction.responsesId.length > 1) {
+      if (interaction.responsesId.length > 1 && !linearStory) {
         script += `    menu:\n`
         for (const responseID of interaction.responsesId) {
           const response = allResponses[responseID]
-          script += `        "{i}Get ${response?.characters[0].emotion} response{/i}":\n`
+          script += `        "{i}Get a ${response?.characters[0].emotion} response{/i}":\n`
           script += `            jump response_${sanitizeId(
             response?.id || ''
           )}\n`
         }
       } else {
-        script += `    jump response_${sanitizeId(
-          interaction.responsesId[0]
-        )}\n`
+        if (linearStory) {
+          const responseID = interaction.responsesId.find((responseID) => {
+            return history.find((dialogue) => {
+              if (dialogue.type === 'response') {
+                return dialogue.item.id === responseID
+              }
+              return false
+            })
+          })
+          script += `    jump response_${sanitizeId(responseID || '')}\n`
+        } else {
+          script += `    jump response_${sanitizeId(
+            interaction.responsesId[0]
+          )}\n`
+        }
       }
       script += `    return\n`
     }
@@ -329,7 +341,7 @@ export const exportToRenPy = (state: RootState) => {
           script += `    ${character?.slug} "${text}"\n`
         })
       })
-      if (response.childrenInteractions.length > 1) {
+      if (response.childrenInteractions.length > 1 && !linearStory) {
         script += `    menu:\n`
         for (const interactionID of response.childrenInteractions) {
           const interaction = allInteractions[interactionID.interactionId]
@@ -339,10 +351,26 @@ export const exportToRenPy = (state: RootState) => {
           )}\n`
         }
       } else {
+        let childInteractionIndex = 0
+        if (linearStory) {
+          childInteractionIndex = response.childrenInteractions.findIndex(
+            (interactionID) => {
+              return history.find((dialogue) => {
+                if (dialogue.type === 'interaction') {
+                  return dialogue.item.id === interactionID.interactionId
+                }
+                return false
+              })
+            }
+          )
+          childInteractionIndex =
+            childInteractionIndex === -1 ? 0 : childInteractionIndex
+        }
         script += `    jump ${
           response.childrenInteractions.length > 0
             ? `interaction_${sanitizeId(
-                response.childrenInteractions[0].interactionId
+                response.childrenInteractions[childInteractionIndex]
+                  .interactionId
               )}`
             : 'splashscreen'
         }\n`
