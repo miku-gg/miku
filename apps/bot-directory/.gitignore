@@ -2,3 +2,4 @@ node_modules
 dist
 _temp
 db
+!db/assets/RenPyExport.zip

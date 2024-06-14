@@ -33,6 +33,7 @@ import {
 import { scenesToObjectives } from '../../state/slices/objectivesSlice'
 import mergeWith from 'lodash.mergewith'
 import { getCongurationFromParams } from '../../../root'
+import { RenPyExportButton } from './ExportToRenpy'
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch()
@@ -109,6 +110,7 @@ const HistoryActions = () => {
   return (
     <div className="History__actions">
       <Tooltip id="history-actions-tooltip" place="bottom" />
+      {hasInteractions ? <RenPyExportButton state={state} /> : null}
       {!hasInteractions ? (
         <label
           className="icon-button"
@@ -284,7 +286,6 @@ const HistoryModal = (): ReactElement => {
       setAllNodesPosition(nodes, edges, topResponse?.id || ''),
     ]
   })()
-
   return (
     <div className="History__modal">
       {/* eslint-disable-next-line */}
