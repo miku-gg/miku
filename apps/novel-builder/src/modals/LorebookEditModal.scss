@@ -3,6 +3,24 @@
   flex-direction: column;
   gap: 1rem;
 
+  &__remove {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    color: white;
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    &:hover {
+      color: #9747ff;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    padding: 0;
+  }
+
   &__createEntry {
     display: flex;
     align-items: center;

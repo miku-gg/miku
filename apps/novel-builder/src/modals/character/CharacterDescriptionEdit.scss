@@ -68,22 +68,7 @@
     height: 4em;
   }
 
-  &__lorebooks {
-    border: 1px solid #5f6388;
-    padding: 10px;
 
-    border-radius: 10px;
-    &__input {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      & label {
-        margin: 0;
-        font-size: 1.25rem;
-      }
-    }
-  }
 }
 .disabled {
   & button {

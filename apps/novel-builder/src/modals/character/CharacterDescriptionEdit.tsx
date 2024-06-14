@@ -1,5 +1,4 @@
 import {
-  Button,
   DragAndDropImages,
   Input,
   Modal,
@@ -17,15 +16,10 @@ import {
   conversationAgent,
 } from "../../libs/utils";
 import { closeModal, openModal } from "../../state/slices/inputSlice";
-import {
-  createLorebook,
-  deleteLorebook,
-  updateCharacter,
-} from "../../state/slices/novelFormSlice";
+import { updateCharacter } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./CharacterDescriptionEdit.scss";
 import { CharacterDescriptionGeneration } from "./CharacterDescriptionGeneration";
-import { CharacterLorebooks } from "./CharacterLorebooks";
 
 const DEFAULT_TAGS = [
   { value: "Male" },
@@ -409,29 +403,6 @@ export default function CharacterDescriptionEdit({
           }
           className="step1Description__textarea"
         />
-      </div>
-      <div className="CharacterDescriptionEdit__lorebooks">
-        <div className="CharacterDescriptionEdit__lorebooks__input">
-          <label className="Input__label">Lorebook</label>
-
-          <Button
-            theme={
-              !character.card.data.character_book ? "secondary" : "primary"
-            }
-            onClick={() => {
-              if (!character.card.data.character_book) {
-                dispatch(createLorebook(characterId));
-              } else {
-                dispatch(deleteLorebook({ characterId }));
-              }
-            }}
-          >
-            {character.card.data.character_book ? "Delete" : "Add"} Lorebook
-          </Button>
-        </div>
-        {!!character.card.data.character_book && (
-          <CharacterLorebooks characterId={characterId} />
-        )}
       </div>
     </div>
   );
