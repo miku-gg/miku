@@ -572,8 +572,8 @@ importers:
   docs:
     devDependencies:
       retypeapp:
-        specifier: ^3.0.3
-        version: 3.0.3
+        specifier: ^3.5.0
+        version: 3.5.0
 
   packages/bot-utils:
     dependencies:
@@ -14808,8 +14808,8 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
-  /retypeapp@3.0.3:
-    resolution: {integrity: sha512-W5gNDz+a5uYvckyujfUytu6IjqX0t+Wih9cR7Mf2U8PQBdvcq0X+Dmda2kUut3dSqfeefgS9ffOVJgf58ZRQbw==}
+  /retypeapp@3.5.0:
+    resolution: {integrity: sha512-YhHilXfKLXU2BCZ0lfj4tUVMrk8nUjkSCAoV52xIPfRfSKQQah9D5vn2Eiu+FUmeGGEB9gykr8UVi7CvjmiqbQ==}
     hasBin: true
     dev: true
 
