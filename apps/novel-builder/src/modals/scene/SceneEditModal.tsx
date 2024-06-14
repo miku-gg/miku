@@ -6,24 +6,24 @@ import {
   ImageSlider,
   Input,
   Modal,
-  MusicSelector,
 } from "@mikugg/ui-kit";
-import { useAppSelector, useAppDispatch } from "../../state/store";
-import { selectEditingScene, selectBackgrounds } from "../../state/selectors";
-import {
-  updateScene,
-  deleteSceneById,
-} from "../../state/slices/novelFormSlice";
-import { closeModal } from "../../state/slices/inputSlice";
-import config from "../../config";
-import { AiOutlinePicture } from "react-icons/ai";
-import "./SceneEditModal.scss";
-import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
-import { useState } from "react";
-import { FaUser } from "react-icons/fa6";
 import classNames from "classnames";
+import { useState } from "react";
+import { AiOutlinePicture } from "react-icons/ai";
+import { FaUser } from "react-icons/fa6";
+import config from "../../config";
+import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
 import Characters from "../../panels/assets/characters/Characters";
 import Songs from "../../panels/assets/songs/Songs";
+import { LorebookList } from "../../panels/details/LorebookList";
+import { selectBackgrounds, selectEditingScene } from "../../state/selectors";
+import { closeModal } from "../../state/slices/inputSlice";
+import {
+  deleteSceneById,
+  updateScene,
+} from "../../state/slices/novelFormSlice";
+import { useAppDispatch, useAppSelector } from "../../state/store";
+import "./SceneEditModal.scss";
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -51,6 +51,20 @@ export default function SceneEditModal() {
         },
       });
     }
+  };
+
+  const handleLorebookSelect = (id: string) => {
+    if (!scene) return;
+    dispatch(
+      updateScene({
+        ...scene._source,
+        lorebookIds: scene.lorebookIds
+          ? scene.lorebookIds.includes(id)
+            ? scene.lorebookIds.filter((lid) => lid !== id)
+            : [...scene.lorebookIds, id]
+          : [id],
+      })
+    );
   };
 
   return (
@@ -387,6 +401,17 @@ export default function SceneEditModal() {
                 })}
               </div>
             </div>
+            <div className="SceneEditModal__scene-lorebooks">
+              <LorebookList
+                selectedLorebookId={scene.lorebookIds}
+                //TODO: Change tooltip text
+                tooltipText="Select lorebooks that are relevant to this scene."
+                onSelectLorebook={(id) => {
+                  handleLorebookSelect(id);
+                }}
+              />
+            </div>
+
             <div className="SceneEditModal__scene-actions">
               <Button theme="primary" onClick={handleDeleteScene}>
                 Delete Scene

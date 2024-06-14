@@ -192,6 +192,12 @@
     }
   }
 
+  &__scene-lorebooks {
+    margin-top: 1rem;
+    background-color: $background-1;
+    border-radius: 1rem;
+  }
+
   &__scene-objective {
     flex: 1;
     min-width: 300px;

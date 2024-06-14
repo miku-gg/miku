@@ -61,6 +61,7 @@ export default function LorebookEditModal() {
     openModal({
       title: "Are you sure?",
       description: "This action cannot be undone",
+      //TODO: Fix z-index for are you sure modal
       onYes: () => {
         dispatch(closeModal({ modalType: "lorebookEdit" }));
         dispatch(deleteLorebook({ lorebookId: lorebook.id }));
