@@ -18,11 +18,24 @@
   }
 
   &__modal {
-    max-width: 350px !important;
+    max-width: 600px !important;
+    width: 100%;
+
+    &__linear-story {
+      margin: 16px 0;
+    }
 
     &__loading {
       display: flex;
       gap: 8px;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      margin-top: 30px;
+
+      & + div {
+        display: none;
+      }
     }
 
     &__button {
@@ -30,7 +43,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 16px;
+      margin-top: 30px;
     }
   }
 

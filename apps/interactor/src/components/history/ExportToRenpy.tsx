@@ -48,12 +48,6 @@ export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
         onCloseModal={() => setIsModalOpen(false)}
         title={`Export as a Ren'Py project`}
       >
-        <CheckBox
-          id="RenPyExportButton__modal__linear-Story"
-          label="Only current narration branch (linear story with no options)"
-          value={linearStory}
-          onChange={(e) => setLinearStory(e.target.checked)}
-        />
         {isLoading ? (
           <p className="RenPyExportButton__modal__loading">
             <Loader />
@@ -70,6 +64,13 @@ export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
             </Button>
           </div>
         )}
+        <div className="RenPyExportButton__modal__linear-story">
+          <CheckBox
+            label="Only current narration branch (linear story with no options)"
+            value={linearStory}
+            onChange={(e) => setLinearStory(e.target.checked)}
+          />
+        </div>
       </Modal>
     </>
   )

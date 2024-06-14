@@ -117,7 +117,7 @@ export const exportToRenPy = (state: RootState, linearStory = false) => {
     .join('\n')
 
   // get all history and separate it in scenes
-  const history = selectAllParentDialogues(state).reverse()
+  const history = [...selectAllParentDialogues(state)].reverse()
   const allInteractions = state.narration.interactions
   const allResponses = state.narration.responses
 
