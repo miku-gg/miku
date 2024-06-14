@@ -6,7 +6,15 @@ import { createLorebook } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./LorebookList.scss";
 
-export const LorebookList = () => {
+interface LorebookListProps {
+  onSelectLorebook?: (id: string) => void;
+  selectedLorebookId?: string[];
+}
+
+export const LorebookList = ({
+  onSelectLorebook,
+  selectedLorebookId,
+}: LorebookListProps) => {
   const dispatch = useAppDispatch();
   const lorebooks = useAppSelector((state) => state.novel.lorebooks);
 
@@ -14,6 +22,11 @@ export const LorebookList = () => {
     const id = randomUUID();
     dispatch(createLorebook(id));
     dispatch(openModal({ modalType: "lorebookEdit", editId: id }));
+  };
+
+  const isSelected = (id: string) => {
+    if (!selectedLorebookId) return false;
+    return selectedLorebookId.includes(id);
   };
 
   return (
@@ -30,7 +43,12 @@ export const LorebookList = () => {
             const { id, name, description } = lorebook;
             return (
               <div key={id} className="lorebookList__box">
-                <div className="lorebookList__lorebook">
+                <div
+                  className={`lorebookList__lorebook${
+                    isSelected(id) ? "selected" : ""
+                  }`}
+                  onClick={() => onSelectLorebook?.(id)}
+                >
                   <FaPencil
                     className="lorebookList__lorebook__edit"
                     onClick={() => {
