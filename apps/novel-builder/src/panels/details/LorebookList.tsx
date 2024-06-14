@@ -1,19 +1,25 @@
-import { Button } from "@mikugg/ui-kit";
+import { Button, Tooltip } from "@mikugg/ui-kit";
 import { FaPencil } from "react-icons/fa6";
+import { IoInformationCircleOutline } from "react-icons/io5";
 import { v4 as randomUUID } from "uuid";
 import { openModal } from "../../state/slices/inputSlice";
-import { createLorebook } from "../../state/slices/novelFormSlice";
+import {
+  createLorebook,
+  updateLorebook,
+} from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./LorebookList.scss";
 
 interface LorebookListProps {
   onSelectLorebook?: (id: string) => void;
   selectedLorebookId?: string[];
+  tooltipText?: string;
 }
 
 export const LorebookList = ({
   onSelectLorebook,
   selectedLorebookId,
+  tooltipText,
 }: LorebookListProps) => {
   const dispatch = useAppDispatch();
   const lorebooks = useAppSelector((state) => state.novel.lorebooks);
@@ -32,7 +38,19 @@ export const LorebookList = ({
   return (
     <div className="lorebookList">
       <div className="lorebookList__header">
-        <h2>Lorebooks</h2>
+        <div className="lorebookList__header__title">
+          <h2>Lorebooks</h2>
+          {tooltipText && (
+            <>
+              <IoInformationCircleOutline
+                className="lorebookList__header__title__infoIcon"
+                data-tooltip-id="Info"
+                data-tooltip-content={tooltipText}
+              />
+              <Tooltip id="Info" place="bottom" />
+            </>
+          )}
+        </div>
         <Button theme="gradient" onClick={() => createNewLorebook()}>
           Create new Book
         </Button>
@@ -44,10 +62,18 @@ export const LorebookList = ({
             return (
               <div key={id} className="lorebookList__box">
                 <div
-                  className={`lorebookList__lorebook${
-                    isSelected(id) ? "selected" : ""
-                  }`}
-                  onClick={() => onSelectLorebook?.(id)}
+                  className={`lorebookList__lorebook ${
+                    selectedLorebookId ? "selector" : ""
+                  }${isSelected(id) ? "__selected" : ""}`}
+                  onClick={() => {
+                    onSelectLorebook?.(id);
+                    dispatch(
+                      updateLorebook({
+                        lorebookId: id,
+                        lorebook: { ...lorebook, isGlobal: false },
+                      })
+                    );
+                  }}
                 >
                   <FaPencil
                     className="lorebookList__lorebook__edit"

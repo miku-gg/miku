@@ -15,6 +15,17 @@
     align-items: center;
     justify-content: space-between;
 
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &__infoIcon {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+
     & h2 {
       margin: 0;
     }
@@ -66,6 +77,15 @@
       &:hover {
         color: #9747ff;
       }
+    }
+  }
+
+  .selector {
+    cursor: pointer;
+
+    &__selected {
+      border-color: #9747ff;
+      cursor: pointer;
     }
   }
 }
