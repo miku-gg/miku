@@ -171,9 +171,42 @@ export const exportToRenPy = (state: RootState) => {
       (background) => background.id === currentScene.background
     )?.source.jpg || ''
 
-  script += `\ntransform yoffset:
+  // animations
+  //   script += `\ntransform bounce:
+  //   yoffset 0
+  //   easein .175 yoffset -10
+  //   easeout .175 yoffset 0
+  //   easein .175 yoffset -4
+  //   easeout .175 yoffset 0
+  //   yoffset 0
+  // transform shake:
+  //   xoffset 0
+  //   easein .175 xoffset -10
+  //   easeout .175 xoffset 0
+  //   easein .175 xoffset -4
+  //   easeout .175 xoffset 0
+  //   xoffset 0
+  // transform vertical_punch:
+  //   yoffset 0
+  //   easein .1 yoffset -5
+  //   easeout .1 yoffset 0
+  //   repeat 3
+  // transform horizontal_punch:
+  //   xoffset 0
+  //   easein .1 xoffset -5
+  //   easeout .1 xoffset 0
+  //   repeat 3`
+
+  script += `\ntransform char_img:
     yalign 1.0
-    xalign 0.5`
+    xalign 0.5
+    fit "cover"
+    ysize 0.9
+    on show:
+        alpha 0.0
+        linear .3 alpha 1.0
+    on hide:
+        linear .3 alpha 0.0`
 
   script += `\ntransform scale:
     xysize(1920,1080)`
@@ -216,7 +249,20 @@ export const exportToRenPy = (state: RootState) => {
       script += `    scene bg ${sanitizeId(backgroundSrc)} at scale\n`
 
       script += `    m "${interaction.query}"\n`
-      script += `    jump response_${sanitizeId(interaction.responsesId[0])}\n`
+      if (interaction.responsesId.length > 1) {
+        script += `    menu:\n`
+        for (const responseID of interaction.responsesId) {
+          const response = allResponses[responseID]
+          script += `        "{i}Get ${response?.characters[0].emotion} response{/i}":\n`
+          script += `            jump response_${sanitizeId(
+            response?.id || ''
+          )}\n`
+        }
+      } else {
+        script += `    jump response_${sanitizeId(
+          interaction.responsesId[0]
+        )}\n`
+      }
       script += `    return\n`
     }
   }
@@ -250,7 +296,7 @@ export const exportToRenPy = (state: RootState) => {
         script += `    image ${character?.slug} ${character?.outfitSlug} ${
           characterResponse.emotion
         } = "${sanitizeId(currentOutfitSrc)}"\n`
-        script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} at yoffset`
+        script += `    show ${character?.slug} ${character?.outfitSlug} ${characterResponse.emotion} at char_img`
         script +=
           response.characters.length > 1
             ? index === 0
