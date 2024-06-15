@@ -84,7 +84,7 @@ export default function LorebookEditModal() {
             }}
           />
           <div>
-            <label>Book name</label>
+            <label>Lorebook name</label>
             <Input
               placeHolder="Name for your memory book"
               value={lorebook?.name}
@@ -99,7 +99,7 @@ export default function LorebookEditModal() {
             />
           </div>
           <div>
-            <label>Book description</label>
+            <label>Lorebook description</label>
             <Input
               placeHolder="Description of your memory book"
               value={lorebook?.description}
@@ -172,7 +172,7 @@ export default function LorebookEditModal() {
                     <div className="CharacterLorebooks__entries__tags">
                       <TagAutocomplete
                         label="Keywords"
-                        description="Keywords for this entry."
+                        description="Trigger this entry when mentioned"
                         value={entry.keys.map((_key) => ({
                           label: _key,
                           value: _key,
@@ -193,7 +193,7 @@ export default function LorebookEditModal() {
                   <Input
                     isTextArea
                     label="Content"
-                    description="This text will be send when one of the keywords is used."
+                    description="This text will be added when this entry is triggered"
                     placeHolder="Memory entry. E.g. {{user}} likes a lot of coffee."
                     value={entry.content}
                     onChange={(e) => {

@@ -404,7 +404,7 @@ export default function SceneEditModal() {
             <div className="SceneEditModal__scene-lorebooks">
               <LorebookList
                 selectedLorebookId={scene?.lorebookIds || []}
-                tooltipText="Select lorebooks that are relevant to this scene."
+                tooltipText="Select lorebooks relevant to this scene."
                 onSelectLorebook={(id) => handleLorebookSelect(id)}
               />
             </div>

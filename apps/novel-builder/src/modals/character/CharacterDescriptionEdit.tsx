@@ -422,7 +422,7 @@ export default function CharacterDescriptionEdit({
         onSelectLorebook={(id) => handleLorebookSelect(id)}
         selectedLorebookId={character.lorebookIds}
         //change tooltip text
-        tooltipText="Select the lorebooks where this character appears."
+        tooltipText="Select the lorebooks this character uses."
       />
     </div>
   );

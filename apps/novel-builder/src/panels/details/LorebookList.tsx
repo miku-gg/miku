@@ -48,7 +48,7 @@ export const LorebookList = ({
                 data-tooltip-id="Info"
                 data-tooltip-content={tooltipText}
               />
-              <Tooltip id="Info" place="bottom" />
+              <Tooltip id="Info" place="top" />
             </>
           )}
         </div>
