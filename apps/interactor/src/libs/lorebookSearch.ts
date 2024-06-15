@@ -3,9 +3,9 @@ interface LorebookEntry {
   content: string
 }
 
-export const findLorebooks = (
+export const findLorebooksEntries = (
   messages: string[],
-  lorebooks: LorebookEntry[]
+  entries: LorebookEntry[]
 ): LorebookEntry[] => {
   const searchKeys = messages
     .map((message) =>
@@ -15,24 +15,22 @@ export const findLorebooks = (
         .split(' ')
     )
     .flat()
-  const maxKeys = lorebooks.reduce(
+  const maxKeys = entries.reduce(
     (prev, cur) => Math.max(prev, cur.keys.length),
     0
   )
 
-  const resultLorebooks: LorebookEntry[] = []
+  const resultEntries: LorebookEntry[] = []
 
   for (let i = 0; i < maxKeys; i++) {
-    const filteredLorebooks = lorebooks.filter(
-      (lorebook) => lorebook.keys[i] && searchKeys.includes(lorebook.keys[i])
+    const filteredEntries = entries.filter(
+      (entry) => entry.keys[i] && searchKeys.includes(entry.keys[i])
     )
 
-    resultLorebooks.push(...filteredLorebooks)
+    resultEntries.push(...filteredEntries)
 
-    lorebooks = lorebooks.filter(
-      (lorebook) => !filteredLorebooks.includes(lorebook)
-    )
+    entries = entries.filter((entry) => !filteredEntries.includes(entry))
   }
 
-  return resultLorebooks
+  return resultEntries
 }

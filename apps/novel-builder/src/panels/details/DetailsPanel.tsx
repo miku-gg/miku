@@ -1,14 +1,15 @@
 import { DragAndDropImages, Input } from "@mikugg/ui-kit";
-import { useAppDispatch, useAppSelector } from "../../state/store";
+import { toast } from "react-toastify";
 import config from "../../config";
 import { checkFileType } from "../../libs/utils";
-import { toast } from "react-toastify";
 import { updateDetails } from "../../state/slices/novelFormSlice";
+import { useAppDispatch, useAppSelector } from "../../state/store";
 
 import "./DetailsPanel.scss";
-
+import { LorebookList } from "./LorebookList";
 export default function DetailsPanel() {
   const dispatch = useAppDispatch();
+
   const { title, description, author, logoPic } = useAppSelector(
     (state) => state.novel
   );
@@ -89,6 +90,7 @@ export default function DetailsPanel() {
               }}
             />
           </div>
+          <div className="DetailsPanel__formGroup"></div>
         </div>
         <div className="DetailsPanel__formGroup">
           <label>Upload novel icon (256x256)</label>
@@ -114,6 +116,7 @@ export default function DetailsPanel() {
           />
         </div>
       </div>
+      <LorebookList tooltipText="Collections of prompts dinamically used by the AI." />
     </div>
   );
 }

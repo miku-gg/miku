@@ -15,7 +15,7 @@ import {
   NarrationInteraction,
   NarrationResponse,
 } from '../../../../state/versioning'
-import { findLorebooks } from '../../../lorebookSearch'
+import { findLorebooksEntries } from '../../../lorebookSearch'
 
 const PROMPT_TOKEN_OFFSET = 50
 
@@ -340,15 +340,50 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     currentCharacterId: string
   ) {
     let content: string = ''
+    const lorebookIds = new Set<string>()
 
+    const currentScene = selectCurrentScene(state)
+    const sceneLorebookIds = (currentScene?.lorebookIds || []).filter(
+      (lorebookId) => {
+        if (lorebookIds.has(lorebookId)) {
+          return false
+        } else {
+          lorebookIds.add(lorebookId)
+          return true
+        }
+      }
+    )
     const charactersInScene = selectLastLoadedCharacters(state)
-    const characterEntries = charactersInScene
+    const characterLorebookIds = charactersInScene
       .map(
         (character) =>
-          state.novel.characters.find((char) => char.id === character.id)?.card
-            .data.character_book?.entries || []
+          state.novel.characters.find((char) => char.id === character.id)
+            ?.lorebookIds || []
       )
       .flat()
+      .filter((characterLorebookId) => {
+        if (lorebookIds.has(characterLorebookId)) {
+          return false
+        } else {
+          lorebookIds.add(characterLorebookId)
+          return true
+        }
+      })
+    const globalLorebookIds =
+      state.novel.lorebooks
+        ?.map((lorebook) => (lorebook.isGlobal ? lorebook.id : null))
+        .filter((id) => {
+          if (id) {
+            if (lorebookIds.has(id)) {
+              return false
+            } else {
+              lorebookIds.add(id)
+              return true
+            }
+          } else {
+            return false
+          }
+        }) || []
 
     const lastMessages = selectAllParentDialoguesWhereCharacterIsPresent(
       state,
@@ -356,8 +391,17 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     )
       .slice(1, 4)
       .reverse()
+    const lorebooks = [
+      ...sceneLorebookIds,
+      ...characterLorebookIds,
+      ...globalLorebookIds,
+    ]
+      .map((lorebookId) =>
+        state.novel.lorebooks?.find((lorebook) => lorebook.id === lorebookId)
+      )
+      .filter((lorebook) => lorebook)
 
-    if (!characterEntries) return null
+    if (!lorebooks.length) return null
 
     const fillTextTemplateWithCharacters = (text: string) =>
       fillTextTemplate(text, {
@@ -383,17 +427,20 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       })
       .flat()
 
-    const currentLorebook = findLorebooks(
+    const currentEntries = findLorebooksEntries(
       lastMessagesWordsArray,
-      characterEntries.map((entry) => ({
-        keys: entry?.keys || [],
-        content: entry?.content || '',
-      }))
+      lorebooks
+        .map((lorebook) => lorebook?.entries || [])
+        .flat()
+        .map((entry) => ({
+          keys: entry?.keys || [],
+          content: entry?.content || '',
+        }))
     )
 
-    if (currentLorebook.length > 0) {
-      // load the top 3 lorebooks
-      currentLorebook.slice(0, 3).forEach((entry, index) => {
+    if (currentEntries.length > 0) {
+      // load the top 3 entries
+      currentEntries.slice(0, 3).forEach((entry, index) => {
         content += (index ? '\n' : '') + entry.content
       })
     }

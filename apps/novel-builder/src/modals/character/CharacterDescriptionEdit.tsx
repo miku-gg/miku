@@ -15,6 +15,7 @@ import {
   checkFileType,
   conversationAgent,
 } from "../../libs/utils";
+import { LorebookList } from "../../panels/details/LorebookList";
 import { closeModal, openModal } from "../../state/slices/inputSlice";
 import { updateCharacter } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
@@ -76,6 +77,19 @@ export default function CharacterDescriptionEdit({
         console.error(e);
       }
     }
+  };
+
+  const handleLorebookSelect = (id: string) => {
+    dispatch(
+      updateCharacter({
+        ...character,
+        lorebookIds: character.lorebookIds
+          ? character.lorebookIds.includes(id)
+            ? character.lorebookIds.filter((lid) => lid !== id)
+            : [...character.lorebookIds, id]
+          : [id],
+      })
+    );
   };
 
   const generatePrompt = async () => {
@@ -404,6 +418,12 @@ export default function CharacterDescriptionEdit({
           className="step1Description__textarea"
         />
       </div>
+      <LorebookList
+        onSelectLorebook={(id) => handleLorebookSelect(id)}
+        selectedLorebookId={character.lorebookIds}
+        //change tooltip text
+        tooltipText="Select the lorebooks this character uses."
+      />
     </div>
   );
 }

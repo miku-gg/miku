@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { NovelV3 } from "@mikugg/bot-utils";
+import { CharacterBook, NovelV3 } from "@mikugg/bot-utils";
+
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { v4 as randomUUID } from "uuid";
 
 const initialState: NovelV3.NovelState = {
@@ -14,6 +15,7 @@ const initialState: NovelV3.NovelState = {
   maps: [],
   scenes: [],
   starts: [],
+  lorebooks: [],
 };
 
 const novelFormSlice = createSlice({
@@ -234,6 +236,85 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.starts.splice(index, 1);
     },
+    createLorebook: (state, action: PayloadAction<string>) => {
+      const lorebook = {
+        id: action.payload,
+        isGlobal: false,
+        name: "New Lorebook",
+        description: "New lorebook description.",
+        extensions: {},
+        entries: [],
+      };
+      state.lorebooks
+        ? state.lorebooks?.push(lorebook)
+        : (state.lorebooks = [lorebook]);
+    },
+    updateLorebook: (
+      state,
+      action: PayloadAction<{
+        lorebookId: string;
+        lorebook: NovelV3.NovelLorebook;
+      }>
+    ) => {
+      const lorebook = state.lorebooks?.find(
+        (lorebook) => lorebook.id === action.payload.lorebookId
+      );
+      if (!lorebook) return;
+      state.lorebooks = state.lorebooks?.map((lorebook) =>
+        lorebook.id === action.payload.lorebookId
+          ? action.payload.lorebook
+          : lorebook
+      );
+    },
+    deleteLorebook: (state, action: PayloadAction<{ lorebookId: string }>) => {
+      state.lorebooks = state.lorebooks?.filter(
+        (lorebook) => lorebook.id !== action.payload.lorebookId
+      );
+    },
+    createEntry: (state, action: PayloadAction<{ lorebookId: string }>) => {
+      const lorebook = state.lorebooks?.find(
+        (lorebook) => lorebook.id === action.payload.lorebookId
+      );
+      if (!lorebook) return;
+      lorebook?.entries.push({
+        keys: [],
+        name: `Entry ${lorebook.entries.length + 1}`,
+        content: "",
+        extensions: {},
+        enabled: false,
+        insertion_order: 0,
+      });
+    },
+    updateEntry: (
+      state,
+      action: PayloadAction<{
+        lorebookId: string;
+        entryIndex: number;
+        entry: CharacterBook["entries"][0];
+      }>
+    ) => {
+      const lorebook = state.lorebooks?.find(
+        (lorebook) => lorebook.id === action.payload.lorebookId
+      );
+
+      if (!lorebook) return;
+
+      lorebook.entries[action.payload.entryIndex] = action.payload.entry;
+    },
+    deleteEntry: (
+      state,
+      action: PayloadAction<{
+        lorebookId: string;
+        entryIndex: number;
+      }>
+    ) => {
+      const lorebook = state.lorebooks?.find(
+        (lorebook) => lorebook.id === action.payload.lorebookId
+      );
+      if (!lorebook) return;
+
+      lorebook.entries.splice(action.payload.entryIndex, 1);
+    },
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;
     },
@@ -269,6 +350,12 @@ export const {
   createStart,
   updateStart,
   deleteStart,
+  createLorebook,
+  updateLorebook,
+  deleteLorebook,
+  createEntry,
+  updateEntry,
+  deleteEntry,
   loadCompleteState,
   updateDetails,
   clearNovelState,
