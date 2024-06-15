@@ -92,6 +92,7 @@
     }
 
     &:hover {
+      background-color: rgba($background-3, 0.6);
       .lorebookList__lorebook__edit {
         opacity: 1;
       }
