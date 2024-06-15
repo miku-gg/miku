@@ -239,7 +239,7 @@ const novelFormSlice = createSlice({
     createLorebook: (state, action: PayloadAction<string>) => {
       const lorebook = {
         id: action.payload,
-        isGlobal: true,
+        isGlobal: false,
         name: "New Lorebook",
         description: "New lorebook description.",
         extensions: {},

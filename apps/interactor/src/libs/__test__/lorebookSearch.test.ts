@@ -1,4 +1,4 @@
-import { findLorebooks } from '../lorebookSearch'
+import { findLorebooksEntries } from '../lorebookSearch'
 
 const testLorebooks = [
   {
@@ -13,7 +13,7 @@ const testLorebooks = [
 
 describe('test lorebook search', () => {
   it('should return search result', () => {
-    const result = findLorebooks(["I'm hungry"], testLorebooks)
+    const result = findLorebooksEntries(["I'm hungry"], testLorebooks)
     expect(result).toEqual([
       {
         keys: ['home', 'food', 'hungry'],

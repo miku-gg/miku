@@ -54,7 +54,7 @@ export const tavernCardToNovelState = (
         {
           ...card.data.character_book,
           id: randomString(),
-          isGlobal: false,
+          isGlobal: true,
         },
       ]
     : [];

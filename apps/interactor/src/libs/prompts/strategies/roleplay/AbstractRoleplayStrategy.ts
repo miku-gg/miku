@@ -369,6 +369,21 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
           return true
         }
       })
+    const globalLorebookIds =
+      state.novel.lorebooks
+        ?.map((lorebook) => (lorebook.isGlobal ? lorebook.id : null))
+        .filter((id) => {
+          if (id) {
+            if (lorebookIds.has(id)) {
+              return false
+            } else {
+              lorebookIds.add(id)
+              return true
+            }
+          } else {
+            return false
+          }
+        }) || []
 
     const lastMessages = selectAllParentDialoguesWhereCharacterIsPresent(
       state,
@@ -376,7 +391,11 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     )
       .slice(1, 4)
       .reverse()
-    const lorebooks = [...sceneLorebookIds, ...characterLorebookIds]
+    const lorebooks = [
+      ...sceneLorebookIds,
+      ...characterLorebookIds,
+      ...globalLorebookIds,
+    ]
       .map((lorebookId) =>
         state.novel.lorebooks?.find((lorebook) => lorebook.id === lorebookId)
       )

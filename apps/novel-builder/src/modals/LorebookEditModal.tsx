@@ -1,6 +1,7 @@
 import {
   AreYouSure,
   Button,
+  CheckBox,
   Input,
   Modal,
   TagAutocomplete,
@@ -83,20 +84,36 @@ export default function LorebookEditModal() {
               handleDeleteLorebook();
             }}
           />
-          <div>
-            <label>Lorebook name</label>
-            <Input
-              placeHolder="Name for your memory book"
-              value={lorebook?.name}
-              onChange={(e) =>
-                dispatch(
-                  updateLorebook({
-                    lorebookId: lorebook.id,
-                    lorebook: { ...lorebook, name: e.target.value },
-                  })
-                )
-              }
-            />
+          <div className="CharacterLorebooks__form-top">
+            <div className="CharacterLorebooks__form-top__name">
+              <Input
+                label="Lorebook name"
+                placeHolder="Name for your memory book"
+                value={lorebook?.name}
+                onChange={(e) =>
+                  dispatch(
+                    updateLorebook({
+                      lorebookId: lorebook.id,
+                      lorebook: { ...lorebook, name: e.target.value },
+                    })
+                  )
+                }
+              />
+            </div>
+            <div className="CharacterLorebooks__form-top__global">
+              <CheckBox
+                label="Global lorebook"
+                value={lorebook?.isGlobal}
+                onChange={(e) =>
+                  dispatch(
+                    updateLorebook({
+                      lorebookId: lorebook.id,
+                      lorebook: { ...lorebook, isGlobal: e.target.checked },
+                    })
+                  )
+                }
+              />
+            </div>
           </div>
           <div>
             <label>Lorebook description</label>

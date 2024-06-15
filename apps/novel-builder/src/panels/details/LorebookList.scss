@@ -89,6 +89,10 @@
       gap: 5px;
       color: #16a34a;
       user-select: none;
+
+      &.global-lorebook {
+        color: #4978fa;
+      }
     }
 
     &:hover {

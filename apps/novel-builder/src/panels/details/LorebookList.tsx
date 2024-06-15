@@ -10,6 +10,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./LorebookList.scss";
 import { FaCheckCircle } from "react-icons/fa";
+import classNames from "classnames";
 
 interface LorebookListProps {
   onSelectLorebook?: (id: string) => void;
@@ -67,13 +68,9 @@ export const LorebookList = ({
                     selectedLorebookId?.length ? "selector" : ""
                   }${isSelected(id) ? "__selected" : ""}`}
                   onClick={() => {
-                    onSelectLorebook?.(id);
-                    dispatch(
-                      updateLorebook({
-                        lorebookId: id,
-                        lorebook: { ...lorebook, isGlobal: false },
-                      })
-                    );
+                    if (!lorebook.isGlobal) {
+                      onSelectLorebook?.(id);
+                    }
                   }}
                 >
                   <FaPencil
@@ -91,10 +88,15 @@ export const LorebookList = ({
                   <p className="lorebookList__lorebook__description">
                     {description}
                   </p>
-                  {isSelected(id) ? (
-                    <div className="lorebookList__lorebook__selected-badge">
+                  {isSelected(id) || lorebook.isGlobal ? (
+                    <div
+                      className={classNames(
+                        "lorebookList__lorebook__selected-badge",
+                        lorebook.isGlobal ? "global-lorebook" : ""
+                      )}
+                    >
                       <FaCheckCircle />
-                      Selected
+                      {lorebook.isGlobal ? "Global" : "Selected"}
                     </div>
                   ) : null}
                 </div>
