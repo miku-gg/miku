@@ -28,11 +28,11 @@ ReactDOM.render(
         </div>
         <SceneEditModal />
         <BackgroundEditModal />
-        <LorebookEditModal />
         <BackgroundSearchModal />
         <SongEditModal />
         <SongSearchModal />
         <CharacterEditModal />
+        <LorebookEditModal />
         <LoadingModal />
         <ToastContainer />
       </AreYouSure.AreYouSureProvider>

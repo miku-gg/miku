@@ -403,15 +403,11 @@ export default function SceneEditModal() {
             </div>
             <div className="SceneEditModal__scene-lorebooks">
               <LorebookList
-                selectedLorebookId={scene.lorebookIds}
-                //TODO: Change tooltip text
+                selectedLorebookId={scene?.lorebookIds || []}
                 tooltipText="Select lorebooks that are relevant to this scene."
-                onSelectLorebook={(id) => {
-                  handleLorebookSelect(id);
-                }}
+                onSelectLorebook={(id) => handleLorebookSelect(id)}
               />
             </div>
-
             <div className="SceneEditModal__scene-actions">
               <Button theme="primary" onClick={handleDeleteScene}>
                 Delete Scene

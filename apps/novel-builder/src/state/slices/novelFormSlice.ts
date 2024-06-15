@@ -237,14 +237,17 @@ const novelFormSlice = createSlice({
       state.starts.splice(index, 1);
     },
     createLorebook: (state, action: PayloadAction<string>) => {
-      state.lorebooks?.push({
+      const lorebook = {
         id: action.payload,
         isGlobal: true,
         name: "New Lorebook",
         description: "New lorebook description.",
         extensions: {},
         entries: [],
-      });
+      };
+      state.lorebooks
+        ? state.lorebooks?.push(lorebook)
+        : (state.lorebooks = [lorebook]);
     },
     updateLorebook: (
       state,

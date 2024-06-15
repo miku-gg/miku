@@ -1,16 +1,16 @@
+@import "../../styles/variables";
+
 .lorebookList {
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   min-width: 350px;
 
-  border: 1px solid #5f6388;
-  padding: 10px;
-  border-radius: 16px;
+  background-color: $background-1;
+
+  padding: 20px;
+  border-radius: 8px;
 
   &__header {
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -35,29 +35,25 @@
   &__container {
     display: flex;
     align-items: center;
-    width: 100%;
     flex-wrap: wrap;
   }
 
   &__box {
-    width: 50%;
-
-    height: 100%;
+    width: 33%;
     padding: 8px;
     min-width: 330px;
   }
 
   &__lorebook {
-    height: 100%;
     display: flex;
     position: relative;
     flex-direction: column;
     padding: 16px;
     gap: 8px;
     align-items: flex-start;
-    width: 100%;
     border: 1px solid #5f6388;
     border-radius: 16px;
+    transition: all 0.2s ease;
 
     &__name {
       margin: 0;
@@ -75,8 +71,28 @@
       color: white;
       width: fit-content;
       cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0;
+
       &:hover {
-        color: #9747ff;
+        color: $secondary-color;
+      }
+    }
+
+    &__selected-badge {
+      position: absolute;
+      right: 10px;
+      bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #16a34a;
+      user-select: none;
+    }
+
+    &:hover {
+      .lorebookList__lorebook__edit {
+        opacity: 1;
       }
     }
   }
@@ -85,7 +101,8 @@
     cursor: pointer;
 
     &__selected {
-      border-color: #9747ff;
+      border-color: $secondary-color;
+      background-color: $background-3;
       cursor: pointer;
     }
   }

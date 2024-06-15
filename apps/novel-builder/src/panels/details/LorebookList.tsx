@@ -9,6 +9,7 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./LorebookList.scss";
+import { FaCheckCircle } from "react-icons/fa";
 
 interface LorebookListProps {
   onSelectLorebook?: (id: string) => void;
@@ -52,7 +53,7 @@ export const LorebookList = ({
           )}
         </div>
         <Button theme="gradient" onClick={() => createNewLorebook()}>
-          Create new Book
+          New Lorebook
         </Button>
       </div>
       {lorebooks && (
@@ -63,7 +64,7 @@ export const LorebookList = ({
               <div key={id} className="lorebookList__box">
                 <div
                   className={`lorebookList__lorebook ${
-                    selectedLorebookId ? "selector" : ""
+                    selectedLorebookId?.length ? "selector" : ""
                   }${isSelected(id) ? "__selected" : ""}`}
                   onClick={() => {
                     onSelectLorebook?.(id);
@@ -88,6 +89,12 @@ export const LorebookList = ({
                   <p className="lorebookList__lorebook__description">
                     {description}
                   </p>
+                  {isSelected(id) ? (
+                    <div className="lorebookList__lorebook__selected-badge">
+                      <FaCheckCircle />
+                      Selected
+                    </div>
+                  ) : null}
                 </div>
               </div>
             );

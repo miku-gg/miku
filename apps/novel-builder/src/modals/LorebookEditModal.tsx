@@ -53,10 +53,6 @@ export default function LorebookEditModal() {
     }
   };
 
-  if (!lorebook) {
-    return null;
-  }
-
   const handleDeleteLorebook = () => {
     openModal({
       title: "Are you sure?",
@@ -64,7 +60,7 @@ export default function LorebookEditModal() {
       //TODO: Fix z-index for are you sure modal
       onYes: () => {
         dispatch(closeModal({ modalType: "lorebookEdit" }));
-        dispatch(deleteLorebook({ lorebookId: lorebook.id }));
+        dispatch(deleteLorebook({ lorebookId: lorebook?.id || "" }));
       },
     });
   };
