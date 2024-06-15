@@ -78,7 +78,9 @@ export const LorebookList = ({
                 >
                   <FaPencil
                     className="lorebookList__lorebook__edit"
-                    onClick={() => {
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       dispatch(
                         openModal({ modalType: "lorebookEdit", editId: id })
                       );
