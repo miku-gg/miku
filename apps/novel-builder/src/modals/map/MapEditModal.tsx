@@ -13,9 +13,9 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
-import "./LorebookEditModal.scss";
+import "./MapEditModal.scss";
 
-export default function LorebookEditModal() {
+export default function MapEditModal() {
   const dispatch = useDispatch();
   const { openModal } = AreYouSure.useAreYouSure();
   const map = useAppSelector(selectEditingMap);
@@ -49,7 +49,7 @@ export default function LorebookEditModal() {
       title: "Are you sure?",
       description: "This action cannot be undone",
       onYes: () => {
-        dispatch(closeModal({ modalType: "lorebookEdit" }));
+        dispatch(closeModal({ modalType: "mapEdit" }));
         dispatch(deleteMap(id));
       },
     });
