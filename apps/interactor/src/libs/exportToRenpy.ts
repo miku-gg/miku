@@ -24,11 +24,10 @@ const sanitizeId = (inputString: string): string => {
   return 'id_' + hash.toString().replace(/[^a-zA-Z0-9]/g, '')
 }
 
-function getSlicedStrings(str: string): string[] {
+export function getSlicedStrings(str: string): string[] {
   const slices: string[] = []
   let startIndex = 0
-  let endIndex = 0
-  const formattedText = str.replace(/\n/g, ' ')
+  const formattedText = str.replace(/\n/g, ' ').replace(/\s\s+/g, ' ').trim()
 
   while (startIndex < formattedText.length) {
     const nextAsteriskIndex = formattedText.indexOf('*', startIndex)
@@ -37,8 +36,10 @@ function getSlicedStrings(str: string): string[] {
     // Check if a quote or asterisk was found
     if (nextAsteriskIndex === -1 && nextQuoteIndex === -1) {
       // If neither was found, add the remaining text and break
-      const remainingText = formattedText.slice(startIndex)
-      addTextToSlices(remainingText, slices)
+      const remainingText = formattedText.slice(startIndex).trim()
+      if (remainingText) {
+        addTextToSlices(remainingText, slices)
+      }
       break
     }
 
@@ -60,26 +61,41 @@ function getSlicedStrings(str: string): string[] {
 
     // If the nearest delimiter is an asterisk
     if (nearestDelimiterIndex === nextAsteriskIndex) {
-      endIndex = formattedText.indexOf('*', nearestDelimiterIndex + 1)
+      let endIndex = formattedText.indexOf('*', nearestDelimiterIndex + 1)
       if (endIndex === -1) {
         endIndex = formattedText.length
       } else {
         endIndex += 1
       }
-      slices.push(formattedText.slice(nearestDelimiterIndex, endIndex))
+      const asteriskText = formattedText
+        .slice(nearestDelimiterIndex, endIndex)
+        .trim()
+      if (
+        asteriskText.length > 3 ||
+        asteriskText.replace(/\*/g, '').trim().length > 0
+      ) {
+        // Ignore isolated asterisks or empty asterisk text
+        slices.push(asteriskText)
+      }
       startIndex = endIndex
     } else {
       // If the nearest delimiter is a quote
-      endIndex = formattedText.indexOf('"', nearestDelimiterIndex + 1)
+      let endIndex = formattedText.indexOf('"', nearestDelimiterIndex + 1)
       if (endIndex === -1) {
         endIndex = formattedText.length
       }
-      slices.push(formattedText.slice(nearestDelimiterIndex + 1, endIndex))
+      const quoteText = formattedText
+        .slice(nearestDelimiterIndex + 1, endIndex)
+        .trim()
+      if (quoteText) {
+        slices.push(quoteText)
+      }
       startIndex = endIndex + 1
     }
   }
 
   // Split slices longer than 50 words into two parts
+
   return slices.flatMap((slice) => {
     const words = slice.split(' ')
     if (words.length >= 40) {

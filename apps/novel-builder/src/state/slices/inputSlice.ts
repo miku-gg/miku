@@ -10,6 +10,7 @@ export type ModalType =
   | "characterGeneration"
   | "characterSearch"
   | "loading"
+  |"lorebookEdit"
   | "errors"
   | "scene";
 
@@ -38,6 +39,9 @@ const initialState: InputState = {
   },
   modals: {
     loading: {
+      opened: false,
+    },
+    lorebookEdit: {
       opened: false,
     },
     background: {

@@ -1,0 +1,115 @@
+@import "../../styles/variables";
+
+.lorebookList {
+  display: flex;
+  flex-direction: column;
+  min-width: 350px;
+
+  background-color: $background-1;
+
+  padding: 20px;
+  border-radius: 8px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &__infoIcon {
+        width: 1.2rem;
+        height: 1.2rem;
+        color: #8489bd;
+      }
+    }
+
+    & h2 {
+      margin: 0;
+    }
+  }
+
+  &__container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  &__box {
+    width: 33%;
+    padding: 8px;
+    min-width: 330px;
+  }
+
+  &__lorebook {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    padding: 16px;
+    gap: 8px;
+    align-items: flex-start;
+    border: 1px solid #5f6388;
+    border-radius: 16px;
+    transition: all 0.2s ease;
+
+    &__name {
+      margin: 0;
+    }
+
+    &__description {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    &__edit {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: white;
+      width: fit-content;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0;
+
+      &:hover {
+        color: $secondary-color;
+      }
+    }
+
+    &__selected-badge {
+      position: absolute;
+      right: 10px;
+      bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #16a34a;
+      user-select: none;
+
+      &.global-lorebook {
+        color: #4978fa;
+      }
+    }
+
+    &:hover {
+      background-color: rgba($background-3, 0.6);
+      .lorebookList__lorebook__edit {
+        opacity: 1;
+      }
+    }
+  }
+
+  .selector {
+    cursor: pointer;
+
+    &__selected {
+      border-color: $secondary-color;
+      background-color: $background-3;
+      cursor: pointer;
+    }
+  }
+}

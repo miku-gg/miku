@@ -39,6 +39,7 @@ export interface NovelScene {
   children: string[];
   parentMapIds?: string[] | null;
   nsfw: NovelNSFW;
+  lorebookIds?: string[];
 }
 
 export interface NovelCharacterOutfit {
@@ -66,6 +67,7 @@ export interface NovelCharacter {
   tags: string[];
   card: MikuCardV2;
   nsfw: NovelNSFW;
+  lorebookIds?: string[];
 }
 
 export interface NovelBackground {
@@ -104,7 +106,6 @@ export interface NovelMap {
     previewSource: string;
     maskSource: string;
   }[];
-  lorebook?: CharacterBook;
 }
 
 export type StateMutation =
@@ -193,6 +194,11 @@ export interface NovelObjective {
   action: NovelObjectiveAction;
 }
 
+export interface NovelLorebook extends CharacterBook {
+  id: string;
+  isGlobal: boolean;
+}
+
 export interface NovelState {
   title: string;
   description: string;
@@ -206,4 +212,5 @@ export interface NovelState {
   scenes: NovelScene[];
   starts: NovelStart[];
   objectives?: NovelObjective[];
+  lorebooks?: NovelLorebook[];
 }

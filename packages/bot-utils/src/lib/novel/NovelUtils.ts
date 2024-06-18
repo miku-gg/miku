@@ -49,6 +49,16 @@ export const tavernCardToNovelState = (
   const mikugg = oldMikuCard?.data.extensions.mikugg;
   const mikugg_v2 = cardV2?.data.extensions.mikugg_v2;
 
+  const lorebooks = card.data.character_book
+    ? [
+        {
+          ...card.data.character_book,
+          id: randomString(),
+          isGlobal: true,
+        },
+      ]
+    : [];
+
   return {
     author: cardV2.data.creator,
     backgrounds: mikugg?.backgrounds.map((bg, index) => ({
@@ -82,6 +92,7 @@ export const tavernCardToNovelState = (
         short_description: mikugg_v2.short_description,
         tags: cardV2.data.tags,
         card: cardV2,
+        lorebookIds: lorebooks.map((l) => l.id),
       },
     ],
     songs: mikugg?.sounds?.map((sound, index) => ({
@@ -158,6 +169,7 @@ export const tavernCardToNovelState = (
         parentMapIds: null,
       },
     ],
+    lorebooks,
   };
 };
 

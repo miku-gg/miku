@@ -9,6 +9,16 @@ export const selectEditingBackground = createSelector(
     return backgrounds.find((background) => background.id === modal.editId);
   }
 );
+export const selectLorebooks = (state: RootState) => {
+  return state.novel.lorebooks;
+};
+export const selectEditingLorebook = createSelector(
+  [(state: RootState) => state.input.modals.lorebookEdit, selectLorebooks],
+  (modal, lorebooks) => {
+    if (!modal.opened) return undefined;
+    return lorebooks?.find((lorebook) => lorebook.id === modal.editId);
+  }
+);
 export const selectEditingSong = createSelector(
   [
     (state: RootState) => state.input.modals.song,
