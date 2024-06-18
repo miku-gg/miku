@@ -2,6 +2,7 @@ import {
   AreYouSure,
   Button,
   DragAndDropImages,
+  Dropdown,
   Input,
   Modal,
   Tooltip,
@@ -31,6 +32,12 @@ export default function MapEditModal() {
   const map = useAppSelector(selectEditingMap);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevPlacesLength = useRef(0);
+  const scenes = useAppSelector((state) => state.novel.scenes);
+  const backgrounds = useAppSelector((state) => state.novel.backgrounds);
+  const items = scenes.map((scene) => ({
+    name: scene.name,
+    value: scene.id,
+  }));
 
   // const [isLoading, setIsLoading] = useState(false);
 
@@ -56,20 +63,51 @@ export default function MapEditModal() {
     }
   };
 
-  const handleUploadMap = async (file: File) => {
+  const handleUploadImage = async (
+    file: File,
+    source: "preview" | "mask" | "map",
+    place?: {
+      id: string;
+      sceneId: string;
+      name: string;
+      description: string;
+      previewSource: string;
+      maskSource: string;
+    }
+  ) => {
     if (file) {
       try {
         const asset = await config.uploadAsset(file);
-
-        dispatch(
-          updateMap({
-            ...map!,
-            source: {
-              ...map!.source,
-              png: asset.assetId,
-            },
-          })
-        );
+        switch (source) {
+          case "preview":
+            dispatch(
+              updatePlace({
+                mapId: map!.id,
+                place: { ...place!, previewSource: asset.assetId },
+              })
+            );
+            return;
+          case "mask":
+            dispatch(
+              updatePlace({
+                mapId: map!.id,
+                place: { ...place!, maskSource: asset.assetId },
+              })
+            );
+            return;
+          case "map": {
+            dispatch(
+              updateMap({
+                ...map!,
+                source: {
+                  ...map!.source,
+                  png: asset.assetId,
+                },
+              })
+            );
+            return;
+          }
+        }
       } catch (e) {
         toast.error("Error uploading the image");
         console.error(e);
@@ -86,6 +124,12 @@ export default function MapEditModal() {
         dispatch(deleteMap(id));
       },
     });
+  };
+
+  const getCurrentSceneData = (id: string) => {
+    const scene = scenes.find((scene) => scene.id === id);
+    if (!scene) return null;
+    return scene;
   };
 
   // const handleUploadMusic = async () => {
@@ -121,7 +165,6 @@ export default function MapEditModal() {
     >
       {map ? (
         <div className="MapEdit scrollbar">
-          <h2 className="MapEdit__title">Edit Map</h2>
           <Tooltip id="delete-tooltip" place="bottom" />
           <FaTrashAlt
             className="MapEdit__removeMap"
@@ -169,10 +212,9 @@ export default function MapEditModal() {
               </div> */}
             </div>
             <DragAndDropImages
-              size="lg"
               placeHolder="Upload map image."
               className="MapEdit__form__uploadMap"
-              handleChange={handleUploadMap}
+              handleChange={(file) => handleUploadImage(file, "map")}
               previewImage={
                 map?.source.png && config.genAssetLink(map.source.png)
               }
@@ -221,6 +263,7 @@ export default function MapEditModal() {
                         );
                       }}
                     />
+
                     <div className="MapEdit__places__input">
                       <Input
                         label="Place name"
@@ -231,6 +274,27 @@ export default function MapEditModal() {
                             updatePlace({
                               mapId: map.id,
                               place: { ...place, name: e.target.value },
+                            })
+                          );
+                        }}
+                      />
+                      <Dropdown
+                        items={items}
+                        selectedIndex={items.findIndex(
+                          (item) => item.value === place.sceneId
+                        )}
+                        placeholder="Select scene"
+                        onChange={(item) => {
+                          let scene = getCurrentSceneData(items[item].value);
+                          dispatch(
+                            updatePlace({
+                              mapId: map.id,
+                              place: {
+                                ...place,
+                                sceneId: items[item].value,
+                                previewSource: scene!.backgroundId,
+                                name: scene!.name,
+                              },
                             })
                           );
                         }}
@@ -252,6 +316,59 @@ export default function MapEditModal() {
                       );
                     }}
                   />
+                  <div className="MapEdit__places__images">
+                    <DragAndDropImages
+                      placeHolder="Add a Preview Image"
+                      previewImage={
+                        place.previewSource
+                          ? config.genAssetLink(
+                              backgrounds.find(
+                                (b) => b.id === place.previewSource
+                              )?.source.jpg || ""
+                            )
+                          : ""
+                      }
+                      handleChange={(file) => {
+                        handleUploadImage(file, "preview", place);
+                      }}
+                      onFileValidate={async (file) => {
+                        if (file.size > 2 * 1024 * 1024) {
+                          toast.error("File size should be less than 1MB");
+                          return false;
+                        }
+                        if (!checkFileType(file, ["image/png", "image/jpeg"])) {
+                          toast.error(
+                            "Invalid file type. Please upload a valid image file"
+                          );
+                          return false;
+                        }
+                        return true;
+                      }}
+                    />
+                    <DragAndDropImages
+                      placeHolder="Add a mask for the place."
+                      previewImage={
+                        place.maskSource &&
+                        config.genAssetLink(place.maskSource)
+                      }
+                      handleChange={(file) => {
+                        handleUploadImage(file, "mask", place);
+                      }}
+                      onFileValidate={async (file) => {
+                        if (file.size > 2 * 1024 * 1024) {
+                          toast.error("File size should be less than 1MB");
+                          return false;
+                        }
+                        if (!checkFileType(file, ["image/png", "image/jpeg"])) {
+                          toast.error(
+                            "Invalid file type. Please upload a valid image file"
+                          );
+                          return false;
+                        }
+                        return true;
+                      }}
+                    />
+                  </div>
                 </div>
               ))}
           </div>
