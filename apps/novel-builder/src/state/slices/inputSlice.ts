@@ -10,13 +10,20 @@ export type ModalType =
   | "characterGeneration"
   | "characterSearch"
   | "loading"
-  |"lorebookEdit"
+  | "lorebookEdit"
+  | "mapEdit"
   | "errors"
   | "scene";
 
-export type PanelType = "details" | "assets" | "scenes" | "starts" | "preview";
+export type PanelType =
+  | "details"
+  | "assets"
+  | "maps"
+  | "scenes"
+  | "starts"
+  | "preview";
 export const isPanelType = (panel: string): panel is PanelType =>
-  ["details", "assets", "scenes", "starts", "preview"].includes(panel);
+  ["details", "assets", "maps", "scenes", "starts", "preview"].includes(panel);
 
 export interface InputState {
   navigation: {
@@ -42,6 +49,9 @@ const initialState: InputState = {
       opened: false,
     },
     lorebookEdit: {
+      opened: false,
+    },
+    mapEdit: {
       opened: false,
     },
     background: {

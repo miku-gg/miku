@@ -1,0 +1,101 @@
+.MapEdit {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 700px;
+
+  &__removeMap,
+  &__removePlace {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    color: white;
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    &:hover {
+      color: #9747ff;
+    }
+  }
+
+  &__removePlace {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &__title {
+    margin: 0;
+    padding: 0;
+  }
+
+  &__createPlace {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 4px;
+    border-radius: 0.625rem;
+    border: 1px solid #5f6388;
+
+    & label {
+      margin-left: 5px;
+    }
+  }
+
+  &__placesContainer {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  &__places {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    background-color: #25284b;
+    padding: 1rem;
+    gap: 10px;
+    border-radius: 16px;
+
+    &__form {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    &__input {
+      display: flex;
+
+      .Input {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        &__container {
+          height: 100%;
+        }
+      }
+    }
+
+    &__tags {
+      width: 100%;
+    }
+  }
+
+  &__form-top {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+
+    &__name {
+      width: 100%;
+    }
+
+    &__global {
+      width: 200px;
+    }
+  }
+}

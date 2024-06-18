@@ -315,6 +315,66 @@ const novelFormSlice = createSlice({
 
       lorebook.entries.splice(action.payload.entryIndex, 1);
     },
+    createMap(state, action: PayloadAction<{id:string}>) {
+      state.maps.push({
+        id: action.payload.id,
+        name: "New Map",
+        description: "New map description.",
+        places: [],
+        source: { png: "" },
+      });
+    },
+    updateMap(state, action: PayloadAction<NovelV3.NovelMap>) {
+      const index = state.maps.findIndex((map) => map.id === action.payload.id);
+      if (index === -1) return;
+      state.maps[index] = action.payload;
+    },
+    deleteMap(state, action: PayloadAction<string>) {
+      const index = state.maps.findIndex((map) => map.id === action.payload);
+      if (index === -1) return;
+      state.maps.splice(index, 1);
+    },
+    createPlace(state, action: PayloadAction<{ mapId: string }>) {
+      const map = state.maps.find((map) => map.id === action.payload.mapId);
+      if (!map) return;
+      map.places.push({
+        id: randomUUID(),
+        sceneId: "",
+        name: "New Place",
+        description: "New place description.",
+        previewSource: "",
+        maskSource: "",
+      });
+    },
+    updatePlace(
+      state,
+      action: PayloadAction<{ mapId: string; place: {
+    id: string;
+    sceneId: string;
+    name: string;
+    description: string;
+    previewSource: string;
+    maskSource: string;
+  } }>
+    ) {
+      const map = state.maps.find((map) => map.id === action.payload.mapId);
+      if (!map) return;
+      const index = map.places.findIndex(
+        (place) => place.id === action.payload.place.id
+      );
+      if (index === -1) return;
+      map.places[index] = action.payload.place;
+    },
+    deletePlace(
+      state,
+      action: PayloadAction<{ mapId: string; placeId: string }>
+    ) {
+      const map = state.maps.find((map) => map.id === action.payload.mapId);
+      if (!map) return;
+      map.places = map.places.filter(
+        (place) => place.id !== action.payload.placeId
+      );
+    },
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;
     },
@@ -356,6 +416,12 @@ export const {
   createEntry,
   updateEntry,
   deleteEntry,
+  createMap,
+  updateMap,
+  deleteMap,
+  createPlace,
+  updatePlace,
+  deletePlace,
   loadCompleteState,
   updateDetails,
   clearNovelState,
