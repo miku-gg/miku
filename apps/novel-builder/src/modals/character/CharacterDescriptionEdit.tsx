@@ -2,7 +2,7 @@ import {
   DragAndDropImages,
   Input,
   Modal,
-  TagAutocomplete,
+  TagAutocomplete
 } from "@mikugg/ui-kit";
 import { useState } from "react";
 import { BsStars } from "react-icons/bs";
@@ -13,13 +13,16 @@ import {
   ModelType,
   SERVICES_ENDPOINT,
   checkFileType,
-  conversationAgent,
+  conversationAgent
 } from "../../libs/utils";
 import { closeModal, openModal } from "../../state/slices/inputSlice";
 import { updateCharacter } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./CharacterDescriptionEdit.scss";
 import { CharacterDescriptionGeneration } from "./CharacterDescriptionGeneration";
+import { TokenDisplayer } from "../../components/TokenDisplayer";
+import { TOKEN_LIMITS, TokenLimitsKey } from "../../data/tokenLimits";
+import { setTokenByKey } from "../../state/slices/tokensSlice";
 
 const DEFAULT_TAGS = [
   { value: "Male" },
@@ -40,11 +43,11 @@ const DEFAULT_TAGS = [
   { value: "Work" },
   { value: "Movies & TV" },
   { value: "VTuber" },
-  { value: "Realistic" },
+  { value: "Realistic" }
 ];
 
 export default function CharacterDescriptionEdit({
-  characterId,
+  characterId
 }: {
   characterId?: string;
 }) {
@@ -57,6 +60,8 @@ export default function CharacterDescriptionEdit({
   const GenerateCharacterModal = useAppSelector(
     (state) => state.input.modals.characterGeneration.opened
   );
+  const tokensState = useAppSelector((state) => state.token);
+
   if (!character || !characterId) {
     return null;
   }
@@ -68,7 +73,7 @@ export default function CharacterDescriptionEdit({
         dispatch(
           updateCharacter({
             ...character,
-            profile_pic: asset.assetId,
+            profile_pic: asset.assetId
           })
         );
       } catch (e) {
@@ -84,12 +89,12 @@ export default function CharacterDescriptionEdit({
 
       const stream = textCompletion({
         template: conversationAgent.generatePrompt({
-          input_description: character.card.data.description,
+          input_description: character.card.data.description
         }),
         model: ModelType.RP,
         variables: {},
         serviceBaseUrl: SERVICES_ENDPOINT,
-        identifier: "character-conversation-generation",
+        identifier: "character-conversation-generation"
       });
 
       for await (const result of stream) {
@@ -104,9 +109,9 @@ export default function CharacterDescriptionEdit({
                   "question_1"
                 )}\n{{char}}: ${result.get("answer_1")}\n{{user}}: ${result.get(
                   "question_2"
-                )}\n{{char}}: ${result.get("answer_2")}`,
-              },
-            },
+                )}\n{{char}}: ${result.get("answer_2")}`
+              }
+            }
           })
         );
       }
@@ -114,6 +119,23 @@ export default function CharacterDescriptionEdit({
     } catch (error) {
       console.error(error);
       setIsGenerating(false);
+    }
+  };
+
+  const dispatchSetTokenByKey = ({
+    key,
+    value
+  }: {
+    key: TokenLimitsKey;
+    value: number;
+  }) => {
+    if (tokensState.tokens[key] !== value) {
+      dispatch(
+        setTokenByKey({
+          key,
+          value
+        })
+      );
     }
   };
 
@@ -139,9 +161,9 @@ export default function CharacterDescriptionEdit({
                         ...character.card,
                         data: {
                           ...character.card.data,
-                          name: e.target.value,
-                        },
-                      },
+                          name: e.target.value
+                        }
+                      }
                     })
                   )
                 }
@@ -163,9 +185,9 @@ export default function CharacterDescriptionEdit({
                         ...character.card,
                         data: {
                           ...character.card.data,
-                          character_version: e.target.value,
-                        },
-                      },
+                          character_version: e.target.value
+                        }
+                      }
                     })
                   )
                 }
@@ -188,9 +210,9 @@ export default function CharacterDescriptionEdit({
                         ...character.card,
                         data: {
                           ...character.card.data,
-                          creator: e.target.value,
-                        },
-                      },
+                          creator: e.target.value
+                        }
+                      }
                     })
                   )
                 }
@@ -210,7 +232,7 @@ export default function CharacterDescriptionEdit({
                 dispatch(
                   updateCharacter({
                     ...character,
-                    short_description: e.target.value,
+                    short_description: e.target.value
                   })
                 )
               }
@@ -221,7 +243,7 @@ export default function CharacterDescriptionEdit({
             <TagAutocomplete
               value={character.tags.map((_tag) => ({
                 label: _tag,
-                value: _tag,
+                value: _tag
               }))}
               name="tags"
               id="tags"
@@ -236,9 +258,9 @@ export default function CharacterDescriptionEdit({
                       ...character.card,
                       data: {
                         ...character.card.data,
-                        tags: event.target.value,
-                      },
-                    },
+                        tags: event.target.value
+                      }
+                    }
                   })
                 )
               }
@@ -286,16 +308,20 @@ export default function CharacterDescriptionEdit({
 
       <div className="CharacterDescriptionEdit__description">
         <div className="CharacterDescriptionEdit__description__label">
-          <label className="Input__label">Character Complete Description</label>
-          <button
-            className="Input__label"
-            onClick={() => {
-              dispatch(openModal({ modalType: "characterGeneration" }));
-            }}
-          >
-            <BsStars />
-            Generate
-          </button>
+          <div className="CharacterDescriptionEdit__description__label-group">
+            <label className="Input__label">
+              Character Complete Description
+            </label>
+            <button
+              className="Input__label"
+              onClick={() => {
+                dispatch(openModal({ modalType: "characterGeneration" }));
+              }}
+            >
+              <BsStars />
+              Generate
+            </button>
+          </div>
           <Modal
             opened={GenerateCharacterModal}
             onCloseModal={() =>
@@ -305,6 +331,16 @@ export default function CharacterDescriptionEdit({
           >
             <CharacterDescriptionGeneration characterID={characterId} />
           </Modal>
+          <TokenDisplayer
+            text={character.card.data.description || ""}
+            limits={TOKEN_LIMITS.CHARACTER_DESCRIPTION}
+            getTokens={(tokens) => {
+              dispatchSetTokenByKey({
+                key: "CHARACTER_DESCRIPTION",
+                value: tokens
+              });
+            }}
+          />
         </div>
         <Input
           isTextArea
@@ -320,9 +356,9 @@ export default function CharacterDescriptionEdit({
                   ...character.card,
                   data: {
                     ...character.card.data,
-                    description: e.target.value,
-                  },
-                },
+                    description: e.target.value
+                  }
+                }
               })
             )
           }
@@ -330,9 +366,21 @@ export default function CharacterDescriptionEdit({
         />
       </div>
       <div className="CharacterDescriptionEdit__personality">
+        <div className="CharacterDescriptionEdit__personality__label">
+          <label className="Input__label">Describe the Personality</label>
+          <TokenDisplayer
+            text={character.card.data.personality || ""}
+            limits={TOKEN_LIMITS.CHARACTER_PERSONALITY}
+            getTokens={(tokens) => {
+              dispatchSetTokenByKey({
+                key: "CHARACTER_PERSONALITY",
+                value: tokens
+              });
+            }}
+          />
+        </div>
         <Input
           isTextArea
-          label="Describe the Personality"
           placeHolder="species: human, role: priest"
           id="personality"
           name="personality"
@@ -345,9 +393,9 @@ export default function CharacterDescriptionEdit({
                   ...character.card,
                   data: {
                     ...character.card.data,
-                    personality: e.target.value,
-                  },
-                },
+                    personality: e.target.value
+                  }
+                }
               })
             )
           }
@@ -356,30 +404,43 @@ export default function CharacterDescriptionEdit({
       </div>
       <div className="CharacterDescriptionEdit__examples">
         <div className="CharacterDescriptionEdit__examples__label">
-          <label className="Input__label">
-            Character Reference Conversation
-          </label>
-          <div
-            className={
-              !character.card.data.description || isGenerating === true
-                ? "disabled"
-                : ""
-            }
-          >
-            <button
-              className="Input__label"
-              disabled={
+          <div className="CharacterDescriptionEdit__examples__label-group">
+            <label className="Input__label">
+              Character Reference Conversation
+            </label>
+            <div
+              className={
                 !character.card.data.description || isGenerating === true
+                  ? "disabled"
+                  : ""
               }
-              onClick={() => {
-                generatePrompt();
-              }}
             >
-              <BsStars />
-              {isGenerating ? "Generating..." : "Generate"}
-            </button>
+              <button
+                className="Input__label"
+                disabled={
+                  !character.card.data.description || isGenerating === true
+                }
+                onClick={() => {
+                  generatePrompt();
+                }}
+              >
+                <BsStars />
+                {isGenerating ? "Generating..." : "Generate"}
+              </button>
+            </div>
           </div>
+          <TokenDisplayer
+            text={character.card.data.mes_example || ""}
+            limits={TOKEN_LIMITS.CHARACTER_REFERENCE_CONVERSATION}
+            getTokens={(tokens) => {
+              dispatchSetTokenByKey({
+                key: "CHARACTER_REFERENCE_CONVERSATION",
+                value: tokens
+              });
+            }}
+          />
         </div>
+
         <Input
           isTextArea
           description="Reference conversations that the AI will use to generate responses."
@@ -395,14 +456,15 @@ export default function CharacterDescriptionEdit({
                   ...character.card,
                   data: {
                     ...character.card.data,
-                    mes_example: e.target.value,
-                  },
-                },
+                    mes_example: e.target.value
+                  }
+                }
               })
             )
           }
           className="step1Description__textarea"
         />
+        {tokensState.totalTokens}
       </div>
     </div>
   );

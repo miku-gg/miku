@@ -1,0 +1,18 @@
+@import "../styles/variables";
+
+.TokenDisplayer {
+  font-size: 0.875rem;
+  margin-right: 4px;
+
+  &.green {
+    color: $token-green;
+  }
+
+  &.yellow {
+    color: $token-yellow;
+  }
+
+  &.red {
+    color: $token-red;
+  }
+}
