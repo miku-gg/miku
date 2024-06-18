@@ -29,24 +29,28 @@ export const MapList = () => {
           {maps.map((map) => {
             const { id, name, description } = map;
             return (
-              <div
-                key={id}
-                className="MapList__container__map"
-                style={{
-                  backgroundImage: config.genAssetLink(map.source.png, true),
-                  
-                }}
-              >
-                <FaPencil
-                  className="MapList__container__edit"
-                  onClick={(e: React.MouseEvent) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    dispatch(openModal({ modalType: "mapEdit", editId: id }));
+              <div className="MapList__container__box">
+                <div
+                  key={id}
+                  className="MapList__container__map"
+                  style={{
+                    backgroundImage: `url(${config.genAssetLink(
+                      map.source.png,
+                      true
+                    )})`,
                   }}
-                />
-                <h3>{name}</h3>
-                <p>{description}</p>
+                >
+                  <FaPencil
+                    className="MapList__container__edit"
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      dispatch(openModal({ modalType: "mapEdit", editId: id }));
+                    }}
+                  />
+                  <h3>{name}</h3>
+                  <p>{description}</p>
+                </div>
               </div>
             );
           })}

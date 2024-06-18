@@ -6,7 +6,7 @@ import {
   Modal,
   Tooltip,
 } from "@mikugg/ui-kit";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { selectEditingMap } from "../../state/selectors";
@@ -27,9 +27,11 @@ import "./MapEditModal.scss";
 
 export default function MapEditModal() {
   const dispatch = useDispatch();
+  const { openModal } = AreYouSure.useAreYouSure();
   const map = useAppSelector(selectEditingMap);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevPlacesLength = useRef(0);
+
   // const [isLoading, setIsLoading] = useState(false);
 
   const handleScrollToTop = useCallback(() => {
@@ -76,8 +78,6 @@ export default function MapEditModal() {
   };
 
   const handleDeleteMap = (id: string) => {
-    const { openModal } = AreYouSure.useAreYouSure();
-
     openModal({
       title: "Are you sure?",
       description: "This action cannot be undone",
