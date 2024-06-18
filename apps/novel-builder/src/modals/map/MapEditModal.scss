@@ -79,23 +79,44 @@
         }
       }
     }
-
-    &__tags {
-      width: 100%;
-    }
   }
 
-  &__form-top {
+  &__form {
     display: flex;
-    align-items: end;
     gap: 10px;
 
-    &__name {
+    &__left {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
       width: 100%;
     }
 
-    &__global {
-      width: 200px;
+    &__music {
+      & label {
+        font-weight: 500;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        color: #fafafa;
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.5rem;
+        width: fit-content;
+      }
+
+      &__content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+
+        & p {
+          margin: 0;
+          padding-left: 8px;
+        }
+      }
     }
   }
 }

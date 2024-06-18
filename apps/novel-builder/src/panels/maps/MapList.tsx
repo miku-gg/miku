@@ -1,22 +1,3 @@
-// export interface NovelMap {
-//   id: string;
-//   name: string;
-//   description: string;
-//   source: {
-//     png: string;
-//     webm?: string;
-//     music?: string;
-//   };
-//   places: {
-//     id: string;
-//     sceneId: string;
-//     name: string;
-//     description: string;
-//     previewSource: string;
-//     maskSource: string;
-//   }[];
-// }
-
 import { Button } from "@mikugg/ui-kit";
 import { FaPencil } from "react-icons/fa6";
 import { v4 as randomUUID } from "uuid";
@@ -52,7 +33,8 @@ export const MapList = () => {
                 key={id}
                 className="MapList__container__map"
                 style={{
-                  background: config.genAssetLink(map.source.png, true),
+                  backgroundImage: config.genAssetLink(map.source.png, true),
+                  
                 }}
               >
                 <FaPencil

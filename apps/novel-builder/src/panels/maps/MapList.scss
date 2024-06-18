@@ -21,6 +21,9 @@
     display: flex;
 
     &__map {
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       position: relative;
       border: 1px solid $node-conector-color;
       padding: 16px;
@@ -34,7 +37,6 @@
       }
 
       &:hover {
-        background-color: rgba($background-3, 0.6);
         .MapList__container__edit {
           opacity: 1;
         }
