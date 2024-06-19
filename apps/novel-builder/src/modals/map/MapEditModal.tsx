@@ -1,11 +1,12 @@
 import {
   AreYouSure,
-  Button,
   DragAndDropImages,
   Input,
   Modal,
   Tooltip,
 } from "@mikugg/ui-kit";
+import { HiOutlinePlus } from "react-icons/hi";
+
 import { useCallback, useEffect, useRef } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
@@ -123,6 +124,7 @@ export default function MapEditModal() {
     <Modal
       opened={!!map}
       shouldCloseOnOverlayClick
+      className="MapEditModal"
       onCloseModal={() => dispatch(closeModal({ modalType: "mapEdit" }))}
     >
       {map ? (
@@ -137,17 +139,17 @@ export default function MapEditModal() {
             }}
           />
           <div className="MapEdit__form">
-            <div className="MapEdit__form__left">
+            <div className="MapEdit__form__top">
               <Input
                 label="Name"
                 placeHolder="Name for the map. E.g. World map."
+                className="MapEdit__form__name"
                 value={map?.name}
                 onChange={(e) =>
                   dispatch(updateMap({ ...map, name: e.target.value }))
                 }
               />
               <Input
-                isTextArea
                 label="Description"
                 className="MapEdit__form__description"
                 placeHolder="Description of the map. E.g. A map of the world."
@@ -162,27 +164,40 @@ export default function MapEditModal() {
                 }
               />
             </div>
-            <DragAndDropImages
-              placeHolder="Upload map image."
-              className="MapEdit__form__uploadMap"
-              handleChange={(file) => handleUploadImage(file, "map")}
-              previewImage={
-                map?.source.png && config.genAssetLink(map.source.png)
-              }
-              onFileValidate={async (file) => {
-                if (file.size > 2 * 1024 * 1024) {
-                  toast.error("File size should be less than 1MB");
-                  return false;
+            <div className="MapEdit__form__map">
+              {map?.places &&
+                map?.places.length > 0 &&
+                map?.places.map(
+                  (place) =>
+                    place.maskSource && (
+                      <img
+                        className="MapEdit__form__placePreview"
+                        src={config.genAssetLink(place.previewSource || "")}
+                      />
+                    )
+                )}
+              <DragAndDropImages
+                placeHolder="Upload map image."
+                className="MapEdit__form__uploadMap"
+                handleChange={(file) => handleUploadImage(file, "map")}
+                previewImage={
+                  map?.source.png && config.genAssetLink(map.source.png)
                 }
-                if (!checkFileType(file, ["image/png", "image/jpeg"])) {
-                  toast.error(
-                    "Invalid file type. Please upload a valid image file"
-                  );
-                  return false;
-                }
-                return true;
-              }}
-            />
+                onFileValidate={async (file) => {
+                  if (file.size > 2 * 1024 * 1024) {
+                    toast.error("File size should be less than 1MB");
+                    return false;
+                  }
+                  if (!checkFileType(file, ["image/png", "image/jpeg"])) {
+                    toast.error(
+                      "Invalid file type. Please upload a valid image file"
+                    );
+                    return false;
+                  }
+                  return true;
+                }}
+              />
+            </div>
           </div>
           <div className="MapEdit__createPlace">
             <label>Places</label>
@@ -193,9 +208,14 @@ export default function MapEditModal() {
             >
               {map?.places &&
                 map?.places.map((place) => (
-                  <div className="MapEdit__places" key={place.id}>
+                  <div className="MapEdit__place" key={place.id}>
+                    {place.previewSource && (
+                      <img
+                        src={config.genAssetLink(place.previewSource || "")}
+                      />
+                    )}
                     <FaPencil
-                      className="MapList__container__edit"
+                      className="MapEdit__place__edit"
                       onClick={(e: React.MouseEvent) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -209,15 +229,13 @@ export default function MapEditModal() {
                     />
                   </div>
                 ))}
-              <Button
-                theme="gradient"
-                onClick={() => {
-                  dispatch(createPlace({ mapId: map.id }));
-                }}
-              >
-                + Place
-              </Button>
             </div>
+            <HiOutlinePlus
+              className="MapEdit__placesContainer__button"
+              onClick={() => {
+                dispatch(createPlace({ mapId: map.id }));
+              }}
+            />
           </div>
         </div>
       ) : null}

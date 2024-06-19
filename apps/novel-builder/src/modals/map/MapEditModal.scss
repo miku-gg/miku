@@ -1,38 +1,58 @@
+@import "../../styles/variables.scss";
+
 .MapEdit {
   display: flex;
-  flex-direction: column;
   gap: 0.5rem;
-  margin-top: 24px;
-  max-height: 700px;
+  align-items: flex-end;
 
-  &__removeMap,
-  &__removePlace {
+  &__removeMap {
     position: absolute;
     top: 16px;
     right: 16px;
-    color: white;
+    color: $text-1;
     width: 1rem;
     height: 1rem;
     cursor: pointer;
 
     &:hover {
-      color: #9747ff;
+      color: $secondary-color;
     }
   }
 
-  &__title {
-    margin: 0;
-    padding: 0;
+  &__form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    max-width: 35rem;
+
+    &__map {
+      width: fit-content;
+      height: fit-content;
+      position: relative;
+    }
+
+    &__uploadMap {
+      margin: 0;
+      .mdSize {
+        width: 35rem;
+        height: 35rem;
+      }
+    }
+
+    &__top {
+      display: flex;
+      gap: 10px;
+    }
   }
 
   &__createPlace {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 4px;
-    border-radius: 0.625rem;
-    border: 1px solid #5f6388;
+    gap: 10px;
+    height: 35rem;
+    padding: 8px;
 
     & label {
       margin-left: 5px;
@@ -41,91 +61,67 @@
 
   &__placesContainer {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
+    align-items: center;
     gap: 10px;
-    max-height: 400px;
+    padding: 8px 0;
+    max-height: 35rem;
+    width: 220px;
     overflow-y: auto;
+
+    &__button {
+      min-width: 1.7rem;
+      min-height: 1.7rem;
+      color: $node-conector-color;
+      transition: ease-in-out 0.2s;
+      cursor: pointer;
+
+      &:hover {
+        color: $text-1;
+      }
+    }
   }
 
-  &__places {
-    display: flex;
+  &__place {
     position: relative;
-    flex-direction: column;
-    background-color: #25284b;
-    padding: 1rem;
-    gap: 10px;
+    width: 200px;
+    height: 100px;
+    min-height: 100px;
+    border: 1px solid $node-conector-color;
+    transition: ease-in-out 0.2s;
     border-radius: 16px;
 
-    &__input {
-      display: flex;
+    &__placePreview {
       width: 100%;
-      align-items: flex-end;
-      gap: 10px;
+      height: 100%;
+      border-radius: 16px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0.6;
+    }
 
-      .dropdown {
-        margin: 0;
-      }
+    &__edit {
+      color: $node-conector-color;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      transition: ease-in-out 0.2s;
+      opacity: 0;
 
-      .Input {
-        display: flex;
-        width: 100%;
-        flex-direction: column;
-        justify-content: space-between;
-
-        &__container {
-          height: 100%;
-        }
+      &:hover {
+        color: $text-1;
       }
     }
-    &__images {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
+
+    &:hover {
+      .MapEdit__place__edit {
+        opacity: 1;
+      }
     }
   }
-
-  &__form {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-
-    &__uploadMap {
-      margin: 0;
-    }
-
-    &__left {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-    }
-
-    // &__music {
-    //   & label {
-    //     font-weight: 500;
-    //     font-size: 0.875rem;
-    //     line-height: 1.25rem;
-    //     color: #fafafa;
-    //     margin-bottom: 0.5rem;
-    //     display: flex;
-    //     justify-content: flex-start;
-    //     align-items: center;
-    //     gap: 0.5rem;
-    //     width: fit-content;
-    //   }
-
-    //   &__content {
-    //     display: flex;
-    //     align-items: center;
-    //     justify-content: space-between;
-    //     gap: 10px;
-
-    //     & p {
-    //       margin: 0;
-    //       padding-left: 8px;
-    //     }
-    //   }
-    // }
-  }
+}
+.MapEditModal {
+  max-width: 850px !important;
 }
