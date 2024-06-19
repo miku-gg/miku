@@ -103,7 +103,7 @@ export const presets = new Map<PresetType, OpenAIAphroditeConfig>([
       presence_penalty: 0.0,
       frequency_penalty: 0.0,
       repetition_penalty: 1.1,
-      temperature: 1.12,
+      temperature: 1.17,
       min_p: 0.075,
       top_p: 0.1,
       top_k: 50,
