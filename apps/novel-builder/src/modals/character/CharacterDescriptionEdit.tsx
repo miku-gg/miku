@@ -22,8 +22,7 @@ import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./CharacterDescriptionEdit.scss";
 import { CharacterDescriptionGeneration } from "./CharacterDescriptionGeneration";
 import { TokenDisplayer } from "../../components/TokenDisplayer";
-import { TOKEN_LIMITS, TokenLimitsKey } from "../../data/tokenLimits";
-import { setTokenByKey } from "../../state/slices/tokensSlice";
+import { TOKEN_LIMITS } from "../../data/tokenLimits";
 
 const DEFAULT_TAGS = [
   { value: "Male" },
@@ -61,7 +60,6 @@ export default function CharacterDescriptionEdit({
   const GenerateCharacterModal = useAppSelector(
     (state) => state.input.modals.characterGeneration.opened
   );
-  const tokensState = useAppSelector((state) => state.token);
 
   if (!character || !characterId) {
     return null;
@@ -92,7 +90,7 @@ export default function CharacterDescriptionEdit({
           ? character.lorebookIds.includes(id)
             ? character.lorebookIds.filter((lid) => lid !== id)
             : [...character.lorebookIds, id]
-          : [id],
+          : [id]
       })
     );
   };
@@ -133,23 +131,6 @@ export default function CharacterDescriptionEdit({
     } catch (error) {
       console.error(error);
       setIsGenerating(false);
-    }
-  };
-
-  const dispatchSetTokenByKey = ({
-    key,
-    value
-  }: {
-    key: TokenLimitsKey;
-    value: number;
-  }) => {
-    if (tokensState.tokens[key] !== value) {
-      dispatch(
-        setTokenByKey({
-          key,
-          value
-        })
-      );
     }
   };
 
@@ -348,12 +329,6 @@ export default function CharacterDescriptionEdit({
           <TokenDisplayer
             text={character.card.data.description || ""}
             limits={TOKEN_LIMITS.CHARACTER_DESCRIPTION}
-            getTokens={(tokens) => {
-              dispatchSetTokenByKey({
-                key: "CHARACTER_DESCRIPTION",
-                value: tokens
-              });
-            }}
           />
         </div>
         <Input
@@ -385,12 +360,6 @@ export default function CharacterDescriptionEdit({
           <TokenDisplayer
             text={character.card.data.personality || ""}
             limits={TOKEN_LIMITS.CHARACTER_PERSONALITY}
-            getTokens={(tokens) => {
-              dispatchSetTokenByKey({
-                key: "CHARACTER_PERSONALITY",
-                value: tokens
-              });
-            }}
           />
         </div>
         <Input
@@ -446,12 +415,6 @@ export default function CharacterDescriptionEdit({
           <TokenDisplayer
             text={character.card.data.mes_example || ""}
             limits={TOKEN_LIMITS.CHARACTER_REFERENCE_CONVERSATION}
-            getTokens={(tokens) => {
-              dispatchSetTokenByKey({
-                key: "CHARACTER_REFERENCE_CONVERSATION",
-                value: tokens
-              });
-            }}
           />
         </div>
 
@@ -478,7 +441,6 @@ export default function CharacterDescriptionEdit({
           }
           className="step1Description__textarea"
         />
-        {tokensState.totalTokens}
       </div>
       <LorebookList
         onSelectLorebook={(id) => handleLorebookSelect(id)}
