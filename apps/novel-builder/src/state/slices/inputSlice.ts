@@ -12,6 +12,7 @@ export type ModalType =
   | "loading"
   | "lorebookEdit"
   | "mapEdit"
+  | "placeEdit"
   | "errors"
   | "scene";
 
@@ -52,6 +53,9 @@ const initialState: InputState = {
       opened: false,
     },
     mapEdit: {
+      opened: false,
+    },
+    placeEdit: {
       opened: false,
     },
     background: {

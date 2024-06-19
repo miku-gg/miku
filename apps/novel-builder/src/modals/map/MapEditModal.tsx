@@ -2,7 +2,6 @@ import {
   AreYouSure,
   Button,
   DragAndDropImages,
-  Dropdown,
   Input,
   Modal,
   Tooltip,
@@ -11,16 +10,16 @@ import { useCallback, useEffect, useRef } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { selectEditingMap } from "../../state/selectors";
-import { closeModal } from "../../state/slices/inputSlice";
+import { closeModal, openModal } from "../../state/slices/inputSlice";
 import {
   createPlace,
   deleteMap,
-  deletePlace,
   updateMap,
   updatePlace,
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
+import { FaPencil } from "react-icons/fa6";
 import { toast } from "react-toastify";
 import config from "../../config";
 import { checkFileType } from "../../libs/utils";
@@ -28,16 +27,10 @@ import "./MapEditModal.scss";
 
 export default function MapEditModal() {
   const dispatch = useDispatch();
-  const { openModal } = AreYouSure.useAreYouSure();
+  const areYouSure = AreYouSure.useAreYouSure();
   const map = useAppSelector(selectEditingMap);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevPlacesLength = useRef(0);
-  const scenes = useAppSelector((state) => state.novel.scenes);
-  const backgrounds = useAppSelector((state) => state.novel.backgrounds);
-  const items = scenes.map((scene) => ({
-    name: scene.name,
-    value: scene.id,
-  }));
 
   // const [isLoading, setIsLoading] = useState(false);
 
@@ -116,7 +109,7 @@ export default function MapEditModal() {
   };
 
   const handleDeleteMap = (id: string) => {
-    openModal({
+    areYouSure.openModal({
       title: "Are you sure?",
       description: "This action cannot be undone",
       onYes: () => {
@@ -125,37 +118,6 @@ export default function MapEditModal() {
       },
     });
   };
-
-  const getCurrentSceneData = (id: string) => {
-    const scene = scenes.find((scene) => scene.id === id);
-    if (!scene) return null;
-    return scene;
-  };
-
-  // const handleUploadMusic = async () => {
-  //   const input = document.createElement("input");
-  //   input.type = "file";
-  //   input.accept = "audio/*";
-  //   input.click();
-  //   setIsLoading(true);
-  //   input.onchange = async (e) => {
-  //     const file = (e.target as HTMLInputElement).files?.[0];
-  //     if (!file) return;
-  //     const { success, assetId } = await config.uploadAsset(file);
-  //     if (!success || !assetId) {
-  //       toast.error("Failed to upload music");
-  //       setIsLoading(false);
-  //       return;
-  //     }
-  //     dispatch(
-  //       updateMap({
-  //         ...map!,
-  //         source: { ...map!.source, music: assetId },
-  //       })
-  //     );
-  //     setIsLoading(false);
-  //   };
-  // };
 
   return (
     <Modal
@@ -199,15 +161,6 @@ export default function MapEditModal() {
                   )
                 }
               />
-              {/* <div className="MapEdit__form__music">
-                <label>Music(optional)</label>
-                <div className="MapEdit__form__music__content">
-                  <p>{isLoading ? "Uploading song.." : map.source.music ? "Song Added" : ""}</p>
-                  <Button theme="gradient" onClick={() => handleUploadMusic()}>
-                    Upload
-                  </Button>
-                </div>
-              </div> */}
             </div>
             <DragAndDropImages
               placeHolder="Upload map image."
@@ -233,142 +186,38 @@ export default function MapEditModal() {
           </div>
           <div className="MapEdit__createPlace">
             <label>Places</label>
-            <Button
-              theme="gradient"
-              onClick={() => {
-                dispatch(createPlace({ mapId: map.id }));
-              }}
+
+            <div
+              className="MapEdit__placesContainer scrollbar"
+              ref={containerRef}
             >
-              + Place
-            </Button>
-          </div>
-          <div
-            className="MapEdit__placesContainer scrollbar"
-            ref={containerRef}
-          >
-            {map?.places &&
-              map?.places.map((place, index) => (
-                <div className="MapEdit__places" key={`place-${index + 1}`}>
-                  <div className="MapEdit__places__form">
-                    <FaTrashAlt
-                      className="MapEdit__removePlace"
-                      onClick={() => {
+              {map?.places &&
+                map?.places.map((place) => (
+                  <div className="MapEdit__places" key={place.id}>
+                    <FaPencil
+                      className="MapList__container__edit"
+                      onClick={(e: React.MouseEvent) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         dispatch(
-                          deletePlace({
-                            mapId: map.id,
-                            placeId: place.id,
+                          openModal({
+                            modalType: "placeEdit",
+                            editId: place.id,
                           })
                         );
                       }}
                     />
-
-                    <div className="MapEdit__places__input">
-                      <Input
-                        label="Place name"
-                        placeHolder="Place name. E.g. Rose garden."
-                        value={place.name}
-                        onChange={(e) => {
-                          dispatch(
-                            updatePlace({
-                              mapId: map.id,
-                              place: { ...place, name: e.target.value },
-                            })
-                          );
-                        }}
-                      />
-                      <Dropdown
-                        items={items}
-                        selectedIndex={items.findIndex(
-                          (item) => item.value === place.sceneId
-                        )}
-                        placeholder="Select scene"
-                        onChange={(item) => {
-                          let scene = getCurrentSceneData(items[item].value);
-                          dispatch(
-                            updatePlace({
-                              mapId: map.id,
-                              place: {
-                                ...place,
-                                sceneId: items[item].value,
-                                previewSource: scene!.backgroundId,
-                                name: scene!.name,
-                              },
-                            })
-                          );
-                        }}
-                      />
-                    </div>
                   </div>
-                  <Input
-                    isTextArea
-                    label="Place description"
-                    description="This is the description for the place."
-                    placeHolder="Description of the place. E.g. A garden with a lot of flowers."
-                    value={place.description}
-                    onChange={(e) => {
-                      dispatch(
-                        updatePlace({
-                          mapId: map.id,
-                          place: { ...place, description: e.target.value },
-                        })
-                      );
-                    }}
-                  />
-                  <div className="MapEdit__places__images">
-                    <DragAndDropImages
-                      placeHolder="Add a Preview Image"
-                      previewImage={
-                        place.previewSource
-                          ? config.genAssetLink(
-                              backgrounds.find(
-                                (b) => b.id === place.previewSource
-                              )?.source.jpg || ""
-                            )
-                          : ""
-                      }
-                      handleChange={(file) => {
-                        handleUploadImage(file, "preview", place);
-                      }}
-                      onFileValidate={async (file) => {
-                        if (file.size > 2 * 1024 * 1024) {
-                          toast.error("File size should be less than 1MB");
-                          return false;
-                        }
-                        if (!checkFileType(file, ["image/png", "image/jpeg"])) {
-                          toast.error(
-                            "Invalid file type. Please upload a valid image file"
-                          );
-                          return false;
-                        }
-                        return true;
-                      }}
-                    />
-                    <DragAndDropImages
-                      placeHolder="Add a mask for the place."
-                      previewImage={
-                        place.maskSource &&
-                        config.genAssetLink(place.maskSource)
-                      }
-                      handleChange={(file) => {
-                        handleUploadImage(file, "mask", place);
-                      }}
-                      onFileValidate={async (file) => {
-                        if (file.size > 2 * 1024 * 1024) {
-                          toast.error("File size should be less than 1MB");
-                          return false;
-                        }
-                        if (!checkFileType(file, ["image/png", "image/jpeg"])) {
-                          toast.error(
-                            "Invalid file type. Please upload a valid image file"
-                          );
-                          return false;
-                        }
-                        return true;
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
+                ))}
+              <Button
+                theme="gradient"
+                onClick={() => {
+                  dispatch(createPlace({ mapId: map.id }));
+                }}
+              >
+                + Place
+              </Button>
+            </div>
           </div>
         </div>
       ) : null}
