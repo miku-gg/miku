@@ -1,5 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "./store";
+import { LLAMA_TOKENIZER } from "../libs/utils";
 
 export const selectBackgrounds = (state: RootState) => state.novel.backgrounds;
 export const selectEditingBackground = createSelector(
@@ -22,7 +23,7 @@ export const selectEditingLorebook = createSelector(
 export const selectEditingSong = createSelector(
   [
     (state: RootState) => state.input.modals.song,
-    (state: RootState) => state.novel.songs,
+    (state: RootState) => state.novel.songs
   ],
   (modal, songs) => {
     if (!modal.opened) return undefined;
@@ -32,7 +33,7 @@ export const selectEditingSong = createSelector(
 export const selectEditingCharacter = createSelector(
   [
     (state: RootState) => state.input.modals.character,
-    (state: RootState) => state.novel.characters,
+    (state: RootState) => state.novel.characters
   ],
   (modal, characters) => {
     if (!modal.opened) return undefined;
@@ -47,7 +48,7 @@ export const selectScenes = createSelector(
     (state: RootState) => state.novel.backgrounds,
     (state: RootState) => state.novel.characters,
     (state: RootState) => state.novel.songs,
-    (state: RootState) => state.novel.maps,
+    (state: RootState) => state.novel.maps
   ],
   (scenes, starts, backgrounds, characters, songs, maps) => {
     return scenes.map((scene) => {
@@ -60,7 +61,7 @@ export const selectScenes = createSelector(
           return {
             ...characters.find((c) => c.id === char.characterId),
             outfit: char.outfit,
-            objective: char.objective,
+            objective: char.objective
           };
         }),
         music: songs.find((song) => song.id === scene.musicId),
@@ -68,7 +69,7 @@ export const selectScenes = createSelector(
           scene.parentMapIds?.map((parentMapId) =>
             maps.find((map) => map.id === parentMapId)
           ) || [],
-        starts: _starts,
+        starts: _starts
       };
     });
   }
@@ -79,5 +80,19 @@ export const selectEditingScene = createSelector(
   (modal, scenes) => {
     if (!modal.opened) return undefined;
     return scenes.find((scene) => scene.id === modal.editId);
+  }
+);
+
+export const selectTotalTokenCount = createSelector(
+  [(state: RootState) => state.novel.characters],
+  (characters) => {
+    return characters.reduce((acc: number, character) => {
+      const characterTokens =
+        LLAMA_TOKENIZER.encodeString(character.card.data.description).length +
+        LLAMA_TOKENIZER.encodeString(character.card.data.mes_example).length +
+        LLAMA_TOKENIZER.encodeString(character.card.data.personality).length;
+
+      return acc + characterTokens;
+    }, 0);
   }
 );

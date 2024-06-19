@@ -61,14 +61,15 @@ export const TokenDisplayer = ({
         className="TokenDisplayer__Modal"
       >
         <pre>
-          The text is tokenized using the LLAMA tokenizer. You see the following
-          colors:
+          This amount is the maximum *AI memory* that the text in this novel
+          will take. The more text there is, the less conversation the AI will
+          remember when the novel is being played.
         </pre>
         <pre>
           <ul>
             <li className="TokenDisplayer__Modal__item">
               <span className="TokenDisplayer__Modal__green-text">Green</span>:
-              If the number of tokens is good for the field.
+              If the number of tokens is good.
             </li>
             <li className="TokenDisplayer__Modal__item">
               <span className="TokenDisplayer__Modal__yellow-text">Yellow</span>
@@ -81,7 +82,15 @@ export const TokenDisplayer = ({
           </ul>
         </pre>
         <pre>
-          This can help you to know if the text is too long for the field.
+          A standard novel narration has 4096 tokens of memory. This should fit
+          all the text considered by the AI for a given scene.
+          <br />
+          You have `scene prompt + character prompt + second character prompt
+          (if exists) + top 3 lorebook entries (if exist) + conversation
+          history`.
+          <br />
+          The more memory is used, the less conversation history will be taken
+          into consideration by the AI.
         </pre>
       </Modal>
     </>

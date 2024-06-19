@@ -32,21 +32,13 @@ import { clearNovelState } from "../state/slices/novelFormSlice";
 import ErrorsDisplay from "../components/ErrorsDisplay";
 import { TokenDisplayer } from "../components/TokenDisplayer";
 import { TOKEN_LIMITS } from "../data/tokenLimits";
+import { selectTotalTokenCount } from "../state/selectors";
 
 function PanelExplorer() {
   const novel = useAppSelector((state) => state.novel);
   const selectedPanel = useAppSelector((state) => state.input.navigation.panel);
   const dispatch = useAppDispatch();
   const { openModal: openAreYouSure } = AreYouSure.useAreYouSure();
-  const { characters } = novel;
-  const tokens = characters.reduce((acc, character) => {
-    const characterTokens =
-      LLAMA_TOKENIZER.encodeString(character.card.data.description).length +
-      LLAMA_TOKENIZER.encodeString(character.card.data.mes_example).length +
-      LLAMA_TOKENIZER.encodeString(character.card.data.personality).length;
-
-    return acc + characterTokens;
-  }, 0);
 
   const maxStep = allowUntilStep(novel);
   return (
@@ -112,7 +104,7 @@ function PanelExplorer() {
           />
           <ErrorsDisplay />
           <TokenDisplayer
-            tokens={tokens}
+            tokens={useAppSelector(selectTotalTokenCount)}
             limits={TOKEN_LIMITS.TOTAL}
             size="large"
           />
