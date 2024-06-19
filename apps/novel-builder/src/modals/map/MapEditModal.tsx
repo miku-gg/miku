@@ -178,7 +178,6 @@ export default function MapEditModal() {
             <div className="MapEdit__form__left">
               <Input
                 label="Name"
-                description="This is the name for the map."
                 placeHolder="Name for the map. E.g. World map."
                 value={map?.name}
                 onChange={(e) =>
@@ -189,7 +188,6 @@ export default function MapEditModal() {
                 isTextArea
                 label="Description"
                 className="MapEdit__form__description"
-                description="This is the description for the map."
                 placeHolder="Description of the map. E.g. A map of the world."
                 value={map?.description}
                 onChange={(e) =>
