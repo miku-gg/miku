@@ -6,16 +6,10 @@ import "./TokenDisplayer.scss";
 interface TokenDisplayerProps {
   text: string;
   limits: TokenLimits;
-  getTokens?: (tokens: number) => void;
 }
 
-export const TokenDisplayer = ({
-  text,
-  limits,
-  getTokens
-}: TokenDisplayerProps) => {
+export const TokenDisplayer = ({ text, limits }: TokenDisplayerProps) => {
   const tokens = LLAMA_TOKENIZER.encodeString(text).length;
-  getTokens && getTokens(tokens);
 
   const colorClassName = ((tokens: number) => {
     if (tokens <= limits.green) {
