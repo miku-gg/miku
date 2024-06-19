@@ -10,9 +10,13 @@ import {
   isPanelType,
   navigatePage,
   navigatePanel,
-  openModal,
+  openModal
 } from "../state/slices/inputSlice";
-import { allowUntilStep, downloadNovelState } from "../libs/utils";
+import {
+  LLAMA_TOKENIZER,
+  allowUntilStep,
+  downloadNovelState
+} from "../libs/utils";
 import { toast } from "react-toastify";
 import { MdOutlinePermMedia } from "react-icons/md";
 import { BiCameraMovie } from "react-icons/bi";
@@ -26,12 +30,23 @@ import { AreYouSure } from "@mikugg/ui-kit";
 import cloneDeep from "lodash.clonedeep";
 import { clearNovelState } from "../state/slices/novelFormSlice";
 import ErrorsDisplay from "../components/ErrorsDisplay";
+import { TokenDisplayer } from "../components/TokenDisplayer";
+import { TOKEN_LIMITS } from "../data/tokenLimits";
 
 function PanelExplorer() {
   const novel = useAppSelector((state) => state.novel);
   const selectedPanel = useAppSelector((state) => state.input.navigation.panel);
   const dispatch = useAppDispatch();
   const { openModal: openAreYouSure } = AreYouSure.useAreYouSure();
+  const { characters } = novel;
+  const tokens = characters.reduce((acc, character) => {
+    const characterTokens =
+      LLAMA_TOKENIZER.encodeString(character.card.data.description).length +
+      LLAMA_TOKENIZER.encodeString(character.card.data.mes_example).length +
+      LLAMA_TOKENIZER.encodeString(character.card.data.personality).length;
+
+    return acc + characterTokens;
+  }, 0);
 
   const maxStep = allowUntilStep(novel);
   return (
@@ -46,7 +61,7 @@ function PanelExplorer() {
                     <LuTextQuote /> <span>Details</span>
                   </>
                 ),
-                value: "details",
+                value: "details"
               },
               {
                 content: (
@@ -54,7 +69,7 @@ function PanelExplorer() {
                     <MdOutlinePermMedia /> <span>Assets</span>
                   </>
                 ),
-                value: "assets",
+                value: "assets"
               },
               {
                 content: (
@@ -65,7 +80,7 @@ function PanelExplorer() {
                 value: "scenes",
                 disabled: maxStep < 1,
                 tooltip:
-                  maxStep < 1 ? "Please add at least one asset for each" : "",
+                  maxStep < 1 ? "Please add at least one asset for each" : ""
               },
               {
                 content: (
@@ -75,7 +90,7 @@ function PanelExplorer() {
                 ),
                 value: "starts",
                 disabled: maxStep < 2,
-                tooltip: maxStep < 2 ? "Please add a scene" : "",
+                tooltip: maxStep < 2 ? "Please add a scene" : ""
               },
               {
                 content: (
@@ -85,8 +100,8 @@ function PanelExplorer() {
                 ),
                 value: "preview",
                 disabled: maxStep < 3,
-                tooltip: maxStep < 3 ? "Please add a start" : "",
-              },
+                tooltip: maxStep < 3 ? "Please add a start" : ""
+              }
             ]}
             selected={selectedPanel}
             onButtonClick={async (value) => {
@@ -96,6 +111,11 @@ function PanelExplorer() {
             }}
           />
           <ErrorsDisplay />
+          <TokenDisplayer
+            tokens={tokens}
+            limits={TOKEN_LIMITS.TOTAL}
+            size="large"
+          />
         </div>
         <ButtonGroup
           buttons={[
@@ -105,7 +125,7 @@ function PanelExplorer() {
                   <BiSolidSave /> <span>Restart</span>
                 </>
               ),
-              value: "restart",
+              value: "restart"
             },
             {
               content: (
@@ -113,8 +133,8 @@ function PanelExplorer() {
                   <BiSolidSave /> <span>Save</span>
                 </>
               ),
-              value: "save",
-            },
+              value: "save"
+            }
           ]}
           selected={selectedPanel}
           onButtonClick={async (value) => {
@@ -127,7 +147,7 @@ function PanelExplorer() {
                     dispatch(
                       openModal({
                         modalType: "loading",
-                        text,
+                        text
                       })
                     );
                   }
@@ -144,7 +164,7 @@ function PanelExplorer() {
                 onYes: () => {
                   dispatch(clearNovelState());
                   dispatch(navigatePage("homepage"));
-                },
+                }
               });
             }
           }}

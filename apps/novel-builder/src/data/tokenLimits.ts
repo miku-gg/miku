@@ -6,7 +6,8 @@ export interface TokenLimits {
 export type TokenLimitsKey =
   | "CHARACTER_DESCRIPTION"
   | "CHARACTER_PERSONALITY"
-  | "CHARACTER_REFERENCE_CONVERSATION";
+  | "CHARACTER_REFERENCE_CONVERSATION"
+  | "TOTAL";
 
 export const TOKEN_LIMITS: Record<TokenLimitsKey, TokenLimits> = {
   CHARACTER_DESCRIPTION: {
@@ -20,5 +21,9 @@ export const TOKEN_LIMITS: Record<TokenLimitsKey, TokenLimits> = {
   CHARACTER_REFERENCE_CONVERSATION: {
     green: 50,
     red: 100
+  },
+  TOTAL: {
+    green: 1000,
+    red: 1500
   }
 };
