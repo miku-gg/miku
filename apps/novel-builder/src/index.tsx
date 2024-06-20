@@ -16,6 +16,8 @@ import SceneEditModal from "./modals/scene/SceneEditModal";
 import Planels from "./panels";
 import { store } from "./state/store";
 import "./styles/main.scss";
+import PlaceEditModal from "./modals/map/PlaceEditModal";
+import SceneSelector from "./modals/scene/SceneSelector";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -36,6 +38,8 @@ ReactDOM.render(
         <LorebookEditModal />
         <LoadingModal />
         <MapEditModal />
+        <PlaceEditModal />
+        <SceneSelector />
         <ToastContainer />
       </AreYouSure.AreYouSureProvider>
     </Provider>

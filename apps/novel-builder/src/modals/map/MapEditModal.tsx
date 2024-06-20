@@ -7,7 +7,6 @@ import {
 } from "@mikugg/ui-kit";
 import { HiOutlinePlus } from "react-icons/hi";
 
-import { useCallback, useEffect, useRef } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { selectEditingMap } from "../../state/selectors";
@@ -30,32 +29,6 @@ export default function MapEditModal() {
   const dispatch = useDispatch();
   const areYouSure = AreYouSure.useAreYouSure();
   const map = useAppSelector(selectEditingMap);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const prevPlacesLength = useRef(0);
-
-  // const [isLoading, setIsLoading] = useState(false);
-
-  const handleScrollToTop = useCallback(() => {
-    if (containerRef.current) {
-      if (map?.places && map?.places?.length > prevPlacesLength.current) {
-        scrollToTop();
-        prevPlacesLength.current = map.places.length;
-      }
-    }
-  }, [map?.places]);
-
-  useEffect(() => {
-    handleScrollToTop();
-  }, [handleScrollToTop]);
-
-  const scrollToTop = () => {
-    if (containerRef.current) {
-      containerRef.current.scrollTo({
-        top: -containerRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  };
 
   const handleUploadImage = async (
     file: File,
@@ -202,13 +175,15 @@ export default function MapEditModal() {
           <div className="MapEdit__createPlace">
             <label>Places</label>
 
-            <div
-              className="MapEdit__placesContainer scrollbar"
-              ref={containerRef}
-            >
+            <div className="MapEdit__placesContainer scrollbar">
               {map?.places &&
                 map?.places.map((place) => (
-                  <div className="MapEdit__place" key={place.id}>
+                  <div
+                    className="MapEdit__place"
+                    data-tooltip-id="place-tooltip"
+                    data-tooltip-content={place.name}
+                    key={place.id}
+                  >
                     {place.previewSource && (
                       <img
                         src={config.genAssetLink(place.previewSource || "")}
@@ -237,6 +212,7 @@ export default function MapEditModal() {
               }}
             />
           </div>
+          <Tooltip id="place-tooltip" place="right" />
         </div>
       ) : null}
     </Modal>
