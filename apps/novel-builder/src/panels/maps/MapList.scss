@@ -50,6 +50,7 @@
       padding: 16px;
       border-radius: 16px;
       width: 100%;
+      z-index: 1;
 
       &__preview {
         width: 100%;
@@ -59,12 +60,14 @@
         top: 0;
         left: 0;
         opacity: 0.3;
+        z-index: 0;
       }
 
       & h3,
       & p {
         margin: 0;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.897);
+        z-index: 1;
       }
 
       &:hover {
@@ -83,6 +86,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
       opacity: 0;
+      z-index: 1;
 
       &:hover {
         color: $secondary-color;

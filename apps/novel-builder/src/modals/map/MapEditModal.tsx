@@ -21,11 +21,11 @@ import { useAppSelector } from "../../state/store";
 
 import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 import { toast } from "react-toastify";
 import config from "../../config";
 import { checkFileType } from "../../libs/utils";
 import "./MapEditModal.scss";
-import { IoIosCloseCircleOutline } from "react-icons/io";
 
 export default function MapEditModal() {
   const dispatch = useDispatch();
@@ -189,9 +189,9 @@ export default function MapEditModal() {
           <div className="MapEdit__createPlace">
             <label>Places</label>
 
-            <div className="MapEdit__placesContainer scrollbar">
-              {map?.places &&
-                map?.places.map((place) => (
+            {map?.places.length > 0 && (
+              <div className="MapEdit__placesContainer scrollbar">
+                {map?.places.map((place) => (
                   <div
                     className="MapEdit__place"
                     data-tooltip-id="place-tooltip"
@@ -220,7 +220,9 @@ export default function MapEditModal() {
                     />
                   </div>
                 ))}
-            </div>
+              </div>
+            )}
+
             <HiOutlinePlus
               className="MapEdit__placesContainer__button"
               onClick={() => {

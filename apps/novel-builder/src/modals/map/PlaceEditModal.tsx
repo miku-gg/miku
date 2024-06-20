@@ -6,7 +6,7 @@ import {
   Tooltip,
 } from "@mikugg/ui-kit";
 import { FaTrashAlt } from "react-icons/fa";
-import { IoIosCloseCircleOutline, IoMdCloseCircleOutline } from "react-icons/io";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { selectEditingMap, selectEditingPlace } from "../../state/selectors";
 

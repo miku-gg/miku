@@ -81,6 +81,7 @@
     align-items: center;
     gap: 10px;
     height: 35rem;
+    width: 220px;
     padding: 8px;
 
     & label {
@@ -94,6 +95,7 @@
     align-items: center;
     gap: 10px;
     padding: 8px 0;
+    height: 100%;
     max-height: 35rem;
     width: 220px;
     overflow-y: auto;
