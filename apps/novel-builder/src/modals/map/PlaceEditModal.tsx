@@ -1,6 +1,5 @@
 import {
   AreYouSure,
-  Button,
   DragAndDropImages,
   Input,
   Modal,
@@ -31,6 +30,7 @@ export default function PlaceEditModal() {
   const [selectSceneOpened, setSelectSceneOpened] = useState(false);
   const place = useAppSelector(selectEditingPlace);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
+  const scenes = useAppSelector((state) => state.novel.scenes);
 
   //TODO: replace with scene selector
 
@@ -92,18 +92,17 @@ export default function PlaceEditModal() {
       description: "This action cannot be undone",
       onYes: () => {
         dispatch(closeModal({ modalType: "placeEdit" }));
-        deletePlace({
+        dispatch(deletePlace({
           mapId: map!.id,
           placeId: id,
-        });
+        }));
       },
     });
   };
 
   const getSceneData = (sceneId: string) => {
-    const scene = useAppSelector((state) =>
-      state.novel.scenes.find((s) => s.id === sceneId)
-    );
+    const scene = scenes.find((s) => s.id === sceneId);
+
     return scene;
   };
 
@@ -158,7 +157,7 @@ export default function PlaceEditModal() {
                 handleDeletePlace(place.id);
               }}
             />
-            <div>
+            <div className="PlaceEdit__sceneSelect">
               <SceneSelector
                 opened={selectSceneOpened}
                 onCloseModal={() => setSelectSceneOpened(false)}
@@ -175,12 +174,18 @@ export default function PlaceEditModal() {
                   );
                 }}
               />
-              <Button
-                theme="secondary"
-                onClick={() => setSelectSceneOpened(true)}
-              >
-                Select scene
-              </Button>
+              <label>Select a scene</label>
+              <div className="PlaceEdit__sceneSelect__container">
+                <p className="PlaceEdit__sceneSelect__name">
+                  {place.sceneId ? getSceneData(place.sceneId)?.name : ""}
+                </p>
+                <button
+                  className="PlaceEdit__sceneSelect__button"
+                  onClick={() => setSelectSceneOpened(true)}
+                >
+                  Select scene
+                </button>
+              </div>
             </div>
             <Input
               label="Place name"
@@ -199,7 +204,6 @@ export default function PlaceEditModal() {
             <Input
               isTextArea
               label="Place description"
-              description="This is the description for the place."
               placeHolder="Description of the place. E.g. A garden with a lot of flowers."
               value={place.description}
               onChange={(e) => {

@@ -315,7 +315,7 @@ const novelFormSlice = createSlice({
 
       lorebook.entries.splice(action.payload.entryIndex, 1);
     },
-    createMap(state, action: PayloadAction<{id:string}>) {
+    createMap(state, action: PayloadAction<{ id: string }>) {
       state.maps.push({
         id: action.payload.id,
         name: "New Map",
@@ -348,14 +348,17 @@ const novelFormSlice = createSlice({
     },
     updatePlace(
       state,
-      action: PayloadAction<{ mapId: string; place: {
-    id: string;
-    sceneId: string;
-    name: string;
-    description: string;
-    previewSource: string;
-    maskSource: string;
-  } }>
+      action: PayloadAction<{
+        mapId: string;
+        place: {
+          id: string;
+          sceneId: string;
+          name: string;
+          description: string;
+          previewSource: string;
+          maskSource: string;
+        };
+      }>
     ) {
       const map = state.maps.find((map) => map.id === action.payload.mapId);
       if (!map) return;

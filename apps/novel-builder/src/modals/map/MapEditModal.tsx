@@ -93,6 +93,7 @@ export default function MapEditModal() {
     });
   };
 
+
   return (
     <Modal
       opened={!!map}

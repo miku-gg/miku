@@ -1,3 +1,5 @@
+@import "../../styles/variables.scss";
+
 .PlaceEditModal {
   max-width: 850px !important;
 }
@@ -36,5 +38,40 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+  }
+
+  &__sceneSelect {
+    & label {
+      color: $text-1;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    &__container {
+      display: flex;
+      justify-content: space-between;
+      border: 1px solid $node-conector-color;
+      padding: 4px;
+      border-radius: 8px;
+      align-items: center;
+    }
+
+    &__name {
+      margin: 0;
+      padding: 0;
+      text-overflow: ellipsis;
+      max-width: 120px;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    &__button {
+      background-color: $secondary-color;
+      border-radius: 8px;
+      border: none;
+      color: $text-1;
+      padding: 2px 4px;
+    }
   }
 }
