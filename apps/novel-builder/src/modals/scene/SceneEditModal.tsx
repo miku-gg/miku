@@ -424,7 +424,7 @@ export default function SceneEditModal() {
                     handleSelectMaps(id);
                   }}
                   selectedMapId={scene?.parentMapIds || []}
-                  tooltipText="Select maps fot this scene."
+                  tooltipText="Select maps reachable from this scene."
                 />
               ) : null}
             </div>

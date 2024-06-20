@@ -241,7 +241,7 @@ const novelFormSlice = createSlice({
         id: action.payload,
         isGlobal: false,
         name: "New Lorebook",
-        description: "New lorebook description.",
+        description: "",
         extensions: {},
         entries: [],
       };
@@ -319,7 +319,7 @@ const novelFormSlice = createSlice({
       state.maps.push({
         id: action.payload.id,
         name: "New Map",
-        description: "New map description.",
+        description: "",
         places: [],
         source: { png: "" },
       });
@@ -341,7 +341,7 @@ const novelFormSlice = createSlice({
         id: randomUUID(),
         sceneId: "",
         name: "New Place",
-        description: "New place description.",
+        description: "",
         previewSource: "",
         maskSource: "",
       });
