@@ -127,6 +127,7 @@ export default function PlaceEditModal() {
 
             <DragAndDropImages
               placeHolder="Add a mask for the place."
+              className="PlaceEdit__maskImage__mask"
               previewImage={
                 place.maskSource && config.genAssetLink(place.maskSource)
               }

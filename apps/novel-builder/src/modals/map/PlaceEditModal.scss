@@ -28,6 +28,12 @@
       opacity: 0.25;
     }
 
+    &__mask {
+      & img {
+        opacity: 0.6;
+      }
+    }
+
     .mdSize {
       width: 35rem;
       height: 35rem;

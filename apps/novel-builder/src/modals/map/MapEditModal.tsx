@@ -19,6 +19,7 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
+import { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { toast } from "react-toastify";
 import config from "../../config";
@@ -29,6 +30,7 @@ export default function MapEditModal() {
   const dispatch = useDispatch();
   const areYouSure = AreYouSure.useAreYouSure();
   const map = useAppSelector(selectEditingMap);
+  const [hoveredPlace, setHoveredPlace] = useState<string | null>(null);
 
   const handleUploadImage = async (
     file: File,
@@ -93,7 +95,6 @@ export default function MapEditModal() {
     });
   };
 
-
   return (
     <Modal
       opened={!!map}
@@ -145,8 +146,10 @@ export default function MapEditModal() {
                   (place) =>
                     place.maskSource && (
                       <img
-                        className="MapEdit__form__placePreview"
-                        src={config.genAssetLink(place.previewSource || "")}
+                        className={`MapEdit__form__placePreview ${
+                          place.id === hoveredPlace ? "hovered" : ""
+                        }`}
+                        src={config.genAssetLink(place.maskSource || "")}
                       />
                     )
                 )}
@@ -184,6 +187,8 @@ export default function MapEditModal() {
                     data-tooltip-id="place-tooltip"
                     data-tooltip-content={place.name}
                     key={place.id}
+                    onMouseEnter={() => setHoveredPlace(place.id)}
+                    onMouseLeave={() => setHoveredPlace(null)}
                   >
                     {place.previewSource && (
                       <img
