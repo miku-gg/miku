@@ -25,6 +25,7 @@ export const MapList = ({
   const createNewMap = () => {
     const id = randomUUID();
     dispatch(createMap({ id: id }));
+    onSelectMap && onSelectMap(id);
     dispatch(openModal({ modalType: "mapEdit", editId: id }));
   };
 

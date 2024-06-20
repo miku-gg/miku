@@ -213,7 +213,6 @@ export default function PlaceEditModal() {
                 );
               }}
             />
-            {/* use scene selector */}
             <Input
               isTextArea
               label="Place description"

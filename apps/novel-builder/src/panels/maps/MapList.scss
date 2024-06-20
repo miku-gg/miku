@@ -61,6 +61,7 @@
         left: 0;
         opacity: 0.3;
         z-index: 0;
+        object-fit: cover;
       }
 
       & h3,
@@ -95,12 +96,6 @@
   }
 }
 .MapSelection {
-  .MapList__header {
-    & button {
-      display: none;
-    }
-  }
-
   .MapList__container__box {
     min-width: 200px;
     min-height: 200px;
