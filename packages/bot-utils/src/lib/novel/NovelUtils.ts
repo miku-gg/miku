@@ -758,7 +758,7 @@ export function validateNovelState(
         errors.push({
           targetType: NovelValidationTargetType.MAP,
           targetId: map.id,
-          severity: "error",
+          severity: "warning",
           message: `Map "${map.name}" has no places`,
         });
       }
