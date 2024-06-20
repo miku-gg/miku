@@ -234,7 +234,7 @@ export default function PlaceEditModal() {
                 place.previewSource
                   ? config.genAssetLink(
                       backgrounds.find((b) => b.id === place.previewSource)
-                        ?.source.jpg || ""
+                        ?.source.jpg || place.previewSource
                     )
                   : ""
               }

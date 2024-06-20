@@ -202,6 +202,7 @@ export default function MapEditModal() {
                   >
                     {place.previewSource && (
                       <img
+                        className="MapEdit__place__previewImage"
                         src={config.genAssetLink(place.previewSource || "")}
                       />
                     )}
