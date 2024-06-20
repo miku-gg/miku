@@ -6,8 +6,10 @@ import {
   Tooltip,
 } from "@mikugg/ui-kit";
 import { FaTrashAlt } from "react-icons/fa";
+import { IoIosCloseCircleOutline, IoMdCloseCircleOutline } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { selectEditingMap, selectEditingPlace } from "../../state/selectors";
+
 import { closeModal } from "../../state/slices/inputSlice";
 import {
   deletePlace,
@@ -92,10 +94,12 @@ export default function PlaceEditModal() {
       description: "This action cannot be undone",
       onYes: () => {
         dispatch(closeModal({ modalType: "placeEdit" }));
-        dispatch(deletePlace({
-          mapId: map!.id,
-          placeId: id,
-        }));
+        dispatch(
+          deletePlace({
+            mapId: map!.id,
+            placeId: id,
+          })
+        );
       },
     });
   };
@@ -116,6 +120,22 @@ export default function PlaceEditModal() {
     >
       {place ? (
         <div className="PlaceEdit">
+          <div className="PlaceEdit__buttons">
+            <FaTrashAlt
+              className="PlaceEdit__buttons__removePlace"
+              data-tooltip-id="delete-tooltip"
+              data-tooltip-content="Delete place"
+              onClick={() => {
+                handleDeletePlace(place.id);
+              }}
+            />
+            <IoIosCloseCircleOutline
+              className="PlaceEdit__buttons__closeModal"
+              onClick={() => {
+                dispatch(closeModal({ modalType: "placeEdit" }));
+              }}
+            />
+          </div>
           <div className="PlaceEdit__maskImage">
             {map?.source.png && (
               <img
@@ -150,14 +170,6 @@ export default function PlaceEditModal() {
             />
           </div>
           <div className="PlaceEdit__form">
-            <FaTrashAlt
-              className="PlaceEdit__removePlace"
-              data-tooltip-id="delete-tooltip"
-              data-tooltip-content="Delete place"
-              onClick={() => {
-                handleDeletePlace(place.id);
-              }}
-            />
             <div className="PlaceEdit__sceneSelect">
               <SceneSelector
                 opened={selectSceneOpened}

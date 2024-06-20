@@ -25,6 +25,7 @@ import { toast } from "react-toastify";
 import config from "../../config";
 import { checkFileType } from "../../libs/utils";
 import "./MapEditModal.scss";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 
 export default function MapEditModal() {
   const dispatch = useDispatch();
@@ -104,15 +105,24 @@ export default function MapEditModal() {
     >
       {map ? (
         <div className="MapEdit scrollbar">
+          <div className="MapEdit__buttons">
+            <FaTrashAlt
+              className="MapEdit__buttons__removePlace"
+              data-tooltip-id="delete-tooltip"
+              data-tooltip-content="Delete place"
+              onClick={() => {
+                handleDeleteMap(map.id);
+              }}
+            />
+            <IoIosCloseCircleOutline
+              className="MapEdit__buttons__closeModal"
+              onClick={() => {
+                dispatch(closeModal({ modalType: "mapEdit" }));
+              }}
+            />
+          </div>
           <Tooltip id="delete-tooltip" place="bottom" />
-          <FaTrashAlt
-            className="MapEdit__removeMap"
-            data-tooltip-id="delete-tooltip"
-            data-tooltip-content="Delete map"
-            onClick={() => {
-              handleDeleteMap(map.id);
-            }}
-          />
+
           <div className="MapEdit__form">
             <div className="MapEdit__form__top">
               <Input

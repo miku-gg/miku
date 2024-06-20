@@ -65,12 +65,7 @@ export const MapList = ({
                   className={`MapList__container__map ${
                     isSelected(id) ? "selected" : ""
                   }`}
-                  style={{
-                    backgroundImage: `url(${config.genAssetLink(
-                      map.source.png,
-                      true
-                    )})`,
-                  }}
+                  
                   onClick={() => onSelectMap && onSelectMap(id)}
                 >
                   <FaPencil
@@ -83,6 +78,13 @@ export const MapList = ({
                   />
                   <h3>{name}</h3>
                   <p>{description}</p>
+                  {map.source.png && (
+                    <img
+                      className="MapList__container__map__preview"
+                      src={config.genAssetLink(map.source.png)}
+                      alt="map"
+                    />
+                  )}
                   {isSelected(id) && (
                     <div className="selected__badge">
                       <FaCheckCircle />
