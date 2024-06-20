@@ -1,5 +1,6 @@
 import {
   AreYouSure,
+  Button,
   DragAndDropImages,
   Input,
   Modal,
@@ -8,7 +9,7 @@ import {
 import { FaTrashAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { selectEditingMap, selectEditingPlace } from "../../state/selectors";
-import { closeModal, openModal } from "../../state/slices/inputSlice";
+import { closeModal } from "../../state/slices/inputSlice";
 import {
   deletePlace,
   updateMap,
@@ -16,25 +17,20 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
+import { useState } from "react";
 import { toast } from "react-toastify";
 import config from "../../config";
 import { checkFileType } from "../../libs/utils";
+import SceneSelector from "../scene/SceneSelector";
 import "./PlaceEditModal.scss";
 
 export default function PlaceEditModal() {
   const dispatch = useDispatch();
   const areYouSure = AreYouSure.useAreYouSure();
   const map = useAppSelector(selectEditingMap);
-
+  const [selectSceneOpened, setSelectSceneOpened] = useState(false);
   const place = useAppSelector(selectEditingPlace);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
-  const sceneSelectModal = useAppSelector(
-    (state) => state.input.modals.sceneSelector
-  );
-  console.log(sceneSelectModal.text);
-  const selectedScene = useAppSelector((state) =>
-    state.novel.scenes.find((scene) => scene.id === sceneSelectModal.text)
-  );
 
   //TODO: replace with scene selector
 
@@ -104,6 +100,13 @@ export default function PlaceEditModal() {
     });
   };
 
+  const getSceneData = (sceneId: string) => {
+    const scene = useAppSelector((state) =>
+      state.novel.scenes.find((s) => s.id === sceneId)
+    );
+    return scene;
+  };
+
   return (
     <Modal
       opened={!!place}
@@ -155,15 +158,30 @@ export default function PlaceEditModal() {
                 handleDeletePlace(place.id);
               }}
             />
-
-            <button
-              onClick={() =>
-                dispatch(openModal({ modalType: "sceneSelector", text: "" }))
-              }
-            >
-              select scene
-            </button>
-
+            <div>
+              <SceneSelector
+                opened={selectSceneOpened}
+                onCloseModal={() => setSelectSceneOpened(false)}
+                selectedSceneId={place.sceneId}
+                onSelectScene={(id) => {
+                  dispatch(
+                    updatePlace({
+                      mapId: map!.id,
+                      place: {
+                        ...place,
+                        sceneId: id,
+                      },
+                    })
+                  );
+                }}
+              />
+              <Button
+                theme="secondary"
+                onClick={() => setSelectSceneOpened(true)}
+              >
+                Select scene
+              </Button>
+            </div>
             <Input
               label="Place name"
               placeHolder="Place name. E.g. Rose garden."

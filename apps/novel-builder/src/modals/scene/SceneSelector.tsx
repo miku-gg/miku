@@ -1,30 +1,30 @@
 import { Modal } from "@mikugg/ui-kit";
 import classNames from "classnames";
-import { useDispatch } from "react-redux";
 import config from "../../config";
 import { selectScenes } from "../../state/selectors";
-import { closeModal } from "../../state/slices/inputSlice";
 import { useAppSelector } from "../../state/store";
 import "./SceneSelector.scss";
 
-export default function SceneSelector() {
-  const dispatch = useDispatch();
+interface SceneSelectorProps {
+  opened: boolean;
+  onCloseModal: () => void;
+  selectedSceneId: string;
+  onSelectScene: (sceneId: string) => void;
+}
+
+export default function SceneSelector({
+  opened,
+  onCloseModal,
+  onSelectScene,
+  selectedSceneId,
+}: SceneSelectorProps) {
   const scenes = useAppSelector(selectScenes);
-  const currentModal = useAppSelector(
-    (state) => state.input.modals.sceneSelector
-  );
 
   return (
     <Modal
       title="Select a Scene"
-      opened={currentModal.opened}
-      onCloseModal={() =>
-        dispatch(
-          closeModal({
-            modalType: "sceneSelector",
-          })
-        )
-      }
+      opened={opened}
+      onCloseModal={() => onCloseModal()}
     >
       <div className="StartsPanel__scene-selection">
         <div className="StartsPanel__scene-selection-list">
@@ -33,16 +33,12 @@ export default function SceneSelector() {
               className={classNames({
                 "StartsPanel__scene-selection-item": true,
                 "StartsPanel__scene-selection-item--selected":
-                  scene.id === currentModal.text,
+                  scene.id === selectedSceneId,
               })}
               key={scene.id}
               onClick={() => {
-                dispatch(
-                  closeModal({
-                    modalType: "sceneSelector",
-                    text: scene.id,
-                  })
-                );
+                onSelectScene(scene.id);
+                onCloseModal();
               }}
             >
               <div

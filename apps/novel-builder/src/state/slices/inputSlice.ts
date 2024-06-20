@@ -14,7 +14,6 @@ export type ModalType =
   | "mapEdit"
   | "placeEdit"
   | "errors"
-  | "sceneSelector"
   | "scene";
 
 export type PanelType =
@@ -83,9 +82,6 @@ const initialState: InputState = {
     scene: {
       opened: false,
     },
-    sceneSelector: {
-      opened: false,
-    },
     errors: {
       opened: false,
     },
@@ -117,13 +113,9 @@ const inputSlice = createSlice({
       state,
       action: PayloadAction<{
         modalType: ModalType;
-        text?: string;
       }>
     ) => {
       state.modals[action.payload.modalType].opened = false;
-      if ("text" in action.payload) {
-        state.modals[action.payload.modalType].text = action.payload.text;
-      }
     },
     navigatePanel(state, action: PayloadAction<PanelType>) {
       state.navigation.panel = action.payload;
