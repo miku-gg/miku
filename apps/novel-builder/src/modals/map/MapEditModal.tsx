@@ -31,6 +31,17 @@ export default function MapEditModal() {
   const dispatch = useDispatch();
   const areYouSure = AreYouSure.useAreYouSure();
   const map = useAppSelector(selectEditingMap);
+  const sceneBackgrounds = useAppSelector((state) => {
+    return state.novel.scenes.reduce((acc, scene) => {
+      const bg = state.novel.backgrounds.find(
+        (background) => background.id === scene.backgroundId
+      );
+      if (bg && scene.id) {
+        acc[scene.id] = bg.source.jpg;
+      }
+      return acc;
+    }, {} as Record<string, string>);
+  });
   const [hoveredPlace, setHoveredPlace] = useState<string | null>(null);
 
   const handleUploadImage = async (
@@ -191,36 +202,42 @@ export default function MapEditModal() {
 
             {map?.places.length > 0 && (
               <div className="MapEdit__placesContainer scrollbar">
-                {map?.places.map((place) => (
-                  <div
-                    className="MapEdit__place"
-                    data-tooltip-id="place-tooltip"
-                    data-tooltip-content={place.name}
-                    key={place.id}
-                    onMouseEnter={() => setHoveredPlace(place.id)}
-                    onMouseLeave={() => setHoveredPlace(null)}
-                  >
-                    {place.previewSource && (
-                      <img
-                        className="MapEdit__place__previewImage"
-                        src={config.genAssetLink(place.previewSource || "")}
+                {map?.places.map((place) => {
+                  const mapPlace =
+                    place.previewSource ||
+                    sceneBackgrounds[place.sceneId] ||
+                    "";
+                  return (
+                    <div
+                      className="MapEdit__place"
+                      data-tooltip-id="place-tooltip"
+                      data-tooltip-content={place.name}
+                      key={place.id}
+                      onMouseEnter={() => setHoveredPlace(place.id)}
+                      onMouseLeave={() => setHoveredPlace(null)}
+                    >
+                      {mapPlace && (
+                        <img
+                          className="MapEdit__place__previewImage"
+                          src={config.genAssetLink(mapPlace)}
+                        />
+                      )}
+                      <FaPencil
+                        className="MapEdit__place__edit"
+                        onClick={(e: React.MouseEvent) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          dispatch(
+                            openModal({
+                              modalType: "placeEdit",
+                              editId: place.id,
+                            })
+                          );
+                        }}
                       />
-                    )}
-                    <FaPencil
-                      className="MapEdit__place__edit"
-                      onClick={(e: React.MouseEvent) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        dispatch(
-                          openModal({
-                            modalType: "placeEdit",
-                            editId: place.id,
-                          })
-                        );
-                      }}
-                    />
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
