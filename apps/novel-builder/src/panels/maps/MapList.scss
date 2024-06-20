@@ -4,14 +4,27 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  border-radius: 16px;
+  margin-top: 1rem;
+  background-color: $background-1;
+  padding: 20px;
 
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: $background-1;
-    padding: 10px 16px;
-    border-radius: 16px;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &__infoIcon {
+        width: 1.2rem;
+        height: 1.2rem;
+        color: #8489bd;
+      }
+    }
 
     & h2 {
       margin: 0;
@@ -38,7 +51,6 @@
       position: relative;
       border: 1px solid $node-conector-color;
       padding: 16px;
-      background-color: $background-1;
       border-radius: 16px;
       width: 100%;
 
@@ -68,6 +80,45 @@
       &:hover {
         color: $secondary-color;
       }
+    }
+  }
+}
+.MapSelection {
+  .MapList__header {
+    & button {
+      display: none;
+    }
+  }
+
+  .MapList__container__box {
+    min-width: 200px;
+    min-height: 200px;
+    width: 200px;
+    height: 200px;
+  }
+
+  .MapList__container__map {
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(27, 33, 66, 0.6);
+      .MapList__container__edit {
+        opacity: 0;
+      }
+    }
+  }
+  .selected {
+    border-color: $secondary-color;
+    background-color: #1b2142;
+
+    &__badge {
+      position: absolute;
+      right: 10px;
+      bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #16a34a;
+      user-select: none;
     }
   }
 }
