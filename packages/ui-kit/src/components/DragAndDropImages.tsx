@@ -3,13 +3,14 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { DefaultImage, UploadIcon } from '../assets/svg';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import './DragAndDropImages.scss';
+import Loader from './Loader';
 interface DragAndDropImagesProps {
   className?: string;
   placeHolder: string;
   dragAreaLabel?: string;
   onFileValidate?: (file: File) => boolean | Promise<boolean>;
   errorMessage?: string;
-  handleChange?: (file: File) => void;
+  handleChange?: ((file: File) => void) | ((file: File) => Promise<void>);
   previewImage?: string;
   size?: 'sm' | 'md' | 'lg';
   placeHolderImage?: React.ReactNode;
@@ -27,6 +28,7 @@ const DragAndDropImages = ({
   placeHolderImage = <DefaultImage />,
 }: DragAndDropImagesProps) => {
   const [dragOver, setDragOver] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null); // Create a ref for the file input
 
   const handleClick = () => {
@@ -35,7 +37,9 @@ const DragAndDropImages = ({
 
   const handleDropZoneChange = async (file: File) => {
     if (await onFileValidate(file)) {
-      handleChange(file);
+      setLoading(true);
+      handleChange && (await handleChange(file));
+      setLoading(false);
     } else if (errorMessage) {
       alert(errorMessage);
     }
@@ -100,6 +104,11 @@ const DragAndDropImages = ({
             )}
           </div>
         )}
+        {loading ? (
+          <div className="dragAndDropImages__loader">
+            <Loader />
+          </div>
+        ) : null}
       </div>
       {dragAreaLabel && <label>{dragAreaLabel}</label>}
     </div>

@@ -304,14 +304,14 @@ export default function CharacterOutfitsEdit({
               <DragAndDropImages
                 size="sm"
                 dragAreaLabel={emotionId}
-                handleChange={(file) => {
+                handleChange={(file) =>
                   handleImageChange(
                     file,
                     groupIndex,
                     emotionId,
                     file.type === "audio/mpeg"
-                  );
-                }}
+                  )
+                }
                 previewImage={
                   emotion?.sources.webm || emotion?.sources.png
                     ? config.genAssetLink(
