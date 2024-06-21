@@ -34,21 +34,8 @@ export default function PlaceEditModal() {
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const scenes = useAppSelector((state) => state.novel.scenes);
 
-  //TODO: replace with scene selector
-
-  const handleUploadImage = async (
-    file: File,
-    source: "preview" | "mask" | "map",
-    place?: {
-      id: string;
-      sceneId: string;
-      name: string;
-      description: string;
-      previewSource: string;
-      maskSource: string;
-    }
-  ) => {
-    if (file) {
+  const handleUploadImage = async (file: File, source: "preview" | "mask") => {
+    if (file && place) {
       try {
         const asset = await config.uploadAsset(file);
         switch (source) {
@@ -56,7 +43,7 @@ export default function PlaceEditModal() {
             dispatch(
               updatePlace({
                 mapId: map!.id,
-                place: { ...place!, previewSource: asset.assetId },
+                place: { id: place.id, previewSource: asset.assetId },
               })
             );
             return;
@@ -64,22 +51,10 @@ export default function PlaceEditModal() {
             dispatch(
               updatePlace({
                 mapId: map!.id,
-                place: { ...place!, maskSource: asset.assetId },
+                place: { id: place.id, maskSource: asset.assetId },
               })
             );
             return;
-          case "map": {
-            dispatch(
-              updateMap({
-                ...map!,
-                source: {
-                  ...map!.source,
-                  png: asset.assetId,
-                },
-              })
-            );
-            return;
-          }
         }
       } catch (e) {
         toast.error("Error uploading the image");
@@ -151,7 +126,7 @@ export default function PlaceEditModal() {
               previewImage={
                 place.maskSource && config.genAssetLink(place.maskSource)
               }
-              handleChange={(file) => handleUploadImage(file, "mask", place)}
+              handleChange={(file) => handleUploadImage(file, "mask")}
               onFileValidate={async (file) => {
                 if (file.size > 2 * 1024 * 1024) {
                   toast.error("File size should be less than 1MB");
@@ -235,7 +210,7 @@ export default function PlaceEditModal() {
                     )
                   : ""
               }
-              handleChange={(file) => handleUploadImage(file, "preview", place)}
+              handleChange={(file) => handleUploadImage(file, "preview")}
               onFileValidate={async (file) => {
                 if (file.size > 2 * 1024 * 1024) {
                   toast.error("File size should be less than 1MB");

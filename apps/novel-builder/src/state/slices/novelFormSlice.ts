@@ -329,6 +329,14 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.maps[index] = action.payload;
     },
+    updateMapImage(
+      state,
+      action: PayloadAction<{ mapId: string; source: { png: string } }>
+    ) {
+      const map = state.maps.find((map) => map.id === action.payload.mapId);
+      if (!map) return;
+      map.source = action.payload.source;
+    },
     deleteMap(state, action: PayloadAction<string>) {
       const index = state.maps.findIndex((map) => map.id === action.payload);
       if (index === -1) return;
@@ -352,11 +360,11 @@ const novelFormSlice = createSlice({
         mapId: string;
         place: {
           id: string;
-          sceneId: string;
-          name: string;
-          description: string;
-          previewSource: string;
-          maskSource: string;
+          sceneId?: string;
+          name?: string;
+          description?: string;
+          previewSource?: string;
+          maskSource?: string;
         };
       }>
     ) {
@@ -366,7 +374,10 @@ const novelFormSlice = createSlice({
         (place) => place.id === action.payload.place.id
       );
       if (index === -1) return;
-      map.places[index] = action.payload.place;
+      map.places[index] = {
+        ...map.places[index],
+        ...action.payload.place,
+      };
     },
     deletePlace(
       state,
@@ -421,6 +432,7 @@ export const {
   deleteEntry,
   createMap,
   updateMap,
+  updateMapImage,
   deleteMap,
   createPlace,
   updatePlace,

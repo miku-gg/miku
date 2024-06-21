@@ -15,7 +15,7 @@ import {
   createPlace,
   deleteMap,
   updateMap,
-  updatePlace,
+  updateMapImage,
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
@@ -44,51 +44,16 @@ export default function MapEditModal() {
   });
   const [hoveredPlace, setHoveredPlace] = useState<string | null>(null);
 
-  const handleUploadImage = async (
-    file: File,
-    source: "preview" | "mask" | "map",
-    place?: {
-      id: string;
-      sceneId: string;
-      name: string;
-      description: string;
-      previewSource: string;
-      maskSource: string;
-    }
-  ) => {
-    if (file) {
+  const handleUploadMapImage = async (file: File) => {
+    if (file && map) {
       try {
         const asset = await config.uploadAsset(file);
-        switch (source) {
-          case "preview":
-            dispatch(
-              updatePlace({
-                mapId: map!.id,
-                place: { ...place!, previewSource: asset.assetId },
-              })
-            );
-            return;
-          case "mask":
-            dispatch(
-              updatePlace({
-                mapId: map!.id,
-                place: { ...place!, maskSource: asset.assetId },
-              })
-            );
-            return;
-          case "map": {
-            dispatch(
-              updateMap({
-                ...map!,
-                source: {
-                  ...map!.source,
-                  png: asset.assetId,
-                },
-              })
-            );
-            return;
-          }
-        }
+        dispatch(
+          updateMapImage({
+            mapId: map.id,
+            source: { ...map!.source, png: asset.assetId },
+          })
+        );
       } catch (e) {
         toast.error("Error uploading the image");
         console.error(e);
@@ -177,7 +142,7 @@ export default function MapEditModal() {
               <DragAndDropImages
                 placeHolder="Upload map image."
                 className="MapEdit__form__uploadMap"
-                handleChange={(file) => handleUploadImage(file, "map")}
+                handleChange={(file) => handleUploadMapImage(file)}
                 previewImage={
                   map?.source.png && config.genAssetLink(map.source.png)
                 }
