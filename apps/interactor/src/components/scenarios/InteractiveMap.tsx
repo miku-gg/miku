@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../state/store'
-import { selectCurrentMaps } from '../../state/selectors'
+import { selectCurrentMaps, selectCurrentScene } from '../../state/selectors'
 import { GiPathDistance } from 'react-icons/gi'
 import './InteractiveMap.scss'
 import { Button, Modal } from '@mikugg/ui-kit'
@@ -96,6 +96,7 @@ const InteractiveMapModal = ({
 }) => {
   const dispatch = useAppDispatch()
   const { servicesEndpoint, apiEndpoint, assetLinkLoader } = useAppContext()
+  const currentScene = useAppSelector(selectCurrentScene)
   const mapBackgroundRef = useRef<HTMLImageElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const offScreenCanvasRef = useRef(document.createElement('canvas'))
@@ -229,7 +230,8 @@ const InteractiveMapModal = ({
           }
 
           if (highlightedPlace) {
-            if (canvas) canvas.style.cursor = 'pointer'
+            if (canvas && highlightedPlace.sceneId !== currentScene?.id)
+              canvas.style.cursor = 'pointer'
             if (canvas) canvas.style.opacity = '0.4'
             if (canvas) canvas.style.filter = 'blur(5px)'
             setHighlightedPlaceId(highlightedPlace.id)
@@ -276,10 +278,14 @@ const InteractiveMapModal = ({
         cleanupFuncRef.current = null
       }
     }
-  }, [map, assetLinkLoader])
+  }, [currentScene?.id, map, assetLinkLoader])
 
   const handleMapClick = () => {
-    if (highlightedPlace && scene) {
+    if (
+      highlightedPlace &&
+      scene &&
+      highlightedPlace.sceneId !== currentScene?.id
+    ) {
       dispatch(setMapModal(false))
       dispatch(
         interactionStart({

@@ -19,6 +19,27 @@ export const selectEditingLorebook = createSelector(
     return lorebooks?.find((lorebook) => lorebook.id === modal.editId);
   }
 );
+export const selectMaps = (state: RootState) => state.novel.maps;
+export const selectEditingMap = createSelector(
+  [(state: RootState) => state.input.modals.mapEdit, selectMaps],
+  (modal, maps) => {
+    if (!modal.opened) return undefined;
+    return maps.find((map) => map.id === modal.editId);
+  }
+);
+export const selectEditingPlace = createSelector(
+  [
+    (state: RootState) => state.input.modals.placeEdit,
+    (state: RootState) => state.novel.maps,
+  ],
+  (modal, maps) => {
+    if (!modal.opened) return undefined;
+    return maps
+      .map((map) => map.places)
+      .flat()
+      .find((place) => place.id === modal.editId);
+  }
+);
 export const selectEditingSong = createSelector(
   [
     (state: RootState) => state.input.modals.song,

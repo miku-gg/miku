@@ -1,0 +1,102 @@
+@import "../../styles/variables.scss";
+
+.PlaceEditModal {
+  max-width: 850px !important;
+}
+.PlaceEdit {
+  display: flex;
+  gap: 10px;
+
+  &__buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+
+    &__removePlace,
+    &__closeModal {
+      color: $text-1;
+      width: 1.3rem;
+      height: 1.3rem;
+      cursor: pointer;
+
+      &:hover {
+        color: $secondary-color;
+      }
+    }
+    &__closeModal {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  &__maskImage {
+    width: 35rem;
+    height: 35rem;
+    position: relative;
+
+    &__map {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      border-radius: 16px;
+      opacity: 0.25;
+    }
+
+    &__mask {
+      & img {
+        opacity: 0.6;
+      }
+    }
+
+    .mdSize {
+      width: 35rem;
+      height: 35rem;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__sceneSelect {
+    & label {
+      color: $text-1;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    &__container {
+      display: flex;
+      justify-content: space-between;
+      border: 1px solid $node-conector-color;
+      padding: 4px;
+      border-radius: 8px;
+      align-items: center;
+    }
+
+    &__name {
+      margin: 0;
+      padding: 0;
+      text-overflow: ellipsis;
+      max-width: 120px;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    &__button {
+      background-color: $secondary-color;
+      border-radius: 8px;
+      border: none;
+      color: $text-1;
+      padding: 2px 4px;
+    }
+  }
+}

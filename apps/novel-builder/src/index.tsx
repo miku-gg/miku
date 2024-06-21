@@ -11,10 +11,12 @@ import LorebookEditModal from "./modals/LorebookEditModal";
 import SongEditModal from "./modals/SongEditModal";
 import SongSearchModal from "./modals/SongSearchModal";
 import CharacterEditModal from "./modals/character/CharacterEditModal";
+import MapEditModal from "./modals/map/MapEditModal";
 import SceneEditModal from "./modals/scene/SceneEditModal";
 import Planels from "./panels";
 import { store } from "./state/store";
 import "./styles/main.scss";
+import PlaceEditModal from "./modals/map/PlaceEditModal";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -34,6 +36,8 @@ ReactDOM.render(
         <CharacterEditModal />
         <LorebookEditModal />
         <LoadingModal />
+        <MapEditModal />
+        <PlaceEditModal />
         <ToastContainer />
       </AreYouSure.AreYouSureProvider>
     </Provider>
