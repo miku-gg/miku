@@ -248,8 +248,11 @@ const InteractiveMapModal = ({
           highlightCoord(e.offsetX, e.offsetY)
         const handleTouchEnd = (e: TouchEvent) => {
           e.preventDefault()
-          const touch = e.touches && e.touches[0]
-          highlightCoord(touch?.clientX, touch?.clientY)
+          const touch = e.changedTouches && e.changedTouches[0]
+          highlightCoord(
+            touch?.clientX - (canvas?.getBoundingClientRect().left || 0),
+            touch?.clientY - (canvas?.getBoundingClientRect().top || 0)
+          )
         }
 
         canvas.addEventListener('mousemove', handleMouseMove)
@@ -335,9 +338,13 @@ const InteractiveMapModal = ({
               {highlightedPlace.description}
             </div>
             <div>
-              <Button theme="secondary" onClick={handleMapClick}>
-                Go to scene
-              </Button>
+              {highlightedPlace.sceneId !== currentScene?.id ? (
+                <Button theme="secondary" onClick={handleMapClick}>
+                  Go to place
+                </Button>
+              ) : (
+                <i>This is the current place</i>
+              )}
             </div>
           </div>
         ) : (
