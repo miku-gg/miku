@@ -64,7 +64,7 @@ export default function MapEditModal() {
   const handleDeleteMap = (id: string) => {
     areYouSure.openModal({
       title: "Are you sure?",
-      description: "This action cannot be undone",
+      description: "This map will be deleted. This action cannot be undone.",
       onYes: () => {
         dispatch(closeModal({ modalType: "mapEdit" }));
         dispatch(deleteMap(id));
@@ -152,9 +152,7 @@ export default function MapEditModal() {
                     return false;
                   }
                   if (!checkFileType(file, ["image/png", "image/jpeg"])) {
-                    toast.error(
-                      "Invalid file type. Please upload a valid image file"
-                    );
+                    toast.error("Invalid file type. Please upload a jpg file.");
                     return false;
                   }
                   return true;

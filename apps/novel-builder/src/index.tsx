@@ -18,6 +18,18 @@ import { store } from "./state/store";
 import "./styles/main.scss";
 import PlaceEditModal from "./modals/map/PlaceEditModal";
 
+const toastRoot = document.getElementById("toast-root");
+
+export class ToastPortal extends React.PureComponent {
+  render() {
+    return ReactDOM.createPortal(
+      // @ts-ignore
+      <ToastContainer theme="dark" position="top-center" />,
+      toastRoot!
+    );
+  }
+}
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
@@ -38,8 +50,8 @@ ReactDOM.render(
         <LoadingModal />
         <MapEditModal />
         <PlaceEditModal />
-        <ToastContainer />
       </AreYouSure.AreYouSureProvider>
+      <ToastPortal />
     </Provider>
   </React.StrictMode>,
   document.getElementById("root")

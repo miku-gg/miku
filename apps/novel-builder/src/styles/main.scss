@@ -55,3 +55,8 @@ a {
     font-weight: bold;
   }
 }
+
+#toast-root {
+  z-index: 999999;
+  position: relative;
+}

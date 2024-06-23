@@ -35,14 +35,19 @@ const DragAndDropImages = ({
     fileInputRef.current?.click(); // Trigger click event of file input when dropzone is clicked
   };
 
-  const handleDropZoneChange = async (file: File) => {
+  const handleDropZoneChange = async (
+    file: File,
+    event?: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setLoading(true);
     if (await onFileValidate(file)) {
-      setLoading(true);
       handleChange && (await handleChange(file));
       setLoading(false);
     } else if (errorMessage) {
       alert(errorMessage);
+      if (event?.target) event.target.value = '';
     }
+    setLoading(false);
   };
 
   const onDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -71,7 +76,7 @@ const DragAndDropImages = ({
         style={{ display: 'none' }} // Hide the file input
         onChange={(event) => {
           const file = event.target.files?.[0];
-          file && handleDropZoneChange(file);
+          file && handleDropZoneChange(file, event);
         }}
       />
       <div
