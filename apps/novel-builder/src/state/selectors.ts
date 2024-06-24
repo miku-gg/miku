@@ -84,15 +84,58 @@ export const selectEditingScene = createSelector(
 );
 
 export const selectTotalTokenCount = createSelector(
-  [(state: RootState) => state.novel.characters],
-  (characters) => {
-    return characters.reduce((acc: number, character) => {
-      const characterTokens =
+  [(state: RootState) => state.novel],
+  (novel) => {
+    const { scenes, characters } = novel;
+    const memoizedResults: { [key: string]: number } = {};
+
+    const getTotalTokensByCharacterId = (characterId: string) => {
+      if (memoizedResults[characterId] !== undefined) {
+        return memoizedResults[characterId];
+      }
+
+      const character = characters.find(
+        (character) => character.id === characterId
+      );
+
+      // TODO: Fix this
+      if (!character) return 0;
+
+      const totalTokens =
         LLAMA_TOKENIZER.encodeString(character.card.data.description).length +
         LLAMA_TOKENIZER.encodeString(character.card.data.mes_example).length +
         LLAMA_TOKENIZER.encodeString(character.card.data.personality).length;
 
-      return acc + characterTokens;
-    }, 0);
+      memoizedResults[characterId] = totalTokens;
+
+      return totalTokens;
+    };
+
+    const scenesTokens: number[] = [];
+
+    scenes.forEach((scene) => {
+      let totalSceneToken = 0;
+
+      scene.characters.forEach((char) => {
+        totalSceneToken += getTotalTokensByCharacterId(char.characterId);
+      });
+
+      const startMessagesTokens = novel.starts
+        .filter((start) => start.sceneId === scene.id)
+        .map((start) =>
+          start.characters.reduce(
+            (acc, char) => acc + LLAMA_TOKENIZER.encodeString(char.text).length,
+            0
+          )
+        );
+
+      totalSceneToken +=
+        Math.max(...startMessagesTokens) +
+        LLAMA_TOKENIZER.encodeString(scene.prompt).length;
+
+      scenesTokens.push(totalSceneToken);
+    });
+
+    return Math.max(...scenesTokens);
   }
 );

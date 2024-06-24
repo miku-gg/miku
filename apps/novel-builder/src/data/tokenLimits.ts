@@ -7,6 +7,8 @@ export type TokenLimitsKey =
   | "CHARACTER_DESCRIPTION"
   | "CHARACTER_PERSONALITY"
   | "CHARACTER_REFERENCE_CONVERSATION"
+  | "STARTS_FIRST_MESSAGE"
+  | "SCENE_PROMPT"
   | "TOTAL";
 
 export const TOKEN_LIMITS: Record<TokenLimitsKey, TokenLimits> = {
@@ -16,11 +18,19 @@ export const TOKEN_LIMITS: Record<TokenLimitsKey, TokenLimits> = {
   },
   CHARACTER_PERSONALITY: {
     green: 50,
-    red: 100
+    red: 200
   },
   CHARACTER_REFERENCE_CONVERSATION: {
     green: 50,
-    red: 100
+    red: 200
+  },
+  STARTS_FIRST_MESSAGE: {
+    green: 50,
+    red: 200
+  },
+  SCENE_PROMPT: {
+    green: 200,
+    red: 400
   },
   TOTAL: {
     green: 1000,
