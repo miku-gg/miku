@@ -109,6 +109,11 @@ export function getSlicedStrings(str: string): string[] {
   })
 }
 
+// replace " with \"
+function escape(text: string) {
+  return text.replace(/"/g, '\\"')
+}
+
 function addTextToSlices(text: string, slices: string[]) {
   const words = text.split(' ')
   if (words.length > 30) {
@@ -122,13 +127,13 @@ function addTextToSlices(text: string, slices: string[]) {
 
 export const exportToRenPy = (state: RootState, linearStory = false) => {
   let script = ''
-  script += `define m = Character("${state.settings.user.name}")\n`
+  script += `define m = Character("${escape(state.settings.user.name)}")\n`
   // define all characters
   script += state.novel.characters
     .map((character) => {
-      return `define ${sanitizeName(character.name)} = Character("${
-        character.name
-      }")`
+      return `define ${escape(
+        sanitizeName(character.name)
+      )} = Character("${escape(character.name)}")`
     })
     .join('\n')
 
@@ -264,12 +269,14 @@ export const exportToRenPy = (state: RootState, linearStory = false) => {
 
       script += `    scene bg ${sanitizeId(backgroundSrc)} at scale\n`
 
-      script += `    m "${interaction.query}"\n`
+      script += `    m "${escape(interaction.query)}"\n`
       if (interaction.responsesId.length > 1 && !linearStory) {
         script += `    menu:\n`
         for (const responseID of interaction.responsesId) {
           const response = allResponses[responseID]
-          script += `        "{i}Get a ${response?.characters[0].emotion} response{/i}":\n`
+          script += `        "{i}Get a ${escape(
+            response?.characters[0].emotion || ''
+          )} response{/i}":\n`
           script += `            jump response_${sanitizeId(
             response?.id || ''
           )}\n`
@@ -354,14 +361,14 @@ export const exportToRenPy = (state: RootState, linearStory = false) => {
             text = '{i}' + text + '{/i}'
           }
 
-          script += `    ${character?.slug} "${text}"\n`
+          script += `    ${character?.slug} "${escape(text)}"\n`
         })
       })
       if (response.childrenInteractions.length > 1 && !linearStory) {
         script += `    menu:\n`
         for (const interactionID of response.childrenInteractions) {
           const interaction = allInteractions[interactionID.interactionId]
-          script += `        "${interaction?.query}":\n`
+          script += `        "${escape(interaction?.query || '')}":\n`
           script += `            jump interaction_${sanitizeId(
             interaction?.id || ''
           )}\n`

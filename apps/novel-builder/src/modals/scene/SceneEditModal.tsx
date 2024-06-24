@@ -17,6 +17,7 @@ import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
 import Characters from "../../panels/assets/characters/Characters";
 import Songs from "../../panels/assets/songs/Songs";
 import { LorebookList } from "../../panels/details/LorebookList";
+import { MapList } from "../../panels/maps/MapList";
 import { selectBackgrounds, selectEditingScene } from "../../state/selectors";
 import { closeModal } from "../../state/slices/inputSlice";
 import {
@@ -33,6 +34,7 @@ export default function SceneEditModal() {
   const dispatch = useAppDispatch();
   const { openModal: openAreYouSure } = AreYouSure.useAreYouSure();
   const scene = useAppSelector(selectEditingScene);
+  const maps = useAppSelector((state) => state.novel.maps);
   const backgrounds = useAppSelector(selectBackgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
   const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] =
@@ -67,6 +69,20 @@ export default function SceneEditModal() {
             ? scene.lorebookIds.filter((lid) => lid !== id)
             : [...scene.lorebookIds, id]
           : [id]
+      })
+    );
+  };
+
+  const handleSelectMaps = (id: string) => {
+    if (!scene) return;
+    dispatch(
+      updateScene({
+        ...scene._source,
+        parentMapIds: scene.parentMapIds
+          ? scene.parentMapIds.includes(id)
+            ? scene.parentMapIds.filter((mid) => mid !== id)
+            : [...scene.parentMapIds, id]
+          : [id],
       })
     );
   };
@@ -419,6 +435,17 @@ export default function SceneEditModal() {
                   );
                 })}
               </div>
+            </div>
+            <div className="SceneEditModal__scene-maps">
+              {maps ? (
+                <MapList
+                  onSelectMap={(id) => {
+                    handleSelectMaps(id);
+                  }}
+                  selectedMapId={scene?.parentMapIds || []}
+                  tooltipText="Select maps reachable from this scene."
+                />
+              ) : null}
             </div>
             <div className="SceneEditModal__scene-lorebooks">
               <LorebookList

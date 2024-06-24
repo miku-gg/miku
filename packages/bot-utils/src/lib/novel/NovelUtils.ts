@@ -1,17 +1,17 @@
 import {
+  hashBase64URI,
+  mikuCardToMikuCardV2,
+  tavernCardV2ToMikuCard,
+} from "../MikuCardUtils";
+import {
   EMOTION_GROUP_TEMPLATES,
   MikuCard,
   MikuCardV2,
   TavernCardV2,
 } from "../MikuCardValidator";
-import {
-  hashBase64URI,
-  mikuCardToMikuCardV2,
-  tavernCardV2ToMikuCard,
-} from "../MikuCardUtils";
+import { replaceStringsInObject } from "../utils";
 import * as NovelV3 from "./NovelV3";
 import * as NovelV2 from "./_deprecated.NovelV2";
-import { replaceStringsInObject } from "../utils";
 
 const randomString = (length = 32) => {
   const characters =
@@ -742,6 +742,78 @@ export function validateNovelState(
       });
     });
 
+    //validate maps
+    novel.maps.forEach((map) => {
+      //validate map image source
+      if (!map.source.png) {
+        errors.push({
+          targetType: NovelValidationTargetType.MAP,
+          targetId: map.id,
+          severity: "error",
+          message: `Map "${map.name}" has no map image`,
+        });
+      }
+      // validate places
+      if (!map.places.length) {
+        errors.push({
+          targetType: NovelValidationTargetType.MAP,
+          targetId: map.id,
+          severity: "warning",
+          message: `Map "${map.name}" has no places`,
+        });
+      }
+      // validate map assigned to at least one scene
+      const mapInScene = novel.scenes.find((scene) =>
+        scene.parentMapIds?.includes(map.id)
+      );
+      if (!mapInScene) {
+        errors.push({
+          targetType: NovelValidationTargetType.MAP,
+          targetId: map.id,
+          severity: "warning",
+          message: `Map "${map.name}" is not assigned to any scene`,
+        });
+      }
+      // validate places
+      map.places.forEach((place) => {
+        if (!place.maskSource) {
+          errors.push({
+            targetType: NovelValidationTargetType.MAP,
+            targetId: map.id,
+            severity: "error",
+            message: `Place ${place.name} has no mask image.`,
+          });
+        }
+        //validate place name
+        if (!place.name) {
+          errors.push({
+            targetType: NovelValidationTargetType.MAP,
+            targetId: map.id,
+            severity: "error",
+            message: `Place has no name in map ${map.name}`,
+          });
+        }
+        // validate sceneId
+        if (!novel.scenes.some((scene) => scene.id === place.sceneId)) {
+          errors.push({
+            targetType: NovelValidationTargetType.MAP,
+            targetId: map.id,
+            severity: "error",
+            message: `Scene ${place.sceneId} not found, please change it on place ${place.name} in map ${map.name}`,
+          });
+        }
+
+        if (!place.sceneId) {
+          errors.push({
+            targetType: NovelValidationTargetType.MAP,
+            targetId: map.id,
+            severity: "error",
+            message: `Place ${place.name} has no scene assigned`,
+          });
+        }
+      });
+    });
+
     novel.scenes.forEach((scene) => {
       // validate background ids
       if (!novel.backgrounds.some((bg) => bg.id === scene.backgroundId)) {
@@ -957,7 +1029,7 @@ export function validateNovelState(
         });
       }
 
-      if (!character.card.data.extensions.mikugg_v2.short_description) {
+      if (!character.short_description) {
         errors.push({
           targetType: NovelValidationTargetType.CHARACTER,
           targetId: character.id,
@@ -1005,9 +1077,7 @@ export function validateNovelState(
       }
 
       // if character short description has more than 100 characters
-      if (
-        character.card.data.extensions.mikugg_v2.short_description.length > 100
-      ) {
+      if (character.short_description.length > 100) {
         errors.push({
           targetType: NovelValidationTargetType.CHARACTER,
           targetId: character.id,
