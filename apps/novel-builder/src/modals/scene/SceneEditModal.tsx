@@ -25,6 +25,7 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./SceneEditModal.scss";
+import { SceneConditions } from "./SceneConditions";
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -321,7 +322,7 @@ export default function SceneEditModal() {
                 />
               </div>
               <div className="SceneEditModal__scene-details-row">
-                <Input
+                {/* <Input
                   id="context"
                   name="context"
                   placeHolder="{{user}} should have invited Nino to the classroom."
@@ -338,7 +339,8 @@ export default function SceneEditModal() {
                     );
                   }}
                   isTextArea
-                />
+                /> */}
+                <SceneConditions />
               </div>
             </div>
             <div className="SceneEditModal__scene-music">
