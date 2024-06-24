@@ -40,6 +40,7 @@ export interface NovelScene {
   parentMapIds?: string[] | null;
   nsfw: NovelNSFW;
   lorebookIds?: string[];
+  sceneConditions?: SceneCondition[];
 }
 
 export interface NovelCharacterOutfit {
@@ -107,6 +108,14 @@ export interface NovelMap {
     maskSource: string;
   }[];
 }
+export interface SceneCondition {
+  id: string;
+  name: string;
+  description: string;
+  sceneId: string;
+  conditionPrompt: string;
+  mutationTrigger: StateMutation;
+}
 
 export type StateMutation =
   | {
@@ -126,6 +135,12 @@ export type StateMutation =
       type: "SUGGEST_ADVANCE_SCENE";
       config: {
         sceneId: string;
+      };
+    }
+  | {
+      type: "ADD_ITEM";
+      config: {
+        item: InventoryItem;
       };
     };
 

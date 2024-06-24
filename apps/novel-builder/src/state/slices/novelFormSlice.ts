@@ -389,6 +389,59 @@ const novelFormSlice = createSlice({
         (place) => place.id !== action.payload.placeId
       );
     },
+    createCondition: (
+      state,
+      action: PayloadAction<{ sceneId: string; conditionId: string }>
+    ) => {
+      const scene = state.scenes.find(
+        (scene) => scene.id === action.payload.sceneId
+      );
+      if (!scene) return;
+      if (scene.sceneConditions === undefined) {
+        scene.sceneConditions = [];
+      }
+      scene.sceneConditions.push({
+        id: action.payload.conditionId,
+        name: "New Condition",
+        description: "",
+        conditionPrompt: "",
+        mutationTrigger: {
+          type: "ADD_CHILDREN",
+          config: { sceneId: "", children: [] },
+        },
+        sceneId: action.payload.sceneId,
+      });
+    },
+    updateCondition: (
+      state,
+      action: PayloadAction<{
+        sceneId: string;
+        conditionId: string;
+        condition: NovelV3.SceneCondition;
+      }>
+    ) => {
+      const scene = state.scenes.find(
+        (scene) => scene.id === action.payload.sceneId
+      );
+      if (!scene) return;
+      const condition = scene.sceneConditions?.find(
+        (condition) => condition.id === action.payload.conditionId
+      );
+      if (!condition) return;
+      Object.assign(condition, action.payload.condition);
+    },
+    deleteCondition: (
+      state,
+      action: PayloadAction<{ sceneId: string; conditionId: string }>
+    ) => {
+      const scene = state.scenes.find(
+        (scene) => scene.id === action.payload.sceneId
+      );
+      if (!scene) return;
+      scene.sceneConditions = scene.sceneConditions?.filter(
+        (condition) => condition.id !== action.payload.conditionId
+      );
+    },
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;
     },
@@ -437,6 +490,9 @@ export const {
   createPlace,
   updatePlace,
   deletePlace,
+  createCondition,
+  updateCondition,
+  deleteCondition,
   loadCompleteState,
   updateDetails,
   clearNovelState,

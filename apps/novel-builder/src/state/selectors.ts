@@ -27,6 +27,19 @@ export const selectEditingMap = createSelector(
     return maps.find((map) => map.id === modal.editId);
   }
 );
+export const selectEditingCondition = createSelector(
+  [
+    (state: RootState) => state.input.modals.conditionEdit,
+    (state: RootState) => state.novel.scenes,
+  ],
+  (modal, scenes) => {
+    if (!modal.opened) return undefined;
+    return scenes
+      .map((scene) => scene.sceneConditions)
+      .flat()
+      .find((condition) => condition?.id === modal.editId);
+  }
+);
 export const selectEditingPlace = createSelector(
   [
     (state: RootState) => state.input.modals.placeEdit,

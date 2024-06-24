@@ -13,6 +13,7 @@ export type ModalType =
   | "lorebookEdit"
   | "mapEdit"
   | "placeEdit"
+  | "conditionEdit"
   | "errors"
   | "scene";
 
@@ -47,6 +48,9 @@ const initialState: InputState = {
   },
   modals: {
     loading: {
+      opened: false,
+    },
+    conditionEdit: {
       opened: false,
     },
     lorebookEdit: {
