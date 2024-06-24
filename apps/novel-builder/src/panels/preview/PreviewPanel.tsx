@@ -1,4 +1,4 @@
-import { Button, Loader } from "@mikugg/ui-kit";
+import { Button, Loader, Modal } from "@mikugg/ui-kit";
 import config, { STAGE } from "../../config";
 import { useEffect, useMemo, useRef, useState } from "react";
 import base64 from "base-64";
@@ -58,6 +58,7 @@ export function generateAlphaLink({
 
 export default function PreviewPanel() {
   const [loadingIframe, setLoadingIframe] = useState<boolean>(true);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const novel = useAppSelector((state) => state.novel);
   const dispatch = useAppDispatch();
@@ -71,11 +72,11 @@ export default function PreviewPanel() {
     []
   );
 
-  const handleBuild = async () => {
+  const handlExport = async (exportFor: "miku" | "local") => {
     try {
       await downloadNovelState(
         cloneDeep(novel),
-        config.genAssetLink,
+        exportFor === "miku" ? config.genAssetLink : false,
         (text: string) => {
           dispatch(
             openModal({
@@ -84,14 +85,15 @@ export default function PreviewPanel() {
             })
           );
         },
-        true
+        exportFor === "miku"
       );
     } catch (e) {
       console.error(e);
-      toast.error("Failed to build novel");
+      toast.error(`Failed to ${exportFor === "miku" ? "build" : "save"} novel`);
     }
     dispatch(closeModal({ modalType: "loading" }));
-  };
+    setIsModalOpen(false);
+  }
 
   useEffect(() => {
     if (!loadingIframe) {
@@ -142,8 +144,35 @@ export default function PreviewPanel() {
     <div className="PreviewPanel">
       <div className="PreviewPanel__header">
         <h1 className="PreviewPanel__title">Preview</h1>
+        <Modal
+          opened={isModalOpen}
+          onCloseModal={() => setIsModalOpen(false)}
+        >
+          <div className="PreviewPanel__modal-content">
+            <h2>Choose Your Building Method</h2>
+            <p>Select how you'd like to export your project:</p>
+            <ul className="PreviewPanel__options">
+              <li className="PreviewPanel__option">
+                <strong>Export for Miku.gg:</strong>
+                <p className="PreviewPanel__option-description">Saves your project as a .json file without assets. Ideal for sharing or uploading to Miku.gg.</p>
+              </li>
+              <li className="PreviewPanel__option">
+                <strong>Export for Local Use:</strong>
+                <p className="PreviewPanel__option-description">Saves your project as a .json file with all associated assets included. Perfect for offline use or complete backups.</p>
+              </li>
+            </ul>
+            <div className="PreviewPanel__buttons-group">
+              <Button theme="gradient" onClick={() => handlExport("miku")}>
+                Export for Miku.gg
+              </Button>
+              <Button theme="transparent" onClick={() => handlExport("local")}>
+                Export for Local Use
+              </Button>
+            </div>
+          </div>
+        </Modal>
         <div className="PreviewPanel__build">
-          <Button theme="gradient" onClick={handleBuild}>
+          <Button theme="gradient" onClick={() => setIsModalOpen(true)}>
             <PiHammerBold />
             Build
           </Button>

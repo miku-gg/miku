@@ -1,3 +1,5 @@
+@import '../../styles/variables';
+
 .PreviewPanel {
   &__iframe-container {
     height: 60vh;
@@ -8,6 +10,28 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+  }
+
+  &__modal-content {
+    font-size: 1em;
+    line-height: 1rem;
+    color: $text-1;
+    font-weight: 400;
+  }
+
+  &__option-description {
+    font-style: italic;
+  }
+
+  &__buttons-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    & > button {
+      width: 200px;
+    }
   }
 
   &__build {
