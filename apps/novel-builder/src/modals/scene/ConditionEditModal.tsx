@@ -14,6 +14,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import ButtonGroup from "../../components/ButtonGroup";
 import "./ConditionEditModal.scss";
+import { SceneMutationForm } from "./SceneMutationForm";
 
 export default function ConditionEditModal() {
   const dispatch = useDispatch();
@@ -74,7 +75,7 @@ export default function ConditionEditModal() {
         return {
           type: "ADD_CHILDREN",
           config: {
-            sceneId: condition?.sceneId || "",
+            sceneId: "",
             children: [],
           },
         } as StateMutation;
@@ -89,7 +90,7 @@ export default function ConditionEditModal() {
         return {
           type: "SUGGEST_ADVANCE_SCENE",
           config: {
-            sceneId: condition?.sceneId || "",
+            sceneId: "",
           },
         } as StateMutation;
       default:
@@ -183,7 +184,7 @@ export default function ConditionEditModal() {
               />
             </div>
             <div className="ConditionEdit__content__mutation">
-              <h2>Condition mutation</h2>
+              <h3>Condition mutation</h3>
               <ButtonGroup
                 buttons={[
                   {
@@ -218,6 +219,7 @@ export default function ConditionEditModal() {
                   );
                 }}
               />
+              <SceneMutationForm />
             </div>
           </div>
         </div>

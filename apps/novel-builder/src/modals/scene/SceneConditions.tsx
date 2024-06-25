@@ -38,8 +38,8 @@ export const SceneConditions = () => {
           {scene.sceneConditions.map((condition) => {
             const { id, name, description } = condition;
             return (
-              <div className="MapList__container__box">
-                <div key={id} className="MapList__container__map">
+              <div key={id} className="MapList__container__box">
+                <div className="MapList__container__map">
                   <FaPencil
                     className="MapList__container__edit"
                     onClick={(e: React.MouseEvent) => {

@@ -4,12 +4,14 @@ import config from "../../config";
 import { selectScenes } from "../../state/selectors";
 import { useAppSelector } from "../../state/store";
 import "./SceneSelector.scss";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 
 interface SceneSelectorProps {
   opened: boolean;
   onCloseModal: () => void;
-  selectedSceneId: string;
+  selectedSceneId?: string;
   onSelectScene: (sceneId: string) => void;
+  selectedScenes?: string[];
 }
 
 export default function SceneSelector({
@@ -17,8 +19,12 @@ export default function SceneSelector({
   onCloseModal,
   onSelectScene,
   selectedSceneId,
+  selectedScenes,
 }: SceneSelectorProps) {
   const scenes = useAppSelector(selectScenes);
+  const isSelected = (sceneId: string) => {
+    return selectedScenes?.includes(sceneId);
+  };
 
   return (
     <Modal
@@ -26,19 +32,28 @@ export default function SceneSelector({
       opened={opened}
       onCloseModal={() => onCloseModal()}
     >
-      <div className="StartsPanel__scene-selection">
-        <div className="StartsPanel__scene-selection-list">
+      <div className="SceneSelector__scene-selection">
+        <IoIosCloseCircleOutline
+          className="SceneSelector__closeModal"
+          onClick={() => {
+            onCloseModal();
+          }}
+        />
+        <div className="SceneSelector__scene-selection-list">
           {scenes.map((scene) => (
             <div
               className={classNames({
-                "StartsPanel__scene-selection-item": true,
-                "StartsPanel__scene-selection-item--selected":
-                  scene.id === selectedSceneId,
+                "SceneSelector__scene-selection-item": true,
+                "SceneSelector__scene-selection-item--selected": selectedScenes
+                  ? isSelected(scene.id)
+                  : scene.id === selectedSceneId,
               })}
               key={scene.id}
               onClick={() => {
                 onSelectScene(scene.id);
-                onCloseModal();
+                if (!selectedScenes) {
+                  onCloseModal();
+                }
               }}
             >
               <div
