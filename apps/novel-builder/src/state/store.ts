@@ -6,8 +6,8 @@ import input from "./slices/inputSlice";
 export const store = configureStore({
   reducer: {
     novel,
-    input,
-  },
+    input
+  }
 });
 
 export type RootState = ReturnType<typeof store.getState>;

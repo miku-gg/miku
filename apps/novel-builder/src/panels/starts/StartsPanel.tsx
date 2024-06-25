@@ -3,13 +3,15 @@ import { useAppDispatch, useAppSelector } from "../../state/store";
 import {
   createStart,
   deleteStart,
-  updateStart,
+  updateStart
 } from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
 import "./StartsPanel.scss";
 import { useState } from "react";
 import classNames from "classnames";
+import { TokenDisplayer } from "../../components/TokenDisplayer";
+import { TOKEN_LIMITS } from "../../data/tokenLimits";
 
 export default function StartsPanel() {
   const dispatch = useAppDispatch();
@@ -24,7 +26,7 @@ export default function StartsPanel() {
   }>({
     opened: false,
     selectedSceneId: null,
-    startId: null,
+    startId: null
   });
 
   return (
@@ -46,13 +48,13 @@ export default function StartsPanel() {
                     style={{
                       backgroundImage: `url(${config.genAssetLink(
                         scene?.background?.source.jpg || ""
-                      )})`,
+                      )})`
                     }}
                     onClick={() =>
                       setSceneSelection({
                         opened: true,
                         selectedSceneId: start.sceneId,
-                        startId: start.id,
+                        startId: start.id
                       })
                     }
                   >
@@ -118,32 +120,39 @@ export default function StartsPanel() {
                         <div className="StartsPanel__item-prompt-character-title">
                           {character?.name} first message
                         </div>
-                        <div className="StartsPanel__item-prompt-character-emotion">
-                          <Dropdown
-                            items={
-                              outfit?.emotions.map((emotion) => ({
-                                name: emotion.id,
-                                value: emotion.id,
-                              })) || []
-                            }
-                            selectedIndex={selectedEmotionIndex}
-                            onChange={(indexEmotion) => {
-                              dispatch(
-                                updateStart({
-                                  ...start,
-                                  characters: start.characters.map((char, i) =>
-                                    i === index
-                                      ? {
-                                          ...char,
-                                          emotion:
-                                            outfit?.emotions[indexEmotion]
-                                              ?.id || "",
-                                        }
-                                      : char
-                                  ),
-                                })
-                              );
-                            }}
+                        <div className="StartsPanel__item-prompt-character-title-right">
+                          <div className="StartsPanel__item-prompt-character-emotion">
+                            <Dropdown
+                              items={
+                                outfit?.emotions.map((emotion) => ({
+                                  name: emotion.id,
+                                  value: emotion.id
+                                })) || []
+                              }
+                              selectedIndex={selectedEmotionIndex}
+                              onChange={(indexEmotion) => {
+                                dispatch(
+                                  updateStart({
+                                    ...start,
+                                    characters: start.characters.map(
+                                      (char, i) =>
+                                        i === index
+                                          ? {
+                                              ...char,
+                                              emotion:
+                                                outfit?.emotions[indexEmotion]
+                                                  ?.id || ""
+                                            }
+                                          : char
+                                    )
+                                  })
+                                );
+                              }}
+                            />
+                          </div>
+                          <TokenDisplayer
+                            text={_character.text || ""}
+                            limits={TOKEN_LIMITS.STARTS_FIRST_MESSAGE}
                           />
                         </div>
                       </div>
@@ -159,7 +168,7 @@ export default function StartsPanel() {
                                 i === index
                                   ? { ...char, text: e.target.value }
                                   : char
-                              ),
+                              )
                             })
                           )
                         }
@@ -178,7 +187,7 @@ export default function StartsPanel() {
                       },
                       description:
                         "Are you sure you want to remove this start?",
-                      yesLabel: "Remove",
+                      yesLabel: "Remove"
                     });
                   }}
                 >
@@ -196,7 +205,7 @@ export default function StartsPanel() {
             setSceneSelection({
               opened: true,
               selectedSceneId: null,
-              startId: null,
+              startId: null
             })
           }
         >
@@ -210,7 +219,7 @@ export default function StartsPanel() {
           setSceneSelection({
             opened: false,
             selectedSceneId: null,
-            startId: null,
+            startId: null
           })
         }
       >
@@ -221,7 +230,7 @@ export default function StartsPanel() {
                 className={classNames({
                   "StartsPanel__scene-selection-item": true,
                   "StartsPanel__scene-selection-item--selected":
-                    scene.id === sceneSelection.selectedSceneId,
+                    scene.id === sceneSelection.selectedSceneId
                 })}
                 key={scene.id}
                 onClick={() => {
@@ -237,7 +246,7 @@ export default function StartsPanel() {
                       characterId: character.id || "",
                       emotion: outfit?.emotions[0]?.id || "",
                       text: "",
-                      pose: "standing",
+                      pose: "standing"
                     };
                   });
                   if (start) {
@@ -245,7 +254,7 @@ export default function StartsPanel() {
                       updateStart({
                         ...start,
                         sceneId: scene.id,
-                        characters,
+                        characters
                       })
                     );
                   } else {
@@ -254,7 +263,7 @@ export default function StartsPanel() {
                   setSceneSelection({
                     opened: false,
                     selectedSceneId: null,
-                    startId: null,
+                    startId: null
                   });
                 }}
               >
@@ -263,7 +272,7 @@ export default function StartsPanel() {
                   style={{
                     backgroundImage: `url(${config.genAssetLink(
                       scene.background?.source.jpg || ""
-                    )})`,
+                    )})`
                   }}
                 >
                   <div className="SceneNode__title">{scene.name}</div>
