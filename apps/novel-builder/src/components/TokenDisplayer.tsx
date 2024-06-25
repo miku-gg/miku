@@ -61,9 +61,9 @@ export const TokenDisplayer = ({
         className="TokenDisplayer__Modal"
       >
         <pre>
-          This amount is the maximum *AI memory* that the text in this novel
-          will take. The more text there is, the less conversation the AI will
-          remember when the novel is being played.
+          This amount is the <b>AI memory</b> that the text will consume. The
+          more text there is, the less conversation the AI will remember when
+          the novel is being played.
         </pre>
         <pre>
           <ul>

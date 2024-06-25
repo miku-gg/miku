@@ -31,7 +31,7 @@ export const selectEditingMap = createSelector(
 export const selectEditingPlace = createSelector(
   [
     (state: RootState) => state.input.modals.placeEdit,
-    (state: RootState) => state.novel.maps,
+    (state: RootState) => state.novel.maps
   ],
   (modal, maps) => {
     if (!modal.opened) return undefined;
@@ -135,11 +135,11 @@ export const selectTotalTokenCount = createSelector(
     const scenesTokens: number[] = [];
 
     scenes.forEach((scene) => {
-      let totalSceneToken = 0;
+      const sceneCharactersTokens = scene.characters.map((char) =>
+        getTotalTokensByCharacterId(char.characterId)
+      );
 
-      scene.characters.forEach((char) => {
-        totalSceneToken += getTotalTokensByCharacterId(char.characterId);
-      });
+      let totalSceneToken = Math.max(0, ...sceneCharactersTokens);
 
       const startMessagesTokens = novel.starts
         .filter((start) => start.sceneId === scene.id)
@@ -151,12 +151,12 @@ export const selectTotalTokenCount = createSelector(
         );
 
       totalSceneToken +=
-        Math.max(...startMessagesTokens) +
+        Math.max(0, ...startMessagesTokens) +
         LLAMA_TOKENIZER.encodeString(scene.prompt).length;
 
       scenesTokens.push(totalSceneToken);
     });
 
-    return Math.max(...scenesTokens);
+    return Math.max(0, ...scenesTokens);
   }
 );
