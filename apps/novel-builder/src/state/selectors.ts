@@ -110,7 +110,13 @@ export const selectTotalTokenCount = createSelector(
     const { scenes, characters } = novel;
     const memoizedResults: { [key: string]: number } = {};
 
-    const getTotalTokensByCharacterId = (characterId: string) => {
+    const getTotalTokensByCharacter = (char: {
+      characterId: string;
+      outfit: string;
+      objective?: string;
+    }) => {
+      const characterId = char.characterId;
+
       if (memoizedResults[characterId] !== undefined) {
         return memoizedResults[characterId];
       }
@@ -119,13 +125,23 @@ export const selectTotalTokenCount = createSelector(
         (character) => character.id === characterId
       );
 
-      // TODO: Fix this
-      if (!character) return 0;
+      const characterOutfit =
+        character?.card.data.extensions.mikugg_v2.outfits.find(
+          (outfit) => outfit.id === char.outfit
+        );
+
+      const totalOutfitTokens = characterOutfit
+        ? LLAMA_TOKENIZER.encodeString(characterOutfit.description).length
+        : 0;
 
       const totalTokens =
-        LLAMA_TOKENIZER.encodeString(character.card.data.description).length +
-        LLAMA_TOKENIZER.encodeString(character.card.data.mes_example).length +
-        LLAMA_TOKENIZER.encodeString(character.card.data.personality).length;
+        (character
+          ? LLAMA_TOKENIZER.encodeString(character.card.data.description)
+              .length +
+            LLAMA_TOKENIZER.encodeString(character.card.data.mes_example)
+              .length +
+            LLAMA_TOKENIZER.encodeString(character.card.data.personality).length
+          : 0) + totalOutfitTokens;
 
       memoizedResults[characterId] = totalTokens;
 
@@ -135,9 +151,9 @@ export const selectTotalTokenCount = createSelector(
     const scenesTokens: number[] = [];
 
     scenes.forEach((scene) => {
-      const sceneCharactersTokens = scene.characters.map((char) =>
-        getTotalTokensByCharacterId(char.characterId)
-      );
+      const sceneCharactersTokens = scene.characters.map((char) => {
+        return getTotalTokensByCharacter(char);
+      });
 
       let totalSceneToken = Math.max(0, ...sceneCharactersTokens);
 
