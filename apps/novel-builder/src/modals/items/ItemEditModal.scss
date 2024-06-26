@@ -2,7 +2,8 @@
 
 .ItemEdit {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
 
   &__buttons {
     display: flex;
@@ -27,6 +28,93 @@
     &__closeModal {
       width: 1.5rem;
       height: 1.5rem;
+    }
+  }
+
+  &__form {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+
+    &__image {
+      display: flex;
+      position: relative;
+      width: fit-content;
+      height: fit-content;
+
+      .dragAndDropImages {
+        margin: 0;
+      }
+
+      &__loaderContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        border-radius: 16px;
+      }
+    }
+
+    &__text {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 16px;
+    }
+  }
+
+  &__actions {
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      & h3 {
+        margin: 0 0 0 10px;
+      }
+    }
+
+    &__container {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+      max-height: 450px;
+      overflow: auto;
+      padding-right: 8px;
+    }
+
+    &__action {
+      background-color: $background-1;
+      padding: 10px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+
+    &__remove {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+
+      &:hover {
+        color: $secondary-color;
+      }
     }
   }
 }

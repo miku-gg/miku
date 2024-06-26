@@ -28,12 +28,13 @@ const InventoryItems = ({
 
   const createItemBlocks = () => {
     if (!items) return [];
+
     return items.map((item) => ({
       id: `item-${item.id}`,
       tooltip: item.name,
       highlighted: selectedItemIds && selectedItemIds.includes(item.id),
       content: {
-        text: item.name,
+        text: !item.icon && item.name,
         image: item.icon && config.genAssetLink(item.icon),
       },
       onEditClick: () =>
