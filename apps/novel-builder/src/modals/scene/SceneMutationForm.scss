@@ -1,5 +1,24 @@
 @import "../../styles/variables.scss";
 
+.AddChildren {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+
+  &__childrenScenes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+.SuggestScene {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
 .scene {
   width: 15rem;
   height: 7rem;

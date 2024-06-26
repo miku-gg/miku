@@ -43,10 +43,13 @@ export const SceneMutationForm = () => {
               config: {
                 ...selectedMutation.config,
                 sceneId: condition.sceneId,
-                children: [
-                  ...selectedMutation.config.children,
-                  selectedSceneId,
-                ],
+                children: selectedMutation.config.children.includes(
+                  selectedSceneId
+                )
+                  ? selectedMutation.config.children.filter(
+                      (id) => id !== selectedSceneId
+                    )
+                  : [...selectedMutation.config.children, selectedSceneId],
               },
             },
           },
@@ -66,7 +69,10 @@ export const SceneMutationForm = () => {
               ...selectedMutation,
               config: {
                 ...selectedMutation.config,
-                sceneId: selectedSceneId,
+                sceneId:
+                  selectedSceneId === selectedMutation.config.sceneId
+                    ? ""
+                    : selectedSceneId,
               },
             },
           },
@@ -79,10 +85,12 @@ export const SceneMutationForm = () => {
   if (selectedMutation?.type === "SUGGEST_ADVANCE_SCENE") {
     const sceneData = getSceneData(selectedMutation.config.sceneId);
     return (
-      <div>
+      <div className="SuggestScene">
         {selectedMutation.config.sceneId && sceneData ? (
           <div className="scene">
-            <div className="scene__name">{sceneData.name}</div>
+            <div className="scene__header">
+              <p className="scene__header__name">{sceneData?.name}</p>
+            </div>
             <img
               className="scene__background"
               src={config.genAssetLink(
@@ -137,9 +145,9 @@ export const SceneMutationForm = () => {
       }
     };
     return (
-      <div>
-        {selectedMutation.config.children && sceneData ? (
-          <div>
+      <div className="AddChildren">
+        {selectedMutation.config.children.length > 0 ? (
+          <div className="AddChildren__childrenScenes">
             {sceneData.map((scene) => {
               return (
                 <div className="scene">
