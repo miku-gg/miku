@@ -16,6 +16,7 @@ const initialState: NovelV3.NovelState = {
   scenes: [],
   starts: [],
   lorebooks: [],
+  inventory: [],
 };
 
 const novelFormSlice = createSlice({
@@ -442,6 +443,34 @@ const novelFormSlice = createSlice({
         (condition) => condition.id !== action.payload.conditionId
       );
     },
+    createNewInventoryItem: (state, action: PayloadAction<{ itemId: string }>) => {
+      if (!state.inventory) state.inventory = [];
+      state.inventory.push({
+        id: action.payload.itemId,
+        name: "New Item",
+        description: "",
+        actions: [],
+        icon: "",
+        isPremium: false,
+        unlocked: true,
+      });
+    },
+    updateInventoryItem: (state, action: PayloadAction<NovelV3.NovelInventoryItem>) => {
+      if (!state.inventory) return;
+      const index = state.inventory.findIndex(
+        (item) => item.id === action.payload.id
+      );
+      if (index === -1) return;
+      state.inventory[index] = action.payload;
+    },
+    deleteInventoryItem: (state, action: PayloadAction<{ itemId: string }>) => {
+      if (!state.inventory) return;
+      const index = state.inventory.findIndex(
+        (item) => item.id === action.payload.itemId
+      );
+      if (index === -1) return;
+      state.inventory.splice(index, 1);
+    },
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;
     },
@@ -493,6 +522,9 @@ export const {
   createCondition,
   updateCondition,
   deleteCondition,
+  createNewInventoryItem,
+  updateInventoryItem,
+  deleteInventoryItem,
   loadCompleteState,
   updateDetails,
   clearNovelState,

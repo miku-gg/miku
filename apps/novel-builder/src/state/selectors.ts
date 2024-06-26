@@ -9,6 +9,14 @@ export const selectEditingBackground = createSelector(
     return backgrounds.find((background) => background.id === modal.editId);
   }
 );
+export const selectInventory = (state: RootState) => state.novel.inventory;
+export const selectEditingInventoryItem = createSelector(
+  [(state: RootState) => state.input.modals.editInventoryItem, selectInventory],
+  (modal, inventory) => {
+    if (!modal.opened) return undefined;
+    return inventory?.find((item) => item.id === modal.editId);
+  }
+);
 export const selectLorebooks = (state: RootState) => {
   return state.novel.lorebooks;
 };

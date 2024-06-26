@@ -14,6 +14,7 @@ export type ModalType =
   | "mapEdit"
   | "placeEdit"
   | "conditionEdit"
+  | "editInventoryItem"
   | "errors"
   | "scene";
 
@@ -51,6 +52,9 @@ const initialState: InputState = {
       opened: false,
     },
     conditionEdit: {
+      opened: false,
+    },
+    editInventoryItem: {
       opened: false,
     },
     lorebookEdit: {

@@ -11,6 +11,7 @@ import LorebookEditModal from "./modals/LorebookEditModal";
 import SongEditModal from "./modals/SongEditModal";
 import SongSearchModal from "./modals/SongSearchModal";
 import CharacterEditModal from "./modals/character/CharacterEditModal";
+import ItemEditModal from "./modals/items/ItemEditModal";
 import MapEditModal from "./modals/map/MapEditModal";
 import PlaceEditModal from "./modals/map/PlaceEditModal";
 import ConditionEditModal from "./modals/scene/ConditionEditModal";
@@ -52,6 +53,7 @@ ReactDOM.render(
         <MapEditModal />
         <PlaceEditModal />
         <ConditionEditModal />
+        <ItemEditModal />
       </AreYouSure.AreYouSureProvider>
       <ToastPortal />
     </Provider>
