@@ -140,7 +140,7 @@ export type StateMutation =
   | {
       type: "ADD_ITEM";
       config: {
-        item: InventoryItem;
+        item: NovelInventoryItem;
       };
     };
 

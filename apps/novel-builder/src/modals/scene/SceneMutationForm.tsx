@@ -1,8 +1,10 @@
+import { NovelInventoryItem } from "@mikugg/bot-utils/dist/lib/novel/NovelV3";
 import { Button } from "@mikugg/ui-kit";
 import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import config from "../../config";
+import InventoryItems from "../../panels/assets/inventory/InventoryItems";
 import { selectEditingCondition } from "../../state/selectors";
 import { updateCondition } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
@@ -14,6 +16,8 @@ export const SceneMutationForm = () => {
   const condition = useAppSelector(selectEditingCondition);
   const selectedMutation = condition?.mutationTrigger;
   const scenes = useAppSelector((state) => state.novel.scenes);
+  const items = useAppSelector((state) => state.novel.inventory);
+
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const [isSceneSelectorOpened, setIsSceneSelectorOpened] = useState(false);
 
@@ -188,7 +192,42 @@ export const SceneMutationForm = () => {
       </div>
     );
   } else if (selectedMutation?.type === "ADD_ITEM") {
-    return <div>item form</div>;
+    const getItems = (itemId: string) => {
+      if (!items) return [];
+      return items.filter((item) => item.id === itemId);
+    };
+
+    const handleSelectItem = (itemId: string) => {
+      if (!condition) return null;
+      dispatch(
+        updateCondition({
+          conditionId: condition.id,
+          sceneId: condition.sceneId,
+          condition: {
+            ...condition,
+            mutationTrigger: {
+              ...selectedMutation,
+              config: {
+                ...selectedMutation.config,
+                item:
+                  selectedMutation.config.item.id === itemId
+                    ? ({} as NovelInventoryItem)
+                    : getItems(itemId)[0],
+              },
+            },
+          },
+        })
+      );
+    };
+
+    return (
+      <InventoryItems
+        selectedItemIds={[selectedMutation.config.item.id]}
+        onSelect={(itemId) => {
+          handleSelectItem(itemId);
+        }}
+      />
+    );
   } else if (selectedMutation?.type === "REMOVE_ITEM") {
     return <div>remove item</div>;
   } else {

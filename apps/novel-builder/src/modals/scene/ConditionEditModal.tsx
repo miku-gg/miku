@@ -21,37 +21,6 @@ export default function ConditionEditModal() {
   const areYouSure = AreYouSure.useAreYouSure();
   const condition = useAppSelector(selectEditingCondition);
 
-  // const handleUploadMapImage = async (file: File) => {
-  //   if (file && map) {
-  //     try {
-  //       const asset = await config.uploadAsset(file);
-  //       dispatch(
-  //         updateMapImage({
-  //           mapId: map.id,
-  //           source: { ...map!.source, png: asset.assetId },
-  //         })
-  //       );
-  //     } catch (e) {
-  //       toast.error("Error uploading the image");
-  //       console.error(e);
-  //     }
-  //   }
-  // };
-  // const stateMutationButtons = [
-  //   {
-  //     content: "Add children",
-  //     value: "ADD_CHILDREN",
-  //   },
-  //   {
-  //     content: "Remove item",
-  //     value: "REMOVE_ITEM",
-  //   },
-  //   {
-  //     content: "Suggest advance scene",
-  //     value: "SUGGEST_ADVANCE_SCENE",
-  //   },
-  // ];
-
   const handleDeleteCondition = (id: string) => {
     if (!condition) return;
     areYouSure.openModal({
