@@ -156,6 +156,7 @@ export interface InventoryAction {
   prompt: string;
 
   // only for novel-specific items
+  id?: string;
   usageCondition?: StateCondition;
   usageMutations?: StateMutation[];
 }
@@ -214,6 +215,11 @@ export interface NovelLorebook extends CharacterBook {
   isGlobal: boolean;
 }
 
+export interface NovelInventoryItem extends InventoryItem {
+  unlocked: boolean;
+  unlockConditionId?: string;
+}
+
 export interface NovelState {
   title: string;
   description: string;
@@ -228,4 +234,5 @@ export interface NovelState {
   starts: NovelStart[];
   objectives?: NovelObjective[];
   lorebooks?: NovelLorebook[];
+  inventory?: NovelInventoryItem[];
 }
