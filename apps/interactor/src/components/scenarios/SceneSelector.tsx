@@ -1,22 +1,29 @@
-import EmotionRenderer from '../emotion-render/EmotionRenderer'
+import { useState } from 'react'
 import { BiCameraMovie } from 'react-icons/bi'
-import { useAppDispatch, useAppSelector } from '../../state/store'
-import { selectAvailableScenes } from '../../state/selectors'
+import { BsStars } from 'react-icons/bs'
+import { toast } from 'react-toastify'
 import { useAppContext } from '../../App.context'
+import { trackEvent } from '../../libs/analytics'
+import { selectAvailableScenes } from '../../state/selectors'
+import { setModalOpened } from '../../state/slices/creationSlice'
 import { interactionStart } from '../../state/slices/narrationSlice'
+import { userDataFetchStart } from '../../state/slices/settingsSlice'
+import { useAppDispatch, useAppSelector } from '../../state/store'
+import EmotionRenderer from '../emotion-render/EmotionRenderer'
+import CreateScene from './CreateScene'
+import { SceneChangeModal } from './SceneChangeModal'
 import './SceneSelector.scss'
 import SlidePanel from './SlidePanel'
-import CreateScene from './CreateScene'
-import { setModalOpened } from '../../state/slices/creationSlice'
-import { toast } from 'react-toastify'
-import { BsStars } from 'react-icons/bs'
-import { trackEvent } from '../../libs/analytics'
-import { userDataFetchStart } from '../../state/slices/settingsSlice'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
   const backgrounds = useAppSelector((state) => state.novel.backgrounds)
   const scenes = useAppSelector(selectAvailableScenes)
+  const [currentNextScene, setCurrentNextScene] = useState<{
+    id: string
+    prompt: string
+    name: string
+  } | null>(null)
   const {
     apiEndpoint,
     assetLinkLoader,
@@ -85,6 +92,17 @@ export default function SceneSelector(): JSX.Element | null {
           dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
         }}
       >
+        <SceneChangeModal
+          isModalOpen={!!currentNextScene}
+          onConfirm={() => {
+            currentNextScene &&
+              handleItemClick(currentNextScene.id, currentNextScene.prompt)
+          }}
+          nextSceneId={currentNextScene?.id || ''}
+          onCloseModal={() => {
+            setCurrentNextScene(null)
+          }}
+        />
         <div className="SceneSelector__list-container">
           <h2>{createSceneOpened ? 'Create Scene' : 'Change Scene'}</h2>
           {createSceneOpened ? (
@@ -96,7 +114,9 @@ export default function SceneSelector(): JSX.Element | null {
                   <button
                     className="SceneSelector__item"
                     key={`scene-selector-${scene.id}-${index}`}
-                    onClick={handleItemClick.bind(null, scene.id, scene.prompt)}
+                    onClick={() => {
+                      setCurrentNextScene(scene)
+                    }}
                   >
                     <div
                       className="SceneSelector__item-background"
