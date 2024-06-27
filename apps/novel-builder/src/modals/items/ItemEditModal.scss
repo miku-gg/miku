@@ -83,7 +83,7 @@
       gap: 10px;
 
       & h3 {
-        margin: 0 0 0 10px;
+        margin: 0;
       }
     }
 
@@ -114,6 +114,18 @@
 
       &:hover {
         color: $secondary-color;
+      }
+    }
+  }
+
+  &__scenes {
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      & h3 {
+        margin: 0;
       }
     }
   }

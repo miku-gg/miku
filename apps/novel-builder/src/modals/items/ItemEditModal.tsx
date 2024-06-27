@@ -1,6 +1,7 @@
 import {
   AreYouSure,
   Button,
+  CheckBox,
   DragAndDropImages,
   Input,
   Loader,
@@ -24,6 +25,7 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import config from "../../config";
+import { checkFileType } from "../../libs/utils";
 import "./ItemEditModal.scss";
 
 export default function ItemEditModal() {
@@ -31,6 +33,16 @@ export default function ItemEditModal() {
   const areYouSure = AreYouSure.useAreYouSure();
   const item = useAppSelector(selectEditingInventoryItem);
   const [isUploading, setIsUploading] = useState(false);
+  const scenes = useAppSelector((state) => state.novel.scenes);
+  const scenesConditions = scenes.map((scene) => scene.sceneConditions).flat();
+
+  const getSceneData = (sceneId: string) => {
+    return scenes.find((scene) => scene.id === sceneId);
+  };
+
+  const getConditionData = (conditionId: string) => {
+    return scenesConditions.find((condition) => condition?.id === conditionId);
+  };
 
   const handleUploadImage = async (file: File) => {
     if (file && item) {
@@ -51,6 +63,7 @@ export default function ItemEditModal() {
       }
     }
   };
+  console.log("item", item);
 
   const handleRemoveAction = (id: string) => {
     if (!item) return;
@@ -126,7 +139,18 @@ export default function ItemEditModal() {
               <DragAndDropImages
                 handleChange={(file) => handleUploadImage(file)}
                 previewImage={item.icon && config.genAssetLink(item.icon)}
-                placeHolder="Upload an Icon for the Item"
+                placeHolder="Icon for the item (512x512)"
+                onFileValidate={async (file) => {
+                  if (file.size > 2 * 512 * 512) {
+                    toast.error("File size should be less than 1MB");
+                    return false;
+                  }
+                  if (!checkFileType(file, ["image/png", "image/jpeg"])) {
+                    toast.error("Invalid file type. Please upload a jpg file.");
+                    return false;
+                  }
+                  return true;
+                }}
               />
             </div>
             <div className="ItemEdit__form__text">
@@ -142,6 +166,52 @@ export default function ItemEditModal() {
                 placeHolder="A beautiful rose"
               />
             </div>
+          </div>
+          <div className="ItemEdit__scenes">
+            <div className="ItemEdit__scenes__title">
+              <h3>Item Visibility</h3>
+              <Tooltip id="Info-Visibility" place="top" />
+              <IoInformationCircleOutline
+                data-tooltip-id="Info-Visibility"
+                data-tooltip-content="Unlocked for the whole novel or locked for specific scenes or unlocked by scene condition."
+              />
+            </div>
+            <CheckBox
+              label="Unlocked"
+              value={item.visibility?.unlocked}
+              onChange={(e) => {
+                dispatch(
+                  updateInventoryItem({
+                    ...item,
+                    visibility: {
+                      ...item.visibility,
+                      unlocked: e.target.checked,
+                    },
+                  })
+                );
+              }}
+            />
+            {item.visibility?.onlyInSceneIds &&
+              item.visibility?.onlyInSceneIds.length > 0 && (
+                <div className="ItemEdit__scenes__container">
+                  {item.visibility.onlyInSceneIds.map((sceneId) => {
+                    const scene = getSceneData(sceneId);
+                    return (
+                      <div
+                        key={`scene-${sceneId}`}
+                        className="ItemEdit__scenes__scene"
+                      >
+                        {scene?.name}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            {item.visibility?.unlockConditionId && (
+              <div>
+                {getConditionData(item.visibility.unlockConditionId)?.name}
+              </div>
+            )}
           </div>
           <div className="ItemEdit__actions">
             <div className="ItemEdit__actions__header">

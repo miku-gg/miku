@@ -41,6 +41,7 @@ export interface NovelScene {
   nsfw: NovelNSFW;
   lorebookIds?: string[];
   sceneConditions?: SceneCondition[];
+  sceneExclusiveItemIds?: string[];
 }
 
 export interface NovelCharacterOutfit {
@@ -216,8 +217,13 @@ export interface NovelLorebook extends CharacterBook {
 }
 
 export interface NovelInventoryItem extends InventoryItem {
-  unlocked: boolean;
-  unlockConditionId?: string;
+  // unlocked: boolean;
+  // unlockConditionId?: string;
+  visibility?: {
+    unlocked: boolean;
+    unlockConditionId?: string;
+    onlyInSceneIds?: string[];
+  }
 }
 
 export interface NovelState {

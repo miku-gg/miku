@@ -6,7 +6,10 @@ import { useDispatch } from "react-redux";
 import config from "../../config";
 import InventoryItems from "../../panels/assets/inventory/InventoryItems";
 import { selectEditingCondition } from "../../state/selectors";
-import { updateCondition } from "../../state/slices/novelFormSlice";
+import {
+  updateCondition,
+  updateInventoryItem,
+} from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 import "./SceneMutationForm.scss";
 import SceneSelector from "./SceneSelector";
@@ -198,7 +201,25 @@ export const SceneMutationForm = () => {
     };
 
     const handleSelectItem = (itemId: string) => {
+      const item = getItems(itemId)[0];
       if (!condition) return null;
+      dispatch(
+        updateInventoryItem({
+          ...item,
+          visibility: {
+            ...item.visibility,
+            unlocked:
+              item.visibility?.unlockConditionId ||
+              item.visibility?.onlyInSceneIds
+                ? false
+                : true,
+            unlockConditionId:
+              item.visibility?.unlockConditionId === condition.id
+                ? ""
+                : condition.id,
+          },
+        })
+      );
       dispatch(
         updateCondition({
           conditionId: condition.id,
@@ -212,7 +233,7 @@ export const SceneMutationForm = () => {
                 item:
                   selectedMutation.config.item.id === itemId
                     ? ({} as NovelInventoryItem)
-                    : getItems(itemId)[0],
+                    : item,
               },
             },
           },
@@ -222,6 +243,7 @@ export const SceneMutationForm = () => {
 
     return (
       <InventoryItems
+        tooltipText="Select the item that will unlock this condition."
         selectedItemIds={[selectedMutation.config.item.id]}
         onSelect={(itemId) => {
           handleSelectItem(itemId);

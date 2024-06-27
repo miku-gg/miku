@@ -13,9 +13,11 @@ import "./InventoryItems.scss"; // Import the SCSS file
 const InventoryItems = ({
   selectedItemIds,
   onSelect,
+  tooltipText,
 }: {
   selectedItemIds?: string[];
   onSelect?: (id: string) => void;
+  tooltipText?: string;
 }) => {
   const dispatch = useDispatch();
   const items = useAppSelector((state) => state.novel.inventory);
@@ -56,7 +58,11 @@ const InventoryItems = ({
         <Tooltip id="Info-Items" place="top" />
         <IoInformationCircleOutline
           data-tooltip-id="Info-Items"
-          data-tooltip-content="[Optional] Custom novel items that can be used only in this novel."
+          data-tooltip-content={
+            tooltipText
+              ? tooltipText
+              : "[Optional] Custom novel items that can be used only in this novel."
+          }
         />
       </div>
       <div className="InventoryItems__list">

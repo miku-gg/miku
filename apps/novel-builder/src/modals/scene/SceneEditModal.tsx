@@ -14,6 +14,7 @@ import { FaUser } from "react-icons/fa6";
 import config from "../../config";
 import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
 import Characters from "../../panels/assets/characters/Characters";
+import InventoryItems from "../../panels/assets/inventory/InventoryItems";
 import Songs from "../../panels/assets/songs/Songs";
 import { LorebookList } from "../../panels/details/LorebookList";
 import { MapList } from "../../panels/maps/MapList";
@@ -21,11 +22,12 @@ import { selectBackgrounds, selectEditingScene } from "../../state/selectors";
 import { closeModal } from "../../state/slices/inputSlice";
 import {
   deleteSceneById,
+  updateInventoryItem,
   updateScene,
 } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
-import "./SceneEditModal.scss";
 import { SceneConditions } from "./SceneConditions";
+import "./SceneEditModal.scss";
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -34,6 +36,7 @@ export default function SceneEditModal() {
   const maps = useAppSelector((state) => state.novel.maps);
   const backgrounds = useAppSelector(selectBackgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
+  const items = useAppSelector((state) => state.novel.inventory);
   const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] =
     useState(false);
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
@@ -54,6 +57,40 @@ export default function SceneEditModal() {
         },
       });
     }
+  };
+
+  const handleSelectItems = (itemId: string) => {
+    if (!scene) return;
+    const item = items?.find((item) => item.id === itemId);
+    if (!item) return;
+    const { visibility } = item;
+    const hasItemSceneLock = visibility?.onlyInSceneIds?.includes(scene.id)
+      ? true
+      : false;
+    const isUnlocked = visibility?.unlockConditionId || visibility?.onlyInSceneIds ? false : true;
+    dispatch(
+      updateInventoryItem({
+        ...item,
+        id: itemId,
+        visibility: {
+          ...visibility,
+          unlocked: isUnlocked,
+          onlyInSceneIds: hasItemSceneLock
+            ? visibility?.onlyInSceneIds?.filter((id) => id !== scene.id)
+            : [...(visibility?.onlyInSceneIds || []), scene.id],
+        },
+      })
+    );
+    dispatch(
+      updateScene({
+        ...scene._source,
+        sceneExclusiveItemIds: scene._source.sceneExclusiveItemIds?.includes(
+          itemId
+        )
+          ? scene._source.sceneExclusiveItemIds.filter((iid) => iid !== itemId)
+          : [...(scene._source.sceneExclusiveItemIds || []), itemId],
+      })
+    );
   };
 
   const handleLorebookSelect = (id: string) => {
@@ -418,6 +455,17 @@ export default function SceneEditModal() {
                   );
                 })}
               </div>
+            </div>
+            <div className="SceneEditModal__scene-items">
+              {items ? (
+                <InventoryItems
+                  tooltipText="Select items that can be used only in this scene."
+                  selectedItemIds={scene?.sceneExclusiveItemIds || []}
+                  onSelect={(id) => {
+                    handleSelectItems(id);
+                  }}
+                />
+              ) : null}
             </div>
             <div className="SceneEditModal__scene-maps">
               {maps ? (

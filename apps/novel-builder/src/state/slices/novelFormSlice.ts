@@ -452,7 +452,11 @@ const novelFormSlice = createSlice({
         actions: [],
         icon: "",
         isPremium: false,
-        unlocked: true,
+        visibility: {
+          unlocked: true,
+          onlyInSceneIds: [],
+          unlockConditionId: "",
+        },
       });
     },
     updateInventoryItem: (state, action: PayloadAction<NovelV3.NovelInventoryItem>) => {
