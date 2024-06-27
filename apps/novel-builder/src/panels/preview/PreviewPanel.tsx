@@ -76,7 +76,7 @@ export default function PreviewPanel() {
     try {
       await downloadNovelState(
         cloneDeep(novel),
-        exportFor === "miku" ? config.genAssetLink : false,
+        exportFor === "local" ? config.genAssetLink : false,
         (text: string) => {
           dispatch(
             openModal({
@@ -85,8 +85,8 @@ export default function PreviewPanel() {
             })
           );
         },
-        exportFor === "miku"
-      );
+        exportFor === "local"
+      );      
     } catch (e) {
       console.error(e);
       toast.error(`Failed to ${exportFor === "miku" ? "build" : "save"} novel`);
@@ -149,15 +149,14 @@ export default function PreviewPanel() {
           onCloseModal={() => setIsModalOpen(false)}
         >
           <div className="PreviewPanel__modal-content">
-            <h2>Choose Your Building Method</h2>
-            <p>Select how you'd like to export your project:</p>
+            <h2 className="PreviewPanel__modal-title">Build project</h2>
             <ul className="PreviewPanel__options">
               <li className="PreviewPanel__option">
-                <strong>Export for Miku.gg:</strong>
+                <p className="PreviewPanel__option-title">Export for Miku.gg</p>
                 <p className="PreviewPanel__option-description">Saves your project as a .json file without assets. Ideal for sharing or uploading to Miku.gg.</p>
               </li>
               <li className="PreviewPanel__option">
-                <strong>Export for Local Use:</strong>
+                <p className="PreviewPanel__option-title">Export for Local Use</p>
                 <p className="PreviewPanel__option-description">Saves your project as a .json file with all associated assets included. Perfect for offline use or complete backups.</p>
               </li>
             </ul>
