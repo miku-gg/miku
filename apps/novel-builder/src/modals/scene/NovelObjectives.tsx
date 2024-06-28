@@ -35,7 +35,7 @@ export const NovelObjectives = () => {
       {objectives ? (
         <div className="MapList__container">
           {objectives.map((objective) => {
-            const { id, name, description, action } = objective;
+            const { id, name, description, actions } = objective;
             return (
               <div key={id} className="MapList__container__box">
                 <div className="MapList__container__map">
@@ -51,7 +51,7 @@ export const NovelObjectives = () => {
                   />
                   <h3>{name}</h3>
                   <p>{description}</p>
-                  <p>Reward: {action.type}</p>
+                  <p>Actions: {actions.length}</p>
                 </div>
               </div>
             );

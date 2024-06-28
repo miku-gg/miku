@@ -1,4 +1,4 @@
-import { AreYouSure, Input, Modal } from "@mikugg/ui-kit";
+import { AreYouSure, Button, Input, Modal } from "@mikugg/ui-kit";
 
 import { useDispatch } from "react-redux";
 import { selectEditingObjective } from "../../state/selectors";
@@ -9,15 +9,11 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
-import {
-  NovelObjectiveAction,
-  NovelObjectiveActionType,
-} from "@mikugg/bot-utils/dist/lib/novel/NovelV3";
 import { FaTrashAlt } from "react-icons/fa";
 import { IoIosCloseCircleOutline } from "react-icons/io";
-import ButtonGroup from "../../components/ButtonGroup";
 import "./ObjectiveEditModal.scss";
-import { ObjectiveMutationForm } from "./ObjectiveMutationForm";
+import NovelActionForm from "./NovelActionForm";
+import { NovelV3 } from "@mikugg/bot-utils";
 
 export default function ObjectiveEditModal() {
   const dispatch = useDispatch();
@@ -34,33 +30,6 @@ export default function ObjectiveEditModal() {
         dispatch(deleteObjective({ id: objective.id }));
       },
     });
-  };
-
-  const getMutationTrigger = (value: string) => {
-    switch (value) {
-      case "ADD_CHILDREN":
-        return {
-          type: NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE,
-          params: {
-            sceneId: "",
-          },
-        } as NovelObjectiveAction;
-
-      case "SUGGEST_ADVANCE_SCENE":
-        return {
-          type: NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE,
-          params: {
-            sceneId: "",
-          },
-        } as NovelObjectiveAction;
-      default:
-        return {
-          type: NovelObjectiveActionType.ITEM_RECEIVE,
-          params: {
-            item: {},
-          },
-        } as NovelObjectiveAction;
-    }
   };
 
   return (
@@ -140,43 +109,67 @@ export default function ObjectiveEditModal() {
                 }}
               />
             </div>
-            <div className="ObjectiveEdit__content__mutation">
-              <h3>Condition mutation</h3>
-              <ButtonGroup
-                buttons={[
-                  {
-                    content: "Add children scene",
-                    value: "ADD_CHILDREN",
-                  },
-
-                  {
-                    content: "Suggest advance scene",
-                    value: "SUGGEST_ADVANCE_SCENE",
-                  },
-                  {
-                    content: "Add item",
-                    value: "ADD_ITEM",
-                  },
-                  {
-                    content: "Remove item",
-                    value: "REMOVE_ITEM",
-                  },
-                ]}
-                selected={objective.action.type}
-                onButtonClick={(value) => {
-                  dispatch(
-                    updateObjective({
-                      id: objective.id,
-                      objective: {
-                        ...objective,
-                        action: getMutationTrigger(value),
-                      },
-                    })
-                  );
-                }}
-              />
-              <ObjectiveMutationForm />
-            </div>
+            <h3>Condition actions</h3>
+            <Button
+              theme="secondary"
+              onClick={() => {
+                dispatch(
+                  updateObjective({
+                    id: objective.id,
+                    objective: {
+                      ...objective,
+                      actions: [
+                        ...(objective.actions || []),
+                        {
+                          type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
+                          params: {
+                            sceneId: "",
+                          },
+                        },
+                      ],
+                    },
+                  })
+                );
+              }}
+            >
+              Add action
+            </Button>
+            {objective.actions.map((action, index) => {
+              return (
+                <NovelActionForm
+                  action={action}
+                  onChange={(novelAction) => {
+                    dispatch(
+                      updateObjective({
+                        id: objective.id,
+                        objective: {
+                          ...objective,
+                          actions: [
+                            ...objective.actions.slice(0, index),
+                            novelAction,
+                            ...objective.actions.slice(index + 1),
+                          ],
+                        },
+                      })
+                    );
+                  }}
+                  onDelete={() => {
+                    dispatch(
+                      updateObjective({
+                        id: objective.id,
+                        objective: {
+                          ...objective,
+                          actions: [
+                            ...objective.actions.slice(0, index),
+                            ...objective.actions.slice(index + 1),
+                          ],
+                        },
+                      })
+                    );
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
       ) : null}

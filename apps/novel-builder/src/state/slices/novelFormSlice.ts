@@ -390,7 +390,7 @@ const novelFormSlice = createSlice({
         (place) => place.id !== action.payload.placeId
       );
     },
-   
+
     createNewInventoryItem: (
       state,
       action: PayloadAction<{ itemId: string }>
@@ -403,16 +403,13 @@ const novelFormSlice = createSlice({
         actions: [],
         icon: "",
         isPremium: false,
-        visibility: {
-          unlocked: true,
-          onlyInSceneIds: [],
-          unlockConditionId: "",
-        },
+        isNovelOnly: true,
+        hidden: false,
       });
     },
     updateInventoryItem: (
       state,
-      action: PayloadAction<NovelV3.NovelInventoryItem>
+      action: PayloadAction<NovelV3.InventoryItem>
     ) => {
       if (!state.inventory) return;
       const index = state.inventory.findIndex(
@@ -430,15 +427,20 @@ const novelFormSlice = createSlice({
       state.inventory.splice(index, 1);
     },
     createObjective: (state, action: PayloadAction<{ id: string }>) => {
-      state.objectives?.push({
+      state.objectives = state.objectives || [];
+      state.objectives.push({
         id: action.payload.id,
         name: "New Objective",
         description: "",
-        sceneIds: [],
-        condition: "",
-        action: {
-          type: NovelV3.NovelObjectiveActionType.SUGGEST_CREATE_SCENE,
+        singleUse: true,
+        stateCondition: {
+          type: "IN_SCENE",
+          config: {
+            sceneIds: [],
+          },
         },
+        condition: "",
+        actions: [],
       });
     },
     updateObjective: (

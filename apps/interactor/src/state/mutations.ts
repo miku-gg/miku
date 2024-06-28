@@ -1,19 +1,29 @@
 import { NovelV3 } from '@mikugg/bot-utils'
 import { addChildrenScenes } from './slices/novelSlice'
-import { removeItem } from './slices/inventorySlice'
+import { toggleItemVisibility } from './slices/inventorySlice'
 import { setNextSceneToCurrentResponse } from './slices/narrationSlice'
 import { Action } from '@reduxjs/toolkit'
 
-export const mutationToAction = (mutation: NovelV3.StateMutation): Action => {
-  switch (mutation.type) {
-    case 'ADD_CHILDREN':
+export const novelActionToStateAction = (
+  action: NovelV3.NovelAction
+): Action | undefined => {
+  switch (action.type) {
+    case NovelV3.NovelActionType.ADD_CHILD_SCENES:
       return addChildrenScenes({
-        parentId: mutation.config.sceneId,
-        childIds: mutation.config.children,
+        parentId: action.params.sceneId,
+        childIds: action.params.children,
       })
-    case 'REMOVE_ITEM':
-      return removeItem(mutation.config.itemId)
-    case 'SUGGEST_ADVANCE_SCENE':
-      return setNextSceneToCurrentResponse(mutation.config.sceneId)
+    case NovelV3.NovelActionType.HIDE_ITEM:
+      return toggleItemVisibility({
+        itemId: action.params.itemId,
+        hidden: true,
+      })
+    case NovelV3.NovelActionType.SHOW_ITEM:
+      return toggleItemVisibility({
+        itemId: action.params.itemId,
+        hidden: false,
+      })
+    case NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE:
+      return setNextSceneToCurrentResponse(action.params.sceneId)
   }
 }

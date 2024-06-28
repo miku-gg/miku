@@ -162,20 +162,17 @@ export default function ItemEditModal() {
               <Tooltip id="Info-Visibility" place="top" />
               <IoInformationCircleOutline
                 data-tooltip-id="Info-Visibility"
-                data-tooltip-content="Unlocked for the whole novel or locked for specific scenes or unlocked by scene condition."
+                data-tooltip-content="Hidden for the whole novel until a condition adds it."
               />
             </div>
             <CheckBox
-              label="Unlocked"
-              value={item.visibility?.unlocked}
+              label="Hidden"
+              value={item.hidden}
               onChange={(e) => {
                 dispatch(
                   updateInventoryItem({
                     ...item,
-                    visibility: {
-                      ...item.visibility,
-                      unlocked: e.target.checked,
-                    },
+                    hidden: !!e.target.checked,
                   })
                 );
               }}

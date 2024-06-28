@@ -42,9 +42,20 @@ const inventorySlice = createSlice({
     addItem: (state, action: PayloadAction<NovelV3.InventoryItem>) => {
       state.items.push(action.payload)
     },
-    removeItem: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter((item) => item.id !== action.payload)
-      if (state.selectedItem?.id === action.payload) {
+    toggleItemVisibility: (
+      state,
+      action: PayloadAction<{
+        itemId: string
+        hidden: boolean
+      }>
+    ) => {
+      state.items = state.items.map((item) => {
+        if (item.id === action.payload.itemId) {
+          item.hidden = action.payload.hidden
+        }
+        return item
+      })
+      if (state.selectedItem?.id === action.payload.itemId) {
         state.selectedItem = null
       }
     },
@@ -63,7 +74,7 @@ export const {
   setItemModalVisibility,
   setSelectedItem,
   addItem,
-  removeItem,
+  toggleItemVisibility,
 } = inventorySlice.actions
 
 export default inventorySlice.reducer

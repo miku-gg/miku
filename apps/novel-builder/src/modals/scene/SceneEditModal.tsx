@@ -36,7 +36,6 @@ export default function SceneEditModal() {
   const maps = useAppSelector((state) => state.novel.maps);
   const backgrounds = useAppSelector(selectBackgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
-  const items = useAppSelector((state) => state.novel.inventory);
   const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] =
     useState(false);
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
@@ -46,9 +45,6 @@ export default function SceneEditModal() {
   });
   const [showingEmotionChar1, setShowingEmotionChar1] = useState("neutral");
   const [showingEmotionChar2, setShowingEmotionChar2] = useState("neutral");
-  const itemIdsByScene = items?.filter((item) =>
-    item.visibility?.onlyInSceneIds?.includes(scene?.id || "")
-  );
 
   const handleDeleteScene = () => {
     if (scene) {
@@ -60,33 +56,6 @@ export default function SceneEditModal() {
         },
       });
     }
-  };
-
-  const handleSelectItems = (itemId: string) => {
-    if (!scene) return;
-    const item = items?.find((item) => item.id === itemId);
-    if (!item) return;
-    const { visibility } = item;
-    const hasItemSceneLock = visibility?.onlyInSceneIds?.includes(scene.id)
-      ? true
-      : false;
-    const isUnlocked =
-      visibility?.unlockConditionId || visibility?.onlyInSceneIds
-        ? false
-        : true;
-    dispatch(
-      updateInventoryItem({
-        ...item,
-        id: itemId,
-        visibility: {
-          ...visibility,
-          unlocked: isUnlocked,
-          onlyInSceneIds: hasItemSceneLock
-            ? visibility?.onlyInSceneIds?.filter((id) => id !== scene.id)
-            : [...(visibility?.onlyInSceneIds || []), scene.id],
-        },
-      })
-    );
   };
 
   const handleLorebookSelect = (id: string) => {
@@ -451,21 +420,6 @@ export default function SceneEditModal() {
                   );
                 })}
               </div>
-            </div>
-            <div className="SceneEditModal__scene-items">
-              {items ? (
-                <InventoryItems
-                  tooltipText="Select items that can be used only in this scene."
-                  selectedItemIds={
-                    itemIdsByScene?.map((item) => {
-                      return item.id;
-                    }) || []
-                  }
-                  onSelect={(id) => {
-                    handleSelectItems(id);
-                  }}
-                />
-              ) : null}
             </div>
             <div className="SceneEditModal__scene-maps">
               {maps ? (
