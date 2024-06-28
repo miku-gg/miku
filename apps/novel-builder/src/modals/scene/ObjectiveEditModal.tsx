@@ -1,4 +1,4 @@
-import { AreYouSure, Button, Input, Modal } from "@mikugg/ui-kit";
+import { AreYouSure, Button, Input, Modal, Tooltip } from "@mikugg/ui-kit";
 
 import { useDispatch } from "react-redux";
 import { selectEditingObjective } from "../../state/selectors";
@@ -9,11 +9,12 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
+import { NovelV3 } from "@mikugg/bot-utils";
 import { FaTrashAlt } from "react-icons/fa";
 import { IoIosCloseCircleOutline } from "react-icons/io";
-import "./ObjectiveEditModal.scss";
+import { IoInformationCircleOutline } from "react-icons/io5";
 import NovelActionForm from "./NovelActionForm";
-import { NovelV3 } from "@mikugg/bot-utils";
+import "./ObjectiveEditModal.scss";
 
 export default function ObjectiveEditModal() {
   const dispatch = useDispatch();
@@ -37,7 +38,6 @@ export default function ObjectiveEditModal() {
       opened={!!objective}
       shouldCloseOnOverlayClick
       className="ObjectiveEditModal"
-      title="Edit condition"
       onCloseModal={() => dispatch(closeModal({ modalType: "objectiveEdit" }))}
     >
       {objective ? (
@@ -109,67 +109,87 @@ export default function ObjectiveEditModal() {
                 }}
               />
             </div>
-            <h3>Condition actions</h3>
-            <Button
-              theme="secondary"
-              onClick={() => {
-                dispatch(
-                  updateObjective({
-                    id: objective.id,
-                    objective: {
-                      ...objective,
-                      actions: [
-                        ...(objective.actions || []),
-                        {
-                          type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
-                          params: {
-                            sceneId: "",
+            <div className="ObjectiveEdit__content__actions">
+              <div className="ObjectiveEdit__header">
+                <div className="ObjectiveEdit__header__title">
+                  <h3>Condition actions</h3>
+                  <IoInformationCircleOutline
+                    data-tooltip-id="Info-actions"
+                    className="ObjectiveEdit__header__title__infoIcon"
+                    data-tooltip-content={""}
+                  />
+
+                  <Tooltip id="Info-actions" place="top" />
+                </div>
+                {objective.actions.length < 1 && (
+                  <Button
+                    theme="secondary"
+                    onClick={() => {
+                      dispatch(
+                        updateObjective({
+                          id: objective.id,
+                          objective: {
+                            ...objective,
+                            actions: [
+                              ...(objective.actions || []),
+                              {
+                                type: NovelV3.NovelActionType
+                                  .SUGGEST_ADVANCE_SCENE,
+                                params: {
+                                  sceneId: "",
+                                },
+                              },
+                            ],
                           },
-                        },
-                      ],
-                    },
-                  })
-                );
-              }}
-            >
-              Add action
-            </Button>
-            {objective.actions.map((action, index) => {
-              return (
-                <NovelActionForm
-                  action={action}
-                  onChange={(novelAction) => {
-                    dispatch(
-                      updateObjective({
-                        id: objective.id,
-                        objective: {
-                          ...objective,
-                          actions: [
-                            ...objective.actions.slice(0, index),
-                            novelAction,
-                            ...objective.actions.slice(index + 1),
-                          ],
-                        },
-                      })
+                        })
+                      );
+                    }}
+                  >
+                    Add action
+                  </Button>
+                )}
+              </div>
+              {objective.actions.length > 0 && (
+                <div className="">
+                  {objective.actions.map((action, index) => {
+                    return (
+                      <NovelActionForm
+                        action={action}
+                        onChange={(novelAction) => {
+                          dispatch(
+                            updateObjective({
+                              id: objective.id,
+                              objective: {
+                                ...objective,
+                                actions: [
+                                  ...objective.actions.slice(0, index),
+                                  novelAction,
+                                  ...objective.actions.slice(index + 1),
+                                ],
+                              },
+                            })
+                          );
+                        }}
+                        onDelete={() => {
+                          dispatch(
+                            updateObjective({
+                              id: objective.id,
+                              objective: {
+                                ...objective,
+                                actions: [
+                                  ...objective.actions.slice(0, index),
+                                  ...objective.actions.slice(index + 1),
+                                ],
+                              },
+                            })
+                          );
+                        }}
+                      />
                     );
-                  }}
-                  onDelete={() => {
-                    dispatch(
-                      updateObjective({
-                        id: objective.id,
-                        objective: {
-                          ...objective,
-                          actions: [
-                            ...objective.actions.slice(0, index),
-                            ...objective.actions.slice(index + 1),
-                          ],
-                        },
-                      })
-                    );
-                  }}
-                />
-              );
-            })}
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ) : null}

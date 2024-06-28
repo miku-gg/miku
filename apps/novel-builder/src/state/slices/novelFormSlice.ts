@@ -431,7 +431,7 @@ const novelFormSlice = createSlice({
       state.objectives.push({
         id: action.payload.id,
         name: "New Objective",
-        description: "",
+        description: "Objective description",
         singleUse: true,
         stateCondition: {
           type: "IN_SCENE",

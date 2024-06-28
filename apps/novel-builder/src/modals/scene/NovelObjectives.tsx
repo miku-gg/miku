@@ -1,12 +1,24 @@
-import { Button } from "@mikugg/ui-kit";
+import { Button, Tooltip } from "@mikugg/ui-kit";
+import { FaCheckCircle } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
+import { IoInformationCircleOutline } from "react-icons/io5";
 import { v4 as randomUUID } from "uuid";
 import { openModal } from "../../state/slices/inputSlice";
 import { createObjective } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import "./NovelObjectives.scss";
 
-export const NovelObjectives = () => {
+interface NovelObjectiveProps {
+  selectedObjectiveIds?: string[];
+  onSelectObjective?: (id: string) => void;
+  tooltipText?: string;
+}
+
+export const NovelObjectives = ({
+  selectedObjectiveIds,
+  onSelectObjective,
+  tooltipText,
+}: NovelObjectiveProps) => {
   const dispatch = useAppDispatch();
   const objectives = useAppSelector((state) => state.novel.objectives);
 
@@ -15,12 +27,23 @@ export const NovelObjectives = () => {
     dispatch(createObjective({ id: id }));
     dispatch(openModal({ modalType: "objectiveEdit", editId: id }));
   };
-
+  const isSelected = (id: string) => {
+    if (!selectedObjectiveIds) return false;
+    return selectedObjectiveIds.includes(id);
+  };
   return (
-    <div className="MapList_">
-      <div className="MapList__header">
-        <div className="MapList__header__title">
-          <h2>Novel objectives.</h2>
+    <div className="NovelObjectives">
+      <div className="NovelObjectives__header">
+        <div className="NovelObjectives__header__title">
+          <h2>Novel objectives</h2>
+          {tooltipText ? (
+            <IoInformationCircleOutline
+              data-tooltip-id="Info-objective"
+              className="NovelObjectives__header__title__infoIcon"
+              data-tooltip-content={tooltipText}
+            />
+          ) : null}
+          <Tooltip id="Info-objective" place="top" />
         </div>
         <Button
           theme="gradient"
@@ -33,14 +56,25 @@ export const NovelObjectives = () => {
       </div>
 
       {objectives ? (
-        <div className="MapList__container">
+        <div
+          className={`NovelObjectives__container ${
+            onSelectObjective ? "ObjectiveSelection" : ""
+          }`}
+        >
           {objectives.map((objective) => {
             const { id, name, description, actions } = objective;
             return (
-              <div key={id} className="MapList__container__box">
-                <div className="MapList__container__map">
+              <div key={id} className="NovelObjectives__container__box">
+                <div
+                  className={`NovelObjectives__container__objective ${
+                    selectedObjectiveIds?.includes(id) ? "selected" : ""
+                  }`}
+                  onClick={() => {
+                    onSelectObjective && onSelectObjective(id);
+                  }}
+                >
                   <FaPencil
-                    className="MapList__container__edit"
+                    className="NovelObjectives__container__edit"
                     onClick={(e: React.MouseEvent) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -49,9 +83,20 @@ export const NovelObjectives = () => {
                       );
                     }}
                   />
-                  <h3>{name}</h3>
+                  <p>{name}</p>
                   <p>{description}</p>
-                  <p>Actions: {actions.length}</p>
+                  <p>
+                    Action:{" "}
+                    {actions.length > 0
+                      ? actions[0].type.toString()
+                      : "no selected."}
+                  </p>
+                  {isSelected(id) && (
+                    <div className="selected__badge">
+                      <FaCheckCircle />
+                      Selected
+                    </div>
+                  )}
                 </div>
               </div>
             );

@@ -95,7 +95,6 @@ export default function ItemEditModal() {
       opened={!!item}
       shouldCloseOnOverlayClick
       className="ItemEditModal"
-      title="Edit Item"
       onCloseModal={() =>
         dispatch(closeModal({ modalType: "editInventoryItem" }))
       }
@@ -119,6 +118,38 @@ export default function ItemEditModal() {
             />
           </div>
           <div className="ItemEdit__form">
+            <div className="ItemEdit__form__text">
+              <Input
+                label="Item name"
+                placeHolder="Rose"
+              />
+              <Input
+                isTextArea
+                label="Item description"
+                placeHolder="A beautiful rose"
+              />
+              <div className="ItemEdit__scenes">
+                <div className="ItemEdit__scenes__title">
+                  <CheckBox
+                    label="Hidden"
+                    value={item.hidden}
+                    onChange={(e) => {
+                      dispatch(
+                        updateInventoryItem({
+                          ...item,
+                          hidden: !!e.target.checked,
+                        })
+                      );
+                    }}
+                  />
+                  <Tooltip id="Info-Visibility" place="top" />
+                  <IoInformationCircleOutline
+                    data-tooltip-id="Info-Visibility"
+                    data-tooltip-content="Hidden for the whole novel until a condition adds it."
+                  />
+                </div>
+              </div>
+            </div>
             <div className="ItemEdit__form__image">
               {isUploading && (
                 <div className="ItemEdit__form__image__loaderContainer">
@@ -142,42 +173,8 @@ export default function ItemEditModal() {
                 }}
               />
             </div>
-            <div className="ItemEdit__form__text">
-              <Input
-                label="Name"
-                description="Name for the item."
-                placeHolder="Rose"
-              />
-              <Input
-                isTextArea
-                label="Description"
-                description="Description for the item."
-                placeHolder="A beautiful rose"
-              />
-            </div>
           </div>
-          <div className="ItemEdit__scenes">
-            <div className="ItemEdit__scenes__title">
-              <h3>Item Visibility</h3>
-              <Tooltip id="Info-Visibility" place="top" />
-              <IoInformationCircleOutline
-                data-tooltip-id="Info-Visibility"
-                data-tooltip-content="Hidden for the whole novel until a condition adds it."
-              />
-            </div>
-            <CheckBox
-              label="Hidden"
-              value={item.hidden}
-              onChange={(e) => {
-                dispatch(
-                  updateInventoryItem({
-                    ...item,
-                    hidden: !!e.target.checked,
-                  })
-                );
-              }}
-            />
-          </div>
+
           <div className="ItemEdit__actions">
             <div className="ItemEdit__actions__header">
               <div className="ItemEdit__actions__title">
@@ -222,7 +219,6 @@ export default function ItemEditModal() {
                     <Input
                       label="Action Name"
                       placeHolder="E.g. Give"
-                      description="Action for the item."
                       value={action.name}
                       onChange={(e) =>
                         handleUpdateAction(action.id || "", {
@@ -233,7 +229,6 @@ export default function ItemEditModal() {
                     <Input
                       isTextArea
                       label="Prompt"
-                      description="Prompt for the action."
                       placeHolder="E.g. *I pull out a rose flower and hand it over to {{char}}*"
                       value={action.prompt}
                       onChange={(e) =>

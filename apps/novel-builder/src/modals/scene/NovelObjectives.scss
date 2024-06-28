@@ -1,14 +1,6 @@
 @import "../../styles/variables.scss";
 
-.MapList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border-radius: 16px;
-  margin-top: 1rem;
-  background-color: $background-1;
-  padding: 20px;
-
+.NovelObjectives {
   &__header {
     display: flex;
     align-items: center;
@@ -32,47 +24,37 @@
   }
   &__container {
     display: flex;
-
     flex-wrap: wrap;
     width: 100%;
 
     &__box {
       display: flex;
-      width: 50%;
+      width: 33.3%;
       padding: 8px;
-      min-width: 300px;
-      min-height: 300px;
+      min-width: 310px;
     }
 
-    &__map {
+    &__objective {
       position: relative;
       border: 1px solid $node-conector-color;
       padding: 16px;
       border-radius: 16px;
       width: 100%;
       z-index: 1;
+      max-height: 110px;
+      text-overflow: hidden;
+      overflow: hidden;
 
-      &__preview {
-        width: 100%;
-        height: 100%;
-        border-radius: 16px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        opacity: 0.3;
-        z-index: 0;
-        object-fit: cover;
-      }
-
-      & h3,
       & p {
         margin: 0;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.897);
         z-index: 1;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
       }
 
       &:hover {
-        .MapList__container__edit {
+        .NovelObjectives__container__edit {
           opacity: 1;
         }
       }
@@ -95,21 +77,11 @@
     }
   }
 }
-.MapSelection {
-  .MapList__container__box {
-    min-width: 200px;
-    min-height: 200px;
-    width: 200px;
-    height: 200px;
-  }
-
-  .MapList__container__map {
+.ObjectiveSelection {
+  .NovelObjectives__container__objective {
     cursor: pointer;
     &:hover {
       background-color: rgba(27, 33, 66, 0.6);
-      .MapList__container__edit {
-        opacity: 0;
-      }
     }
   }
   .selected {

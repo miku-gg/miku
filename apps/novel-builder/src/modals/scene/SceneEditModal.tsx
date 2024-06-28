@@ -14,7 +14,6 @@ import { FaUser } from "react-icons/fa6";
 import config from "../../config";
 import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
 import Characters from "../../panels/assets/characters/Characters";
-import InventoryItems from "../../panels/assets/inventory/InventoryItems";
 import Songs from "../../panels/assets/songs/Songs";
 import { LorebookList } from "../../panels/details/LorebookList";
 import { MapList } from "../../panels/maps/MapList";
@@ -22,7 +21,6 @@ import { selectBackgrounds, selectEditingScene } from "../../state/selectors";
 import { closeModal } from "../../state/slices/inputSlice";
 import {
   deleteSceneById,
-  updateInventoryItem,
   updateScene,
 } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
@@ -324,13 +322,12 @@ export default function SceneEditModal() {
                 />
               </div>
               <div className="SceneEditModal__scene-details-row">
-                {/* <Input
+                <Input
                   id="context"
                   name="context"
                   placeHolder="{{user}} should have invited Nino to the classroom."
                   label="Condition"
-                  // description="OPTIONAL. This condition must be met for the scene to be suggested."
-                  description="OPTIONAL. This field has no effect at the moment."
+                  description="OPTIONAL. This condition must be met for the scene to be suggested."
                   value={scene.condition || ""}
                   onChange={(e) => {
                     dispatch(
@@ -341,9 +338,11 @@ export default function SceneEditModal() {
                     );
                   }}
                   isTextArea
-                /> */}
-                <NovelObjectives />
+                />
               </div>
+            </div>
+            <div className="SceneEditModal__scene-objectives">
+              <NovelObjectives />
             </div>
             <div className="SceneEditModal__scene-music">
               <div className="SceneEditModal__scene-music-label">
