@@ -1,39 +1,37 @@
 import { AreYouSure, Input, Modal } from "@mikugg/ui-kit";
 
 import { useDispatch } from "react-redux";
-import { selectEditingCondition } from "../../state/selectors";
+import { selectEditingObjective } from "../../state/selectors";
 import { closeModal } from "../../state/slices/inputSlice";
 import {
-  deleteCondition,
-  updateCondition,
+  deleteObjective,
+  updateObjective,
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
-import { StateMutation } from "@mikugg/bot-utils/dist/lib/novel/NovelV3";
+import {
+  NovelObjectiveAction,
+  NovelObjectiveActionType,
+} from "@mikugg/bot-utils/dist/lib/novel/NovelV3";
 import { FaTrashAlt } from "react-icons/fa";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import ButtonGroup from "../../components/ButtonGroup";
-import "./ConditionEditModal.scss";
-import { SceneMutationForm } from "./SceneMutationForm";
+import "./ObjectiveEditModal.scss";
+import { ObjectiveMutationForm } from "./ObjectiveMutationForm";
 
-export default function ConditionEditModal() {
+export default function ObjectiveEditModal() {
   const dispatch = useDispatch();
   const areYouSure = AreYouSure.useAreYouSure();
-  const condition = useAppSelector(selectEditingCondition);
+  const objective = useAppSelector(selectEditingObjective);
 
-  const handleDeleteCondition = (id: string) => {
-    if (!condition) return;
+  const handleDeleteObjective = () => {
+    if (!objective) return;
     areYouSure.openModal({
       title: "Are you sure?",
       description: "This map will be deleted. This action cannot be undone.",
       onYes: () => {
-        dispatch(closeModal({ modalType: "conditionEdit" }));
-        dispatch(
-          deleteCondition({
-            sceneId: condition.sceneId,
-            conditionId: id,
-          })
-        );
+        dispatch(closeModal({ modalType: "objectiveEdit" }));
+        dispatch(deleteObjective({ id: objective.id }));
       },
     });
   };
@@ -42,74 +40,66 @@ export default function ConditionEditModal() {
     switch (value) {
       case "ADD_CHILDREN":
         return {
-          type: "ADD_CHILDREN",
-          config: {
+          type: NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE,
+          params: {
             sceneId: "",
-            children: [],
           },
-        } as StateMutation;
-      case "REMOVE_ITEM":
-        return {
-          type: "REMOVE_ITEM",
-          config: {
-            itemId: "",
-          },
-        } as StateMutation;
+        } as NovelObjectiveAction;
+
       case "SUGGEST_ADVANCE_SCENE":
         return {
-          type: "SUGGEST_ADVANCE_SCENE",
-          config: {
+          type: NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE,
+          params: {
             sceneId: "",
           },
-        } as StateMutation;
+        } as NovelObjectiveAction;
       default:
         return {
-          type: "ADD_ITEM",
-          config: {
+          type: NovelObjectiveActionType.ITEM_RECEIVE,
+          params: {
             item: {},
           },
-        } as StateMutation;
+        } as NovelObjectiveAction;
     }
   };
 
   return (
     <Modal
-      opened={!!condition}
+      opened={!!objective}
       shouldCloseOnOverlayClick
-      className="ConditionEditModal"
+      className="ObjectiveEditModal"
       title="Edit condition"
-      onCloseModal={() => dispatch(closeModal({ modalType: "conditionEdit" }))}
+      onCloseModal={() => dispatch(closeModal({ modalType: "objectiveEdit" }))}
     >
-      {condition ? (
-        <div className="ConditionEdit scrollbar">
-          <div className="ConditionEdit__buttons">
+      {objective ? (
+        <div className="ObjectiveEdit scrollbar">
+          <div className="ObjectiveEdit__buttons">
             <FaTrashAlt
               className="MapEdit__buttons__removePlace"
               data-tooltip-id="delete-tooltip"
               data-tooltip-content="Delete place"
               onClick={() => {
-                handleDeleteCondition(condition.id);
+                handleDeleteObjective();
               }}
             />
             <IoIosCloseCircleOutline
               className="MapEdit__buttons__closeModal"
               onClick={() => {
-                dispatch(closeModal({ modalType: "conditionEdit" }));
+                dispatch(closeModal({ modalType: "objectiveEdit" }));
               }}
             />
           </div>
-          <div className="ConditionEdit__content">
-            <div className="ConditionEdit__content__form">
+          <div className="ObjectiveEdit__content">
+            <div className="ObjectiveEdit__content__form">
               <Input
                 label="Name"
-                value={condition.name || ""}
+                value={objective.name || ""}
                 onChange={(e) => {
                   dispatch(
-                    updateCondition({
-                      conditionId: condition.id,
-                      sceneId: condition.sceneId,
-                      condition: {
-                        ...condition,
+                    updateObjective({
+                      id: objective.id,
+                      objective: {
+                        ...objective,
                         name: e.target.value,
                       },
                     })
@@ -118,14 +108,13 @@ export default function ConditionEditModal() {
               />
               <Input
                 label="Description"
-                value={condition.description || ""}
+                value={objective.description || ""}
                 onChange={(e) => {
                   dispatch(
-                    updateCondition({
-                      conditionId: condition.id,
-                      sceneId: condition.sceneId,
-                      condition: {
-                        ...condition,
+                    updateObjective({
+                      id: objective.id,
+                      objective: {
+                        ...objective,
                         description: e.target.value,
                       },
                     })
@@ -137,22 +126,21 @@ export default function ConditionEditModal() {
                 isTextArea
                 description="The answer of the condition prompt always have to be YES or NO."
                 placeHolder="E.g. Do {{CHAR}} have the key for the door?"
-                value={condition.conditionPrompt || ""}
+                value={objective.condition || ""}
                 onChange={(e) => {
                   dispatch(
-                    updateCondition({
-                      conditionId: condition.id,
-                      sceneId: condition.sceneId,
-                      condition: {
-                        ...condition,
-                        conditionPrompt: e.target.value,
+                    updateObjective({
+                      id: objective.id,
+                      objective: {
+                        ...objective,
+                        condition: e.target.value,
                       },
                     })
                   );
                 }}
               />
             </div>
-            <div className="ConditionEdit__content__mutation">
+            <div className="ObjectiveEdit__content__mutation">
               <h3>Condition mutation</h3>
               <ButtonGroup
                 buttons={[
@@ -174,21 +162,20 @@ export default function ConditionEditModal() {
                     value: "REMOVE_ITEM",
                   },
                 ]}
-                selected={condition.mutationTrigger.type}
+                selected={objective.action.type}
                 onButtonClick={(value) => {
                   dispatch(
-                    updateCondition({
-                      conditionId: condition.id,
-                      sceneId: condition.sceneId,
-                      condition: {
-                        ...condition,
-                        mutationTrigger: getMutationTrigger(value),
+                    updateObjective({
+                      id: objective.id,
+                      objective: {
+                        ...objective,
+                        action: getMutationTrigger(value),
                       },
                     })
                   );
                 }}
               />
-              <SceneMutationForm />
+              <ObjectiveMutationForm />
             </div>
           </div>
         </div>

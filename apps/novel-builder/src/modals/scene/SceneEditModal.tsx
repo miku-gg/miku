@@ -26,7 +26,7 @@ import {
   updateScene,
 } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
-import { SceneConditions } from "./SceneConditions";
+import { NovelObjectives } from "./NovelObjectives";
 import "./SceneEditModal.scss";
 
 export default function SceneEditModal() {
@@ -46,6 +46,9 @@ export default function SceneEditModal() {
   });
   const [showingEmotionChar1, setShowingEmotionChar1] = useState("neutral");
   const [showingEmotionChar2, setShowingEmotionChar2] = useState("neutral");
+  const itemIdsByScene = items?.filter((item) =>
+    item.visibility?.onlyInSceneIds?.includes(scene?.id || "")
+  );
 
   const handleDeleteScene = () => {
     if (scene) {
@@ -67,7 +70,10 @@ export default function SceneEditModal() {
     const hasItemSceneLock = visibility?.onlyInSceneIds?.includes(scene.id)
       ? true
       : false;
-    const isUnlocked = visibility?.unlockConditionId || visibility?.onlyInSceneIds ? false : true;
+    const isUnlocked =
+      visibility?.unlockConditionId || visibility?.onlyInSceneIds
+        ? false
+        : true;
     dispatch(
       updateInventoryItem({
         ...item,
@@ -79,16 +85,6 @@ export default function SceneEditModal() {
             ? visibility?.onlyInSceneIds?.filter((id) => id !== scene.id)
             : [...(visibility?.onlyInSceneIds || []), scene.id],
         },
-      })
-    );
-    dispatch(
-      updateScene({
-        ...scene._source,
-        sceneExclusiveItemIds: scene._source.sceneExclusiveItemIds?.includes(
-          itemId
-        )
-          ? scene._source.sceneExclusiveItemIds.filter((iid) => iid !== itemId)
-          : [...(scene._source.sceneExclusiveItemIds || []), itemId],
       })
     );
   };
@@ -377,7 +373,7 @@ export default function SceneEditModal() {
                   }}
                   isTextArea
                 /> */}
-                <SceneConditions />
+                <NovelObjectives />
               </div>
             </div>
             <div className="SceneEditModal__scene-music">
@@ -460,7 +456,11 @@ export default function SceneEditModal() {
               {items ? (
                 <InventoryItems
                   tooltipText="Select items that can be used only in this scene."
-                  selectedItemIds={scene?.sceneExclusiveItemIds || []}
+                  selectedItemIds={
+                    itemIdsByScene?.map((item) => {
+                      return item.id;
+                    }) || []
+                  }
                   onSelect={(id) => {
                     handleSelectItems(id);
                   }}

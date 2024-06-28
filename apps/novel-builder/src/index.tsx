@@ -14,7 +14,7 @@ import CharacterEditModal from "./modals/character/CharacterEditModal";
 import ItemEditModal from "./modals/items/ItemEditModal";
 import MapEditModal from "./modals/map/MapEditModal";
 import PlaceEditModal from "./modals/map/PlaceEditModal";
-import ConditionEditModal from "./modals/scene/ConditionEditModal";
+import ObjectiveEditModal from "./modals/scene/ObjectiveEditModal";
 import SceneEditModal from "./modals/scene/SceneEditModal";
 import Planels from "./panels";
 import { store } from "./state/store";
@@ -52,7 +52,7 @@ ReactDOM.render(
         <LoadingModal />
         <MapEditModal />
         <PlaceEditModal />
-        <ConditionEditModal />
+        <ObjectiveEditModal />
         <ItemEditModal />
       </AreYouSure.AreYouSureProvider>
       <ToastPortal />

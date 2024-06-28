@@ -33,16 +33,6 @@ export default function ItemEditModal() {
   const areYouSure = AreYouSure.useAreYouSure();
   const item = useAppSelector(selectEditingInventoryItem);
   const [isUploading, setIsUploading] = useState(false);
-  const scenes = useAppSelector((state) => state.novel.scenes);
-  const scenesConditions = scenes.map((scene) => scene.sceneConditions).flat();
-
-  const getSceneData = (sceneId: string) => {
-    return scenes.find((scene) => scene.id === sceneId);
-  };
-
-  const getConditionData = (conditionId: string) => {
-    return scenesConditions.find((condition) => condition?.id === conditionId);
-  };
 
   const handleUploadImage = async (file: File) => {
     if (file && item) {
@@ -63,7 +53,6 @@ export default function ItemEditModal() {
       }
     }
   };
-  console.log("item", item);
 
   const handleRemoveAction = (id: string) => {
     if (!item) return;
@@ -191,27 +180,6 @@ export default function ItemEditModal() {
                 );
               }}
             />
-            {item.visibility?.onlyInSceneIds &&
-              item.visibility?.onlyInSceneIds.length > 0 && (
-                <div className="ItemEdit__scenes__container">
-                  {item.visibility.onlyInSceneIds.map((sceneId) => {
-                    const scene = getSceneData(sceneId);
-                    return (
-                      <div
-                        key={`scene-${sceneId}`}
-                        className="ItemEdit__scenes__scene"
-                      >
-                        {scene?.name}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            {item.visibility?.unlockConditionId && (
-              <div>
-                {getConditionData(item.visibility.unlockConditionId)?.name}
-              </div>
-            )}
           </div>
           <div className="ItemEdit__actions">
             <div className="ItemEdit__actions__header">

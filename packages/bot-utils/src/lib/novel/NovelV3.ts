@@ -40,8 +40,6 @@ export interface NovelScene {
   parentMapIds?: string[] | null;
   nsfw: NovelNSFW;
   lorebookIds?: string[];
-  sceneConditions?: SceneCondition[];
-  sceneExclusiveItemIds?: string[];
 }
 
 export interface NovelCharacterOutfit {
@@ -109,14 +107,6 @@ export interface NovelMap {
     maskSource: string;
   }[];
 }
-export interface SceneCondition {
-  id: string;
-  name: string;
-  description: string;
-  sceneId: string;
-  conditionPrompt: string;
-  mutationTrigger: StateMutation;
-}
 
 export type StateMutation =
   | {
@@ -175,7 +165,7 @@ export enum NovelObjectiveActionType {
   SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
   SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
   ACHIEVEMENT_UNLOCK = "ACHIEVEMENT_UNLOCK",
-  ITEM_RECEIVE = "ITEM_RECEIVE",
+  ITEM_RECEIVE = "ITEM_RECEIVE",//delete
 }
 
 export type NovelObjectiveAction =
@@ -211,14 +201,13 @@ export interface NovelObjective {
   action: NovelObjectiveAction;
 }
 
+
 export interface NovelLorebook extends CharacterBook {
   id: string;
   isGlobal: boolean;
 }
 
 export interface NovelInventoryItem extends InventoryItem {
-  // unlocked: boolean;
-  // unlockConditionId?: string;
   visibility?: {
     unlocked: boolean;
     unlockConditionId?: string;

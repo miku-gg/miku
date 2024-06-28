@@ -390,60 +390,11 @@ const novelFormSlice = createSlice({
         (place) => place.id !== action.payload.placeId
       );
     },
-    createCondition: (
+   
+    createNewInventoryItem: (
       state,
-      action: PayloadAction<{ sceneId: string; conditionId: string }>
+      action: PayloadAction<{ itemId: string }>
     ) => {
-      const scene = state.scenes.find(
-        (scene) => scene.id === action.payload.sceneId
-      );
-      if (!scene) return;
-      if (scene.sceneConditions === undefined) {
-        scene.sceneConditions = [];
-      }
-      scene.sceneConditions.push({
-        id: action.payload.conditionId,
-        name: "New Condition",
-        description: "",
-        conditionPrompt: "",
-        mutationTrigger: {
-          type: "ADD_CHILDREN",
-          config: { sceneId: "", children: [] },
-        },
-        sceneId: action.payload.sceneId,
-      });
-    },
-    updateCondition: (
-      state,
-      action: PayloadAction<{
-        sceneId: string;
-        conditionId: string;
-        condition: NovelV3.SceneCondition;
-      }>
-    ) => {
-      const scene = state.scenes.find(
-        (scene) => scene.id === action.payload.sceneId
-      );
-      if (!scene) return;
-      const condition = scene.sceneConditions?.find(
-        (condition) => condition.id === action.payload.conditionId
-      );
-      if (!condition) return;
-      Object.assign(condition, action.payload.condition);
-    },
-    deleteCondition: (
-      state,
-      action: PayloadAction<{ sceneId: string; conditionId: string }>
-    ) => {
-      const scene = state.scenes.find(
-        (scene) => scene.id === action.payload.sceneId
-      );
-      if (!scene) return;
-      scene.sceneConditions = scene.sceneConditions?.filter(
-        (condition) => condition.id !== action.payload.conditionId
-      );
-    },
-    createNewInventoryItem: (state, action: PayloadAction<{ itemId: string }>) => {
       if (!state.inventory) state.inventory = [];
       state.inventory.push({
         id: action.payload.itemId,
@@ -459,7 +410,10 @@ const novelFormSlice = createSlice({
         },
       });
     },
-    updateInventoryItem: (state, action: PayloadAction<NovelV3.NovelInventoryItem>) => {
+    updateInventoryItem: (
+      state,
+      action: PayloadAction<NovelV3.NovelInventoryItem>
+    ) => {
       if (!state.inventory) return;
       const index = state.inventory.findIndex(
         (item) => item.id === action.payload.id
@@ -474,6 +428,35 @@ const novelFormSlice = createSlice({
       );
       if (index === -1) return;
       state.inventory.splice(index, 1);
+    },
+    createObjective: (state, action: PayloadAction<{ id: string }>) => {
+      state.objectives?.push({
+        id: action.payload.id,
+        name: "New Objective",
+        description: "",
+        sceneIds: [],
+        condition: "",
+        action: {
+          type: NovelV3.NovelObjectiveActionType.SUGGEST_CREATE_SCENE,
+        },
+      });
+    },
+    updateObjective: (
+      state,
+      action: PayloadAction<{ id: string; objective: NovelV3.NovelObjective }>
+    ) => {
+      if (!state.objectives) return;
+      const index = state.objectives?.findIndex(
+        (objective) => objective.id === action.payload.id
+      );
+      if (index === -1) return;
+      state.objectives[index] = action.payload.objective;
+    },
+    deleteObjective: (state, action: PayloadAction<{ id: string }>) => {
+      if (!state.objectives) return;
+      state.objectives = state.objectives.filter(
+        (objective) => objective.id !== action.payload.id
+      );
     },
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;
@@ -523,12 +506,12 @@ export const {
   createPlace,
   updatePlace,
   deletePlace,
-  createCondition,
-  updateCondition,
-  deleteCondition,
   createNewInventoryItem,
   updateInventoryItem,
   deleteInventoryItem,
+  createObjective,
+  updateObjective,
+  deleteObjective,
   loadCompleteState,
   updateDetails,
   clearNovelState,

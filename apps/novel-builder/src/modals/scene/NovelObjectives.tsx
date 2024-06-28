@@ -1,42 +1,41 @@
 import { Button } from "@mikugg/ui-kit";
 import { FaPencil } from "react-icons/fa6";
 import { v4 as randomUUID } from "uuid";
-import { selectEditingScene } from "../../state/selectors";
 import { openModal } from "../../state/slices/inputSlice";
-import { createCondition } from "../../state/slices/novelFormSlice";
+import { createObjective } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
+import "./NovelObjectives.scss";
 
-export const SceneConditions = () => {
+export const NovelObjectives = () => {
   const dispatch = useAppDispatch();
-  const scene = useAppSelector(selectEditingScene);
-  if (!scene) return;
+  const objectives = useAppSelector((state) => state.novel.objectives);
 
-  const handleCreateCondition = () => {
+  const handleCreateObjective = () => {
     const id = randomUUID();
-    dispatch(createCondition({ sceneId: scene.id, conditionId: id }));
-    dispatch(openModal({ modalType: "conditionEdit", editId: id }));
+    dispatch(createObjective({ id: id }));
+    dispatch(openModal({ modalType: "objectiveEdit", editId: id }));
   };
 
   return (
     <div className="MapList_">
       <div className="MapList__header">
         <div className="MapList__header__title">
-          <h2>Scene conditions.</h2>
+          <h2>Novel objectives.</h2>
         </div>
         <Button
           theme="gradient"
           onClick={() => {
-            handleCreateCondition();
+            handleCreateObjective();
           }}
         >
-          Create new condition
+          Create new objective
         </Button>
       </div>
 
-      {scene.sceneConditions ? (
+      {objectives ? (
         <div className="MapList__container">
-          {scene.sceneConditions.map((condition) => {
-            const { id, name, description } = condition;
+          {objectives.map((objective) => {
+            const { id, name, description, action } = objective;
             return (
               <div key={id} className="MapList__container__box">
                 <div className="MapList__container__map">
@@ -46,20 +45,20 @@ export const SceneConditions = () => {
                       e.preventDefault();
                       e.stopPropagation();
                       dispatch(
-                        openModal({ modalType: "conditionEdit", editId: id })
+                        openModal({ modalType: "objectiveEdit", editId: id })
                       );
                     }}
                   />
                   <h3>{name}</h3>
                   <p>{description}</p>
-                  <p>Reward: {condition.mutationTrigger.type}</p>
+                  <p>Reward: {action.type}</p>
                 </div>
               </div>
             );
           })}
         </div>
       ) : (
-        <p>Don't have any conditions created.</p>
+        <p>Don't have any objective created.</p>
       )}
     </div>
   );

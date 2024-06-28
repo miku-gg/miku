@@ -1,6 +1,6 @@
 @import "../../styles/variables.scss";
 
-.ConditionEdit {
+.ObjectiveEdit {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -31,6 +31,6 @@
     }
   }
 }
-.ConditionEditModal {
+.ObjectiveEditModal {
   max-width: 750px !important;
 }
