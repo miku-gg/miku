@@ -16,7 +16,7 @@ import {
   selectLastLoadedResponse,
 } from '../../state/selectors'
 import { toast } from 'react-toastify'
-import { mutationToAction } from '../../state/mutations'
+import { novelActionToStateAction } from '../../state/mutations'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
@@ -133,10 +133,11 @@ export default function Inventory() {
                 })
               )
             }
-            if (action.usageMutations) {
-              action.usageMutations.forEach((mutation) =>
-                dispatch(mutationToAction(mutation))
-              )
+            if (action.usageActions) {
+              action.usageActions.forEach((novelAction) => {
+                const action = novelActionToStateAction(novelAction)
+                if (action) dispatch(action)
+              })
             }
           }}
         />

@@ -70,27 +70,35 @@ export const getUnlockableAchievements = async (
         id: achievement.id,
         name: achievement.name,
         description: achievement.description,
-        sceneIds: achievement.scenes,
-        condition: achievement.condition,
-        action: {
-          type: NovelV3.NovelObjectiveActionType.ACHIEVEMENT_UNLOCK,
-          params: {
-            achievementId: achievement.id,
-            reward: {
-              id: achievement.inventoryItem.id,
-              name: achievement.inventoryItem.name,
-              description: achievement.inventoryItem.description,
-              icon: achievement.inventoryItem.icon,
-              isPremium: achievement.inventoryItem.isPremium,
-              actions: achievement.inventoryItem.actions.map((action) => {
-                return {
-                  name: action.name,
-                  prompt: action.prompt,
-                }
-              }),
-            },
+        singleUse: true,
+        stateCondition: {
+          type: 'IN_SCENE',
+          config: {
+            sceneIds: achievement.scenes,
           },
         },
+        condition: achievement.condition,
+        actions: [
+          {
+            type: NovelV3.NovelActionType.ACHIEVEMENT_UNLOCK,
+            params: {
+              achievementId: achievement.id,
+              reward: {
+                id: achievement.inventoryItem.id,
+                name: achievement.inventoryItem.name,
+                description: achievement.inventoryItem.description,
+                icon: achievement.inventoryItem.icon,
+                isPremium: achievement.inventoryItem.isPremium,
+                actions: achievement.inventoryItem.actions.map((action) => {
+                  return {
+                    name: action.name,
+                    prompt: action.prompt,
+                  }
+                }),
+              },
+            },
+          },
+        ],
       }
     })
   } catch (error) {

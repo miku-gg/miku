@@ -38,14 +38,22 @@ export const scenesToObjectives = (
         result.push({
           id: `scene_transition_${scene.id}_to_${childId}`,
           name: `Transition to ${child.name}`,
-          sceneIds: [scene.id],
-          condition: child.condition,
-          action: {
-            type: NovelV3.NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE,
-            params: {
-              sceneId: childId,
+          singleUse: false,
+          stateCondition: {
+            type: 'IN_SCENE',
+            config: {
+              sceneIds: [scene.id],
             },
           },
+          condition: child.condition,
+          actions: [
+            {
+              type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
+              params: {
+                sceneId: childId,
+              },
+            },
+          ],
         })
       }
     })

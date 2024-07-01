@@ -9,6 +9,22 @@ export const selectEditingBackground = createSelector(
     return backgrounds.find((background) => background.id === modal.editId);
   }
 );
+export const selectObjectives = (state: RootState) => state.novel.objectives;
+export const selectEditingObjective = createSelector(
+  [(state: RootState) => state.input.modals.objectiveEdit, selectObjectives],
+  (modal, objectives) => {
+    if (!modal.opened) return undefined;
+    return objectives?.find((objective) => objective.id === modal.editId);
+  }
+);
+export const selectInventory = (state: RootState) => state.novel.inventory;
+export const selectEditingInventoryItem = createSelector(
+  [(state: RootState) => state.input.modals.editInventoryItem, selectInventory],
+  (modal, inventory) => {
+    if (!modal.opened) return undefined;
+    return inventory?.find((item) => item.id === modal.editId);
+  }
+);
 export const selectLorebooks = (state: RootState) => {
   return state.novel.lorebooks;
 };
@@ -27,6 +43,7 @@ export const selectEditingMap = createSelector(
     return maps.find((map) => map.id === modal.editId);
   }
 );
+
 export const selectEditingPlace = createSelector(
   [
     (state: RootState) => state.input.modals.placeEdit,

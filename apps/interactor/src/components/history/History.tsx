@@ -84,7 +84,10 @@ const HistoryActions = () => {
         dispatch(
           replaceState({
             ...stateJson,
-            objectives: [...scenesToObjectives(stateJson.novel.scenes)],
+            objectives: [
+              ...scenesToObjectives(stateJson.novel.scenes),
+              ...(stateJson.novel.objectives || []),
+            ],
             inventory: {
               ...initialInventoryState,
               ...(stateJson.inventory || {}),

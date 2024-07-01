@@ -25,7 +25,7 @@ import {
 import { NovelV3 } from '@mikugg/bot-utils'
 import { CustomEventType, postMessage } from '../../libs/stateEvents'
 import { unlockAchievement } from '../../libs/platformAPI'
-import { addItem } from '../slices/inventorySlice'
+import { addItem, toggleItemVisibility } from '../slices/inventorySlice'
 import { removeObjective } from '../slices/objectivesSlice'
 import { toast } from 'react-toastify'
 import { GiOpenChest } from 'react-icons/gi'
@@ -136,20 +136,29 @@ const interactionEffect = async (
     )
     const objectives = [...selectCurrentSceneObjectives(state)]
     if (
-      !objectives.some(
-        (objective) =>
-          objective.action.type ===
-          NovelV3.NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE
+      !objectives.some((objective) =>
+        objective.actions.some(
+          (action) =>
+            action.type === NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE
+        )
       )
     ) {
       objectives.push({
         id: 'temp_generate_scene_objective',
         condition: '{{char}} and {{user}} are now in a different place',
         name: 'Generate a new scene',
-        sceneIds: [currentScene?.id || ''],
-        action: {
-          type: NovelV3.NovelObjectiveActionType.SUGGEST_CREATE_SCENE,
+        singleUse: false,
+        stateCondition: {
+          type: 'IN_SCENE',
+          config: {
+            sceneIds: [currentScene?.id || ''],
+          },
         },
+        actions: [
+          {
+            type: NovelV3.NovelActionType.SUGGEST_CREATE_SCENE,
+          },
+        ],
       })
     }
 
@@ -182,77 +191,88 @@ const interactionEffect = async (
             response = result.get('cond') || ''
           }
           if (response === ' Yes') {
-            switch (objective.action.type) {
-              case NovelV3.NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE:
-                dispatch(
-                  interactionSuccess({
-                    ...currentResponseState,
-                    nextScene: objective.action.params.sceneId,
-                    completed: true,
-                  })
-                )
-                break
-              case NovelV3.NovelObjectiveActionType.SUGGEST_CREATE_SCENE:
-                dispatch(
-                  interactionSuccess({
-                    ...currentResponseState,
-                    shouldSuggestScenes: true,
-                    completed: true,
-                  })
-                )
-                break
-              case NovelV3.NovelObjectiveActionType.ACHIEVEMENT_UNLOCK:
-                postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
-                  achievement: {
-                    id: objective.action.params.achievementId,
-                    name: objective.name,
-                    description: objective.description || '',
-                    inventoryItem: objective.action.params.reward,
-                  },
-                })
-                unlockAchievement(
-                  apiEndpoint,
-                  objective.action.params.achievementId
-                )
-                if (objective.action.params.reward) {
-                  dispatch(addItem(objective.action.params.reward))
-                }
-                dispatch(removeObjective(objective.id))
-                break
-              case NovelV3.NovelObjectiveActionType.ITEM_RECEIVE:
-                dispatch(addItem(objective.action.params.item))
-                dispatch(removeObjective(objective.id))
-                toast(
-                  <div
-                    style={{
-                      textAlign: 'left',
-                      display: 'inline-flex',
-                      gap: 10,
-                    }}
-                  >
-                    <GiOpenChest />
-                    <span>
-                      <b>{objective.action.params.item.name}</b> added to the
-                      inventory
-                    </span>
-                  </div>,
-                  {
-                    position: 'top-left',
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    closeButton: false,
-                    theme: 'dark',
-                    style: {
-                      marginTop: 50,
-                      marginLeft: 10,
+            objective.actions.forEach((action) => {
+              switch (action.type) {
+                case NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE:
+                  dispatch(
+                    interactionSuccess({
+                      ...currentResponseState,
+                      nextScene: action.params.sceneId,
+                      completed: true,
+                    })
+                  )
+                  break
+                case NovelV3.NovelActionType.SUGGEST_CREATE_SCENE:
+                  dispatch(
+                    interactionSuccess({
+                      ...currentResponseState,
+                      shouldSuggestScenes: true,
+                      completed: true,
+                    })
+                  )
+                  break
+                case NovelV3.NovelActionType.ACHIEVEMENT_UNLOCK:
+                  postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
+                    achievement: {
+                      id: action.params.achievementId,
+                      name: objective.name,
+                      description: objective.description || '',
+                      inventoryItem: action.params.reward,
                     },
+                  })
+                  unlockAchievement(apiEndpoint, action.params.achievementId)
+                  if (action.params.reward) {
+                    dispatch(addItem(action.params.reward))
                   }
-                )
-                break
+                  dispatch(removeObjective(objective.id))
+                  break
+                case NovelV3.NovelActionType.SHOW_ITEM:
+                  const item = state.inventory.items.find(
+                    (item) => item.id === action.params.itemId
+                  )
+                  if (!item) {
+                    break
+                  }
+                  dispatch(
+                    toggleItemVisibility({
+                      itemId: item.id,
+                      hidden: false,
+                    })
+                  )
+                  toast(
+                    <div
+                      style={{
+                        textAlign: 'left',
+                        display: 'inline-flex',
+                        gap: 10,
+                      }}
+                    >
+                      <GiOpenChest />
+                      <span>
+                        <b>{item.name}</b> added to the inventory
+                      </span>
+                    </div>,
+                    {
+                      position: 'top-left',
+                      autoClose: 3000,
+                      hideProgressBar: true,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      closeButton: false,
+                      theme: 'dark',
+                      style: {
+                        marginTop: 50,
+                        marginLeft: 10,
+                      },
+                    }
+                  )
+                  break
+              }
+            })
+            if (objective.singleUse) {
+              dispatch(removeObjective(objective.id))
             }
           }
         })

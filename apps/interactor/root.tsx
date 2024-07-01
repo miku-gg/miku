@@ -193,6 +193,7 @@ export const loadNarration = async (): Promise<RootState> => {
             ...migrated,
             objectives: [
               ...scenesToObjectives(migrated.novel.scenes),
+              ...(migrated.novel.objectives || []),
               ...achievements,
             ],
             inventory: {
@@ -216,6 +217,7 @@ export const loadNarration = async (): Promise<RootState> => {
             ...migrated,
             objectives: [
               ...scenesToObjectives(migrated.novel.scenes),
+              ...(migrated.novel.objectives || []),
               ...achievements,
             ],
             inventory: {
@@ -237,7 +239,11 @@ export const loadNarration = async (): Promise<RootState> => {
       }
       return {
         ...data,
-        objectives: [...scenesToObjectives(data.novel.scenes), ...achievements],
+        objectives: [
+          ...scenesToObjectives(data.novel.scenes),
+          ...(data.novel.objectives || []),
+          ...achievements,
+        ],
         inventory: {
           ...initialInventoryState,
           items: [...inventoryItems, ...DEFAULT_INVENTORY],
@@ -258,7 +264,11 @@ export const loadNarration = async (): Promise<RootState> => {
     return {
       novel,
       narration,
-      objectives: [...scenesToObjectives(novel.scenes), ...achievements],
+      objectives: [
+        ...scenesToObjectives(novel.scenes),
+        ...(novel.objectives || []),
+        ...achievements,
+      ],
       inventory: {
         ...initialInventoryState,
         items: [...inventoryItems, ...DEFAULT_INVENTORY],
