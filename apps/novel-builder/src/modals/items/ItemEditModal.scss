@@ -98,13 +98,33 @@
     }
 
     &__action {
-      background-color: $background-1;
+      background-color: $background-3;
       padding: 10px;
       border-radius: 16px;
       display: flex;
       flex-direction: column;
       gap: 8px;
       position: relative;
+
+      &__mutation {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid $node-conector-color;
+        border-radius: 16px;
+        padding: 4px;
+
+        & h3 {
+          margin: 0;
+          padding-left: 4px;
+        }
+
+        & div {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+      }
     }
 
     &__remove {
@@ -132,5 +152,5 @@
   }
 }
 .ItemEditModal {
-  max-width: 750px !important;
+  max-width: 800px !important;
 }

@@ -19,6 +19,7 @@ import {
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
+import { NovelV3 } from "@mikugg/bot-utils";
 import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { IoIosCloseCircleOutline } from "react-icons/io";
@@ -26,6 +27,7 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import config from "../../config";
 import { checkFileType } from "../../libs/utils";
+import NovelActionForm from "../scene/NovelActionForm";
 import "./ItemEditModal.scss";
 
 export default function ItemEditModal() {
@@ -119,10 +121,7 @@ export default function ItemEditModal() {
           </div>
           <div className="ItemEdit__form">
             <div className="ItemEdit__form__text">
-              <Input
-                label="Item name"
-                placeHolder="Rose"
-              />
+              <Input label="Item name" placeHolder="Rose" />
               <Input
                 isTextArea
                 label="Item description"
@@ -237,6 +236,59 @@ export default function ItemEditModal() {
                         })
                       }
                     />
+                    <div className="ItemEdit__actions__action__mutation">
+                      <div>
+                        <h3>Item Action</h3>
+                        <IoInformationCircleOutline
+                          data-tooltip-id={`Info-item-actions-${action.id}`}
+                          className="ObjectiveEdit__header__title__infoIcon"
+                          data-tooltip-content="The action that will be triggered when the player uses this item"
+                        />
+                      </div>
+                      <Button
+                        theme="secondary"
+                        onClick={() => {
+                          handleUpdateAction(action.id || "", {
+                            usageActions:
+                              action.usageActions &&
+                              action.usageActions?.length < 1
+                                ? [
+                                    {
+                                      type: NovelV3.NovelActionType.SHOW_ITEM,
+                                      params: { itemId: "" },
+                                    },
+                                  ]
+                                : [],
+                          });
+                        }}
+                      >
+                        {action.usageActions && action.usageActions?.length < 1
+                          ? "Add action"
+                          : "Remove action"}
+                      </Button>
+                      <Tooltip
+                        id={`Info-item-actions-${action.id}`}
+                        place="top"
+                      />
+                    </div>
+                    {action.usageActions && action.usageActions.length > 0 ? (
+                      <NovelActionForm
+                        action={
+                          action.usageActions
+                            ? action.usageActions[0]
+                            : {
+                                type: NovelV3.NovelActionType.SHOW_ITEM,
+                                params: { itemId: "" },
+                              }
+                        }
+                        onChange={(act) => {
+                          handleUpdateAction(action.id || "", {
+                            usageActions: [act],
+                          });
+                        }}
+                        onDelete={() => {}}
+                      />
+                    ) : null}
                   </div>
                 ))}
               </div>

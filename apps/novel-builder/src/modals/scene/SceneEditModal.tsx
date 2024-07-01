@@ -450,6 +450,7 @@ export default function SceneEditModal() {
                     updateInventoryItem({
                       ...item,
                       id: itemId,
+                      // ToDo: add a way to remove the scene lock
                       locked: {
                         type: "IN_SCENE",
                         config: {
