@@ -116,7 +116,7 @@ export default function ObjectiveEditModal() {
                   <IoInformationCircleOutline
                     data-tooltip-id="Info-actions"
                     className="ObjectiveEdit__header__title__infoIcon"
-                    data-tooltip-content={""}
+                    data-tooltip-content="The condition Prompt will be trigger one of these actions."
                   />
 
                   <Tooltip id="Info-actions" place="top" />

@@ -18,6 +18,79 @@
   flex-direction: column;
   width: 100%;
   gap: 10px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid $node-conector-color;
+    border-radius: 16px;
+    padding: 6px;
+
+    &__title {
+      margin: 0;
+      padding-left: 4px;
+    }
+  }
+}
+
+.ChildScenes {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  width: 100%;
+  gap: 10px;
+
+  &__parent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $node-conector-color;
+    border-radius: 16px;
+    padding: 6px;
+    min-width: 205px;
+    max-height: 140px;
+
+    .scene {
+      width: 12rem;
+      height: 6rem;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      justify-content: space-between;
+
+      &__title {
+        margin: 0;
+      }
+    }
+  }
+
+  &__childrens {
+    width: 100%;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 6px 0;
+
+      &__title {
+        margin: 0;
+        padding-left: 4px;
+      }
+    }
+
+    &__scenes {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+  }
 }
 .scene {
   width: 15rem;
@@ -44,9 +117,11 @@
     &__name {
       color: white;
       margin: 0;
+      text-overflow: ellipsis;
     }
-    &__remove {
-      color: white;
+
+    &__edit {
+      color: $text-1;
       cursor: pointer;
       &:hover {
         color: $secondary-color;
