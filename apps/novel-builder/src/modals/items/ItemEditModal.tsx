@@ -97,6 +97,7 @@ export default function ItemEditModal() {
       opened={!!item}
       shouldCloseOnOverlayClick
       className="ItemEditModal"
+      title="Edit Item"
       onCloseModal={() =>
         dispatch(closeModal({ modalType: "editInventoryItem" }))
       }
@@ -273,14 +274,7 @@ export default function ItemEditModal() {
                     </div>
                     {action.usageActions && action.usageActions.length > 0 ? (
                       <NovelActionForm
-                        action={
-                          action.usageActions
-                            ? action.usageActions[0]
-                            : {
-                                type: NovelV3.NovelActionType.SHOW_ITEM,
-                                params: { itemId: "" },
-                              }
-                        }
+                        action={action.usageActions[0]}
                         onChange={(act) => {
                           handleUpdateAction(action.id || "", {
                             usageActions: [act],

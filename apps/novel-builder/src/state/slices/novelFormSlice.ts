@@ -400,7 +400,14 @@ const novelFormSlice = createSlice({
         id: action.payload.itemId,
         name: "New Item",
         description: "",
-        actions: [],
+        actions: [
+          {
+            name: "",
+            prompt: "",
+            id: randomUUID(),
+            usageActions: [],
+          },
+        ],
         icon: "",
         isPremium: false,
         isNovelOnly: true,
