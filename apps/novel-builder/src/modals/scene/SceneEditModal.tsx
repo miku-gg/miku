@@ -450,22 +450,24 @@ export default function SceneEditModal() {
                     updateInventoryItem({
                       ...item,
                       id: itemId,
-                      // ToDo: add a way to remove the scene lock
-                      locked: {
-                        type: "IN_SCENE",
-                        config: {
-                          sceneIds: item.locked?.config.sceneIds.includes(
-                            scene.id
-                          )
-                            ? item.locked?.config.sceneIds.filter(
-                                (id) => id !== scene.id
-                              )
-                            : [
-                                ...(item.locked?.config.sceneIds ?? []),
-                                scene.id,
-                              ],
-                        },
-                      },
+                      locked:
+                        item.locked?.config.sceneIds.length === 0
+                          ? undefined
+                          : {
+                              type: "IN_SCENE",
+                              config: {
+                                sceneIds: item.locked?.config.sceneIds.includes(
+                                  scene.id
+                                )
+                                  ? item.locked?.config.sceneIds.filter(
+                                      (id) => id !== scene.id
+                                    )
+                                  : [
+                                      ...(item.locked?.config.sceneIds ?? []),
+                                      scene.id,
+                                    ],
+                              },
+                            },
                     })
                   );
                 }}

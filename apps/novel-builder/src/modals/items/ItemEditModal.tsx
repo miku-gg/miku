@@ -194,7 +194,12 @@ export default function ItemEditModal() {
                         ...item,
                         actions: [
                           ...item.actions,
-                          { name: "", prompt: "", id: randomUUID() },
+                          {
+                            name: "",
+                            prompt: "",
+                            id: randomUUID(),
+                            usageActions: [],
+                          },
                         ],
                       })
                     );
@@ -239,7 +244,7 @@ export default function ItemEditModal() {
                     />
                     <div className="ItemEdit__actions__action__mutation">
                       <div>
-                        <h3>Item Action</h3>
+                        <h3>Usage Action</h3>
                         <IoInformationCircleOutline
                           data-tooltip-id={`Info-item-actions-${action.id}`}
                           className="ObjectiveEdit__header__title__infoIcon"
