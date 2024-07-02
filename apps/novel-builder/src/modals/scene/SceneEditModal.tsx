@@ -23,6 +23,7 @@ import { closeModal } from "../../state/slices/inputSlice";
 import {
   deleteSceneById,
   updateInventoryItem,
+  updateObjective,
   updateScene,
 } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
@@ -42,6 +43,10 @@ export default function SceneEditModal() {
       item.locked?.type === "IN_SCENE" &&
       item.locked.config.sceneIds.includes(scene?.id || "")
   );
+  const objectives = useAppSelector((state) => state.novel.objectives);
+  const objectiveLockedsByScenes = objectives?.filter((obj) => {
+    return obj.stateCondition.config.sceneIds.includes(scene?.id || "");
+  });
   const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] =
     useState(false);
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
@@ -51,6 +56,10 @@ export default function SceneEditModal() {
   });
   const [showingEmotionChar1, setShowingEmotionChar1] = useState("neutral");
   const [showingEmotionChar2, setShowingEmotionChar2] = useState("neutral");
+
+  const getObjectiveData = (id: string) => {
+    return objectives?.find((objective) => objective.id === id);
+  };
 
   const handleDeleteScene = () => {
     if (scene) {
@@ -350,7 +359,39 @@ export default function SceneEditModal() {
               </div>
             </div>
             <div className="SceneEditModal__scene-objectives">
-              <NovelObjectives />
+              <NovelObjectives
+                selectedObjectiveIds={
+                  objectiveLockedsByScenes?.map((obj) => obj.id) || []
+                }
+                onSelectObjective={(id) => {
+                  const objective = getObjectiveData(id);
+                  if (!objective) return;
+                  dispatch(
+                    updateObjective({
+                      id,
+                      objective: {
+                        ...objective,
+                        stateCondition: {
+                          type: "IN_SCENE",
+                          config: {
+                            sceneIds:
+                              objective.stateCondition.config.sceneIds.includes(
+                                scene.id
+                              )
+                                ? objective.stateCondition.config.sceneIds.filter(
+                                    (id) => id !== scene.id
+                                  )
+                                : [
+                                    ...objective.stateCondition.config.sceneIds,
+                                    scene.id,
+                                  ],
+                          },
+                        },
+                      },
+                    })
+                  );
+                }}
+              />
             </div>
             <div className="SceneEditModal__scene-music">
               <div className="SceneEditModal__scene-music-label">
