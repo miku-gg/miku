@@ -14,8 +14,11 @@ import {
   isPanelType,
   navigatePage,
   navigatePanel,
-  openModal,
+  openModal
 } from "../state/slices/inputSlice";
+import { TokenDisplayer } from "../components/TokenDisplayer";
+import { TOKEN_LIMITS } from "../data/tokenLimits";
+import { selectTotalTokenCount } from "../state/selectors";
 import { clearNovelState } from "../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../state/store";
 import HomePanel from "./HomePanel";
@@ -46,7 +49,7 @@ function PanelExplorer() {
                     <LuTextQuote /> <span>Details</span>
                   </>
                 ),
-                value: "details",
+                value: "details"
               },
               {
                 content: (
@@ -54,7 +57,7 @@ function PanelExplorer() {
                     <MdOutlinePermMedia /> <span>Assets</span>
                   </>
                 ),
-                value: "assets",
+                value: "assets"
               },
               {
                 content: (
@@ -65,7 +68,7 @@ function PanelExplorer() {
                 value: "scenes",
                 disabled: maxStep < 1,
                 tooltip:
-                  maxStep < 1 ? "Please add at least one asset for each" : "",
+                  maxStep < 1 ? "Please add at least one asset for each" : ""
               },
               {
                 content: (
@@ -76,7 +79,7 @@ function PanelExplorer() {
                 ),
                 value: "maps",
                 disabled: maxStep < 2,
-                tooltip: maxStep < 2 ? "Please add a scene" : "",
+                tooltip: maxStep < 2 ? "Please add a scene" : ""
               },
               {
                 content: (
@@ -86,7 +89,7 @@ function PanelExplorer() {
                 ),
                 value: "starts",
                 disabled: maxStep < 2,
-                tooltip: maxStep < 2 ? "Please add a scene" : "",
+                tooltip: maxStep < 2 ? "Please add a scene" : ""
               },
               {
                 content: (
@@ -96,8 +99,8 @@ function PanelExplorer() {
                 ),
                 value: "preview",
                 disabled: maxStep < 3,
-                tooltip: maxStep < 3 ? "Please add a start" : "",
-              },
+                tooltip: maxStep < 3 ? "Please add a start" : ""
+              }
             ]}
             selected={selectedPanel}
             onButtonClick={async (value) => {
@@ -107,6 +110,11 @@ function PanelExplorer() {
             }}
           />
           <ErrorsDisplay />
+          <TokenDisplayer
+            tokens={useAppSelector(selectTotalTokenCount)}
+            limits={TOKEN_LIMITS.TOTAL}
+            size="large"
+          />
         </div>
         <ButtonGroup
           buttons={[
@@ -116,7 +124,7 @@ function PanelExplorer() {
                   <BiSolidSave /> <span>Restart</span>
                 </>
               ),
-              value: "restart",
+              value: "restart"
             },
             {
               content: (
@@ -124,8 +132,8 @@ function PanelExplorer() {
                   <BiSolidSave /> <span>Save</span>
                 </>
               ),
-              value: "save",
-            },
+              value: "save"
+            }
           ]}
           selected={selectedPanel}
           onButtonClick={async (value) => {
@@ -138,7 +146,7 @@ function PanelExplorer() {
                     dispatch(
                       openModal({
                         modalType: "loading",
-                        text,
+                        text
                       })
                     );
                   }
@@ -155,7 +163,7 @@ function PanelExplorer() {
                 onYes: () => {
                   dispatch(clearNovelState());
                   dispatch(navigatePage("homepage"));
-                },
+                }
               });
             }
           }}
