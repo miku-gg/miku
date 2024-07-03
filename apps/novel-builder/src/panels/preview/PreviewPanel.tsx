@@ -94,7 +94,7 @@ export default function PreviewPanel() {
             })
           );
         },
-        exportFor === "local"
+        true
       );
     } catch (e) {
       console.error(e);

@@ -49,7 +49,11 @@ export const downloadNovelState = async (
 ) => {
   const filename =
     _novel.title.replace(/ /g, "_") +
-    (asBuild ? ".novel.json" : ".novel.miku-light.json");
+    (asBuild
+      ? getAssetUrl
+        ? ".novel.json"
+        : ".novel.miku-light.json"
+      : ".novel.miku-temp.json");
   onUpdate("Extracting assets...");
   const { assets, novel } = await extractNovelAssets(_novel);
 
