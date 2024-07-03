@@ -6,6 +6,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import ButtonGroup from "../../components/ButtonGroup";
 import config from "../../config";
 import InventoryItems from "../../panels/assets/inventory/InventoryItems";
+import { selectEditingInventoryItem } from "../../state/selectors";
 import { useAppSelector } from "../../state/store";
 import "./NovelActionForm.scss";
 import SceneSelector from "./SceneSelector";
@@ -63,7 +64,7 @@ const ActionParamsForm = ({
   availableActionTypes?: NovelV3.NovelActionType[];
 }) => {
   const scenes = useAppSelector((state) => state.novel.scenes);
-
+  const editingItem = useAppSelector(selectEditingInventoryItem);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const [isSceneSelectorOpened, setIsSceneSelectorOpened] = useState(false);
   const [childSceneSelectorId, setChildSceneSelectorId] = useState<
@@ -144,6 +145,7 @@ const ActionParamsForm = ({
   else if (action.type === NovelV3.NovelActionType.SHOW_ITEM) {
     return (
       <InventoryItems
+        skipItemIds={editingItem ? [editingItem.id] : []}
         tooltipText="Select the item that will unlock this condition."
         selectedItemIds={[action.params.itemId]}
         onSelect={(itemId) => {

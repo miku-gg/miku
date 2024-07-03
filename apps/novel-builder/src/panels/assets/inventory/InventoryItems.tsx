@@ -14,13 +14,16 @@ const InventoryItems = ({
   selectedItemIds,
   onSelect,
   tooltipText,
+  skipItemIds,
 }: {
   selectedItemIds?: string[];
   onSelect?: (id: string) => void;
   tooltipText?: string;
+  skipItemIds?: string[];
 }) => {
   const dispatch = useDispatch();
   const items = useAppSelector((state) => state.novel.inventory);
+  const currentItems = items?.filter((item) => !skipItemIds?.includes(item.id));
 
   const handleCreateInventoryItem = () => {
     const id = randomUUID();
@@ -29,9 +32,9 @@ const InventoryItems = ({
   };
 
   const createItemBlocks = () => {
-    if (!items) return [];
+    if (!currentItems) return [];
 
-    return items.map((item) => ({
+    return currentItems.map((item) => ({
       id: `item-${item.id}`,
       tooltip: item.name,
       highlighted: selectedItemIds && selectedItemIds.includes(item.id),
