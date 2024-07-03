@@ -6,7 +6,7 @@ import {
   Button,
   DragAndDropImages,
   Dropdown,
-  Input,
+  Input
 } from "@mikugg/ui-kit";
 
 import { checkFileType } from "../../libs/utils";
@@ -21,16 +21,11 @@ import config from "../../config";
 import "./CharacterOutfitsEdit.scss";
 import { toast } from "react-toastify";
 import { BsStars } from "react-icons/bs";
-
-interface EmotionGroup {
-  id: string;
-  name: string;
-  template: string;
-  emotions: { id: string; source: string[] }[];
-}
+import { TokenDisplayer } from "../../components/TokenDisplayer";
+import { TOKEN_LIMITS } from "../../data/tokenLimits";
 
 export default function CharacterOutfitsEdit({
-  characterId,
+  characterId
 }: {
   characterId?: string;
 }) {
@@ -59,11 +54,11 @@ export default function CharacterOutfitsEdit({
             ...character.card.data.extensions,
             mikugg_v2: {
               ...character.card.data.extensions.mikugg_v2,
-              outfits,
-            },
-          },
-        },
-      },
+              outfits
+            }
+          }
+        }
+      }
     };
   };
 
@@ -79,10 +74,10 @@ export default function CharacterOutfitsEdit({
           {
             id: "neutral",
             sources: {
-              png: "empty_char_emotion.png",
-            },
-          },
-        ],
+              png: "empty_char_emotion.png"
+            }
+          }
+        ]
       };
     dispatch(
       updateCharacter(
@@ -112,7 +107,7 @@ export default function CharacterOutfitsEdit({
       newGroups[groupIndex] = {
         ...newGroups[groupIndex],
         template: selectedTemplateId,
-        emotions: [],
+        emotions: []
       };
       dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
     }
@@ -135,7 +130,7 @@ export default function CharacterOutfitsEdit({
       const newGroups = [...outfits];
       newGroups[groupIndex] = {
         ...newGroups[groupIndex],
-        name: value,
+        name: value
       };
 
       dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
@@ -153,7 +148,7 @@ export default function CharacterOutfitsEdit({
       const newGroups = [...outfits];
       newGroups[groupIndex] = {
         ...newGroups[groupIndex],
-        description: value,
+        description: value
       };
 
       dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
@@ -165,7 +160,7 @@ export default function CharacterOutfitsEdit({
     groupIndex,
     emotionId,
     isAudio,
-    outfits: _outfits,
+    outfits: _outfits
   }: {
     file: File;
     groupIndex: number;
@@ -197,8 +192,8 @@ export default function CharacterOutfitsEdit({
           ...emotions[emotionIndex],
           sources: {
             ...emotions[emotionIndex].sources,
-            sound: assetId,
-          },
+            sound: assetId
+          }
         };
       }
     } else if (file.type === "video/webm") {
@@ -207,16 +202,16 @@ export default function CharacterOutfitsEdit({
           ...emotions[emotionIndex],
           sources: {
             ...emotions[emotionIndex]?.sources,
-            webm: assetId,
-          },
+            webm: assetId
+          }
         };
       } else {
         emotions.push({
           id: emotionId,
           sources: {
             png: "",
-            webm: assetId,
-          },
+            webm: assetId
+          }
         });
       }
     } else {
@@ -225,22 +220,22 @@ export default function CharacterOutfitsEdit({
           ...emotions[emotionIndex],
           sources: {
             ...emotions[emotionIndex]?.sources,
-            png: assetId,
-          },
+            png: assetId
+          }
         };
       } else {
         emotions.push({
           id: emotionId,
           sources: {
-            png: assetId,
-          },
+            png: assetId
+          }
         });
       }
     }
 
     newGroups[groupIndex] = {
       ...newGroups[groupIndex],
-      emotions,
+      emotions
     };
     return newGroups;
   };
@@ -257,7 +252,7 @@ export default function CharacterOutfitsEdit({
         groupIndex,
         emotionId,
         isAudio,
-        outfits,
+        outfits
       });
       dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
     }
@@ -278,7 +273,7 @@ export default function CharacterOutfitsEdit({
           groupIndex,
           emotionId,
           isAudio: false,
-          outfits: newGroups,
+          outfits: newGroups
         });
         dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
       }
@@ -325,7 +320,7 @@ export default function CharacterOutfitsEdit({
                     "image/png",
                     "image/gif",
                     "video/webm",
-                    "audio/mpeg",
+                    "audio/mpeg"
                   ]);
                 }}
               />
@@ -360,8 +355,14 @@ export default function CharacterOutfitsEdit({
             />
           </div>
           <div className="CharacterOutfitsEdit__formGroup">
+            <div className="CharacterOutfitsEdit__description-label-container">
+              <label className="Input__label">Description</label>
+              <TokenDisplayer
+                text={group.description}
+                limits={TOKEN_LIMITS.OUTFIT_DESCRIPTION}
+              />
+            </div>
             <Input
-              label="Description"
               placeHolder={`[Maiko's Body= "white long hair", "black horns", "dark body lingerie",  "deep pink eyes", "pale skin", "slender figure", "big breasts", "clumsy posture", "pointy ears", "small devilish wings"]`}
               id={`group_${groupIndex}_name`}
               name="description"

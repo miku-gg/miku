@@ -22,15 +22,13 @@ const ModelSelector = () => {
   let tooltipMessage = ''
 
   if (!isPremium && !freeSmart) {
-    tooltipMessage = '70B model is only available for premium users.'
+    tooltipMessage = 'Makes the AI smarter. Available for premium users.'
   } else if (freeSmart) {
     tooltipMessage = isSmart
-      ? 'Deactivate 70B'
-      : 'Activate 70B model. Free for a limited time.'
+      ? 'Deactivate Smart mode.'
+      : 'Activate Smart mode. Free for a limited time.'
   } else if (isPremium) {
-    tooltipMessage = isSmart
-      ? 'Deactivate 70B'
-      : 'Activate 70B model. Makes the AI smarter.'
+    tooltipMessage = isSmart ? 'Deactivate Smart mode.' : 'Activate Smart mode.'
   }
 
   return (

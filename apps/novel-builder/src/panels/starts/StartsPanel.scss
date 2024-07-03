@@ -65,6 +65,16 @@
     width: 200px;
   }
 
+  &__item-prompt-character-title-right {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+
+    > .TokenDisplayer {
+      margin-bottom: 8px;
+    }
+  }
+
   &__scene-selection-list {
     display: flex;
     flex-wrap: wrap;

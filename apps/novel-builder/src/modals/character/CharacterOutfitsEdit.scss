@@ -47,6 +47,22 @@
     }
   }
 
+  &__description-label-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .Input__label {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    justify-content: space-between;
+  }
+
   &__controls {
     display: flex;
     justify-content: space-between;
