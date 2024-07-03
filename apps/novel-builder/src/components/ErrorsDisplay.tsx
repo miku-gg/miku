@@ -1,14 +1,14 @@
-import { useAppDispatch, useAppSelector } from "../state/store";
 import {
   NovelValidationTargetType,
   validateNovelState,
 } from "@mikugg/bot-utils";
-import { allowUntilStep } from "../libs/utils";
 import { Modal } from "@mikugg/ui-kit";
-import { closeModal, openModal } from "../state/slices/inputSlice";
-import { BiError } from "react-icons/bi";
-import "./ErrorsDisplay.scss";
 import classNames from "classnames";
+import { BiError } from "react-icons/bi";
+import { allowUntilStep } from "../libs/utils";
+import { closeModal, openModal } from "../state/slices/inputSlice";
+import { useAppDispatch, useAppSelector } from "../state/store";
+import "./ErrorsDisplay.scss";
 
 export default function ErrorsDisplay() {
   const dispatch = useAppDispatch();
@@ -28,6 +28,8 @@ export default function ErrorsDisplay() {
           NovelValidationTargetType.CHARACTER,
           NovelValidationTargetType.OUTFIT,
           NovelValidationTargetType.SONG,
+          NovelValidationTargetType.OBJETIVES,
+          NovelValidationTargetType.INVENTORY,
         ];
       case 1:
         return [
@@ -37,6 +39,7 @@ export default function ErrorsDisplay() {
           NovelValidationTargetType.OUTFIT,
           NovelValidationTargetType.SONG,
           NovelValidationTargetType.SCENE,
+          NovelValidationTargetType.INVENTORY,
         ];
       case 0:
         return [
@@ -45,6 +48,7 @@ export default function ErrorsDisplay() {
           NovelValidationTargetType.CHARACTER,
           NovelValidationTargetType.OUTFIT,
           NovelValidationTargetType.SONG,
+          NovelValidationTargetType.INVENTORY,
         ];
     }
     return [];

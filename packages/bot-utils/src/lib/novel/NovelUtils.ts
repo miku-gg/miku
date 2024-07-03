@@ -816,7 +816,7 @@ export function validateNovelState(
       });
     });
 
-    //validate items
+    //Validate Inventory Items
     if (novel.inventory) {
       novel.inventory.forEach((item) => {
         if (!item.name) {
@@ -941,7 +941,7 @@ export function validateNovelState(
       });
     }
 
-    //validate objectives
+    //Validate Novel objectives
     if (novel.objectives) {
       novel.objectives.forEach((objective) => {
         if (!objective.name) {
@@ -952,18 +952,7 @@ export function validateNovelState(
             message: `Objective has no name`,
           });
         }
-        if (objective.stateCondition) {
-          if (!objective.stateCondition.config.sceneIds) {
-            errors.push({
-              targetType: NovelValidationTargetType.OBJETIVES,
-              targetId: objective.id,
-              severity: "error",
-              message: `Objective '${objective.name}' has no condition`,
-            });
-          }
-        }
         if (objective.actions) {
-          //validate actions
           if (!objective.actions.length) {
             errors.push({
               targetType: NovelValidationTargetType.OBJETIVES,
@@ -1037,7 +1026,7 @@ export function validateNovelState(
             targetType: NovelValidationTargetType.OBJETIVES,
             targetId: objective.id,
             severity: "error",
-            message: `Objective ''${objective.name}'' is not assigned to any scene`,
+            message: `Objective '${objective.name}' is not assigned to any scene`,
           });
         }
       });
