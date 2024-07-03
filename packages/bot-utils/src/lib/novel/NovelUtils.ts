@@ -832,7 +832,7 @@ export function validateNovelState(
             targetType: NovelValidationTargetType.INVENTORY,
             targetId: item.id,
             severity: "warning",
-            message: `Item ${item.name} has no description`,
+            message: `Item '${item.name}' has no description`,
           });
         }
         if (!item.icon) {
@@ -840,7 +840,7 @@ export function validateNovelState(
             targetType: NovelValidationTargetType.INVENTORY,
             targetId: item.id,
             severity: "error",
-            message: `Item ${item.name} has no icon`,
+            message: `Item '${item.name}' has no icon`,
           });
         }
         if (item.actions) {
@@ -849,7 +849,7 @@ export function validateNovelState(
               targetType: NovelValidationTargetType.INVENTORY,
               targetId: item.id,
               severity: "error",
-              message: `Item ${item.name} has no actions`,
+              message: `Item '${item.name}' has no actions`,
             });
           }
           item.actions.forEach((action) => {
@@ -858,7 +858,7 @@ export function validateNovelState(
                 targetType: NovelValidationTargetType.INVENTORY,
                 targetId: item.id,
                 severity: "error",
-                message: `Action has no name in item ${item.name}`,
+                message: `Action has no name in item '${item.name}'`,
               });
             }
             if (!action.prompt) {
@@ -866,7 +866,7 @@ export function validateNovelState(
                 targetType: NovelValidationTargetType.INVENTORY,
                 targetId: item.id,
                 severity: "error",
-                message: `Action ${action.name} has no description in item ${item.name}`,
+                message: `Action '${action.name}' in item '${item.name}' has no prompt`,
               });
             }
             if (action.usageActions) {
@@ -877,7 +877,7 @@ export function validateNovelState(
                       targetType: NovelValidationTargetType.DESC,
                       targetId: item.id,
                       severity: "error",
-                      message: `Show item action has no item id in item ${item.name}`,
+                      message: `Show item action has no item id in action '${action.name}' in '${item.name}'`,
                     });
                   }
                 }
@@ -887,7 +887,7 @@ export function validateNovelState(
                       targetType: NovelValidationTargetType.DESC,
                       targetId: item.id,
                       severity: "error",
-                      message: `Hide item action has no item id in item ${item.name}`,
+                      message: `Hide item action has no item id in action '${action.name}' in '${item.name}'`,
                     });
                   }
                 }
@@ -899,7 +899,7 @@ export function validateNovelState(
                       targetType: NovelValidationTargetType.DESC,
                       targetId: item.id,
                       severity: "error",
-                      message: `Add child scenes action has no scene id in item ${item.name}`,
+                      message: `Add child scenes action has no scene id in action '${action.name}' in '${item.name}'`,
                     });
                   }
                   if (!usageAction.params.children) {
@@ -907,7 +907,7 @@ export function validateNovelState(
                       targetType: NovelValidationTargetType.DESC,
                       targetId: item.id,
                       severity: "error",
-                      message: `Add child scenes action has no children in item ${item.name}`,
+                      message: `Add child scenes action has no children in action '${action.name}' in '${item.name}'`,
                     });
                   }
                 }
@@ -920,7 +920,7 @@ export function validateNovelState(
                       targetType: NovelValidationTargetType.DESC,
                       targetId: item.id,
                       severity: "error",
-                      message: `Suggest advance scene action has no scene id in item ${item.name}`,
+                      message: `Suggest advance scene action has no scene id in action '${action.name}' in '${item.name}'`,
                     });
                   }
                 }
@@ -932,7 +932,7 @@ export function validateNovelState(
                   targetType: NovelValidationTargetType.INVENTORY,
                   targetId: item.id,
                   severity: "error",
-                  message: `Action ${action.name} has no condition in item ${item.name}`,
+                  message: `Action '${action.name}' has no condition in item '${item.name}'`,
                 });
               }
             }
@@ -958,7 +958,7 @@ export function validateNovelState(
               targetType: NovelValidationTargetType.OBJETIVES,
               targetId: objective.id,
               severity: "error",
-              message: `Objective ${objective.name} has no condition`,
+              message: `Objective '${objective.name}' has no condition`,
             });
           }
         }
@@ -969,7 +969,7 @@ export function validateNovelState(
               targetType: NovelValidationTargetType.OBJETIVES,
               targetId: objective.id,
               severity: "error",
-              message: `Objective ${objective.name} has no actions`,
+              message: `Objective '${objective.name}' has no actions`,
             });
           }
           objective.actions.forEach((action) => {
@@ -979,7 +979,7 @@ export function validateNovelState(
                   targetType: NovelValidationTargetType.OBJETIVES,
                   targetId: objective.id,
                   severity: "error",
-                  message: `Show item action has no item id in objective ${objective.name}`,
+                  message: `Show item action has no item id in objective '${objective.name}'`,
                 });
               }
             }
@@ -989,7 +989,7 @@ export function validateNovelState(
                   targetType: NovelValidationTargetType.OBJETIVES,
                   targetId: objective.id,
                   severity: "error",
-                  message: `Hide item action has no item id in objective ${objective.name}`,
+                  message: `Hide item action has no item id in objective '${objective.name}'`,
                 });
               }
             }
@@ -999,7 +999,7 @@ export function validateNovelState(
                   targetType: NovelValidationTargetType.OBJETIVES,
                   targetId: objective.id,
                   severity: "error",
-                  message: `Add child scenes action has no scene id in objective ${objective.name}`,
+                  message: `Add child scenes action has no scene id in objective '${objective.name}'`,
                 });
               }
               if (!action.params.children) {
@@ -1007,7 +1007,7 @@ export function validateNovelState(
                   targetType: NovelValidationTargetType.OBJETIVES,
                   targetId: objective.id,
                   severity: "error",
-                  message: `Add child scenes action has no children in objective ${objective.name}`,
+                  message: `Add child scenes action has no children in objective '${objective.name}'`,
                 });
               }
             }
@@ -1017,7 +1017,7 @@ export function validateNovelState(
                   targetType: NovelValidationTargetType.OBJETIVES,
                   targetId: objective.id,
                   severity: "error",
-                  message: `Suggest advance scene action has no scene id in objective ${objective.name}`,
+                  message: `Suggest advance scene action has no scene id in objective '${objective.name}'`,
                 });
               }
             }
@@ -1028,7 +1028,16 @@ export function validateNovelState(
             targetType: NovelValidationTargetType.OBJETIVES,
             targetId: objective.id,
             severity: "error",
-            message: `Objective ${objective.name} has no condition`,
+            message: `Objective '${objective.name}' has no condition`,
+          });
+        }
+
+        if (!objective.stateCondition.config.sceneIds) {
+          errors.push({
+            targetType: NovelValidationTargetType.OBJETIVES,
+            targetId: objective.id,
+            severity: "error",
+            message: `Objective ''${objective.name}'' is not assigned to any scene`,
           });
         }
       });
