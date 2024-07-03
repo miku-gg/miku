@@ -360,6 +360,7 @@ export default function SceneEditModal() {
             </div>
             <div className="SceneEditModal__scene-objectives">
               <NovelObjectives
+                tooltipText="Select objectives that are relevant to this scene."
                 selectedObjectiveIds={
                   objectiveLockedsByScenes?.map((obj) => obj.id) || []
                 }

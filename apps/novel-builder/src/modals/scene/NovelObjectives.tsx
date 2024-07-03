@@ -1,3 +1,4 @@
+import { NovelV3 } from "@mikugg/bot-utils";
 import { Button, Tooltip } from "@mikugg/ui-kit";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
@@ -6,6 +7,7 @@ import { v4 as randomUUID } from "uuid";
 import { openModal } from "../../state/slices/inputSlice";
 import { createObjective } from "../../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../../state/store";
+
 import "./NovelObjectives.scss";
 
 interface NovelObjectiveProps {
@@ -30,6 +32,22 @@ export const NovelObjectives = ({
   const isSelected = (id: string) => {
     if (!selectedObjectiveIds) return false;
     return selectedObjectiveIds.includes(id);
+  };
+  const getTextFromActionType = (type: NovelV3.NovelActionType) => {
+    switch (type) {
+      case NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE:
+        return "Suggest advance scene";
+      case NovelV3.NovelActionType.SUGGEST_CREATE_SCENE:
+        return "Suggest create scene";
+      case NovelV3.NovelActionType.HIDE_ITEM:
+        return "Hide item";
+      case NovelV3.NovelActionType.SHOW_ITEM:
+        return "Show item";
+      case NovelV3.NovelActionType.ADD_CHILD_SCENES:
+        return "Add child scenes";
+      default:
+        return "No selected";
+    }
   };
   return (
     <div className="NovelObjectives">
@@ -88,8 +106,8 @@ export const NovelObjectives = ({
                   <p>
                     Action:{" "}
                     {actions.length > 0
-                      ? actions[0].type.toString()
-                      : "no selected."}
+                      ? getTextFromActionType(actions[0].type)
+                      : "No selected"}
                   </p>
                   {isSelected(id) && (
                     <div className="selected__badge">

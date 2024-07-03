@@ -38,7 +38,7 @@
     &__objective {
       position: relative;
       border: 1px solid $node-conector-color;
-      padding: 16px;
+      padding: 12px;
       border-radius: 16px;
       width: 100%;
       z-index: 1;
@@ -91,8 +91,8 @@
 
     &__badge {
       position: absolute;
-      right: 10px;
-      bottom: 8px;
+      right: 6px;
+      bottom: 2px;
       display: flex;
       align-items: center;
       gap: 5px;
