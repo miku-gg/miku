@@ -122,11 +122,32 @@ export default function ItemEditModal() {
           </div>
           <div className="ItemEdit__form">
             <div className="ItemEdit__form__text">
-              <Input label="Item name" placeHolder="Rose" />
+              <Input
+                label="Item name"
+                placeHolder="Rose"
+                value={item.name}
+                onChange={(e) => {
+                  dispatch(
+                    updateInventoryItem({
+                      ...item,
+                      name: e.target.value,
+                    })
+                  );
+                }}
+              />
               <Input
                 isTextArea
-                label="Item description"
+                label="Short item description"
                 placeHolder="A beautiful rose"
+                value={item.description}
+                onChange={(e) => {
+                  dispatch(
+                    updateInventoryItem({
+                      ...item,
+                      description: e.target.value,
+                    })
+                  );
+                }}
               />
               <div className="ItemEdit__scenes">
                 <div className="ItemEdit__scenes__title">
@@ -137,7 +158,7 @@ export default function ItemEditModal() {
                       dispatch(
                         updateInventoryItem({
                           ...item,
-                          hidden: !!e.target.checked,
+                          hidden: e.target.checked,
                         })
                       );
                     }}
