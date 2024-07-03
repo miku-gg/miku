@@ -1,22 +1,22 @@
-import { Button, Tooltip } from '@mikugg/ui-kit'
-import { useAppDispatch, useAppSelector } from '../../state/store'
 import { NovelV3 } from '@mikugg/bot-utils'
-import {
-  setInventoryVisibility,
-  setItemModalVisibility,
-  setSelectedItem,
-} from '../../state/slices/inventorySlice'
+import { Button, Tooltip } from '@mikugg/ui-kit'
 import { FaTimes } from 'react-icons/fa'
-import './Inventory.scss'
+import { toast } from 'react-toastify'
 import { useAppContext } from '../../App.context'
-import { interactionStart } from '../../state/slices/narrationSlice'
+import { novelActionToStateAction } from '../../state/mutations'
 import {
   selectConditionStatus,
   selectCurrentScene,
   selectLastLoadedResponse,
 } from '../../state/selectors'
-import { toast } from 'react-toastify'
-import { novelActionToStateAction } from '../../state/mutations'
+import {
+  setInventoryVisibility,
+  setItemModalVisibility,
+  setSelectedItem,
+} from '../../state/slices/inventorySlice'
+import { interactionStart } from '../../state/slices/narrationSlice'
+import { useAppDispatch, useAppSelector } from '../../state/store'
+import './Inventory.scss'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
@@ -24,6 +24,7 @@ export default function Inventory() {
   const { showInventory, selectedItem, items } = useAppSelector(
     (state) => state.inventory
   )
+  const currentScene = useAppSelector(selectCurrentScene)
   const {
     servicesEndpoint,
     isInteractionDisabled,
@@ -55,13 +56,17 @@ export default function Inventory() {
             const animationDuration = Math.max(item.name.length / speed, 3)
             const isSelectedItem = item.id === selectedItem?.id
             const disabled = !isPremium && item.isPremium
-
+            const isHiden = item.hidden
+            const isLocked = item.locked?.config.sceneIds.includes(
+              currentScene?.id || ''
+            )
             return (
               <div
                 key={item.id}
                 className={`Inventory__item ${
                   isSelectedItem ? 'selected' : ''
                 } ${disabled ? 'disabled' : ''}
+                  ${isHiden || (item.locked && !isLocked) ? 'hidden' : ''}
                 `}
                 onClick={() => {
                   if (disabled) return
