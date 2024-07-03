@@ -74,6 +74,15 @@ export default function PreviewPanel() {
 
   const handlExport = async (exportFor: "miku" | "local") => {
     try {
+      setIsModalOpen(false);
+      dispatch(
+        openModal({
+          modalType: "loading",
+          text: `Building project for ${
+            exportFor === "miku" ? "Miku.gg" : "local"
+          }...`,
+        })
+      );
       await downloadNovelState(
         cloneDeep(novel),
         exportFor === "local" ? config.genAssetLink : false,
@@ -86,14 +95,14 @@ export default function PreviewPanel() {
           );
         },
         exportFor === "local"
-      );      
+      );
     } catch (e) {
       console.error(e);
       toast.error(`Failed to ${exportFor === "miku" ? "build" : "save"} novel`);
     }
     dispatch(closeModal({ modalType: "loading" }));
     setIsModalOpen(false);
-  }
+  };
 
   useEffect(() => {
     if (!loadingIframe) {
@@ -144,20 +153,25 @@ export default function PreviewPanel() {
     <div className="PreviewPanel">
       <div className="PreviewPanel__header">
         <h1 className="PreviewPanel__title">Preview</h1>
-        <Modal
-          opened={isModalOpen}
-          onCloseModal={() => setIsModalOpen(false)}
-        >
+        <Modal opened={isModalOpen} onCloseModal={() => setIsModalOpen(false)}>
           <div className="PreviewPanel__modal-content">
             <h2 className="PreviewPanel__modal-title">Build project</h2>
             <ul className="PreviewPanel__options">
               <li className="PreviewPanel__option">
                 <p className="PreviewPanel__option-title">Export for Miku.gg</p>
-                <p className="PreviewPanel__option-description">Saves your project as a .json file without assets. Ideal for sharing or uploading to Miku.gg.</p>
+                <p className="PreviewPanel__option-description">
+                  Saves your project as a .json file without assets. Ideal for
+                  sharing or uploading to Miku.gg.
+                </p>
               </li>
               <li className="PreviewPanel__option">
-                <p className="PreviewPanel__option-title">Export for Local Use</p>
-                <p className="PreviewPanel__option-description">Saves your project as a .json file with all associated assets included. Perfect for offline use or complete backups.</p>
+                <p className="PreviewPanel__option-title">
+                  Export for Local Use
+                </p>
+                <p className="PreviewPanel__option-description">
+                  Saves your project as a .json file with all associated assets
+                  included. Perfect for offline use or complete backups.
+                </p>
               </li>
             </ul>
             <div className="PreviewPanel__buttons-group">
