@@ -117,7 +117,6 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        border: 1px solid $node-conector-color;
         border-radius: 16px;
         padding: 4px;
 
@@ -133,7 +132,31 @@
         }
       }
     }
+    &__mutations {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    &__usageAction {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid $node-conector-color;
+      border-radius: 16px;
 
+      &__remove {
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+
+        &:hover {
+          color: $secondary-color;
+        }
+      }
+    }
     &__remove {
       position: absolute;
       top: 10px;

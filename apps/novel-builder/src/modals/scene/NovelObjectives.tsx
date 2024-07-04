@@ -15,6 +15,22 @@ interface NovelObjectiveProps {
   onSelectObjective?: (id: string) => void;
   tooltipText?: string;
 }
+ export const getTextFromActionType = (type: NovelV3.NovelActionType) => {
+   switch (type) {
+     case NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE:
+       return "Suggest advance scene";
+     case NovelV3.NovelActionType.SUGGEST_CREATE_SCENE:
+       return "Suggest create scene";
+     case NovelV3.NovelActionType.HIDE_ITEM:
+       return "Hide item";
+     case NovelV3.NovelActionType.SHOW_ITEM:
+       return "Show item";
+     case NovelV3.NovelActionType.ADD_CHILD_SCENES:
+       return "Add child scenes";
+     default:
+       return "No selected";
+   }
+ };
 
 export const NovelObjectives = ({
   selectedObjectiveIds,
@@ -33,22 +49,7 @@ export const NovelObjectives = ({
     if (!selectedObjectiveIds) return false;
     return selectedObjectiveIds.includes(id);
   };
-  const getTextFromActionType = (type: NovelV3.NovelActionType) => {
-    switch (type) {
-      case NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE:
-        return "Suggest advance scene";
-      case NovelV3.NovelActionType.SUGGEST_CREATE_SCENE:
-        return "Suggest create scene";
-      case NovelV3.NovelActionType.HIDE_ITEM:
-        return "Hide item";
-      case NovelV3.NovelActionType.SHOW_ITEM:
-        return "Show item";
-      case NovelV3.NovelActionType.ADD_CHILD_SCENES:
-        return "Add child scenes";
-      default:
-        return "No selected";
-    }
-  };
+ 
   return (
     <div className="NovelObjectives">
       <div className="NovelObjectives__header">

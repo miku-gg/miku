@@ -107,8 +107,6 @@ export default function ItemEditModal() {
           <div className="ItemEdit__buttons">
             <FaTrashAlt
               className="ItemEdit__buttons__removePlace"
-              data-tooltip-id="delete-tooltip"
-              data-tooltip-content="Delete place"
               onClick={() => {
                 handleDelete(item.id);
               }}
@@ -265,7 +263,7 @@ export default function ItemEditModal() {
                     />
                     <div className="ItemEdit__actions__action__mutation">
                       <div>
-                        <h3>Usage Action</h3>
+                        <h3>Usage Actions</h3>
                         <IoInformationCircleOutline
                           data-tooltip-id={`Info-item-actions-${action.id}`}
                           className="ObjectiveEdit__header__title__infoIcon"
@@ -273,25 +271,20 @@ export default function ItemEditModal() {
                         />
                       </div>
                       <Button
-                        theme="secondary"
+                        theme="primary"
                         onClick={() => {
                           handleUpdateAction(action.id || "", {
-                            usageActions:
-                              action.usageActions &&
-                              action.usageActions?.length < 1
-                                ? [
-                                    {
-                                      type: NovelV3.NovelActionType.SHOW_ITEM,
-                                      params: { itemId: "" },
-                                    },
-                                  ]
-                                : [],
+                            usageActions: [
+                              ...(action.usageActions || []),
+                              {
+                                type: NovelV3.NovelActionType.SHOW_ITEM,
+                                params: { itemId: "" },
+                              },
+                            ],
                           });
                         }}
                       >
-                        {action.usageActions && action.usageActions?.length < 1
-                          ? "Add action"
-                          : "Remove action"}
+                        Add usage action
                       </Button>
                       <Tooltip
                         id={`Info-item-actions-${action.id}`}
@@ -299,15 +292,38 @@ export default function ItemEditModal() {
                       />
                     </div>
                     {action.usageActions && action.usageActions.length > 0 ? (
-                      <NovelActionForm
-                        action={action.usageActions[0]}
-                        onChange={(act) => {
-                          handleUpdateAction(action.id || "", {
-                            usageActions: [act],
-                          });
-                        }}
-                        onDelete={() => {}}
-                      />
+                      <div className="ItemEdit__actions__mutations">
+                        {action.usageActions.map((act, index) => (
+                          <div
+                            key={`${act.type}-${index + 1}`}
+                            className="ItemEdit__actions__usageAction"
+                          >
+                            <FaTrashAlt
+                              className="ItemEdit__actions__usageAction__remove"
+                              onClick={() => {
+                                handleUpdateAction(action.id || "", {
+                                  usageActions: action.usageActions?.filter(
+                                    (_, i) => i !== index
+                                  ),
+                                });
+                              }}
+                            />
+                            <NovelActionForm
+                              action={act}
+                              onChange={(act) => {
+                                handleUpdateAction(action.id || "", {
+                                  usageActions: [
+                                    ...action.usageActions!.slice(0, index),
+                                    act,
+                                    ...action.usageActions!.slice(index + 1),
+                                  ],
+                                });
+                              }}
+                              onDelete={() => {}}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     ) : null}
                   </div>
                 ))}
