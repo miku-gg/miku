@@ -94,6 +94,12 @@ const interactionEffect = async (
       identifier,
     })
 
+    const completionQueryTemplate = completionQuery.template || ''
+    const lastInstructions = completionQueryTemplate
+      .split('### Instruction:')
+      .pop()
+    console.log('Last Instructions:', lastInstructions)
+
     let finishedCompletionResult = new Map<string, string>()
     for await (const result of stream) {
       finishedCompletionResult = result
