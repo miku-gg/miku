@@ -6,13 +6,16 @@ import {
   ImageSlider,
   Input,
   Modal,
-  Tooltip
+  Tooltip,
 } from "@mikugg/ui-kit";
 import classNames from "classnames";
 import { useState } from "react";
 import { AiOutlinePicture } from "react-icons/ai";
 import { FaUser } from "react-icons/fa6";
+import { IoInformationCircleOutline } from "react-icons/io5";
+import { TokenDisplayer } from "../../components/TokenDisplayer";
 import config from "../../config";
+import { TOKEN_LIMITS } from "../../data/tokenLimits";
 import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
 import Characters from "../../panels/assets/characters/Characters";
 import InventoryItems from "../../panels/assets/inventory/InventoryItems";
@@ -30,9 +33,6 @@ import {
 import { useAppDispatch, useAppSelector } from "../../state/store";
 import { NovelObjectives } from "./NovelObjectives";
 import "./SceneEditModal.scss";
-import { TokenDisplayer } from "../../components/TokenDisplayer";
-import { TOKEN_LIMITS } from "../../data/tokenLimits";
-import { IoInformationCircleOutline } from "react-icons/io5";
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -56,7 +56,7 @@ export default function SceneEditModal() {
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
   const [selectCharacterModal, setSelectCharacterModal] = useState({
     opened: false,
-    characterIndex: 0
+    characterIndex: 0,
   });
   const [showingEmotionChar1, setShowingEmotionChar1] = useState("neutral");
   const [showingEmotionChar2, setShowingEmotionChar2] = useState("neutral");
@@ -72,7 +72,7 @@ export default function SceneEditModal() {
         onYes: () => {
           dispatch(deleteSceneById(scene.id));
           dispatch(closeModal({ modalType: "scene" }));
-        }
+        },
       });
     }
   };
@@ -86,7 +86,7 @@ export default function SceneEditModal() {
           ? scene.lorebookIds.includes(id)
             ? scene.lorebookIds.filter((lid) => lid !== id)
             : [...scene.lorebookIds, id]
-          : [id]
+          : [id],
       })
     );
   };
@@ -137,7 +137,7 @@ export default function SceneEditModal() {
                 onClick={() =>
                   setSelectCharacterModal({
                     opened: true,
-                    characterIndex: 0
+                    characterIndex: 0,
                   })
                 }
                 tabIndex={0}
@@ -149,12 +149,12 @@ export default function SceneEditModal() {
                 className={classNames({
                   "SceneEditModal__character-select2-btn": true,
                   "SceneEditModal__character-select2-btn--disabled":
-                    scene.characters.length < 2
+                    scene.characters.length < 2,
                 })}
                 onClick={() =>
                   setSelectCharacterModal({
                     opened: true,
-                    characterIndex: 1
+                    characterIndex: 1,
                   })
                 }
                 tabIndex={0}
@@ -184,8 +184,8 @@ export default function SceneEditModal() {
                     outfits[selectedOutfitIndex].emotions[0] || {
                       id: "neutral",
                       sources: {
-                        png: ""
-                      }
+                        png: "",
+                      },
                     };
                   return (
                     <div
@@ -197,7 +197,7 @@ export default function SceneEditModal() {
                           source: config.genAssetLink(
                             selectedEmotion.sources.png
                           ),
-                          label: outfit.name
+                          label: outfit.name,
                         }))}
                         backgroundImageSource=""
                         selectedIndex={selectedOutfitIndex}
@@ -216,15 +216,15 @@ export default function SceneEditModal() {
                                   return {
                                     characterId: char.id || "",
                                     objective: char.objective,
-                                    outfit: outfits[newOutfitIndex].id
+                                    outfit: outfits[newOutfitIndex].id,
                                   };
                                 }
                                 return {
                                   characterId: char.id || "",
                                   objective: char.objective,
-                                  outfit: char.outfit
+                                  outfit: char.outfit,
                                 };
-                              })
+                              }),
                             })
                           );
                         }}
@@ -232,7 +232,7 @@ export default function SceneEditModal() {
                       <Carousel
                         items={outfits[selectedOutfitIndex].emotions.map(
                           (emotion) => ({
-                            title: emotion.id
+                            title: emotion.id,
                           })
                         )}
                         selectedIndex={
@@ -269,7 +269,7 @@ export default function SceneEditModal() {
                     dispatch(
                       updateScene({
                         ...scene._source,
-                        name: e.target.value
+                        name: e.target.value,
                       })
                     )
                   }
@@ -286,7 +286,7 @@ export default function SceneEditModal() {
                     dispatch(
                       updateScene({
                         ...scene._source,
-                        name: e.target.value
+                        name: e.target.value,
                       })
                     )
                   }
@@ -302,7 +302,7 @@ export default function SceneEditModal() {
                       dispatch(
                         updateScene({
                           ...scene._source,
-                          nsfw: e.target.checked ? 1 : 0
+                          nsfw: e.target.checked ? 1 : 0,
                         })
                       )
                     }
@@ -316,7 +316,7 @@ export default function SceneEditModal() {
                       dispatch(
                         updateScene({
                           ...scene._source,
-                          nsfw: e.target.checked ? 2 : 1
+                          nsfw: e.target.checked ? 2 : 1,
                         })
                       );
                     }}
@@ -349,7 +349,7 @@ export default function SceneEditModal() {
                       dispatch(
                         updateScene({
                           ...scene._source,
-                          prompt: e.target.value
+                          prompt: e.target.value,
                         })
                       );
                     }}
@@ -369,7 +369,7 @@ export default function SceneEditModal() {
                     dispatch(
                       updateScene({
                         ...scene._source,
-                        condition: e.target.value || null
+                        condition: e.target.value || null,
                       })
                     );
                   }}
@@ -469,15 +469,15 @@ export default function SceneEditModal() {
                                     return {
                                       characterId: char.id || "",
                                       objective: e.target.value,
-                                      outfit: char.outfit
+                                      outfit: char.outfit,
                                     };
                                   }
                                   return {
                                     characterId: char.id || "",
                                     objective: char.objective,
-                                    outfit: char.outfit
+                                    outfit: char.outfit,
                                   };
-                                })
+                                }),
                               })
                             );
                           }}
@@ -511,24 +511,21 @@ export default function SceneEditModal() {
                     updateInventoryItem({
                       ...item,
                       id: itemId,
-                      locked:
-                        item.locked?.config.sceneIds.length === 0
-                          ? undefined
-                          : {
-                              type: "IN_SCENE",
-                              config: {
-                                sceneIds: item.locked?.config.sceneIds.includes(
-                                  scene.id
-                                )
-                                  ? item.locked?.config.sceneIds.filter(
-                                      (id) => id !== scene.id
-                                    )
-                                  : [
-                                      ...(item.locked?.config.sceneIds ?? []),
-                                      scene.id,
-                                    ],
-                              },
-                            },
+                      locked: {
+                        type: "IN_SCENE",
+                        config: {
+                          sceneIds: item.locked?.config.sceneIds.includes(
+                            scene.id
+                          )
+                            ? item.locked?.config.sceneIds.filter(
+                                (id) => id !== scene.id
+                              )
+                            : [
+                                ...(item.locked?.config.sceneIds ?? []),
+                                scene.id,
+                              ],
+                        },
+                      },
                     })
                   );
                 }}
@@ -561,7 +558,7 @@ export default function SceneEditModal() {
               dispatch(
                 updateScene({
                   ...scene._source,
-                  backgroundId
+                  backgroundId,
                 })
               );
               setSelectBackgroundModalOpened(false);
@@ -592,7 +589,7 @@ export default function SceneEditModal() {
             if (scene?._source) {
               const newSceneCharacters = scene.characters.map((character) => ({
                 characterId: character.id || "",
-                outfit: character.outfit || ""
+                outfit: character.outfit || "",
               }));
               const newCharacter = characters.find(
                 (character) => character.id === characterId
@@ -602,7 +599,7 @@ export default function SceneEditModal() {
                   characterId,
                   outfit:
                     newCharacter?.card.data.extensions.mikugg_v2.outfits[0]
-                      .id || ""
+                      .id || "",
                 };
               } else {
                 newSceneCharacters.splice(
@@ -613,12 +610,12 @@ export default function SceneEditModal() {
               dispatch(
                 updateScene({
                   ...scene._source,
-                  characters: newSceneCharacters
+                  characters: newSceneCharacters,
                 })
               );
               setSelectCharacterModal({
                 opened: false,
-                characterIndex: 0
+                characterIndex: 0,
               });
             }
           }}
@@ -636,7 +633,7 @@ export default function SceneEditModal() {
               dispatch(
                 updateScene({
                   ...scene._source,
-                  musicId
+                  musicId,
                 })
               );
               setSelectSongModalOpened(false);
