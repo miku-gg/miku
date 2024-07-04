@@ -8,6 +8,7 @@ import './InteractorHeader.scss'
 import Settings from './Settings'
 import ModelSelector from './ModelSelector'
 import InteractiveMap from '../scenarios/InteractiveMap'
+import { SceneChangeModal } from '../scenarios/SceneChangeModal'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
@@ -35,6 +36,7 @@ const InteractorHeader = () => {
         <SceneSelector />
         <History />
         <InteractiveMap />
+        <SceneChangeModal />
       </div>
       <div className="InteractorHeader__right">
         <ModelSelector />

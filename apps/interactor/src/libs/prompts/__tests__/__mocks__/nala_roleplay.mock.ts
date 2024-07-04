@@ -33,6 +33,7 @@ export default {
       prompt: { loading: false, value: '' },
       music: { opened: false, selected: '', source: '' },
       sceneSugestions: { opened: false, inferencing: false },
+      scenePreview: { opened: false, sceneId: '' },
     },
     inference: { fetching: false, backgrounds: [] },
   },

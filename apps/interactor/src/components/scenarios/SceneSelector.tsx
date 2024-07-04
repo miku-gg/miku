@@ -1,29 +1,22 @@
-import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import { BiCameraMovie } from 'react-icons/bi'
-import { useAppDispatch, useAppSelector } from '../../state/store'
-import { selectAvailableScenes } from '../../state/selectors'
+import { BsStars } from 'react-icons/bs'
+import { toast } from 'react-toastify'
 import { useAppContext } from '../../App.context'
-import { interactionStart } from '../../state/slices/narrationSlice'
+import { trackEvent } from '../../libs/analytics'
+import { selectAvailableScenes } from '../../state/selectors'
+import { setModalOpened } from '../../state/slices/creationSlice'
+import { userDataFetchStart } from '../../state/slices/settingsSlice'
+import { useAppDispatch, useAppSelector } from '../../state/store'
+import EmotionRenderer from '../emotion-render/EmotionRenderer'
+import CreateScene from './CreateScene'
 import './SceneSelector.scss'
 import SlidePanel from './SlidePanel'
-import CreateScene from './CreateScene'
-import { setModalOpened } from '../../state/slices/creationSlice'
-import { toast } from 'react-toastify'
-import { BsStars } from 'react-icons/bs'
-import { trackEvent } from '../../libs/analytics'
-import { userDataFetchStart } from '../../state/slices/settingsSlice'
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch()
-  const backgrounds = useAppSelector((state) => state.novel.backgrounds)
   const scenes = useAppSelector(selectAvailableScenes)
-  const {
-    apiEndpoint,
-    assetLinkLoader,
-    servicesEndpoint,
-    isInteractionDisabled,
-    isMobileApp,
-  } = useAppContext()
+  const { apiEndpoint, assetLinkLoader, isInteractionDisabled, isMobileApp } =
+    useAppContext()
 
   const slidePanelOpened = useAppSelector(
     (state) => state.creation.scene.slidePanelOpened
@@ -35,33 +28,6 @@ export default function SceneSelector(): JSX.Element | null {
     (state) => state.narration.input
   )
 
-  const handleItemClick = (id: string, prompt: string) => {
-    if (isInteractionDisabled) {
-      toast.warn('Please log in to interact.', {
-        position: 'top-center',
-        style: {
-          top: 10,
-        },
-      })
-      return
-    }
-    const scene = scenes.find((s) => s.id === id)
-    dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
-    dispatch(
-      interactionStart({
-        sceneId: id,
-        text: prompt,
-        characters: scene?.characters.map((r) => r.characterId) || [],
-        servicesEndpoint,
-        apiEndpoint,
-        selectedCharacterId:
-          scene?.characters[
-            Math.floor(Math.random() * (scene?.characters.length || 0))
-          ].characterId || '',
-      })
-    )
-    trackEvent('scene-select')
-  }
   return (
     <div
       className={`SceneSelector ${
@@ -96,23 +62,31 @@ export default function SceneSelector(): JSX.Element | null {
                   <button
                     className="SceneSelector__item"
                     key={`scene-selector-${scene.id}-${index}`}
-                    onClick={handleItemClick.bind(null, scene.id, scene.prompt)}
+                    onClick={() => {
+                      trackEvent('scene-select')
+                      dispatch(
+                        setModalOpened({
+                          id: 'scene-preview',
+                          opened: true,
+                          itemId: scene.id,
+                        })
+                      )
+                    }}
                   >
                     <div
                       className="SceneSelector__item-background"
                       style={{
                         backgroundImage: `url(${assetLinkLoader(
-                          backgrounds.find((b) => b.id === scene.backgroundId)
-                            ?.source.jpg || '',
+                          scene.backgroundImage || '',
                           true
                         )})`,
                       }}
                     />
-                    {scene.emotion ? (
+                    {scene.characterImages ? (
                       <EmotionRenderer
                         className="SceneSelector__item-emotion"
                         assetLinkLoader={assetLinkLoader}
-                        assetUrl={scene.emotion}
+                        assetUrl={scene.characterImages[0] || ''}
                       />
                     ) : null}
                     <div className="SceneSelector__item-text">{scene.name}</div>

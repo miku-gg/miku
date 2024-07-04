@@ -1,0 +1,80 @@
+.SceneChangeModal {
+  padding: 0 !important;
+  background: black !important;
+  box-shadow: 0px 0px 20px 0px rgb(white, 0.7);
+
+  &__content {
+    width: 100%;
+    height: 100%;
+    transition: all 0.2s ease-out;
+    padding: 16px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px;
+    z-index: 1;
+  }
+
+  &__background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.9;
+    transition: all 0.2s ease-out;
+    overflow: hidden;
+    opacity: 0.4;
+  }
+
+  &__text-container {
+    z-index: 1;
+  }
+
+  &__title {
+    margin-bottom: 10px;
+  }
+
+  &__title,
+  &__prompt {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.897);
+  }
+
+  &__prompt {
+    font-family: 'Courier New', Courier, monospace;
+  }
+
+  &__buttons {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    gap: 16px;
+    z-index: 1;
+
+    & button {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.212);
+    }
+  }
+
+  &__characters {
+    position: absolute;
+    height: 80%;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+    z-index: 0;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  &__character-emotion {
+    height: 100%;
+    margin-left: 10px;
+    z-index: 0;
+  }
+}

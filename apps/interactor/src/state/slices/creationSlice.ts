@@ -42,6 +42,10 @@ interface CreationState {
       opened: boolean
       inferencing: boolean
     }
+    scenePreview: {
+      opened: boolean
+      sceneId: string
+    }
   }
   inference: {
     fetching: boolean
@@ -101,6 +105,10 @@ export const initialState: CreationState = {
       opened: false,
       inferencing: false,
     },
+    scenePreview: {
+      opened: false,
+      sceneId: '',
+    },
   },
   inference: {
     fetching: false,
@@ -124,7 +132,9 @@ export const creationSlice = createSlice({
           | 'characters-search'
           | 'background-gen'
           | 'scene-suggestions'
+          | 'scene-preview'
         opened: boolean
+        itemId?: string
       }>
     ) => {
       if (action.payload.id === 'scene') {
@@ -139,6 +149,10 @@ export const creationSlice = createSlice({
         state.scene.background.gen.opened = action.payload.opened
       } else if (action.payload.id === 'scene-suggestions') {
         state.scene.sceneSugestions.opened = action.payload.opened
+      } else if (action.payload.id === 'scene-preview') {
+        state.scene.scenePreview.opened = action.payload.opened
+        state.scene.scenePreview.sceneId =
+          action.payload.itemId || state.scene.scenePreview.sceneId
       } else {
         state.scene[action.payload.id].opened = action.payload.opened
       }

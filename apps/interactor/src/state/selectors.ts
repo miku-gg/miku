@@ -137,14 +137,48 @@ export const selectLastSelectedCharacter = createSelector(
   }
 )
 
-export const selectAvailableScenes = createSelector(
+export const selectScenes = createSelector(
   [
     (state: RootState) => state.novel.scenes,
     (state: RootState) => state.novel.characters,
+    (state: RootState) => state.novel.backgrounds,
+  ],
+  (scenes, characters, backgrounds) => {
+    return scenes.map((scene) => {
+      const characterImages = scene.characters.map(
+        ({ characterId, outfit: outfitId }) => {
+          const outfits = selectCharacterOutfits(
+            { novel: { characters } } as RootState,
+            characterId || ''
+          )
+          const outfit = outfits.find((outfit) => outfit.id === outfitId)
+          const neutralEmotion =
+            outfit?.emotions.find((emotion) => emotion.id === 'neutral') ||
+            outfit?.emotions[0]
+          return neutralEmotion?.sources.png || ''
+        }
+      )
+
+      const backgroundImage =
+        backgrounds.find((background) => background.id === scene.backgroundId)
+          ?.source.jpg || ''
+
+      return {
+        ...scene,
+        characterImages,
+        backgroundImage,
+      }
+    })
+  }
+)
+
+export const selectAvailableScenes = createSelector(
+  [
+    selectScenes,
     (state: RootState) => state.settings.user.nsfw,
     selectCurrentScene,
   ],
-  (scenes, characters, nsfw, currentScene) => {
+  (scenes, nsfw, currentScene) => {
     if (scenes.length === 1) return []
     return scenes
       .filter(
@@ -152,29 +186,7 @@ export const selectAvailableScenes = createSelector(
           !currentScene?.children.length ||
           currentScene?.children.includes(scene.id)
       )
-      .filter((scene) => {
-        return nsfw >= scene.nsfw
-      })
-      .map((scene) => {
-        const outfits = selectCharacterOutfits(
-          { novel: { characters } } as RootState,
-          scene.characters[0]?.characterId || ''
-        )
-        const outfit = outfits.find(
-          (outfit) => outfit.id === scene.characters[0]?.outfit
-        )
-        const emotionImage = outfit?.emotions[0].sources.png || ''
-
-        return {
-          id: scene.id,
-          name: scene.name,
-          prompt: scene.prompt,
-          backgroundId: scene.backgroundId,
-          musicId: scene.musicId,
-          emotion: emotionImage,
-          characters: scene.characters,
-        }
-      })
+      .filter((scene) => nsfw >= scene.nsfw)
   }
 )
 
