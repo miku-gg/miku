@@ -105,19 +105,10 @@ export default function SceneSuggestion() {
               className="SceneSuggestion__button"
               onClick={async () => {
                 dispatch(
-                  interactionStart({
-                    sceneId: nextScene.id,
-                    text: nextScene.prompt,
-                    characters:
-                      nextScene?.characters.map((r) => r.characterId) || [],
-                    servicesEndpoint,
-                    apiEndpoint,
-                    selectedCharacterId:
-                      nextScene?.characters[
-                        Math.floor(
-                          Math.random() * (nextScene?.characters.length || 0)
-                        )
-                      ].characterId || '',
+                  setModalOpened({
+                    id: 'scene-preview',
+                    opened: true,
+                    itemId: nextScene.id,
                   })
                 )
                 trackEvent('scene-advance-suggestion-click')

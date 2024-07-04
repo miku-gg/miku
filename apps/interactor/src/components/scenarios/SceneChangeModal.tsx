@@ -1,73 +1,112 @@
 import { Button, Modal } from '@mikugg/ui-kit'
 import { useAppContext } from '../../App.context'
 import { fillTextTemplate } from '../../libs/prompts/strategies'
-import { selectAvailableScenes } from '../../state/selectors'
-import { useAppSelector } from '../../state/store'
+import { selectScenes } from '../../state/selectors'
+import { useAppDispatch, useAppSelector } from '../../state/store'
 import './SceneChangeModal.scss'
+import { setModalOpened } from '../../state/slices/creationSlice'
+import { toast } from 'react-toastify'
+import { interactionStart } from '../../state/slices/narrationSlice'
+import EmotionRenderer from '../emotion-render/EmotionRenderer'
 
-interface SceneChangeModalProps {
-  onCancel?: () => void
-  onConfirm: () => void
-  isModalOpen: boolean
-  onCloseModal: () => void
-  nextSceneId: string
-}
-
-export const SceneChangeModal = ({
-  onCancel,
-  onConfirm,
-  isModalOpen,
-  onCloseModal,
-  nextSceneId,
-}: SceneChangeModalProps) => {
-  const { assetLinkLoader, persona } = useAppContext()
-  const scene = useAppSelector(selectAvailableScenes).find(
-    (s) => s.id === nextSceneId
+export const SceneChangeModal = () => {
+  const {
+    assetLinkLoader,
+    isInteractionDisabled,
+    servicesEndpoint,
+    apiEndpoint,
+  } = useAppContext()
+  const dispatch = useAppDispatch()
+  const userName = useAppSelector((state) => state.settings.user.name)
+  const { opened, sceneId } = useAppSelector(
+    (state) => state.creation.scene.scenePreview
   )
+  const scene = useAppSelector(selectScenes).find((s) => s.id === sceneId)
   const currentCharacterName = useAppSelector(
     (state) =>
       state.novel.characters.find(
         (c) => c.id === scene?.characters[0].characterId
       )?.name
   )
-  const backgrounds = useAppSelector((state) => state.novel.backgrounds)
-  const handleCloseModal = () => {
-    onCancel && onCancel()
-    onCloseModal()
-  }
+
   const handleConfirm = () => {
-    onConfirm()
-    onCloseModal()
+    if (isInteractionDisabled) {
+      toast.warn('Please log in to interact.', {
+        position: 'top-center',
+        style: {
+          top: 10,
+        },
+      })
+      return
+    }
+    if (!scene) {
+      toast.warn('Scene not found.', {
+        position: 'top-center',
+        style: {
+          top: 10,
+        },
+      })
+      return
+    }
+    dispatch(setModalOpened({ id: 'scene-preview', opened: false }))
+    dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
+    dispatch(
+      interactionStart({
+        sceneId,
+        text: scene.prompt || '',
+        characters: scene.characters.map((r) => r.characterId) || [],
+        servicesEndpoint,
+        apiEndpoint,
+        selectedCharacterId:
+          (scene.characters.length &&
+            scene.characters[
+              Math.floor(Math.random() * (scene.characters.length || 0))
+            ].characterId) ||
+          '',
+      })
+    )
+  }
+
+  const handleCloseModal = () => {
+    dispatch(setModalOpened({ id: 'scene-preview', opened: false }))
   }
 
   const prompt = fillTextTemplate(scene?.prompt || '', {
-    user: persona.name,
-    bot: currentCharacterName || '{{Char}}',
+    user: userName,
+    bot: currentCharacterName || '{{char}}',
   })
 
   return (
     <Modal
       className="SceneChangeModal"
-      opened={isModalOpen}
+      opened={opened}
       onCloseModal={() => handleCloseModal()}
-      title="You should go to scene:"
     >
-      <div
-        className="SceneChangeModal__content"
-        style={{
-          backgroundImage: `url(${assetLinkLoader(
-            backgrounds.find((b) => b.id === scene?.backgroundId)?.source.jpg ||
-              '',
-            true
-          )})`,
-        }}
-      >
-        <h2 className="SceneChangeModal__title">
-          '{scene?.name || 'NextScene'}'
-        </h2>
-        <p className="SceneChangeModal__prompt">{prompt}</p>
+      <div className="SceneChangeModal__content">
+        <img
+          className="SceneChangeModal__background-image"
+          src={assetLinkLoader(scene?.backgroundImage || '', true)}
+        />
+        <div className="SceneChangeModal__characters">
+          {scene?.characterImages?.map((image, index) => {
+            return (
+              <EmotionRenderer
+                key={`scene-character-${index}`}
+                className="SceneChangeModal__character-emotion"
+                assetLinkLoader={assetLinkLoader}
+                assetUrl={image}
+              />
+            )
+          })}
+        </div>
+        <div className="SceneChangeModal__text-container">
+          <h2 className="SceneChangeModal__title">
+            {scene?.name || 'Next scene'}
+          </h2>
+          <p className="SceneChangeModal__prompt">{prompt}</p>
+        </div>
         <div className="SceneChangeModal__buttons">
-          <Button theme="primary" onClick={() => handleCloseModal()}>
+          <Button theme="secondary" onClick={() => handleCloseModal()}>
             Cancel
           </Button>
           <Button theme="gradient" onClick={() => handleConfirm()}>
