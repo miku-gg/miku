@@ -9,6 +9,11 @@ MikuGG is a generative visual novel platform. This is the open source interactor
 - Node.js: Download and install from [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 - An [Aphrodite engine](https://github.com/PygmalionAI/aphrodite-engine#quickstart) running instance.
 - A GPU for running a large language model.
+- Any missing packages required by the install script. Packages (ex: distutils) may be missing from more recent version of Pythons. Therefore, you may need to install such packages manually:
+```bash
+# Example installing distutils manually
+pip install setuptools
+```
 
 > **Note**
 > On windows, Make sure to add Node.js to your system's **PATH**.
