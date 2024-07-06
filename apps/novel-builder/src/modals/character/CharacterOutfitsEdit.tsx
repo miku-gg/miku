@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import {
   Accordion,
   AccordionItem,
+  AreYouSure,
   Button,
   DragAndDropImages,
   Dropdown,
@@ -40,6 +41,7 @@ export default function CharacterOutfitsEdit({
   const [selectedItemByIndex, setSelectedItemByIndex] = useState<number>(-1);
   const [expandedTemplateDropdown, setExpandedTemplateDropdown] =
     useState(false);
+  const { openModal } = AreYouSure.useAreYouSure();
 
   const decorateCharacterWithOutfits = (
     outfits: MikuCardV2["data"]["extensions"]["mikugg_v2"]["outfits"]
@@ -387,7 +389,29 @@ export default function CharacterOutfitsEdit({
             </label>
             <Dropdown
               items={emotionTemplates}
-              onChange={(index) => handleTemplateChange(index, groupIndex)}
+              onChange={(index) => {
+                const hasEmotionsUploaded =
+                  outfits[groupIndex]?.emotions.length > 0;
+                const isNeutralDefaultEmotion =
+                  outfits[groupIndex]?.emotions[0]?.id === "neutral" &&
+                  outfits[groupIndex]?.emotions[0]?.sources?.png ===
+                    "empty_char_emotion.png";
+                const currentEmotionTemplateIndex =
+                  getDropdownEmotionTemplateIndex(groupIndex);
+
+                if (index === currentEmotionTemplateIndex) return;
+
+                if (hasEmotionsUploaded && !isNeutralDefaultEmotion) {
+                  openModal({
+                    title: "Are you sure?",
+                    description:
+                      "All uploaded emotions to the current set will be removed.",
+                    onYes: () => handleTemplateChange(index, groupIndex),
+                  });
+                } else {
+                  handleTemplateChange(index, groupIndex);
+                }
+              }}
               expanded={expandedTemplateDropdown}
               onToggle={setExpandedTemplateDropdown}
               selectedIndex={getDropdownEmotionTemplateIndex(groupIndex)}
