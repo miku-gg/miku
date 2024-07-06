@@ -395,6 +395,10 @@ export default function CharacterOutfitsEdit({
                   outfits[groupIndex]?.emotions[0]?.id === "neutral" &&
                   outfits[groupIndex]?.emotions[0]?.sources?.png ===
                     "empty_char_emotion.png";
+                const currentEmotionTemplateIndex =
+                  getDropdownEmotionTemplateIndex(groupIndex);
+
+                if (index === currentEmotionTemplateIndex) return;
 
                 if (hasEmotionsUploaded && !isNeutralDefaultEmotion) {
                   openModal({
