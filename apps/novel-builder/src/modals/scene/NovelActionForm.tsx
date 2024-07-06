@@ -1,5 +1,4 @@
 import { NovelV3 } from "@mikugg/bot-utils";
-import { NovelAction } from "@mikugg/bot-utils/dist/lib/novel/NovelV3";
 import { Button } from "@mikugg/ui-kit";
 import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
@@ -59,8 +58,8 @@ const ActionParamsForm = ({
   onChange,
   availableActionTypes,
 }: {
-  action: NovelAction;
-  onChange: (action: NovelAction) => void;
+  action: NovelV3.NovelAction;
+  onChange: (action: NovelV3.NovelAction) => void;
   availableActionTypes?: NovelV3.NovelActionType[];
 }) => {
   const scenes = useAppSelector((state) => state.novel.scenes);
