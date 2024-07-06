@@ -389,17 +389,19 @@ export default function CharacterOutfitsEdit({
             <Dropdown
               items={emotionTemplates}
               onChange={(index) => {
-                const hasEmotionsUploaded = outfits[groupIndex]?.emotions.length > 0;
-                const isNeutralDefaultEmotion = outfits[groupIndex]?.emotions[0]?.id === "neutral" && outfits[groupIndex]?.emotions[0]?.sources?.png === "empty_char_emotion.png";
-                const currentSelectedIndex = getDropdownEmotionTemplateIndex(groupIndex);
+                const hasEmotionsUploaded =
+                  outfits[groupIndex]?.emotions.length > 0;
+                const isNeutralDefaultEmotion =
+                  outfits[groupIndex]?.emotions[0]?.id === "neutral" &&
+                  outfits[groupIndex]?.emotions[0]?.sources?.png ===
+                    "empty_char_emotion.png";
 
-                if(index === currentSelectedIndex) return;
-                
                 if (hasEmotionsUploaded && !isNeutralDefaultEmotion) {
                   openModal({
-                    title: "Are you sure you want to change the emotion set?",
-                    description: "Changing the emotion set will remove all the uploaded emotions.",
-                    onYes: () => handleTemplateChange(index, groupIndex)
+                    title: "Are you sure?",
+                    description:
+                      "All uploaded emotions to the current set will be removed.",
+                    onYes: () => handleTemplateChange(index, groupIndex),
                   });
                 } else {
                   handleTemplateChange(index, groupIndex);
