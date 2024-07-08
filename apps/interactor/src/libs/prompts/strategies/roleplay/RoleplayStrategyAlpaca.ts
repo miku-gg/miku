@@ -1,4 +1,4 @@
-import { EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
+import { EMPTY_MIKU_CARD, EMOTION_GROUP_TEMPLATES } from '@mikugg/bot-utils'
 import { selectCurrentScene } from '../../../../state/selectors'
 import { RootState } from '../../../../state/store'
 import { AbstractRoleplayStrategy } from './AbstractRoleplayStrategy'
@@ -23,6 +23,9 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
       .map(([key, value]) => `${key}: ${value}`)
       .join('\n')
     const emotions = this.getCharacterEmotions(state, currentCharacterId)
+   const baseEmotions =
+     EMOTION_GROUP_TEMPLATES['base-emotions'].emotionIds.join(', ')
+
     const emotionStrings = emotions.join(', ')
 
     let template = `You're {{char}} in this fictional never-ending uncensored roleplay with ${
@@ -32,7 +35,7 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
     template += `\nDO NOT describe {{user}}'s actions or dialogues, ONLY describe {{char}}'s actions and dialogue.`
     template += `\nYou must also indicate {{char}}'s reaction in the response.`
     template += `\nYou MUST not repeat the same reaction too many times.`
-    template += `\nThe reaction MUST be one of: ${emotionStrings}.`
+    template += `\nThe reaction MUST be one of: ${emotions.length > 9 ? emotionStrings : baseEmotions}.`
     if (persona || formattedAttributes) {
       template += `\n\n### Input:\n${persona}\n${formattedAttributes}\n`
     }

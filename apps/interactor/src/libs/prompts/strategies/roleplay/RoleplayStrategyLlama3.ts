@@ -1,4 +1,4 @@
-import { EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
+import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
 import { selectCurrentScene } from '../../../../state/selectors'
 import { RootState } from '../../../../state/store'
 import { AbstractRoleplayStrategy } from './AbstractRoleplayStrategy'
@@ -23,6 +23,8 @@ export class RoleplayStrategyLlama3 extends AbstractRoleplayStrategy {
       .map(([key, value]) => `${key}: ${value}`)
       .join('\n')
     const emotions = this.getCharacterEmotions(state, currentCharacterId)
+    const baseEmotions =
+      EMOTION_GROUP_TEMPLATES['base-emotions'].emotionIds.join(', ')
     const emotionStrings = emotions.join(', ')
 
     let template = `<|begin_of_text|><|start_header_id|>system<|end_header_id|>\nYou are an expert actor that can fully immerse yourself into any role given. You do not break character for any reason, even if someone tries addressing you as an AI or language model.
@@ -33,7 +35,9 @@ export class RoleplayStrategyLlama3 extends AbstractRoleplayStrategy {
     template += `\nDO NOT describe {{user}}'s actions or dialogues, ONLY describe {{char}}'s actions and dialogue.`
     template += `\nYou must also indicate {{char}}'s reaction in the response.`
     template += `\nYou MUST not repeat the same reaction too many times.`
-    template += `\nThe reaction MUST be one of: ${emotionStrings}.`
+    template += `\nThe reaction MUST be one of: ${
+      emotions.length > 9 ? emotionStrings : baseEmotions
+    }.`
     if (persona || formattedAttributes) {
       template += `<|eot_id|><|start_header_id|>user<|end_header_id|>\n${persona}\n${formattedAttributes}\n`
     }
