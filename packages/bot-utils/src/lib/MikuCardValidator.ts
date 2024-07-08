@@ -157,6 +157,7 @@ export const LICENSES = [
 
 export type EmotionTemplateSlug =
   | "single-emotion"
+  | "tiny-emotions"
   | "base-emotions"
   | "lewd-emotions";
 
@@ -172,6 +173,21 @@ export const EMOTION_GROUP_TEMPLATES: Record<
     id: "single-emotion",
     label: "Single emotion",
     emotionIds: ["neutral"],
+  },
+  "tiny-emotions": {
+    id: "tiny-emotions",
+    label: "Tiny emotions",
+    emotionIds: [
+      "angry",
+      "sad",
+      "happy",
+      "disgusted",
+      "scared",
+      "hopeful",
+      "proud",
+      "neutral",
+      "confused",
+    ],
   },
   "base-emotions": {
     id: "base-emotions",
