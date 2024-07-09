@@ -36,112 +36,15 @@
 
 .ChildScenes {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   margin-top: 10px;
   width: 100%;
   gap: 10px;
 
-  &__parent {
+  &__children {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid $node-conector-color;
-    border-radius: 16px;
-    padding: 6px;
-    min-width: 205px;
-    max-height: 140px;
-
-    .scene {
-      width: 12rem;
-      height: 6rem;
-    }
-
-    &__header {
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      justify-content: space-between;
-
-      &__title {
-        margin: 0;
-      }
-    }
-  }
-
-  &__childrens {
+    gap: 10px;
+    flex-wrap: wrap;
     width: 100%;
-
-    &__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 6px 0;
-
-      &__title {
-        margin: 0;
-        padding-left: 4px;
-      }
-    }
-
-    &__scenes {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      width: 100%;
-    }
-  }
-}
-.scene {
-  width: 15rem;
-  height: 7rem;
-  position: relative;
-  border-radius: 16px;
-
-  &__header {
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    padding: 2px 6px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    transition: ease-in-out 0.3s;
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
-    background-color: rgba(0, 0, 0, 0.568);
-    &__name {
-      color: white;
-      margin: 0;
-      text-overflow: ellipsis;
-    }
-
-    &__edit {
-      color: $text-1;
-      cursor: pointer;
-      &:hover {
-        color: $secondary-color;
-      }
-    }
-  }
-
-  &__background {
-    position: absolute;
-    z-index: 0;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.6;
-    border-radius: 16px;
-  }
-  &:hover {
-    .scene__header {
-      opacity: 1;
-    }
   }
 }

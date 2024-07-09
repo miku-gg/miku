@@ -30,6 +30,7 @@
   box-shadow: 0px 0px 5px 0px rgb(205 95 234);
   transition: all 0.2s ease-out;
   user-select: none;
+  cursor: pointer;
 
   &:hover {
     box-shadow: 0px 0px 10px 0px rgb(205 95 234);

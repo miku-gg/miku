@@ -65,10 +65,6 @@ const ActionParamsForm = ({
   const scenes = useAppSelector((state) => state.novel.scenes);
   const editingItem = useAppSelector(selectEditingInventoryItem);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
-  const [isSceneSelectorOpened, setIsSceneSelectorOpened] = useState(false);
-  const [childSceneSelectorId, setChildSceneSelectorId] = useState<
-    "parent" | "children" | null
-  >(null);
 
   const getSceneData = (sceneId: string) => {
     return scenes.find((scene) => scene.id === sceneId);
@@ -85,56 +81,19 @@ const ActionParamsForm = ({
 
   //suggest-advance-scene
   if (action.type === NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE) {
-    const sceneData = getSceneData(action.params.sceneId);
     return (
       <div className="SuggestScene">
-        <div className="SuggestScene__header">
-          <h3 className="SuggestScene__header__title">Select the scene</h3>
-          <Button
-            theme="gradient"
-            onClick={() => {
-              setIsSceneSelectorOpened(true);
-            }}
-          >
-            Select the scene
-          </Button>
-        </div>
-        {action.params.sceneId && sceneData ? (
-          <div className="scene">
-            <div className="scene__header">
-              <p className="scene__header__name">{sceneData?.name}</p>
-              <FaTrashAlt
-                className="scene__header__edit"
-                onClick={() => {
-                  onChange({
-                    type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
-                    params: {
-                      sceneId: "",
-                    },
-                  });
-                }}
-              />
-            </div>
-            <img
-              className="scene__background"
-              src={config.genAssetLink(
-                getBackgroundSource(sceneData.backgroundId) || ""
-              )}
-            />
-          </div>
-        ) : null}
         <SceneSelector
-          opened={isSceneSelectorOpened}
-          onCloseModal={() => setIsSceneSelectorOpened(false)}
-          onSelectScene={(id) =>
+          value={action.params.sceneId}
+          multiSelect={false}
+          onChange={(sceneId) =>
             onChange({
               type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
               params: {
-                sceneId: id,
+                sceneId: sceneId || "",
               },
             })
           }
-          selectedSceneId={action.params.sceneId}
         />
       </div>
     );
@@ -179,129 +138,40 @@ const ActionParamsForm = ({
 
   //add-child-scenes
   else if (action.type === NovelV3.NovelActionType.ADD_CHILD_SCENES) {
-    const sceneData = getSceneData(action.params.sceneId);
     return (
       <div className="ChildScenes">
         <div className="ChildScenes__parent">
-          <div className="ChildScenes__parent__header">
-            <h3 className="ChildScenes__parent__header__title">Parent scene</h3>
-            {!action.params.sceneId && (
-              <Button
-                theme="gradient"
-                onClick={() => {
-                  setChildSceneSelectorId("parent");
-                }}
-              >
-                Select scene
-              </Button>
-            )}
-          </div>
-          {action.params.sceneId && sceneData ? (
-            <div className="scene">
-              <div className="scene__header">
-                <p className="scene__header__name">{sceneData.name}</p>
-                <FaTrashAlt
-                  className="scene__header__edit"
-                  onClick={() => {
-                    onChange({
-                      type: NovelV3.NovelActionType.ADD_CHILD_SCENES,
-                      params: {
-                        ...action.params,
-                        sceneId: "",
-                      },
-                    });
-                  }}
-                />
-              </div>
-              <img
-                className="scene__background"
-                src={config.genAssetLink(
-                  getBackgroundSource(sceneData.backgroundId)
-                )}
-              />
-            </div>
-          ) : null}
-        </div>
-        <div className="ChildScenes__childrens">
-          <div className="ChildScenes__childrens__header">
-            <h3 className="ChildScenes__childrens__header__title">
-              Select the children scenes
-            </h3>
-            <Button
-              theme="gradient"
-              onClick={() => {
-                setChildSceneSelectorId("children");
-              }}
-            >
-              Select scenes
-            </Button>
-          </div>
-          <div className="ChildScenes__childrens__scenes">
-            {action.params.children.length > 0
-              ? action.params.children.map((sceneId) => {
-                  const scene = getSceneData(sceneId);
-                  return (
-                    <div key={sceneId} className="scene">
-                      <div className="scene__header">
-                        <p className="scene__header__name">{scene?.name}</p>
-                        <FaTrashAlt
-                          className="scene__header__edit"
-                          onClick={() => {
-                            onChange({
-                              type: NovelV3.NovelActionType.ADD_CHILD_SCENES,
-                              params: {
-                                ...action.params,
-                                children: action.params.children.filter(
-                                  (id) => id !== sceneId
-                                ),
-                              },
-                            });
-                          }}
-                        />
-                      </div>
-                      <img
-                        className="scene__background"
-                        src={config.genAssetLink(
-                          getBackgroundSource(scene?.backgroundId || "") || ""
-                        )}
-                      />
-                    </div>
-                  );
-                })
-              : null}
-          </div>
-        </div>
-
-        <SceneSelector
-          opened={!!childSceneSelectorId}
-          onCloseModal={() => setChildSceneSelectorId(null)}
-          onSelectScene={(sceneId) => {
-            if (childSceneSelectorId === "children") {
+          <SceneSelector
+            value={action.params.sceneId}
+            multiSelect={false}
+            title="Parent Scene"
+            onChange={(sceneId) => {
               onChange({
-                type: NovelV3.NovelActionType.ADD_CHILD_SCENES,
+                ...action,
                 params: {
                   ...action.params,
-                  children: action.params.children.includes(sceneId)
-                    ? action.params.children.filter((id) => id !== sceneId)
-                    : [...action.params.children, sceneId],
+                  sceneId: sceneId || "",
                 },
               });
-            } else {
+            }}
+          />
+        </div>
+        <div className="ChildScenes__children">
+          <SceneSelector
+            value={action.params.children}
+            multiSelect={true}
+            title="Child Scenes"
+            onChange={(children) => {
               onChange({
-                type: NovelV3.NovelActionType.ADD_CHILD_SCENES,
+                ...action,
                 params: {
                   ...action.params,
-                  sceneId: action.params.sceneId === sceneId ? "" : sceneId,
+                  children,
                 },
               });
-            }
-          }}
-          selectedScenes={
-            childSceneSelectorId === "children"
-              ? action.params.children
-              : [action.params.sceneId]
-          }
-        />
+            }}
+          />
+        </div>
       </div>
     );
   } else {

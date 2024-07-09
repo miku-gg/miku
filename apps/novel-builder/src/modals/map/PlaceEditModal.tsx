@@ -208,16 +208,16 @@ export default function PlaceEditModal() {
           <div className="PlaceEdit__form">
             <div className="PlaceEdit__sceneSelect">
               <SceneSelector
-                opened={selectSceneOpened}
-                onCloseModal={() => setSelectSceneOpened(false)}
-                selectedSceneId={place.sceneId}
-                onSelectScene={(id) => {
+                multiSelect={false}
+                nonDeletable
+                value={place.sceneId}
+                onChange={(sceneId) => {
                   dispatch(
                     updatePlace({
                       mapId: map!.id,
                       place: {
                         ...place,
-                        sceneId: id,
+                        sceneId: sceneId || "",
                       },
                     })
                   );
