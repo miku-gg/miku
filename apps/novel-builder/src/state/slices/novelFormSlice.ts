@@ -402,7 +402,7 @@ const novelFormSlice = createSlice({
         description: "",
         actions: [
           {
-            name: "",
+            name: "New action",
             prompt: "",
             id: randomUUID(),
             usageActions: [],

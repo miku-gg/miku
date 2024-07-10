@@ -31,11 +31,8 @@ export const selectEditingAction = createSelector(
   [(state: RootState) => state.input.modals.actionEdit, selectInventory],
   (modal, inventory) => {
     if (!modal.opened) return undefined;
-    const action = inventory?.map((item) =>
-      item.actions.find((action) => action.id === modal.editId)
-    );
-    if (!action) return undefined;
-    return action[0];
+    const actions = inventory?.map((item) => item.actions).flat();
+    return actions?.find((action) => action.id === modal.editId);
   }
 );
 export const selectLorebooks = (state: RootState) => {
