@@ -1,9 +1,5 @@
 import { NovelV3 } from "@mikugg/bot-utils";
-import { Button } from "@mikugg/ui-kit";
-import { useState } from "react";
-import { FaTrashAlt } from "react-icons/fa";
 import ButtonGroup from "../../components/ButtonGroup";
-import config from "../../config";
 import InventoryItems from "../../panels/assets/inventory/InventoryItems";
 import { selectEditingInventoryItem } from "../../state/selectors";
 import { useAppSelector } from "../../state/store";
@@ -62,22 +58,7 @@ const ActionParamsForm = ({
   onChange: (action: NovelV3.NovelAction) => void;
   availableActionTypes?: NovelV3.NovelActionType[];
 }) => {
-  const scenes = useAppSelector((state) => state.novel.scenes);
   const editingItem = useAppSelector(selectEditingInventoryItem);
-  const backgrounds = useAppSelector((state) => state.novel.backgrounds);
-
-  const getSceneData = (sceneId: string) => {
-    return scenes.find((scene) => scene.id === sceneId);
-  };
-
-  const getBackgroundSource = (backgroundId: string) => {
-    const background = backgrounds.find(
-      (background) => background.id === backgroundId
-    );
-    if (background) {
-      return background.source.jpg;
-    } else return "";
-  };
 
   //suggest-advance-scene
   if (action.type === NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE) {
