@@ -207,6 +207,7 @@ export default function PlaceEditModal() {
           </div>
           <div className="PlaceEdit__form">
             <div className="PlaceEdit__sceneSelect">
+              <label>Select a scene</label>
               <SceneSelector
                 multiSelect={false}
                 nonDeletable
@@ -223,18 +224,6 @@ export default function PlaceEditModal() {
                   );
                 }}
               />
-              <label>Select a scene</label>
-              <div className="PlaceEdit__sceneSelect__container">
-                <p className="PlaceEdit__sceneSelect__name">
-                  {place.sceneId ? getSceneData(place.sceneId)?.name : ""}
-                </p>
-                <button
-                  className="PlaceEdit__sceneSelect__button"
-                  onClick={() => setSelectSceneOpened(true)}
-                >
-                  Select scene
-                </button>
-              </div>
             </div>
             <Input
               label="Place name"
