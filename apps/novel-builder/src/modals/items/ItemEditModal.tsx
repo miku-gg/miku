@@ -105,6 +105,7 @@ export default function ItemEditModal() {
     >
       {item ? (
         <div className="ItemEdit">
+          <h3 className="ItemEdit__title">Item Edit</h3>
           <div className="ItemEdit__buttons">
             <FaTrashAlt
               className="ItemEdit__buttons__removePlace"
