@@ -21,11 +21,13 @@ import { useAppSelector } from "../../state/store";
 
 import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
+import { FaPencil } from "react-icons/fa6";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import config from "../../config";
 import { checkFileType } from "../../libs/utils";
+import SceneSelector from "../scene/SceneSelector";
 import "./ItemEditModal.scss";
 
 export default function ItemEditModal() {
@@ -54,31 +56,6 @@ export default function ItemEditModal() {
     }
   };
 
-  const handleRemoveAction = (id: string) => {
-    if (!item) return;
-    const newActions = item.actions.filter((action) => action.id !== id);
-    dispatch(
-      updateInventoryItem({
-        ...item,
-        actions: newActions,
-      })
-    );
-  };
-
-  const handleUpdateAction = (actionId: string, action: {}) => {
-    if (!item) return;
-    const newActions = item.actions.map((a) =>
-      a.id === actionId ? { ...a, ...action } : a
-    );
-
-    dispatch(
-      updateInventoryItem({
-        ...item,
-        actions: newActions,
-      })
-    );
-  };
-
   const handleDelete = (id: string) => {
     areYouSure.openModal({
       title: "Are you sure?",
@@ -90,12 +67,38 @@ export default function ItemEditModal() {
     });
   };
 
+  const handleSelectScenes = (ids: string[]) => {
+    if (!item) return;
+
+    if (!item.locked) {
+      dispatch(
+        updateInventoryItem({
+          ...item,
+          hidden: true,
+          locked: {
+            type: "IN_SCENE",
+            config: {
+              sceneIds: ids,
+            },
+          },
+        })
+      );
+    } else if (item.locked.config.sceneIds.length === 0 || ids.length === 0) {
+      dispatch(
+        updateInventoryItem({
+          ...item,
+          hidden: false,
+          locked: undefined,
+        })
+      );
+    }
+  };
+
   return (
     <Modal
       opened={!!item}
       shouldCloseOnOverlayClick
       className="ItemEditModal"
-      title="Edit Item"
       onCloseModal={() =>
         dispatch(closeModal({ modalType: "editInventoryItem" }))
       }
@@ -116,6 +119,7 @@ export default function ItemEditModal() {
               }}
             />
           </div>
+
           <div className="ItemEdit__form">
             <div className="ItemEdit__form__text">
               <Input
@@ -145,27 +149,6 @@ export default function ItemEditModal() {
                   );
                 }}
               />
-              <div className="ItemEdit__scenes">
-                <div className="ItemEdit__scenes__title">
-                  <CheckBox
-                    label="Hidden"
-                    value={item.hidden}
-                    onChange={(e) => {
-                      dispatch(
-                        updateInventoryItem({
-                          ...item,
-                          hidden: e.target.checked,
-                        })
-                      );
-                    }}
-                  />
-                  <Tooltip id="Info-Visibility" place="top" />
-                  <IoInformationCircleOutline
-                    data-tooltip-id="Info-Visibility"
-                    data-tooltip-content="Hidden for the whole novel until a condition adds it."
-                  />
-                </div>
-              </div>
             </div>
             <div className="ItemEdit__form__image">
               {isUploading && (
@@ -213,7 +196,7 @@ export default function ItemEditModal() {
                         actions: [
                           ...item.actions,
                           {
-                            name: "",
+                            name: "New Action",
                             prompt: "",
                             id: id,
                             usageActions: [],
@@ -230,19 +213,15 @@ export default function ItemEditModal() {
                 </Button>
               )}
             </div>
-
             {item.actions.length >= 0 && (
-              <div className="ItemEdit__actions__container scrollbar">
+              <div className="ItemEdit__actionList scrollbar">
                 {item.actions.map((action) => (
                   <div
                     key={`action-${action.id}`}
-                    className="ItemEdit__actions__action"
+                    className="ItemEdit__actionList__action"
                   >
-                    <FaTrashAlt
-                      onClick={() => handleRemoveAction(action.id || "")}
-                      className="ItemEdit__actions__remove"
-                    />
-                    <button
+                    <FaPencil
+                      className="ItemEdit__actionList__edit"
                       onClick={() => {
                         dispatch(
                           openModal({
@@ -251,14 +230,55 @@ export default function ItemEditModal() {
                           })
                         );
                       }}
-                    >
-                      edit
-                    </button>
-                    {action.name}
+                    />
+                    <p className="ItemEdit__actionList__action__name">
+                      {action.name}
+                    </p>
                   </div>
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="ItemEdit__visibility">
+            <div className="ItemEdit__visibility__title">
+              <h3 className="ItemEdit__visibility__title">Visibility</h3>
+              <div className="ItemEdit__visibility__hidden">
+                <CheckBox
+                  label="Condition hide"
+                  value={item.hidden}
+                  onChange={(e) => {
+                    dispatch(
+                      updateInventoryItem({
+                        ...item,
+                        hidden: e.target.checked,
+                      })
+                    );
+                  }}
+                />
+                <Tooltip id="Info-Visibility" place="top" />
+                <IoInformationCircleOutline
+                  data-tooltip-id="Info-Visibility"
+                  data-tooltip-content="[OPTIONAL]Hidden for the whole novel until a condition adds it."
+                />
+              </div>
+            </div>
+
+            <div className="ItemEdit__visibility__sceneLock">
+              <div className="ItemEdit__visibility__sceneLock__label">
+                <label>Scene Lock</label>
+                <Tooltip id="Info-scene-lock" place="top" />
+                <IoInformationCircleOutline
+                  data-tooltip-id="Info-scene-lock"
+                  data-tooltip-content="[OPTIONAL] Lock the item to a scene. It will be visible only in the selected scenes."
+                />
+              </div>
+              <SceneSelector
+                multiSelect
+                value={item.locked?.config.sceneIds || []}
+                onChange={(sceneIds: string[]) => handleSelectScenes(sceneIds)}
+              />
+            </div>
           </div>
         </div>
       ) : null}
