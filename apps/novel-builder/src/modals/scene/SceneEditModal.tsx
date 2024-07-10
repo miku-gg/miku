@@ -18,7 +18,6 @@ import config from "../../config";
 import { TOKEN_LIMITS } from "../../data/tokenLimits";
 import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
 import Characters from "../../panels/assets/characters/Characters";
-import InventoryItems from "../../panels/assets/inventory/InventoryItems";
 import Songs from "../../panels/assets/songs/Songs";
 import { LorebookList } from "../../panels/details/LorebookList";
 import { MapList } from "../../panels/maps/MapList";
@@ -26,7 +25,6 @@ import { selectBackgrounds, selectEditingScene } from "../../state/selectors";
 import { closeModal } from "../../state/slices/inputSlice";
 import {
   deleteSceneById,
-  updateInventoryItem,
   updateObjective,
   updateScene,
 } from "../../state/slices/novelFormSlice";
@@ -41,12 +39,7 @@ export default function SceneEditModal() {
   const maps = useAppSelector((state) => state.novel.maps);
   const backgrounds = useAppSelector(selectBackgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
-  const items = useAppSelector((state) => state.novel.inventory);
-  const sceneLockedItems = items?.filter(
-    (item) =>
-      item.locked?.type === "IN_SCENE" &&
-      item.locked.config.sceneIds.includes(scene?.id || "")
-  );
+ 
   const objectives = useAppSelector((state) => state.novel.objectives);
   const objectiveLockedsByScenes = objectives?.filter((obj) => {
     return obj.stateCondition.config.sceneIds.includes(scene?.id || "");
@@ -500,37 +493,7 @@ export default function SceneEditModal() {
                 />
               ) : null}
             </div>
-            <div className="SceneEditModal__scene-items">
-              <InventoryItems
-                tooltipText="Select items that can be used only in this scene."
-                selectedItemIds={sceneLockedItems?.map((item) => item.id) || []}
-                onSelect={(itemId) => {
-                  const item = items?.find((item) => item.id === itemId);
-                  if (!item) return;
-                  dispatch(
-                    updateInventoryItem({
-                      ...item,
-                      id: itemId,
-                      locked: {
-                        type: "IN_SCENE",
-                        config: {
-                          sceneIds: item.locked?.config.sceneIds.includes(
-                            scene.id
-                          )
-                            ? item.locked?.config.sceneIds.filter(
-                                (id) => id !== scene.id
-                              )
-                            : [
-                                ...(item.locked?.config.sceneIds ?? []),
-                                scene.id,
-                              ],
-                        },
-                      },
-                    })
-                  );
-                }}
-              />
-            </div>
+
             <div className="SceneEditModal__scene-lorebooks">
               <LorebookList
                 selectedLorebookId={scene?.lorebookIds || []}
