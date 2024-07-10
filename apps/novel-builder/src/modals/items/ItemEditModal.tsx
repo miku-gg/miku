@@ -12,14 +12,13 @@ import { v4 as randomUUID } from "uuid";
 
 import { useDispatch } from "react-redux";
 import { selectEditingInventoryItem } from "../../state/selectors";
-import { closeModal } from "../../state/slices/inputSlice";
+import { closeModal, openModal } from "../../state/slices/inputSlice";
 import {
   deleteInventoryItem,
   updateInventoryItem,
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
-import { NovelV3 } from "@mikugg/bot-utils";
 import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { IoIosCloseCircleOutline } from "react-icons/io";
@@ -27,7 +26,6 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import config from "../../config";
 import { checkFileType } from "../../libs/utils";
-import NovelActionForm from "../scene/NovelActionForm";
 import "./ItemEditModal.scss";
 
 export default function ItemEditModal() {
@@ -208,6 +206,7 @@ export default function ItemEditModal() {
                 <Button
                   theme="secondary"
                   onClick={() => {
+                    const id = randomUUID();
                     dispatch(
                       updateInventoryItem({
                         ...item,
@@ -216,11 +215,14 @@ export default function ItemEditModal() {
                           {
                             name: "",
                             prompt: "",
-                            id: randomUUID(),
+                            id: id,
                             usageActions: [],
                           },
                         ],
                       })
+                    );
+                    dispatch(
+                      openModal({ modalType: "actionEdit", editId: id })
                     );
                   }}
                 >
@@ -240,91 +242,19 @@ export default function ItemEditModal() {
                       onClick={() => handleRemoveAction(action.id || "")}
                       className="ItemEdit__actions__remove"
                     />
-                    <Input
-                      label="Action Name"
-                      placeHolder="E.g. Give"
-                      value={action.name}
-                      onChange={(e) =>
-                        handleUpdateAction(action.id || "", {
-                          name: e.target.value,
-                        })
-                      }
-                    />
-                    <Input
-                      isTextArea
-                      label="Prompt"
-                      placeHolder="E.g. *I pull out a rose flower and hand it over to {{char}}*"
-                      value={action.prompt}
-                      onChange={(e) =>
-                        handleUpdateAction(action.id || "", {
-                          prompt: e.target.value,
-                        })
-                      }
-                    />
-                    <div className="ItemEdit__actions__action__mutation">
-                      <div>
-                        <h3>Usage Actions</h3>
-                        <IoInformationCircleOutline
-                          data-tooltip-id={`Info-item-actions-${action.id}`}
-                          className="ObjectiveEdit__header__title__infoIcon"
-                          data-tooltip-content="The action that will be triggered when the player uses this item"
-                        />
-                      </div>
-                      <Button
-                        theme="primary"
-                        onClick={() => {
-                          handleUpdateAction(action.id || "", {
-                            usageActions: [
-                              ...(action.usageActions || []),
-                              {
-                                type: NovelV3.NovelActionType.SHOW_ITEM,
-                                params: { itemId: "" },
-                              },
-                            ],
-                          });
-                        }}
-                      >
-                        Add usage action
-                      </Button>
-                      <Tooltip
-                        id={`Info-item-actions-${action.id}`}
-                        place="top"
-                      />
-                    </div>
-                    {action.usageActions && action.usageActions.length > 0 ? (
-                      <div className="ItemEdit__actions__mutations">
-                        {action.usageActions.map((act, index) => (
-                          <div
-                            key={`${act.type}-${index + 1}`}
-                            className="ItemEdit__actions__usageAction"
-                          >
-                            <FaTrashAlt
-                              className="ItemEdit__actions__usageAction__remove"
-                              onClick={() => {
-                                handleUpdateAction(action.id || "", {
-                                  usageActions: action.usageActions?.filter(
-                                    (_, i) => i !== index
-                                  ),
-                                });
-                              }}
-                            />
-                            <NovelActionForm
-                              action={act}
-                              onChange={(act) => {
-                                handleUpdateAction(action.id || "", {
-                                  usageActions: [
-                                    ...action.usageActions!.slice(0, index),
-                                    act,
-                                    ...action.usageActions!.slice(index + 1),
-                                  ],
-                                });
-                              }}
-                              onDelete={() => {}}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
+                    <button
+                      onClick={() => {
+                        dispatch(
+                          openModal({
+                            modalType: "actionEdit",
+                            editId: action.id,
+                          })
+                        );
+                      }}
+                    >
+                      edit
+                    </button>
+                    {action.name}
                   </div>
                 ))}
               </div>
