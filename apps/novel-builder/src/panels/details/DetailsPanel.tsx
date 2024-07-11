@@ -116,7 +116,7 @@ export default function DetailsPanel() {
           />
         </div>
       </div>
-      <LorebookList tooltipText="Collections of prompts dinamically used by the AI." />
+      <LorebookList tooltipText="Prompt collections dynamically used by the AI." />
     </div>
   );
 }
