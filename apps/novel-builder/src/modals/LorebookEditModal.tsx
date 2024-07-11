@@ -16,8 +16,10 @@ import {
   createEntry,
   deleteEntry,
   deleteLorebook,
+  updateCharacter,
   updateEntry,
   updateLorebook,
+  updateScene,
 } from "../state/slices/novelFormSlice";
 import { useAppSelector } from "../state/store";
 import "./LorebookEditModal.scss";
@@ -28,6 +30,8 @@ export default function LorebookEditModal() {
   const dispatch = useDispatch();
   const lorebook = useAppSelector(selectEditingLorebook);
   const { openModal } = AreYouSure.useAreYouSure();
+  const characters = useAppSelector((state) => state.novel.characters);
+  const scenes = useAppSelector((state) => state.novel.scenes);
 
   const handleScrollToTop = useCallback(() => {
     if (containerRef.current) {
@@ -54,14 +58,42 @@ export default function LorebookEditModal() {
     }
   };
 
-  const handleDeleteLorebook = () => {
+  const removeIdsFromCharacters = (id: string) => {
+    const charactersWithLorebook = characters.filter((character) =>
+      character.lorebookIds?.includes(id)
+    );
+
+    charactersWithLorebook.forEach((character) => {
+      const updatedCharacter = {
+        ...character,
+        lorebookIds: character.lorebookIds?.filter((_id) => _id !== id),
+      };
+      dispatch(updateCharacter(updatedCharacter));
+    });
+  };
+
+  const removeIdsFromScenes = (id: string) => {
+    const scenesWithLorebook = scenes.filter((scene) =>
+      scene.lorebookIds?.includes(id)
+    );
+    scenesWithLorebook.forEach((scene) => {
+      const updatedScene = {
+        ...scene,
+        lorebookIds: scene.lorebookIds?.filter((_id) => _id !== id),
+      };
+      dispatch(updateScene(updatedScene));
+    });
+  };
+
+  const handleDeleteLorebook = (id: string) => {
     openModal({
       title: "Are you sure?",
       description: "This action cannot be undone",
-      //TODO: Fix z-index for are you sure modal
       onYes: () => {
         dispatch(closeModal({ modalType: "lorebookEdit" }));
-        dispatch(deleteLorebook({ lorebookId: lorebook?.id || "" }));
+        removeIdsFromCharacters(id);
+        removeIdsFromScenes(id);
+        dispatch(deleteLorebook({ lorebookId: id }));
       },
     });
   };
@@ -81,7 +113,7 @@ export default function LorebookEditModal() {
             data-tooltip-id="delete-tooltip"
             data-tooltip-content="Delete lorebook"
             onClick={() => {
-              handleDeleteLorebook();
+              handleDeleteLorebook(lorebook.id);
             }}
           />
           <div className="CharacterLorebooks__form-top">
