@@ -2,7 +2,7 @@ import {
   DragAndDropImages,
   Input,
   Modal,
-  TagAutocomplete
+  TagAutocomplete,
 } from "@mikugg/ui-kit";
 import { useState } from "react";
 import { BsStars } from "react-icons/bs";
@@ -13,7 +13,7 @@ import {
   ModelType,
   SERVICES_ENDPOINT,
   checkFileType,
-  conversationAgent
+  conversationAgent,
 } from "../../libs/utils";
 import { LorebookList } from "../../panels/details/LorebookList";
 import { closeModal, openModal } from "../../state/slices/inputSlice";
@@ -43,11 +43,11 @@ const DEFAULT_TAGS = [
   { value: "Work" },
   { value: "Movies & TV" },
   { value: "VTuber" },
-  { value: "Realistic" }
+  { value: "Realistic" },
 ];
 
 export default function CharacterDescriptionEdit({
-  characterId
+  characterId,
 }: {
   characterId?: string;
 }) {
@@ -72,7 +72,7 @@ export default function CharacterDescriptionEdit({
         dispatch(
           updateCharacter({
             ...character,
-            profile_pic: asset.assetId
+            profile_pic: asset.assetId,
           })
         );
       } catch (e) {
@@ -90,7 +90,7 @@ export default function CharacterDescriptionEdit({
           ? character.lorebookIds.includes(id)
             ? character.lorebookIds.filter((lid) => lid !== id)
             : [...character.lorebookIds, id]
-          : [id]
+          : [id],
       })
     );
   };
@@ -101,12 +101,12 @@ export default function CharacterDescriptionEdit({
 
       const stream = textCompletion({
         template: conversationAgent.generatePrompt({
-          input_description: character.card.data.description
+          input_description: character.card.data.description,
         }),
         model: ModelType.RP,
         variables: {},
         serviceBaseUrl: SERVICES_ENDPOINT,
-        identifier: "character-conversation-generation"
+        identifier: "character-conversation-generation",
       });
 
       for await (const result of stream) {
@@ -121,9 +121,9 @@ export default function CharacterDescriptionEdit({
                   "question_1"
                 )}\n{{char}}: ${result.get("answer_1")}\n{{user}}: ${result.get(
                   "question_2"
-                )}\n{{char}}: ${result.get("answer_2")}`
-              }
-            }
+                )}\n{{char}}: ${result.get("answer_2")}`,
+              },
+            },
           })
         );
       }
@@ -156,9 +156,9 @@ export default function CharacterDescriptionEdit({
                         ...character.card,
                         data: {
                           ...character.card.data,
-                          name: e.target.value
-                        }
-                      }
+                          name: e.target.value,
+                        },
+                      },
                     })
                   )
                 }
@@ -180,9 +180,9 @@ export default function CharacterDescriptionEdit({
                         ...character.card,
                         data: {
                           ...character.card.data,
-                          character_version: e.target.value
-                        }
-                      }
+                          character_version: e.target.value,
+                        },
+                      },
                     })
                   )
                 }
@@ -205,9 +205,9 @@ export default function CharacterDescriptionEdit({
                         ...character.card,
                         data: {
                           ...character.card.data,
-                          creator: e.target.value
-                        }
-                      }
+                          creator: e.target.value,
+                        },
+                      },
                     })
                   )
                 }
@@ -227,7 +227,7 @@ export default function CharacterDescriptionEdit({
                 dispatch(
                   updateCharacter({
                     ...character,
-                    short_description: e.target.value
+                    short_description: e.target.value,
                   })
                 )
               }
@@ -238,7 +238,7 @@ export default function CharacterDescriptionEdit({
             <TagAutocomplete
               value={character.tags.map((_tag) => ({
                 label: _tag,
-                value: _tag
+                value: _tag,
               }))}
               name="tags"
               id="tags"
@@ -253,9 +253,9 @@ export default function CharacterDescriptionEdit({
                       ...character.card,
                       data: {
                         ...character.card.data,
-                        tags: event.target.value
-                      }
-                    }
+                        tags: event.target.value,
+                      },
+                    },
                   })
                 )
               }
@@ -345,18 +345,20 @@ export default function CharacterDescriptionEdit({
                   ...character.card,
                   data: {
                     ...character.card.data,
-                    description: e.target.value
-                  }
-                }
+                    description: e.target.value,
+                  },
+                },
               })
             )
           }
           className="step1Description__textarea"
         />
       </div>
-      <div className="CharacterDescriptionEdit__personality">
+      {/* <div className="CharacterDescriptionEdit__personality">
         <div className="CharacterDescriptionEdit__personality__label">
-          <label className="Input__label">Describe the Personality</label>
+          <label className="Input__label">
+            Describe the Personality (DEPRECATED, do not use)
+          </label>
           <TokenDisplayer
             text={character.card.data.personality || ""}
             limits={TOKEN_LIMITS.CHARACTER_PERSONALITY}
@@ -376,15 +378,15 @@ export default function CharacterDescriptionEdit({
                   ...character.card,
                   data: {
                     ...character.card.data,
-                    personality: e.target.value
-                  }
-                }
+                    personality: e.target.value,
+                  },
+                },
               })
             )
           }
           className="step1Description__textarea"
         />
-      </div>
+      </div> */}
       <div className="CharacterDescriptionEdit__examples">
         <div className="CharacterDescriptionEdit__examples__label">
           <div className="CharacterDescriptionEdit__examples__label-group">
@@ -433,9 +435,9 @@ export default function CharacterDescriptionEdit({
                   ...character.card,
                   data: {
                     ...character.card.data,
-                    mes_example: e.target.value
-                  }
-                }
+                    mes_example: e.target.value,
+                  },
+                },
               })
             )
           }
