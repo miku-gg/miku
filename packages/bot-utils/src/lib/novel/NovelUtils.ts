@@ -591,6 +591,8 @@ export enum NovelValidationTargetType {
   BACKGROUND,
   START,
   MAP,
+  INVENTORY,
+  OBJETIVES,
 }
 export interface NovelValidation {
   targetType: NovelValidationTargetType;
@@ -813,6 +815,222 @@ export function validateNovelState(
         }
       });
     });
+
+    //Validate Inventory Items
+    if (novel.inventory) {
+      novel.inventory.forEach((item) => {
+        if (!item.name) {
+          errors.push({
+            targetType: NovelValidationTargetType.INVENTORY,
+            targetId: item.id,
+            severity: "error",
+            message: `Item has no name`,
+          });
+        }
+        if (!item.description) {
+          errors.push({
+            targetType: NovelValidationTargetType.INVENTORY,
+            targetId: item.id,
+            severity: "warning",
+            message: `Item '${item.name}' has no description`,
+          });
+        }
+        if (!item.icon) {
+          errors.push({
+            targetType: NovelValidationTargetType.INVENTORY,
+            targetId: item.id,
+            severity: "error",
+            message: `Item '${item.name}' has no icon`,
+          });
+        }
+        if (item.actions) {
+          if (!item.actions.length) {
+            errors.push({
+              targetType: NovelValidationTargetType.INVENTORY,
+              targetId: item.id,
+              severity: "error",
+              message: `Item '${item.name}' has no actions`,
+            });
+          }
+          item.actions.forEach((action) => {
+            if (!action.name) {
+              errors.push({
+                targetType: NovelValidationTargetType.INVENTORY,
+                targetId: item.id,
+                severity: "error",
+                message: `Action has no name in item '${item.name}'`,
+              });
+            }
+            if (!action.prompt) {
+              errors.push({
+                targetType: NovelValidationTargetType.INVENTORY,
+                targetId: item.id,
+                severity: "error",
+                message: `Action '${action.name}' in item '${item.name}' has no prompt`,
+              });
+            }
+            if (action.usageActions) {
+              action.usageActions.forEach((usageAction) => {
+                if (usageAction.type === NovelV3.NovelActionType.SHOW_ITEM) {
+                  if (!usageAction.params.itemId) {
+                    errors.push({
+                      targetType: NovelValidationTargetType.DESC,
+                      targetId: item.id,
+                      severity: "error",
+                      message: `Show item action has no item id in action '${action.name}' in '${item.name}'`,
+                    });
+                  }
+                }
+                if (usageAction.type === NovelV3.NovelActionType.HIDE_ITEM) {
+                  if (!usageAction.params.itemId) {
+                    errors.push({
+                      targetType: NovelValidationTargetType.DESC,
+                      targetId: item.id,
+                      severity: "error",
+                      message: `Hide item action has no item id in action '${action.name}' in '${item.name}'`,
+                    });
+                  }
+                }
+                if (
+                  usageAction.type === NovelV3.NovelActionType.ADD_CHILD_SCENES
+                ) {
+                  if (!usageAction.params.sceneId) {
+                    errors.push({
+                      targetType: NovelValidationTargetType.DESC,
+                      targetId: item.id,
+                      severity: "error",
+                      message: `Add child scenes action has no scene id in action '${action.name}' in '${item.name}'`,
+                    });
+                  }
+                  if (!usageAction.params.children) {
+                    errors.push({
+                      targetType: NovelValidationTargetType.DESC,
+                      targetId: item.id,
+                      severity: "error",
+                      message: `Add child scenes action has no children in action '${action.name}' in '${item.name}'`,
+                    });
+                  }
+                }
+                if (
+                  usageAction.type ===
+                  NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE
+                ) {
+                  if (!usageAction.params.sceneId) {
+                    errors.push({
+                      targetType: NovelValidationTargetType.DESC,
+                      targetId: item.id,
+                      severity: "error",
+                      message: `Suggest advance scene action has no scene id in action '${action.name}' in '${item.name}'`,
+                    });
+                  }
+                }
+              });
+            }
+            if (action.usageCondition) {
+              if (!action.usageCondition.config.sceneIds) {
+                errors.push({
+                  targetType: NovelValidationTargetType.INVENTORY,
+                  targetId: item.id,
+                  severity: "error",
+                  message: `Action '${action.name}' has no condition in item '${item.name}'`,
+                });
+              }
+            }
+          });
+        }
+      });
+    }
+
+    //Validate Novel objectives
+    if (novel.objectives) {
+      novel.objectives.forEach((objective) => {
+        if (!objective.name) {
+          errors.push({
+            targetType: NovelValidationTargetType.OBJETIVES,
+            targetId: objective.id,
+            severity: "error",
+            message: `Objective has no name`,
+          });
+        }
+        if (objective.actions) {
+          if (!objective.actions.length) {
+            errors.push({
+              targetType: NovelValidationTargetType.OBJETIVES,
+              targetId: objective.id,
+              severity: "error",
+              message: `Objective '${objective.name}' has no actions`,
+            });
+          }
+          objective.actions.forEach((action) => {
+            if (action.type === NovelV3.NovelActionType.SHOW_ITEM) {
+              if (!action.params.itemId) {
+                errors.push({
+                  targetType: NovelValidationTargetType.OBJETIVES,
+                  targetId: objective.id,
+                  severity: "error",
+                  message: `Show item action has no item id in objective '${objective.name}'`,
+                });
+              }
+            }
+            if (action.type === NovelV3.NovelActionType.HIDE_ITEM) {
+              if (!action.params.itemId) {
+                errors.push({
+                  targetType: NovelValidationTargetType.OBJETIVES,
+                  targetId: objective.id,
+                  severity: "error",
+                  message: `Hide item action has no item id in objective '${objective.name}'`,
+                });
+              }
+            }
+            if (action.type === NovelV3.NovelActionType.ADD_CHILD_SCENES) {
+              if (!action.params.sceneId) {
+                errors.push({
+                  targetType: NovelValidationTargetType.OBJETIVES,
+                  targetId: objective.id,
+                  severity: "error",
+                  message: `Add child scenes action has no scene id in objective '${objective.name}'`,
+                });
+              }
+              if (!action.params.children) {
+                errors.push({
+                  targetType: NovelValidationTargetType.OBJETIVES,
+                  targetId: objective.id,
+                  severity: "error",
+                  message: `Add child scenes action has no children in objective '${objective.name}'`,
+                });
+              }
+            }
+            if (action.type === NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE) {
+              if (!action.params.sceneId) {
+                errors.push({
+                  targetType: NovelValidationTargetType.OBJETIVES,
+                  targetId: objective.id,
+                  severity: "error",
+                  message: `Suggest advance scene action has no scene id in objective '${objective.name}'`,
+                });
+              }
+            }
+          });
+        }
+        if (!objective.condition) {
+          errors.push({
+            targetType: NovelValidationTargetType.OBJETIVES,
+            targetId: objective.id,
+            severity: "error",
+            message: `Objective '${objective.name}' has no condition`,
+          });
+        }
+
+        if (!objective.stateCondition.config.sceneIds) {
+          errors.push({
+            targetType: NovelValidationTargetType.OBJETIVES,
+            targetId: objective.id,
+            severity: "error",
+            message: `Objective '${objective.name}' is not assigned to any scene`,
+          });
+        }
+      });
+    }
 
     novel.scenes.forEach((scene) => {
       // validate background ids

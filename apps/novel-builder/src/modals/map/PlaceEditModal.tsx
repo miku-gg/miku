@@ -207,34 +207,23 @@ export default function PlaceEditModal() {
           </div>
           <div className="PlaceEdit__form">
             <div className="PlaceEdit__sceneSelect">
+              <label>Select a scene</label>
               <SceneSelector
-                opened={selectSceneOpened}
-                onCloseModal={() => setSelectSceneOpened(false)}
-                selectedSceneId={place.sceneId}
-                onSelectScene={(id) => {
+                multiSelect={false}
+                nonDeletable
+                value={place.sceneId}
+                onChange={(sceneId) => {
                   dispatch(
                     updatePlace({
                       mapId: map!.id,
                       place: {
                         ...place,
-                        sceneId: id,
+                        sceneId: sceneId || "",
                       },
                     })
                   );
                 }}
               />
-              <label>Select a scene</label>
-              <div className="PlaceEdit__sceneSelect__container">
-                <p className="PlaceEdit__sceneSelect__name">
-                  {place.sceneId ? getSceneData(place.sceneId)?.name : ""}
-                </p>
-                <button
-                  className="PlaceEdit__sceneSelect__button"
-                  onClick={() => setSelectSceneOpened(true)}
-                >
-                  Select scene
-                </button>
-              </div>
             </div>
             <Input
               label="Place name"

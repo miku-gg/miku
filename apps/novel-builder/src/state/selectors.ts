@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { RootState } from "./store";
 import { LLAMA_TOKENIZER } from "../libs/utils";
+import { RootState } from "./store";
 
 export const selectBackgrounds = (state: RootState) => state.novel.backgrounds;
 export const selectEditingBackground = createSelector(
@@ -8,6 +8,31 @@ export const selectEditingBackground = createSelector(
   (modal, backgrounds) => {
     if (!modal.opened) return undefined;
     return backgrounds.find((background) => background.id === modal.editId);
+  }
+);
+
+export const selectObjectives = (state: RootState) => state.novel.objectives;
+export const selectEditingObjective = createSelector(
+  [(state: RootState) => state.input.modals.objectiveEdit, selectObjectives],
+  (modal, objectives) => {
+    if (!modal.opened) return undefined;
+    return objectives?.find((objective) => objective.id === modal.editId);
+  }
+);
+export const selectInventory = (state: RootState) => state.novel.inventory;
+export const selectEditingInventoryItem = createSelector(
+  [(state: RootState) => state.input.modals.editInventoryItem, selectInventory],
+  (modal, inventory) => {
+    if (!modal.opened) return undefined;
+    return inventory?.find((item) => item.id === modal.editId);
+  }
+);
+export const selectEditingAction = createSelector(
+  [(state: RootState) => state.input.modals.actionEdit, selectInventory],
+  (modal, inventory) => {
+    if (!modal.opened) return undefined;
+    const actions = inventory?.map((item) => item.actions).flat();
+    return actions?.find((action) => action.id === modal.editId);
   }
 );
 export const selectLorebooks = (state: RootState) => {
@@ -28,10 +53,11 @@ export const selectEditingMap = createSelector(
     return maps.find((map) => map.id === modal.editId);
   }
 );
+
 export const selectEditingPlace = createSelector(
   [
     (state: RootState) => state.input.modals.placeEdit,
-    (state: RootState) => state.novel.maps
+    (state: RootState) => state.novel.maps,
   ],
   (modal, maps) => {
     if (!modal.opened) return undefined;
@@ -44,7 +70,7 @@ export const selectEditingPlace = createSelector(
 export const selectEditingSong = createSelector(
   [
     (state: RootState) => state.input.modals.song,
-    (state: RootState) => state.novel.songs
+    (state: RootState) => state.novel.songs,
   ],
   (modal, songs) => {
     if (!modal.opened) return undefined;
@@ -54,7 +80,7 @@ export const selectEditingSong = createSelector(
 export const selectEditingCharacter = createSelector(
   [
     (state: RootState) => state.input.modals.character,
-    (state: RootState) => state.novel.characters
+    (state: RootState) => state.novel.characters,
   ],
   (modal, characters) => {
     if (!modal.opened) return undefined;
@@ -69,7 +95,7 @@ export const selectScenes = createSelector(
     (state: RootState) => state.novel.backgrounds,
     (state: RootState) => state.novel.characters,
     (state: RootState) => state.novel.songs,
-    (state: RootState) => state.novel.maps
+    (state: RootState) => state.novel.maps,
   ],
   (scenes, starts, backgrounds, characters, songs, maps) => {
     return scenes.map((scene) => {
@@ -82,7 +108,7 @@ export const selectScenes = createSelector(
           return {
             ...characters.find((c) => c.id === char.characterId),
             outfit: char.outfit,
-            objective: char.objective
+            objective: char.objective,
           };
         }),
         music: songs.find((song) => song.id === scene.musicId),
@@ -90,7 +116,7 @@ export const selectScenes = createSelector(
           scene.parentMapIds?.map((parentMapId) =>
             maps.find((map) => map.id === parentMapId)
           ) || [],
-        starts: _starts
+        starts: _starts,
       };
     });
   }

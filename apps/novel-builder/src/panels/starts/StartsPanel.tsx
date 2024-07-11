@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../state/store";
 import {
   createStart,
   deleteStart,
-  updateStart
+  updateStart,
 } from "../../state/slices/novelFormSlice";
 import { selectScenes } from "../../state/selectors";
 import config from "../../config";
@@ -12,6 +12,9 @@ import { useState } from "react";
 import classNames from "classnames";
 import { TokenDisplayer } from "../../components/TokenDisplayer";
 import { TOKEN_LIMITS } from "../../data/tokenLimits";
+import SceneSelector, {
+  SceneSelectorModal,
+} from "../../modals/scene/SceneSelector";
 
 export default function StartsPanel() {
   const dispatch = useAppDispatch();
@@ -19,15 +22,24 @@ export default function StartsPanel() {
   const characters = useAppSelector((state) => state.novel.characters);
   const scenes = useAppSelector(selectScenes);
   const { openModal: openAreYouSureModal } = AreYouSure.useAreYouSure();
-  const [sceneSelection, setSceneSelection] = useState<{
-    opened: boolean;
-    selectedSceneId: string | null;
-    startId: string | null;
-  }>({
-    opened: false,
-    selectedSceneId: null,
-    startId: null
-  });
+  const [newStartOpened, setNewStartOpened] = useState<boolean>(false);
+
+  const getSceneCharactersStartResponse = (sceneId: string) => {
+    const scene = scenes.find((scene) => scene.id === sceneId);
+    return (
+      scene?.characters.map((character) => {
+        const outfit = character.card?.data.extensions.mikugg_v2.outfits.find(
+          (outfit) => outfit.id === character.outfit
+        );
+        return {
+          characterId: character.id || "",
+          emotion: outfit?.emotions[0]?.id || "",
+          text: "",
+          pose: "standing",
+        };
+      }) || []
+    );
+  };
 
   return (
     <div className="StartsPanel">
@@ -43,33 +55,23 @@ export default function StartsPanel() {
             <div className="StartsPanel__item" key={start.id}>
               <div className="StartsPanel__item-spec">
                 <div className="StartsPanel__item-scene">
-                  <div
-                    className="SceneNode"
-                    style={{
-                      backgroundImage: `url(${config.genAssetLink(
-                        scene?.background?.source.jpg || ""
-                      )})`
+                  <SceneSelector
+                    multiSelect={false}
+                    nonDeletable
+                    value={start.sceneId}
+                    onChange={(sceneId) => {
+                      if (sceneId) {
+                        dispatch(
+                          updateStart({
+                            ...start,
+                            sceneId,
+                            characters:
+                              getSceneCharactersStartResponse(sceneId),
+                          })
+                        );
+                      }
                     }}
-                    onClick={() =>
-                      setSceneSelection({
-                        opened: true,
-                        selectedSceneId: start.sceneId,
-                        startId: start.id
-                      })
-                    }
-                  >
-                    <div className="SceneNode__title">{scene?.name || ""}</div>
-                    <div className="SceneNode__characters">
-                      {scene?.characters.map((character, index) => (
-                        <img
-                          key={index}
-                          src={config.genAssetLink(character.profile_pic || "")}
-                          alt={`Character ${index}`}
-                          className="SceneNode__character"
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  />
                 </div>
 
                 <div className="StartsPanel__item-docs">
@@ -126,7 +128,7 @@ export default function StartsPanel() {
                               items={
                                 outfit?.emotions.map((emotion) => ({
                                   name: emotion.id,
-                                  value: emotion.id
+                                  value: emotion.id,
                                 })) || []
                               }
                               selectedIndex={selectedEmotionIndex}
@@ -141,10 +143,10 @@ export default function StartsPanel() {
                                               ...char,
                                               emotion:
                                                 outfit?.emotions[indexEmotion]
-                                                  ?.id || ""
+                                                  ?.id || "",
                                             }
                                           : char
-                                    )
+                                    ),
                                   })
                                 );
                               }}
@@ -168,7 +170,7 @@ export default function StartsPanel() {
                                 i === index
                                   ? { ...char, text: e.target.value }
                                   : char
-                              )
+                              ),
                             })
                           )
                         }
@@ -187,7 +189,7 @@ export default function StartsPanel() {
                       },
                       description:
                         "Are you sure you want to remove this start?",
-                      yesLabel: "Remove"
+                      yesLabel: "Remove",
                     });
                   }}
                 >
@@ -199,99 +201,18 @@ export default function StartsPanel() {
         })}
       </div>
       <div className="StartsPanel__add-button">
-        <Button
-          theme="secondary"
-          onClick={() =>
-            setSceneSelection({
-              opened: true,
-              selectedSceneId: null,
-              startId: null
-            })
-          }
-        >
+        <Button theme="secondary" onClick={() => setNewStartOpened(true)}>
           Add Start
         </Button>
       </div>
-      <Modal
-        title="Select a Scene"
-        opened={sceneSelection.opened}
-        onCloseModal={() =>
-          setSceneSelection({
-            opened: false,
-            selectedSceneId: null,
-            startId: null
-          })
-        }
-      >
-        <div className="StartsPanel__scene-selection">
-          <div className="StartsPanel__scene-selection-list">
-            {scenes.map((scene) => (
-              <div
-                className={classNames({
-                  "StartsPanel__scene-selection-item": true,
-                  "StartsPanel__scene-selection-item--selected":
-                    scene.id === sceneSelection.selectedSceneId
-                })}
-                key={scene.id}
-                onClick={() => {
-                  const start = starts.find(
-                    (start) => start.id === sceneSelection.startId
-                  );
-                  const characters = scene.characters.map((character) => {
-                    const outfit =
-                      character.card?.data.extensions.mikugg_v2.outfits.find(
-                        (outfit) => outfit.id === character.outfit
-                      );
-                    return {
-                      characterId: character.id || "",
-                      emotion: outfit?.emotions[0]?.id || "",
-                      text: "",
-                      pose: "standing"
-                    };
-                  });
-                  if (start) {
-                    dispatch(
-                      updateStart({
-                        ...start,
-                        sceneId: scene.id,
-                        characters
-                      })
-                    );
-                  } else {
-                    dispatch(createStart(scene.id));
-                  }
-                  setSceneSelection({
-                    opened: false,
-                    selectedSceneId: null,
-                    startId: null
-                  });
-                }}
-              >
-                <div
-                  className="SceneNode"
-                  style={{
-                    backgroundImage: `url(${config.genAssetLink(
-                      scene.background?.source.jpg || ""
-                    )})`
-                  }}
-                >
-                  <div className="SceneNode__title">{scene.name}</div>
-                  <div className="SceneNode__characters">
-                    {scene.characters.map((character, index) => (
-                      <img
-                        key={index}
-                        src={config.genAssetLink(character.profile_pic || "")}
-                        alt={`Character ${index}`}
-                        className="SceneNode__character"
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Modal>
+      <SceneSelectorModal
+        opened={newStartOpened}
+        onCloseModal={() => setNewStartOpened(false)}
+        onSelectScene={(sceneId) => {
+          dispatch(createStart(sceneId));
+          setNewStartOpened(false);
+        }}
+      />
     </div>
   );
 }

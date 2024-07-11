@@ -208,6 +208,10 @@
     border-radius: 1rem;
   }
 
+  &__scene-items {
+    margin-top: 1rem;
+  }
+
   &__scene-objective {
     flex: 1;
     min-width: 300px;
@@ -224,6 +228,7 @@
         border-radius: 50%;
       }
     }
+
     &__input {
     }
   }

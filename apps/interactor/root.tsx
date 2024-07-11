@@ -15,18 +15,18 @@ import queryString from 'query-string'
 import { PersonaResult } from './src/libs/listSearch'
 import { loadNovelFromSingleCard } from './src/libs/loadNovel'
 
-import { initialState as initialCreationState } from './src/state/slices/creationSlice'
-import { initialState as initialSettingsState } from './src/state/slices/settingsSlice'
-import { initialState as initialInventoryState } from './src/state/slices/inventorySlice'
-import { RootState } from './src/state/store'
-import { VersionId } from './src/state/versioning'
-import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
-import { scenesToObjectives } from './src/state/slices/objectivesSlice'
+import { DEFAULT_INVENTORY } from './src/libs/inventoryItems'
 import {
   getUnlockableAchievements,
   getUnlockedItems,
 } from './src/libs/platformAPI'
-import { DEFAULT_INVENTORY } from './src/libs/inventoryItems'
+import { initialState as initialCreationState } from './src/state/slices/creationSlice'
+import { initialState as initialInventoryState } from './src/state/slices/inventorySlice'
+import { scenesToObjectives } from './src/state/slices/objectivesSlice'
+import { initialState as initialSettingsState } from './src/state/slices/settingsSlice'
+import { RootState } from './src/state/store'
+import { VersionId } from './src/state/versioning'
+import { migrateV1toV2, migrateV2toV3 } from './src/state/versioning/migrations'
 
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -193,11 +193,16 @@ export const loadNarration = async (): Promise<RootState> => {
             ...migrated,
             objectives: [
               ...scenesToObjectives(migrated.novel.scenes),
+              ...(migrated.novel.objectives || []),
               ...achievements,
             ],
             inventory: {
               ...initialInventoryState,
-              items: [...inventoryItems, ...DEFAULT_INVENTORY],
+              items: [
+                ...(migrated.novel.inventory || []),
+                ...inventoryItems,
+                ...DEFAULT_INVENTORY,
+              ],
             },
             creation: initialCreationState,
             settings: mergeWith(
@@ -216,11 +221,16 @@ export const loadNarration = async (): Promise<RootState> => {
             ...migrated,
             objectives: [
               ...scenesToObjectives(migrated.novel.scenes),
+              ...(migrated.novel.objectives || []),
               ...achievements,
             ],
             inventory: {
               ...initialInventoryState,
-              items: [...inventoryItems, ...DEFAULT_INVENTORY],
+              items: [
+                ...(migrated.novel.inventory || []),
+                ...inventoryItems,
+                ...DEFAULT_INVENTORY,
+              ],
             },
             creation: initialCreationState,
             settings: mergeWith(
@@ -237,10 +247,18 @@ export const loadNarration = async (): Promise<RootState> => {
       }
       return {
         ...data,
-        objectives: [...scenesToObjectives(data.novel.scenes), ...achievements],
+        objectives: [
+          ...scenesToObjectives(data.novel.scenes),
+          ...(data.novel.objectives || []),
+          ...achievements,
+        ],
         inventory: {
           ...initialInventoryState,
-          items: [...inventoryItems, ...DEFAULT_INVENTORY],
+          items: [
+            ...(data.novel.inventory || []),
+            ...inventoryItems,
+            ...DEFAULT_INVENTORY,
+          ],
         },
         creation: initialCreationState,
         settings: mergeWith(
@@ -258,10 +276,18 @@ export const loadNarration = async (): Promise<RootState> => {
     return {
       novel,
       narration,
-      objectives: [...scenesToObjectives(novel.scenes), ...achievements],
+      objectives: [
+        ...scenesToObjectives(novel.scenes),
+        ...(novel.objectives || []),
+        ...achievements,
+      ],
       inventory: {
         ...initialInventoryState,
-        items: [...inventoryItems, ...DEFAULT_INVENTORY],
+        items: [
+          ...(novel.inventory || []),
+          ...inventoryItems,
+          ...DEFAULT_INVENTORY,
+        ],
       },
       creation: initialCreationState,
       settings: mergeWith(

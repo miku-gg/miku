@@ -20,6 +20,18 @@
     }
   }
 
+  &__item-scene {
+    .SceneSelector {
+      background: transparent;
+      padding: 0;
+      margin: 0;
+    }
+
+    .SceneNode {
+      margin: 0;
+    }
+  }
+
   &__item-remove {
     position: absolute;
     top: 20px;

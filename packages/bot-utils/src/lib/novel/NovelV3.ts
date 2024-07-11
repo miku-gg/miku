@@ -108,24 +108,52 @@ export interface NovelMap {
   }[];
 }
 
-export type StateMutation =
+export enum NovelActionType {
+  // NOT DEFINABLE BY NOVEL
+  ACHIEVEMENT_UNLOCK = "ACHIEVEMENT_UNLOCK",
+
+  // DEFINABLE BY NOVEL
+  SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
+  SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
+  HIDE_ITEM = "HIDE_ITEM",
+  SHOW_ITEM = "SHOW_ITEM",
+  ADD_CHILD_SCENES = "ADD_CHILD_SCENES",
+}
+
+export type NovelAction =
   | {
-      type: "ADD_CHILDREN";
-      config: {
+      type: NovelActionType.SUGGEST_ADVANCE_SCENE;
+      params: {
         sceneId: string;
-        children: string[];
       };
     }
   | {
-      type: "REMOVE_ITEM";
-      config: {
+      type: NovelActionType.SUGGEST_CREATE_SCENE;
+    }
+  | {
+      type: NovelActionType.ACHIEVEMENT_UNLOCK;
+      params: {
+        achievementId: string;
+        reward: InventoryItem | null;
+      };
+    }
+  | {
+      type: NovelActionType.SHOW_ITEM;
+      params: {
         itemId: string;
       };
     }
   | {
-      type: "SUGGEST_ADVANCE_SCENE";
-      config: {
+      type: NovelActionType.HIDE_ITEM;
+      params: {
+        itemId: string;
+      };
+    }
+  | {
+      type: NovelActionType.ADD_CHILD_SCENES;
+      params: {
         sceneId: string;
+        children: string[];
       };
     };
 
@@ -141,8 +169,9 @@ export interface InventoryAction {
   prompt: string;
 
   // only for novel-specific items
+  id?: string;
   usageCondition?: StateCondition;
-  usageMutations?: StateMutation[];
+  usageActions?: NovelAction[];
 }
 
 export interface InventoryItem {
@@ -152,46 +181,19 @@ export interface InventoryItem {
   icon: string;
   isPremium?: boolean;
   actions: InventoryAction[];
+  isNovelOnly?: boolean;
+  hidden?: boolean;
+  locked?: StateCondition;
 }
-
-export enum NovelObjectiveActionType {
-  SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
-  SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
-  ACHIEVEMENT_UNLOCK = "ACHIEVEMENT_UNLOCK",
-  ITEM_RECEIVE = "ITEM_RECEIVE",
-}
-
-export type NovelObjectiveAction =
-  | {
-      type: NovelObjectiveActionType.SUGGEST_ADVANCE_SCENE;
-      params: {
-        sceneId: string;
-      };
-    }
-  | {
-      type: NovelObjectiveActionType.SUGGEST_CREATE_SCENE;
-    }
-  | {
-      type: NovelObjectiveActionType.ACHIEVEMENT_UNLOCK;
-      params: {
-        achievementId: string;
-        reward: InventoryItem | null;
-      };
-    }
-  | {
-      type: NovelObjectiveActionType.ITEM_RECEIVE;
-      params: {
-        item: InventoryItem;
-      };
-    };
 
 export interface NovelObjective {
   id: string;
   name: string;
   description?: string;
-  sceneIds: string[];
+  stateCondition: StateCondition;
   condition: string;
-  action: NovelObjectiveAction;
+  singleUse: boolean;
+  actions: NovelAction[];
 }
 
 export interface NovelLorebook extends CharacterBook {
@@ -213,4 +215,5 @@ export interface NovelState {
   starts: NovelStart[];
   objectives?: NovelObjective[];
   lorebooks?: NovelLorebook[];
+  inventory?: InventoryItem[];
 }

@@ -13,6 +13,9 @@ export type ModalType =
   | "lorebookEdit"
   | "mapEdit"
   | "placeEdit"
+  | "objectiveEdit"
+  | "editInventoryItem"
+  |"actionEdit"
   | "errors"
   | "scene";
 
@@ -47,6 +50,15 @@ const initialState: InputState = {
   },
   modals: {
     loading: {
+      opened: false,
+    },
+    objectiveEdit: {
+      opened: false,
+    },
+    editInventoryItem: {
+      opened: false,
+    },
+    actionEdit: {
       opened: false,
     },
     lorebookEdit: {

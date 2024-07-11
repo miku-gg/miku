@@ -16,6 +16,7 @@ const initialState: NovelV3.NovelState = {
   scenes: [],
   starts: [],
   lorebooks: [],
+  inventory: [],
 };
 
 const novelFormSlice = createSlice({
@@ -389,6 +390,83 @@ const novelFormSlice = createSlice({
         (place) => place.id !== action.payload.placeId
       );
     },
+
+    createNewInventoryItem: (
+      state,
+      action: PayloadAction<{ itemId: string }>
+    ) => {
+      if (!state.inventory) state.inventory = [];
+      state.inventory.push({
+        id: action.payload.itemId,
+        name: "New Item",
+        description: "",
+        actions: [
+          {
+            name: "New action",
+            prompt: "",
+            id: randomUUID(),
+            usageActions: [],
+          },
+        ],
+        icon: "",
+        isPremium: false,
+        isNovelOnly: true,
+        hidden: false,
+      });
+    },
+    updateInventoryItem: (
+      state,
+      action: PayloadAction<NovelV3.InventoryItem>
+    ) => {
+      if (!state.inventory) return;
+      const index = state.inventory.findIndex(
+        (item) => item.id === action.payload.id
+      );
+      if (index === -1) return;
+      state.inventory[index] = action.payload;
+    },
+    deleteInventoryItem: (state, action: PayloadAction<{ itemId: string }>) => {
+      if (!state.inventory) return;
+      const index = state.inventory.findIndex(
+        (item) => item.id === action.payload.itemId
+      );
+      if (index === -1) return;
+      state.inventory.splice(index, 1);
+    },
+    createObjective: (state, action: PayloadAction<{ id: string }>) => {
+      state.objectives = state.objectives || [];
+      state.objectives.push({
+        id: action.payload.id,
+        name: "New Objective",
+        description: "Objective description",
+        singleUse: true,
+        stateCondition: {
+          type: "IN_SCENE",
+          config: {
+            sceneIds: [],
+          },
+        },
+        condition: "",
+        actions: [],
+      });
+    },
+    updateObjective: (
+      state,
+      action: PayloadAction<{ id: string; objective: NovelV3.NovelObjective }>
+    ) => {
+      if (!state.objectives) return;
+      const index = state.objectives?.findIndex(
+        (objective) => objective.id === action.payload.id
+      );
+      if (index === -1) return;
+      state.objectives[index] = action.payload.objective;
+    },
+    deleteObjective: (state, action: PayloadAction<{ id: string }>) => {
+      if (!state.objectives) return;
+      state.objectives = state.objectives.filter(
+        (objective) => objective.id !== action.payload.id
+      );
+    },
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;
     },
@@ -437,6 +515,12 @@ export const {
   createPlace,
   updatePlace,
   deletePlace,
+  createNewInventoryItem,
+  updateInventoryItem,
+  deleteInventoryItem,
+  createObjective,
+  updateObjective,
+  deleteObjective,
   loadCompleteState,
   updateDetails,
   clearNovelState,

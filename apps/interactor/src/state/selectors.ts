@@ -436,8 +436,9 @@ export const selectCurrentSceneObjectives = createSelector(
   (objectives, scene) => {
     return objectives.filter(
       (objective) =>
-        objective.sceneIds.includes(scene?.id || '') ||
-        !objective.sceneIds.length
+        objective.stateCondition.type === 'IN_SCENE' &&
+        (objective.stateCondition.config.sceneIds.includes(scene?.id || '') ||
+          !objective.stateCondition.config.sceneIds.length)
     )
   }
 )

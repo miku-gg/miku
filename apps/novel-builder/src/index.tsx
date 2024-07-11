@@ -11,12 +11,15 @@ import LorebookEditModal from "./modals/LorebookEditModal";
 import SongEditModal from "./modals/SongEditModal";
 import SongSearchModal from "./modals/SongSearchModal";
 import CharacterEditModal from "./modals/character/CharacterEditModal";
+import ActionEditModal from "./modals/items/ActionEditModal";
+import ItemEditModal from "./modals/items/ItemEditModal";
 import MapEditModal from "./modals/map/MapEditModal";
+import PlaceEditModal from "./modals/map/PlaceEditModal";
+import ObjectiveEditModal from "./modals/scene/ObjectiveEditModal";
 import SceneEditModal from "./modals/scene/SceneEditModal";
 import Planels from "./panels";
 import { store } from "./state/store";
 import "./styles/main.scss";
-import PlaceEditModal from "./modals/map/PlaceEditModal";
 
 const toastRoot = document.getElementById("toast-root");
 
@@ -50,6 +53,9 @@ ReactDOM.render(
         <LoadingModal />
         <MapEditModal />
         <PlaceEditModal />
+        <ObjectiveEditModal />
+        <ItemEditModal />
+        <ActionEditModal />
       </AreYouSure.AreYouSureProvider>
       <ToastPortal />
     </Provider>
