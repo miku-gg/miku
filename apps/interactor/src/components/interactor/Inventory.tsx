@@ -17,6 +17,7 @@ import {
 import { interactionStart } from '../../state/slices/narrationSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import './Inventory.scss'
+import classNames from 'classnames'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
@@ -58,16 +59,19 @@ export default function Inventory() {
             const isLocked = item.locked?.config.sceneIds.includes(
               currentScene?.id || ''
             )
-            const disabled = !isPremium && item.isPremium
+            const disabled =
+              (!isPremium && item.isPremium) || (item.locked && !isLocked)
             const isHidden = item.hidden
             return (
               <div
                 key={item.id}
-                className={`Inventory__item ${
-                  isSelectedItem ? 'selected' : ''
-                } ${disabled || (item.locked && !isLocked) ? 'disabled' : ''}
-                  ${isHidden ? 'hidden' : ''}
-                `}
+                className={classNames({
+                  Inventory__item: true,
+                  selected: isSelectedItem,
+                  disabled: disabled,
+                  hidden: isHidden,
+                  highlighted: item.isNovelOnly && !disabled,
+                })}
                 onClick={() => {
                   if (disabled) return
                   if (!isSelectedItem) {
@@ -81,10 +85,14 @@ export default function Inventory() {
                     }, 150)
                   }
                 }}
-                data-tooltip-id={disabled ? 'premium-item-invetory' : undefined}
+                data-tooltip-id={
+                  disabled ? 'premium-item-inventory' : undefined
+                }
                 data-tooltip-varaint="light"
                 data-tooltip-content={
-                  disabled ? 'This is a premium-only item' : undefined
+                  disabled && item.isPremium
+                    ? 'This is a premium-only item'
+                    : undefined
                 }
               >
                 <img
@@ -110,7 +118,7 @@ export default function Inventory() {
             )
           })}
         </div>
-        <Tooltip id="premium-item-invetory" place="right" />
+        <Tooltip id="premium-item-inventory" place="right" />
         <Tooltip id="item-name" place="top" />
         <InventoryItemModal
           item={selectedItem}
