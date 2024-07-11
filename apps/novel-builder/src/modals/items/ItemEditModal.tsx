@@ -246,7 +246,7 @@ export default function ItemEditModal() {
               <h3 className="ItemEdit__visibility__title">Visibility</h3>
               <div className="ItemEdit__visibility__hidden">
                 <CheckBox
-                  label="Condition hide"
+                  label="Hidden by default"
                   value={item.hidden}
                   onChange={(e) => {
                     dispatch(
@@ -260,20 +260,22 @@ export default function ItemEditModal() {
                 <Tooltip id="Info-Visibility" place="top" />
                 <IoInformationCircleOutline
                   data-tooltip-id="Info-Visibility"
-                  data-tooltip-content="[OPTIONAL]Hidden for the whole novel until a condition adds it."
+                  data-tooltip-content="Hide the item until a condition adds it."
                 />
               </div>
             </div>
-
+          </div>
+          <div className="ItemEdit__visibility">
+            <div className="ItemEdit__visibility__title">
+              <h3>Restricted to scenes</h3>
+            </div>
+            <div className="ItemEdit__visibility__description">
+              It will be usable only in the selected scenes.
+              <br />
+              If no scenes are selected, it will be usable in all scenes if it's
+              not hidden.
+            </div>
             <div className="ItemEdit__visibility__sceneLock">
-              <div className="ItemEdit__visibility__sceneLock__label">
-                <label>Scene Lock</label>
-                <Tooltip id="Info-scene-lock" place="top" />
-                <IoInformationCircleOutline
-                  data-tooltip-id="Info-scene-lock"
-                  data-tooltip-content="[OPTIONAL] Lock the item to a scene. It will be visible only in the selected scenes."
-                />
-              </div>
               <SceneSelector
                 multiSelect
                 value={item.locked?.config.sceneIds || []}

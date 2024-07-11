@@ -154,6 +154,11 @@
       }
     }
 
+    &__description {
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+
     &__hidden {
       display: flex;
       align-items: center;

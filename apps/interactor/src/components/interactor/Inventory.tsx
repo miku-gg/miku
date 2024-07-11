@@ -55,18 +55,18 @@ export default function Inventory() {
             const position = Math.max(item.name.length + 10, 20)
             const animationDuration = Math.max(item.name.length / speed, 3)
             const isSelectedItem = item.id === selectedItem?.id
-            const disabled = !isPremium && item.isPremium
-            const isHiden = item.hidden
             const isLocked = item.locked?.config.sceneIds.includes(
               currentScene?.id || ''
             )
+            const disabled = !isPremium && item.isPremium
+            const isHidden = item.hidden
             return (
               <div
                 key={item.id}
                 className={`Inventory__item ${
                   isSelectedItem ? 'selected' : ''
-                } ${disabled ? 'disabled' : ''}
-                  ${isHiden || (item.locked && !isLocked) ? 'hidden' : ''}
+                } ${disabled || (item.locked && !isLocked) ? 'disabled' : ''}
+                  ${isHidden ? 'hidden' : ''}
                 `}
                 onClick={() => {
                   if (disabled) return

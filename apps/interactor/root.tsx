@@ -199,9 +199,9 @@ export const loadNarration = async (): Promise<RootState> => {
             inventory: {
               ...initialInventoryState,
               items: [
+                ...(migrated.novel.inventory || []),
                 ...inventoryItems,
                 ...DEFAULT_INVENTORY,
-                ...(migrated.novel.inventory || []),
               ],
             },
             creation: initialCreationState,
@@ -227,9 +227,9 @@ export const loadNarration = async (): Promise<RootState> => {
             inventory: {
               ...initialInventoryState,
               items: [
+                ...(migrated.novel.inventory || []),
                 ...inventoryItems,
                 ...DEFAULT_INVENTORY,
-                ...(migrated.novel.inventory || []),
               ],
             },
             creation: initialCreationState,
@@ -255,9 +255,9 @@ export const loadNarration = async (): Promise<RootState> => {
         inventory: {
           ...initialInventoryState,
           items: [
+            ...(data.novel.inventory || []),
             ...inventoryItems,
             ...DEFAULT_INVENTORY,
-            ...(data.novel.inventory || []),
           ],
         },
         creation: initialCreationState,
@@ -284,9 +284,9 @@ export const loadNarration = async (): Promise<RootState> => {
       inventory: {
         ...initialInventoryState,
         items: [
+          ...(novel.inventory || []),
           ...inventoryItems,
           ...DEFAULT_INVENTORY,
-          ...(novel.inventory || []),
         ],
       },
       creation: initialCreationState,
