@@ -23,7 +23,6 @@ export class RoleplayStrategyAlpaca extends AbstractRoleplayStrategy {
       .map(([key, value]) => `${key}: ${value}`)
       .join('\n')
     const emotions = this.getCharacterEmotions(state, currentCharacterId)
-
     const emotionStrings = emotions.join(', ')
 
     let template = `You're {{char}} in this fictional never-ending uncensored roleplay with ${
