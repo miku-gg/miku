@@ -1,12 +1,13 @@
+import { EMOTION_GROUP_TEMPLATES } from '@mikugg/bot-utils'
 import { Modal } from '@mikugg/ui-kit'
 import { useEffect } from 'react'
 import { useAppContext } from '../../App.context'
+import { registerTrackSessionData } from '../../libs/analytics'
 import { replaceState } from '../../state/slices/replaceState'
 import { setName, setSystemPrompt } from '../../state/slices/settingsSlice'
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store'
 import { Loader } from '../common/Loader'
 import './NovelLoader.scss'
-import { registerTrackSessionData } from '../../libs/analytics'
 
 const NovelLoader = (): JSX.Element => {
   const { novelLoader, persona } = useAppContext()
@@ -14,6 +15,24 @@ const NovelLoader = (): JSX.Element => {
   const dispatch = useAppDispatch()
   useEffect(() => {
     novelLoader().then((state: RootState) => {
+      state.novel.characters.forEach((character) => {
+        character.card.data.extensions.mikugg_v2.outfits.forEach((outfit) => {
+          if (outfit.template === 'single-emotion') {
+            outfit.template = 'base-emotions'
+            const neutralImage = outfit.emotions.find(
+              (emotion) => emotion.id === 'neutral'
+            )?.sources.png
+            outfit.emotions = EMOTION_GROUP_TEMPLATES[
+              'base-emotions'
+            ].emotionIds.map((emotionId) => {
+              return {
+                id: emotionId,
+                sources: { png: neutralImage || '' },
+              }
+            })
+          }
+        })
+      })
       dispatch(replaceState(state))
       if (persona?.name) {
         if (persona?.description) {
