@@ -16,6 +16,7 @@ import {
   deleteMap,
   updateMap,
   updateMapImage,
+  updateScene,
 } from "../../state/slices/novelFormSlice";
 import { useAppSelector } from "../../state/store";
 
@@ -31,6 +32,7 @@ export default function MapEditModal() {
   const dispatch = useDispatch();
   const areYouSure = AreYouSure.useAreYouSure();
   const map = useAppSelector(selectEditingMap);
+  const scenes = useAppSelector((state) => state.novel.scenes);
   const sceneBackgrounds = useAppSelector((state) => {
     return state.novel.scenes.reduce((acc, scene) => {
       const bg = state.novel.backgrounds.find(
@@ -61,12 +63,28 @@ export default function MapEditModal() {
     }
   };
 
+  const handleRemoveIds = (id: string) => {
+    const scenesWithMap = scenes.filter((scene) =>
+      scene.parentMapIds?.includes(id)
+    );
+    scenesWithMap.forEach((scene) => {
+      if (scene) {
+        const newScene = {
+          ...scene,
+          parentMapIds: scene.parentMapIds?.filter((mapId) => mapId !== id),
+        };
+        dispatch(updateScene(newScene));
+      }
+    });
+  };
+
   const handleDeleteMap = (id: string) => {
     areYouSure.openModal({
       title: "Are you sure?",
       description: "This map will be deleted. This action cannot be undone.",
       onYes: () => {
         dispatch(closeModal({ modalType: "mapEdit" }));
+        handleRemoveIds(id);
         dispatch(deleteMap(id));
       },
     });
