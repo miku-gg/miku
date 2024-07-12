@@ -35,7 +35,7 @@ export class RoleplayStrategyVicuna extends AbstractRoleplayStrategy {
     template += `\nYou must also indicate {{char}}'s reaction in the response.`
     template += `\nYou MUST not repeat the same reaction too many times.`
     template += `\nThe reaction MUST be one of: ${
-      emotions.length > 9 ? emotionStrings : baseEmotions
+      emotions.length == 1 ? baseEmotions : emotionStrings
     }.`
     if (persona || formattedAttributes) {
       template += `\n\n${persona}\n${formattedAttributes}\n`

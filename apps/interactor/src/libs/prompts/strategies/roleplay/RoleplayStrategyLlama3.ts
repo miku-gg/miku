@@ -36,7 +36,7 @@ export class RoleplayStrategyLlama3 extends AbstractRoleplayStrategy {
     template += `\nYou must also indicate {{char}}'s reaction in the response.`
     template += `\nYou MUST not repeat the same reaction too many times.`
     template += `\nThe reaction MUST be one of: ${
-      emotions.length > 9 ? emotionStrings : baseEmotions
+      emotions.length == 1 ? baseEmotions : emotionStrings
     }.`
     if (persona || formattedAttributes) {
       template += `<|eot_id|><|start_header_id|>user<|end_header_id|>\n${persona}\n${formattedAttributes}\n`

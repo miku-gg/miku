@@ -1,4 +1,4 @@
-import { EMPTY_MIKU_CARD, EMOTION_GROUP_TEMPLATES } from '@mikugg/bot-utils'
+import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD } from '@mikugg/bot-utils'
 import { selectCurrentScene } from '../../../../state/selectors'
 import { RootState } from '../../../../state/store'
 import { AbstractRoleplayStrategy } from './AbstractRoleplayStrategy'
@@ -37,7 +37,7 @@ export class RoleplayStrategyMetharme extends AbstractRoleplayStrategy {
     template += `\nYou must also indicate {{char}}'s reaction in the response.`
     template += `\nYou MUST not repeat the same reaction too many times.`
     template += `\nThe reaction MUST be one of: ${
-      emotions.length > 9 ? emotionStrings : baseEmotions
+      emotions.length == 1 ? baseEmotions : emotionStrings
     }.`
 
     if (persona || formattedAttributes) {
