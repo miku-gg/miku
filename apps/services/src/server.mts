@@ -3,14 +3,10 @@ import cors from "cors";
 import express, { Request, Response } from "express";
 import jwtPermissionMiddleware from "./lib/verifyJWT.mjs";
 import audioHandler from "./services/audio/index.mjs";
-import textHandler, {
-  loadTemplateProccessors,
-  modelsMetadata,
-  tokenizeHandler,
-} from "./services/text/index.mjs";
-import { ModelType } from "./services/text/lib/queryValidation.mjs";
+import textHandler, { tokenizeHandler } from "./services/text/index.mjs";
 import { TokenizerType, loadTokenizer } from "./services/text/lib/tokenize.mjs";
 import monitor from "express-status-monitor";
+import modelServerSettingsStore from "./services/text/lib/modelServerSettingsStore.mjs";
 const PORT = process.env.SERVICES_PORT || 8484;
 
 const app: express.Application = express();
@@ -84,13 +80,15 @@ app.get("/", (req, res) => {
 
 app.get("/text/metadata/:model", async (req, res) => {
   try {
-    const model = req.params.model as ModelType;
-    const metadata = modelsMetadata.get(model);
+    const model = req.params.model as string;
+    const models = modelServerSettingsStore.getRPModels();
+    const metadata = models.find((m) => m.id === model);
     res.send({
       strategy: metadata?.strategy || "alpacarp",
       tokenizer: metadata?.tokenizer || "llama",
       trucation_length: metadata?.truncation_length || 4096,
-      max_new_tokens: metadata?.max_new_tokens || 200,
+      max_new_tokens: metadata?.new_tokens || 200,
+      cost: metadata?.cost || 0,
     });
   } catch (error) {
     res.send({
@@ -98,8 +96,24 @@ app.get("/text/metadata/:model", async (req, res) => {
       tokenizer: "llama",
       trucation_length: 4096,
       max_new_tokens: 200,
+      cost: 0,
     });
   }
+});
+
+app.get("/text/models", async (req, res) => {
+  const models = modelServerSettingsStore.getRPModels();
+  res.send(
+    models.map((model) => {
+      return {
+        id: model.id,
+        name: model.name,
+        description: model.description,
+        permission: model.permission,
+        cost: model.cost,
+      };
+    })
+  );
 });
 
 console.log("Loading tokenizers...");
@@ -111,7 +125,6 @@ Promise.all([
   loadTokenizer(TokenizerType.COHERE),
   loadTokenizer(TokenizerType.WIZARDLM2),
 ]).then(() => {
-  loadTemplateProccessors();
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });

@@ -1,11 +1,5 @@
 import { OpenAIAphroditeConfig } from "../lib/aphroditeTokenGenerator.mjs";
-
-export enum PresetType {
-  DIVINE_INTELECT = "DIVINE_INTELECT",
-  LLAMA_PRECISE = "LLAMA_PRECISE",
-  MINIMAL_WORK = "MINIMAL_WORK",
-  STHENO_V3 = "STHENO_V3",
-}
+import { PresetType } from "./rpModelTypes.mjs";
 
 //truncation_length: 4096,
 
