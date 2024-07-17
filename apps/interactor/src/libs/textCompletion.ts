@@ -17,6 +17,13 @@ function getLastJsonObject(jsonString: string): Record<string, string> {
   }
 }
 
+export const completionHistory: {
+  model: string
+  template: string
+  variables: Record<string, string[] | string>
+  timestamp: number
+}[] = []
+
 const textCompletion = async function* ({
   serviceBaseUrl,
   template,
@@ -31,6 +38,12 @@ const textCompletion = async function* ({
   identifier: string
 }): AsyncGenerator<Map<string, string>> {
   try {
+    completionHistory.push({
+      model,
+      template,
+      variables,
+      timestamp: Date.now(),
+    })
     const response = await fetch(serviceBaseUrl + '/text', {
       method: 'POST',
       body: JSON.stringify({

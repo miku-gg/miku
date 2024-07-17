@@ -48,6 +48,8 @@ export const initialState: SettingsState = {
     about: false,
     history: false,
     map: false,
+    debug: false,
+    testing: false,
     edit: {
       opened: false,
       id: '',
@@ -122,6 +124,12 @@ export const settingSlice = createSlice({
     ) => {
       state.modals.edit = action.payload
     },
+    setDebugModal: (state, action: PayloadAction<boolean>) => {
+      state.modals.debug = action.payload
+    },
+    setTestingModal: (state, action: PayloadAction<boolean>) => {
+      state.modals.testing = action.payload
+    },
     userDataFetchStart: (
       state,
       // eslint-disable-next-line
@@ -172,6 +180,8 @@ export const {
   setHistoryModal,
   setMapModal,
   setEditModal,
+  setDebugModal,
+  setTestingModal,
   userDataFetchStart,
   userDataFetchEnd,
 } = settingSlice.actions

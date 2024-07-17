@@ -81,7 +81,9 @@ class ModelServerSettingsStore {
 
       this.settings = result.data;
     } catch (error) {
-      console.error("Error while fetching model server settings", error);
+      if (process.env.MODEL_SERVER_SETTINGS_URL) {
+        console.error("Error while fetching model server settings", error);
+      }
     }
   }
 }

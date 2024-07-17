@@ -23,6 +23,7 @@ import textCompletion from '../../libs/textCompletion'
 import { setInventoryVisibility } from '../../state/slices/inventorySlice'
 import { Loader } from '../common/Loader'
 import './InputBox.scss'
+import { setDebugModal } from '../../state/slices/settingsSlice'
 
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
@@ -73,6 +74,12 @@ const InputBox = (): JSX.Element | null => {
     e.stopPropagation()
     e.preventDefault()
     if (!text || disabled) return
+
+    if (text === '/debug') {
+      dispatch(setInputText(''))
+      dispatch(setDebugModal(true))
+      return
+    }
 
     sendMessage(text)
   }

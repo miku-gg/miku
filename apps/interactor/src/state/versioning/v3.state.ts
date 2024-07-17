@@ -137,6 +137,8 @@ export interface SettingsState {
     about: boolean
     history: boolean
     map: boolean
+    debug: boolean
+    testing: boolean
     edit: {
       opened: boolean
       id: string
