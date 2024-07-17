@@ -61,6 +61,8 @@ export default {
       settingsTab: 'general',
       about: false,
       history: false,
+      debug: false,
+      testing: false,
       edit: { opened: false, id: '' },
     },
     chatBox: {
