@@ -1,5 +1,6 @@
 import { AreYouSure } from "@mikugg/ui-kit";
 import cloneDeep from "lodash.clonedeep";
+import { useEffect } from "react";
 import { BiCameraMovie, BiSolidSave } from "react-icons/bi";
 import { GiPathDistance } from "react-icons/gi";
 import { LuMonitorPlay, LuTextQuote } from "react-icons/lu";
@@ -29,7 +30,6 @@ import { MapList } from "./maps/MapList";
 import PreviewPanel from "./preview/PreviewPanel";
 import SceneGraph from "./scenes/SceneGraph";
 import StartsPanel from "./starts/StartsPanel";
-import { useEffect } from "react";
 
 function PanelExplorer() {
   const novel = useAppSelector((state) => state.novel);
@@ -37,24 +37,11 @@ function PanelExplorer() {
   const dispatch = useAppDispatch();
   const { openModal: openAreYouSure } = AreYouSure.useAreYouSure();
 
-  const preventTabClose = (isEditing: boolean) => {
-    useEffect(() => {
-      const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-        if (isEditing) {
-          event.preventDefault();
-          event.returnValue = true;
-        }
-      };
-
-      window.addEventListener("beforeunload", handleBeforeUnload);
-
-      return () => {
-        window.removeEventListener("beforeunload", handleBeforeUnload);
-      };
-    }, [isEditing]);
-  };
-
-  preventTabClose(!!novel);
+  useEffect(() => {
+    if (!window.onbeforeunload) {
+      window.onbeforeunload = () => true;
+    }
+  }, [novel]);
 
   const maxStep = allowUntilStep(novel);
   return (
