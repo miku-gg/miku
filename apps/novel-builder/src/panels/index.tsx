@@ -38,7 +38,7 @@ function PanelExplorer() {
   const { openModal: openAreYouSure } = AreYouSure.useAreYouSure();
 
   useEffect(() => {
-    if (!window.onbeforeunload) {
+    if (!window.onbeforeunload && novel) {
       window.onbeforeunload = () => true;
     }
   }, [novel]);
