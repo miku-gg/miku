@@ -9,8 +9,9 @@ const updateStateMiddleware = (store) => (next) => (action) => {
 
   // Check if it is the specific action after the state is updated
   if (
-    action.type === 'narration/interactionSuccess' &&
-    action.payload.completed === true
+    (action.type === 'narration/interactionSuccess' &&
+      action.payload.completed === true) ||
+    action.type === 'objectives/removeObjective'
   ) {
     // Get the updated state
     const updatedState = store.getState()

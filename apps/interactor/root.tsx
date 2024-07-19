@@ -248,14 +248,16 @@ export const loadNarration = async (): Promise<RootState> => {
       return {
         ...data,
         objectives: [
-          ...scenesToObjectives(data.novel.scenes),
-          ...(data.novel.objectives || []),
-          ...achievements,
+          ...data.objectives,
+          ...achievements.filter(
+            (achievement) =>
+              !data.objectives.find((o) => o.id === achievement.id)
+          ),
         ],
         inventory: {
           ...initialInventoryState,
           items: [
-            ...(data.novel.inventory || []),
+            ...data.inventory.items.filter((item) => item.isNovelOnly),
             ...inventoryItems,
             ...DEFAULT_INVENTORY,
           ],
