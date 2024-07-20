@@ -257,7 +257,7 @@ export const loadNarration = async (): Promise<RootState> => {
         inventory: {
           ...initialInventoryState,
           items: [
-            ...(data.inventory.items || []).filter((item) => item.isNovelOnly),
+            ...(data.inventory?.items || []).filter((item) => item.isNovelOnly),
             ...inventoryItems,
             ...DEFAULT_INVENTORY,
           ],

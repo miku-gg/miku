@@ -18,6 +18,7 @@ import { interactionStart } from '../../state/slices/narrationSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import './Inventory.scss'
 import classNames from 'classnames'
+import { GiLockedChest } from 'react-icons/gi'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
@@ -211,5 +212,30 @@ export const InventoryItemModal = ({
         ))}
       </footer>
     </div>
+  )
+}
+
+export const InventoryTrigger = () => {
+  const dispatch = useAppDispatch()
+  const showInventory = useAppSelector((state) => state.inventory.showInventory)
+  const { disabled: inputDisabled } = useAppSelector(
+    (state) => state.narration.input
+  )
+  return (
+    <button
+      className="InteractiveMap__toggle"
+      disabled={inputDisabled}
+      onClick={() => {
+        dispatch(
+          setInventoryVisibility(
+            showInventory === 'initial' || showInventory === 'closed'
+              ? 'open'
+              : 'closed'
+          )
+        )
+      }}
+    >
+      <GiLockedChest />
+    </button>
   )
 }

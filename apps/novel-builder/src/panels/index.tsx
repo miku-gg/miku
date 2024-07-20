@@ -3,7 +3,7 @@ import cloneDeep from "lodash.clonedeep";
 import { BiCameraMovie, BiSolidSave } from "react-icons/bi";
 import { GiPathDistance } from "react-icons/gi";
 import { LuMonitorPlay, LuTextQuote } from "react-icons/lu";
-import { MdOutlinePermMedia } from "react-icons/md";
+import { MdOutlinePermMedia, MdOutlineRestartAlt } from "react-icons/md";
 import { TbBoxMultiple } from "react-icons/tb";
 import { toast } from "react-toastify";
 import ButtonGroup from "../components/ButtonGroup";
@@ -14,7 +14,7 @@ import {
   isPanelType,
   navigatePage,
   navigatePanel,
-  openModal
+  openModal,
 } from "../state/slices/inputSlice";
 import { TokenDisplayer } from "../components/TokenDisplayer";
 import { TOKEN_LIMITS } from "../data/tokenLimits";
@@ -49,7 +49,7 @@ function PanelExplorer() {
                     <LuTextQuote /> <span>Details</span>
                   </>
                 ),
-                value: "details"
+                value: "details",
               },
               {
                 content: (
@@ -57,7 +57,7 @@ function PanelExplorer() {
                     <MdOutlinePermMedia /> <span>Assets</span>
                   </>
                 ),
-                value: "assets"
+                value: "assets",
               },
               {
                 content: (
@@ -68,7 +68,7 @@ function PanelExplorer() {
                 value: "scenes",
                 disabled: maxStep < 1,
                 tooltip:
-                  maxStep < 1 ? "Please add at least one asset for each" : ""
+                  maxStep < 1 ? "Please add at least one asset for each" : "",
               },
               {
                 content: (
@@ -79,7 +79,7 @@ function PanelExplorer() {
                 ),
                 value: "maps",
                 disabled: maxStep < 2,
-                tooltip: maxStep < 2 ? "Please add a scene" : ""
+                tooltip: maxStep < 2 ? "Please add a scene" : "",
               },
               {
                 content: (
@@ -89,7 +89,7 @@ function PanelExplorer() {
                 ),
                 value: "starts",
                 disabled: maxStep < 2,
-                tooltip: maxStep < 2 ? "Please add a scene" : ""
+                tooltip: maxStep < 2 ? "Please add a scene" : "",
               },
               {
                 content: (
@@ -99,8 +99,8 @@ function PanelExplorer() {
                 ),
                 value: "preview",
                 disabled: maxStep < 3,
-                tooltip: maxStep < 3 ? "Please add a start" : ""
-              }
+                tooltip: maxStep < 3 ? "Please add a start" : "",
+              },
             ]}
             selected={selectedPanel}
             onButtonClick={async (value) => {
@@ -121,10 +121,10 @@ function PanelExplorer() {
             {
               content: (
                 <>
-                  <BiSolidSave /> <span>Restart</span>
+                  <MdOutlineRestartAlt /> <span>Restart</span>
                 </>
               ),
-              value: "restart"
+              value: "restart",
             },
             {
               content: (
@@ -132,8 +132,8 @@ function PanelExplorer() {
                   <BiSolidSave /> <span>Save</span>
                 </>
               ),
-              value: "save"
-            }
+              value: "save",
+            },
           ]}
           selected={selectedPanel}
           onButtonClick={async (value) => {
@@ -146,7 +146,7 @@ function PanelExplorer() {
                     dispatch(
                       openModal({
                         modalType: "loading",
-                        text
+                        text,
                       })
                     );
                   }
@@ -163,7 +163,7 @@ function PanelExplorer() {
                 onYes: () => {
                   dispatch(clearNovelState());
                   dispatch(navigatePage("homepage"));
-                }
+                },
               });
             }
           }}

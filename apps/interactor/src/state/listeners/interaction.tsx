@@ -141,7 +141,8 @@ const interactionEffect = async (
           (action) =>
             action.type === NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE
         )
-      )
+      ) &&
+      !currentScene?.preventSceneGenerationSuggestion
     ) {
       objectives.push({
         id: 'temp_generate_scene_objective',

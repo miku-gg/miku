@@ -9,6 +9,9 @@ import Settings from './Settings'
 import ModelSelector from './ModelSelector'
 import InteractiveMap from '../scenarios/InteractiveMap'
 import { SceneChangeModal } from '../scenarios/SceneChangeModal'
+import { InventoryTrigger } from './Inventory'
+import AnimatedText from '../common/AnimatedText'
+import { CustomEventType, postMessage } from '../../libs/stateEvents'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
@@ -16,6 +19,7 @@ const InteractorHeader = () => {
   const firstCharacter = useAppSelector(
     (state) => Object.values(state.novel.characters)[0]
   )
+  const isMobileWidth = document.body.clientWidth < 600
 
   if (!firstCharacter) {
     return null
@@ -31,16 +35,22 @@ const InteractorHeader = () => {
               ? `url(${assetLinkLoader(firstCharacter.profile_pic, true)})`
               : '',
           }}
+          onClick={() => postMessage(CustomEventType.NOVEL_PROFILE_CLICK, true)}
         />
-        <div className="InteractorHeader__header-name">{title}</div>
+        {!isMobileWidth && (
+          <div className="InteractorHeader__header-name">
+            {<AnimatedText text={title} minLength={20} />}
+          </div>
+        )}
         <SceneSelector />
-        <History />
         <InteractiveMap />
         <SceneChangeModal />
+        <InventoryTrigger />
       </div>
       <div className="InteractorHeader__right">
         <ModelSelector />
         <MusicPlayer />
+        <History />
         <ScreenSizer />
         <Settings />
       </div>

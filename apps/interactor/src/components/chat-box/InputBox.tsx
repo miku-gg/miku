@@ -15,12 +15,10 @@ import { useAppDispatch, useAppSelector } from '../../state/store'
 import { Tooltip } from '@mikugg/ui-kit'
 import classNames from 'classnames'
 import React, { RefObject, useRef, useState } from 'react'
-import { FaStore } from 'react-icons/fa6'
 import { toast } from 'react-toastify'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSuggestionStrategy'
 import textCompletion from '../../libs/textCompletion'
-import { setInventoryVisibility } from '../../state/slices/inventorySlice'
 import { Loader } from '../common/Loader'
 import './InputBox.scss'
 import { setDebugModal } from '../../state/slices/settingsSlice'
@@ -42,11 +40,8 @@ const InputBox = (): JSX.Element | null => {
   const suggestions = useAppSelector(
     (state) => state.narration.input.suggestions
   )
-  const showInventory = useAppSelector((state) => state.inventory.showInventory)
   const [isAutocompleteLoading, setIsAutocompleteLoading] =
     useState<boolean>(false)
-
-  const interactionsCount = Object.keys(state.narration.interactions).length
 
   const sendMessage = (text: string) => {
     if (isInteractionDisabled) {
@@ -133,19 +128,6 @@ const InputBox = (): JSX.Element | null => {
     }
   }
 
-  const onInventory = (e: React.MouseEvent<unknown>) => {
-    e.stopPropagation()
-    e.preventDefault()
-
-    dispatch(
-      setInventoryVisibility(
-        showInventory === 'initial' || showInventory === 'closed'
-          ? 'open'
-          : 'closed'
-      )
-    )
-  }
-
   const TextAreaRowCalculator = (value: string) => {
     if (textAreaRef.current) {
       const newRows = Math.ceil(
@@ -186,18 +168,6 @@ const InputBox = (): JSX.Element | null => {
           placeholder="Type a message..."
           ref={textAreaRef}
         />
-        {interactionsCount ? (
-          <button
-            className="InputBox__inventory"
-            data-tooltip-id="inventory-tooltip"
-            data-tooltip-content="Inventory"
-            data-tooltip-varaint="light"
-            disabled={disabled}
-            onClick={onInventory}
-          >
-            <FaStore />
-          </button>
-        ) : null}
         <button
           className={classNames({
             'InputBox__suggestion-trigger': true,

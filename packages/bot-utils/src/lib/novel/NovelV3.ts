@@ -31,6 +31,7 @@ export interface NovelScene {
   condition: string | null;
   backgroundId: string;
   musicId: string;
+  preventSceneGenerationSuggestion?: boolean;
   characters: {
     characterId: string;
     outfit: string;

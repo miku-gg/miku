@@ -11,6 +11,7 @@ import { downloadNovelState } from "../../libs/utils";
 import cloneDeep from "lodash.clonedeep";
 import { closeModal, openModal } from "../../state/slices/inputSlice";
 import { toast } from "react-toastify";
+import { NovelV3 } from "@mikugg/bot-utils";
 
 export function generateAlphaLink({
   botHash,
@@ -62,6 +63,40 @@ export default function PreviewPanel() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const novel = useAppSelector((state) => state.novel);
   const dispatch = useAppDispatch();
+
+  const scenesToObjectives = (
+    scenes: NovelV3.NovelScene[]
+  ): NovelV3.NovelObjective[] => {
+    const result: NovelV3.NovelObjective[] = [];
+    scenes.forEach((scene) => {
+      scene.children.forEach((childId) => {
+        const child = scenes.find((scene) => scene.id === childId);
+        if (child?.condition) {
+          result.push({
+            id: `scene_transition_${scene.id}_to_${childId}`,
+            name: `Transition to ${child.name}`,
+            singleUse: false,
+            stateCondition: {
+              type: "IN_SCENE",
+              config: {
+                sceneIds: [scene.id],
+              },
+            },
+            condition: child.condition,
+            actions: [
+              {
+                type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
+                params: {
+                  sceneId: childId,
+                },
+              },
+            ],
+          });
+        }
+      });
+    });
+    return result;
+  };
 
   const botInteractionUrl = useMemo(
     () =>
@@ -142,6 +177,15 @@ export default function PreviewPanel() {
                 return acc;
               }, {} as Record<string, object>),
             },
+            inventory: {
+              items: novel.inventory || [],
+              showInventory: false,
+              showItemModal: false,
+            },
+            objectives: [
+              ...scenesToObjectives(novel.scenes),
+              ...(novel.objectives || []),
+            ],
           },
         },
         "*"

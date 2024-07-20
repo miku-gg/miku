@@ -1,0 +1,22 @@
+.AnimatedText {
+  animation: infiniteSlide var(--animation-duration) linear infinite;
+  width: 150px;
+  white-space: nowrap;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  left: 0;
+
+  &__container {
+    width: 150px;
+  }
+}
+
+@keyframes infiniteSlide {
+  0% {
+    text-indent: var(--initial-text-position);
+  }
+  100% {
+    text-indent: var(--ending-text-position);
+  }
+}

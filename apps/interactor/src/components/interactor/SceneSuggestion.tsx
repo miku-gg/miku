@@ -76,7 +76,27 @@ export default function SceneSuggestion() {
         )}
       >
         <div className="SceneSuggestion__button-container">
-          {!disabled && shouldSuggestScenes ? (
+          {!disabled && nextScene ? (
+            <button
+              {...swipeHandlers}
+              className="SceneSuggestion__button"
+              onClick={async () => {
+                dispatch(
+                  setModalOpened({
+                    id: 'scene-preview',
+                    opened: true,
+                    itemId: nextScene.id,
+                  })
+                )
+                trackEvent('scene-advance-suggestion-click')
+              }}
+            >
+              <div className="SceneSuggestion__text">
+                <span>Go to next scene</span>
+              </div>
+              <TbPlayerTrackNextFilled />
+            </button>
+          ) : !disabled && shouldSuggestScenes ? (
             <button
               {...swipeHandlers}
               className="SceneSuggestion__button"
@@ -98,26 +118,6 @@ export default function SceneSuggestion() {
                 <span>Generate next scene</span>
               </div>
               <GiFallingStar />
-            </button>
-          ) : !disabled && nextScene ? (
-            <button
-              {...swipeHandlers}
-              className="SceneSuggestion__button"
-              onClick={async () => {
-                dispatch(
-                  setModalOpened({
-                    id: 'scene-preview',
-                    opened: true,
-                    itemId: nextScene.id,
-                  })
-                )
-                trackEvent('scene-advance-suggestion-click')
-              }}
-            >
-              <div className="SceneSuggestion__text">
-                <span>Go to next scene</span>
-              </div>
-              <TbPlayerTrackNextFilled />
             </button>
           ) : null}
         </div>

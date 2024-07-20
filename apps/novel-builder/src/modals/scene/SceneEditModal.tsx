@@ -39,7 +39,7 @@ export default function SceneEditModal() {
   const maps = useAppSelector((state) => state.novel.maps);
   const backgrounds = useAppSelector(selectBackgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
- 
+
   const objectives = useAppSelector((state) => state.novel.objectives);
   const objectiveLockedsByScenes = objectives?.filter((obj) => {
     return obj.stateCondition.config.sceneIds.includes(scene?.id || "");
@@ -367,6 +367,24 @@ export default function SceneEditModal() {
                     );
                   }}
                   isTextArea
+                />
+              </div>
+              <div>
+                <CheckBox
+                  id="scene-generation-prevention"
+                  name="scene-generation-prevention"
+                  label="Don't suggest 'Generate new scene' in this scene"
+                  value={scene?.preventSceneGenerationSuggestion}
+                  onChange={(e) => {
+                    dispatch(
+                      updateScene({
+                        ...scene._source,
+                        preventSceneGenerationSuggestion: e.target.checked
+                          ? true
+                          : false,
+                      })
+                    );
+                  }}
                 />
               </div>
             </div>
