@@ -43,9 +43,9 @@ const InteractorHeader = () => {
           </div>
         )}
         <SceneSelector />
+        <InventoryTrigger />
         <InteractiveMap />
         <SceneChangeModal />
-        <InventoryTrigger />
       </div>
       <div className="InteractorHeader__right">
         <ModelSelector />

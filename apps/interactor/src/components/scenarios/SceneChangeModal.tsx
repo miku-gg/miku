@@ -8,6 +8,7 @@ import { setModalOpened } from '../../state/slices/creationSlice'
 import { toast } from 'react-toastify'
 import { interactionStart } from '../../state/slices/narrationSlice'
 import EmotionRenderer from '../emotion-render/EmotionRenderer'
+import { setMapModal } from '../../state/slices/settingsSlice'
 
 export const SceneChangeModal = () => {
   const {
@@ -50,6 +51,7 @@ export const SceneChangeModal = () => {
     }
     dispatch(setModalOpened({ id: 'scene-preview', opened: false }))
     dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
+    dispatch(setMapModal(false))
     dispatch(
       interactionStart({
         sceneId,

@@ -8,6 +8,7 @@ import { setMapModal } from '../../state/slices/settingsSlice'
 import { trackEvent } from '../../libs/analytics'
 import { interactionStart } from '../../state/slices/narrationSlice'
 import { useAppContext } from '../../App.context'
+import { setModalOpened } from '../../state/slices/creationSlice'
 
 const isTouchScreen = window.navigator.maxTouchPoints > 0
 
@@ -289,6 +290,23 @@ const InteractiveMapModal = ({
       scene &&
       highlightedPlace.sceneId !== currentScene?.id
     ) {
+      dispatch(
+        setModalOpened({
+          id: 'scene-preview',
+          opened: true,
+          itemId: scene.id,
+        })
+      )
+      trackEvent('scene-select')
+    }
+  }
+
+  const handleGoToScene = () => {
+    if (
+      highlightedPlace &&
+      scene &&
+      highlightedPlace.sceneId !== currentScene?.id
+    ) {
       dispatch(setMapModal(false))
       dispatch(
         interactionStart({
@@ -339,7 +357,7 @@ const InteractiveMapModal = ({
             </div>
             <div>
               {highlightedPlace.sceneId !== currentScene?.id ? (
-                <Button theme="secondary" onClick={handleMapClick}>
+                <Button theme="secondary" onClick={handleGoToScene}>
                   Go to place
                 </Button>
               ) : (

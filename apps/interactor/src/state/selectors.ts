@@ -181,11 +181,7 @@ export const selectAvailableScenes = createSelector(
   (scenes, nsfw, currentScene) => {
     if (scenes.length === 1) return []
     return scenes
-      .filter(
-        (scene) =>
-          !currentScene?.children.length ||
-          currentScene?.children.includes(scene.id)
-      )
+      .filter((scene) => currentScene?.children.includes(scene.id))
       .filter((scene) => nsfw >= scene.nsfw)
   }
 )
