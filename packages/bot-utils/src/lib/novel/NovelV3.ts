@@ -26,6 +26,7 @@ export interface NovelStart {
 export interface NovelScene {
   id: string;
   name: string;
+  description?: string;
   prompt: string;
   actionText: string;
   condition: string | null;

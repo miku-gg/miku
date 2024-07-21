@@ -135,7 +135,11 @@
     gap: 1rem;
     align-items: center;
     & > div {
-      flex: 3;
+      flex: 2;
+    }
+
+    .SceneEditModal__scene-details-description {
+      flex: 4;
     }
 
     .SceneEditModal__scene-details-nsfw {

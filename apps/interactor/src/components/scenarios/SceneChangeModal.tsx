@@ -78,6 +78,13 @@ export const SceneChangeModal = () => {
     bot: currentCharacterName || '{{char}}',
   })
 
+  const description = scene?.description
+    ? fillTextTemplate(scene.description, {
+        user: userName,
+        bot: currentCharacterName || '{{char}}',
+      })
+    : ''
+
   return (
     <Modal
       className="SceneChangeModal"
@@ -105,7 +112,7 @@ export const SceneChangeModal = () => {
           <h2 className="SceneChangeModal__title">
             {scene?.name || 'Next scene'}
           </h2>
-          <p className="SceneChangeModal__prompt">{prompt}</p>
+          <p className="SceneChangeModal__prompt">{description || prompt}</p>
         </div>
         <div className="SceneChangeModal__buttons">
           <Button theme="secondary" onClick={() => handleCloseModal()}>

@@ -269,6 +269,23 @@ export default function SceneEditModal() {
                   maxLength={256}
                 />
                 <Input
+                  id="scene-description"
+                  name="description"
+                  className="SceneEditModal__scene-details-description"
+                  placeHolder="{{user}} finds Nino in the classroom working on a project."
+                  label="Scene Description"
+                  value={scene?.description}
+                  onChange={(e) =>
+                    dispatch(
+                      updateScene({
+                        ...scene._source,
+                        description: e.target.value,
+                      })
+                    )
+                  }
+                  maxLength={256}
+                />
+                <Input
                   id="scene-actionText"
                   name="actionText"
                   placeHolder="Go to the classroom"
@@ -279,7 +296,7 @@ export default function SceneEditModal() {
                     dispatch(
                       updateScene({
                         ...scene._source,
-                        name: e.target.value,
+                        actionText: e.target.value,
                       })
                     )
                   }
@@ -458,7 +475,10 @@ export default function SceneEditModal() {
               <div className="SceneEditModal__scene-objectives-list">
                 {scene.characters.map((character) => {
                   return (
-                    <div className="SceneEditModal__scene-objective">
+                    <div
+                      className="SceneEditModal__scene-objective"
+                      key={`objective-${scene.id}-${character.id}`}
+                    >
                       <div className="SceneEditModal__scene-objective__character">
                         <img
                           src={config.genAssetLink(character.profile_pic || "")}

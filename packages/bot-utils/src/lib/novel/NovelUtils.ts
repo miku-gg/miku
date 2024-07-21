@@ -143,9 +143,11 @@ export const tavernCardToNovelState = (
           outfit: scenario.emotion_group,
         },
       ],
-      children: scenario.children_scenarios.map(
-        (child) => child || "default-scenario"
-      ),
+      children: scenario.children_scenarios?.length
+        ? scenario.children_scenarios.map(
+            (child) => child || "default-scenario"
+          )
+        : mikugg.scenarios.map((s) => s.id).filter((_) => _),
       musicId: scenario.music || "",
       prompt: scenario.context,
       parentMapIds: null,
@@ -231,7 +233,9 @@ export const migrateNovelV2ToV3 = (
         id: scene.id,
         actionText: "",
         condition: "",
-        children: scene.children,
+        children: scene.children.length
+          ? scene.children
+          : novel.scenes.map((s) => s.id).filter((_) => _),
         name: scene.name,
         parentMapIds: null,
         prompt: scene.prompt,

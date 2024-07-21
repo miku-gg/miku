@@ -60,13 +60,12 @@ export const MapList = ({
           {maps.map((map) => {
             const { id, name, description } = map;
             return (
-              <div className="MapList__container__box">
+              <div className="MapList__container__box" key={`map-${id}`}>
                 <div
                   key={id}
                   className={`MapList__container__map ${
                     isSelected(id) ? "selected" : ""
                   }`}
-                  
                   onClick={() => onSelectMap && onSelectMap(id)}
                 >
                   <FaPencil
