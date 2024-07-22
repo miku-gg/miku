@@ -30,6 +30,7 @@ export interface NovelScene {
   prompt: string;
   actionText: string;
   condition: string | null;
+  hint?: string;
   backgroundId: string;
   musicId: string;
   preventSceneGenerationSuggestion?: boolean;
@@ -196,6 +197,7 @@ export interface NovelObjective {
   condition: string;
   singleUse: boolean;
   actions: NovelAction[];
+  hint?: string;
 }
 
 export interface NovelLorebook extends CharacterBook {

@@ -369,6 +369,25 @@ export default function SceneEditModal() {
               </div>
               <div className="SceneEditModal__scene-details-row">
                 <Input
+                  id="hint"
+                  name="hint"
+                  placeHolder="Give nino a hug."
+                  label="Hint"
+                  description="OPTIONAL. A small hint to advance in the story."
+                  value={scene.hint || ""}
+                  onChange={(e) => {
+                    dispatch(
+                      updateScene({
+                        ...scene._source,
+                        hint: e.target.value || undefined,
+                      })
+                    );
+                  }}
+                  maxLength={34}
+                />
+              </div>
+              <div className="SceneEditModal__scene-details-row">
+                <Input
                   id="context"
                   name="context"
                   placeHolder="{{user}} should have invited Nino to the classroom."

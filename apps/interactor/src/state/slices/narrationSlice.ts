@@ -26,6 +26,7 @@ const initialState: NarrationState = {
   },
   interactions: {},
   responses: {},
+  seenHints: [],
 }
 
 const narrationSlice = createSlice({
@@ -429,6 +430,13 @@ const narrationSlice = createSlice({
         response.nextScene = action.payload
       }
     },
+    markHintSeen(state, action: PayloadAction<string>) {
+      if (state.seenHints) {
+        state.seenHints.push(action.payload)
+      } else {
+        state.seenHints = [action.payload]
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -458,6 +466,7 @@ export const {
   sceneSuggestionsUpdate,
   sceneSuggestionsEnd,
   setNextSceneToCurrentResponse,
+  markHintSeen,
 } = narrationSlice.actions
 
 export default narrationSlice.reducer

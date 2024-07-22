@@ -451,3 +451,12 @@ export const selectConditionStatus = (
   }
   return false
 }
+
+export const selectCurrentSceneInteractionCount = createSelector(
+  [(state: RootState) => state.narration.interactions, selectCurrentScene],
+  (interactions, scene) => {
+    return Object.values(interactions).filter(
+      (interaction) => interaction?.sceneId === scene?.id
+    ).length
+  }
+)

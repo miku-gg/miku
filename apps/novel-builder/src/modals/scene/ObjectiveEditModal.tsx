@@ -91,10 +91,28 @@ export default function ObjectiveEditModal() {
                 }}
               />
               <Input
-                label="Condition Prompt"
+                label="Hint"
+                description="[OPTIONAL] Give a hint to the player to help them achieve the objective."
+                placeHolder="Try to find the key in the room."
+                value={objective.hint || ""}
+                onChange={(e) => {
+                  dispatch(
+                    updateObjective({
+                      id: objective.id,
+                      objective: {
+                        ...objective,
+                        hint: e.target.value,
+                      },
+                    })
+                  );
+                }}
+                maxLength={34}
+              />
+              <Input
+                label="Condition"
                 isTextArea
-                description="The answer of the condition prompt always have to be YES or NO."
-                placeHolder="E.g. Do {{CHAR}} have the key for the door?"
+                description="Condition to be met to trigger the actions. Must be a YES/NO condition."
+                placeHolder="{{user}} found the door's key."
                 value={objective.condition || ""}
                 onChange={(e) => {
                   dispatch(
@@ -116,7 +134,7 @@ export default function ObjectiveEditModal() {
                   <IoInformationCircleOutline
                     data-tooltip-id="Info-actions"
                     className="ObjectiveEdit__header__title__infoIcon"
-                    data-tooltip-content="The condition Prompt will be trigger one of these actions."
+                    data-tooltip-content="If the condition is met, these actions are triggered."
                   />
 
                   <Tooltip id="Info-actions" place="top" />

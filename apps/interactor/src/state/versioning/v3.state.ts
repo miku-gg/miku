@@ -57,6 +57,7 @@ export interface NarrationState {
   responses: {
     [id: string]: NarrationResponse | undefined
   }
+  seenHints?: string[]
 }
 
 export interface NovelScene extends NovelV3.NovelScene {}

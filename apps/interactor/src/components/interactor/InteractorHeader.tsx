@@ -12,6 +12,7 @@ import { SceneChangeModal } from '../scenarios/SceneChangeModal'
 import { InventoryTrigger } from './Inventory'
 import AnimatedText from '../common/AnimatedText'
 import { CustomEventType, postMessage } from '../../libs/stateEvents'
+import Hint from './Hint'
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext()
@@ -45,6 +46,7 @@ const InteractorHeader = () => {
         <SceneSelector />
         <InventoryTrigger />
         <InteractiveMap />
+        <Hint />
         <SceneChangeModal />
       </div>
       <div className="InteractorHeader__right">
