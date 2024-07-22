@@ -34,7 +34,7 @@ export default function TaskList() {
       </div>
       <div className="TaskList__popup">
         <div className="TaskList__tasks">
-          {tasks.map((task, index) => (
+          {tasks.map((task) => (
             <div
               key={`${task}-${task.id}`}
               className={classNames(
