@@ -81,6 +81,7 @@ export interface NovelBackground {
   source: {
     jpg: string;
     webm?: string;
+    mp4?: string;
   };
 }
 

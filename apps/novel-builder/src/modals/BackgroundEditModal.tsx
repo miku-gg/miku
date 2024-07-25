@@ -1,14 +1,14 @@
 import { AreYouSure, Button, Input, Modal } from "@mikugg/ui-kit";
-import { useAppSelector } from "../state/store";
-import { selectEditingBackground } from "../state/selectors";
 import { useDispatch } from "react-redux";
-import { closeModal } from "../state/slices/inputSlice";
 import config from "../config";
-import "./BackgroundEditModal.scss";
+import { selectEditingBackground } from "../state/selectors";
+import { closeModal } from "../state/slices/inputSlice";
 import {
   deleteBackground,
   updateBackground,
 } from "../state/slices/novelFormSlice";
+import { useAppSelector } from "../state/store";
+import "./BackgroundEditModal.scss";
 
 export default function BackgroundEditModal() {
   const background = useAppSelector(selectEditingBackground);
@@ -28,6 +28,7 @@ export default function BackgroundEditModal() {
     });
   };
 
+
   return (
     <Modal
       opened={!!background}
@@ -38,14 +39,31 @@ export default function BackgroundEditModal() {
     >
       {background ? (
         <div className="BackgroundEditModal_content">
-          <div
-            className="BackgroundEditModal__background"
-            style={{
-              backgroundImage: `url(${config.genAssetLink(
-                background.source.jpg
-              )})`,
-            }}
-          />
+          {background.source.jpg.length > 0 ? (
+            <div
+              className="BackgroundEditModal__background"
+              style={{
+                backgroundImage: `url(${config.genAssetLink(
+                  background.source.jpg
+                )})`,
+              }}
+            />
+          ) : null}
+          <div>
+            {background.source.mp4 ? (
+              <video
+                className="BackgroundEditModal__background-video"
+                autoPlay
+                loop
+                muted
+              >
+                <source
+                  src={config.genAssetLink(background.source.mp4)}
+                  type="video/mp4"
+                />
+              </video>
+            ) : null}
+          </div>
           <div>
             <Input
               label="Name"
