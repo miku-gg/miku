@@ -1,4 +1,4 @@
-import { AreYouSure } from "@mikugg/ui-kit";
+import { AreYouSure, Button } from "@mikugg/ui-kit";
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
@@ -20,6 +20,7 @@ import SceneEditModal from "./modals/scene/SceneEditModal";
 import Planels from "./panels";
 import { store } from "./state/store";
 import "./styles/main.scss";
+import { GiBookPile } from "react-icons/gi";
 
 const toastRoot = document.getElementById("toast-root");
 
@@ -39,7 +40,22 @@ ReactDOM.render(
       <AreYouSure.AreYouSureProvider>
         <div className="app">
           <div className="app__header">
-            <div>Novel Builder</div>
+            <div className="app__header-logo">
+              <img src="/logo.png" width={40} />
+              Novel Builder
+            </div>
+            <div>
+              <a
+                href="https://docs.miku.gg/guides/novel-builder/1-get-started/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Button theme="transparent">
+                  <GiBookPile size={24} />
+                  Documentation
+                </Button>
+              </a>
+            </div>
           </div>
           <Planels />
         </div>

@@ -53,6 +53,15 @@ a {
     padding: 1rem 0;
     font-size: 1.4rem;
     font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 }
 
