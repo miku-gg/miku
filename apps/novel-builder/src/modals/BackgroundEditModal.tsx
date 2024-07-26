@@ -132,7 +132,7 @@ export default function BackgroundEditModal() {
                 <Tooltip id="Info-animated-bg" place="top" />
                 <IoInformationCircleOutline
                   data-tooltip-id="Info-animated-bg"
-                  data-tooltip-content="[OPTIONAL] Add a MP4 background, it will be desplayed remplacing the static image."
+                  data-tooltip-content="[OPTIONAL] Add a MP4 background, it will be displayed remplacing the static image."
                 />
               </div>
               <Button
