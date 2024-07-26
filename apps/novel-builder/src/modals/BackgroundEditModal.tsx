@@ -11,6 +11,7 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import ButtonGroup from "../components/ButtonGroup";
 import config from "../config";
 import { selectEditingBackground } from "../state/selectors";
 import { closeModal } from "../state/slices/inputSlice";
@@ -27,6 +28,7 @@ export default function BackgroundEditModal() {
   const { openModal } = AreYouSure.useAreYouSure();
   const [backgroundUploading, setBackgroundUploading] =
     useState<boolean>(false);
+  const [selectedTab, setSelectedTab] = useState<"image" | "video">("image");
 
   const handleDeleteBackground = () => {
     openModal({
@@ -66,6 +68,7 @@ export default function BackgroundEditModal() {
           })
         );
         setBackgroundUploading(false);
+        setSelectedTab("video");
       });
     };
     a.click();
@@ -79,19 +82,32 @@ export default function BackgroundEditModal() {
         source: { ...background.source, mp4: "" },
       })
     );
+    setSelectedTab("image");
   };
 
   return (
     <Modal
       opened={!!background}
-      title="Edit Background"
       className="BackgroundEditModal"
       shouldCloseOnOverlayClick
       onCloseModal={() => dispatch(closeModal({ modalType: "background" }))}
     >
       {background ? (
         <div className="BackgroundEditModal_content">
-          {background.source.jpg.length > 0 ? (
+          <div className="BackgroundEditModal__buttons">
+            <h2>Edit Background</h2>
+            {background.source.mp4 ? (
+              <ButtonGroup
+                selected={selectedTab}
+                onButtonClick={(value) => setSelectedTab(value)}
+                buttons={[
+                  { content: "Image", value: "image" },
+                  { content: "Video", value: "video" },
+                ]}
+              />
+            ) : null}{" "}
+          </div>
+          {background.source.jpg.length > 0 && selectedTab === "image" ? (
             <div
               className="BackgroundEditModal__background"
               style={{
@@ -100,6 +116,20 @@ export default function BackgroundEditModal() {
                 )})`,
               }}
             />
+          ) : null}
+          {background.source.mp4 && selectedTab === "video" ? (
+            <div className="BackgroundEditModal__video">
+              <IoIosCloseCircleOutline
+                className="BackgroundEditModal__video-remove"
+                onClick={handleRemoveVideo}
+              />
+              <video autoPlay loop muted>
+                <source
+                  src={config.genAssetLink(background.source.mp4)}
+                  type="video/mp4"
+                />
+              </video>
+            </div>
           ) : null}
           <div>
             <Input
@@ -143,21 +173,6 @@ export default function BackgroundEditModal() {
                 {backgroundUploading ? <Loader /> : "Add background"}
               </Button>
             </div>
-
-            {background.source.mp4 ? (
-              <div className="BackgroundEditModal__video">
-                <IoIosCloseCircleOutline
-                  className="BackgroundEditModal__video-remove"
-                  onClick={handleRemoveVideo}
-                />
-                <video autoPlay loop muted>
-                  <source
-                    src={config.genAssetLink(background.source.mp4)}
-                    type="video/mp4"
-                  />
-                </video>
-              </div>
-            ) : null}
           </div>
           <div className="BackgroundEditModal__delete">
             <Button onClick={handleDeleteBackground} theme="primary">
