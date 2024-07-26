@@ -39,7 +39,9 @@ const Interactor = () => {
               src={
                 background
                   ? assetLinkLoader(
-                      background.source.webm || background.source.jpg
+                      background.source.mp4 ||
+                        background.source.webm ||
+                        background.source.jpg
                     )
                   : ''
               }
@@ -47,21 +49,27 @@ const Interactor = () => {
                 background ? assetLinkLoader(background.source.jpg, true) : ''
               }
             >
-              {(src) => (
-                <img
-                  className="Interactor__background-image"
-                  src={`${src}`}
-                  alt="background"
-                  onError={({ currentTarget }) => {
-                    if (
-                      currentTarget.src !== '/images/default_background.png'
-                    ) {
-                      currentTarget.onerror = null
-                      currentTarget.src = '/images/default_background.png'
-                    }
-                  }}
-                />
-              )}
+              {(src) =>
+                background?.source.mp4 ? (
+                  <video className="Interactor__background-video" loop autoPlay>
+                    <source src={assetLinkLoader(background.source.mp4)}></source>
+                  </video>
+                ) : (
+                  <img
+                    className="Interactor__background-image"
+                    src={`${src}`}
+                    alt="background"
+                    onError={({ currentTarget }) => {
+                      if (
+                        currentTarget.src !== '/images/default_background.png'
+                      ) {
+                        currentTarget.onerror = null
+                        currentTarget.src = '/images/default_background.png'
+                      }
+                    }}
+                  />
+                )
+              }
             </ProgressiveImage>
             <div
               className={classNames({
