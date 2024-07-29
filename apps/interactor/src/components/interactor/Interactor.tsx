@@ -1,23 +1,23 @@
 import { AreYouSure } from '@mikugg/ui-kit'
+import classNames from 'classnames'
 import ProgressiveImage from 'react-progressive-graceful-image'
-import './Interactor.scss'
-import { useAppSelector } from '../../state/store'
+import { useAppContext } from '../../App.context'
 import {
   selectCurrentScene,
   selectLastLoadedCharacters,
   selectLastSelectedCharacter,
 } from '../../state/selectors'
-import EmotionRenderer from '../emotion-render/EmotionRenderer'
-import { useAppContext } from '../../App.context'
-import SceneSuggestion from './SceneSuggestion'
-import InteractorHeader from './InteractorHeader'
+import { useAppSelector } from '../../state/store'
 import ChatBox from '../chat-box/ChatBox'
-import classNames from 'classnames'
-import Inventory from './Inventory'
+import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import DebugModal from './DebugModal'
+import './Interactor.scss'
+import InteractorHeader from './InteractorHeader'
+import Inventory from './Inventory'
+import SceneSuggestion from './SceneSuggestion'
 
 const Interactor = () => {
-  const { assetLinkLoader } = useAppContext()
+  const { assetLinkLoader, isMobileApp } = useAppContext()
   const scene = useAppSelector(selectCurrentScene)
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
   const displayCharacter = useAppSelector(selectLastSelectedCharacter)
@@ -39,8 +39,9 @@ const Interactor = () => {
               src={
                 background
                   ? assetLinkLoader(
-                      background.source.mp4 ||
-                        background.source.jpg
+                      isMobileApp && background.source.mp4Mobile
+                        ? background.source.mp4Mobile
+                        : background.source.mp4 || background.source.jpg
                     )
                   : ''
               }
@@ -49,9 +50,18 @@ const Interactor = () => {
               }
             >
               {(src) =>
+                isMobileApp && background?.source.mp4Mobile ? (
+                  <video className="Interactor__background-mobileVideo" loop autoPlay>
+                    <source
+                      src={assetLinkLoader(background.source.mp4Mobile)}
+                    ></source>
+                  </video>
+                ) :
                 background?.source.mp4 ? (
                   <video className="Interactor__background-video" loop autoPlay>
-                    <source src={assetLinkLoader(background.source.mp4)}></source>
+                    <source
+                      src={assetLinkLoader(background.source.mp4)}
+                    ></source>
                   </video>
                 ) : (
                   <img
