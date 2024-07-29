@@ -16,6 +16,7 @@ export const initialState: SettingsState = {
   model: ModelType.RP,
   user: {
     name: 'Anon',
+    isTester: false,
     isPremium: false,
     nsfw: NovelNSFW.EXPLICIT,
     credits: 0,
@@ -50,6 +51,7 @@ export const initialState: SettingsState = {
     map: false,
     debug: false,
     testing: false,
+    modelSelector: false,
     edit: {
       opened: false,
       id: '',
@@ -127,6 +129,9 @@ export const settingSlice = createSlice({
     setDebugModal: (state, action: PayloadAction<boolean>) => {
       state.modals.debug = action.payload
     },
+    setModelSelectorModal: (state, action: PayloadAction<boolean>) => {
+      state.modals.modelSelector = action.payload
+    },
     setTestingModal: (state, action: PayloadAction<boolean>) => {
       state.modals.testing = action.payload
     },
@@ -143,12 +148,14 @@ export const settingSlice = createSlice({
         isPremium: boolean
         credits: number
         sceneSuggestionsLeft: number
+        isTester: boolean
       }>
     ) => {
       state.user.loading = false
       state.user.isPremium = action.payload.isPremium
       state.user.credits = action.payload.credits
       state.user.sceneSuggestionsLeft = action.payload.sceneSuggestionsLeft
+      state.user.isTester = action.payload.isTester
     },
   },
   extraReducers: (builder) => {
@@ -174,6 +181,7 @@ export const {
   setVoiceSpeed,
   setVoiceId,
   setMusicEnabled,
+  setModelSelectorModal,
   setMusicVolume,
   setSettingsModal,
   setAboutModal,

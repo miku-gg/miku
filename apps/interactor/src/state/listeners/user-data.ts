@@ -1,7 +1,7 @@
 import { Dispatch, createListenerMiddleware } from '@reduxjs/toolkit'
+import axios from 'axios'
 import { userDataFetchEnd, userDataFetchStart } from '../slices/settingsSlice'
 import { RootState } from '../store'
-import axios from 'axios'
 
 const userDataEffect = async (
   dispatch: Dispatch,
@@ -14,14 +14,17 @@ const userDataEffect = async (
       credits: number
       tier: string
       id: string
+      tester: boolean
     }>(`${apiEndpoint}/user`, {
       withCredentials: true,
     })
+
     dispatch(
       userDataFetchEnd({
         credits: result.data.credits,
         isPremium: result.data.tier === 'PREMIUM',
         sceneSuggestionsLeft: result.data.sceneSuggestionsLeft,
+        isTester: result.data.tester,
       })
     )
   } catch (error) {
@@ -31,6 +34,7 @@ const userDataEffect = async (
         credits: state.settings.user.credits,
         isPremium: state.settings.user.isPremium,
         sceneSuggestionsLeft: 0,
+        isTester: state.settings.user.isTester,
       })
     )
   }
