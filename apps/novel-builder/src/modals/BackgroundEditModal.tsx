@@ -28,7 +28,7 @@ export default function BackgroundEditModal() {
   const { openModal } = AreYouSure.useAreYouSure();
   const [backgroundUploading, setBackgroundUploading] =
     useState<boolean>(false);
-  const [selectedTab, setSelectedTab] = useState<"image" | "video">("image");
+  const [selectedTab, setSelectedTab] = useState<string>("image");
 
   const handleDeleteBackground = () => {
     openModal({
@@ -43,7 +43,7 @@ export default function BackgroundEditModal() {
     });
   };
 
-  const handleUploadMP4 = () => {
+  const handleUploadMP4 = (isForMobile: boolean) => {
     if (!background) return;
     const a = document.createElement("input");
     a.type = "file";
@@ -61,28 +61,70 @@ export default function BackgroundEditModal() {
           setBackgroundUploading(false);
           return;
         }
-        dispatch(
-          updateBackground({
-            ...background,
-            source: { ...background.source, mp4: assetId },
-          })
-        );
+        if (!isForMobile) {
+          dispatch(
+            updateBackground({
+              ...background,
+              source: { ...background.source, mp4: assetId },
+            })
+          );
+          setSelectedTab("video");
+        } else {
+          dispatch(
+            updateBackground({
+              ...background,
+              source: { ...background.source, mp4Mobile: assetId },
+            })
+          );
+          setSelectedTab("mobileVideo");
+        }
         setBackgroundUploading(false);
-        setSelectedTab("video");
       });
     };
     a.click();
   };
 
-  const handleRemoveVideo = () => {
+  const handleRemoveVideo = (isForMobile: boolean) => {
     if (!background) return;
-    dispatch(
-      updateBackground({
-        ...background,
-        source: { ...background.source, mp4: "" },
-      })
-    );
-    setSelectedTab("image");
+    if (isForMobile) {
+      dispatch(
+        updateBackground({
+          ...background,
+          source: { ...background.source, mp4Mobile: "" },
+        })
+      );
+      setSelectedTab("video");
+    } else {
+      dispatch(
+        updateBackground({
+          ...background,
+          source: { ...background.source, mp4: "", mp4Mobile: "" },
+        })
+      );
+      setSelectedTab("image");
+    }
+  };
+
+  const getBackgroundSteps = () => {
+    const steps = [
+      {
+        content: "Image",
+        value: "image",
+      },
+    ];
+    if (background?.source.mp4) {
+      steps.push({
+        content: "Video",
+        value: "video",
+      });
+    }
+    if (background?.source.mp4Mobile) {
+      steps.push({
+        content: "Mobile Video",
+        value: "mobileVideo",
+      });
+    }
+    return steps;
   };
 
   return (
@@ -100,10 +142,7 @@ export default function BackgroundEditModal() {
               <ButtonGroup
                 selected={selectedTab}
                 onButtonClick={(value) => setSelectedTab(value)}
-                buttons={[
-                  { content: "Image", value: "image" },
-                  { content: "Video", value: "video" },
-                ]}
+                buttons={getBackgroundSteps()}
               />
             ) : null}{" "}
           </div>
@@ -121,7 +160,7 @@ export default function BackgroundEditModal() {
             <div className="BackgroundEditModal__video">
               <IoIosCloseCircleOutline
                 className="BackgroundEditModal__video-remove"
-                onClick={handleRemoveVideo}
+                onClick={() => handleRemoveVideo(false)}
               />
               <video autoPlay loop muted>
                 <source
@@ -131,10 +170,25 @@ export default function BackgroundEditModal() {
               </video>
             </div>
           ) : null}
+          {background.source.mp4Mobile && selectedTab === "mobileVideo" ? (
+            <div className="BackgroundEditModal__video mobileVideo">
+              <IoIosCloseCircleOutline
+                className="BackgroundEditModal__video-remove"
+                onClick={() => handleRemoveVideo(true)}
+              />
+              <video autoPlay loop muted>
+                <source
+                  src={config.genAssetLink(background.source.mp4Mobile)}
+                  type="video/mp4"
+                />
+              </video>
+            </div>
+          ) : null}
           <div>
             <Input
               label="Name"
               placeHolder="Forest"
+              className="BackgroundEditModal__input"
               value={background.name}
               onChange={(e) =>
                 dispatch(
@@ -145,6 +199,7 @@ export default function BackgroundEditModal() {
             <Input
               label="Description"
               placeHolder="forest at night, with trees and animals"
+              className="BackgroundEditModal__input"
               value={background.description}
               onChange={(e) =>
                 dispatch(
@@ -156,23 +211,44 @@ export default function BackgroundEditModal() {
               }
             />
 
-            <div className="BackgroundEditModal__animated">
-              <div className="BackgroundEditModal__animated-label">
-                <p>Animated background</p>
-                <Tooltip id="Info-animated-bg" place="top" />
-                <IoInformationCircleOutline
-                  data-tooltip-id="Info-animated-bg"
-                  data-tooltip-content="[OPTIONAL] Add a MP4 background, it will be displayed remplacing the static image."
-                />
+            {!background.source.mp4 ? (
+              <div className="BackgroundEditModal__animated">
+                <div className="BackgroundEditModal__animated-label">
+                  <p>Animated background</p>
+                  <Tooltip id="Info-animated-bg" place="top" />
+                  <IoInformationCircleOutline
+                    data-tooltip-id="Info-animated-bg"
+                    data-tooltip-content="[OPTIONAL] Add a MP4 background, it will be displayed remplacing the static image."
+                  />
+                </div>
+                <Button
+                  disabled={backgroundUploading}
+                  theme="gradient"
+                  onClick={() => handleUploadMP4(false)}
+                >
+                  {backgroundUploading ? <Loader /> : "Add background"}
+                </Button>
               </div>
-              <Button
-                disabled={backgroundUploading}
-                theme="gradient"
-                onClick={handleUploadMP4}
-              >
-                {backgroundUploading ? <Loader /> : "Add background"}
-              </Button>
-            </div>
+            ) : null}
+            {background.source.mp4 && !background.source.mp4Mobile ? (
+              <div className="BackgroundEditModal__animated">
+                <div className="BackgroundEditModal__animated-label">
+                  <p>Animated mobile background</p>
+                  <Tooltip id="Info-animated-bg-mobile" place="top" />
+                  <IoInformationCircleOutline
+                    data-tooltip-id="Info-animated-bg-mobile"
+                    data-tooltip-content="[OPTIONAL] This would be a vertical background for the mobile use case"
+                  />
+                </div>
+                <Button
+                  disabled={backgroundUploading}
+                  theme="gradient"
+                  onClick={() => handleUploadMP4(true)}
+                >
+                  {backgroundUploading ? <Loader /> : "Add mobile background"}
+                </Button>
+              </div>
+            ) : null}
           </div>
           <div className="BackgroundEditModal__delete">
             <Button onClick={handleDeleteBackground} theme="primary">

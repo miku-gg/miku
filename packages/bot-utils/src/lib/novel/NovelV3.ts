@@ -80,8 +80,8 @@ export interface NovelBackground {
   attributes: string[][];
   source: {
     jpg: string;
-    webm?: string;
     mp4?: string;
+    mp4Mobile?: string;
   };
 }
 

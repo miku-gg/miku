@@ -42,18 +42,16 @@
     }
   }
 
-  &__background {
-    &-image,
-    &-video {
-      height: 100%;
-      width: 100%;
-      z-index: 0;
-      border-radius: 0.75rem; // Equivalent to 'rounded-xl' in Tailwind
-      object-fit: cover;
-      transition: all 0.2s ease-in;
-      pointer-events: none;
-      user-select: none;
-    }
+  &__background-image,
+  &__background-video {
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+    border-radius: 0.75rem; // Equivalent to 'rounded-xl' in Tailwind
+    object-fit: cover;
+    transition: all 0.2s ease-in;
+    pointer-events: none;
+    user-select: none;
   }
 
   &__characters {

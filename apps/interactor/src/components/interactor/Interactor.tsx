@@ -40,7 +40,6 @@ const Interactor = () => {
                 background
                   ? assetLinkLoader(
                       background.source.mp4 ||
-                        background.source.webm ||
                         background.source.jpg
                     )
                   : ''

@@ -42,25 +42,13 @@ export default function Backgrounds({
     setBackgroundUploading(false);
     const id = randomUUID();
 
-    const getSource = (assetId: string) => {
-      let source = { jpg: "", webm: "", mp4: "" };
-      if (assetId.endsWith(".jpg")) {
-        source = { ...source, jpg: assetId };
-      } else if (assetId.endsWith(".webm")) {
-        source = { ...source, webm: assetId };
-      } else if (assetId.endsWith(".mp4")) {
-        source = { ...source, mp4: assetId };
-      }
-      return source;
-    };
-
     dispatch(
       addBackground({
         id,
         attributes: [],
         description: "",
         name: `background-${backgrounds.length + 1}`,
-        source: getSource(assetId),
+        source: { jpg: assetId, mp4: "" },
       })
     );
     dispatch(openModal({ modalType: "background", editId: id }));
@@ -88,7 +76,6 @@ export default function Backgrounds({
             },
             content: {
               image: config.genAssetLink(background.source.jpg, true),
-              
             },
             onClick: () => {
               onSelect?.(background.id);
