@@ -106,7 +106,7 @@ export interface SettingsState {
   model: ModelType
   user: {
     name: string
-    isTester:boolean,
+    isTester?: boolean
     isPremium: boolean
     nsfw: NovelNSFW
     credits: number
