@@ -15,6 +15,7 @@ import ChatBox from '../chat-box/ChatBox'
 import classNames from 'classnames'
 import Inventory from './Inventory'
 import DebugModal from './DebugModal'
+import ModelSelectorModal from './ModelSelectorModal'
 
 const Interactor = () => {
   const { assetLinkLoader } = useAppContext()
@@ -91,6 +92,7 @@ const Interactor = () => {
           <ChatBox />
           <Inventory />
           <DebugModal />
+          <ModelSelectorModal />
         </div>
       </div>
     </AreYouSure.AreYouSureProvider>

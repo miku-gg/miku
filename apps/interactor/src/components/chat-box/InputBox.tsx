@@ -19,9 +19,13 @@ import { toast } from 'react-toastify'
 import PromptBuilder from '../../libs/prompts/PromptBuilder'
 import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSuggestionStrategy'
 import textCompletion from '../../libs/textCompletion'
+import {
+  setDebugModal,
+  setModelSelectorModal,
+  userDataFetchStart,
+} from '../../state/slices/settingsSlice'
 import { Loader } from '../common/Loader'
 import './InputBox.scss'
-import { setDebugModal } from '../../state/slices/settingsSlice'
 
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch()
@@ -33,6 +37,7 @@ const InputBox = (): JSX.Element | null => {
 
   const { text, disabled } = useAppSelector((state) => state.narration.input)
   const { isMobileApp } = useAppContext()
+  const isTesterUser = useAppSelector((state) => state.settings.user.isTester)
 
   const state = useAppSelector((state) => state)
   const scene = useAppSelector(selectCurrentScene)
@@ -73,6 +78,14 @@ const InputBox = (): JSX.Element | null => {
     if (text === '/debug') {
       dispatch(setInputText(''))
       dispatch(setDebugModal(true))
+      return
+    }
+
+    dispatch(userDataFetchStart({ apiEndpoint }))
+
+    if (text === '/model' && isTesterUser) {
+      dispatch(setInputText(''))
+      dispatch(setModelSelectorModal(true))
       return
     }
 
