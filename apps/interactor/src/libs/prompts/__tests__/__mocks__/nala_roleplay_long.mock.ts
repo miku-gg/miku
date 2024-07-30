@@ -64,6 +64,7 @@ export default {
       debug: false,
       testing: false,
       edit: { opened: false, id: '' },
+      modelSelector: false,
     },
     chatBox: {
       isDraggable: false,
