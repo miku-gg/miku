@@ -320,12 +320,12 @@ export const extractNovelAssets = async (
     } else {
       images.set(background.source.jpg, background.source.jpg);
     }
-    if (background.source.webm?.startsWith("data:")) {
-      const bgHashWebm = await hashBase64URI(background.source.webm);
-      videos.set(bgHashWebm, background.source.webm);
-      background.source.webm = bgHashWebm;
-    } else if (background.source.webm) {
-      videos.set(background.source.webm, background.source.webm);
+    if (background.source.mp4?.startsWith("data:")) {
+      const bgHashWebm = await hashBase64URI(background.source.mp4);
+      videos.set(bgHashWebm, background.source.mp4);
+      background.source.mp4 = bgHashWebm;
+    } else if (background.source.mp4) {
+      videos.set(background.source.mp4, background.source.mp4);
     }
   }
 
