@@ -34,7 +34,7 @@ const userDataEffect = async (
         credits: state.settings.user.credits,
         isPremium: state.settings.user.isPremium,
         sceneSuggestionsLeft: 0,
-        isTester: state.settings.user.isTester,
+        isTester: state.settings.user.isTester || false,
       })
     )
   }
