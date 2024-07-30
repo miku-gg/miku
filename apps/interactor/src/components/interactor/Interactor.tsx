@@ -1,23 +1,23 @@
 import { AreYouSure } from '@mikugg/ui-kit'
+import classNames from 'classnames'
 import ProgressiveImage from 'react-progressive-graceful-image'
-import './Interactor.scss'
-import { useAppSelector } from '../../state/store'
+import { useAppContext } from '../../App.context'
 import {
   selectCurrentScene,
   selectLastLoadedCharacters,
   selectLastSelectedCharacter,
 } from '../../state/selectors'
-import EmotionRenderer from '../emotion-render/EmotionRenderer'
-import { useAppContext } from '../../App.context'
-import SceneSuggestion from './SceneSuggestion'
-import InteractorHeader from './InteractorHeader'
+import { useAppSelector } from '../../state/store'
 import ChatBox from '../chat-box/ChatBox'
-import classNames from 'classnames'
-import Inventory from './Inventory'
 import DebugModal from './DebugModal'
+import './Interactor.scss'
+import InteractorHeader from './InteractorHeader'
+import Inventory from './Inventory'
+import SceneSuggestion from './SceneSuggestion'
+import EmotionRenderer from '../emotion-render/EmotionRenderer'
 
 const Interactor = () => {
-  const { assetLinkLoader } = useAppContext()
+  const { assetLinkLoader, isMobileApp } = useAppContext()
   const scene = useAppSelector(selectCurrentScene)
   const lastCharacters = useAppSelector(selectLastLoadedCharacters)
   const displayCharacter = useAppSelector(selectLastSelectedCharacter)
@@ -39,7 +39,10 @@ const Interactor = () => {
               src={
                 background
                   ? assetLinkLoader(
-                      background.source.webm || background.source.jpg
+                      (isMobileApp || window.innerWidth < 600) &&
+                        background.source.mp4Mobile
+                        ? background.source.mp4Mobile
+                        : background.source.mp4 || background.source.jpg
                     )
                   : ''
               }
@@ -47,21 +50,46 @@ const Interactor = () => {
                 background ? assetLinkLoader(background.source.jpg, true) : ''
               }
             >
-              {(src) => (
-                <img
-                  className="Interactor__background-image"
-                  src={`${src}`}
-                  alt="background"
-                  onError={({ currentTarget }) => {
-                    if (
-                      currentTarget.src !== '/images/default_background.png'
-                    ) {
-                      currentTarget.onerror = null
-                      currentTarget.src = '/images/default_background.png'
-                    }
-                  }}
-                />
-              )}
+              {(src) =>
+                (isMobileApp || window.innerWidth < 600) &&
+                background?.source.mp4Mobile ? (
+                  <video
+                    className="Interactor__background-mobileVideo"
+                    loop
+                    autoPlay
+                    muted
+                  >
+                    <source
+                      src={assetLinkLoader(background.source.mp4Mobile)}
+                    ></source>
+                  </video>
+                ) : background?.source.mp4 ? (
+                  <video
+                    className="Interactor__background-video"
+                    loop
+                    autoPlay
+                    muted
+                  >
+                    <source
+                      src={assetLinkLoader(background.source.mp4)}
+                    ></source>
+                  </video>
+                ) : (
+                  <img
+                    className="Interactor__background-image"
+                    src={`${src}`}
+                    alt="background"
+                    onError={({ currentTarget }) => {
+                      if (
+                        currentTarget.src !== '/images/default_background.png'
+                      ) {
+                        currentTarget.onerror = null
+                        currentTarget.src = '/images/default_background.png'
+                      }
+                    }}
+                  />
+                )
+              }
             </ProgressiveImage>
             <div
               className={classNames({

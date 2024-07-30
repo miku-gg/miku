@@ -42,7 +42,9 @@
     }
   }
 
-  &__background-image {
+  &__background-image,
+  &__background-video,
+  &__background-mobileVideo {
     height: 100%;
     width: 100%;
     z-index: 0;
@@ -51,6 +53,10 @@
     transition: all 0.2s ease-in;
     pointer-events: none;
     user-select: none;
+  }
+
+  &__mobileVideo{
+    object-fit: none;
   }
 
   &__characters {
