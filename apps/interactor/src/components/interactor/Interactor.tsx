@@ -9,12 +9,12 @@ import {
 } from '../../state/selectors'
 import { useAppSelector } from '../../state/store'
 import ChatBox from '../chat-box/ChatBox'
-import EmotionRenderer from '../emotion-render/EmotionRenderer'
 import DebugModal from './DebugModal'
 import './Interactor.scss'
 import InteractorHeader from './InteractorHeader'
 import Inventory from './Inventory'
 import SceneSuggestion from './SceneSuggestion'
+import EmotionRenderer from '../emotion-render/EmotionRenderer'
 
 const Interactor = () => {
   const { assetLinkLoader, isMobileApp } = useAppContext()
@@ -39,7 +39,8 @@ const Interactor = () => {
               src={
                 background
                   ? assetLinkLoader(
-                      isMobileApp && background.source.mp4Mobile
+                      (isMobileApp || window.innerWidth < 600) &&
+                        background.source.mp4Mobile
                         ? background.source.mp4Mobile
                         : background.source.mp4 || background.source.jpg
                     )
@@ -50,15 +51,25 @@ const Interactor = () => {
               }
             >
               {(src) =>
-                isMobileApp && background?.source.mp4Mobile ? (
-                  <video className="Interactor__background-mobileVideo" loop autoPlay>
+                (isMobileApp || window.innerWidth < 600) &&
+                background?.source.mp4Mobile ? (
+                  <video
+                    className="Interactor__background-mobileVideo"
+                    loop
+                    autoPlay
+                    muted
+                  >
                     <source
                       src={assetLinkLoader(background.source.mp4Mobile)}
                     ></source>
                   </video>
-                ) :
-                background?.source.mp4 ? (
-                  <video className="Interactor__background-video" loop autoPlay>
+                ) : background?.source.mp4 ? (
+                  <video
+                    className="Interactor__background-video"
+                    loop
+                    autoPlay
+                    muted
+                  >
                     <source
                       src={assetLinkLoader(background.source.mp4)}
                     ></source>

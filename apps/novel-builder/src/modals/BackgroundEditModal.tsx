@@ -51,8 +51,8 @@ export default function BackgroundEditModal() {
     a.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
-      if (file.size > 1500000) {
-        toast.error("File size must be less than 1.5MB");
+      if (file.size > 10000000) {
+        toast.error("File size must be less than 10MB");
         return;
       }
       setBackgroundUploading(true);
@@ -218,7 +218,7 @@ export default function BackgroundEditModal() {
                   <Tooltip id="Info-animated-bg" place="top" />
                   <IoInformationCircleOutline
                     data-tooltip-id="Info-animated-bg"
-                    data-tooltip-content="[OPTIONAL] Add a MP4 background, it will be displayed remplacing the static image."
+                    data-tooltip-content="[OPTIONAL] Add a MP4 background, it will be displayed remplacing the static image.(Recomended 1920x1080)"
                   />
                 </div>
                 <Button
@@ -237,7 +237,7 @@ export default function BackgroundEditModal() {
                   <Tooltip id="Info-animated-bg-mobile" place="top" />
                   <IoInformationCircleOutline
                     data-tooltip-id="Info-animated-bg-mobile"
-                    data-tooltip-content="[OPTIONAL] This would be a vertical background for the mobile use case"
+                    data-tooltip-content="[OPTIONAL] This would be a vertical background for the mobile use case.(Recomended 720x1280)"
                   />
                 </div>
                 <Button

@@ -55,6 +55,10 @@
     user-select: none;
   }
 
+  &__mobileVideo{
+    object-fit: none;
+  }
+
   &__characters {
     position: absolute;
     bottom: 0;
