@@ -24,6 +24,7 @@ export default function ModelSelectorModal() {
   const { modelSelector: opened } = useAppSelector(
     (state) => state.settings.modals
   )
+  const user = useAppSelector((state) => state.settings.user)
 
   const getModels = async () => {
     try {
@@ -46,11 +47,13 @@ export default function ModelSelectorModal() {
   }
 
   useEffect(() => {
-    const models = getModels()
-    if (models) {
-      models.then((data) => {
-        setModels(data)
-      })
+    if (user.isTester) {
+      const models = getModels()
+      if (models) {
+        models.then((data) => {
+          setModels(data)
+        })
+      }
     }
   }, [])
 
