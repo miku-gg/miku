@@ -34,12 +34,11 @@ export default function ModelSelectorModal() {
   };
 
   const handleSelectModel = (model: ModelType) => {
-    if (currentModel === model) {
-      toast.error(`Model ${model} as already selected`);
-      return;
+    if (currentModel !== model) {
+      dispatch(setModel(model));
+      toast.success(`Model ${model} selected`);
     }
-    dispatch(setModel(model));
-    toast.success(`Model ${model} selected`);
+    dispatch(setModelSelectorModal(false));
   };
 
   useEffect(() => {
@@ -70,16 +69,11 @@ export default function ModelSelectorModal() {
             <div
               key={model.id}
               className={`ModelSelectorModal__model ${currentModel === model.id ? 'selected' : ''}`}
-              onClick={() => {
-                handleSelectModel(model.id);
-              }}
+              onClick={() => handleSelectModel(model.id)}
             >
               <div className="ModelSelectorModal__model-id">Type: {model.id}</div>
               <div className="ModelSelectorModal__model-name">Name: {model.name}</div>
               <div className="ModelSelectorModal__model-description">Description: {model.description}</div>
-              <div className="ModelSelectorModal__model-cost">Cost: {model.cost} tokens</div>
-
-              <div className="ModelSelectorModal__model-permission">Permission: {model.permission}</div>
             </div>
           ))
         )}
