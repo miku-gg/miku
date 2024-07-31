@@ -1,5 +1,6 @@
 import { AreYouSure } from "@mikugg/ui-kit";
 import cloneDeep from "lodash.clonedeep";
+import { useEffect } from "react";
 import { BiCameraMovie, BiSolidSave } from "react-icons/bi";
 import { GiPathDistance } from "react-icons/gi";
 import { LuMonitorPlay, LuTextQuote } from "react-icons/lu";
@@ -8,7 +9,10 @@ import { TbBoxMultiple } from "react-icons/tb";
 import { toast } from "react-toastify";
 import ButtonGroup from "../components/ButtonGroup";
 import ErrorsDisplay from "../components/ErrorsDisplay";
+import { TokenDisplayer } from "../components/TokenDisplayer";
+import { TOKEN_LIMITS } from "../data/tokenLimits";
 import { allowUntilStep, downloadNovelState } from "../libs/utils";
+import { selectTotalTokenCount } from "../state/selectors";
 import {
   closeModal,
   isPanelType,
@@ -16,9 +20,6 @@ import {
   navigatePanel,
   openModal,
 } from "../state/slices/inputSlice";
-import { TokenDisplayer } from "../components/TokenDisplayer";
-import { TOKEN_LIMITS } from "../data/tokenLimits";
-import { selectTotalTokenCount } from "../state/selectors";
 import { clearNovelState } from "../state/slices/novelFormSlice";
 import { useAppDispatch, useAppSelector } from "../state/store";
 import HomePanel from "./HomePanel";
@@ -35,6 +36,12 @@ function PanelExplorer() {
   const selectedPanel = useAppSelector((state) => state.input.navigation.panel);
   const dispatch = useAppDispatch();
   const { openModal: openAreYouSure } = AreYouSure.useAreYouSure();
+
+  useEffect(() => {
+    if (!window.onbeforeunload && novel) {
+      window.onbeforeunload = () => true;
+    }
+  }, [novel]);
 
   const maxStep = allowUntilStep(novel);
   return (

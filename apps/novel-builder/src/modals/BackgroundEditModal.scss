@@ -1,31 +1,86 @@
+@import "../styles/variables.scss";
 .BackgroundEditModal {
   box-shadow: 0px 0px 20px 0px rgb(205 95 234) !important;
 
+  &__input {
+    margin-bottom: 10px;
+  }
+
+  &__buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    & h2 {
+      margin: 0;
+    }
+  }
   &__background {
     height: 300px;
     background-size: cover;
     background-position: center;
     border-radius: 15px;
     margin: 1em 0;
-  }
 
-  &__attribute {
-    display: flex;
-    align-items: center;
-    font-size: 1.4rem;
-    gap: 0.4rem;
-    .Button {
-      margin-left: 1rem;
+    &-video {
+      height: 300px;
+      width: 100%;
+      border: 1px solid $node-conector-color;
+      border-radius: 16px;
     }
   }
 
-  &__addAttributeButton {
-    margin-top: 1em;
+  &__animated {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px;
+    border: 1px solid $node-conector-color;
+    border-radius: 16px;
+    margin: 10px 0;
+
+    &-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      & svg {
+        color: $node-conector-color;
+      }
+    }
+
+    & p {
+      margin: 0;
+      padding-left: 4px;
+    }
   }
 
-  &__delete {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1em;
+  &__video {
+    height: 300px;
+    width: 100%;
+    border: 1px solid $node-conector-color;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    position: relative;
+    margin: 1em 0;
+
+    &-remove {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 2rem;
+      height: 2rem;
+      cursor: pointer;
+      z-index: 1;
+
+      &:hover {
+        color: $secondary-color;
+      }
+    }
+
+    & video {
+      width: 100%;
+      height: 100%;
+    }
   }
 }

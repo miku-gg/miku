@@ -1,18 +1,18 @@
-import "./Backgrounds.scss";
-import { MdSearch } from "react-icons/md";
 import { FaUpload } from "react-icons/fa6";
+import { MdSearch } from "react-icons/md";
 import { v4 as randomUUID } from "uuid";
 import config from "../../../config";
+import "./Backgrounds.scss";
 
 import { Blocks } from "@mikugg/ui-kit";
-import { useAppDispatch, useAppSelector } from "../../../state/store";
-import { selectBackgrounds } from "../../../state/selectors";
-import { addBackground } from "../../../state/slices/novelFormSlice";
 import { useRef, useState } from "react";
-import { toast } from "react-toastify";
-import { openModal } from "../../../state/slices/inputSlice";
-import { FaPencil } from "react-icons/fa6";
 import { BsStars } from "react-icons/bs";
+import { FaPencil } from "react-icons/fa6";
+import { toast } from "react-toastify";
+import { selectBackgrounds } from "../../../state/selectors";
+import { openModal } from "../../../state/slices/inputSlice";
+import { addBackground } from "../../../state/slices/novelFormSlice";
+import { useAppDispatch, useAppSelector } from "../../../state/store";
 
 export default function Backgrounds({
   selected,
@@ -48,9 +48,7 @@ export default function Backgrounds({
         attributes: [],
         description: "",
         name: `background-${backgrounds.length + 1}`,
-        source: {
-          jpg: assetId,
-        },
+        source: { jpg: assetId, mp4: "" },
       })
     );
     dispatch(openModal({ modalType: "background", editId: id }));

@@ -8,6 +8,8 @@
     "start:no-services": "lerna run start --parallel --ignore @mikugg/docs --ignore @mikugg/services",
     "run-services": "cd apps/services && node --loader ts-node/esm src/server.mts",
     "test": "lerna run test --scope=@mikugg/extensions --scope=@mikugg/ui-kit",
+    "format": "prettier --write --loglevel warn '**/src/**/*.{js,jsx,ts,tsx,json,md,scss}'",
+    "format:check": "prettier --check '**/src/**/*.{js,jsx,ts,tsx,json,md,scss}'",
     "pull": "git reset --hard HEAD && git pull origin master && pnpm install",
     "build": "npx lerna run build"
   },
