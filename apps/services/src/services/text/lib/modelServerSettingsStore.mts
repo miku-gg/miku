@@ -58,11 +58,6 @@ class ModelServerSettingsStore {
 
   private async retrieveSettings(): Promise<void> {
     try {
-      console.log('as', process.env.MODEL_SERVER_SETTINGS_URL || 'http://localhost:8080/settings/models', {
-        headers: {
-          authorization: `Bearer ${process.env.MODEL_SERVER_SETTINGS_TOKEN || ''}`,
-        },
-      });
       const result = await axios.get<ModelServerSettings>(
         process.env.MODEL_SERVER_SETTINGS_URL || 'http://localhost:8080/settings/models',
         {
