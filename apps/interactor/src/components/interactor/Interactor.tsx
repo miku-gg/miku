@@ -1,34 +1,30 @@
-import { AreYouSure } from '@mikugg/ui-kit'
-import classNames from 'classnames'
-import ProgressiveImage from 'react-progressive-graceful-image'
-import { useAppContext } from '../../App.context'
-import {
-  selectCurrentScene,
-  selectLastLoadedCharacters,
-  selectLastSelectedCharacter,
-} from '../../state/selectors'
-import { useAppSelector } from '../../state/store'
-import ChatBox from '../chat-box/ChatBox'
-import DebugModal from './DebugModal'
-import ModelSelectorModal from './ModelSelectorModal'
-import './Interactor.scss'
-import InteractorHeader from './InteractorHeader'
-import Inventory from './Inventory'
-import SceneSuggestion from './SceneSuggestion'
-import EmotionRenderer from '../emotion-render/EmotionRenderer'
+import { AreYouSure } from '@mikugg/ui-kit';
+import classNames from 'classnames';
+import ProgressiveImage from 'react-progressive-graceful-image';
+import { useAppContext } from '../../App.context';
+import { selectCurrentScene, selectLastLoadedCharacters, selectLastSelectedCharacter } from '../../state/selectors';
+import { useAppSelector } from '../../state/store';
+import ChatBox from '../chat-box/ChatBox';
+import DebugModal from './DebugModal';
+import ModelSelectorModal from './ModelSelectorModal';
+import './Interactor.scss';
+import InteractorHeader from './InteractorHeader';
+import Inventory from './Inventory';
+import SceneSuggestion from './SceneSuggestion';
+import EmotionRenderer from '../emotion-render/EmotionRenderer';
 
 const Interactor = () => {
-  const { assetLinkLoader, isMobileApp } = useAppContext()
-  const scene = useAppSelector(selectCurrentScene)
-  const lastCharacters = useAppSelector(selectLastLoadedCharacters)
-  const displayCharacter = useAppSelector(selectLastSelectedCharacter)
-  const backgrounds = useAppSelector((state) => state.novel.backgrounds)
+  const { assetLinkLoader, isMobileApp } = useAppContext();
+  const scene = useAppSelector(selectCurrentScene);
+  const lastCharacters = useAppSelector(selectLastLoadedCharacters);
+  const displayCharacter = useAppSelector(selectLastSelectedCharacter);
+  const backgrounds = useAppSelector((state) => state.novel.backgrounds);
 
   if (!scene) {
-    return null
+    return null;
   }
 
-  const background = backgrounds.find((b) => b.id === scene.backgroundId)
+  const background = backgrounds.find((b) => b.id === scene.backgroundId);
   return (
     <AreYouSure.AreYouSureProvider>
       <div className="Interactor">
@@ -40,40 +36,22 @@ const Interactor = () => {
               src={
                 background
                   ? assetLinkLoader(
-                      (isMobileApp || window.innerWidth < 600) &&
-                        background.source.mp4Mobile
+                      (isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile
                         ? background.source.mp4Mobile
-                        : background.source.mp4 || background.source.jpg
+                        : background.source.mp4 || background.source.jpg,
                     )
                   : ''
               }
-              placeholder={
-                background ? assetLinkLoader(background.source.jpg, true) : ''
-              }
+              placeholder={background ? assetLinkLoader(background.source.jpg, true) : ''}
             >
               {(src) =>
-                (isMobileApp || window.innerWidth < 600) &&
-                background?.source.mp4Mobile ? (
-                  <video
-                    className="Interactor__background-mobileVideo"
-                    loop
-                    autoPlay
-                    muted
-                  >
-                    <source
-                      src={assetLinkLoader(background.source.mp4Mobile)}
-                    ></source>
+                (isMobileApp || window.innerWidth < 600) && background?.source.mp4Mobile ? (
+                  <video className="Interactor__background-mobileVideo" loop autoPlay muted>
+                    <source src={assetLinkLoader(background.source.mp4Mobile)}></source>
                   </video>
                 ) : background?.source.mp4 ? (
-                  <video
-                    className="Interactor__background-video"
-                    loop
-                    autoPlay
-                    muted
-                  >
-                    <source
-                      src={assetLinkLoader(background.source.mp4)}
-                    ></source>
+                  <video className="Interactor__background-video" loop autoPlay muted>
+                    <source src={assetLinkLoader(background.source.mp4)}></source>
                   </video>
                 ) : (
                   <img
@@ -81,11 +59,9 @@ const Interactor = () => {
                     src={`${src}`}
                     alt="background"
                     onError={({ currentTarget }) => {
-                      if (
-                        currentTarget.src !== '/images/default_background.png'
-                      ) {
-                        currentTarget.onerror = null
-                        currentTarget.src = '/images/default_background.png'
+                      if (currentTarget.src !== '/images/default_background.png') {
+                        currentTarget.onerror = null;
+                        currentTarget.src = '/images/default_background.png';
                       }
                     }}
                   />
@@ -100,7 +76,7 @@ const Interactor = () => {
             >
               {lastCharacters.map(({ id, image }) => {
                 if (!image) {
-                  return null
+                  return null;
                 }
                 return (
                   <EmotionRenderer
@@ -113,7 +89,7 @@ const Interactor = () => {
                       selected: displayCharacter?.id === id,
                     })}
                   />
-                )
+                );
               })}
             </div>
           </div>
@@ -124,7 +100,7 @@ const Interactor = () => {
         </div>
       </div>
     </AreYouSure.AreYouSureProvider>
-  )
-}
+  );
+};
 
-export default Interactor
+export default Interactor;
