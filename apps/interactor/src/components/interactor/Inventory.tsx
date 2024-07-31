@@ -1,8 +1,11 @@
 import { NovelV3 } from '@mikugg/bot-utils'
 import { Button, Tooltip } from '@mikugg/ui-kit'
+import classNames from 'classnames'
 import { FaTimes } from 'react-icons/fa'
+import { GiLockedChest } from 'react-icons/gi'
 import { toast } from 'react-toastify'
 import { useAppContext } from '../../App.context'
+import { CustomEventType, postMessage } from '../../libs/stateEvents'
 import { novelActionToStateAction } from '../../state/mutations'
 import {
   selectConditionStatus,
@@ -17,8 +20,6 @@ import {
 import { interactionStart } from '../../state/slices/narrationSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store'
 import './Inventory.scss'
-import classNames from 'classnames'
-import { GiLockedChest } from 'react-icons/gi'
 
 export default function Inventory() {
   const dispatch = useAppDispatch()
@@ -125,6 +126,10 @@ export default function Inventory() {
           item={selectedItem}
           onUse={(action) => {
             dispatch(setInventoryVisibility('closed'))
+            postMessage(
+              CustomEventType.ITEM_USE,
+              selectedItem?.isNovelOnly ? 'Custom item' : 'Default item'
+            )
 
             if (isInteractionDisabled) {
               toast.warn('Please log in to interact.', {
