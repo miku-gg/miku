@@ -10,6 +10,7 @@ import {
 import { useAppSelector } from '../../state/store'
 import ChatBox from '../chat-box/ChatBox'
 import DebugModal from './DebugModal'
+import ModelSelectorModal from './ModelSelectorModal'
 import './Interactor.scss'
 import InteractorHeader from './InteractorHeader'
 import Inventory from './Inventory'
@@ -119,6 +120,7 @@ const Interactor = () => {
           <ChatBox />
           <Inventory />
           <DebugModal />
+          <ModelSelectorModal />
         </div>
       </div>
     </AreYouSure.AreYouSureProvider>

@@ -106,6 +106,7 @@ export interface SettingsState {
   model: ModelType
   user: {
     name: string
+    isTester?: boolean
     isPremium: boolean
     nsfw: NovelNSFW
     credits: number
@@ -140,6 +141,7 @@ export interface SettingsState {
     map: boolean
     debug: boolean
     testing: boolean
+    modelSelector: boolean
     edit: {
       opened: boolean
       id: string
