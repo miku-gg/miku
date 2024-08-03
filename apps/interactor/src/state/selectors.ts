@@ -1,61 +1,45 @@
-import { RootState } from './store'
-import { NovelCharacterOutfit, NovelScene } from './slices/novelSlice'
-import {
-  NarrationInteraction,
-  NarrationResponse,
-} from './slices/narrationSlice'
-import { createSelector } from '@reduxjs/toolkit'
-import { EmotionTemplateSlug, NovelV3 } from '@mikugg/bot-utils'
-import { NovelNSFW } from './versioning'
+import { RootState } from './store';
+import { NovelCharacterOutfit, NovelScene } from './slices/novelSlice';
+import { NarrationInteraction, NarrationResponse } from './slices/narrationSlice';
+import { createSelector } from '@reduxjs/toolkit';
+import { EmotionTemplateSlug, NovelV3 } from '@mikugg/bot-utils';
+import { NovelNSFW } from './versioning';
 
-export const selectLastLoadedResponse = (
-  state: RootState
-): NarrationResponse | undefined => {
-  const { currentResponseId } = state.narration
-  const response = state.narration.responses[currentResponseId]
+export const selectLastLoadedResponse = (state: RootState): NarrationResponse | undefined => {
+  const { currentResponseId } = state.narration;
+  const response = state.narration.responses[currentResponseId];
   if (response?.fetching && response?.parentInteractionId) {
-    const interaction =
-      state.narration.interactions[response.parentInteractionId]
-    let selectedResponseId = interaction?.responsesId.find(
-      (id) => !state.narration.responses[id]?.selected
-    )
+    const interaction = state.narration.interactions[response.parentInteractionId];
+    let selectedResponseId = interaction?.responsesId.find((id) => !state.narration.responses[id]?.selected);
     if (!selectedResponseId) {
-      selectedResponseId = interaction?.parentResponseId || ''
+      selectedResponseId = interaction?.parentResponseId || '';
     }
-    return state.narration.responses[selectedResponseId || '']
+    return state.narration.responses[selectedResponseId || ''];
   } else {
-    return response
+    return response;
   }
-}
+};
 
 export const selectSceneFromResponse = (
   state: RootState,
-  response: NarrationResponse | undefined
+  response: NarrationResponse | undefined,
 ): NovelScene | undefined => {
-  const interactionId = response?.parentInteractionId || ''
+  const interactionId = response?.parentInteractionId || '';
   if (interactionId) {
-    return state.novel.scenes.find(
-      (scene) =>
-        scene.id === state.narration.interactions[interactionId]?.sceneId
-    )
+    return state.novel.scenes.find((scene) => scene.id === state.narration.interactions[interactionId]?.sceneId);
   } else {
-    const start = state.novel.starts.find((start) => start.id === response?.id)
-    return state.novel.scenes.find((scene) => scene.id === start?.sceneId)
+    const start = state.novel.starts.find((start) => start.id === response?.id);
+    return state.novel.scenes.find((scene) => scene.id === start?.sceneId);
   }
-}
+};
 
-export const selectCurrentScene = (
-  state: RootState
-): NovelScene | undefined => {
-  const { currentResponseId } = state.narration
-  const response = state.narration.responses[currentResponseId]
-  return selectSceneFromResponse(state, response)
-}
+export const selectCurrentScene = (state: RootState): NovelScene | undefined => {
+  const { currentResponseId } = state.narration;
+  const response = state.narration.responses[currentResponseId];
+  return selectSceneFromResponse(state, response);
+};
 
-export const selectCharacterOutfits = (
-  state: RootState,
-  characterId: string
-): NovelCharacterOutfit[] => {
+export const selectCharacterOutfits = (state: RootState, characterId: string): NovelCharacterOutfit[] => {
   return (
     state.novel.characters
       .find((character) => character.id === characterId)
@@ -64,59 +48,44 @@ export const selectCharacterOutfits = (
         nsfw: outfit.nsfw as NovelNSFW,
         template: outfit.template as EmotionTemplateSlug,
       })) || []
-  )
-}
+  );
+};
 
-export const selectLastImageOfCharacter = (
-  state: RootState,
-  characterId: string,
-  responseId?: string
-): string => {
-  const { currentResponseId } = state.narration
-  responseId = responseId || currentResponseId
-  const response = state.narration.responses[responseId]
-  const scene = selectSceneFromResponse(state, response)
-  const characterResponse = response?.characters.find(
-    (character) => character.characterId === characterId
-  )
+export const selectLastImageOfCharacter = (state: RootState, characterId: string, responseId?: string): string => {
+  const { currentResponseId } = state.narration;
+  responseId = responseId || currentResponseId;
+  const response = state.narration.responses[responseId];
+  const scene = selectSceneFromResponse(state, response);
+  const characterResponse = response?.characters.find((character) => character.characterId === characterId);
   if (characterResponse?.text) {
-    const characterOutfitId = scene?.characters.find(
-      (character) => character.characterId === characterId
-    )?.outfit
-    const outfits = selectCharacterOutfits(state, characterId)
-    const outfit = outfits.find((outfit) => outfit.id === characterOutfitId)
-    const emotions = outfit?.emotions.find(
-      (emotion) => emotion.id === characterResponse.emotion
-    )
-    return emotions?.sources.webm || emotions?.sources.png || ''
+    const characterOutfitId = scene?.characters.find((character) => character.characterId === characterId)?.outfit;
+    const outfits = selectCharacterOutfits(state, characterId);
+    const outfit = outfits.find((outfit) => outfit.id === characterOutfitId);
+    const emotions = outfit?.emotions.find((emotion) => emotion.id === characterResponse.emotion);
+    return emotions?.sources.webm || emotions?.sources.png || '';
   } else if (response?.parentInteractionId) {
-    const interaction =
-      state.narration.interactions[response?.parentInteractionId]
-    const oldResponseId = interaction?.parentResponseId
-    if (!oldResponseId) return ''
-    else
-      return selectLastImageOfCharacter(state, characterId, oldResponseId || '')
+    const interaction = state.narration.interactions[response?.parentInteractionId];
+    const oldResponseId = interaction?.parentResponseId;
+    if (!oldResponseId) return '';
+    else return selectLastImageOfCharacter(state, characterId, oldResponseId || '');
   } else {
-    return ''
+    return '';
   }
-}
+};
 
 export const selectLastLoadedCharacters = createSelector(
   [
     (state) => state,
     selectLastLoadedResponse,
-    (state: RootState) =>
-      selectSceneFromResponse(state, selectLastLoadedResponse(state)),
+    (state: RootState) => selectSceneFromResponse(state, selectLastLoadedResponse(state)),
     (state: RootState) => state.novel.characters,
     (state) => state,
   ],
   (state: RootState, response?: NarrationResponse, scene?: NovelScene) => {
     return (
       scene?.characters.map(({ characterId, outfit }) => {
-        const characterResponse = response?.characters.find(
-          (character) => character.characterId === characterId
-        )
-        const emotionSlug = characterResponse?.emotion || ''
+        const characterResponse = response?.characters.find((character) => character.characterId === characterId);
+        const emotionSlug = characterResponse?.emotion || '';
         return {
           id: characterId || '',
           outfit: outfit || '',
@@ -124,18 +93,15 @@ export const selectLastLoadedCharacters = createSelector(
           image: selectLastImageOfCharacter(state, characterId, response?.id),
           emotion: emotionSlug,
           selected: characterId === response?.selectedCharacterId,
-        }
+        };
       }) || []
-    )
-  }
-)
+    );
+  },
+);
 
-export const selectLastSelectedCharacter = createSelector(
-  [selectLastLoadedCharacters],
-  (characters) => {
-    return characters.find((character) => character.selected) || characters[0]
-  }
-)
+export const selectLastSelectedCharacter = createSelector([selectLastLoadedCharacters], (characters) => {
+  return characters.find((character) => character.selected) || characters[0];
+});
 
 export const selectScenes = createSelector(
   [
@@ -145,46 +111,31 @@ export const selectScenes = createSelector(
   ],
   (scenes, characters, backgrounds) => {
     return scenes.map((scene) => {
-      const characterImages = scene.characters.map(
-        ({ characterId, outfit: outfitId }) => {
-          const outfits = selectCharacterOutfits(
-            { novel: { characters } } as RootState,
-            characterId || ''
-          )
-          const outfit = outfits.find((outfit) => outfit.id === outfitId)
-          const neutralEmotion =
-            outfit?.emotions.find((emotion) => emotion.id === 'neutral') ||
-            outfit?.emotions[0]
-          return neutralEmotion?.sources.png || ''
-        }
-      )
+      const characterImages = scene.characters.map(({ characterId, outfit: outfitId }) => {
+        const outfits = selectCharacterOutfits({ novel: { characters } } as RootState, characterId || '');
+        const outfit = outfits.find((outfit) => outfit.id === outfitId);
+        const neutralEmotion = outfit?.emotions.find((emotion) => emotion.id === 'neutral') || outfit?.emotions[0];
+        return neutralEmotion?.sources.png || '';
+      });
 
-      const backgroundImage =
-        backgrounds.find((background) => background.id === scene.backgroundId)
-          ?.source.jpg || ''
+      const backgroundImage = backgrounds.find((background) => background.id === scene.backgroundId)?.source.jpg || '';
 
       return {
         ...scene,
         characterImages,
         backgroundImage,
-      }
-    })
-  }
-)
+      };
+    });
+  },
+);
 
 export const selectAvailableScenes = createSelector(
-  [
-    selectScenes,
-    (state: RootState) => state.settings.user.nsfw,
-    selectCurrentScene,
-  ],
+  [selectScenes, (state: RootState) => state.settings.user.nsfw, selectCurrentScene],
   (scenes, nsfw, currentScene) => {
-    if (scenes.length === 1) return []
-    return scenes
-      .filter((scene) => currentScene?.children.includes(scene.id))
-      .filter((scene) => nsfw >= scene.nsfw)
-  }
-)
+    if (scenes.length === 1) return [];
+    return scenes.filter((scene) => currentScene?.children.includes(scene.id)).filter((scene) => nsfw >= scene.nsfw);
+  },
+);
 
 export const selectCurrentSwipeResponses = createSelector(
   [
@@ -194,16 +145,13 @@ export const selectCurrentSwipeResponses = createSelector(
   ],
   (interactions, responses, currentResponseId) => {
     if (responses[currentResponseId]?.parentInteractionId) {
-      const interaction =
-        interactions[responses[currentResponseId]?.parentInteractionId || '']
-      return interaction?.responsesId.map((id) => responses[id])
+      const interaction = interactions[responses[currentResponseId]?.parentInteractionId || ''];
+      return interaction?.responsesId.map((id) => responses[id]);
     } else {
-      return Object.values(responses).filter(
-        (responses) => responses?.parentInteractionId === null
-      )
+      return Object.values(responses).filter((responses) => responses?.parentInteractionId === null);
     }
-  }
-)
+  },
+);
 
 export const selectAllParentDialogues = createSelector(
   [
@@ -212,179 +160,151 @@ export const selectAllParentDialogues = createSelector(
     (state: RootState) => state.narration.currentResponseId,
   ],
   (interactions, responses, currentResponseId) => {
-    let responseIdPointer = currentResponseId
+    let responseIdPointer = currentResponseId;
     const dialogues: (
       | { type: 'response'; item: NarrationResponse }
       | { type: 'interaction'; item: NarrationInteraction }
-    )[] = []
+    )[] = [];
     while (responseIdPointer) {
-      const response = responses[responseIdPointer]
+      const response = responses[responseIdPointer];
       if (response) {
-        dialogues.push({ type: 'response', item: response })
+        dialogues.push({ type: 'response', item: response });
         if (response?.parentInteractionId) {
-          const interaction = interactions[response?.parentInteractionId]
+          const interaction = interactions[response?.parentInteractionId];
           if (interaction) {
-            dialogues.push({ type: 'interaction', item: interaction })
-            responseIdPointer = interaction?.parentResponseId || ''
+            dialogues.push({ type: 'interaction', item: interaction });
+            responseIdPointer = interaction?.parentResponseId || '';
           } else {
-            break
+            break;
           }
         } else {
-          break
+          break;
         }
       } else {
-        break
+        break;
       }
     }
-    return dialogues
-  }
-)
+    return dialogues;
+  },
+);
 
 export const selectCurrentCharacterOutfits = createSelector(
-  [
-    (state: RootState) => state.novel.characters,
-    selectCurrentScene,
-    selectLastLoadedResponse,
-  ],
+  [(state: RootState) => state.novel.characters, selectCurrentScene, selectLastLoadedResponse],
   (characters, scene) => {
     return (
       scene?.characters
         .map(({ characterId, outfit: outfitId }) => {
-          const character = characters.find(
-            (character) => character.id === characterId
-          )
-          const outfits = selectCharacterOutfits(
-            { novel: { characters } } as RootState,
-            characterId
-          )
-          const outfit = outfits.find((outfit) => outfit.id === outfitId)
+          const character = characters.find((character) => character.id === characterId);
+          const outfits = selectCharacterOutfits({ novel: { characters } } as RootState, characterId);
+          const outfit = outfits.find((outfit) => outfit.id === outfitId);
           return {
             id: characterId,
             name: character?.name,
             outfit,
-          }
+          };
         })
         .filter((char) => char.outfit) || []
-    )
-  }
-)
+    );
+  },
+);
 
 export const selectChatHistory = createSelector(
-  [
-    selectAllParentDialogues,
-    (state: RootState) => state.novel.characters,
-    (state: RootState) => state,
-  ],
+  [selectAllParentDialogues, (state: RootState) => state.novel.characters, (state: RootState) => state],
   (
     dialogues,
     characters,
-    state
+    state,
   ): {
-    name: string
-    text: string
-    type: 'response' | 'interaction'
+    name: string;
+    text: string;
+    type: 'response' | 'interaction';
   }[] => {
     return dialogues
       .map(
         (
-          dialogue
+          dialogue,
         ): {
-          name: string
-          text: string
-          type: 'response' | 'interaction'
+          name: string;
+          text: string;
+          type: 'response' | 'interaction';
         }[] => {
-          const interaction = state.narration.interactions[dialogue.item.id]
+          const interaction = state.narration.interactions[dialogue.item.id];
           if (interaction) {
-            const character = state.settings.user.name
+            const character = state.settings.user.name;
             return [
               {
                 name: character,
                 text: interaction.query,
                 type: 'interaction',
               },
-            ]
+            ];
           }
 
-          const response = state.narration.responses[dialogue.item.id]
+          const response = state.narration.responses[dialogue.item.id];
           if (response) {
             return response.characters.map(
               ({
                 characterId,
                 text,
               }): {
-                name: string
-                text: string
-                type: 'response' | 'interaction'
+                name: string;
+                text: string;
+                type: 'response' | 'interaction';
               } => {
-                const char = characters.find(
-                  (character) => character.id === characterId
-                )
+                const char = characters.find((character) => character.id === characterId);
                 return {
                   name: char?.name || '',
                   text,
                   type: 'response',
-                }
-              }
-            )
+                };
+              },
+            );
           } else {
-            return []
+            return [];
           }
-        }
+        },
       )
-      .flat()
-  }
-)
+      .flat();
+  },
+);
 
 export const selectCharactersInCurrentScene = createSelector(
   [(state: RootState) => state.novel.characters, selectCurrentScene],
   (characters, scene) => {
     return scene?.characters.map(({ characterId, outfit: outfitId }) => {
-      const character = characters.find(
-        (character) => character.id === characterId
-      )
-      const outfits = selectCharacterOutfits(
-        { novel: { characters } } as RootState,
-        characterId
-      )
-      const outfit = outfits.find((outfit) => outfit.id === outfitId)
+      const character = characters.find((character) => character.id === characterId);
+      const outfits = selectCharacterOutfits({ novel: { characters } } as RootState, characterId);
+      const outfit = outfits.find((outfit) => outfit.id === outfitId);
       return {
         ...character,
         outfit,
-      }
-    })
-  }
-)
+      };
+    });
+  },
+);
 
 export const selectCurrentNextScene = createSelector(
   [selectAllParentDialogues, selectCurrentScene],
   (dialogues, scene) => {
     if (scene?.id && dialogues.length) {
       const findFirstCurrentSceneIndex =
-        dialogues.findIndex(
-          (d) => d.type == 'interaction' && d.item.sceneId !== scene.id
-        ) - 1
+        dialogues.findIndex((d) => d.type == 'interaction' && d.item.sceneId !== scene.id) - 1;
 
       const currentDialogues = dialogues.slice(
         0,
-        findFirstCurrentSceneIndex < 0
-          ? dialogues.length
-          : findFirstCurrentSceneIndex
-      )
-      const _responseOfSuggestion = currentDialogues.find(
-        (d) => d.type === 'response' && d.item.nextScene
-      )
-      return _responseOfSuggestion?.type === 'response'
-        ? _responseOfSuggestion.item.nextScene || null
-        : null
+        findFirstCurrentSceneIndex < 0 ? dialogues.length : findFirstCurrentSceneIndex,
+      );
+      const _responseOfSuggestion = currentDialogues.find((d) => d.type === 'response' && d.item.nextScene);
+      return _responseOfSuggestion?.type === 'response' ? _responseOfSuggestion.item.nextScene || null : null;
     }
-    return null
-  }
-)
+    return null;
+  },
+);
 
 export const selectCurrentMaps = createSelector(
   [selectCurrentScene, (state: RootState) => state.novel.maps],
   (scene, maps) => {
-    const mapIds = scene?.parentMapIds
+    const mapIds = scene?.parentMapIds;
     return (
       mapIds
         ?.map((mapId) => maps.find((map) => map.id === mapId) || null)
@@ -397,9 +317,9 @@ export const selectCurrentMaps = createSelector(
               isCurrentPlace: place.sceneId === scene?.id,
             })) || [],
         })) || []
-    )
-  }
-)
+    );
+  },
+);
 
 export const selectAllParentDialoguesWhereCharacterIsPresent = createSelector(
   [
@@ -409,54 +329,44 @@ export const selectAllParentDialoguesWhereCharacterIsPresent = createSelector(
     (state: RootState) => state,
   ],
   (dialogues, scenes, characterId, state) => {
-    const result = []
+    const result = [];
     for (let i = 0; i < dialogues.length; i++) {
-      const dialogue = dialogues[i]
+      const dialogue = dialogues[i];
       const scene =
         dialogue.type === 'interaction'
           ? scenes.find((scene) => scene.id === dialogue.item.sceneId)
-          : selectSceneFromResponse(state, dialogue.item)
-      if (
-        scene &&
-        scene.characters.some((c) => c.characterId === characterId)
-      ) {
-        result.push(dialogue)
+          : selectSceneFromResponse(state, dialogue.item);
+      if (scene && scene.characters.some((c) => c.characterId === characterId)) {
+        result.push(dialogue);
       }
     }
-    return result
-  }
-)
+    return result;
+  },
+);
 
 export const selectCurrentSceneObjectives = createSelector(
   [(state: RootState) => state.objectives, selectCurrentScene],
   (objectives, scene) => {
     return objectives.filter(
       (objective) =>
-        objective.stateCondition.type === 'IN_SCENE' &&
-        (objective.stateCondition.config.sceneIds.includes(scene?.id || '') ||
-          !objective.stateCondition.config.sceneIds.length)
-    )
-  }
-)
+        objective.stateCondition?.type === 'IN_SCENE' &&
+        (objective.stateCondition?.config?.sceneIds?.includes(scene?.id || '') ||
+          !objective.stateCondition?.config?.sceneIds?.length),
+    );
+  },
+);
 
-export const selectConditionStatus = (
-  state: RootState,
-  condition: NovelV3.StateCondition
-) => {
+export const selectConditionStatus = (state: RootState, condition: NovelV3.StateCondition) => {
   switch (condition.type) {
     case 'IN_SCENE':
-      return condition.config.sceneIds.includes(
-        selectCurrentScene(state)?.id || ''
-      )
+      return condition.config.sceneIds.includes(selectCurrentScene(state)?.id || '');
   }
-  return false
-}
+  return false;
+};
 
 export const selectCurrentSceneInteractionCount = createSelector(
   [(state: RootState) => state.narration.interactions, selectCurrentScene],
   (interactions, scene) => {
-    return Object.values(interactions).filter(
-      (interaction) => interaction?.sceneId === scene?.id
-    ).length
-  }
-)
+    return Object.values(interactions).filter((interaction) => interaction?.sceneId === scene?.id).length;
+  },
+);

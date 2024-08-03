@@ -1,36 +1,23 @@
-import {
-  AreYouSure,
-  Button,
-  Carousel,
-  CheckBox,
-  ImageSlider,
-  Input,
-  Modal,
-  Tooltip,
-} from "@mikugg/ui-kit";
-import classNames from "classnames";
-import { useState } from "react";
-import { AiOutlinePicture } from "react-icons/ai";
-import { FaUser } from "react-icons/fa6";
-import { IoInformationCircleOutline } from "react-icons/io5";
-import { TokenDisplayer } from "../../components/TokenDisplayer";
-import config from "../../config";
-import { TOKEN_LIMITS } from "../../data/tokenLimits";
-import Backgrounds from "../../panels/assets/backgrounds/Backgrounds";
-import Characters from "../../panels/assets/characters/Characters";
-import Songs from "../../panels/assets/songs/Songs";
-import { LorebookList } from "../../panels/details/LorebookList";
-import { MapList } from "../../panels/maps/MapList";
-import { selectBackgrounds, selectEditingScene } from "../../state/selectors";
-import { closeModal } from "../../state/slices/inputSlice";
-import {
-  deleteSceneById,
-  updateObjective,
-  updateScene,
-} from "../../state/slices/novelFormSlice";
-import { useAppDispatch, useAppSelector } from "../../state/store";
-import { NovelObjectives } from "./NovelObjectives";
-import "./SceneEditModal.scss";
+import { AreYouSure, Button, Carousel, CheckBox, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import classNames from 'classnames';
+import { useState } from 'react';
+import { AiOutlinePicture } from 'react-icons/ai';
+import { FaUser } from 'react-icons/fa6';
+import { IoInformationCircleOutline } from 'react-icons/io5';
+import { TokenDisplayer } from '../../components/TokenDisplayer';
+import config from '../../config';
+import { TOKEN_LIMITS } from '../../data/tokenLimits';
+import Backgrounds from '../../panels/assets/backgrounds/Backgrounds';
+import Characters from '../../panels/assets/characters/Characters';
+import Songs from '../../panels/assets/songs/Songs';
+import { LorebookList } from '../../panels/details/LorebookList';
+import { MapList } from '../../panels/maps/MapList';
+import { selectBackgrounds, selectEditingScene } from '../../state/selectors';
+import { closeModal } from '../../state/slices/inputSlice';
+import { deleteSceneById, updateObjective, updateScene } from '../../state/slices/novelFormSlice';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import { NovelObjectives } from './NovelObjectives';
+import './SceneEditModal.scss';
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -42,17 +29,16 @@ export default function SceneEditModal() {
 
   const objectives = useAppSelector((state) => state.novel.objectives);
   const objectiveLockedsByScenes = objectives?.filter((obj) => {
-    return obj.stateCondition.config.sceneIds.includes(scene?.id || "");
+    return obj.stateCondition?.config?.sceneIds?.includes(scene?.id || '');
   });
-  const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] =
-    useState(false);
+  const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] = useState(false);
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
   const [selectCharacterModal, setSelectCharacterModal] = useState({
     opened: false,
     characterIndex: 0,
   });
-  const [showingEmotionChar1, setShowingEmotionChar1] = useState("neutral");
-  const [showingEmotionChar2, setShowingEmotionChar2] = useState("neutral");
+  const [showingEmotionChar1, setShowingEmotionChar1] = useState('neutral');
+  const [showingEmotionChar2, setShowingEmotionChar2] = useState('neutral');
 
   const getObjectiveData = (id: string) => {
     return objectives?.find((objective) => objective.id === id);
@@ -61,10 +47,10 @@ export default function SceneEditModal() {
   const handleDeleteScene = () => {
     if (scene) {
       openAreYouSure({
-        description: "Are you sure you what to delete this scene?",
+        description: 'Are you sure you what to delete this scene?',
         onYes: () => {
           dispatch(deleteSceneById(scene.id));
-          dispatch(closeModal({ modalType: "scene" }));
+          dispatch(closeModal({ modalType: 'scene' }));
         },
       });
     }
@@ -80,7 +66,7 @@ export default function SceneEditModal() {
             ? scene.lorebookIds.filter((lid) => lid !== id)
             : [...scene.lorebookIds, id]
           : [id],
-      })
+      }),
     );
   };
 
@@ -94,7 +80,7 @@ export default function SceneEditModal() {
             ? scene.parentMapIds.filter((mid) => mid !== id)
             : [...scene.parentMapIds, id]
           : [id],
-      })
+      }),
     );
   };
 
@@ -106,16 +92,14 @@ export default function SceneEditModal() {
         className="SceneEditModal"
         overlayClassName="scrollbar"
         shouldCloseOnOverlayClick
-        onCloseModal={() => dispatch(closeModal({ modalType: "scene" }))}
+        onCloseModal={() => dispatch(closeModal({ modalType: 'scene' }))}
       >
         {scene ? (
           <div className="SceneEditModal__content">
             <div className="SceneEditModal__background-container">
               <img
                 className="SceneEditModal__background"
-                src={config.genAssetLink(
-                  scene?.background?.source.jpg || backgrounds[0].source.jpg
-                )}
+                src={config.genAssetLink(scene?.background?.source.jpg || backgrounds[0].source.jpg)}
               />
               <div
                 className="SceneEditModal__background-edit-btn"
@@ -140,9 +124,8 @@ export default function SceneEditModal() {
               </div>
               <div
                 className={classNames({
-                  "SceneEditModal__character-select2-btn": true,
-                  "SceneEditModal__character-select2-btn--disabled":
-                    scene.characters.length < 2,
+                  'SceneEditModal__character-select2-btn': true,
+                  'SceneEditModal__character-select2-btn--disabled': scene.characters.length < 2,
                 })}
                 onClick={() =>
                   setSelectCharacterModal({
@@ -157,39 +140,25 @@ export default function SceneEditModal() {
               </div>
               <div className="SceneEditModal__characters">
                 {scene.characters.map((character, characterIndex) => {
-                  const outfits =
-                    character.card?.data.extensions.mikugg_v2.outfits || [];
+                  const outfits = character.card?.data.extensions.mikugg_v2.outfits || [];
                   const selectedOutfitIndex = Math.max(
-                    outfits.findIndex(
-                      (outfit) => outfit.id === character.outfit
-                    ),
-                    0
+                    outfits.findIndex((outfit) => outfit.id === character.outfit),
+                    0,
                   );
-                  const selectedEmotion = outfits[
-                    selectedOutfitIndex
-                  ].emotions.find(
-                    (emotion) =>
-                      emotion.id ===
-                      (characterIndex === 0
-                        ? showingEmotionChar1
-                        : showingEmotionChar2)
+                  const selectedEmotion = outfits[selectedOutfitIndex].emotions.find(
+                    (emotion) => emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
                   ) ||
                     outfits[selectedOutfitIndex].emotions[0] || {
-                      id: "neutral",
+                      id: 'neutral',
                       sources: {
-                        png: "",
+                        png: '',
                       },
                     };
                   return (
-                    <div
-                      key={character.id}
-                      className="SceneEditModal__character"
-                    >
+                    <div key={character.id} className="SceneEditModal__character">
                       <ImageSlider
                         images={outfits.map((outfit) => ({
-                          source: config.genAssetLink(
-                            selectedEmotion.sources.png
-                          ),
+                          source: config.genAssetLink(selectedEmotion.sources.png),
                           label: outfit.name,
                         }))}
                         backgroundImageSource=""
@@ -207,42 +176,34 @@ export default function SceneEditModal() {
                               characters: scene.characters.map((char) => {
                                 if (char.id === character.id) {
                                   return {
-                                    characterId: char.id || "",
+                                    characterId: char.id || '',
                                     objective: char.objective,
                                     outfit: outfits[newOutfitIndex].id,
                                   };
                                 }
                                 return {
-                                  characterId: char.id || "",
+                                  characterId: char.id || '',
                                   objective: char.objective,
                                   outfit: char.outfit,
                                 };
                               }),
-                            })
+                            }),
                           );
                         }}
                       />
                       <Carousel
-                        items={outfits[selectedOutfitIndex].emotions.map(
-                          (emotion) => ({
-                            title: emotion.id,
-                          })
-                        )}
+                        items={outfits[selectedOutfitIndex].emotions.map((emotion) => ({
+                          title: emotion.id,
+                        }))}
                         selectedIndex={
                           outfits[selectedOutfitIndex].emotions.findIndex(
-                            (emotion) => emotion.id === selectedEmotion.id
+                            (emotion) => emotion.id === selectedEmotion.id,
                           ) || 0
                         }
                         onClick={(index) => {
                           characterIndex === 0
-                            ? setShowingEmotionChar1(
-                                outfits[selectedOutfitIndex].emotions[index]
-                                  ?.id || ""
-                              )
-                            : setShowingEmotionChar2(
-                                outfits[selectedOutfitIndex].emotions[index]
-                                  ?.id || ""
-                              );
+                            ? setShowingEmotionChar1(outfits[selectedOutfitIndex].emotions[index]?.id || '')
+                            : setShowingEmotionChar2(outfits[selectedOutfitIndex].emotions[index]?.id || '');
                         }}
                       />
                     </div>
@@ -263,7 +224,7 @@ export default function SceneEditModal() {
                       updateScene({
                         ...scene._source,
                         name: e.target.value,
-                      })
+                      }),
                     )
                   }
                   maxLength={256}
@@ -280,7 +241,7 @@ export default function SceneEditModal() {
                       updateScene({
                         ...scene._source,
                         description: e.target.value,
-                      })
+                      }),
                     )
                   }
                   maxLength={256}
@@ -297,7 +258,7 @@ export default function SceneEditModal() {
                       updateScene({
                         ...scene._source,
                         actionText: e.target.value,
-                      })
+                      }),
                     )
                   }
                   maxLength={256}
@@ -313,7 +274,7 @@ export default function SceneEditModal() {
                         updateScene({
                           ...scene._source,
                           nsfw: e.target.checked ? 1 : 0,
-                        })
+                        }),
                       )
                     }
                   />
@@ -327,7 +288,7 @@ export default function SceneEditModal() {
                         updateScene({
                           ...scene._source,
                           nsfw: e.target.checked ? 2 : 1,
-                        })
+                        }),
                       );
                     }}
                   />
@@ -337,18 +298,14 @@ export default function SceneEditModal() {
                 <div>
                   <div className="SceneEditModal__scene-details-row__label">
                     <label className="Input__label">
-                      Prompt{" "}
-                      <IoInformationCircleOutline data-tooltip-id="scene-prompt-tooltip" />
+                      Prompt <IoInformationCircleOutline data-tooltip-id="scene-prompt-tooltip" />
                     </label>
                     <Tooltip
                       id="scene-prompt-tooltip"
                       content="Instruction for the AI when this scene is triggered."
                       place="right"
                     />
-                    <TokenDisplayer
-                      text={scene.prompt}
-                      limits={TOKEN_LIMITS.SCENE_PROMPT}
-                    />
+                    <TokenDisplayer text={scene.prompt} limits={TOKEN_LIMITS.SCENE_PROMPT} />
                   </div>
                   <Input
                     id="context"
@@ -360,7 +317,7 @@ export default function SceneEditModal() {
                         updateScene({
                           ...scene._source,
                           prompt: e.target.value,
-                        })
+                        }),
                       );
                     }}
                     isTextArea
@@ -374,13 +331,13 @@ export default function SceneEditModal() {
                   placeHolder="Give nino a hug."
                   label="Hint"
                   description="OPTIONAL. A small hint to advance in the story."
-                  value={scene.hint || ""}
+                  value={scene.hint || ''}
                   onChange={(e) => {
                     dispatch(
                       updateScene({
                         ...scene._source,
                         hint: e.target.value || undefined,
-                      })
+                      }),
                     );
                   }}
                   maxLength={34}
@@ -393,13 +350,13 @@ export default function SceneEditModal() {
                   placeHolder="{{user}} should have invited Nino to the classroom."
                   label="Condition"
                   description="OPTIONAL. This condition must be met for the scene to be suggested."
-                  value={scene.condition || ""}
+                  value={scene.condition || ''}
                   onChange={(e) => {
                     dispatch(
                       updateScene({
                         ...scene._source,
                         condition: e.target.value || null,
-                      })
+                      }),
                     );
                   }}
                   isTextArea
@@ -415,10 +372,8 @@ export default function SceneEditModal() {
                     dispatch(
                       updateScene({
                         ...scene._source,
-                        preventSceneGenerationSuggestion: e.target.checked
-                          ? true
-                          : false,
-                      })
+                        preventSceneGenerationSuggestion: e.target.checked ? true : false,
+                      }),
                     );
                   }}
                 />
@@ -427,9 +382,7 @@ export default function SceneEditModal() {
             <div className="SceneEditModal__scene-objectives">
               <NovelObjectives
                 tooltipText="Select objectives that are relevant to this scene."
-                selectedObjectiveIds={
-                  objectiveLockedsByScenes?.map((obj) => obj.id) || []
-                }
+                selectedObjectiveIds={objectiveLockedsByScenes?.map((obj) => obj.id) || []}
                 onSelectObjective={(id) => {
                   const objective = getObjectiveData(id);
                   if (!objective) return;
@@ -439,69 +392,46 @@ export default function SceneEditModal() {
                       objective: {
                         ...objective,
                         stateCondition: {
-                          type: "IN_SCENE",
+                          type: 'IN_SCENE',
                           config: {
-                            sceneIds:
-                              objective.stateCondition.config.sceneIds.includes(
-                                scene.id
-                              )
-                                ? objective.stateCondition.config.sceneIds.filter(
-                                    (id) => id !== scene.id
-                                  )
-                                : [
-                                    ...objective.stateCondition.config.sceneIds,
-                                    scene.id,
-                                  ],
+                            sceneIds: objective.stateCondition?.config?.sceneIds?.includes(scene?.id)
+                              ? objective.stateCondition?.config?.sceneIds?.filter((id) => id !== scene?.id)
+                              : [...(objective.stateCondition?.config?.sceneIds || []), scene?.id],
                           },
                         },
                       },
-                    })
+                    }),
                   );
                 }}
               />
             </div>
             <div className="SceneEditModal__scene-music">
               <div className="SceneEditModal__scene-music-label">
-                {scene.music?.name || "No music"}
-                <Button
-                  theme="secondary"
-                  onClick={() => setSelectSongModalOpened(true)}
-                >
+                {scene.music?.name || 'No music'}
+                <Button theme="secondary" onClick={() => setSelectSongModalOpened(true)}>
                   Change
                 </Button>
               </div>
               <div className="SceneEditModal__scene-music-audio">
                 <audio
                   controls
-                  src={
-                    scene.music?.source
-                      ? config.genAssetLink(scene.music?.source)
-                      : undefined
-                  }
+                  src={scene.music?.source ? config.genAssetLink(scene.music?.source) : undefined}
                 ></audio>
               </div>
             </div>
             <div className="SceneEditModal__scene-objectives">
               <div className="SceneEditModal__scene-objectives-header">
-                <div className="SceneEditModal__scene-objectives-title">
-                  Character Objectives
-                </div>
+                <div className="SceneEditModal__scene-objectives-title">Character Objectives</div>
                 <div className="SceneEditModal__scene-objectives-description">
-                  [Optional] Indicate what each character is trying to achieve
-                  in this scene.
+                  [Optional] Indicate what each character is trying to achieve in this scene.
                 </div>
               </div>
               <div className="SceneEditModal__scene-objectives-list">
                 {scene.characters.map((character) => {
                   return (
-                    <div
-                      className="SceneEditModal__scene-objective"
-                      key={`objective-${scene.id}-${character.id}`}
-                    >
+                    <div className="SceneEditModal__scene-objective" key={`objective-${scene.id}-${character.id}`}>
                       <div className="SceneEditModal__scene-objective__character">
-                        <img
-                          src={config.genAssetLink(character.profile_pic || "")}
-                        />
+                        <img src={config.genAssetLink(character.profile_pic || '')} />
                         <span>{character.name}</span>
                       </div>
                       <div className="SceneEditModal__scene-objective__input">
@@ -509,7 +439,7 @@ export default function SceneEditModal() {
                           id={`objective-${character.id}`}
                           name={`objective-${character.id}`}
                           placeHolder={`What is ${character.name} trying to achieve?`}
-                          value={character.objective || ""}
+                          value={character.objective || ''}
                           onChange={(e) => {
                             dispatch(
                               updateScene({
@@ -517,18 +447,18 @@ export default function SceneEditModal() {
                                 characters: scene.characters.map((char) => {
                                   if (char.id === character.id) {
                                     return {
-                                      characterId: char.id || "",
+                                      characterId: char.id || '',
                                       objective: e.target.value,
                                       outfit: char.outfit,
                                     };
                                   }
                                   return {
-                                    characterId: char.id || "",
+                                    characterId: char.id || '',
                                     objective: char.objective,
                                     outfit: char.outfit,
                                   };
                                 }),
-                              })
+                              }),
                             );
                           }}
                           isTextArea
@@ -579,7 +509,7 @@ export default function SceneEditModal() {
                 updateScene({
                   ...scene._source,
                   backgroundId,
-                })
+                }),
               );
               setSelectBackgroundModalOpened(false);
             }
@@ -588,9 +518,7 @@ export default function SceneEditModal() {
       </Modal>
       <Modal
         opened={selectCharacterModal.opened}
-        onCloseModal={() =>
-          setSelectCharacterModal((_state) => ({ ..._state, opened: false }))
-        }
+        onCloseModal={() => setSelectCharacterModal((_state) => ({ ..._state, opened: false }))}
         className="SceneEditModal__select-character-modal"
       >
         <Characters
@@ -608,30 +536,23 @@ export default function SceneEditModal() {
           onSelect={(characterId) => {
             if (scene?._source) {
               const newSceneCharacters = scene.characters.map((character) => ({
-                characterId: character.id || "",
-                outfit: character.outfit || "",
+                characterId: character.id || '',
+                outfit: character.outfit || '',
               }));
-              const newCharacter = characters.find(
-                (character) => character.id === characterId
-              );
+              const newCharacter = characters.find((character) => character.id === characterId);
               if (newCharacter) {
                 newSceneCharacters[selectCharacterModal.characterIndex || 0] = {
                   characterId,
-                  outfit:
-                    newCharacter?.card.data.extensions.mikugg_v2.outfits[0]
-                      .id || "",
+                  outfit: newCharacter?.card.data.extensions.mikugg_v2.outfits[0].id || '',
                 };
               } else {
-                newSceneCharacters.splice(
-                  selectCharacterModal.characterIndex,
-                  1
-                );
+                newSceneCharacters.splice(selectCharacterModal.characterIndex, 1);
               }
               dispatch(
                 updateScene({
                   ...scene._source,
                   characters: newSceneCharacters,
-                })
+                }),
               );
               setSelectCharacterModal({
                 opened: false,
@@ -654,7 +575,7 @@ export default function SceneEditModal() {
                 updateScene({
                   ...scene._source,
                   musicId,
-                })
+                }),
               );
               setSelectSongModalOpened(false);
             }
