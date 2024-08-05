@@ -36,6 +36,7 @@ export default function BackgroundEditModal() {
       description: "This action cannot be undone",
       onYes: () => {
         dispatch(closeModal({ modalType: "background" }));
+        setSelectedTab("image");
         if (background) {
           dispatch(deleteBackground(background.id));
         }
@@ -132,7 +133,10 @@ export default function BackgroundEditModal() {
       opened={!!background}
       className="BackgroundEditModal"
       shouldCloseOnOverlayClick
-      onCloseModal={() => dispatch(closeModal({ modalType: "background" }))}
+      onCloseModal={() => {
+        dispatch(closeModal({ modalType: "background" }));
+        setSelectedTab("image");
+      }}
     >
       {background ? (
         <div className="BackgroundEditModal_content">
