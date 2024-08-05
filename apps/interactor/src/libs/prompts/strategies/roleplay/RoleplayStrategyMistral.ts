@@ -68,7 +68,7 @@ export class RoleplayStrategyMistral extends AbstractRoleplayStrategy {
       askLine: '[/INST]# Reaction + 2 paragraphs (engaging, natural, authentic, descriptive, creative)\n',
       instruction: '[INST]',
       response: '[/INST]',
-      stops: ['[/INST]', '[INST]'],
+      stops: ['INST', '/INST'],
     };
   }
 }

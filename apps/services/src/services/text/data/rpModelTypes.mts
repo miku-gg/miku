@@ -5,6 +5,7 @@ export enum RPModelTokenizers {
   LLAMA3 = 'llama3',
   COHERE = 'cohere',
   WIZARDLM2 = 'wizardlm2',
+  NEMO = 'nemo',
 }
 
 export enum RPModelStrategy {
@@ -20,6 +21,7 @@ export enum PresetType {
   LLAMA_PRECISE = 'LLAMA_PRECISE',
   MINIMAL_WORK = 'MINIMAL_WORK',
   STHENO_V3 = 'STHENO_V3',
+  NEMO = 'NEMO',
 }
 
 export enum RPModelPermission {

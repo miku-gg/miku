@@ -76,12 +76,12 @@ const interactionEffect = async (
       new PromptBuilder<AbstractRoleplayStrategy>({
         maxNewTokens: 200,
         strategy: primaryStrategy,
-        truncationLength: truncation_length,
+        truncationLength: truncation_length - 150,
       }),
       new PromptBuilder<AbstractRoleplayStrategy>({
         maxNewTokens: 200,
         strategy: secondaryStrategy,
-        truncationLength: secondary.truncation_length,
+        truncationLength: secondary.truncation_length - 150,
       }),
     ];
 

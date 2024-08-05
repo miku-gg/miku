@@ -37,7 +37,8 @@ class PromptBuilder<StrategyClass extends AbstractPromptStrategy<unknown, unknow
         return recursiveBinarySearch(midIndex + 1, maxIndex, maxTokens);
       }
     };
-    const memorySize = recursiveBinarySearch(0, maxMemorySize, this.options.truncationLength - 200) - 1;
+    const memorySize =
+      recursiveBinarySearch(0, maxMemorySize, this.options.truncationLength - this.options.maxNewTokens) - 1;
 
     return this.strategy.buildGuidancePrompt(this.options.maxNewTokens, memorySize, input);
   }

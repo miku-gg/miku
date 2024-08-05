@@ -137,6 +137,7 @@ Promise.all([
   loadTokenizer(TokenizerType.LLAMA_3),
   loadTokenizer(TokenizerType.MISTRAL),
   loadTokenizer(TokenizerType.SOLAR),
+  loadTokenizer(TokenizerType.NEMO),
   loadTokenizer(TokenizerType.COHERE),
   loadTokenizer(TokenizerType.WIZARDLM2),
 ]).then(() => {
