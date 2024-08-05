@@ -111,7 +111,7 @@ export class TemplateProcessor<TRequestOptions = undefined> {
             const nextChildren = trie.getNextChildren(currentPrefix);
             if (nextChildren.length < 2) {
               // If there is only one child, we complete
-              completion = this.tokenizer.decodeString(trie.getWord(currentPrefix)).substring(prompt.length);
+              completion = this.tokenizer.decodeString(trie.getWord(currentPrefix));
               if (!this.isnemo) {
                 completion = completion.substring(prompt.length);
               }
