@@ -18,10 +18,11 @@ import { selectAllParentDialogues, selectCurrentScene, selectCurrentSceneObjecti
 import { NovelV3 } from '@mikugg/bot-utils';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { unlockAchievement } from '../../libs/platformAPI';
-import { addItem, toggleItemVisibility } from '../slices/inventorySlice';
+import { addItem } from '../slices/inventorySlice';
 import { removeObjective } from '../slices/objectivesSlice';
 import { toast } from 'react-toastify';
 import { GiOpenChest } from 'react-icons/gi';
+import { novelActionToStateAction } from '../mutations';
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -252,25 +253,11 @@ const interactionEffect = async (
           }
           if (response === ' Yes') {
             objective.actions.forEach((action) => {
+              const stateAction = novelActionToStateAction(action);
+              if (stateAction) {
+                dispatch(stateAction);
+              }
               switch (action.type) {
-                case NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE:
-                  dispatch(
-                    interactionSuccess({
-                      ...currentResponseState,
-                      nextScene: action.params.sceneId,
-                      completed: true,
-                    }),
-                  );
-                  break;
-                case NovelV3.NovelActionType.SUGGEST_CREATE_SCENE:
-                  dispatch(
-                    interactionSuccess({
-                      ...currentResponseState,
-                      shouldSuggestScenes: true,
-                      completed: true,
-                    }),
-                  );
-                  break;
                 case NovelV3.NovelActionType.ACHIEVEMENT_UNLOCK:
                   postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
                     achievement: {
@@ -291,12 +278,6 @@ const interactionEffect = async (
                   if (!item) {
                     break;
                   }
-                  dispatch(
-                    toggleItemVisibility({
-                      itemId: item.id,
-                      hidden: false,
-                    }),
-                  );
                   toast(
                     <div
                       style={{
