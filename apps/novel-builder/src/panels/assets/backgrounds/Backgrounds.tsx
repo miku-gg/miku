@@ -1,42 +1,36 @@
-import { FaUpload } from "react-icons/fa6";
-import { MdSearch } from "react-icons/md";
-import { v4 as randomUUID } from "uuid";
-import config from "../../../config";
-import "./Backgrounds.scss";
+import { FaUpload } from 'react-icons/fa6';
+import { MdSearch } from 'react-icons/md';
+import { v4 as randomUUID } from 'uuid';
+import config from '../../../config';
+import './Backgrounds.scss';
 
-import { Blocks } from "@mikugg/ui-kit";
-import { useRef, useState } from "react";
-import { BsStars } from "react-icons/bs";
-import { FaPencil } from "react-icons/fa6";
-import { toast } from "react-toastify";
-import { selectBackgrounds } from "../../../state/selectors";
-import { openModal } from "../../../state/slices/inputSlice";
-import { addBackground } from "../../../state/slices/novelFormSlice";
-import { useAppDispatch, useAppSelector } from "../../../state/store";
+import { Blocks } from '@mikugg/ui-kit';
+import { useRef, useState } from 'react';
+import { BsStars } from 'react-icons/bs';
+import { FaPencil } from 'react-icons/fa6';
+import { toast } from 'react-toastify';
+import { selectBackgrounds } from '../../../state/selectors';
+import { openModal } from '../../../state/slices/inputSlice';
+import { addBackground } from '../../../state/slices/novelFormSlice';
+import { useAppDispatch, useAppSelector } from '../../../state/store';
 
-export default function Backgrounds({
-  selected,
-  onSelect,
-}: {
-  selected?: string;
-  onSelect?: (id: string) => void;
-}) {
+export default function Backgrounds({ selected, onSelect }: { selected?: string; onSelect?: (id: string) => void }) {
   const backgrounds = useAppSelector(selectBackgrounds);
   const dispatch = useAppDispatch();
-  const [backgroundUploading, setBackgroundUploading] =
-    useState<boolean>(false);
+  const [backgroundUploading, setBackgroundUploading] = useState<boolean>(false);
   const uploadBackground = useRef<HTMLInputElement>(null);
 
-  const handleUploadBackground = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleUploadBackground = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !['image/jpeg', 'image/webp'].includes(file.type)) {
+      toast.error('Please upload a jpg or webp file');
+      return;
+    }
     setBackgroundUploading(true);
     const { success, assetId } = await config.uploadAsset(file);
     if (!success || !assetId) {
       setBackgroundUploading(false);
-      toast.error("Failed to upload background");
+      toast.error('Failed to upload background');
       return;
     }
     setBackgroundUploading(false);
@@ -46,12 +40,12 @@ export default function Backgrounds({
       addBackground({
         id,
         attributes: [],
-        description: "",
+        description: '',
         name: `background-${backgrounds.length + 1}`,
-        source: { jpg: assetId, mp4: "" },
-      })
+        source: { jpg: assetId, mp4: '' },
+      }),
     );
-    dispatch(openModal({ modalType: "background", editId: id }));
+    dispatch(openModal({ modalType: 'background', editId: id }));
     onSelect?.(id);
   };
 
@@ -69,9 +63,9 @@ export default function Backgrounds({
             onEditClick: () => {
               dispatch(
                 openModal({
-                  modalType: "background",
+                  modalType: 'background',
                   editId: background.id,
-                })
+                }),
               );
             },
             content: {
@@ -82,49 +76,39 @@ export default function Backgrounds({
             },
           })),
           {
-            id: "upload",
+            id: 'upload',
             highlighted: false,
             content: {
               icon: <FaUpload />,
-              text: "Upload",
+              text: 'Upload',
             },
             onClick: () => uploadBackground?.current?.click(),
             loading: backgroundUploading,
             disabled: backgroundUploading,
           },
           {
-            id: "generate",
+            id: 'generate',
             highlighted: false,
             content: {
               icon: <BsStars />,
-              text: "Gen",
+              text: 'Gen',
             },
-            onClick: () =>
-              window.open(
-                "https://emotions.miku.gg/background-generation",
-                "_blank"
-              ),
+            onClick: () => window.open('https://emotions.miku.gg/background-generation', '_blank'),
             loading: backgroundUploading,
             disabled: backgroundUploading,
           },
           {
-            id: "search",
+            id: 'search',
             highlighted: false,
             content: {
               icon: <MdSearch />,
-              text: "Search",
+              text: 'Search',
             },
-            onClick: () =>
-              dispatch(openModal({ modalType: "backgroundSearch" })),
+            onClick: () => dispatch(openModal({ modalType: 'backgroundSearch' })),
           },
         ]}
       />
-      <input
-        type="file"
-        onChange={handleUploadBackground}
-        ref={uploadBackground}
-        hidden
-      />
+      <input type="file" onChange={handleUploadBackground} ref={uploadBackground} hidden />
     </div>
   );
 }
