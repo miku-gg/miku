@@ -1,7 +1,7 @@
-@import "../styles/variables.scss";
+@import '../styles/variables.scss';
 .BackgroundEditModal {
   box-shadow: 0px 0px 20px 0px rgb(205 95 234) !important;
-
+  min-width: 750px !important;
   &__input {
     margin-bottom: 10px;
   }
@@ -13,6 +13,11 @@
 
     & h2 {
       margin: 0;
+    }
+
+    .empty {
+      background-color: $node-conector-color;
+      opacity: 0.8;
     }
   }
   &__background {
@@ -63,6 +68,30 @@
     margin-bottom: 10px;
     position: relative;
     margin: 1em 0;
+
+    &-subTabs {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+
+      & p {
+        margin: 0;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+          text-decoration-color: $primary-color;
+          text-decoration-thickness: 2px;
+        }
+      }
+
+      .selected {
+        text-decoration: underline;
+        text-decoration-color: $secondary-color;
+        text-decoration-thickness: 2px;
+      }
+    }
 
     &-remove {
       position: absolute;
