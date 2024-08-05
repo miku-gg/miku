@@ -65,7 +65,8 @@ export class RoleplayStrategyMistral extends AbstractRoleplayStrategy {
 
   public override template() {
     return {
-      askLine: '[/INST]# Reaction + 2 paragraphs (engaging, natural, authentic, descriptive, creative)\n',
+      askLine:
+        '[/INST]OOC: I WILL roleplay as {{char}} with two paragraphs, actions and descriptions between asterisks, and dialogue between quotes.\n',
       instruction: '[INST]',
       response: '[/INST]',
       stops: ['INST', '/INST'],
