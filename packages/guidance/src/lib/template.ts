@@ -86,8 +86,6 @@ export class TemplateProcessor<TRequestOptions = undefined> {
             throw new Error(`${methodArgs['options']} variable not found`);
           }
 
-          prompt = this.tokenizer.decodeString(this.tokenizer.encodeString(prompt));
-
           if (this.isnemo) {
             options.forEach((option) => {
               const prefix = this.tokenizer.encodeString(option);
