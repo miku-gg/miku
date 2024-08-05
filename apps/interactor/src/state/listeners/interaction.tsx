@@ -18,7 +18,7 @@ import { selectAllParentDialogues, selectCurrentScene, selectCurrentSceneObjecti
 import { NovelV3 } from '@mikugg/bot-utils';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { unlockAchievement } from '../../libs/platformAPI';
-import { addItem, toggleItemVisibility } from '../slices/inventorySlice';
+import { addItem } from '../slices/inventorySlice';
 import { removeObjective } from '../slices/objectivesSlice';
 import { toast } from 'react-toastify';
 import { GiOpenChest } from 'react-icons/gi';
