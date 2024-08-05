@@ -10,6 +10,7 @@ const getTokenizer = (_tokenizer: string): Guidance.Tokenizer.AbstractTokenizer 
   if (_tokenizer === 'mistral') return tokenizers.get(TokenizerType.MISTRAL)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (_tokenizer === 'solar') return tokenizers.get(TokenizerType.SOLAR)!;
+  if (_tokenizer === 'nemo') return tokenizers.get(TokenizerType.NEMO)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (_tokenizer === 'llama3') return tokenizers.get(TokenizerType.LLAMA_3)!;
   if (_tokenizer === 'wizardlm2')

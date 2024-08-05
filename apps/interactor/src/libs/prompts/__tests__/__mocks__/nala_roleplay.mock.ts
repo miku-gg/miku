@@ -1,4 +1,4 @@
-import { RootState } from '../../../../state/store'
+import { RootState } from '../../../../state/store';
 
 export default {
   objectives: [],
@@ -493,7 +493,7 @@ export default {
     ],
   },
   version: 'v3',
-} as RootState
+} as RootState;
 
 export const expectedResult = {
   template:
@@ -532,5 +532,5 @@ export const expectedResult = {
       ' amused',
     ],
   },
-  totalTokens: 1413,
-}
+  totalTokens: 1360,
+};
