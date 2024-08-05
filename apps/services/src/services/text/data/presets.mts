@@ -141,7 +141,7 @@ export const presets = new Map<PresetType, OpenAIAphroditeConfig>([
       use_beam_search: false,
       length_penalty: 1.0,
       early_stopping: false,
-      stop: ['\n###', '</s>', '<|eot_id|>', '<|end_of_text|>', '<|', '\n#', '\n\n\n'],
+      stop: ['\n###', '</s>', '[INST]', '[/INST]', '\n#', '\n\n\n'],
       ignore_eos: false,
       skip_special_tokens: true,
       spaces_between_special_tokens: true,
