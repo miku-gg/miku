@@ -12,7 +12,7 @@ import { toast } from 'react-toastify';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSuggestionStrategy';
 import textCompletion from '../../libs/textCompletion';
-import { setDebugModal, setModelSelectorModal, userDataFetchStart } from '../../state/slices/settingsSlice';
+import { setDebugModal, setModel, setModelSelectorModal, userDataFetchStart } from '../../state/slices/settingsSlice';
 import { Loader } from '../common/Loader';
 import './InputBox.scss';
 
@@ -27,6 +27,7 @@ const InputBox = (): JSX.Element | null => {
   const { isMobileApp } = useAppContext();
   const isTesterUser = useAppSelector((state) => state.settings.user.isTester);
 
+  const isPremium = useAppSelector((state) => state.settings.user.isPremium);
   const state = useAppSelector((state) => state);
   const scene = useAppSelector(selectCurrentScene);
   const lastResponse = useAppSelector(selectLastLoadedResponse);
@@ -75,6 +76,14 @@ const InputBox = (): JSX.Element | null => {
       if (isTesterUser) {
         dispatch(setModelSelectorModal(true));
       }
+      return;
+    }
+
+    if (text === '/nemo') {
+      // @ts-ignore
+      dispatch(setModel(isPremium ? 'RP_NEMO' : 'RP_NEMO_4K'));
+      dispatch(setInputText(''));
+      toast.success(`${isPremium ? 'Nemo 32K' : 'Nemo 4K'} model selected`);
       return;
     }
 
