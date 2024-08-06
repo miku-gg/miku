@@ -39,6 +39,14 @@
     &--disabled:hover {
       box-shadow: none;
     }
+
+    &--disabled {
+      .InputBox__input {
+        font-style: italic;
+        color: gray;
+        caret-color: transparent;
+      }
+    }
   }
 
   &__input {
