@@ -47,7 +47,6 @@ const narrationSlice = createSlice({
       }>,
     ) {
       const { text, sceneId } = action.payload;
-      state.input.text = '';
       const newInteractionId = randomUUID();
       const response: NarrationResponse = {
         id: randomUUID(),
@@ -152,9 +151,13 @@ const narrationSlice = createSlice({
         if (action.payload.nextScene) {
           response.nextScene = action.payload.nextScene;
         }
+        if (!response.fetching) {
+          state.input.text = '';
+        }
       }
       if (action.payload.completed) {
         state.input.disabled = false;
+        state.input.text = '';
       }
     },
     regenerationStart(
