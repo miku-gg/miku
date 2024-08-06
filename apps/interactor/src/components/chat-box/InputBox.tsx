@@ -12,7 +12,13 @@ import { toast } from 'react-toastify';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSuggestionStrategy';
 import textCompletion from '../../libs/textCompletion';
-import { setDebugModal, setModel, setModelSelectorModal, userDataFetchStart } from '../../state/slices/settingsSlice';
+import {
+  ModelType,
+  setDebugModal,
+  setModel,
+  setModelSelectorModal,
+  userDataFetchStart,
+} from '../../state/slices/settingsSlice';
 import { Loader } from '../common/Loader';
 import './InputBox.scss';
 
@@ -28,6 +34,7 @@ const InputBox = (): JSX.Element | null => {
   const isTesterUser = useAppSelector((state) => state.settings.user.isTester);
 
   const isPremium = useAppSelector((state) => state.settings.user.isPremium);
+  const model = useAppSelector((state) => state.settings.model);
   const state = useAppSelector((state) => state);
   const scene = useAppSelector(selectCurrentScene);
   const lastResponse = useAppSelector(selectLastLoadedResponse);
@@ -80,10 +87,18 @@ const InputBox = (): JSX.Element | null => {
     }
 
     if (text === '/nemo') {
-      // @ts-ignore
-      dispatch(setModel(isPremium ? 'RP_NEMO' : 'RP_NEMO_4K'));
       dispatch(setInputText(''));
-      toast.success(`${isPremium ? 'Nemo 32K' : 'Nemo 4K'} model selected`);
+
+      // @ts-ignore
+      if (model !== 'RP_NEMO' && model !== 'RP_NEMO_4K') {
+        // @ts-ignore
+        dispatch(setModel(isPremium ? 'RP_NEMO' : 'RP_NEMO_4K'));
+        toast.success(`${isPremium ? 'Nemo 32K' : 'Nemo 4K'} model selected`);
+      } else {
+        dispatch(setModel(isPremium ? ModelType.RP_SMART : ModelType.RP));
+        toast.info('Nemo unselected');
+      }
+
       return;
     }
 
