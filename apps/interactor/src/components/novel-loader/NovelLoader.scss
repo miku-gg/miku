@@ -6,3 +6,26 @@
   gap: 3rem;
   padding: 2rem;
 }
+
+.NovelLoaderModal {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+  top: 0 !important;
+  border-radius: 0 !important;
+
+  .Loader__spin {
+    width: 24px;
+    height: 24px;
+  }
+
+  .NovelLoader {
+    gap: 1rem;
+
+    &__text {
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+  }
+}

@@ -140,6 +140,10 @@
     height: 80vh;
     background: transparent;
     margin-top: 15px;
+
+    &--mobile {
+      height: 70vh;
+    }
   }
 
   &__actions {
@@ -183,6 +187,10 @@
     @media screen and (max-height: 800px) {
       top: 2vh;
     }
+  }
+
+  &__modal-container--mobile.Modal {
+    margin-top: 8vh;
   }
 
   &__trigger {
