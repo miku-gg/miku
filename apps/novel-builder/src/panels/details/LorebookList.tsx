@@ -1,16 +1,13 @@
-import { Button, Tooltip } from "@mikugg/ui-kit";
-import { FaPencil } from "react-icons/fa6";
-import { IoInformationCircleOutline } from "react-icons/io5";
-import { v4 as randomUUID } from "uuid";
-import { openModal } from "../../state/slices/inputSlice";
-import {
-  createLorebook,
-  updateLorebook,
-} from "../../state/slices/novelFormSlice";
-import { useAppDispatch, useAppSelector } from "../../state/store";
-import "./LorebookList.scss";
-import { FaCheckCircle } from "react-icons/fa";
-import classNames from "classnames";
+import { Button, Tooltip } from '@mikugg/ui-kit';
+import { FaPencil } from 'react-icons/fa6';
+import { IoInformationCircleOutline } from 'react-icons/io5';
+import { v4 as randomUUID } from 'uuid';
+import { openModal } from '../../state/slices/inputSlice';
+import { createLorebook, updateLorebook } from '../../state/slices/novelFormSlice';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import './LorebookList.scss';
+import { FaCheckCircle } from 'react-icons/fa';
+import classNames from 'classnames';
 
 interface LorebookListProps {
   onSelectLorebook?: (id: string) => void;
@@ -18,18 +15,14 @@ interface LorebookListProps {
   tooltipText?: string;
 }
 
-export const LorebookList = ({
-  onSelectLorebook,
-  selectedLorebookId,
-  tooltipText,
-}: LorebookListProps) => {
+export const LorebookList = ({ onSelectLorebook, selectedLorebookId, tooltipText }: LorebookListProps) => {
   const dispatch = useAppDispatch();
   const lorebooks = useAppSelector((state) => state.novel.lorebooks);
 
   const createNewLorebook = () => {
     const id = randomUUID();
     dispatch(createLorebook(id));
-    dispatch(openModal({ modalType: "lorebookEdit", editId: id }));
+    dispatch(openModal({ modalType: 'lorebookEdit', editId: id }));
   };
 
   const isSelected = (id: string) => {
@@ -64,9 +57,9 @@ export const LorebookList = ({
             return (
               <div key={id} className="lorebookList__box">
                 <div
-                  className={`lorebookList__lorebook ${
-                    selectedLorebookId?.length ? "selector" : ""
-                  }${isSelected(id) ? "__selected" : ""}`}
+                  className={`lorebookList__lorebook ${selectedLorebookId?.length ? 'selector' : ''}${
+                    isSelected(id) ? '__selected' : ''
+                  }`}
                   onClick={() => {
                     if (!lorebook.isGlobal) {
                       onSelectLorebook?.(id);
@@ -78,25 +71,21 @@ export const LorebookList = ({
                     onClick={(e: React.MouseEvent) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      dispatch(
-                        openModal({ modalType: "lorebookEdit", editId: id })
-                      );
+                      dispatch(openModal({ modalType: 'lorebookEdit', editId: id }));
                     }}
                   />
 
                   <h3 className="lorebookList__lorebook__name">{name}</h3>
-                  <p className="lorebookList__lorebook__description">
-                    {description}
-                  </p>
+                  <p className="lorebookList__lorebook__description">{description}</p>
                   {isSelected(id) || lorebook.isGlobal ? (
                     <div
                       className={classNames(
-                        "lorebookList__lorebook__selected-badge",
-                        lorebook.isGlobal ? "global-lorebook" : ""
+                        'lorebookList__lorebook__selected-badge',
+                        lorebook.isGlobal ? 'global-lorebook' : '',
                       )}
                     >
                       <FaCheckCircle />
-                      {lorebook.isGlobal ? "Global" : "Selected"}
+                      {lorebook.isGlobal ? 'Global' : 'Selected'}
                     </div>
                   ) : null}
                 </div>

@@ -1,22 +1,21 @@
-import { Button, Modal } from '@mikugg/ui-kit'
-import { useAppDispatch, useAppSelector } from '../../state/store'
-import { useEffect, useState } from 'react'
-import { completionHistory } from '../../libs/textCompletion'
-import classNames from 'classnames'
-import { setDebugModal } from '../../state/slices/settingsSlice'
-import './DebugModal.scss'
+import { Button, Modal } from '@mikugg/ui-kit';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import { useEffect, useState } from 'react';
+import { completionHistory } from '../../libs/textCompletion';
+import classNames from 'classnames';
+import { setDebugModal } from '../../state/slices/settingsSlice';
+import './DebugModal.scss';
 
 export default function DebugModal() {
-  const dispatch = useAppDispatch()
-  const { debug: opened } = useAppSelector((state) => state.settings.modals)
-  const [completionHistoryIndex, setCompletionHistoryIndex] =
-    useState<number>(0)
+  const dispatch = useAppDispatch();
+  const { debug: opened } = useAppSelector((state) => state.settings.modals);
+  const [completionHistoryIndex, setCompletionHistoryIndex] = useState<number>(0);
 
   useEffect(() => {
     if (opened) {
-      setCompletionHistoryIndex(completionHistory.length - 1)
+      setCompletionHistoryIndex(completionHistory.length - 1);
     }
-  }, [opened])
+  }, [opened]);
 
   return (
     <Modal
@@ -35,11 +34,7 @@ export default function DebugModal() {
             <div className="DebugModal__items scrollbar">
               {completionHistory.map((item, index) => (
                 <Button
-                  theme={
-                    index === completionHistoryIndex
-                      ? 'secondary'
-                      : 'transparent'
-                  }
+                  theme={index === completionHistoryIndex ? 'secondary' : 'transparent'}
                   key={index}
                   className="DebugModal__item"
                   onClick={() => setCompletionHistoryIndex(index)}
@@ -54,39 +49,30 @@ export default function DebugModal() {
                   {JSON.stringify(
                     {
                       model: completionHistory[completionHistoryIndex].model,
-                      variables:
-                        completionHistory[completionHistoryIndex].variables,
+                      variables: completionHistory[completionHistoryIndex].variables,
                     },
                     null,
-                    2
+                    2,
                   )}
                 </div>
                 <div className="DebugModal__template scrollbar">
-                  {completionHistory[completionHistoryIndex].template
-                    .split('\n')
-                    .map((value, index) => {
-                      const systemLine = [
-                        '###',
-                        'USER:',
-                        'ASSISTANT:',
-                        '<|',
-                      ].some((v) => value.startsWith(v))
-                      const genLine =
-                        value.includes('{{SEL') || value.includes('{{GEN')
+                  {completionHistory[completionHistoryIndex].template.split('\n').map((value, index) => {
+                    const systemLine = ['###', 'USER:', 'ASSISTANT:', '<|'].some((v) => value.startsWith(v));
+                    const genLine = value.includes('{{SEL') || value.includes('{{GEN');
 
-                      return (
-                        <div
-                          key={`${index}-${value}`}
-                          className={classNames({
-                            DebugModal__template__line: true,
-                            'DebugModal__template__line--system': systemLine,
-                            'DebugModal__template__line--gen': genLine,
-                          })}
-                        >
-                          {value}
-                        </div>
-                      )
-                    })}
+                    return (
+                      <div
+                        key={`${index}-${value}`}
+                        className={classNames({
+                          DebugModal__template__line: true,
+                          'DebugModal__template__line--system': systemLine,
+                          'DebugModal__template__line--gen': genLine,
+                        })}
+                      >
+                        {value}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ) : null}
@@ -94,5 +80,5 @@ export default function DebugModal() {
         )}
       </div>
     </Modal>
-  )
+  );
 }

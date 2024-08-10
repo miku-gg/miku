@@ -1,6 +1,6 @@
-import { CheckBox, Dropdown, Input, Modal, Slider } from '@mikugg/ui-kit'
-import { MdRecordVoiceOver } from 'react-icons/md'
-import { SlSettings } from 'react-icons/sl'
+import { CheckBox, Dropdown, Input, Modal, Slider } from '@mikugg/ui-kit';
+import { MdRecordVoiceOver } from 'react-icons/md';
+import { SlSettings } from 'react-icons/sl';
 import {
   FontSize,
   Speed,
@@ -14,22 +14,18 @@ import {
   setVoiceAutoplay,
   setVoiceId,
   setVoiceSpeed,
-} from '../../state/slices/settingsSlice'
-import { useAppDispatch, useAppSelector } from '../../state/store'
-import './Settings.scss'
-import { trackEvent } from '../../libs/analytics'
-const audio = new Audio()
+} from '../../state/slices/settingsSlice';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import './Settings.scss';
+import { trackEvent } from '../../libs/analytics';
+const audio = new Audio();
 
 const Settings = (): JSX.Element => {
-  const dispatch = useAppDispatch()
-  const settings = useAppSelector((state) => state.settings)
-  const settingsTab = useAppSelector(
-    (state) => state.settings.modals.settingsTab
-  )
-  const currentSystemPromptLenght = useAppSelector(
-    (state) => state.settings.prompt.systemPrompt.length
-  )
-  const systemPromptMaxLenght = 800
+  const dispatch = useAppDispatch();
+  const settings = useAppSelector((state) => state.settings);
+  const settingsTab = useAppSelector((state) => state.settings.modals.settingsTab);
+  const currentSystemPromptLenght = useAppSelector((state) => state.settings.prompt.systemPrompt.length);
+  const systemPromptMaxLenght = 800;
 
   const voiceItems = [
     {
@@ -60,15 +56,15 @@ const Settings = (): JSX.Element => {
       name: 'Tony',
       value: Voices.Tony,
     },
-  ]
+  ];
 
   return (
     <div className="Settings">
       <button
         className="Settings__button icon-button"
         onClick={() => {
-          dispatch(setSettingsModal(true))
-          trackEvent('settings-click')
+          dispatch(setSettingsModal(true));
+          trackEvent('settings-click');
         }}
       >
         <SlSettings />
@@ -82,17 +78,13 @@ const Settings = (): JSX.Element => {
           <div className="SettingsModal__title">Settings</div>
           <div className="SettingsModal__navigation">
             <button
-              className={`SettingsModal__navigation__button ${
-                settingsTab === 'general' ? 'selected' : ''
-              }`}
+              className={`SettingsModal__navigation__button ${settingsTab === 'general' ? 'selected' : ''}`}
               onClick={() => dispatch(setSettingsTab('general'))}
             >
               General Settings
             </button>
             <button
-              className={`SettingsModal__navigation__button ${
-                settingsTab === 'prompt' ? 'selected' : ''
-              }`}
+              className={`SettingsModal__navigation__button ${settingsTab === 'prompt' ? 'selected' : ''}`}
               onClick={() => dispatch(setSettingsTab('prompt'))}
             >
               Prompt Settings
@@ -117,9 +109,7 @@ const Settings = (): JSX.Element => {
                   label="Custom system prompt"
                   placeHolder={`Add information to always be remembered. For Example: Anon is Miku's student.`}
                   value={settings.prompt.systemPrompt}
-                  onChange={(event) =>
-                    dispatch(setSystemPrompt(event.target.value))
-                  }
+                  onChange={(event) => dispatch(setSystemPrompt(event.target.value))}
                 />
                 <p className="SettingsModal__systemPrompt__count">
                   {currentSystemPromptLenght}/{systemPromptMaxLenght}
@@ -178,22 +168,17 @@ const Settings = (): JSX.Element => {
               <div className="SettingsModal__voice">
                 <div className="SettingsModal__voice-header">
                   <div className="SettingsModal__voice-header-title">
-                    <div className="SettingsModal__voice-title">
-                      Narration Voice
-                    </div>
+                    <div className="SettingsModal__voice-title">Narration Voice</div>
                     <div className="SettingsModal__voice-description">
-                      Enhances the experience by adding a narration voice audio
-                      to every response. This feature is only avalable for
-                      premium users.
+                      Enhances the experience by adding a narration voice audio to every response. This feature is only
+                      avalable for premium users.
                     </div>
                   </div>
                   <div className="SettingsModal__voice-enabled">
                     <CheckBox
                       label="Autoplay"
                       value={settings.voice.autoplay}
-                      onChange={(event) =>
-                        dispatch(setVoiceAutoplay(event.target.checked))
-                      }
+                      onChange={(event) => dispatch(setVoiceAutoplay(event.target.checked))}
                     />
                   </div>
                 </div>
@@ -203,20 +188,16 @@ const Settings = (): JSX.Element => {
                     <div
                       className="SettingsModal__voice-id-listen"
                       onClick={() => {
-                        audio.src = `https://assets.miku.gg/${settings.voice.voiceId}.mp3`
-                        audio.play()
+                        audio.src = `https://assets.miku.gg/${settings.voice.voiceId}.mp3`;
+                        audio.play();
                       }}
                       tabIndex={0}
                     >
                       <MdRecordVoiceOver />
                     </div>
                     <Dropdown
-                      selectedIndex={voiceItems.findIndex(
-                        (item) => item.value === settings.voice.voiceId
-                      )}
-                      onChange={(index) =>
-                        dispatch(setVoiceId(voiceItems[index].value))
-                      }
+                      selectedIndex={voiceItems.findIndex((item) => item.value === settings.voice.voiceId)}
+                      onChange={(index) => dispatch(setVoiceId(voiceItems[index].value))}
                       items={voiceItems}
                     />
                   </div>
@@ -225,9 +206,7 @@ const Settings = (): JSX.Element => {
                   <p>Reading speed</p>
                   <Slider
                     value={settings.voice.speed}
-                    onChange={(value) =>
-                      dispatch(setVoiceSpeed(value as Speed))
-                    }
+                    onChange={(value) => dispatch(setVoiceSpeed(value as Speed))}
                     steps={[
                       {
                         label: 'Slow',
@@ -254,7 +233,7 @@ const Settings = (): JSX.Element => {
         </div>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default Settings
+export default Settings;

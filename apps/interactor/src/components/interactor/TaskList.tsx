@@ -1,11 +1,11 @@
-import { GiScrollQuill } from 'react-icons/gi'
-import './TaskList.scss'
-import classNames from 'classnames'
+import { GiScrollQuill } from 'react-icons/gi';
+import './TaskList.scss';
+import classNames from 'classnames';
 
 interface Task {
-  id: string
-  text: string
-  checked: boolean
+  id: string;
+  text: string;
+  checked: boolean;
 }
 
 const tasks: Task[] = [
@@ -24,7 +24,7 @@ const tasks: Task[] = [
     text: 'Invite Seraphina to the party.',
     checked: true,
   },
-]
+];
 
 export default function TaskList() {
   return (
@@ -37,10 +37,7 @@ export default function TaskList() {
           {tasks.map((task) => (
             <div
               key={`${task}-${task.id}`}
-              className={classNames(
-                'TaskList__task',
-                task.checked ? 'TaskList__task--checked' : ''
-              )}
+              className={classNames('TaskList__task', task.checked ? 'TaskList__task--checked' : '')}
             >
               <div className="TaskList__task-check">
                 <GiScrollQuill />
@@ -53,5 +50,5 @@ export default function TaskList() {
         </div>
       </div>
     </div>
-  )
+  );
 }

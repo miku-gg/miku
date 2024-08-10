@@ -1,4 +1,4 @@
-import { RootState } from '../../../../state/store'
+import { RootState } from '../../../../state/store';
 
 export default {
   objectives: [],
@@ -734,4 +734,4 @@ export default {
     ],
   },
   version: 'v3',
-} as RootState
+} as RootState;

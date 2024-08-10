@@ -60,9 +60,7 @@ const Dropdown = ({
           <>
             <div className="dropdown__selected-name">{selectedItem.name}</div>
             {selectedItem.description && (
-              <div className="dropdown__selected-description">
-                {selectedItem.description}
-              </div>
+              <div className="dropdown__selected-description">{selectedItem.description}</div>
             )}
           </>
         ) : (
@@ -75,19 +73,13 @@ const Dropdown = ({
           {items.map((item, index) => (
             <div
               key={index}
-              className={`dropdown__list-item${
-                index === selectedIndex ? '-selected' : ''
-              }`}
+              className={`dropdown__list-item${index === selectedIndex ? '-selected' : ''}`}
               onClick={() => handleItemClick(index)}
               role="option"
               aria-selected={index === selectedIndex}
             >
               <div className="dropdown__list-item-name">{item.name}</div>
-              {item.description && (
-                <div className="dropdown__list-item-description">
-                  {item.description}
-                </div>
-              )}
+              {item.description && <div className="dropdown__list-item-description">{item.description}</div>}
             </div>
           ))}
         </div>

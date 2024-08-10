@@ -1,14 +1,11 @@
-import {
-  NovelValidationTargetType,
-  validateNovelState,
-} from "@mikugg/bot-utils";
-import { Modal } from "@mikugg/ui-kit";
-import classNames from "classnames";
-import { BiError } from "react-icons/bi";
-import { allowUntilStep } from "../libs/utils";
-import { closeModal, openModal } from "../state/slices/inputSlice";
-import { useAppDispatch, useAppSelector } from "../state/store";
-import "./ErrorsDisplay.scss";
+import { NovelValidationTargetType, validateNovelState } from '@mikugg/bot-utils';
+import { Modal } from '@mikugg/ui-kit';
+import classNames from 'classnames';
+import { BiError } from 'react-icons/bi';
+import { allowUntilStep } from '../libs/utils';
+import { closeModal, openModal } from '../state/slices/inputSlice';
+import { useAppDispatch, useAppSelector } from '../state/store';
+import './ErrorsDisplay.scss';
 
 export default function ErrorsDisplay() {
   const dispatch = useAppDispatch();
@@ -54,15 +51,13 @@ export default function ErrorsDisplay() {
     return [];
   })();
 
-  const warns = validateNovelState(novel).filter((error) =>
-    targetTypes.includes(error.targetType)
-  );
-  const errorCount = warns.filter((warn) => warn.severity === "error").length;
+  const warns = validateNovelState(novel).filter((error) => targetTypes.includes(error.targetType));
+  const errorCount = warns.filter((warn) => warn.severity === 'error').length;
 
   const classes = {
     ErrorsDisplay: true,
-    "ErrorsDisplay--has-warns": warns.length > 0,
-    "ErrorsDisplay--has-errors": errorCount > 0,
+    'ErrorsDisplay--has-warns': warns.length > 0,
+    'ErrorsDisplay--has-errors': errorCount > 0,
   };
 
   return (
@@ -73,13 +68,12 @@ export default function ErrorsDisplay() {
           onClick={() =>
             dispatch(
               openModal({
-                modalType: "errors",
-              })
+                modalType: 'errors',
+              }),
             )
           }
         >
-          <BiError /> {errorCount ? errorCount : warns.length}{" "}
-          {errorCount ? "errors" : "warns"}
+          <BiError /> {errorCount ? errorCount : warns.length} {errorCount ? 'errors' : 'warns'}
         </button>
       </div>
       <Modal
@@ -87,8 +81,8 @@ export default function ErrorsDisplay() {
         onCloseModal={() =>
           dispatch(
             closeModal({
-              modalType: "errors",
-            })
+              modalType: 'errors',
+            }),
           )
         }
         title="Warnings"
@@ -99,15 +93,11 @@ export default function ErrorsDisplay() {
               <div
                 key={`${warn.message}-${index}`}
                 className={classNames({
-                  "ErrorsDisplay__content-item": true,
-                  "ErrorsDisplay__content-item--error":
-                    warn.severity === "error",
+                  'ErrorsDisplay__content-item': true,
+                  'ErrorsDisplay__content-item--error': warn.severity === 'error',
                 })}
               >
-                <BiError />{" "}
-                <span className="ErrorsDisplay__content-item-text scrollbar">
-                  {warn.message}
-                </span>
+                <BiError /> <span className="ErrorsDisplay__content-item-text scrollbar">{warn.message}</span>
               </div>
             ))}
           </div>

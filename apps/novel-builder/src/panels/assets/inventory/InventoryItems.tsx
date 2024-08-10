@@ -1,14 +1,14 @@
-import { Blocks, Tooltip } from "@mikugg/ui-kit";
-import { FaHammer } from "react-icons/fa";
-import { FaPencil } from "react-icons/fa6";
-import { IoInformationCircleOutline } from "react-icons/io5";
-import { useDispatch } from "react-redux";
-import { v4 as randomUUID } from "uuid";
-import config from "../../../config";
-import { openModal } from "../../../state/slices/inputSlice";
-import { createNewInventoryItem } from "../../../state/slices/novelFormSlice";
-import { useAppSelector } from "../../../state/store";
-import "./InventoryItems.scss"; // Import the SCSS file
+import { Blocks, Tooltip } from '@mikugg/ui-kit';
+import { FaHammer } from 'react-icons/fa';
+import { FaPencil } from 'react-icons/fa6';
+import { IoInformationCircleOutline } from 'react-icons/io5';
+import { useDispatch } from 'react-redux';
+import { v4 as randomUUID } from 'uuid';
+import config from '../../../config';
+import { openModal } from '../../../state/slices/inputSlice';
+import { createNewInventoryItem } from '../../../state/slices/novelFormSlice';
+import { useAppSelector } from '../../../state/store';
+import './InventoryItems.scss'; // Import the SCSS file
 
 const InventoryItems = ({
   selectedItemIds,
@@ -28,7 +28,7 @@ const InventoryItems = ({
   const handleCreateInventoryItem = () => {
     const id = randomUUID();
     dispatch(createNewInventoryItem({ itemId: id }));
-    dispatch(openModal({ modalType: "editInventoryItem", editId: id }));
+    dispatch(openModal({ modalType: 'editInventoryItem', editId: id }));
   };
 
   const createItemBlocks = () => {
@@ -45,9 +45,9 @@ const InventoryItems = ({
       onEditClick: () =>
         dispatch(
           openModal({
-            modalType: "editInventoryItem",
+            modalType: 'editInventoryItem',
             editId: item.id,
-          })
+          }),
         ),
       editIcon: <FaPencil />,
       onClick: () => onSelect?.(item.id),
@@ -62,9 +62,7 @@ const InventoryItems = ({
         <IoInformationCircleOutline
           data-tooltip-id="Info-Items"
           data-tooltip-content={
-            tooltipText
-              ? tooltipText
-              : "[Optional] Custom novel items that can be used only in this novel."
+            tooltipText ? tooltipText : '[Optional] Custom novel items that can be used only in this novel.'
           }
         />
       </div>
@@ -75,10 +73,10 @@ const InventoryItems = ({
             ...createItemBlocks(),
 
             {
-              id: "create",
+              id: 'create',
               content: {
                 icon: <FaHammer />,
-                text: "Create",
+                text: 'Create',
               },
               onClick: () => handleCreateInventoryItem(),
             },

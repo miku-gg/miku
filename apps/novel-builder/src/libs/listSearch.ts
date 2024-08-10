@@ -1,48 +1,48 @@
-import axios from 'axios'
+import axios from 'axios';
 
 export interface BackgroundResult {
-  id: string
-  description: string
-  asset: string
-  sdPrompt: string | null
-  sdModel: string | null
-  sdParams: string | null
+  id: string;
+  description: string;
+  asset: string;
+  sdPrompt: string | null;
+  sdModel: string | null;
+  sdParams: string | null;
   author: {
-    id: string
-    username: string
-    profilePic: string | null
-  }
-  createdAt: Date
-  tags: string[]
+    id: string;
+    username: string;
+    profilePic: string | null;
+  };
+  createdAt: Date;
+  tags: string[];
 }
 
 export interface CharacterResult {
-  id: string
-  name: string
-  description: string
-  card: string
-  profilePic: string
-  language: string
-  nsfw: boolean
+  id: string;
+  name: string;
+  description: string;
+  card: string;
+  profilePic: string;
+  language: string;
+  nsfw: boolean;
   author: {
-    id: string
-    username: string
-    profilePic: string | null
-  }
-  createdAt: Date
-  updatedAt: Date
-  tags: string[]
+    id: string;
+    username: string;
+    profilePic: string | null;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+  tags: string[];
 }
 
 export interface SongResult {
-  id: string
-  description: string
-  title: string
-  asset: string
-  tags: string[]
-  authorId: string
-  createdAt: Date
-  updatedAt: Date
+  id: string;
+  description: string;
+  title: string;
+  asset: string;
+  tags: string[];
+  authorId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export enum SearchType {
@@ -53,9 +53,7 @@ export enum SearchType {
   SONG_VECTOR = '/songs/vector-search',
 }
 
-export const listSearch = async <
-  T extends BackgroundResult | CharacterResult | SongResult
->(
+export const listSearch = async <T extends BackgroundResult | CharacterResult | SongResult>(
   apiEndpont: string,
   searchType: T extends BackgroundResult
     ? SearchType.BACKGROUND | SearchType.BACKGROUND_VECTORS
@@ -63,10 +61,10 @@ export const listSearch = async <
     ? SearchType.CHARACTER
     : SearchType.SONG | SearchType.SONG_VECTOR,
   params: {
-    search: string
-    take: number
-    skip: number
-  }
+    search: string;
+    take: number;
+    skip: number;
+  },
 ): Promise<T[]> => {
   const response = await axios.get<T[]>(apiEndpont + searchType, {
     params,
@@ -74,7 +72,7 @@ export const listSearch = async <
     headers: {
       Accept: 'application/json',
     },
-  })
+  });
   // read as json
-  return response.data
-}
+  return response.data;
+};

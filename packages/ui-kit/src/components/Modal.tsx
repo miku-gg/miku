@@ -17,8 +17,7 @@ interface ModalProps {
 }
 
 export default function Modal(props: ModalProps): JSX.Element {
-  const { opened, onCloseModal, title, children, shouldCloseOnOverlayClick } =
-    props;
+  const { opened, onCloseModal, title, children, shouldCloseOnOverlayClick } = props;
 
   return (
     <ReactModal

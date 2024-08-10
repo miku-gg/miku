@@ -6,21 +6,21 @@
 .horizontal-slider {
   width: 100%;
   height: 6px;
-  background: #E0E0E0;
+  background: #e0e0e0;
 }
 
 .track {
   height: 100%;
   transition: right 0.2s ease-out;
-  
+
   &-0 {
     // background: #9747ff;
     // background linear gradient
     background: linear-gradient(90deg, #9747ff 0%, #b280f5 100%);
   }
-  
+
   &-1 {
-    background: #9747ff2A;
+    background: #9747ff2a;
   }
 }
 
@@ -32,7 +32,7 @@
   cursor: pointer;
   box-shadow: 0px 0px 6px 1px #9747ff;
   top: -4px;
-  
+
   transition: left 0.3s, box-shadow 0.3s, transform 0.3s; // Adding a transition for position, shadow, and scale changes
   &:active {
     transform: scale(1.1); // Slightly scale up the thumb on active/drag
@@ -48,7 +48,7 @@
   padding-right: 10px;
 
   .label {
-    font-size: .8rem;
+    font-size: 0.8rem;
     cursor: pointer;
     // flex: 1;
     user-select: none;

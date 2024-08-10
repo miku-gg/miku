@@ -1,17 +1,9 @@
-import {
-  AreYouSure,
-  Button,
-  CheckBox,
-  Input,
-  Modal,
-  TagAutocomplete,
-  Tooltip,
-} from "@mikugg/ui-kit";
-import { useCallback, useEffect, useRef } from "react";
-import { FaTrashAlt } from "react-icons/fa";
-import { useDispatch } from "react-redux";
-import { selectEditingLorebook } from "../state/selectors";
-import { closeModal } from "../state/slices/inputSlice";
+import { AreYouSure, Button, CheckBox, Input, Modal, TagAutocomplete, Tooltip } from '@mikugg/ui-kit';
+import { useCallback, useEffect, useRef } from 'react';
+import { FaTrashAlt } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
+import { selectEditingLorebook } from '../state/selectors';
+import { closeModal } from '../state/slices/inputSlice';
 import {
   createEntry,
   deleteEntry,
@@ -20,9 +12,9 @@ import {
   updateEntry,
   updateLorebook,
   updateScene,
-} from "../state/slices/novelFormSlice";
-import { useAppSelector } from "../state/store";
-import "./LorebookEditModal.scss";
+} from '../state/slices/novelFormSlice';
+import { useAppSelector } from '../state/store';
+import './LorebookEditModal.scss';
 
 export default function LorebookEditModal() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -35,10 +27,7 @@ export default function LorebookEditModal() {
 
   const handleScrollToTop = useCallback(() => {
     if (containerRef.current) {
-      if (
-        lorebook?.entries &&
-        lorebook?.entries?.length > prevEntriesLength.current
-      ) {
+      if (lorebook?.entries && lorebook?.entries?.length > prevEntriesLength.current) {
         scrollToTop();
         prevEntriesLength.current = lorebook.entries.length;
       }
@@ -53,15 +42,13 @@ export default function LorebookEditModal() {
     if (containerRef.current) {
       containerRef.current.scrollTo({
         top: -containerRef.current.scrollHeight,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     }
   };
 
   const removeIdsFromCharacters = (id: string) => {
-    const charactersWithLorebook = characters.filter((character) =>
-      character.lorebookIds?.includes(id)
-    );
+    const charactersWithLorebook = characters.filter((character) => character.lorebookIds?.includes(id));
 
     charactersWithLorebook.forEach((character) => {
       const updatedCharacter = {
@@ -73,9 +60,7 @@ export default function LorebookEditModal() {
   };
 
   const removeIdsFromScenes = (id: string) => {
-    const scenesWithLorebook = scenes.filter((scene) =>
-      scene.lorebookIds?.includes(id)
-    );
+    const scenesWithLorebook = scenes.filter((scene) => scene.lorebookIds?.includes(id));
     scenesWithLorebook.forEach((scene) => {
       const updatedScene = {
         ...scene,
@@ -87,10 +72,10 @@ export default function LorebookEditModal() {
 
   const handleDeleteLorebook = (id: string) => {
     openModal({
-      title: "Are you sure?",
-      description: "This action cannot be undone",
+      title: 'Are you sure?',
+      description: 'This action cannot be undone',
       onYes: () => {
-        dispatch(closeModal({ modalType: "lorebookEdit" }));
+        dispatch(closeModal({ modalType: 'lorebookEdit' }));
         removeIdsFromCharacters(id);
         removeIdsFromScenes(id);
         dispatch(deleteLorebook({ lorebookId: id }));
@@ -102,7 +87,7 @@ export default function LorebookEditModal() {
     <Modal
       opened={!!lorebook}
       shouldCloseOnOverlayClick
-      onCloseModal={() => dispatch(closeModal({ modalType: "lorebookEdit" }))}
+      onCloseModal={() => dispatch(closeModal({ modalType: 'lorebookEdit' }))}
     >
       {lorebook ? (
         <div className="CharacterLorebooks scrollbar">
@@ -127,7 +112,7 @@ export default function LorebookEditModal() {
                     updateLorebook({
                       lorebookId: lorebook.id,
                       lorebook: { ...lorebook, name: e.target.value },
-                    })
+                    }),
                   )
                 }
               />
@@ -141,7 +126,7 @@ export default function LorebookEditModal() {
                     updateLorebook({
                       lorebookId: lorebook.id,
                       lorebook: { ...lorebook, isGlobal: e.target.checked },
-                    })
+                    }),
                   )
                 }
               />
@@ -160,7 +145,7 @@ export default function LorebookEditModal() {
                       ...lorebook!,
                       description: e.target.value,
                     },
-                  })
+                  }),
                 )
               }
             />
@@ -173,23 +158,17 @@ export default function LorebookEditModal() {
                 dispatch(
                   createEntry({
                     lorebookId: lorebook.id,
-                  })
+                  }),
                 );
               }}
             >
               + Entry
             </Button>
           </div>
-          <div
-            className="CharacterLorebooks__entriesContainer scrollbar"
-            ref={containerRef}
-          >
+          <div className="CharacterLorebooks__entriesContainer scrollbar" ref={containerRef}>
             {lorebook?.entries &&
               lorebook?.entries.map((entry, index) => (
-                <div
-                  className="CharacterLorebooks__entries"
-                  key={`entry-${index + 1}`}
-                >
+                <div className="CharacterLorebooks__entries" key={`entry-${index + 1}`}>
                   <div className="CharacterLorebooks__entries__form">
                     <FaTrashAlt
                       className="CharacterLorebooks__removeEntry"
@@ -198,7 +177,7 @@ export default function LorebookEditModal() {
                           deleteEntry({
                             entryIndex: index,
                             lorebookId: lorebook.id,
-                          })
+                          }),
                         );
                       }}
                     />
@@ -213,7 +192,7 @@ export default function LorebookEditModal() {
                               entryIndex: index,
                               lorebookId: lorebook.id,
                               entry: { ...entry, name: e.target.value },
-                            })
+                            }),
                           );
                         }}
                       />
@@ -232,7 +211,7 @@ export default function LorebookEditModal() {
                               entryIndex: index,
                               lorebookId: lorebook.id,
                               entry: { ...entry, keys: e.target.value },
-                            })
+                            }),
                           );
                         }}
                         tags={[]}
@@ -251,7 +230,7 @@ export default function LorebookEditModal() {
                           entryIndex: index,
                           lorebookId: lorebook.id,
                           entry: { ...entry, content: e.target.value },
-                        })
+                        }),
                       );
                     }}
                   />

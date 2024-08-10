@@ -35,10 +35,7 @@ const DragAndDropImages = ({
     fileInputRef.current?.click(); // Trigger click event of file input when dropzone is clicked
   };
 
-  const handleDropZoneChange = async (
-    file: File,
-    event?: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleDropZoneChange = async (file: File, event?: React.ChangeEvent<HTMLInputElement>) => {
     setLoading(true);
     if (await onFileValidate(file)) {
       handleChange && (await handleChange(file));
@@ -80,9 +77,7 @@ const DragAndDropImages = ({
         }}
       />
       <div
-        className={`dragAndDropImages__dropzone ${size}Size ${
-          dragOver ? 'dragOver' : ''
-        }`}
+        className={`dragAndDropImages__dropzone ${size}Size ${dragOver ? 'dragOver' : ''}`}
         onDrop={onDrop}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
@@ -96,14 +91,8 @@ const DragAndDropImages = ({
           </div>
         ) : (
           <div className="dragAndDropImages__preview">
-            {previewImage.indexOf('video/webm') !== -1 ||
-            previewImage.endsWith('.webm') ? (
-              <video
-                src={previewImage}
-                autoPlay={true}
-                loop={true}
-                muted={true}
-              />
+            {previewImage.indexOf('video/webm') !== -1 || previewImage.endsWith('.webm') ? (
+              <video src={previewImage} autoPlay={true} loop={true} muted={true} />
             ) : (
               <LazyLoadImage effect="blur" src={previewImage} />
             )}

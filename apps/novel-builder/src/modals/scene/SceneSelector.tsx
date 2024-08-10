@@ -1,12 +1,12 @@
-import { Modal } from "@mikugg/ui-kit";
-import classNames from "classnames";
-import config from "../../config";
-import { selectScenes } from "../../state/selectors";
-import { useAppSelector } from "../../state/store";
-import "./SceneSelector.scss";
-import { IoIosCloseCircleOutline } from "react-icons/io";
-import { useState } from "react";
-import { FaTrashAlt } from "react-icons/fa";
+import { Modal } from '@mikugg/ui-kit';
+import classNames from 'classnames';
+import config from '../../config';
+import { selectScenes } from '../../state/selectors';
+import { useAppSelector } from '../../state/store';
+import './SceneSelector.scss';
+import { IoIosCloseCircleOutline } from 'react-icons/io';
+import { useState } from 'react';
+import { FaTrashAlt } from 'react-icons/fa';
 
 interface SceneSelectorProps {
   opened: boolean;
@@ -29,26 +29,17 @@ export const SceneSelectorModal = ({
   };
 
   return (
-    <Modal
-      title="Select a Scene"
-      opened={opened}
-      onCloseModal={onCloseModal}
-      className="SceneSelectorModal"
-    >
+    <Modal title="Select a Scene" opened={opened} onCloseModal={onCloseModal} className="SceneSelectorModal">
       <div className="SceneSelectorModal__scene-selection">
-        <IoIosCloseCircleOutline
-          className="SceneSelectorModal__closeModal"
-          onClick={onCloseModal}
-        />
+        <IoIosCloseCircleOutline className="SceneSelectorModal__closeModal" onClick={onCloseModal} />
         <div className="SceneSelectorModal__scene-selection-list">
           {scenes.map((scene) => (
             <div
               className={classNames({
-                "SceneSelectorModal__scene-selection-item": true,
-                "SceneSelectorModal__scene-selection-item--selected":
-                  selectedScenes
-                    ? isSelected(scene.id)
-                    : scene.id === selectedSceneId,
+                'SceneSelectorModal__scene-selection-item': true,
+                'SceneSelectorModal__scene-selection-item--selected': selectedScenes
+                  ? isSelected(scene.id)
+                  : scene.id === selectedSceneId,
               })}
               key={scene.id}
               onClick={() => {
@@ -61,9 +52,7 @@ export const SceneSelectorModal = ({
               <div
                 className="SceneNode"
                 style={{
-                  backgroundImage: `url(${config.genAssetLink(
-                    scene.background?.source.jpg || ""
-                  )})`,
+                  backgroundImage: `url(${config.genAssetLink(scene.background?.source.jpg || '')})`,
                 }}
               >
                 <div className="SceneNode__title">{scene.name}</div>
@@ -71,7 +60,7 @@ export const SceneSelectorModal = ({
                   {scene.characters.map((character, index) => (
                     <img
                       key={index}
-                      src={config.genAssetLink(character.profile_pic || "")}
+                      src={config.genAssetLink(character.profile_pic || '')}
                       alt={`Character ${index}`}
                       className="SceneNode__character"
                     />
@@ -112,8 +101,7 @@ export default function SceneSelector({
   const scenes = useAppSelector(selectScenes);
   const value = multiSelect ? _value : _value ? [_value] : [];
   const selectedScenes = scenes.filter((scene) => value.includes(scene.id));
-  const selectedSceneId =
-    editingIndex !== null ? value[editingIndex] : undefined;
+  const selectedSceneId = editingIndex !== null ? value[editingIndex] : undefined;
 
   return (
     <div className="SceneSelector">
@@ -130,9 +118,7 @@ export default function SceneSelector({
                 setEditingIndex(index);
               }}
               style={{
-                backgroundImage: `url(${config.genAssetLink(
-                  scene.background?.source.jpg || ""
-                )})`,
+                backgroundImage: `url(${config.genAssetLink(scene.background?.source.jpg || '')})`,
               }}
             >
               <div className="SceneNode__title">{scene.name}</div>
@@ -154,7 +140,7 @@ export default function SceneSelector({
                 {scene.characters.map((character, index) => (
                   <img
                     key={index}
-                    src={config.genAssetLink(character.profile_pic || "")}
+                    src={config.genAssetLink(character.profile_pic || '')}
                     alt={`Character ${index}`}
                     className="SceneNode__character"
                   />
@@ -162,8 +148,7 @@ export default function SceneSelector({
               </div>
             </div>
           ))}
-          {(multiSelect && value.length < 3) ||
-          (!multiSelect && value.length === 0) ? (
+          {(multiSelect && value.length < 3) || (!multiSelect && value.length === 0) ? (
             <div
               className="SceneNode"
               tabIndex={0}
@@ -172,7 +157,7 @@ export default function SceneSelector({
                 setEditingIndex(value.length);
               }}
               style={{
-                backgroundImage: `url(${config.genAssetLink("add_item.jpg")})`,
+                backgroundImage: `url(${config.genAssetLink('add_item.jpg')})`,
               }}
             ></div>
           ) : null}

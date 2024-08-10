@@ -1,21 +1,21 @@
-import { Dispatch, createListenerMiddleware } from '@reduxjs/toolkit'
+import { Dispatch, createListenerMiddleware } from '@reduxjs/toolkit';
 import {
   backgroundInferenceEnd,
   backgroundInferenceFailure,
   backgroundInferenceStart,
   backgroundInferenceUpdate,
-} from '../slices/creationSlice'
-import axios, { AxiosResponse } from 'axios'
+} from '../slices/creationSlice';
+import axios, { AxiosResponse } from 'axios';
 
 export interface InferenceStatus {
-  status: 'pending' | 'done' | 'error'
+  status: 'pending' | 'done' | 'error';
   step: {
-    id: string
-    progress: number
-    total: number
-  } | null
-  wait: number
-  result: string[]
+    id: string;
+    progress: number;
+    total: number;
+  } | null;
+  wait: number;
+  result: string[];
 }
 
 const inferenceEffect = async (
@@ -23,7 +23,7 @@ const inferenceEffect = async (
   apiEndpoint: string,
   servicesEndpoint: string,
   id: string,
-  prompt: string
+  prompt: string,
 ) => {
   try {
     const inference: AxiosResponse<string> = await axios.post(
@@ -42,30 +42,28 @@ const inferenceEffect = async (
       },
       {
         withCredentials: true,
-      }
-    )
-    const inferenceId = inference.data
+      },
+    );
+    const inferenceId = inference.data;
     dispatch(
       backgroundInferenceUpdate({
         id,
         inferenceId,
         queuePosition: 0,
-      })
-    )
+      }),
+    );
 
     // calls /inferences/statuses every 5 seconds with setTimeout loop
     const checkStatus = async () => {
       try {
-        const status: AxiosResponse<
-          { status: InferenceStatus; inferenceId: string }[]
-        > = await axios.get(
+        const status: AxiosResponse<{ status: InferenceStatus; inferenceId: string }[]> = await axios.get(
           `${apiEndpoint}/inferences/statuses?inferenceIds[]=${inferenceId}`,
-          { withCredentials: true }
-        )
+          { withCredentials: true },
+        );
         if (status.data.length === 0) {
-          throw new Error('Inference not found')
+          throw new Error('Inference not found');
         }
-        const inferenceStatus = status.data[0].status
+        const inferenceStatus = status.data[0].status;
 
         if (inferenceStatus.status === 'done') {
           try {
@@ -76,8 +74,8 @@ const inferenceEffect = async (
               },
               {
                 withCredentials: true,
-              }
-            )
+              },
+            );
             await axios.post(
               `${apiEndpoint}/background`,
               {
@@ -87,10 +85,10 @@ const inferenceEffect = async (
               },
               {
                 withCredentials: true,
-              }
-            )
+              },
+            );
           } catch (e) {
-            console.error(e)
+            console.error(e);
           }
           dispatch(
             backgroundInferenceEnd({
@@ -98,31 +96,31 @@ const inferenceEffect = async (
               result: inferenceStatus.result[0],
               apiEndpoint,
               servicesEndpoint,
-            })
-          )
+            }),
+          );
         } else {
           dispatch(
             backgroundInferenceUpdate({
               id,
               inferenceId,
               queuePosition: inferenceStatus.wait,
-            })
-          )
-          setTimeout(checkStatus, 5000)
+            }),
+          );
+          setTimeout(checkStatus, 5000);
         }
       } catch (error) {
-        console.error(error)
-        setTimeout(checkStatus, 5000)
+        console.error(error);
+        setTimeout(checkStatus, 5000);
       }
-    }
-    setTimeout(checkStatus, 1000)
+    };
+    setTimeout(checkStatus, 1000);
   } catch (error) {
-    console.error(error)
-    dispatch(backgroundInferenceFailure(id))
+    console.error(error);
+    dispatch(backgroundInferenceFailure(id));
   }
-}
+};
 
-export const inferenceListenerMiddleware = createListenerMiddleware()
+export const inferenceListenerMiddleware = createListenerMiddleware();
 
 inferenceListenerMiddleware.startListening({
   actionCreator: backgroundInferenceStart,
@@ -132,7 +130,7 @@ inferenceListenerMiddleware.startListening({
       action.payload.apiEndpoint,
       action.payload.servicesEndpoint,
       action.payload.id,
-      action.payload.prompt
-    )
+      action.payload.prompt,
+    );
   },
-})
+});

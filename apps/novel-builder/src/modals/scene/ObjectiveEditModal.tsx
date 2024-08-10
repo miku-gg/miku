@@ -1,20 +1,17 @@
-import { AreYouSure, Button, Input, Modal, Tooltip } from "@mikugg/ui-kit";
+import { AreYouSure, Button, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 
-import { useDispatch } from "react-redux";
-import { selectEditingObjective } from "../../state/selectors";
-import { closeModal } from "../../state/slices/inputSlice";
-import {
-  deleteObjective,
-  updateObjective,
-} from "../../state/slices/novelFormSlice";
-import { useAppSelector } from "../../state/store";
+import { useDispatch } from 'react-redux';
+import { selectEditingObjective } from '../../state/selectors';
+import { closeModal } from '../../state/slices/inputSlice';
+import { deleteObjective, updateObjective } from '../../state/slices/novelFormSlice';
+import { useAppSelector } from '../../state/store';
 
-import { NovelV3 } from "@mikugg/bot-utils";
-import { FaTrashAlt } from "react-icons/fa";
-import { IoIosCloseCircleOutline } from "react-icons/io";
-import { IoInformationCircleOutline } from "react-icons/io5";
-import NovelActionForm from "./NovelActionForm";
-import "./ObjectiveEditModal.scss";
+import { NovelV3 } from '@mikugg/bot-utils';
+import { FaTrashAlt } from 'react-icons/fa';
+import { IoIosCloseCircleOutline } from 'react-icons/io';
+import { IoInformationCircleOutline } from 'react-icons/io5';
+import NovelActionForm from './NovelActionForm';
+import './ObjectiveEditModal.scss';
 
 export default function ObjectiveEditModal() {
   const dispatch = useDispatch();
@@ -24,10 +21,10 @@ export default function ObjectiveEditModal() {
   const handleDeleteObjective = () => {
     if (!objective) return;
     areYouSure.openModal({
-      title: "Are you sure?",
-      description: "This map will be deleted. This action cannot be undone.",
+      title: 'Are you sure?',
+      description: 'This map will be deleted. This action cannot be undone.',
       onYes: () => {
-        dispatch(closeModal({ modalType: "objectiveEdit" }));
+        dispatch(closeModal({ modalType: 'objectiveEdit' }));
         dispatch(deleteObjective({ id: objective.id }));
       },
     });
@@ -38,7 +35,7 @@ export default function ObjectiveEditModal() {
       opened={!!objective}
       shouldCloseOnOverlayClick
       className="ObjectiveEditModal"
-      onCloseModal={() => dispatch(closeModal({ modalType: "objectiveEdit" }))}
+      onCloseModal={() => dispatch(closeModal({ modalType: 'objectiveEdit' }))}
     >
       {objective ? (
         <div className="ObjectiveEdit scrollbar">
@@ -54,7 +51,7 @@ export default function ObjectiveEditModal() {
             <IoIosCloseCircleOutline
               className="MapEdit__buttons__closeModal"
               onClick={() => {
-                dispatch(closeModal({ modalType: "objectiveEdit" }));
+                dispatch(closeModal({ modalType: 'objectiveEdit' }));
               }}
             />
           </div>
@@ -62,7 +59,7 @@ export default function ObjectiveEditModal() {
             <div className="ObjectiveEdit__content__form">
               <Input
                 label="Name"
-                value={objective.name || ""}
+                value={objective.name || ''}
                 onChange={(e) => {
                   dispatch(
                     updateObjective({
@@ -71,13 +68,13 @@ export default function ObjectiveEditModal() {
                         ...objective,
                         name: e.target.value,
                       },
-                    })
+                    }),
                   );
                 }}
               />
               <Input
                 label="Description"
-                value={objective.description || ""}
+                value={objective.description || ''}
                 onChange={(e) => {
                   dispatch(
                     updateObjective({
@@ -86,7 +83,7 @@ export default function ObjectiveEditModal() {
                         ...objective,
                         description: e.target.value,
                       },
-                    })
+                    }),
                   );
                 }}
               />
@@ -94,7 +91,7 @@ export default function ObjectiveEditModal() {
                 label="Hint"
                 description="[OPTIONAL] Give a hint to the player to help them achieve the objective."
                 placeHolder="Try to find the key in the room."
-                value={objective.hint || ""}
+                value={objective.hint || ''}
                 onChange={(e) => {
                   dispatch(
                     updateObjective({
@@ -103,7 +100,7 @@ export default function ObjectiveEditModal() {
                         ...objective,
                         hint: e.target.value,
                       },
-                    })
+                    }),
                   );
                 }}
                 maxLength={34}
@@ -113,7 +110,7 @@ export default function ObjectiveEditModal() {
                 isTextArea
                 description="Condition to be met to trigger the actions. Must be a YES/NO condition."
                 placeHolder="{{user}} found the door's key."
-                value={objective.condition || ""}
+                value={objective.condition || ''}
                 onChange={(e) => {
                   dispatch(
                     updateObjective({
@@ -122,7 +119,7 @@ export default function ObjectiveEditModal() {
                         ...objective,
                         condition: e.target.value,
                       },
-                    })
+                    }),
                   );
                 }}
               />
@@ -151,15 +148,14 @@ export default function ObjectiveEditModal() {
                             actions: [
                               ...(objective.actions || []),
                               {
-                                type: NovelV3.NovelActionType
-                                  .SUGGEST_ADVANCE_SCENE,
+                                type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
                                 params: {
-                                  sceneId: "",
+                                  sceneId: '',
                                 },
                               },
                             ],
                           },
-                        })
+                        }),
                       );
                     }}
                   >
@@ -185,7 +181,7 @@ export default function ObjectiveEditModal() {
                                   ...objective.actions.slice(index + 1),
                                 ],
                               },
-                            })
+                            }),
                           );
                         }}
                         onDelete={() => {
@@ -194,12 +190,9 @@ export default function ObjectiveEditModal() {
                               id: objective.id,
                               objective: {
                                 ...objective,
-                                actions: [
-                                  ...objective.actions.slice(0, index),
-                                  ...objective.actions.slice(index + 1),
-                                ],
+                                actions: [...objective.actions.slice(0, index), ...objective.actions.slice(index + 1)],
                               },
-                            })
+                            }),
                           );
                         }}
                       />

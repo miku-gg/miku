@@ -1,99 +1,99 @@
-import { EmotionTemplateSlug, MikuCard } from '@mikugg/bot-utils'
+import { EmotionTemplateSlug, MikuCard } from '@mikugg/bot-utils';
 
 export interface NarrationInteraction {
-  id: string
-  parentResponseId: string | null
-  query: string
-  sceneId: string
-  responsesId: string[]
+  id: string;
+  parentResponseId: string | null;
+  query: string;
+  sceneId: string;
+  responsesId: string[];
 }
 
 export interface NarrationResponse {
-  id: string
-  selected: boolean
-  fetching: boolean
-  parentInteractionId: string | null
-  suggestedScenes: string[]
+  id: string;
+  selected: boolean;
+  fetching: boolean;
+  parentInteractionId: string | null;
+  suggestedScenes: string[];
   characters: {
     [role: string]:
       | {
-          emotion: string
-          pose: string
-          text: string
+          emotion: string;
+          pose: string;
+          text: string;
         }
-      | undefined
-  }
+      | undefined;
+  };
   childrenInteractions: {
-    interactionId: string
-    selected: boolean
-  }[]
+    interactionId: string;
+    selected: boolean;
+  }[];
 }
 
 export interface NarrationState {
-  id: string
-  fetching: boolean
-  currentResponseId: string
+  id: string;
+  fetching: boolean;
+  currentResponseId: string;
   input: {
-    text: string
-    suggestions: string[]
-    disabled: boolean
-  }
+    text: string;
+    suggestions: string[];
+    disabled: boolean;
+  };
   interactions: {
-    [id: string]: NarrationInteraction | undefined
-  }
+    [id: string]: NarrationInteraction | undefined;
+  };
   responses: {
-    [id: string]: NarrationResponse | undefined
-  }
+    [id: string]: NarrationResponse | undefined;
+  };
 }
 
 export interface NovelScene {
-  id: string
-  name: string
-  prompt: string
-  background: string
-  music: string
+  id: string;
+  name: string;
+  prompt: string;
+  background: string;
+  music: string;
   roles: {
-    characterId: string
-    role: string
-  }[]
-  children: string[]
+    characterId: string;
+    role: string;
+  }[];
+  children: string[];
 }
 
 export interface NovelCharacterOutfit {
-  id: string
-  name: string
-  template: EmotionTemplateSlug
+  id: string;
+  name: string;
+  template: EmotionTemplateSlug;
   emotions: {
-    id: string
-    source: string[]
-    sound?: string
-  }[]
+    id: string;
+    source: string[];
+    sound?: string;
+  }[];
 }
 
 export interface NovelCharacters {
   [id: string]:
     | {
-        id: string
-        name: string
-        profile_pic: string
-        card: MikuCard
+        id: string;
+        name: string;
+        profile_pic: string;
+        card: MikuCard;
         outfits: {
-          [outfit: string]: NovelCharacterOutfit | undefined
-        }
+          [outfit: string]: NovelCharacterOutfit | undefined;
+        };
         /** Role to outfit mapping */
         roles: {
-          [role: string]: string | undefined
-        }
+          [role: string]: string | undefined;
+        };
       }
-    | undefined
+    | undefined;
 }
 export interface NovelState {
-  fetching: boolean
-  title: string
-  description: string
-  characters: NovelCharacters
-  scenes: NovelScene[]
-  startSceneId: string
+  fetching: boolean;
+  title: string;
+  description: string;
+  characters: NovelCharacters;
+  scenes: NovelScene[];
+  startSceneId: string;
 }
 
 export enum ModelType {
@@ -124,41 +124,41 @@ export enum Voices {
 }
 
 export interface SettingsState {
-  model: ModelType
+  model: ModelType;
   user: {
-    name: string
-    isPremium: boolean
-  }
+    name: string;
+    isPremium: boolean;
+  };
   text: {
-    speed: Speed
-    fontSize: FontSize
-    autoContinue: boolean
-  }
+    speed: Speed;
+    fontSize: FontSize;
+    autoContinue: boolean;
+  };
   voice: {
-    autoplay: boolean
-    speed: Speed
-    voiceId: Voices
-  }
+    autoplay: boolean;
+    speed: Speed;
+    voiceId: Voices;
+  };
   music: {
-    enabled: boolean
-    volume: number
-  }
+    enabled: boolean;
+    volume: number;
+  };
   modals: {
-    settings: boolean
-    about: boolean
-    history: boolean
+    settings: boolean;
+    about: boolean;
+    history: boolean;
     edit: {
-      opened: boolean
-      id: string
-    }
-  }
+      opened: boolean;
+      id: string;
+    };
+  };
 }
 
-export const VersionId = 'v1'
+export const VersionId = 'v1';
 
 export interface State {
-  version: string
-  settings: SettingsState
-  narration: NarrationState
-  novel: NovelState
+  version: string;
+  settings: SettingsState;
+  narration: NarrationState;
+  novel: NovelState;
 }

@@ -64,11 +64,7 @@ const Input = ({
               >
                 <InfoIcon />
               </div>
-              <Tooltip
-                id={`input-tooltip-${id}`}
-                place="right"
-                className="Input__tooltip"
-              />
+              <Tooltip id={`input-tooltip-${id}`} place="right" className="Input__tooltip" />
             </>
           )}
         </label>

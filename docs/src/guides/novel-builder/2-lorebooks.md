@@ -15,6 +15,7 @@ Creating lorebooks involves defining individual entries. Each entry consists of 
 [!embed Lorebook creation tutorial](/assets/novel-builder/tutorial_2.mp4)
 
 ### Steps
+
 1. First, click on **New Lorebook** and put the basic information.
    - **Name**: Enter the name of the lorebook.
    - **Description**: Provide a brief description of the lorebook.
@@ -24,27 +25,30 @@ Creating lorebooks involves defining individual entries. Each entry consists of 
    - **Keywords**: Define keywords that will trigger the inclusion of this entry in the AI's prompts.
 
 !!!info When will an entry be used?
-The entry will be used when a keyword is **mentioned in the conversation**. Only the top 3 entries are will be added per AI response. *The keyword order is important. Put the most relevant keyword first.*
+The entry will be used when a keyword is **mentioned in the conversation**. Only the top 3 entries are will be added per AI response. _The keyword order is important. Put the most relevant keyword first._
 !!!
 
 ### Lorebook visibility
 
 +++ Global Lorebook
-   Check the **Global lorebook** option if you want the lorebook to be used throughout the entire novel.
+Check the **Global lorebook** option if you want the lorebook to be used throughout the entire novel.
 +++ Scene-Specific Lorebook
-  The lorebook will be used only in the scenes you specify when creating them.
+The lorebook will be used only in the scenes you specify when creating them.
 +++ Character-Specific Lorebook
-  The lorebook will be used whenever the a specific character is present. You can select it when creating a character.
+The lorebook will be used whenever the a specific character is present. You can select it when creating a character.
 +++
 
 ### Entry optimization
+
 Keep entries concise and relevant. Use keywords wisely to ensure the AI has the right context without overloading its memory with unnecessary information.
 
 The content should have the Q-A format.
+
 ```
 user: Which country are we in?
 Anna: Did you forget your head too, user? We are in Tokyo, Japan!
 ```
+
 This also allows to give a personality to the response, so the AI can use it as example.
 
 !!!warning Use templates
@@ -55,4 +59,3 @@ See the tutorial video above for reference.
 !!!
 
 By following these steps, you can create rich, dynamic lorebooks that enhance the depth and realism of your visual novel, providing the AI with the necessary context to generate immersive and accurate responses.
-

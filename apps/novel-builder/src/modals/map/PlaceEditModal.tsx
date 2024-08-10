@@ -1,25 +1,19 @@
-import {
-  AreYouSure,
-  DragAndDropImages,
-  Input,
-  Modal,
-  Tooltip,
-} from "@mikugg/ui-kit";
-import { FaTrashAlt } from "react-icons/fa";
-import { IoIosCloseCircleOutline } from "react-icons/io";
-import { useDispatch } from "react-redux";
-import { selectEditingMap, selectEditingPlace } from "../../state/selectors";
+import { AreYouSure, DragAndDropImages, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import { FaTrashAlt } from 'react-icons/fa';
+import { IoIosCloseCircleOutline } from 'react-icons/io';
+import { useDispatch } from 'react-redux';
+import { selectEditingMap, selectEditingPlace } from '../../state/selectors';
 
-import { closeModal } from "../../state/slices/inputSlice";
-import { deletePlace, updatePlace } from "../../state/slices/novelFormSlice";
-import { useAppSelector } from "../../state/store";
+import { closeModal } from '../../state/slices/inputSlice';
+import { deletePlace, updatePlace } from '../../state/slices/novelFormSlice';
+import { useAppSelector } from '../../state/store';
 
-import { useState } from "react";
-import { toast } from "react-toastify";
-import config from "../../config";
-import { checkFileType } from "../../libs/utils";
-import SceneSelector from "../scene/SceneSelector";
-import "./PlaceEditModal.scss";
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+import config from '../../config';
+import { checkFileType } from '../../libs/utils';
+import SceneSelector from '../scene/SceneSelector';
+import './PlaceEditModal.scss';
 
 function isBlackAndWhite(pixels: Uint8ClampedArray): boolean {
   for (let i = 0; i < pixels.length; i += 4) {
@@ -45,30 +39,30 @@ export default function PlaceEditModal() {
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const scenes = useAppSelector((state) => state.novel.scenes);
 
-  const handleUploadImage = async (file: File, source: "preview" | "mask") => {
+  const handleUploadImage = async (file: File, source: 'preview' | 'mask') => {
     if (file && place) {
       try {
         const asset = await config.uploadAsset(file);
         switch (source) {
-          case "preview":
+          case 'preview':
             dispatch(
               updatePlace({
                 mapId: map!.id,
                 place: { id: place.id, previewSource: asset.assetId },
-              })
+              }),
             );
             return;
-          case "mask":
+          case 'mask':
             dispatch(
               updatePlace({
                 mapId: map!.id,
                 place: { id: place.id, maskSource: asset.assetId },
-              })
+              }),
             );
             return;
         }
       } catch (e) {
-        toast.error("Error uploading the image");
+        toast.error('Error uploading the image');
         console.error(e);
       }
     }
@@ -76,15 +70,15 @@ export default function PlaceEditModal() {
 
   const handleDeletePlace = (id: string) => {
     areYouSure.openModal({
-      title: "Are you sure?",
-      description: "This action cannot be undone",
+      title: 'Are you sure?',
+      description: 'This action cannot be undone',
       onYes: () => {
-        dispatch(closeModal({ modalType: "placeEdit" }));
+        dispatch(closeModal({ modalType: 'placeEdit' }));
         dispatch(
           deletePlace({
             mapId: map!.id,
             placeId: id,
-          })
+          }),
         );
       },
     });
@@ -102,7 +96,7 @@ export default function PlaceEditModal() {
       shouldCloseOnOverlayClick
       className="PlaceEditModal"
       title="Edit Place"
-      onCloseModal={() => dispatch(closeModal({ modalType: "placeEdit" }))}
+      onCloseModal={() => dispatch(closeModal({ modalType: 'placeEdit' }))}
     >
       {place ? (
         <div className="PlaceEdit">
@@ -118,38 +112,32 @@ export default function PlaceEditModal() {
             <IoIosCloseCircleOutline
               className="PlaceEdit__buttons__closeModal"
               onClick={() => {
-                dispatch(closeModal({ modalType: "placeEdit" }));
+                dispatch(closeModal({ modalType: 'placeEdit' }));
               }}
             />
           </div>
           <div className="PlaceEdit__maskImage">
             {map?.source.png && (
-              <img
-                className="PlaceEdit__maskImage__map"
-                src={config.genAssetLink(map.source.png)}
-                alt="map"
-              />
+              <img className="PlaceEdit__maskImage__map" src={config.genAssetLink(map.source.png)} alt="map" />
             )}
 
             <DragAndDropImages
               placeHolder="Add a mask for the place."
               className="PlaceEdit__maskImage__mask"
-              previewImage={
-                place.maskSource && config.genAssetLink(place.maskSource)
-              }
-              handleChange={(file) => handleUploadImage(file, "mask")}
+              previewImage={place.maskSource && config.genAssetLink(place.maskSource)}
+              handleChange={(file) => handleUploadImage(file, 'mask')}
               onFileValidate={async (file) => {
                 const mapImageSrc = map?.source.png;
                 if (!mapImageSrc) {
-                  toast.error("Please upload a map image first.");
+                  toast.error('Please upload a map image first.');
                   return false;
                 }
                 if (file.size > 2 * 1024 * 1024) {
-                  toast.error("File size should be less than 1MB");
+                  toast.error('File size should be less than 1MB');
                   return false;
                 }
-                if (!checkFileType(file, ["image/png", "image/jpeg"])) {
-                  toast.error("Invalid file type. Please upload a jpg file.");
+                if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+                  toast.error('Invalid file type. Please upload a jpg file.');
                   return false;
                 }
                 const image = new Image();
@@ -161,8 +149,8 @@ export default function PlaceEditModal() {
                 return new Promise((resolve) => {
                   image.onload = () => {
                     // check if the mask contains only black and white pixels
-                    const canvas = document.createElement("canvas");
-                    const ctx = canvas.getContext("2d");
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
                     if (!ctx) {
                       resolve(false);
                       return;
@@ -170,17 +158,10 @@ export default function PlaceEditModal() {
                     canvas.width = image.width;
                     canvas.height = image.height;
                     ctx.drawImage(image, 0, 0, image.width, image.height);
-                    const pixels = ctx.getImageData(
-                      0,
-                      0,
-                      image.width,
-                      image.height
-                    ).data;
+                    const pixels = ctx.getImageData(0, 0, image.width, image.height).data;
 
                     if (!isBlackAndWhite(pixels)) {
-                      toast.error(
-                        "Mask should be all black and have a white area for the place."
-                      );
+                      toast.error('Mask should be all black and have a white area for the place.');
                       resolve(false);
                       return;
                     }
@@ -188,13 +169,8 @@ export default function PlaceEditModal() {
                     const mapImage = new Image();
                     mapImage.src = config.genAssetLink(mapImageSrc);
                     mapImage.onload = () => {
-                      if (
-                        mapImage.width !== image.width ||
-                        mapImage.height !== image.height
-                      ) {
-                        toast.error(
-                          "Mask should be the same size as the map image."
-                        );
+                      if (mapImage.width !== image.width || mapImage.height !== image.height) {
+                        toast.error('Mask should be the same size as the map image.');
                         resolve(false);
                         return;
                       }
@@ -218,9 +194,9 @@ export default function PlaceEditModal() {
                       mapId: map!.id,
                       place: {
                         ...place,
-                        sceneId: sceneId || "",
+                        sceneId: sceneId || '',
                       },
-                    })
+                    }),
                   );
                 }}
               />
@@ -234,7 +210,7 @@ export default function PlaceEditModal() {
                   updatePlace({
                     mapId: map!.id,
                     place: { ...place, name: e.target.value },
-                  })
+                  }),
                 );
               }}
             />
@@ -248,7 +224,7 @@ export default function PlaceEditModal() {
                   updatePlace({
                     mapId: map!.id,
                     place: { ...place, description: e.target.value },
-                  })
+                  }),
                 );
               }}
             />
@@ -257,21 +233,18 @@ export default function PlaceEditModal() {
               previewImage={
                 place.previewSource
                   ? config.genAssetLink(
-                      backgrounds.find((b) => b.id === place.previewSource)
-                        ?.source.jpg || place.previewSource
+                      backgrounds.find((b) => b.id === place.previewSource)?.source.jpg || place.previewSource,
                     )
-                  : ""
+                  : ''
               }
-              handleChange={(file) => handleUploadImage(file, "preview")}
+              handleChange={(file) => handleUploadImage(file, 'preview')}
               onFileValidate={async (file) => {
                 if (file.size > 2 * 1024 * 1024) {
-                  toast.error("File size should be less than 1MB");
+                  toast.error('File size should be less than 1MB');
                   return false;
                 }
-                if (!checkFileType(file, ["image/png", "image/jpeg"])) {
-                  toast.error(
-                    "Invalid file type. Please upload a valid image file"
-                  );
+                if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+                  toast.error('Invalid file type. Please upload a valid image file');
                   return false;
                 }
                 return true;

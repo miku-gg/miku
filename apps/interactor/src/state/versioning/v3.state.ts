@@ -1,63 +1,63 @@
-import { NovelV3 } from '@mikugg/bot-utils'
+import { NovelV3 } from '@mikugg/bot-utils';
 
 export interface NarrationInteraction {
-  id: string
-  parentResponseId: string | null
-  query: string
-  sceneId: string
-  responsesId: string[]
+  id: string;
+  parentResponseId: string | null;
+  query: string;
+  sceneId: string;
+  responsesId: string[];
 }
 
 export interface NarrationSceneSuggestion {
-  actionText: string
-  textPrompt: string
-  sdPrompt: string
+  actionText: string;
+  textPrompt: string;
+  sdPrompt: string;
   characters: {
-    characterId: string
-    outfitPrompt: string
-  }[]
-  sceneId: string
-  music?: string
+    characterId: string;
+    outfitPrompt: string;
+  }[];
+  sceneId: string;
+  music?: string;
 }
 
 export interface NarrationResponse {
-  id: string
-  selected: boolean
-  fetching: boolean
-  parentInteractionId: string | null
-  fetchingSuggestions?: boolean
-  nextScene?: string
-  shouldSuggestScenes?: boolean
-  suggestedScenes: NarrationSceneSuggestion[]
-  selectedCharacterId: string | null
+  id: string;
+  selected: boolean;
+  fetching: boolean;
+  parentInteractionId: string | null;
+  fetchingSuggestions?: boolean;
+  nextScene?: string;
+  shouldSuggestScenes?: boolean;
+  suggestedScenes: NarrationSceneSuggestion[];
+  selectedCharacterId: string | null;
   characters: {
-    characterId: string
-    emotion: string
-    pose: string
-    text: string
-  }[]
+    characterId: string;
+    emotion: string;
+    pose: string;
+    text: string;
+  }[];
   childrenInteractions: {
-    interactionId: string
-    selected: boolean
-  }[]
+    interactionId: string;
+    selected: boolean;
+  }[];
 }
 
 export interface NarrationState {
-  id: string
-  fetching: boolean
-  currentResponseId: string
+  id: string;
+  fetching: boolean;
+  currentResponseId: string;
   input: {
-    text: string
-    suggestions: string[]
-    disabled: boolean
-  }
+    text: string;
+    suggestions: string[];
+    disabled: boolean;
+  };
   interactions: {
-    [id: string]: NarrationInteraction | undefined
-  }
+    [id: string]: NarrationInteraction | undefined;
+  };
   responses: {
-    [id: string]: NarrationResponse | undefined
-  }
-  seenHints?: string[]
+    [id: string]: NarrationResponse | undefined;
+  };
+  seenHints?: string[];
 }
 
 export interface NovelScene extends NovelV3.NovelScene {}
@@ -103,57 +103,57 @@ export enum Voices {
 }
 
 export interface SettingsState {
-  model: ModelType
+  model: ModelType;
   user: {
-    name: string
-    isTester?: boolean
-    isPremium: boolean
-    nsfw: NovelNSFW
-    credits: number
-    loading: boolean
-    sceneSuggestionsLeft: number
-  }
+    name: string;
+    isTester?: boolean;
+    isPremium: boolean;
+    nsfw: NovelNSFW;
+    credits: number;
+    loading: boolean;
+    sceneSuggestionsLeft: number;
+  };
   prompt: {
-    systemPrompt: string
-  }
+    systemPrompt: string;
+  };
   chatBox: {
-    isDraggable: boolean
-  }
+    isDraggable: boolean;
+  };
   text: {
-    speed: Speed
-    fontSize: FontSize
-    autoContinue: boolean
-  }
+    speed: Speed;
+    fontSize: FontSize;
+    autoContinue: boolean;
+  };
   voice: {
-    autoplay: boolean
-    speed: Speed
-    voiceId: Voices
-  }
+    autoplay: boolean;
+    speed: Speed;
+    voiceId: Voices;
+  };
   music: {
-    enabled: boolean
-    volume: number
-  }
+    enabled: boolean;
+    volume: number;
+  };
   modals: {
-    settings: boolean
-    settingsTab: 'general' | 'prompt' | 'audio'
-    about: boolean
-    history: boolean
-    map: boolean
-    debug: boolean
-    testing: boolean
-    modelSelector: boolean
+    settings: boolean;
+    settingsTab: 'general' | 'prompt' | 'audio';
+    about: boolean;
+    history: boolean;
+    map: boolean;
+    debug: boolean;
+    testing: boolean;
+    modelSelector: boolean;
     edit: {
-      opened: boolean
-      id: string
-    }
-  }
+      opened: boolean;
+      id: string;
+    };
+  };
 }
 
-export const VersionId = 'v3'
+export const VersionId = 'v3';
 
 export interface State {
-  version: string
-  settings: SettingsState
-  narration: NarrationState
-  novel: NovelState
+  version: string;
+  settings: SettingsState;
+  narration: NarrationState;
+  novel: NovelState;
 }

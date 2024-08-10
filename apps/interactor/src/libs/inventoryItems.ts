@@ -1,13 +1,8 @@
-import { NovelV3 } from '@mikugg/bot-utils'
+import { NovelV3 } from '@mikugg/bot-utils';
 
-export const getItemByActionPrompt = (
-  inventoryItems: NovelV3.InventoryItem[],
-  query: string
-) => {
-  return inventoryItems.find((item) =>
-    item.actions?.some((action) => action.prompt === query)
-  )
-}
+export const getItemByActionPrompt = (inventoryItems: NovelV3.InventoryItem[], query: string) => {
+  return inventoryItems.find((item) => item.actions?.some((action) => action.prompt === query));
+};
 
 export const DEFAULT_INVENTORY: NovelV3.InventoryItem[] = [
   {
@@ -38,8 +33,7 @@ export const DEFAULT_INVENTORY: NovelV3.InventoryItem[] = [
     actions: [
       {
         name: 'Give',
-        prompt:
-          '*I open my bag and pull out a stick. I give the stick to {{char}}.*',
+        prompt: '*I open my bag and pull out a stick. I give the stick to {{char}}.*',
       },
       {
         name: 'Bonk',
@@ -112,9 +106,8 @@ export const DEFAULT_INVENTORY: NovelV3.InventoryItem[] = [
       },
       {
         name: 'Destroy',
-        prompt:
-          '*I pull out a teddy bear and start to rip it apart. Stuffing flies everywhere.*',
+        prompt: '*I pull out a teddy bear and start to rip it apart. Stuffing flies everywhere.*',
       },
     ],
   },
-]
+];

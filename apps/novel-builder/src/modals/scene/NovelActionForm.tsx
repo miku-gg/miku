@@ -1,20 +1,18 @@
-import { NovelV3 } from "@mikugg/bot-utils";
-import ButtonGroup from "../../components/ButtonGroup";
-import InventoryItems from "../../panels/assets/inventory/InventoryItems";
-import { selectEditingInventoryItem } from "../../state/selectors";
-import { useAppSelector } from "../../state/store";
-import "./NovelActionForm.scss";
-import SceneSelector from "./SceneSelector";
+import { NovelV3 } from '@mikugg/bot-utils';
+import ButtonGroup from '../../components/ButtonGroup';
+import InventoryItems from '../../panels/assets/inventory/InventoryItems';
+import { selectEditingInventoryItem } from '../../state/selectors';
+import { useAppSelector } from '../../state/store';
+import './NovelActionForm.scss';
+import SceneSelector from './SceneSelector';
 
-export const getDefaultAction = (
-  actionType: NovelV3.NovelActionType
-): NovelV3.NovelAction => {
+export const getDefaultAction = (actionType: NovelV3.NovelActionType): NovelV3.NovelAction => {
   switch (actionType) {
     case NovelV3.NovelActionType.ADD_CHILD_SCENES:
       return {
         type: NovelV3.NovelActionType.ADD_CHILD_SCENES,
         params: {
-          sceneId: "",
+          sceneId: '',
           children: [],
         },
       };
@@ -22,28 +20,28 @@ export const getDefaultAction = (
       return {
         type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
         params: {
-          sceneId: "",
+          sceneId: '',
         },
       };
     case NovelV3.NovelActionType.SHOW_ITEM:
       return {
         type: NovelV3.NovelActionType.SHOW_ITEM,
         params: {
-          itemId: "",
+          itemId: '',
         },
       };
     case NovelV3.NovelActionType.HIDE_ITEM:
       return {
         type: NovelV3.NovelActionType.HIDE_ITEM,
         params: {
-          itemId: "",
+          itemId: '',
         },
       };
     default:
       return {
         type: NovelV3.NovelActionType.HIDE_ITEM,
         params: {
-          itemId: "",
+          itemId: '',
         },
       };
   }
@@ -71,7 +69,7 @@ const ActionParamsForm = ({
             onChange({
               type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
               params: {
-                sceneId: sceneId || "",
+                sceneId: sceneId || '',
               },
             })
           }
@@ -131,7 +129,7 @@ const ActionParamsForm = ({
                 ...action,
                 params: {
                   ...action.params,
-                  sceneId: sceneId || "",
+                  sceneId: sceneId || '',
                 },
               });
             }}
@@ -177,19 +175,19 @@ export default function NovelActionForm({
         <ButtonGroup<NovelV3.NovelActionType>
           buttons={[
             {
-              content: "Add children scenes",
+              content: 'Add children scenes',
               value: NovelV3.NovelActionType.ADD_CHILD_SCENES,
             },
             {
-              content: "Suggest advance scene",
+              content: 'Suggest advance scene',
               value: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
             },
             {
-              content: "Add item",
+              content: 'Add item',
               value: NovelV3.NovelActionType.SHOW_ITEM,
             },
             {
-              content: "Remove item",
+              content: 'Remove item',
               value: NovelV3.NovelActionType.HIDE_ITEM,
             },
           ]}

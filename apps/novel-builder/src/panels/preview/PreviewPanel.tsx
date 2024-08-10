@@ -1,25 +1,19 @@
-import { Button, Loader, Modal } from "@mikugg/ui-kit";
-import config, { STAGE } from "../../config";
-import { useEffect, useMemo, useRef, useState } from "react";
-import base64 from "base-64";
-import utf8 from "utf8";
-import queryString from "query-string";
-import { useAppDispatch, useAppSelector } from "../../state/store";
-import { PiHammerBold } from "react-icons/pi";
-import "./PreviewPanel.scss";
-import { downloadNovelState } from "../../libs/utils";
-import cloneDeep from "lodash.clonedeep";
-import { closeModal, openModal } from "../../state/slices/inputSlice";
-import { toast } from "react-toastify";
-import { NovelV3 } from "@mikugg/bot-utils";
+import { Button, Loader, Modal } from '@mikugg/ui-kit';
+import config, { STAGE } from '../../config';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import base64 from 'base-64';
+import utf8 from 'utf8';
+import queryString from 'query-string';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import { PiHammerBold } from 'react-icons/pi';
+import './PreviewPanel.scss';
+import { downloadNovelState } from '../../libs/utils';
+import cloneDeep from 'lodash.clonedeep';
+import { closeModal, openModal } from '../../state/slices/inputSlice';
+import { toast } from 'react-toastify';
+import { NovelV3 } from '@mikugg/bot-utils';
 
-export function generateAlphaLink({
-  botHash,
-  chatId,
-}: {
-  botHash: string;
-  chatId: string;
-}): string {
+export function generateAlphaLink({ botHash, chatId }: { botHash: string; chatId: string }): string {
   const searchParams = {
     cardId: botHash,
     narrationId: chatId,
@@ -27,18 +21,12 @@ export function generateAlphaLink({
     configuration: base64.encode(
       utf8.encode(
         JSON.stringify({
-          assetUploadEndpoint: "http://localhost:8585/s3/asset-upload",
-          characterSearchEndpoint: "",
-          backgroundSearchEndpoint: "",
-          assetsEndpoint:
-            STAGE === "development"
-              ? "http://localhost:8585/s3/assets"
-              : "https://assets.miku.gg",
-          cardEndpoint: "http://localhost:8585/s3/bots",
-          servicesEndpoint:
-            STAGE === "development"
-              ? "http://localhost:8484"
-              : "https://services.miku.gg",
+          assetUploadEndpoint: 'http://localhost:8585/s3/asset-upload',
+          characterSearchEndpoint: '',
+          backgroundSearchEndpoint: '',
+          assetsEndpoint: STAGE === 'development' ? 'http://localhost:8585/s3/assets' : 'https://assets.miku.gg',
+          cardEndpoint: 'http://localhost:8585/s3/bots',
+          servicesEndpoint: STAGE === 'development' ? 'http://localhost:8484' : 'https://services.miku.gg',
           freeTTS: false,
           freeSmart: false,
           settings: {
@@ -47,8 +35,8 @@ export function generateAlphaLink({
               nsfw: 2,
             },
           },
-        })
-      )
+        }),
+      ),
     ),
   };
 
@@ -64,9 +52,7 @@ export default function PreviewPanel() {
   const novel = useAppSelector((state) => state.novel);
   const dispatch = useAppDispatch();
 
-  const scenesToObjectives = (
-    scenes: NovelV3.NovelScene[]
-  ): NovelV3.NovelObjective[] => {
+  const scenesToObjectives = (scenes: NovelV3.NovelScene[]): NovelV3.NovelObjective[] => {
     const result: NovelV3.NovelObjective[] = [];
     scenes.forEach((scene) => {
       scene.children.forEach((childId) => {
@@ -77,7 +63,7 @@ export default function PreviewPanel() {
             name: `Transition to ${child.name}`,
             singleUse: false,
             stateCondition: {
-              type: "IN_SCENE",
+              type: 'IN_SCENE',
               config: {
                 sceneIds: [scene.id],
               },
@@ -101,41 +87,39 @@ export default function PreviewPanel() {
   const botInteractionUrl = useMemo(
     () =>
       generateAlphaLink({
-        botHash: "QmXe2icjuvjQ8F1LskALxQ5ugQKr59eZDvtFhkjvUYN64v.json",
-        chatId: "chatId",
+        botHash: 'QmXe2icjuvjQ8F1LskALxQ5ugQKr59eZDvtFhkjvUYN64v.json',
+        chatId: 'chatId',
       }),
-    []
+    [],
   );
 
-  const handlExport = async (exportFor: "miku" | "local") => {
+  const handlExport = async (exportFor: 'miku' | 'local') => {
     try {
       setIsModalOpen(false);
       dispatch(
         openModal({
-          modalType: "loading",
-          text: `Building project for ${
-            exportFor === "miku" ? "Miku.gg" : "local"
-          }...`,
-        })
+          modalType: 'loading',
+          text: `Building project for ${exportFor === 'miku' ? 'Miku.gg' : 'local'}...`,
+        }),
       );
       await downloadNovelState(
         cloneDeep(novel),
-        exportFor === "local" ? config.genAssetLink : false,
+        exportFor === 'local' ? config.genAssetLink : false,
         (text: string) => {
           dispatch(
             openModal({
-              modalType: "loading",
+              modalType: 'loading',
               text,
-            })
+            }),
           );
         },
-        true
+        true,
       );
     } catch (e) {
       console.error(e);
-      toast.error(`Failed to ${exportFor === "miku" ? "build" : "save"} novel`);
+      toast.error(`Failed to ${exportFor === 'miku' ? 'build' : 'save'} novel`);
     }
-    dispatch(closeModal({ modalType: "loading" }));
+    dispatch(closeModal({ modalType: 'loading' }));
     setIsModalOpen(false);
   };
 
@@ -149,16 +133,16 @@ export default function PreviewPanel() {
 
       iframe?.contentWindow?.postMessage(
         {
-          type: "NARRATION_DATA",
+          type: 'NARRATION_DATA',
           payload: {
-            version: "v3",
+            version: 'v3',
             novel,
             narration: {
               fetching: false,
               currentResponseId: start.id,
-              id: "chatId",
+              id: 'chatId',
               input: {
-                text: "",
+                text: '',
                 suggestions: [],
                 disabled: false,
               },
@@ -182,13 +166,10 @@ export default function PreviewPanel() {
               showInventory: false,
               showItemModal: false,
             },
-            objectives: [
-              ...scenesToObjectives(novel.scenes),
-              ...(novel.objectives || []),
-            ],
+            objectives: [...scenesToObjectives(novel.scenes), ...(novel.objectives || [])],
           },
         },
-        "*"
+        '*',
       );
     }
   }, [loadingIframe, novel]);
@@ -204,25 +185,22 @@ export default function PreviewPanel() {
               <li className="PreviewPanel__option">
                 <p className="PreviewPanel__option-title">Export for Miku.gg</p>
                 <p className="PreviewPanel__option-description">
-                  Saves your project as a .json file without assets. Ideal for
-                  sharing or uploading to Miku.gg.
+                  Saves your project as a .json file without assets. Ideal for sharing or uploading to Miku.gg.
                 </p>
               </li>
               <li className="PreviewPanel__option">
-                <p className="PreviewPanel__option-title">
-                  Export for Local Use
-                </p>
+                <p className="PreviewPanel__option-title">Export for Local Use</p>
                 <p className="PreviewPanel__option-description">
-                  Saves your project as a .json file with all associated assets
-                  included. Perfect for offline use or complete backups.
+                  Saves your project as a .json file with all associated assets included. Perfect for offline use or
+                  complete backups.
                 </p>
               </li>
             </ul>
             <div className="PreviewPanel__buttons-group">
-              <Button theme="gradient" onClick={() => handlExport("miku")}>
+              <Button theme="gradient" onClick={() => handlExport('miku')}>
                 Export for Miku.gg
               </Button>
-              <Button theme="transparent" onClick={() => handlExport("local")}>
+              <Button theme="transparent" onClick={() => handlExport('local')}>
                 Export for Local Use
               </Button>
             </div>

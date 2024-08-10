@@ -26,6 +26,7 @@ On the first page, you have to complete the form for the bot creation.
 - **Character Greeting**: The first message from the bot that triggres conversation starts.
 
 ### Import Bots
+
 You can import bots in .png format that are already built, using the import button.
 You can also imports bots that are build for other frontends like [Agnai](https://agnai.chat), [RisuAI](https://risuai.xyz) or [SillyTavern](https://docs.sillytavern.app). Most of these frontends are intended primarily for text-only bots, so you will have to add the images for the bot to make it work well with miku.gg.
 
@@ -51,8 +52,8 @@ You can have different outfits for your character. For example, you can have a `
 
 Additionally, you need to select the **Emotion Set** which is the group of emotions that will be used for each particular group.
 
-* *Regular Emotions* are intended for most cases. They consist of 29 emotions, you can repeat the same image too if you don't have that many images.
-* *Lewd Emotions* are intended for NSFW outfits. They consist of 16 erotic-roleplay emotions.
+- _Regular Emotions_ are intended for most cases. They consist of 29 emotions, you can repeat the same image too if you don't have that many images.
+- _Lewd Emotions_ are intended for NSFW outfits. They consist of 16 erotic-roleplay emotions.
 
 !!!warning
 All the images you upload should have transparency because they will be placed on top of backgrounds. Also, the canvas size should fit the content for better results.
@@ -75,25 +76,27 @@ Next, you'll have to add the scenarios for the bot. Scenarios are the background
 Each scenario represents a different environment for the bot. For example, you can have a `bedroom` scenario and a `kitchen` scenario.
 
 #### Scenario prompt definitions
+
 Once you select a background and an emotion group, you need to defined other attributes.
 
 ![](/assets/bot_builder_3_2.png)
 
-* *Make primary scenario* is for the scenario that will be used as the default scenario for the bot. It will be used when the bot is first loaded.
+- _Make primary scenario_ is for the scenario that will be used as the default scenario for the bot. It will be used when the bot is first loaded.
 
-* *Scenario name* is a short name for referencing the scenario. It will not be used in the prompt.
+- _Scenario name_ is a short name for referencing the scenario. It will not be used in the prompt.
 
-* *Voice* is the voice that will be used for the bot. It's recommended to use Azure voices since it's the cheapest. You can also use ElevenLabs voices.
+- _Voice_ is the voice that will be used for the bot. It's recommended to use Azure voices since it's the cheapest. You can also use ElevenLabs voices.
 
-* *Keywords* are a list of words that define the scenario. This will be used by the emotion interpreter to try to guess when it's appropiate to change to this scenario and suggest it to the user. *This is a work in progress feature.*
+- _Keywords_ are a list of words that define the scenario. This will be used by the emotion interpreter to try to guess when it's appropiate to change to this scenario and suggest it to the user. _This is a work in progress feature._
 
-* *Action text* is the text of the button that will be used to change to this scenario.
+- _Action text_ is the text of the button that will be used to change to this scenario.
 
-* *Prompt context* [see below](#prompt-context).
+- _Prompt context_ [see below](#prompt-context).
 
-* *Children scenarios* are the list of scenarios that can be accessed from this scenario. For example, if you have a `bedroom` scenario, you can have a `kitchen` scenario as a child scenario.
+- _Children scenarios_ are the list of scenarios that can be accessed from this scenario. For example, if you have a `bedroom` scenario, you can have a `kitchen` scenario as a child scenario.
 
 ##### Prompt context
+
 When creating a scenario, you have to define the prompt for the scenario. The prompt is the text that will be used to give context about the new environment. For example, if you have a `bedroom` scenario, you can use the following prompt:
 
 ```

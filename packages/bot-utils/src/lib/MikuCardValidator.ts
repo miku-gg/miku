@@ -1,4 +1,4 @@
-import { DEFAULT_MUSIC } from "..";
+import { DEFAULT_MUSIC } from '..';
 
 export type LorebookEntry = Array<{
   keys: Array<string>;
@@ -18,7 +18,7 @@ export type LorebookEntry = Array<{
   selective?: boolean; // if `true`, require a key from both `keys` and `secondary_keys` to trigger the entry
   secondary_keys?: Array<string>; // see field `selective`. ignored if selective == false
   constant?: boolean; // if true, always inserted in the prompt (within budget limit)
-  position?: "before_char" | "after_char"; // whether the entry is placed before or after the character defs
+  position?: 'before_char' | 'after_char'; // whether the entry is placed before or after the character defs
 }>;
 
 export type CharacterBook = {
@@ -32,8 +32,8 @@ export type CharacterBook = {
 };
 
 export type TavernCardV2 = {
-  spec: "chara_card_v2";
-  spec_version: "2.0"; // May 8th addition
+  spec: 'chara_card_v2';
+  spec_version: '2.0'; // May 8th addition
   data: {
     name: string;
     description: string;
@@ -145,21 +145,9 @@ export type MikuCardV2 = TavernCardV2 & {
   };
 };
 
-export const LICENSES = [
-  "CC0",
-  "CC BY",
-  "CC BY-SA",
-  "CC BY-ND",
-  "CC BY-NC",
-  "CC BY-NC-SA",
-  "CC BY-NC-ND",
-];
+export const LICENSES = ['CC0', 'CC BY', 'CC BY-SA', 'CC BY-ND', 'CC BY-NC', 'CC BY-NC-SA', 'CC BY-NC-ND'];
 
-export type EmotionTemplateSlug =
-  | "single-emotion"
-  | "tiny-emotions"
-  | "base-emotions"
-  | "lewd-emotions";
+export type EmotionTemplateSlug = 'single-emotion' | 'tiny-emotions' | 'base-emotions' | 'lewd-emotions';
 
 export const EMOTION_GROUP_TEMPLATES: Record<
   EmotionTemplateSlug,
@@ -169,131 +157,121 @@ export const EMOTION_GROUP_TEMPLATES: Record<
     emotionIds: string[];
   }
 > = {
-  "single-emotion": {
-    id: "single-emotion",
-    label: "Single emotion",
-    emotionIds: ["neutral"],
+  'single-emotion': {
+    id: 'single-emotion',
+    label: 'Single emotion',
+    emotionIds: ['neutral'],
   },
-  "tiny-emotions": {
-    id: "tiny-emotions",
-    label: "Tiny emotions",
+  'tiny-emotions': {
+    id: 'tiny-emotions',
+    label: 'Tiny emotions',
+    emotionIds: ['angry', 'sad', 'happy', 'disgusted', 'scared', 'embarrased', 'surprised', 'neutral', 'confused'],
+  },
+  'base-emotions': {
+    id: 'base-emotions',
+    label: 'Base emotions',
     emotionIds: [
-      "angry",
-      "sad",
-      "happy",
-      "disgusted",
-      "scared",
-      "embarrased",
-      "surprised",
-      "neutral",
-      "confused",
+      'angry',
+      'sad',
+      'happy',
+      'disgusted',
+      'begging',
+      'scared',
+      'excited',
+      'hopeful',
+      'longing',
+      'proud',
+      'neutral',
+      'rage',
+      'scorn',
+      'blushed',
+      'pleasure',
+      'lustful',
+      'shocked',
+      'confused',
+      'disappointed',
+      'embarrassed',
+      'guilty',
+      'shy',
+      'frustrated',
+      'annoyed',
+      'exhausted',
+      'tired',
+      'curious',
+      'intrigued',
+      'amused',
     ],
   },
-  "base-emotions": {
-    id: "base-emotions",
-    label: "Base emotions",
+  'lewd-emotions': {
+    id: 'lewd-emotions',
+    label: 'Lewd emotions',
     emotionIds: [
-      "angry",
-      "sad",
-      "happy",
-      "disgusted",
-      "begging",
-      "scared",
-      "excited",
-      "hopeful",
-      "longing",
-      "proud",
-      "neutral",
-      "rage",
-      "scorn",
-      "blushed",
-      "pleasure",
-      "lustful",
-      "shocked",
-      "confused",
-      "disappointed",
-      "embarrassed",
-      "guilty",
-      "shy",
-      "frustrated",
-      "annoyed",
-      "exhausted",
-      "tired",
-      "curious",
-      "intrigued",
-      "amused",
-    ],
-  },
-  "lewd-emotions": {
-    id: "lewd-emotions",
-    label: "Lewd emotions",
-    emotionIds: [
-      "desire",
-      "pleasure",
-      "anticipation",
-      "condescension",
-      "arousal",
-      "ecstasy",
-      "relief",
-      "release",
-      "intensity",
-      "comfort",
-      "humiliation",
-      "discomfort",
-      "submission",
-      "pain",
-      "teasing",
-      "arrogant",
+      'desire',
+      'pleasure',
+      'anticipation',
+      'condescension',
+      'arousal',
+      'ecstasy',
+      'relief',
+      'release',
+      'intensity',
+      'comfort',
+      'humiliation',
+      'discomfort',
+      'submission',
+      'pain',
+      'teasing',
+      'arrogant',
     ],
   },
 };
 
 export const EMPTY_MIKU_CARD: MikuCard = {
-  spec: "chara_card_v2",
-  spec_version: "2.0",
+  spec: 'chara_card_v2',
+  spec_version: '2.0',
   data: {
-    name: "",
-    character_version: "1",
-    system_prompt: "",
-    description: "",
-    personality: "",
-    scenario: "",
-    first_mes: "",
-    mes_example: "",
+    name: '',
+    character_version: '1',
+    system_prompt: '',
+    description: '',
+    personality: '',
+    scenario: '',
+    first_mes: '',
+    mes_example: '',
     alternate_greetings: [],
-    post_history_instructions: "",
-    creator_notes: "",
+    post_history_instructions: '',
+    creator_notes: '',
     tags: [],
-    creator: "",
+    creator: '',
     extensions: {
       mikugg: {
-        license: "CC BY",
-        language: "en",
-        profile_pic: "",
-        short_description: "",
-        start_scenario: "default",
+        license: 'CC BY',
+        language: 'en',
+        profile_pic: '',
+        short_description: '',
+        start_scenario: 'default',
         scenarios: [
           {
-            id: "default",
-            name: "",
+            id: 'default',
+            name: '',
             children_scenarios: [],
-            context: "",
-            trigger_suggestion_similarity: "",
-            trigger_action: "",
-            background: "",
-            emotion_group: "",
-            voice: "",
-            music: "",
+            context: '',
+            trigger_suggestion_similarity: '',
+            trigger_action: '',
+            background: '',
+            emotion_group: '',
+            voice: '',
+            music: '',
           },
         ],
         emotion_groups: [],
         backgrounds: [],
         voices: [
           {
-            id: "azure_tts.en-GB-SoniaNeural",
-            provider: "azure_tts",
-            provider_voice_id: "en-GB-SoniaNeural",
-            provider_emotion: "sad",
+            id: 'azure_tts.en-GB-SoniaNeural',
+            provider: 'azure_tts',
+            provider_voice_id: 'en-GB-SoniaNeural',
+            provider_emotion: 'sad',
           },
         ],
         sounds: [],
@@ -305,111 +283,69 @@ export const EMPTY_MIKU_CARD: MikuCard = {
 export function validateMikuCard(card: MikuCard): string[] {
   const errors: string[] = [];
   const { mikugg } = card.data.extensions;
-  if (!mikugg.scenarios.length)
-    errors.push("extensions.mikugg.scenarios is empty");
-  if (!mikugg.backgrounds.length)
-    errors.push("extensions.mikugg.backgrounds is empty");
-  if (!mikugg.emotion_groups.length)
-    errors.push("extensions.mikugg.emotion_groups is empty");
-  if (!mikugg.voices.length) errors.push("extensions.mikugg.voices is empty");
+  if (!mikugg.scenarios.length) errors.push('extensions.mikugg.scenarios is empty');
+  if (!mikugg.backgrounds.length) errors.push('extensions.mikugg.backgrounds is empty');
+  if (!mikugg.emotion_groups.length) errors.push('extensions.mikugg.emotion_groups is empty');
+  if (!mikugg.voices.length) errors.push('extensions.mikugg.voices is empty');
 
   const scenarios = new Map<string, (typeof mikugg.scenarios)[0]>();
   const backgrounds = new Map<string, (typeof mikugg.backgrounds)[0]>();
   const emotion_groups = new Map<string, (typeof mikugg.emotion_groups)[0]>();
   const voices = new Map<string, (typeof mikugg.voices)[0]>();
-  const sounds = new Map<
-    string,
-    { id: string; name: string; source: string }
-  >();
+  const sounds = new Map<string, { id: string; name: string; source: string }>();
 
   mikugg.scenarios.forEach((scenario) => scenarios.set(scenario.id, scenario));
-  mikugg.backgrounds.forEach((background) =>
-    backgrounds.set(background.id, background)
-  );
-  mikugg.emotion_groups.forEach((emotion_group) =>
-    emotion_groups.set(emotion_group.id, emotion_group)
-  );
+  mikugg.backgrounds.forEach((background) => backgrounds.set(background.id, background));
+  mikugg.emotion_groups.forEach((emotion_group) => emotion_groups.set(emotion_group.id, emotion_group));
   mikugg.voices.forEach((voice) => voices.set(voice.id, voice));
   mikugg.sounds?.forEach((sound) => sounds.set(sound.id, sound));
 
   // check start scenario
-  if (!scenarios.has(mikugg.start_scenario))
-    errors.push("start_scenario not found in scenarios");
+  if (!scenarios.has(mikugg.start_scenario)) errors.push('start_scenario not found in scenarios');
 
   // check scenarios
   for (const scenario of mikugg.scenarios) {
     if (!backgrounds.has(scenario.background))
-      errors.push(
-        `${scenario.id}: ${scenario.background} not found in mikugg.backgrounds`
-      );
+      errors.push(`${scenario.id}: ${scenario.background} not found in mikugg.backgrounds`);
     if (!emotion_groups.has(scenario.emotion_group))
-      errors.push(
-        `${scenario.id}: ${scenario.emotion_group} not found in mikugg.emotion_groups`
-      );
-    if (!voices.has(scenario.voice))
-      errors.push(
-        `${scenario.id}: ${scenario.voice} not found in mikugg.voices`
-      );
+      errors.push(`${scenario.id}: ${scenario.emotion_group} not found in mikugg.emotion_groups`);
+    if (!voices.has(scenario.voice)) errors.push(`${scenario.id}: ${scenario.voice} not found in mikugg.voices`);
 
     for (const child_scenario of scenario.children_scenarios)
       if (!scenarios.has(child_scenario))
-        errors.push(
-          `${scenario.id}: ${child_scenario} not found in children_scenarios`
-        );
+        errors.push(`${scenario.id}: ${child_scenario} not found in children_scenarios`);
 
-    if (
-      scenario.music &&
-      !sounds.has(scenario.music || "") &&
-      !DEFAULT_MUSIC.includes(scenario.music || "")
-    ) {
-      errors.push(
-        `${scenario.id}: ${scenario.music} not found in mikugg.sounds`
-      );
+    if (scenario.music && !sounds.has(scenario.music || '') && !DEFAULT_MUSIC.includes(scenario.music || '')) {
+      errors.push(`${scenario.id}: ${scenario.music} not found in mikugg.sounds`);
     }
   }
 
   // check license
   if (!LICENSES.includes(mikugg.license))
-    errors.push(
-      `Invalid mikugg.license ${
-        mikugg.license
-      }. Please use one of ${LICENSES.join(" | ")}`
-    );
+    errors.push(`Invalid mikugg.license ${mikugg.license}. Please use one of ${LICENSES.join(' | ')}`);
 
   // check emotion_groups
   for (const [_, emotion_group] of emotion_groups) {
-    if (
-      !Object.keys(EMOTION_GROUP_TEMPLATES).includes(emotion_group.template)
-    ) {
-      errors.push(
-        `${emotion_group.id}: Invalid emotion group template ${emotion_group.template}`
-      );
+    if (!Object.keys(EMOTION_GROUP_TEMPLATES).includes(emotion_group.template)) {
+      errors.push(`${emotion_group.id}: Invalid emotion group template ${emotion_group.template}`);
     } else {
       const emotions_ids = new Map<string, string[]>(
-        emotion_group.emotions.map((emotion) => [emotion.id, emotion.source])
+        emotion_group.emotions.map((emotion) => [emotion.id, emotion.source]),
       );
 
       // check each emotion has valid or null sound
       for (const emotion of emotion_group.emotions) {
         if (emotion.sound && !sounds.has(emotion.sound))
-          errors.push(
-            `${emotion_group.id}: ${emotion.id}: ${emotion.sound} not found in mikugg.sounds`
-          );
+          errors.push(`${emotion_group.id}: ${emotion.id}: ${emotion.sound} not found in mikugg.sounds`);
       }
 
       // eslint-disable-next-line
       // @ts-ignore
-      for (const template_emotion_id of EMOTION_GROUP_TEMPLATES[
-        emotion_group.template
-      ].emotionIds) {
+      for (const template_emotion_id of EMOTION_GROUP_TEMPLATES[emotion_group.template].emotionIds) {
         if (!emotions_ids.has(template_emotion_id))
-          errors.push(
-            `mikugg.emotion_groups ${emotion_group.id}: ${template_emotion_id} not found`
-          );
+          errors.push(`mikugg.emotion_groups ${emotion_group.id}: ${template_emotion_id} not found`);
         else if (!emotions_ids.get(template_emotion_id)?.length)
-          errors.push(
-            `mikugg.emotion_groups ${emotion_group.id}: no source files for ${template_emotion_id}`
-          );
+          errors.push(`mikugg.emotion_groups ${emotion_group.id}: no source files for ${template_emotion_id}`);
       }
     }
   }
@@ -421,15 +357,11 @@ export function validateMikuCardV2(card: MikuCardV2): string[] {
   const errors = [];
   const { mikugg_v2 } = card.data.extensions;
 
-  if (!mikugg_v2?.language)
-    errors.push("extensions.mikugg_v2.language is empty");
-  if (!mikugg_v2?.profile_pic)
-    errors.push("extensions.mikugg_v2.profile_pic is empty");
-  if (!mikugg_v2?.short_description)
-    errors.push("extensions.mikugg_v2.short_description is empty");
+  if (!mikugg_v2?.language) errors.push('extensions.mikugg_v2.language is empty');
+  if (!mikugg_v2?.profile_pic) errors.push('extensions.mikugg_v2.profile_pic is empty');
+  if (!mikugg_v2?.short_description) errors.push('extensions.mikugg_v2.short_description is empty');
 
-  if (!mikugg_v2?.outfits?.length)
-    errors.push("extensions.mikugg_v2.outfits is empty");
+  if (!mikugg_v2?.outfits?.length) errors.push('extensions.mikugg_v2.outfits is empty');
 
   const outfits = new Map<string, (typeof mikugg_v2.outfits)[0]>();
   mikugg_v2.outfits.forEach((outfit) => outfits.set(outfit.id, outfit));
@@ -439,24 +371,16 @@ export function validateMikuCardV2(card: MikuCardV2): string[] {
       errors.push(`${outfit.id}: Invalid outfit template ${outfit.template}`);
     } else {
       const emotions_ids = new Map<string, string[]>(
-        outfit.emotions.map((emotion) => [
-          emotion.id,
-          Object.values(emotion.sources),
-        ])
+        outfit.emotions.map((emotion) => [emotion.id, Object.values(emotion.sources)]),
       );
 
       // eslint-disable-next-line
       // @ts-ignore
-      for (const template_emotion_id of EMOTION_GROUP_TEMPLATES[outfit.template]
-        .emotionIds) {
+      for (const template_emotion_id of EMOTION_GROUP_TEMPLATES[outfit.template].emotionIds) {
         if (!emotions_ids.has(template_emotion_id))
-          errors.push(
-            `mikugg_v2.outfits ${outfit.id}: ${template_emotion_id} not found`
-          );
+          errors.push(`mikugg_v2.outfits ${outfit.id}: ${template_emotion_id} not found`);
         else if (!emotions_ids.get(template_emotion_id)?.length)
-          errors.push(
-            `mikugg_v2.outfits ${outfit.id}: no source files for ${template_emotion_id}`
-          );
+          errors.push(`mikugg_v2.outfits ${outfit.id}: no source files for ${template_emotion_id}`);
       }
     }
   }

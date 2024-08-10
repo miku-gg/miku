@@ -13,14 +13,9 @@ export type AccordionItemProps = {
   className?: string;
 };
 
-const AccordionItem: React.FC<AccordionItemProps> = ({
-  title,
-  children,
-  className = '',
-}) => {
+const AccordionItem: React.FC<AccordionItemProps> = ({ title, children, className = '' }) => {
   const accordionContext = useContext(AccordionContext);
-  const { selectedIndex, onChange, onRemoveItem, items } =
-    accordionContext || {};
+  const { selectedIndex, onChange, onRemoveItem, items } = accordionContext || {};
   const index = items ? items[title] : -1;
 
   const handleRemoveItem = () => {
@@ -46,9 +41,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
           </button>
         </div>
       </div>
-      {selectedIndex === index && (
-        <div className="AccordionItem__content">{children}</div>
-      )}
+      {selectedIndex === index && <div className="AccordionItem__content">{children}</div>}
     </div>
   );
 };

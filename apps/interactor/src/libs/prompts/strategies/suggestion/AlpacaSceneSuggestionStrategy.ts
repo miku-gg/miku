@@ -1,51 +1,44 @@
-import { AbstractPromptStrategy } from '../AbstractPromptStrategy'
-import {
-  selectCharactersInCurrentScene,
-  selectChatHistory,
-  selectCurrentScene,
-} from '../../../../state/selectors'
-import { RootState } from '../../../../state/store'
-import { fillTextTemplate } from '..'
+import { AbstractPromptStrategy } from '../AbstractPromptStrategy';
+import { selectCharactersInCurrentScene, selectChatHistory, selectCurrentScene } from '../../../../state/selectors';
+import { RootState } from '../../../../state/store';
+import { fillTextTemplate } from '..';
 
 export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
   { state: RootState; singleScenePrompt?: string },
   {
-    actionText: string
-    music: string
-    prompt: string
-    sdPrompt: string
+    actionText: string;
+    music: string;
+    prompt: string;
+    sdPrompt: string;
   }[]
 > {
   public buildGuidancePrompt(
     maxNewTokens: number,
     memorySize: number,
-    {
-      state,
-      singleScenePrompt,
-    }: { state: RootState; singleScenePrompt?: string }
+    { state, singleScenePrompt }: { state: RootState; singleScenePrompt?: string },
   ): {
-    template: string
-    variables: Record<string, string | string[]>
-    totalTokens: number
+    template: string;
+    variables: Record<string, string | string[]>;
+    totalTokens: number;
   } {
     const personas = Object.values(state.novel.characters)
       .map((character) => character?.card?.data?.description || '')
       .filter(Boolean)
-      .join('\n')
-    const messages = this.getMessagesPrompt(state, memorySize)
-    const characters = selectCharactersInCurrentScene(state)
-    const scene = selectCurrentScene(state)
-    let template = `You're a writing assistant that will suggest possible next scenarios for a story.\n`
-    template += `### Instruction:\n`
+      .join('\n');
+    const messages = this.getMessagesPrompt(state, memorySize);
+    const characters = selectCharactersInCurrentScene(state);
+    const scene = selectCurrentScene(state);
+    let template = `You're a writing assistant that will suggest possible next scenarios for a story.\n`;
+    template += `### Instruction:\n`;
     if (singleScenePrompt) {
-      template += `Given an input of the current scene and conversation. You MUST suggest a possible next scene, describe a text explaining what should happen next.\n`
-      template += `The scene MUST indicate a change in the background, so you MUST describe a different environment.\n`
+      template += `Given an input of the current scene and conversation. You MUST suggest a possible next scene, describe a text explaining what should happen next.\n`;
+      template += `The scene MUST indicate a change in the background, so you MUST describe a different environment.\n`;
     } else {
-      template += `Given an input of the current scene and conversation. You MUST suggest 3 possible next scenes, describe a text explaining what should happen next. Also, describe an "action" for a button that the user can click.\n`
-      template += `Each of the 3 scenes MUST indicate a change in the background, so you MUST describe a different environment.\n`
+      template += `Given an input of the current scene and conversation. You MUST suggest 3 possible next scenes, describe a text explaining what should happen next. Also, describe an "action" for a button that the user can click.\n`;
+      template += `Each of the 3 scenes MUST indicate a change in the background, so you MUST describe a different environment.\n`;
     }
     // SHOTS: START
-    template += `### Input:\n`
+    template += `### Input:\n`;
     template +=
       'Nala is your recently hired maid. She is a slave and will follow every command from  {{user}}. Nala is scared to disappoint {{user}}. {{user}} is her Mistress. Her old master was abusive.\nSCENE: {{user}} and Nala are at the main hall of the mansion.' +
       "\nNala: Hello... mistress... *Nala looks down, with her ears pointed to you. She's clearly scared, but she doesn't say anything about her feelings.* I am a good maid, you do not have to punish me okay? I-I can do many things... *Nala's tail wags as she looks down at the floor. She's waiting for your approval.* I promise..." +
@@ -54,14 +47,14 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
       '\nAs Nala speaks, her brown eyes light up with excitement, and her fluffy ears twitch eagerly. She stands up straight, confident in her ability to help you throw an amazing party. Her tail swings back and forth behind her, adding to her enthusiasm.' +
       "\nAnon: Well I don't know yet, I need to organize. the party is tomorrow night and the people coming are nobles. any ideas?\nNala: Hmm, well, we could start by deciding on a theme for the party. Perhaps something elegant and sophisticated, such as a masquerade ball or a black tie affair. This would allow us to create a cohesive atmosphere throughout the entire event. We could use candles and dimmed lights to set a romantic ambiance, and incorporate elements of gold and silver to add a touch of luxury.\n" +
       "\nFor food and drinks, we could offer a variety of hors d'oeuvres and cocktails. Some popular options among nobility include caviar, oysters, and champagne. However, we should also consider offering vegetarian and non-alcoholic options to accommodate guests with dietary restrictions. Additionally, we could arrange for live music, perhaps a string quartet or jazz band, to provide entertainment throughout the evening." +
-      '\nAnon: very good.'
+      '\nAnon: very good.';
     if (singleScenePrompt) {
       template +=
         '\n### Response:' +
         '\nSCENE ABOUT: "plan party together"\n' +
         '  BACKGROUND: masion hall, long table, papers, books, party supplies, afternoon.\n' +
         '  MUSIC: uplifting, party, bouncy, grooving\n' +
-        '  DESCRIPTION: *{{user}} and Nala sit down together at a large table in the study, spreading out papers and notes. They begin to discuss the details of the party, including the guest list, menu, decorations, and music.*\n'
+        '  DESCRIPTION: *{{user}} and Nala sit down together at a large table in the study, spreading out papers and notes. They begin to discuss the details of the party, including the guest list, menu, decorations, and music.*\n';
     } else {
       template +=
         '\n### Response:' +
@@ -79,7 +72,7 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
         '  BACKGROUND: mansion room, tables, chairs, empty with no people, paltes, dinner, candles\n' +
         '  ACTION: Practice serving skills.\n' +
         '  MUSIC: viving, relaxed, bright\n' +
-        "  DESCRIPTION: *With the party fast approaching, {{user}} decides to test Nala's serving skills. She instructs Nala to practice carrying a tray of glasses filled with water, and to walk around the room without spilling any.*\n"
+        "  DESCRIPTION: *With the party fast approaching, {{user}} decides to test Nala's serving skills. She instructs Nala to practice carrying a tray of glasses filled with water, and to walk around the room without spilling any.*\n";
     }
     // template +=
     //   `### Input:\n` +
@@ -121,68 +114,68 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
     //   '  DESCRIPTION: *While exploring the forest during their lesson, Roxy and {{user}} come across a mysterious magical creature. Roxy helps {{user}} approach and interact with the creature safely, teaching {{user}} about its unique abilities and characteristics.*\n'
     // SHOTS: END
 
-    template += `\n### Input:\n`
-    template += `${personas}\n`
-    if (scene?.prompt) template += `CURRENT SCENE:\n${scene.prompt}\n`
-    template += `CONVERSATION:\n${messages}\n`
+    template += `\n### Input:\n`;
+    template += `${personas}\n`;
+    if (scene?.prompt) template += `CURRENT SCENE:\n${scene.prompt}\n`;
+    template += `CONVERSATION:\n${messages}\n`;
 
     if (singleScenePrompt) {
-      template += `### Response:\n`
-      template += `SCENE ABOUT: ${singleScenePrompt}\n`
-      template += `  BACKGROUND:{{GEN place_1 max_tokens=50 stop=["\\n", "\\"", "."]}}"\n`
-      template += `  MUSIC:{{GEN music_1 max_tokens=10 stop=["\\n", "\\"", "%"]}}"\n`
-      template += `  DESCRIPTION:{{GEN desc_1 max_tokens=150 stop=["\\n", "\\""]}}"\n`
+      template += `### Response:\n`;
+      template += `SCENE ABOUT: ${singleScenePrompt}\n`;
+      template += `  BACKGROUND:{{GEN place_1 max_tokens=50 stop=["\\n", "\\"", "."]}}"\n`;
+      template += `  MUSIC:{{GEN music_1 max_tokens=10 stop=["\\n", "\\"", "%"]}}"\n`;
+      template += `  DESCRIPTION:{{GEN desc_1 max_tokens=150 stop=["\\n", "\\""]}}"\n`;
     } else {
-      template += `### Response:\n`
-      template += `SCENE 1:\n`
-      template += `  BACKGROUND:{{GEN place_1 max_tokens=50 stop=["\\n", "\\"", "."]}}"\n`
-      template += `  ACTION:{{GEN action_1 max_tokens=15 stop=["\\n", "\\""]}}"\n`
-      template += `  MUSIC:{{GEN music_1 max_tokens=10 stop=["\\n", "\\"", "%"]}}"\n`
-      template += `  DESCRIPTION:{{GEN desc_1 max_tokens=150 stop=["\\n", "\\""]}}"\n`
+      template += `### Response:\n`;
+      template += `SCENE 1:\n`;
+      template += `  BACKGROUND:{{GEN place_1 max_tokens=50 stop=["\\n", "\\"", "."]}}"\n`;
+      template += `  ACTION:{{GEN action_1 max_tokens=15 stop=["\\n", "\\""]}}"\n`;
+      template += `  MUSIC:{{GEN music_1 max_tokens=10 stop=["\\n", "\\"", "%"]}}"\n`;
+      template += `  DESCRIPTION:{{GEN desc_1 max_tokens=150 stop=["\\n", "\\""]}}"\n`;
 
-      template += `SCENE 2:\n`
-      template += `  BACKGROUND:{{GEN place_2 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`
-      template += `  ACTION:{{GEN action_2 max_tokens=15 stop=["\\n", "\\""]}}"\n`
-      template += `  MUSIC:{{GEN music_2 max_tokens=10 stop=["\\n", "\\"", "%"]}}\n`
-      template += `  DESCRIPTION:{{GEN desc_2 max_tokens=150 stop=["\\n", "\\""]}}\n`
+      template += `SCENE 2:\n`;
+      template += `  BACKGROUND:{{GEN place_2 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`;
+      template += `  ACTION:{{GEN action_2 max_tokens=15 stop=["\\n", "\\""]}}"\n`;
+      template += `  MUSIC:{{GEN music_2 max_tokens=10 stop=["\\n", "\\"", "%"]}}\n`;
+      template += `  DESCRIPTION:{{GEN desc_2 max_tokens=150 stop=["\\n", "\\""]}}\n`;
 
-      template += `SCENE 3:\n`
-      template += `  BACKGROUND:{{GEN place_3 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`
-      template += `  ACTION:{{GEN action_3 max_tokens=15 stop=["\\n", "\\""]}}"\n`
-      template += `  MUSIC:{{GEN music_3 max_tokens=10 stop=["\\n", "\\"", "%"]}}\n`
-      template += `  DESCRIPTION:{{GEN desc_3 max_tokens=150 stop=["\\n", "\\""]}}\n`
+      template += `SCENE 3:\n`;
+      template += `  BACKGROUND:{{GEN place_3 max_tokens=50 stop=["\\n", "\\"", "."]}}\n`;
+      template += `  ACTION:{{GEN action_3 max_tokens=15 stop=["\\n", "\\""]}}"\n`;
+      template += `  MUSIC:{{GEN music_3 max_tokens=10 stop=["\\n", "\\"", "%"]}}\n`;
+      template += `  DESCRIPTION:{{GEN desc_3 max_tokens=150 stop=["\\n", "\\""]}}\n`;
     }
 
     template = fillTextTemplate(template, {
       user: state.settings.user.name,
       bot: (characters?.length && characters[0].name) || '',
       characters: characters?.reduce((prev, { id, name }) => {
-        prev[id || ''] = name || ''
-        return prev
+        prev[id || ''] = name || '';
+        return prev;
       }, {} as Record<string, string>),
-    })
+    });
 
     return {
       template,
       variables: {},
       totalTokens: this.countTokens(template) + maxNewTokens * 3,
-    }
+    };
   }
 
   public completeResponse(
     _input: { state: RootState; singleScenePrompt?: string },
     _response: {
-      actionText: string
-      music: string
-      prompt: string
-      sdPrompt: string
+      actionText: string;
+      music: string;
+      prompt: string;
+      sdPrompt: string;
     }[],
-    variables: Map<string, string>
+    variables: Map<string, string>,
   ): {
-    actionText: string
-    music: string
-    prompt: string
-    sdPrompt: string
+    actionText: string;
+    music: string;
+    prompt: string;
+    sdPrompt: string;
   }[] {
     if (_input.singleScenePrompt) {
       return [
@@ -192,7 +185,7 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
           prompt: variables.get('desc_1') || '',
           sdPrompt: variables.get('place_1') || '',
         },
-      ]
+      ];
     } else {
       return [
         {
@@ -213,7 +206,7 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
           prompt: variables.get('desc_3') || '',
           sdPrompt: variables.get('place_3') || '',
         },
-      ]
+      ];
     }
   }
 
@@ -222,8 +215,8 @@ export class AlpacaSceneSuggestionStrategy extends AbstractPromptStrategy<
       .filter((_, index) => index < memorySize)
       .map((message) => `${message.name}: ${message.text}`)
       .reverse()
-      .join('\n')
+      .join('\n');
 
-    return messages
+    return messages;
   }
 }

@@ -1,35 +1,35 @@
-import { AreYouSure, Button } from "@mikugg/ui-kit";
-import React from "react";
-import ReactDOM from "react-dom";
-import { Provider } from "react-redux";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import BackgroundEditModal from "./modals/BackgroundEditModal";
-import BackgroundSearchModal from "./modals/BackgroundSearchModal";
-import LoadingModal from "./modals/LoadingModal";
-import LorebookEditModal from "./modals/LorebookEditModal";
-import SongEditModal from "./modals/SongEditModal";
-import SongSearchModal from "./modals/SongSearchModal";
-import CharacterEditModal from "./modals/character/CharacterEditModal";
-import ActionEditModal from "./modals/items/ActionEditModal";
-import ItemEditModal from "./modals/items/ItemEditModal";
-import MapEditModal from "./modals/map/MapEditModal";
-import PlaceEditModal from "./modals/map/PlaceEditModal";
-import ObjectiveEditModal from "./modals/scene/ObjectiveEditModal";
-import SceneEditModal from "./modals/scene/SceneEditModal";
-import Planels from "./panels";
-import { store } from "./state/store";
-import "./styles/main.scss";
-import { GiBookPile } from "react-icons/gi";
+import { AreYouSure, Button } from '@mikugg/ui-kit';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import BackgroundEditModal from './modals/BackgroundEditModal';
+import BackgroundSearchModal from './modals/BackgroundSearchModal';
+import LoadingModal from './modals/LoadingModal';
+import LorebookEditModal from './modals/LorebookEditModal';
+import SongEditModal from './modals/SongEditModal';
+import SongSearchModal from './modals/SongSearchModal';
+import CharacterEditModal from './modals/character/CharacterEditModal';
+import ActionEditModal from './modals/items/ActionEditModal';
+import ItemEditModal from './modals/items/ItemEditModal';
+import MapEditModal from './modals/map/MapEditModal';
+import PlaceEditModal from './modals/map/PlaceEditModal';
+import ObjectiveEditModal from './modals/scene/ObjectiveEditModal';
+import SceneEditModal from './modals/scene/SceneEditModal';
+import Planels from './panels';
+import { store } from './state/store';
+import './styles/main.scss';
+import { GiBookPile } from 'react-icons/gi';
 
-const toastRoot = document.getElementById("toast-root");
+const toastRoot = document.getElementById('toast-root');
 
 export class ToastPortal extends React.PureComponent {
   render() {
     return ReactDOM.createPortal(
       // @ts-ignore
       <ToastContainer theme="dark" position="top-center" />,
-      toastRoot!
+      toastRoot!,
     );
   }
 }
@@ -45,11 +45,7 @@ ReactDOM.render(
               Novel Builder
             </div>
             <div>
-              <a
-                href="https://docs.miku.gg/guides/novel-builder/1-get-started/"
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a href="https://docs.miku.gg/guides/novel-builder/1-get-started/" target="_blank" rel="noreferrer">
                 <Button theme="transparent">
                   <GiBookPile size={24} />
                   Documentation
@@ -76,5 +72,5 @@ ReactDOM.render(
       <ToastPortal />
     </Provider>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root'),
 );

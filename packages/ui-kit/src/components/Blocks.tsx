@@ -39,7 +39,7 @@ const Blocks = ({ tooltipId, items }: BlockProps) => {
         const className = classnames(
           'Blocks__item',
           item.highlighted ? 'Blocks__item--highlighted' : null,
-          item.onClick && !item.disabled ? 'Blocks__item--clickable' : null
+          item.onClick && !item.disabled ? 'Blocks__item--clickable' : null,
         );
 
         return (
@@ -48,9 +48,7 @@ const Blocks = ({ tooltipId, items }: BlockProps) => {
             onClick={!item.disabled ? item.onClick : null}
             aria-disabled={item.disabled}
             key={item.id}
-            data-tooltip-id={
-              tooltipId ? `blocks-tooltip-${tooltipId}` : undefined
-            }
+            data-tooltip-id={tooltipId ? `blocks-tooltip-${tooltipId}` : undefined}
             data-tooltip-html={item.tooltip}
             data-tooltip-varaint="dark"
             role="button"
@@ -60,15 +58,9 @@ const Blocks = ({ tooltipId, items }: BlockProps) => {
               <Loader />
             ) : (
               <>
-                {contentImage.image ? (
-                  <img src={contentImage.image} alt={item.tooltip} />
-                ) : null}
-                {contentText.icon ? (
-                  <div className="Blocks__item-icon">{contentText.icon}</div>
-                ) : null}
-                {contentText.text ? (
-                  <div className="Blocks__item-text">{contentText.text}</div>
-                ) : null}
+                {contentImage.image ? <img src={contentImage.image} alt={item.tooltip} /> : null}
+                {contentText.icon ? <div className="Blocks__item-icon">{contentText.icon}</div> : null}
+                {contentText.text ? <div className="Blocks__item-text">{contentText.text}</div> : null}
                 {item.editIcon ? (
                   <div
                     className="Blocks__item-edit"
@@ -85,9 +77,7 @@ const Blocks = ({ tooltipId, items }: BlockProps) => {
           </div>
         );
       })}
-      {tooltipId ? (
-        <Tooltip id={`blocks-tooltip-${tooltipId}`} place="bottom" />
-      ) : null}
+      {tooltipId ? <Tooltip id={`blocks-tooltip-${tooltipId}`} place="bottom" /> : null}
     </div>
   );
 };

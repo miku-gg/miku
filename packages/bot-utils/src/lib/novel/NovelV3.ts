@@ -1,8 +1,4 @@
-import {
-  CharacterBook,
-  EmotionTemplateSlug,
-  MikuCardV2,
-} from "../MikuCardValidator";
+import { CharacterBook, EmotionTemplateSlug, MikuCardV2 } from '../MikuCardValidator';
 
 export enum NovelNSFW {
   NONE = 0,
@@ -114,14 +110,14 @@ export interface NovelMap {
 
 export enum NovelActionType {
   // NOT DEFINABLE BY NOVEL
-  ACHIEVEMENT_UNLOCK = "ACHIEVEMENT_UNLOCK",
+  ACHIEVEMENT_UNLOCK = 'ACHIEVEMENT_UNLOCK',
 
   // DEFINABLE BY NOVEL
-  SUGGEST_ADVANCE_SCENE = "SUGGEST_ADVANCE_SCENE",
-  SUGGEST_CREATE_SCENE = "SUGGEST_CREATE_SCENE",
-  HIDE_ITEM = "HIDE_ITEM",
-  SHOW_ITEM = "SHOW_ITEM",
-  ADD_CHILD_SCENES = "ADD_CHILD_SCENES",
+  SUGGEST_ADVANCE_SCENE = 'SUGGEST_ADVANCE_SCENE',
+  SUGGEST_CREATE_SCENE = 'SUGGEST_CREATE_SCENE',
+  HIDE_ITEM = 'HIDE_ITEM',
+  SHOW_ITEM = 'SHOW_ITEM',
+  ADD_CHILD_SCENES = 'ADD_CHILD_SCENES',
 }
 
 export type NovelAction =
@@ -162,7 +158,7 @@ export type NovelAction =
     };
 
 export type StateCondition = {
-  type: "IN_SCENE";
+  type: 'IN_SCENE';
   config: {
     sceneIds: string[];
   };

@@ -1,33 +1,31 @@
-import { Button, CheckBox, Loader, Modal, Tooltip } from '@mikugg/ui-kit'
-import { useState } from 'react'
-import { toast } from 'react-toastify'
-import { downloadRenPyProject, exportToRenPy } from '../../libs/exportToRenpy'
-import { RootState } from '../../state/store'
-import './ExportToRenpy.scss'
-import { useAppContext } from '../../App.context'
+import { Button, CheckBox, Loader, Modal, Tooltip } from '@mikugg/ui-kit';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+import { downloadRenPyProject, exportToRenPy } from '../../libs/exportToRenpy';
+import { RootState } from '../../state/store';
+import './ExportToRenpy.scss';
+import { useAppContext } from '../../App.context';
 
 interface RenPyExportButtonProps {
-  state: RootState
+  state: RootState;
 }
 
 export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  const [linearStory, setLinearStory] = useState<boolean>(false)
-  const { assetLinkLoader } = useAppContext()
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [linearStory, setLinearStory] = useState<boolean>(false);
+  const { assetLinkLoader } = useAppContext();
   const handleButtonClick = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const script = exportToRenPy(state, linearStory)
-      await downloadRenPyProject(script, state, assetLinkLoader)
+      const script = exportToRenPy(state, linearStory);
+      await downloadRenPyProject(script, state, assetLinkLoader);
     } catch (error) {
-      toast.error(
-        'An error occurred while generating the script, please try again.'
-      )
+      toast.error('An error occurred while generating the script, please try again.');
     }
-    setIsLoading(false)
-    setIsModalOpen(false)
-  }
+    setIsLoading(false);
+    setIsModalOpen(false);
+  };
 
   return (
     <>
@@ -55,11 +53,7 @@ export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
           </p>
         ) : (
           <div className="RenPyExportButton__modal__button">
-            <Button
-              theme="gradient"
-              onClick={handleButtonClick}
-              disabled={isLoading}
-            >
+            <Button theme="gradient" onClick={handleButtonClick} disabled={isLoading}>
               Download Project
             </Button>
           </div>
@@ -73,5 +67,5 @@ export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
         </div>
       </Modal>
     </>
-  )
-}
+  );
+};

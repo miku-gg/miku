@@ -1,14 +1,14 @@
-import { FaHammer, FaPencil } from "react-icons/fa6";
-import { MdSearch } from "react-icons/md";
-import config from "../../../config";
-import { openModal } from "../../../state/slices/inputSlice";
-import { useAppDispatch, useAppSelector } from "../../../state/store";
-import "./Characters.scss";
-import { Blocks } from "@mikugg/ui-kit";
-import { useRef, useState } from "react";
-import { toast } from "react-toastify";
-import { v4 as randomUUID } from "uuid";
-import { createCharacter } from "../../../state/slices/novelFormSlice";
+import { FaHammer, FaPencil } from 'react-icons/fa6';
+import { MdSearch } from 'react-icons/md';
+import config from '../../../config';
+import { openModal } from '../../../state/slices/inputSlice';
+import { useAppDispatch, useAppSelector } from '../../../state/store';
+import './Characters.scss';
+import { Blocks } from '@mikugg/ui-kit';
+import { useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import { v4 as randomUUID } from 'uuid';
+import { createCharacter } from '../../../state/slices/novelFormSlice';
 
 export default function Characters({
   selected,
@@ -27,7 +27,7 @@ export default function Characters({
   const handleCreateCharacter = () => {
     const id = randomUUID();
     dispatch(createCharacter(id));
-    dispatch(openModal({ modalType: "character", editId: id }));
+    dispatch(openModal({ modalType: 'character', editId: id }));
   };
 
   const blocks: {
@@ -60,9 +60,9 @@ export default function Characters({
         onEditClick: () =>
           dispatch(
             openModal({
-              modalType: "character",
+              modalType: 'character',
               editId: character.id,
-            })
+            }),
           ),
         editIcon: <FaPencil />,
         onClick: () => {
@@ -70,11 +70,11 @@ export default function Characters({
         },
       })),
     {
-      id: "create",
+      id: 'create',
       highlighted: false,
       content: {
         icon: <FaHammer />,
-        text: "Create",
+        text: 'Create',
       },
       onClick: handleCreateCharacter,
     },
@@ -91,12 +91,12 @@ export default function Characters({
 
   if (showNone) {
     blocks.push({
-      id: "none",
+      id: 'none',
       highlighted: !selected,
       content: {
-        text: "None",
+        text: 'None',
       },
-      onClick: () => onSelect && onSelect(""),
+      onClick: () => onSelect && onSelect(''),
     });
   }
 

@@ -2,13 +2,7 @@ import React from 'react';
 
 export const ArrowIcon = () => {
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 9 15"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="16" height="16" viewBox="0 0 9 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M0.792893 14.2071C0.402369 13.8166 0.402369 13.1834 0.792893 12.7929L6.08579 7.5L0.792895 2.20711C0.402371 1.81658 0.402371 1.18342 0.792895 0.792893C1.18342 0.402369 1.81658 0.402369 2.20711 0.792894L8.20711 6.79289C8.59763 7.18342 8.59763 7.81658 8.20711 8.20711L2.20711 14.2071C1.81658 14.5976 1.18342 14.5976 0.792893 14.2071Z"
         fill="currentColor"
@@ -18,12 +12,7 @@ export const ArrowIcon = () => {
 };
 export const RemoveIcon = () => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
       <path
         fill="currentColor"
         d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.5 16.084l-1.403 1.416-4.09-4.096-4.102 4.096-1.405-1.405 4.093-4.092-4.093-4.098 1.405-1.405 4.088 4.089 4.091-4.089 1.416 1.403-4.092 4.087 4.092 4.094z"
@@ -33,13 +22,7 @@ export const RemoveIcon = () => {
 };
 export const DashIcon = () => {
   return (
-    <svg
-      width="16"
-      height="17"
-      viewBox="0 0 16 17"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect y="0.5" width="16" height="16" rx="8" fill="currentColor" />
       <rect x="4" y="7.5" width="8" height="2" fill="#1B2142" />
     </svg>
@@ -61,13 +44,7 @@ export const DefaultImage = () => {
 };
 export const UploadIcon = () => {
   return (
-    <svg
-      width="16"
-      height="21"
-      viewBox="0 0 16 21"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="16" height="21" viewBox="0 0 16 21" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M7.29289 0.792893C7.68342 0.402369 8.31658 0.402369 8.70711 0.792893L12.7071 4.79289C13.0976 5.18342 13.0976 5.81658 12.7071 6.20711C12.3166 6.59763 11.6834 6.59763 11.2929 6.20711L9 3.91421V14.5C9 15.0523 8.55228 15.5 8 15.5C7.44772 15.5 7 15.0523 7 14.5V3.91421L4.70711 6.20711C4.31658 6.59763 3.68342 6.59763 3.29289 6.20711C2.90237 5.81658 2.90237 5.18342 3.29289 4.79289L7.29289 0.792893ZM1 15.5C1.55228 15.5 2 15.9477 2 16.5V18.5H14V16.5C14 15.9477 14.4477 15.5 15 15.5C15.5523 15.5 16 15.9477 16 16.5V18.5C16 19.6046 15.1046 20.5 14 20.5H2C0.895431 20.5 0 19.6046 0 18.5V16.5C0 15.9477 0.447715 15.5 1 15.5Z"
         fill="currentColor"
@@ -77,17 +54,8 @@ export const UploadIcon = () => {
 };
 export const DownArrow = () => {
   return (
-    <svg
-      width="10"
-      height="7"
-      viewBox="0 0 10 7"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M5 6.5L0.669873 0.5L9.33013 0.500001L5 6.5Z"
-        fill="currentColor"
-      />
+    <svg width="10" height="7" viewBox="0 0 10 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 6.5L0.669873 0.5L9.33013 0.500001L5 6.5Z" fill="currentColor" />
     </svg>
   );
 };
@@ -115,13 +83,7 @@ export const CheckIcon = () => {
 
 export const EditIcon = () => {
   return (
-    <svg
-      width="12"
-      height="13"
-      viewBox="0 0 12 13"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M8.39551 0.684985C8.64216 0.438338 9.04205 0.438338 9.2887 0.684985L11.815 3.2113C12.0617 3.45795 12.0617 3.85784 11.815 4.10449L3.60449 12.315C3.48604 12.4335 3.3254 12.5 3.15789 12.5H0.631579C0.282767 12.5 0 12.2172 0 11.8684V9.3421C0 9.1746 0.0665411 9.01396 0.184985 8.89551L6.50064 2.57985L8.39551 0.684985ZM9.47368 4.65944L10.4752 3.65789L8.8421 2.02477L7.84055 3.02632L9.47368 4.65944Z"
         fill="currentColor"
@@ -154,12 +116,7 @@ export const SquareCheckEmpty = () => {
 
 export const InfoIcon = () => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="16"
-      height="16"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
       <path
         d="M13 7.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-3 3.75a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v4.25h.75a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1 0-1.5h.75V12h-.75a.75.75 0 0 1-.75-.75Z"
         fill="currentColor"

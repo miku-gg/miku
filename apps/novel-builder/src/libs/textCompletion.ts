@@ -1,4 +1,4 @@
-import { ModelType } from "./utils";
+import { ModelType } from './utils';
 
 function getLastJsonObject(jsonString: string): Record<string, string> {
   // Regular expression to match JSON objects
@@ -10,10 +10,10 @@ function getLastJsonObject(jsonString: string): Record<string, string> {
     try {
       return JSON.parse(matches[matches.length - 1]);
     } catch (error) {
-      throw "Error parsing JSON:";
+      throw 'Error parsing JSON:';
     }
   } else {
-    throw "No JSON objects found";
+    throw 'No JSON objects found';
   }
 }
 
@@ -31,21 +31,21 @@ const textCompletion = async function* ({
   identifier: string;
 }): AsyncGenerator<Map<string, string>> {
   try {
-    const response = await fetch(serviceBaseUrl + "/text", {
-      method: "POST",
+    const response = await fetch(serviceBaseUrl + '/text', {
+      method: 'POST',
       body: JSON.stringify({
         model,
         template,
         variables,
       }),
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Identifier: identifier,
       },
-      credentials: "include",
+      credentials: 'include',
     });
     const reader = response.body?.getReader();
-    const decoder = new TextDecoder("utf-8");
+    const decoder = new TextDecoder('utf-8');
 
     const result = new Map<string, string>();
     let read;
@@ -54,14 +54,12 @@ const textCompletion = async function* ({
       if (read?.value) {
         const valueString = decoder.decode(read.value);
         const jsonObject = getLastJsonObject(valueString);
-        Object.keys(jsonObject).forEach((key) =>
-          result.set(key, jsonObject[key])
-        );
+        Object.keys(jsonObject).forEach((key) => result.set(key, jsonObject[key]));
         yield result;
       }
     }
   } catch (error) {
-    throw "Error fetching data:" + error;
+    throw 'Error fetching data:' + error;
   }
 };
 

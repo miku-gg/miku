@@ -30,9 +30,7 @@ const MusicSelector = ({
     <div className="MusicSelector">
       <div className="MusicSelector__form">
         <div className="MusicSelector__selected">
-          <div className="MusicSelector__selected-name">
-            {selectedMusic.name || 'No music selected'}
-          </div>
+          <div className="MusicSelector__selected-name">{selectedMusic.name || 'No music selected'}</div>
         </div>
         <div className="MusicSelector__actions">
           <Button theme="secondary" onClick={() => setExpanded(true)}>
@@ -47,7 +45,7 @@ const MusicSelector = ({
                     name: '',
                     source: '',
                   },
-                  false
+                  false,
                 )
               }
             >
@@ -58,11 +56,7 @@ const MusicSelector = ({
       </div>
       {selectedMusic.source ? (
         <div className="MusicSelector__selected-source">
-          <audio
-            src={selectedMusic.source}
-            className="MusicSelector__player"
-            controls
-          />
+          <audio src={selectedMusic.source} className="MusicSelector__player" controls />
         </div>
       ) : null}
       <Modal
@@ -77,10 +71,7 @@ const MusicSelector = ({
         <div className="MusicSelector__defaults-selector">
           <div className="MusicSelector__defaults scrollbar">
             {musicList.map((music, index) => (
-              <div
-                key={`music-list-${music.name}-${index}`}
-                className="MusicSelector__default"
-              >
+              <div key={`music-list-${music.name}-${index}`} className="MusicSelector__default">
                 <div className="MusicSelector__default-name">{music.name}</div>
                 <Button
                   theme="transparent"
@@ -103,19 +94,10 @@ const MusicSelector = ({
               </div>
             ))}
           </div>
-          {currentPlaying ? (
-            <audio
-              src={currentPlaying}
-              className="MusicSelector__player"
-              controls
-              autoPlay
-            />
-          ) : null}
+          {currentPlaying ? <audio src={currentPlaying} className="MusicSelector__player" controls autoPlay /> : null}
           {!hideUpload ? (
             <div className="MusicSelector__custom">
-              <div className="MusicSelector__custom-title">
-                Custom music from file
-              </div>
+              <div className="MusicSelector__custom-title">Custom music from file</div>
               <div className="MusicSelector__custom-input">
                 <input
                   type="file"
@@ -137,7 +119,7 @@ const MusicSelector = ({
                             name: file.name,
                             source: result,
                           },
-                          false
+                          false,
                         );
                         setExpanded(false);
                         setCurrentPlaying('');

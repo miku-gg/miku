@@ -1,47 +1,47 @@
-import { DeprecatedNovelV2 as NovelV2 } from '@mikugg/bot-utils'
+import { DeprecatedNovelV2 as NovelV2 } from '@mikugg/bot-utils';
 
 export interface NarrationInteraction {
-  id: string
-  parentResponseId: string | null
-  query: string
-  sceneId: string
-  responsesId: string[]
+  id: string;
+  parentResponseId: string | null;
+  query: string;
+  sceneId: string;
+  responsesId: string[];
 }
 
 export interface NarrationResponse {
-  id: string
-  selected: boolean
-  fetching: boolean
-  parentInteractionId: string | null
-  suggestedScenes: string[]
-  selectedRole: string | null
+  id: string;
+  selected: boolean;
+  fetching: boolean;
+  parentInteractionId: string | null;
+  suggestedScenes: string[];
+  selectedRole: string | null;
   characters: {
-    role: string
-    emotion: string
-    pose: string
-    text: string
-  }[]
+    role: string;
+    emotion: string;
+    pose: string;
+    text: string;
+  }[];
   childrenInteractions: {
-    interactionId: string
-    selected: boolean
-  }[]
+    interactionId: string;
+    selected: boolean;
+  }[];
 }
 
 export interface NarrationState {
-  id: string
-  fetching: boolean
-  currentResponseId: string
+  id: string;
+  fetching: boolean;
+  currentResponseId: string;
   input: {
-    text: string
-    suggestions: string[]
-    disabled: boolean
-  }
+    text: string;
+    suggestions: string[];
+    disabled: boolean;
+  };
   interactions: {
-    [id: string]: NarrationInteraction | undefined
-  }
+    [id: string]: NarrationInteraction | undefined;
+  };
   responses: {
-    [id: string]: NarrationResponse | undefined
-  }
+    [id: string]: NarrationResponse | undefined;
+  };
 }
 
 export interface NovelScene extends NovelV2.NovelScene {}
@@ -77,45 +77,45 @@ export enum Voices {
 }
 
 export interface SettingsState {
-  model: ModelType
+  model: ModelType;
   user: {
-    name: string
-    isPremium: boolean
-  }
+    name: string;
+    isPremium: boolean;
+  };
   prompt: {
-    systemPrompt: string
-  }
+    systemPrompt: string;
+  };
   text: {
-    speed: Speed
-    fontSize: FontSize
-    autoContinue: boolean
-  }
+    speed: Speed;
+    fontSize: FontSize;
+    autoContinue: boolean;
+  };
   voice: {
-    autoplay: boolean
-    speed: Speed
-    voiceId: Voices
-  }
+    autoplay: boolean;
+    speed: Speed;
+    voiceId: Voices;
+  };
   music: {
-    enabled: boolean
-    volume: number
-  }
+    enabled: boolean;
+    volume: number;
+  };
   modals: {
-    settings: boolean
-    settingsTab: 'general' | 'prompt' | 'audio'
-    about: boolean
-    history: boolean
+    settings: boolean;
+    settingsTab: 'general' | 'prompt' | 'audio';
+    about: boolean;
+    history: boolean;
     edit: {
-      opened: boolean
-      id: string
-    }
-  }
+      opened: boolean;
+      id: string;
+    };
+  };
 }
 
-export const VersionId = 'v2'
+export const VersionId = 'v2';
 
 export interface State {
-  version: string
-  settings: SettingsState
-  narration: NarrationState
-  novel: NovelState
+  version: string;
+  settings: SettingsState;
+  narration: NarrationState;
+  novel: NovelState;
 }

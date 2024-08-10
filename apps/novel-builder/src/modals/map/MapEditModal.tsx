@@ -1,32 +1,20 @@
-import {
-  AreYouSure,
-  DragAndDropImages,
-  Input,
-  Modal,
-  Tooltip,
-} from "@mikugg/ui-kit";
-import { HiOutlinePlus } from "react-icons/hi";
+import { AreYouSure, DragAndDropImages, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import { HiOutlinePlus } from 'react-icons/hi';
 
-import { FaTrashAlt } from "react-icons/fa";
-import { useDispatch } from "react-redux";
-import { selectEditingMap } from "../../state/selectors";
-import { closeModal, openModal } from "../../state/slices/inputSlice";
-import {
-  createPlace,
-  deleteMap,
-  updateMap,
-  updateMapImage,
-  updateScene,
-} from "../../state/slices/novelFormSlice";
-import { useAppSelector } from "../../state/store";
+import { FaTrashAlt } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
+import { selectEditingMap } from '../../state/selectors';
+import { closeModal, openModal } from '../../state/slices/inputSlice';
+import { createPlace, deleteMap, updateMap, updateMapImage, updateScene } from '../../state/slices/novelFormSlice';
+import { useAppSelector } from '../../state/store';
 
-import { useState } from "react";
-import { FaPencil } from "react-icons/fa6";
-import { IoIosCloseCircleOutline } from "react-icons/io";
-import { toast } from "react-toastify";
-import config from "../../config";
-import { checkFileType } from "../../libs/utils";
-import "./MapEditModal.scss";
+import { useState } from 'react';
+import { FaPencil } from 'react-icons/fa6';
+import { IoIosCloseCircleOutline } from 'react-icons/io';
+import { toast } from 'react-toastify';
+import config from '../../config';
+import { checkFileType } from '../../libs/utils';
+import './MapEditModal.scss';
 
 export default function MapEditModal() {
   const dispatch = useDispatch();
@@ -35,9 +23,7 @@ export default function MapEditModal() {
   const scenes = useAppSelector((state) => state.novel.scenes);
   const sceneBackgrounds = useAppSelector((state) => {
     return state.novel.scenes.reduce((acc, scene) => {
-      const bg = state.novel.backgrounds.find(
-        (background) => background.id === scene.backgroundId
-      );
+      const bg = state.novel.backgrounds.find((background) => background.id === scene.backgroundId);
       if (bg && scene.id) {
         acc[scene.id] = bg.source.jpg;
       }
@@ -54,19 +40,17 @@ export default function MapEditModal() {
           updateMapImage({
             mapId: map.id,
             source: { ...map!.source, png: asset.assetId },
-          })
+          }),
         );
       } catch (e) {
-        toast.error("Error uploading the image");
+        toast.error('Error uploading the image');
         console.error(e);
       }
     }
   };
 
   const handleRemoveIds = (id: string) => {
-    const scenesWithMap = scenes.filter((scene) =>
-      scene.parentMapIds?.includes(id)
-    );
+    const scenesWithMap = scenes.filter((scene) => scene.parentMapIds?.includes(id));
     scenesWithMap.forEach((scene) => {
       if (scene) {
         const newScene = {
@@ -80,10 +64,10 @@ export default function MapEditModal() {
 
   const handleDeleteMap = (id: string) => {
     areYouSure.openModal({
-      title: "Are you sure?",
-      description: "This map will be deleted. This action cannot be undone.",
+      title: 'Are you sure?',
+      description: 'This map will be deleted. This action cannot be undone.',
       onYes: () => {
-        dispatch(closeModal({ modalType: "mapEdit" }));
+        dispatch(closeModal({ modalType: 'mapEdit' }));
         handleRemoveIds(id);
         dispatch(deleteMap(id));
       },
@@ -95,7 +79,7 @@ export default function MapEditModal() {
       opened={!!map}
       shouldCloseOnOverlayClick
       className="MapEditModal"
-      onCloseModal={() => dispatch(closeModal({ modalType: "mapEdit" }))}
+      onCloseModal={() => dispatch(closeModal({ modalType: 'mapEdit' }))}
     >
       {map ? (
         <div className="MapEdit scrollbar">
@@ -111,7 +95,7 @@ export default function MapEditModal() {
             <IoIosCloseCircleOutline
               className="MapEdit__buttons__closeModal"
               onClick={() => {
-                dispatch(closeModal({ modalType: "mapEdit" }));
+                dispatch(closeModal({ modalType: 'mapEdit' }));
               }}
             />
           </div>
@@ -124,9 +108,7 @@ export default function MapEditModal() {
                 placeHolder="Name for the map. E.g. World map."
                 className="MapEdit__form__name"
                 value={map?.name}
-                onChange={(e) =>
-                  dispatch(updateMap({ ...map, name: e.target.value }))
-                }
+                onChange={(e) => dispatch(updateMap({ ...map, name: e.target.value }))}
               />
               <Input
                 label="Description"
@@ -138,7 +120,7 @@ export default function MapEditModal() {
                     updateMap({
                       ...map!,
                       description: e.target.value,
-                    })
+                    }),
                   )
                 }
               />
@@ -150,27 +132,23 @@ export default function MapEditModal() {
                   (place) =>
                     place.maskSource && (
                       <img
-                        className={`MapEdit__form__placePreview ${
-                          place.id === hoveredPlace ? "hovered" : ""
-                        }`}
-                        src={config.genAssetLink(place.maskSource || "")}
+                        className={`MapEdit__form__placePreview ${place.id === hoveredPlace ? 'hovered' : ''}`}
+                        src={config.genAssetLink(place.maskSource || '')}
                       />
-                    )
+                    ),
                 )}
               <DragAndDropImages
                 placeHolder="Upload map image."
                 className="MapEdit__form__uploadMap"
                 handleChange={(file) => handleUploadMapImage(file)}
-                previewImage={
-                  map?.source.png && config.genAssetLink(map.source.png)
-                }
+                previewImage={map?.source.png && config.genAssetLink(map.source.png)}
                 onFileValidate={async (file) => {
                   if (file.size > 2 * 1024 * 1024) {
-                    toast.error("File size should be less than 1MB");
+                    toast.error('File size should be less than 1MB');
                     return false;
                   }
-                  if (!checkFileType(file, ["image/png", "image/jpeg"])) {
-                    toast.error("Invalid file type. Please upload a jpg file.");
+                  if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+                    toast.error('Invalid file type. Please upload a jpg file.');
                     return false;
                   }
                   return true;
@@ -184,10 +162,7 @@ export default function MapEditModal() {
             {map?.places.length > 0 && (
               <div className="MapEdit__placesContainer scrollbar">
                 {map?.places.map((place) => {
-                  const mapPlace =
-                    place.previewSource ||
-                    sceneBackgrounds[place.sceneId] ||
-                    "";
+                  const mapPlace = place.previewSource || sceneBackgrounds[place.sceneId] || '';
                   return (
                     <div
                       className="MapEdit__place"
@@ -197,12 +172,7 @@ export default function MapEditModal() {
                       onMouseEnter={() => setHoveredPlace(place.id)}
                       onMouseLeave={() => setHoveredPlace(null)}
                     >
-                      {mapPlace && (
-                        <img
-                          className="MapEdit__place__previewImage"
-                          src={config.genAssetLink(mapPlace)}
-                        />
-                      )}
+                      {mapPlace && <img className="MapEdit__place__previewImage" src={config.genAssetLink(mapPlace)} />}
                       <FaPencil
                         className="MapEdit__place__edit"
                         onClick={(e: React.MouseEvent) => {
@@ -210,9 +180,9 @@ export default function MapEditModal() {
                           e.stopPropagation();
                           dispatch(
                             openModal({
-                              modalType: "placeEdit",
+                              modalType: 'placeEdit',
                               editId: place.id,
-                            })
+                            }),
                           );
                         }}
                       />

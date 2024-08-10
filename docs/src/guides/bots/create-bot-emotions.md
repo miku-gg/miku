@@ -6,7 +6,7 @@ order: 1000
 
 This guide explains how to create the chracter expression for a mikugg character using stable diffusion.
 
-### Prerequisites 
+### Prerequisites
 
 - Automatic1111 Stable Diffusion Web UI for generating images
 - Latest version of ControlNet installed
@@ -47,11 +47,9 @@ You should use Gimp or Photoshop to create the image with the 4 pose structures.
 
 ![2048x512 final image](/assets/emotion_tutorial_4_1.png)
 
-
 ### 3. Generate the character sheet
 
 Now that we have the reference image, the character prompt and the poses reference, we can head back to automatic1111 and build the character sheet.
-
 
 1. Go to txt2img, write you previous prompt (positive and negative)
 2. The dimensions should be 2048 x 512
@@ -81,13 +79,11 @@ As you can see, the image is still unclea, has some faces are not the best and h
 
 First let's add more detail to our image using img2img upscaling by clicking on "Send to img2img". The important thing here is to use a low **Denoising strength** to avoid destroying the image too much and add more details in the proccess.
 
-
 ||| img2img prompt
 ![](/assets/emotion_tutorial_7_1.png)
 ||| parameters
 ![Denoising strength=3](/assets/emotion_tutorial_7_2.png)
 |||
-
 
 ![High quality result](/assets/emotion_tutorial_7_3.png)
 
@@ -108,7 +104,7 @@ After you have clean up the pngs, separate each pose in a diffrent png file to g
 ![](/assets/emotion_tutorial_7_4_pose4.png)
 |||
 
-### 5. Generate expressions 
+### 5. Generate expressions
 
 We will use a tool called [miku_expressions_gen.py](https://rentry.org/mikugg-emotions-script). Which is a script for Automatic1111. Please follow the instructions in that link about how to install it.
 
@@ -117,6 +113,7 @@ After installing the script, you should place one of the poses in the "inpaint" 
 ![](/assets/emotion_tutorial_8_1.png)
 
 You should make sure to:
+
 - Use an inpaiting model
 - Mask the face correctly
 - maintain the same prompt and it MUST end with a comma `, `
@@ -132,18 +129,15 @@ One you have run the script, it will generate all the expressions. For reference
 
 ![](/assets/emotion_tutorial_8_3.png)
 
-
 Please do the same with each pose so you can have more variety of expressions. Also, if some expressions are meant for specific poses, you can unselect them in the checkboxes for the other poses.
 
 The expresions should be saved in a folder inside the `outputs/expresions_packs` folder of your stable-diffusion-webui folder. Each image expression has their name written in their file, which makes is simplier to import into the miku bot builder.
 
 ![](/assets/emotion_tutorial_8_4.png)
 
-
-
 ### 6. Import into Miku
 
 Finally, you can import all these poses and their expressions into Miku.
-For a tutorial on how to create a bot, please refer to the [Create bots](/guides/bots/create-bots.md) guide. 
+For a tutorial on how to create a bot, please refer to the [Create bots](/guides/bots/create-bots.md) guide.
 
 ![](/assets/emotion_tutorial_9.png)

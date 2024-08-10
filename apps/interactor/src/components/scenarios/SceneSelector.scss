@@ -67,11 +67,7 @@
 
       &--aero {
         opacity: 0.3;
-        background: radial-gradient(
-          ellipse at bottom,
-          #0d1d31 30%,
-          #0c0d13 100%
-        );
+        background: radial-gradient(ellipse at bottom, #0d1d31 30%, #0c0d13 100%);
         overflow: hidden;
 
         &:hover {

@@ -1,34 +1,22 @@
-import {
-  AreYouSure,
-  Button,
-  CheckBox,
-  DragAndDropImages,
-  Input,
-  Loader,
-  Modal,
-  Tooltip,
-} from "@mikugg/ui-kit";
-import { v4 as randomUUID } from "uuid";
+import { AreYouSure, Button, CheckBox, DragAndDropImages, Input, Loader, Modal, Tooltip } from '@mikugg/ui-kit';
+import { v4 as randomUUID } from 'uuid';
 
-import { useDispatch } from "react-redux";
-import { selectEditingInventoryItem } from "../../state/selectors";
-import { closeModal, openModal } from "../../state/slices/inputSlice";
-import {
-  deleteInventoryItem,
-  updateInventoryItem,
-} from "../../state/slices/novelFormSlice";
-import { useAppSelector } from "../../state/store";
+import { useDispatch } from 'react-redux';
+import { selectEditingInventoryItem } from '../../state/selectors';
+import { closeModal, openModal } from '../../state/slices/inputSlice';
+import { deleteInventoryItem, updateInventoryItem } from '../../state/slices/novelFormSlice';
+import { useAppSelector } from '../../state/store';
 
-import { useState } from "react";
-import { FaTrashAlt } from "react-icons/fa";
-import { FaPencil } from "react-icons/fa6";
-import { IoIosCloseCircleOutline } from "react-icons/io";
-import { IoInformationCircleOutline } from "react-icons/io5";
-import { toast } from "react-toastify";
-import config from "../../config";
-import { checkFileType } from "../../libs/utils";
-import SceneSelector from "../scene/SceneSelector";
-import "./ItemEditModal.scss";
+import { useState } from 'react';
+import { FaTrashAlt } from 'react-icons/fa';
+import { FaPencil } from 'react-icons/fa6';
+import { IoIosCloseCircleOutline } from 'react-icons/io';
+import { IoInformationCircleOutline } from 'react-icons/io5';
+import { toast } from 'react-toastify';
+import config from '../../config';
+import { checkFileType } from '../../libs/utils';
+import SceneSelector from '../scene/SceneSelector';
+import './ItemEditModal.scss';
 
 export default function ItemEditModal() {
   const dispatch = useDispatch();
@@ -45,11 +33,11 @@ export default function ItemEditModal() {
           updateInventoryItem({
             ...item,
             icon: asset.assetId,
-          })
+          }),
         );
         setIsUploading(false);
       } catch (e) {
-        toast.error("Error uploading the image");
+        toast.error('Error uploading the image');
         setIsUploading(false);
         console.error(e);
       }
@@ -58,10 +46,10 @@ export default function ItemEditModal() {
 
   const handleDelete = (id: string) => {
     areYouSure.openModal({
-      title: "Are you sure?",
-      description: "This Item will be deleted. This action cannot be undone.",
+      title: 'Are you sure?',
+      description: 'This Item will be deleted. This action cannot be undone.',
       onYes: () => {
-        dispatch(closeModal({ modalType: "editInventoryItem" }));
+        dispatch(closeModal({ modalType: 'editInventoryItem' }));
         dispatch(deleteInventoryItem({ itemId: id }));
       },
     });
@@ -76,12 +64,12 @@ export default function ItemEditModal() {
           ...item,
           hidden: true,
           locked: {
-            type: "IN_SCENE",
+            type: 'IN_SCENE',
             config: {
               sceneIds: ids,
             },
           },
-        })
+        }),
       );
     } else if (item.locked.config.sceneIds.length === 0 || ids.length === 0) {
       dispatch(
@@ -89,7 +77,7 @@ export default function ItemEditModal() {
           ...item,
           hidden: false,
           locked: undefined,
-        })
+        }),
       );
     }
   };
@@ -99,9 +87,7 @@ export default function ItemEditModal() {
       opened={!!item}
       shouldCloseOnOverlayClick
       className="ItemEditModal"
-      onCloseModal={() =>
-        dispatch(closeModal({ modalType: "editInventoryItem" }))
-      }
+      onCloseModal={() => dispatch(closeModal({ modalType: 'editInventoryItem' }))}
     >
       {item ? (
         <div className="ItemEdit">
@@ -116,7 +102,7 @@ export default function ItemEditModal() {
             <IoIosCloseCircleOutline
               className="ItemEdit__buttons__closeModal"
               onClick={() => {
-                dispatch(closeModal({ modalType: "editInventoryItem" }));
+                dispatch(closeModal({ modalType: 'editInventoryItem' }));
               }}
             />
           </div>
@@ -132,7 +118,7 @@ export default function ItemEditModal() {
                     updateInventoryItem({
                       ...item,
                       name: e.target.value,
-                    })
+                    }),
                   );
                 }}
               />
@@ -146,7 +132,7 @@ export default function ItemEditModal() {
                     updateInventoryItem({
                       ...item,
                       description: e.target.value,
-                    })
+                    }),
                   );
                 }}
               />
@@ -163,11 +149,11 @@ export default function ItemEditModal() {
                 placeHolder="Icon for the item (512x512)"
                 onFileValidate={async (file) => {
                   if (file.size > 2 * 512 * 512) {
-                    toast.error("File size should be less than 1MB");
+                    toast.error('File size should be less than 1MB');
                     return false;
                   }
-                  if (!checkFileType(file, ["image/png", "image/jpeg"])) {
-                    toast.error("Invalid file type. Please upload a jpg file.");
+                  if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+                    toast.error('Invalid file type. Please upload a jpg file.');
                     return false;
                   }
                   return true;
@@ -197,17 +183,15 @@ export default function ItemEditModal() {
                         actions: [
                           ...item.actions,
                           {
-                            name: "New Action",
-                            prompt: "",
+                            name: 'New Action',
+                            prompt: '',
                             id: id,
                             usageActions: [],
                           },
                         ],
-                      })
+                      }),
                     );
-                    dispatch(
-                      openModal({ modalType: "actionEdit", editId: id })
-                    );
+                    dispatch(openModal({ modalType: 'actionEdit', editId: id }));
                   }}
                 >
                   Add Action
@@ -217,24 +201,19 @@ export default function ItemEditModal() {
             {item.actions.length >= 0 && (
               <div className="ItemEdit__actionList scrollbar">
                 {item.actions.map((action) => (
-                  <div
-                    key={`action-${action.id}`}
-                    className="ItemEdit__actionList__action"
-                  >
+                  <div key={`action-${action.id}`} className="ItemEdit__actionList__action">
                     <FaPencil
                       className="ItemEdit__actionList__edit"
                       onClick={() => {
                         dispatch(
                           openModal({
-                            modalType: "actionEdit",
+                            modalType: 'actionEdit',
                             editId: action.id,
-                          })
+                          }),
                         );
                       }}
                     />
-                    <p className="ItemEdit__actionList__action__name">
-                      {action.name}
-                    </p>
+                    <p className="ItemEdit__actionList__action__name">{action.name}</p>
                   </div>
                 ))}
               </div>
@@ -253,7 +232,7 @@ export default function ItemEditModal() {
                       updateInventoryItem({
                         ...item,
                         hidden: e.target.checked,
-                      })
+                      }),
                     );
                   }}
                 />
@@ -272,8 +251,7 @@ export default function ItemEditModal() {
             <div className="ItemEdit__visibility__description">
               It will be usable only in the selected scenes.
               <br />
-              If no scenes are selected, it will be usable in all scenes if it's
-              not hidden.
+              If no scenes are selected, it will be usable in all scenes if it's not hidden.
             </div>
             <div className="ItemEdit__visibility__sceneLock">
               <SceneSelector

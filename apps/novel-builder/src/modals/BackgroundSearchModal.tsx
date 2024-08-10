@@ -1,14 +1,12 @@
-import ItemSearch from "../components/ItemSearch";
-import config from "../config";
-import { NovelV3 } from "@mikugg/bot-utils";
-import { closeModal } from "../state/slices/inputSlice";
-import { addBackground } from "../state/slices/novelFormSlice";
-import { useAppDispatch, useAppSelector } from "../state/store";
+import ItemSearch from '../components/ItemSearch';
+import config from '../config';
+import { NovelV3 } from '@mikugg/bot-utils';
+import { closeModal } from '../state/slices/inputSlice';
+import { addBackground } from '../state/slices/novelFormSlice';
+import { useAppDispatch, useAppSelector } from '../state/store';
 
 export default function BackgroundSearchModal() {
-  const opened = useAppSelector(
-    (state) => state.input.modals.backgroundSearch.opened
-  );
+  const opened = useAppSelector((state) => state.input.modals.backgroundSearch.opened);
   const dispatch = useAppDispatch();
 
   return (
@@ -18,16 +16,14 @@ export default function BackgroundSearchModal() {
       pageSize={10}
       onSearch={async (query) => {
         const { result, success } = await config.search.backgrounds(query);
-        if (!success) throw new Error("Error searching backgrounds");
+        if (!success) throw new Error('Error searching backgrounds');
         const mapBackground = (item: NovelV3.NovelBackground) => {
           return {
             id: item.id,
             description: item.description,
             name: item.name,
             previewAssetUrl: config.genAssetLink(item.source.jpg, true),
-            tags: item.attributes
-              .map((attr) => (attr?.length && attr[1]) || "")
-              .filter((x) => x),
+            tags: item.attributes.map((attr) => (attr?.length && attr[1]) || '').filter((x) => x),
             value: item,
           };
         };
@@ -40,10 +36,10 @@ export default function BackgroundSearchModal() {
         };
       }}
       onSelect={(background) => {
-        dispatch(closeModal({ modalType: "backgroundSearch" }));
+        dispatch(closeModal({ modalType: 'backgroundSearch' }));
         dispatch(addBackground(background));
       }}
-      onClose={() => dispatch(closeModal({ modalType: "backgroundSearch" }))}
+      onClose={() => dispatch(closeModal({ modalType: 'backgroundSearch' }))}
     />
   );
 }

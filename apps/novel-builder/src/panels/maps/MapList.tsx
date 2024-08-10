@@ -1,13 +1,13 @@
-import { Button, Tooltip } from "@mikugg/ui-kit";
-import { FaCheckCircle } from "react-icons/fa";
-import { FaPencil } from "react-icons/fa6";
-import { IoInformationCircleOutline } from "react-icons/io5";
-import { v4 as randomUUID } from "uuid";
-import config from "../../config";
-import { openModal } from "../../state/slices/inputSlice";
-import { createMap } from "../../state/slices/novelFormSlice";
-import { useAppDispatch, useAppSelector } from "../../state/store";
-import "./MapList.scss";
+import { Button, Tooltip } from '@mikugg/ui-kit';
+import { FaCheckCircle } from 'react-icons/fa';
+import { FaPencil } from 'react-icons/fa6';
+import { IoInformationCircleOutline } from 'react-icons/io5';
+import { v4 as randomUUID } from 'uuid';
+import config from '../../config';
+import { openModal } from '../../state/slices/inputSlice';
+import { createMap } from '../../state/slices/novelFormSlice';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import './MapList.scss';
 
 interface MapListProps {
   onSelectMap?: (mapId: string) => void;
@@ -15,18 +15,14 @@ interface MapListProps {
   selectedMapId?: string[];
 }
 
-export const MapList = ({
-  onSelectMap,
-  tooltipText,
-  selectedMapId,
-}: MapListProps) => {
+export const MapList = ({ onSelectMap, tooltipText, selectedMapId }: MapListProps) => {
   const dispatch = useAppDispatch();
   const maps = useAppSelector((state) => state.novel.maps);
   const createNewMap = () => {
     const id = randomUUID();
     dispatch(createMap({ id: id }));
     onSelectMap && onSelectMap(id);
-    dispatch(openModal({ modalType: "mapEdit", editId: id }));
+    dispatch(openModal({ modalType: 'mapEdit', editId: id }));
   };
 
   const isSelected = (id: string) => {
@@ -35,7 +31,7 @@ export const MapList = ({
   };
 
   return (
-    <div className={`MapList ${onSelectMap ? "MapSelection" : ""}`}>
+    <div className={`MapList ${onSelectMap ? 'MapSelection' : ''}`}>
       <div className="MapList__header">
         <div className="MapList__header__title">
           <h2>Maps</h2>
@@ -63,9 +59,7 @@ export const MapList = ({
               <div className="MapList__container__box" key={`map-${id}`}>
                 <div
                   key={id}
-                  className={`MapList__container__map ${
-                    isSelected(id) ? "selected" : ""
-                  }`}
+                  className={`MapList__container__map ${isSelected(id) ? 'selected' : ''}`}
                   onClick={() => onSelectMap && onSelectMap(id)}
                 >
                   <FaPencil
@@ -73,7 +67,7 @@ export const MapList = ({
                     onClick={(e: React.MouseEvent) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      dispatch(openModal({ modalType: "mapEdit", editId: id }));
+                      dispatch(openModal({ modalType: 'mapEdit', editId: id }));
                     }}
                   />
                   <h3>{name}</h3>

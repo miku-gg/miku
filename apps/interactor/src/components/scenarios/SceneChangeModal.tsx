@@ -1,34 +1,24 @@
-import { Button, Modal } from '@mikugg/ui-kit'
-import { useAppContext } from '../../App.context'
-import { fillTextTemplate } from '../../libs/prompts/strategies'
-import { selectScenes } from '../../state/selectors'
-import { useAppDispatch, useAppSelector } from '../../state/store'
-import './SceneChangeModal.scss'
-import { setModalOpened } from '../../state/slices/creationSlice'
-import { toast } from 'react-toastify'
-import { interactionStart } from '../../state/slices/narrationSlice'
-import EmotionRenderer from '../emotion-render/EmotionRenderer'
-import { setMapModal } from '../../state/slices/settingsSlice'
+import { Button, Modal } from '@mikugg/ui-kit';
+import { useAppContext } from '../../App.context';
+import { fillTextTemplate } from '../../libs/prompts/strategies';
+import { selectScenes } from '../../state/selectors';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import './SceneChangeModal.scss';
+import { setModalOpened } from '../../state/slices/creationSlice';
+import { toast } from 'react-toastify';
+import { interactionStart } from '../../state/slices/narrationSlice';
+import EmotionRenderer from '../emotion-render/EmotionRenderer';
+import { setMapModal } from '../../state/slices/settingsSlice';
 
 export const SceneChangeModal = () => {
-  const {
-    assetLinkLoader,
-    isInteractionDisabled,
-    servicesEndpoint,
-    apiEndpoint,
-  } = useAppContext()
-  const dispatch = useAppDispatch()
-  const userName = useAppSelector((state) => state.settings.user.name)
-  const { opened, sceneId } = useAppSelector(
-    (state) => state.creation.scene.scenePreview
-  )
-  const scene = useAppSelector(selectScenes).find((s) => s.id === sceneId)
+  const { assetLinkLoader, isInteractionDisabled, servicesEndpoint, apiEndpoint } = useAppContext();
+  const dispatch = useAppDispatch();
+  const userName = useAppSelector((state) => state.settings.user.name);
+  const { opened, sceneId } = useAppSelector((state) => state.creation.scene.scenePreview);
+  const scene = useAppSelector(selectScenes).find((s) => s.id === sceneId);
   const currentCharacterName = useAppSelector(
-    (state) =>
-      state.novel.characters.find(
-        (c) => c.id === scene?.characters[0].characterId
-      )?.name
-  )
+    (state) => state.novel.characters.find((c) => c.id === scene?.characters[0].characterId)?.name,
+  );
 
   const handleConfirm = () => {
     if (isInteractionDisabled) {
@@ -37,8 +27,8 @@ export const SceneChangeModal = () => {
         style: {
           top: 10,
         },
-      })
-      return
+      });
+      return;
     }
     if (!scene) {
       toast.warn('Scene not found.', {
@@ -46,12 +36,12 @@ export const SceneChangeModal = () => {
         style: {
           top: 10,
         },
-      })
-      return
+      });
+      return;
     }
-    dispatch(setModalOpened({ id: 'scene-preview', opened: false }))
-    dispatch(setModalOpened({ id: 'slidepanel', opened: false }))
-    dispatch(setMapModal(false))
+    dispatch(setModalOpened({ id: 'scene-preview', opened: false }));
+    dispatch(setModalOpened({ id: 'slidepanel', opened: false }));
+    dispatch(setMapModal(false));
     dispatch(
       interactionStart({
         sceneId,
@@ -61,41 +51,32 @@ export const SceneChangeModal = () => {
         apiEndpoint,
         selectedCharacterId:
           (scene.characters.length &&
-            scene.characters[
-              Math.floor(Math.random() * (scene.characters.length || 0))
-            ].characterId) ||
+            scene.characters[Math.floor(Math.random() * (scene.characters.length || 0))].characterId) ||
           '',
-      })
-    )
-  }
+      }),
+    );
+  };
 
   const handleCloseModal = () => {
-    dispatch(setModalOpened({ id: 'scene-preview', opened: false }))
-  }
+    dispatch(setModalOpened({ id: 'scene-preview', opened: false }));
+  };
 
   const prompt = fillTextTemplate(scene?.prompt || '', {
     user: userName,
     bot: currentCharacterName || '{{char}}',
-  })
+  });
 
   const description = scene?.description
     ? fillTextTemplate(scene.description, {
         user: userName,
         bot: currentCharacterName || '{{char}}',
       })
-    : ''
+    : '';
 
   return (
-    <Modal
-      className="SceneChangeModal"
-      opened={opened}
-      onCloseModal={() => handleCloseModal()}
-    >
+    <Modal className="SceneChangeModal" opened={opened} onCloseModal={() => handleCloseModal()}>
       <div className="SceneChangeModal__content">
-        <img
-          className="SceneChangeModal__background-image"
-          src={assetLinkLoader(scene?.backgroundImage || '', true)}
-        />
+        <img className="SceneChangeModal__background-image" src={assetLinkLoader(scene?.backgroundImage || '', true)} />
         <div className="SceneChangeModal__characters">
           {scene?.characterImages?.map((image, index) => {
             return (
@@ -105,13 +86,11 @@ export const SceneChangeModal = () => {
                 assetLinkLoader={assetLinkLoader}
                 assetUrl={image}
               />
-            )
+            );
           })}
         </div>
         <div className="SceneChangeModal__text-container">
-          <h2 className="SceneChangeModal__title">
-            {scene?.name || 'Next scene'}
-          </h2>
+          <h2 className="SceneChangeModal__title">{scene?.name || 'Next scene'}</h2>
           <p className="SceneChangeModal__prompt">{description || prompt}</p>
         </div>
         <div className="SceneChangeModal__buttons">
@@ -124,5 +103,5 @@ export const SceneChangeModal = () => {
         </div>
       </div>
     </Modal>
-  )
-}
+  );
+};

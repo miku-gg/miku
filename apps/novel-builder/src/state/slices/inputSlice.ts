@@ -1,37 +1,31 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 // Define a type for the modal types
 export type ModalType =
-  | "background"
-  | "backgroundSearch"
-  | "song"
-  | "songSearch"
-  | "character"
-  | "characterGeneration"
-  | "characterSearch"
-  | "loading"
-  | "lorebookEdit"
-  | "mapEdit"
-  | "placeEdit"
-  | "objectiveEdit"
-  | "editInventoryItem"
-  |"actionEdit"
-  | "errors"
-  | "scene";
+  | 'background'
+  | 'backgroundSearch'
+  | 'song'
+  | 'songSearch'
+  | 'character'
+  | 'characterGeneration'
+  | 'characterSearch'
+  | 'loading'
+  | 'lorebookEdit'
+  | 'mapEdit'
+  | 'placeEdit'
+  | 'objectiveEdit'
+  | 'editInventoryItem'
+  | 'actionEdit'
+  | 'errors'
+  | 'scene';
 
-export type PanelType =
-  | "details"
-  | "assets"
-  | "maps"
-  | "scenes"
-  | "starts"
-  | "preview";
+export type PanelType = 'details' | 'assets' | 'maps' | 'scenes' | 'starts' | 'preview';
 export const isPanelType = (panel: string): panel is PanelType =>
-  ["details", "assets", "maps", "scenes", "starts", "preview"].includes(panel);
+  ['details', 'assets', 'maps', 'scenes', 'starts', 'preview'].includes(panel);
 
 export interface InputState {
   navigation: {
-    page: "homepage" | "edit";
+    page: 'homepage' | 'edit';
     panel: PanelType;
   };
   modals: {
@@ -45,8 +39,8 @@ export interface InputState {
 
 const initialState: InputState = {
   navigation: {
-    page: "homepage",
-    panel: "details",
+    page: 'homepage',
+    panel: 'details',
   },
   modals: {
     loading: {
@@ -101,7 +95,7 @@ const initialState: InputState = {
 };
 
 const inputSlice = createSlice({
-  name: "input",
+  name: 'input',
   initialState,
   reducers: {
     openModal: (
@@ -110,14 +104,14 @@ const inputSlice = createSlice({
         modalType: ModalType;
         editId?: string;
         text?: string;
-      }>
+      }>,
     ) => {
       const { modalType, editId } = action.payload;
       state.modals[modalType].opened = true;
-      if ("editId" in action.payload) {
+      if ('editId' in action.payload) {
         state.modals[modalType].editId = editId;
       }
-      if ("text" in action.payload) {
+      if ('text' in action.payload) {
         state.modals[modalType].text = action.payload.text;
       }
     },
@@ -125,20 +119,19 @@ const inputSlice = createSlice({
       state,
       action: PayloadAction<{
         modalType: ModalType;
-      }>
+      }>,
     ) => {
       state.modals[action.payload.modalType].opened = false;
     },
     navigatePanel(state, action: PayloadAction<PanelType>) {
       state.navigation.panel = action.payload;
     },
-    navigatePage(state, action: PayloadAction<"homepage" | "edit">) {
+    navigatePage(state, action: PayloadAction<'homepage' | 'edit'>) {
       state.navigation.page = action.payload;
     },
   },
 });
 
-export const { openModal, closeModal, navigatePage, navigatePanel } =
-  inputSlice.actions;
+export const { openModal, closeModal, navigatePage, navigatePanel } = inputSlice.actions;
 
 export default inputSlice.reducer;

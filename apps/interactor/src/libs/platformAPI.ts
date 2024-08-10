@@ -1,69 +1,64 @@
-import axios from 'axios'
-import { NovelV3 } from '@mikugg/bot-utils'
+import axios from 'axios';
+import { NovelV3 } from '@mikugg/bot-utils';
 
-export const spendSceneSuggestion = async (
-  apiEndpoint: string
-): Promise<void> => {
+export const spendSceneSuggestion = async (apiEndpoint: string): Promise<void> => {
   await axios.post(
     `${apiEndpoint}/user/use-suggestion`,
     {},
     {
       withCredentials: true,
-    }
-  )
-}
+    },
+  );
+};
 
-export const unlockAchievement = async (
-  apiEndpoint: string,
-  achievementId: string
-): Promise<void> => {
+export const unlockAchievement = async (apiEndpoint: string, achievementId: string): Promise<void> => {
   await axios.put(
     `${apiEndpoint}/achievement/${achievementId}`,
     {},
     {
       withCredentials: true,
-    }
-  )
-}
+    },
+  );
+};
 
 export const getUnlockableAchievements = async (
   apiEndpoint: string,
-  botId: string
+  botId: string,
 ): Promise<NovelV3.NovelObjective[]> => {
   try {
-    if (!apiEndpoint || !botId) return []
+    if (!apiEndpoint || !botId) return [];
     const { data } = await axios.get<
       {
-        id: string
-        name: string
-        description: string
-        condition: string
-        scenes: string[]
-        isEnabled: boolean
-        botId: string
-        inventoryItemId: string
-        createdAt: Date
-        updatedAt: Date
+        id: string;
+        name: string;
+        description: string;
+        condition: string;
+        scenes: string[];
+        isEnabled: boolean;
+        botId: string;
+        inventoryItemId: string;
+        createdAt: Date;
+        updatedAt: Date;
         inventoryItem: {
-          id: string
-          name: string
-          description: string
-          isPremium: boolean
-          icon: string
-          createdAt: Date
-          updatedAt: Date
+          id: string;
+          name: string;
+          description: string;
+          isPremium: boolean;
+          icon: string;
+          createdAt: Date;
+          updatedAt: Date;
           actions: {
-            id: string
-            name: string
-            prompt: string
-            createdAt: Date
-            updatedAt: Date
-          }[]
-        }
+            id: string;
+            name: string;
+            prompt: string;
+            createdAt: Date;
+            updatedAt: Date;
+          }[];
+        };
       }[]
     >(`${apiEndpoint}/achievements/${botId}/unlockable`, {
       withCredentials: true,
-    })
+    });
 
     return data.map((achievement) => {
       return {
@@ -93,30 +88,28 @@ export const getUnlockableAchievements = async (
                   return {
                     name: action.name,
                     prompt: action.prompt,
-                  }
+                  };
                 }),
               },
             },
           },
         ],
-      }
-    })
+      };
+    });
   } catch (error) {
-    console.warn(error)
-    return []
+    console.warn(error);
+    return [];
   }
-}
+};
 
-export const getUnlockedItems = async (
-  apiEndpoint: string
-): Promise<NovelV3.InventoryItem[]> => {
+export const getUnlockedItems = async (apiEndpoint: string): Promise<NovelV3.InventoryItem[]> => {
   try {
-    if (!apiEndpoint) return []
+    if (!apiEndpoint) return [];
     const { data } = await axios.get(`${apiEndpoint}/items/unlocked`, {
       withCredentials: true,
-    })
-    return data
+    });
+    return data;
   } catch (error) {
-    return []
+    return [];
   }
-}
+};
