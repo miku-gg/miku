@@ -207,15 +207,20 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     const existingText = currentCharacterResponse?.text || '';
     const charStops = scene?.characters
       .map(({ characterId }) => {
-        return `"\\n{{${characterId}}}:","\\n{{${characterId}}}'s reaction:"`;
+        const character = state.novel.characters.find((char) => char.id === characterId);
+        const charName = (character?.name || '').replace(/"/g, '\\"');
+
+        return `"\\n${charName}:","\\n${charName}'s reaction:"`;
       })
       .concat(temp.stops.map((stop) => `"${stop}"`))
       .join(',');
 
+    const userSanitized = state.settings.user.name.replace(/"/g, '\\"');
+
     return (
       temp.askLine +
       `{{char}}'s reaction:${existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'}\n` +
-      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n{{user}}:",${charStops}]}}`
+      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`
     );
   }
 
