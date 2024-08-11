@@ -47,7 +47,7 @@ export default async (req: Request<string>, res: Response) => {
     ),
   );
   const stream = templateProcessor.processTemplateStream(
-    guidanceQuery.template,
+    modelSettings.model_id_for_select ? guidanceQuery.template.replace(/{{SEL[\s\S]*?}}/g, '') : guidanceQuery.template,
     new Map(Object.entries(guidanceQuery.variables || {})),
     {
       headers: {
