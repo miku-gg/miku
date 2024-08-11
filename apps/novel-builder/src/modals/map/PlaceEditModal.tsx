@@ -14,6 +14,7 @@ import config from '../../config';
 import { checkFileType } from '../../libs/utils';
 import SceneSelector from '../scene/SceneSelector';
 import './PlaceEditModal.scss';
+import { AssetType } from '@mikugg/bot-utils';
 
 function isBlackAndWhite(pixels: Uint8ClampedArray): boolean {
   for (let i = 0; i < pixels.length; i += 4) {
@@ -42,7 +43,10 @@ export default function PlaceEditModal() {
   const handleUploadImage = async (file: File, source: 'preview' | 'mask') => {
     if (file && place) {
       try {
-        const asset = await config.uploadAsset(file);
+        const asset = await config.uploadAsset(
+          file,
+          source === 'preview' ? AssetType.MAP_IMAGE_PREVIEW : AssetType.MAP_MASK,
+        );
         switch (source) {
           case 'preview':
             dispatch(

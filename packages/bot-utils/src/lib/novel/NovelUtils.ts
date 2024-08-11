@@ -269,30 +269,53 @@ export const extractNovelAssets = async (
 ): Promise<{
   novel: NovelV3.NovelState;
   assets: {
-    images: Map<string, string>;
-    audios: Map<string, string>;
-    videos: Map<string, string>;
+    images: Map<string, { source: string; type: AssetType }>;
+    audios: Map<string, { source: string; type: AssetType }>;
+    videos: Map<string, { source: string; type: AssetType }>;
   };
 }> => {
-  const images = new Map<string, string>();
-  const audios = new Map<string, string>();
-  const videos = new Map<string, string>();
+  const images = new Map<string, { source: string; type: AssetType }>();
+  const audios = new Map<string, { source: string; type: AssetType }>();
+  const videos = new Map<string, { source: string; type: AssetType }>();
 
   // Process backgrounds
   for (const background of novel.backgrounds) {
     if (background.source.jpg.startsWith('data:')) {
       const bgHashJpg = await hashBase64URI(background.source.jpg);
-      images.set(bgHashJpg, background.source.jpg);
+      images.set(bgHashJpg, { source: background.source.jpg, type: AssetType.BACKGROUND_IMAGE });
       background.source.jpg = bgHashJpg;
     } else {
-      images.set(background.source.jpg, background.source.jpg);
+      images.set(background.source.jpg, { source: background.source.jpg, type: AssetType.BACKGROUND_IMAGE });
     }
+
+    if (background.source.jpgMobile?.startsWith('data:')) {
+      const bgHashJpgMobile = await hashBase64URI(background.source.jpgMobile);
+      images.set(bgHashJpgMobile, { source: background.source.jpgMobile, type: AssetType.BACKGROUND_IMAGE });
+      background.source.jpgMobile = bgHashJpgMobile;
+    } else if (background.source.jpgMobile) {
+      images.set(background.source.jpgMobile, {
+        source: background.source.jpgMobile,
+        type: AssetType.BACKGROUND_IMAGE,
+      });
+    }
+
     if (background.source.mp4?.startsWith('data:')) {
       const bgHashWebm = await hashBase64URI(background.source.mp4);
-      videos.set(bgHashWebm, background.source.mp4);
+      videos.set(bgHashWebm, { source: background.source.mp4, type: AssetType.BACKGROUND_VIDEO });
       background.source.mp4 = bgHashWebm;
     } else if (background.source.mp4) {
-      videos.set(background.source.mp4, background.source.mp4);
+      videos.set(background.source.mp4, { source: background.source.mp4, type: AssetType.BACKGROUND_VIDEO });
+    }
+
+    if (background.source.mp4Mobile?.startsWith('data:')) {
+      const bgHashWebmMobile = await hashBase64URI(background.source.mp4Mobile);
+      videos.set(bgHashWebmMobile, { source: background.source.mp4Mobile, type: AssetType.BACKGROUND_VIDEO });
+      background.source.mp4Mobile = bgHashWebmMobile;
+    } else if (background.source.mp4Mobile) {
+      videos.set(background.source.mp4Mobile, {
+        source: background.source.mp4Mobile,
+        type: AssetType.BACKGROUND_VIDEO,
+      });
     }
   }
 
@@ -300,10 +323,10 @@ export const extractNovelAssets = async (
   for (const song of novel.songs) {
     if (song.source.startsWith('data:')) {
       const songHash = await hashBase64URI(song.source);
-      audios.set(songHash, song.source);
+      audios.set(songHash, { source: song.source, type: AssetType.MUSIC });
       song.source = songHash;
     } else {
-      audios.set(song.source, song.source);
+      audios.set(song.source, { source: song.source, type: AssetType.MUSIC });
     }
   }
 
@@ -311,40 +334,41 @@ export const extractNovelAssets = async (
   for (const map of novel.maps) {
     if (map.source.png.startsWith('data:')) {
       const mapHashPng = await hashBase64URI(map.source.png);
-      images.set(mapHashPng, map.source.png);
+      images.set(mapHashPng, { source: map.source.png, type: AssetType.MAP_IMAGE });
       map.source.png = mapHashPng;
     } else {
-      images.set(map.source.png, map.source.png);
+      images.set(map.source.png, { source: map.source.png, type: AssetType.MAP_IMAGE });
     }
-    if (map.source.webm?.startsWith('data:')) {
-      const mapHashWebm = await hashBase64URI(map.source.webm);
-      videos.set(mapHashWebm, map.source.webm);
-      map.source.webm = mapHashWebm;
-    } else if (map.source.webm) {
-      videos.set(map.source.webm, map.source.webm);
+    if (map.source.mp4?.startsWith('data:')) {
+      const mapHashMp4 = await hashBase64URI(map.source.mp4);
+      videos.set(mapHashMp4, { source: map.source.mp4, type: AssetType.MAP_VIDEO });
+      map.source.mp4 = mapHashMp4;
+    } else if (map.source.mp4) {
+      videos.set(map.source.mp4, { source: map.source.mp4, type: AssetType.MAP_VIDEO });
     }
+
     if (map.source.music?.startsWith('data:')) {
       const mapMusicHash = await hashBase64URI(map.source.music);
-      audios.set(mapMusicHash, map.source.music);
+      audios.set(mapMusicHash, { source: map.source.music, type: AssetType.MUSIC });
       map.source.music = mapMusicHash;
     } else if (map.source.music) {
-      audios.set(map.source.music, map.source.music);
+      audios.set(map.source.music, { source: map.source.music, type: AssetType.MUSIC });
     }
 
     for (const place of map.places) {
       if (place.previewSource.startsWith('data:')) {
         const placePreviewHash = await hashBase64URI(place.previewSource);
-        images.set(placePreviewHash, place.previewSource);
+        images.set(placePreviewHash, { source: place.previewSource, type: AssetType.MAP_IMAGE_PREVIEW });
         place.previewSource = placePreviewHash;
       } else if (place.previewSource) {
-        images.set(place.previewSource, place.previewSource);
+        images.set(place.previewSource, { source: place.previewSource, type: AssetType.MAP_IMAGE_PREVIEW });
       }
       if (place.maskSource.startsWith('data:')) {
         const placeMaskHash = await hashBase64URI(place.maskSource);
-        images.set(placeMaskHash, place.maskSource);
+        images.set(placeMaskHash, { source: place.maskSource, type: AssetType.MAP_MASK });
         place.maskSource = placeMaskHash;
       } else if (place.maskSource) {
-        images.set(place.maskSource, place.maskSource);
+        images.set(place.maskSource, { source: place.maskSource, type: AssetType.MAP_MASK });
       }
     }
   }
@@ -352,31 +376,34 @@ export const extractNovelAssets = async (
   // process logoPic
   if (isDataUri(novel.logoPic)) {
     const logoPicHash = await hashBase64URI(novel.logoPic);
-    images.set(logoPicHash, novel.logoPic);
+    images.set(logoPicHash, { source: novel.logoPic, type: AssetType.NOVEL_PIC });
     novel.logoPic = logoPicHash;
   } else {
-    images.set(novel.logoPic, novel.logoPic);
+    images.set(novel.logoPic, { source: novel.logoPic, type: AssetType.NOVEL_PIC });
   }
 
   // process characters
   for (const character of novel.characters) {
     if (isDataUri(character.profile_pic)) {
       const profilePicHash = await hashBase64URI(character.profile_pic);
-      images.set(profilePicHash, character.profile_pic);
+      images.set(profilePicHash, { source: character.profile_pic, type: AssetType.CHARACTER_PIC });
       character.profile_pic = profilePicHash;
     } else {
-      images.set(character.profile_pic, character.profile_pic);
+      images.set(character.profile_pic, { source: character.profile_pic, type: AssetType.CHARACTER_PIC });
     }
 
     if (character.card.data.extensions.mikugg_v2.profile_pic.startsWith('data:')) {
       const profilePicHash = await hashBase64URI(character.card.data.extensions.mikugg_v2.profile_pic);
-      images.set(profilePicHash, character.card.data.extensions.mikugg_v2.profile_pic);
+      images.set(profilePicHash, {
+        source: character.card.data.extensions.mikugg_v2.profile_pic,
+        type: AssetType.CHARACTER_PIC,
+      });
       character.card.data.extensions.mikugg_v2.profile_pic = profilePicHash;
     } else {
-      images.set(
-        character.card.data.extensions.mikugg_v2.profile_pic,
-        character.card.data.extensions.mikugg_v2.profile_pic,
-      );
+      images.set(character.card.data.extensions.mikugg_v2.profile_pic, {
+        source: character.card.data.extensions.mikugg_v2.profile_pic,
+        type: AssetType.CHARACTER_PIC,
+      });
     }
 
     // process character outfits
@@ -384,24 +411,37 @@ export const extractNovelAssets = async (
       for (const emotion of outfit.emotions) {
         if (isDataUri(emotion.sources.png)) {
           const emotionPngHash = await hashBase64URI(emotion.sources.png);
-          images.set(emotionPngHash, emotion.sources.png);
+          images.set(emotionPngHash, { source: emotion.sources.png, type: AssetType.EMOTION_IMAGE });
           emotion.sources.png = emotionPngHash;
         } else {
-          images.set(emotion.sources.png, emotion.sources.png);
+          images.set(emotion.sources.png, { source: emotion.sources.png, type: AssetType.EMOTION_IMAGE });
         }
         if (emotion.sources.webm && isDataUri(emotion.sources.webm)) {
           const emotionWebmHash = await hashBase64URI(emotion.sources.webm);
-          videos.set(emotionWebmHash, emotion.sources.webm);
+          videos.set(emotionWebmHash, { source: emotion.sources.webm, type: AssetType.EMOTION_ANIMATED });
           emotion.sources.webm = emotionWebmHash;
         } else if (emotion.sources.webm) {
-          videos.set(emotion.sources.webm, emotion.sources.webm);
+          videos.set(emotion.sources.webm, { source: emotion.sources.webm, type: AssetType.EMOTION_ANIMATED });
         }
         if (emotion.sources.sound && isDataUri(emotion.sources.sound)) {
           const emotionSoundHash = await hashBase64URI(emotion.sources.sound);
-          audios.set(emotionSoundHash, emotion.sources.sound);
+          audios.set(emotionSoundHash, { source: emotion.sources.sound, type: AssetType.EMOTION_SOUND });
           emotion.sources.sound = emotionSoundHash;
         } else if (emotion.sources.sound) {
-          audios.set(emotion.sources.sound, emotion.sources.sound);
+          audios.set(emotion.sources.sound, { source: emotion.sources.sound, type: AssetType.EMOTION_SOUND });
+        }
+      }
+    }
+
+    // process items
+    if (novel.inventory?.length) {
+      for (const item of novel.inventory) {
+        if (isDataUri(item.icon)) {
+          const itemIconHash = await hashBase64URI(item.icon);
+          images.set(itemIconHash, { source: item.icon, type: AssetType.ITEM_IMAGE });
+          item.icon = itemIconHash;
+        } else {
+          images.set(item.icon, { source: item.icon, type: AssetType.ITEM_IMAGE });
         }
       }
     }
@@ -424,10 +464,26 @@ export enum ErrorImportType {
   UPLOAD_FAILED = 'UPLOAD_FAILED',
 }
 
+export enum AssetType {
+  NOVEL_PIC = 'NOVEL_PIC',
+  CHARACTER_PIC = 'CHARACTER_PIC',
+  EMOTION_IMAGE = 'EMOTION_IMAGE',
+  EMOTION_ANIMATED = 'EMOTION_ANIMATED',
+  EMOTION_SOUND = 'EMOTION_SOUND',
+  BACKGROUND_IMAGE = 'BACKGROUND_IMAGE',
+  BACKGROUND_VIDEO = 'BACKGROUND_VIDEO',
+  MAP_IMAGE = 'MAP_IMAGE',
+  MAP_MASK = 'MAP_MASK',
+  MAP_IMAGE_PREVIEW = 'MAP_IMAGE_PREVIEW',
+  MAP_VIDEO = 'MAP_VIDEO',
+  MUSIC = 'MUSIC',
+  ITEM_IMAGE = 'ITEM_IMAGE',
+}
+
 export const importAndReplaceNovelStateAssets = async (
   novel: NovelV3.NovelState,
   options: {
-    uploadAsset: (dataString: string) => Promise<{ success: boolean; assetId: string }>;
+    uploadAsset: (dataString: string, type: AssetType) => Promise<{ success: boolean; assetId: string }>;
     onUpdate: (value: { progress: number; total: number; bytes: number }) => void;
     onError: (error: ErrorImportType, message?: string) => void;
     uploadBatchSize: number;
@@ -438,14 +494,14 @@ export const importAndReplaceNovelStateAssets = async (
     assets: { images, audios, videos },
   } = await extractNovelAssets(novel);
   // CHECK IF SOME AUDIO IS MORE THAN 20MB
-  const bigAudio = Array.from(audios.entries()).find(([_, audio]) => audio.length > 20 * ONE_MB);
+  const bigAudio = Array.from(audios.entries()).find(([_, audio]) => audio.source.length > 20 * ONE_MB);
 
   if (bigAudio) {
     options.onError(ErrorImportType.ASSET_TOO_LARGE, `Audio ${bigAudio[0]} is too large`);
   }
 
   // check big image
-  const bigImage = Array.from(images.entries()).find(([_, image]) => image.length > 20 * ONE_MB);
+  const bigImage = Array.from(images.entries()).find(([_, image]) => image.source.length > 20 * ONE_MB);
 
   if (bigImage) {
     options.onError(ErrorImportType.ASSET_TOO_LARGE, `Image ${bigImage[0]} is too large`);
@@ -453,7 +509,7 @@ export const importAndReplaceNovelStateAssets = async (
 
   // check big video
 
-  const bigVideo = Array.from(videos.entries()).find(([_, video]) => video.length > 20 * ONE_MB);
+  const bigVideo = Array.from(videos.entries()).find(([_, video]) => video.source.length > 20 * ONE_MB);
 
   if (bigVideo) {
     options.onError(ErrorImportType.ASSET_TOO_LARGE, `Video ${bigVideo[0]} is too large`);
@@ -470,11 +526,12 @@ export const importAndReplaceNovelStateAssets = async (
     return Promise.all(
       batch.map(async (asset) => {
         try {
-          const result = await options.uploadAsset(assets.get(asset)!);
+          const { source, type } = assets.get(asset)!;
+          const result = await options.uploadAsset(source, type);
           options.onUpdate({
             progress: ++progress,
             total,
-            bytes: (bytes = bytes + assets.get(asset)!.length),
+            bytes: (bytes = bytes + source.length),
           });
           if (!result.success) {
             options.onError(ErrorImportType.UPLOAD_FAILED, `Asset ${asset} upload failed.`);

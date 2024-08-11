@@ -11,6 +11,7 @@ import { closeModal } from '../state/slices/inputSlice';
 import { deleteBackground, updateBackground } from '../state/slices/novelFormSlice';
 import { useAppSelector } from '../state/store';
 import './BackgroundEditModal.scss';
+import { AssetType } from '@mikugg/bot-utils';
 
 export default function BackgroundEditModal() {
   const background = useAppSelector(selectEditingBackground);
@@ -46,7 +47,7 @@ export default function BackgroundEditModal() {
         return;
       }
       setBackgroundUploading(true);
-      config.uploadAsset(file).then(({ success, assetId }) => {
+      config.uploadAsset(file, AssetType.BACKGROUND_VIDEO).then(({ success, assetId }) => {
         if (!success || !assetId) {
           setBackgroundUploading(false);
           return;

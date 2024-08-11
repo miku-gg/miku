@@ -17,6 +17,7 @@ import config from '../../config';
 import { checkFileType } from '../../libs/utils';
 import SceneSelector from '../scene/SceneSelector';
 import './ItemEditModal.scss';
+import { AssetType } from '@mikugg/bot-utils';
 
 export default function ItemEditModal() {
   const dispatch = useDispatch();
@@ -28,7 +29,7 @@ export default function ItemEditModal() {
     if (file && item) {
       setIsUploading(true);
       try {
-        const asset = await config.uploadAsset(file);
+        const asset = await config.uploadAsset(file, AssetType.ITEM_IMAGE);
         dispatch(
           updateInventoryItem({
             ...item,

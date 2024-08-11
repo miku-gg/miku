@@ -1,4 +1,4 @@
-import { NovelV3, uploadAsset } from '@mikugg/bot-utils';
+import { AssetType, NovelV3, _browser_convertAsset, _browser_convertToWebP, uploadAsset } from '@mikugg/bot-utils';
 import { BackgroundResult, listSearch, SearchType, SongResult } from './libs/listSearch';
 import { API_ENDPOINT } from './libs/utils';
 
@@ -24,7 +24,10 @@ async function fileToDataURI(file: File): Promise<string> {
 
 interface BuilderConfig {
   genAssetLink: (asset: string, lowres?: boolean) => string;
-  uploadAsset: (file: File | string) => Promise<{
+  uploadAsset: (
+    file: File | string,
+    type: AssetType,
+  ) => Promise<{
     success: boolean;
     assetId: string;
   }>;
@@ -67,10 +70,11 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
           return `http://localhost:8585/s3/assets/${lowres ? `480p_${asset}` : asset}`;
         }
       },
-      uploadAsset: async (file: File | string) => {
+      uploadAsset: async (file: File | string, type) => {
         if (typeof file === 'string') {
           file = await dataURItoFile(file, 'asset');
         }
+        const assets = _browser_convertAsset(file, type);
 
         const result = await uploadAsset('http://localhost:8585/asset-upload', file);
 

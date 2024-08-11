@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 import config from '../../config';
 import { checkFileType } from '../../libs/utils';
 import './MapEditModal.scss';
+import { AssetType } from '@mikugg/bot-utils';
 
 export default function MapEditModal() {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ export default function MapEditModal() {
   const handleUploadMapImage = async (file: File) => {
     if (file && map) {
       try {
-        const asset = await config.uploadAsset(file);
+        const asset = await config.uploadAsset(file, AssetType.MAP_IMAGE);
         dispatch(
           updateMapImage({
             mapId: map.id,

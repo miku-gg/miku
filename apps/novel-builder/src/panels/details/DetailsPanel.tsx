@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 
 import './DetailsPanel.scss';
 import { LorebookList } from './LorebookList';
+import { AssetType } from '@mikugg/bot-utils';
 export default function DetailsPanel() {
   const dispatch = useAppDispatch();
 
@@ -15,7 +16,7 @@ export default function DetailsPanel() {
   const handleLogoPicChange = async (file: File) => {
     if (file) {
       try {
-        const asset = await config.uploadAsset(file);
+        const asset = await config.uploadAsset(file, AssetType.NOVEL_PIC);
         dispatch(
           updateDetails({
             name: 'logoPic',

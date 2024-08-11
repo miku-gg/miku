@@ -13,6 +13,7 @@ import './CharacterDescriptionEdit.scss';
 import { CharacterDescriptionGeneration } from './CharacterDescriptionGeneration';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
+import { AssetType } from '@mikugg/bot-utils';
 
 const DEFAULT_TAGS = [
   { value: 'Male' },
@@ -50,7 +51,7 @@ export default function CharacterDescriptionEdit({ characterId }: { characterId?
   const handleAvatarChange = async (file: File) => {
     if (file) {
       try {
-        const asset = await config.uploadAsset(file);
+        const asset = await config.uploadAsset(file, AssetType.CHARACTER_PIC);
         dispatch(
           updateCharacter({
             ...character,

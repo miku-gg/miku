@@ -9,7 +9,7 @@ import { emotionTemplates } from '../../data/emotions';
 import AudioPreview from '../../components/AudioPreview';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { updateCharacter } from '../../state/slices/novelFormSlice';
-import { MikuCardV2 } from '@mikugg/bot-utils';
+import { AssetType, MikuCardV2 } from '@mikugg/bot-utils';
 import config from '../../config';
 import './CharacterOutfitsEdit.scss';
 import { toast } from 'react-toastify';
@@ -146,7 +146,14 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
     isAudio?: boolean;
     outfits: MikuCardV2['data']['extensions']['mikugg_v2']['outfits'];
   }): Promise<MikuCardV2['data']['extensions']['mikugg_v2']['outfits']> => {
-    const { assetId, success } = await config.uploadAsset(file);
+    const { assetId, success } = await config.uploadAsset(
+      file,
+      file.type === 'video/webm'
+        ? AssetType.EMOTION_ANIMATED
+        : isAudio
+        ? AssetType.EMOTION_SOUND
+        : AssetType.EMOTION_IMAGE,
+    );
     if (!success) {
       toast.warn('Failed to upload asset');
       return _outfits;
