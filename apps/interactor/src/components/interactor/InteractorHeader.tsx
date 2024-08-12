@@ -12,6 +12,7 @@ import { SceneChangeModal } from '../scenarios/SceneChangeModal';
 import { InventoryTrigger } from './Inventory';
 import AnimatedText from '../common/AnimatedText';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
+import PremiumHint from './PremiumHint';
 import Hint from './Hint';
 
 const InteractorHeader = () => {
@@ -43,6 +44,7 @@ const InteractorHeader = () => {
         <InventoryTrigger />
         <InteractiveMap />
         <Hint />
+        <PremiumHint />
         <SceneChangeModal />
       </div>
       <div className="InteractorHeader__right">

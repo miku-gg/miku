@@ -1,8 +1,8 @@
 @import '../../variables';
 
-.Hint {
+.PremiumHint {
   position: absolute;
-  top: 50px;
+  top: 100px;
   left: 0;
   // linear gradient transparency left to right
   background: linear-gradient(to right, rgba(black, 0.6), rgba(black, 0.3) 100%);
@@ -19,7 +19,7 @@
     animation: showup 7s forwards;
     color: #ffe23f;
     transition: all 0.2s ease-out;
-    filter: drop-shadow(0px -3px 4px #ffe23f);
+    filter: drop-shadow(0px 0px 4px #ff3f3f);
 
     font-size: 20px;
   }
@@ -53,10 +53,20 @@
     margin-right: 4px;
     color: rgb(225, 138, 36);
     display: inline-block;
+    animation: infiniteSlide var(--animation-duration) linear infinite;
   }
 
   &--hidden {
     opacity: 0;
+  }
+
+  @keyframes infiniteSlide {
+    30% {
+      transform: translateX(var(--initial-text-position));
+    }
+    100% {
+      transform: translateX(var(--ending-text-position));
+    }
   }
 
   @keyframes showup {
