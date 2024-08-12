@@ -15,12 +15,11 @@ export default function Hint() {
   const dispatch = useAppDispatch();
   const scene = useAppSelector(selectCurrentScene);
   const count = useAppSelector(selectCurrentSceneInteractionCount);
-  const disabled = useAppSelector((state) => state.narration.input.disabled);
   const objectives =
     useAppSelector(selectCurrentSceneObjectives).filter((o) => !seenHints?.includes(o.id) && o.hint) || [];
   let hintToShow = [...objectives, seenHints.includes(scene?.id || '') ? null : scene][0];
 
-  if (count < 2 || disabled) {
+  if (count < 2) {
     hintToShow = undefined;
   }
 
