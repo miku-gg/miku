@@ -1,10 +1,5 @@
-export enum ModelType {
-  RP = "RP",
-  RP_SMART = "RP_SMART",
-}
-
 export interface GuidanceQuery {
-  model: ModelType;
+  model: string;
   template: string;
   variables: Record<string, string[] | string>;
 }
@@ -12,10 +7,6 @@ export interface GuidanceQuery {
 export const validateGuidanceQuery = (query: GuidanceQuery): void => {
   if (query.model === undefined) {
     throw { message: "model is required", status: 400 };
-  }
-
-  if (ModelType[query.model] === undefined) {
-    throw { message: "model is invalid", status: 400 };
   }
 
   if (query.template === undefined) {

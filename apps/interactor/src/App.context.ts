@@ -1,25 +1,25 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext } from 'react';
 
-import { RootState } from './state/store'
+import { RootState } from './state/store';
 
-import { PersonaResult } from './libs/listSearch'
+import { PersonaResult } from './libs/listSearch';
 
 export interface AppProps {
-  isProduction: boolean
-  isInteractionDisabled: boolean
-  apiEndpoint: string
-  isMobileApp: boolean
-  cardEndpoint: string
-  servicesEndpoint: string
-  freeTTS: boolean
-  freeSmart: boolean
-  persona: PersonaResult
-  novelLoader: () => Promise<RootState>
-  assetLinkLoader: (asset: string, lowres?: boolean) => string
+  isProduction: boolean;
+  isInteractionDisabled: boolean;
+  apiEndpoint: string;
+  isMobileApp: boolean;
+  cardEndpoint: string;
+  servicesEndpoint: string;
+  freeTTS: boolean;
+  freeSmart: boolean;
+  persona: PersonaResult;
+  novelLoader: () => Promise<RootState>;
+  assetLinkLoader: (asset: string, lowres?: boolean) => string;
   assetUploader: (data: File) => Promise<{
-    fileName: string
-    fileSize: number
-  }>
+    fileName: string;
+    fileSize: number;
+  }>;
 }
 
 const AppContext = createContext<AppProps>({
@@ -39,8 +39,8 @@ const AppContext = createContext<AppProps>({
       fileName: '',
       fileSize: 0,
     }),
-})
+});
 
-export const AppProvider = AppContext.Provider
+export const AppProvider = AppContext.Provider;
 
-export const useAppContext = () => useContext(AppContext)
+export const useAppContext = () => useContext(AppContext);

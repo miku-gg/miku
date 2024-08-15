@@ -1,11 +1,11 @@
-import { Loader } from '@mikugg/ui-kit'
-import { useAppSelector } from '../../state/store'
-import { FaCoins } from 'react-icons/fa6'
-import './CreditsDisplayer.scss'
-import { trackEvent } from '../../libs/analytics'
+import { Loader } from '@mikugg/ui-kit';
+import { useAppSelector } from '../../state/store';
+import { FaCoins } from 'react-icons/fa6';
+import './CreditsDisplayer.scss';
+import { trackEvent } from '../../libs/analytics';
 
 export default function CreditsDisplayer() {
-  const { credits, loading } = useAppSelector((state) => state.settings.user)
+  const { credits, loading } = useAppSelector((state) => state.settings.user);
   return (
     <span className="CreditsDisplayer">
       {loading ? (
@@ -27,5 +27,5 @@ export default function CreditsDisplayer() {
         </span>
       )}
     </span>
-  )
+  );
 }

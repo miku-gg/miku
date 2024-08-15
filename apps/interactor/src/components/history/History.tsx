@@ -1,89 +1,85 @@
-import { Modal, Tooltip } from '@mikugg/ui-kit'
-import { GrHistory } from 'react-icons/gr'
-import { BiCloudUpload, BiCloudDownload } from 'react-icons/bi'
-import { FaTimes } from 'react-icons/fa'
-import { ReactElement } from 'react'
-import { useAppDispatch, useAppSelector } from '../../state/store'
-import { setEditModal, setHistoryModal } from '../../state/slices/settingsSlice'
-import ReactFlow, { Position, Node, Edge, NodeTypes } from 'reactflow'
-import DialogueNode from './DialogueNode'
-import { NodeEditor } from './NodeEditor'
-import {
-  NarrationResponse,
-  swipeResponse,
-} from '../../state/slices/narrationSlice'
-import { DialogueNodeData, setAllNodesPosition } from './utils'
-import { replaceState } from '../../state/slices/replaceState'
-import { toast } from 'react-toastify'
+import { Modal, Tooltip } from '@mikugg/ui-kit';
+import { GrHistory } from 'react-icons/gr';
+import { BiCloudUpload, BiCloudDownload } from 'react-icons/bi';
+import { FaTimes } from 'react-icons/fa';
+import { ReactElement } from 'react';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import { setEditModal, setHistoryModal } from '../../state/slices/settingsSlice';
+import ReactFlow, { Position, Node, Edge, NodeTypes } from 'reactflow';
+import DialogueNode from './DialogueNode';
+import { NodeEditor } from './NodeEditor';
+import { NarrationResponse, swipeResponse } from '../../state/slices/narrationSlice';
+import { DialogueNodeData, setAllNodesPosition } from './utils';
+import { replaceState } from '../../state/slices/replaceState';
+import { toast } from 'react-toastify';
 
-import './History.scss'
-import 'reactflow/dist/style.css'
-import { VersionId as V1VersionId } from '../../state/versioning/v1.state'
-import { VersionId as V2VersionId } from '../../state/versioning/v2.state'
-import { VersionId as V3VersionId } from '../../state/versioning/v3.state'
-import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
-import { initialState as initialSettingsState } from '../../state/slices/settingsSlice'
-import { initialState as initialCreationState } from '../../state/slices/creationSlice'
-import { initialState as initialInventoryState } from '../../state/slices/inventorySlice'
-import { trackEvent } from '../../libs/analytics'
-import {
-  DEFAULT_INVENTORY,
-  getItemByActionPrompt,
-} from '../../libs/inventoryItems'
-import { scenesToObjectives } from '../../state/slices/objectivesSlice'
-import mergeWith from 'lodash.mergewith'
-import { getCongurationFromParams } from '../../../root'
+import './History.scss';
+import 'reactflow/dist/style.css';
+import { VersionId as V1VersionId } from '../../state/versioning/v1.state';
+import { VersionId as V2VersionId } from '../../state/versioning/v2.state';
+import { VersionId as V3VersionId } from '../../state/versioning/v3.state';
+import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations';
+import { initialState as initialSettingsState } from '../../state/slices/settingsSlice';
+import { initialState as initialCreationState } from '../../state/slices/creationSlice';
+import { initialState as initialInventoryState } from '../../state/slices/inventorySlice';
+import { trackEvent } from '../../libs/analytics';
+import { DEFAULT_INVENTORY, getItemByActionPrompt } from '../../libs/inventoryItems';
+import { scenesToObjectives } from '../../state/slices/objectivesSlice';
+import mergeWith from 'lodash.mergewith';
+import { getCongurationFromParams } from '../../../root';
+import { RenPyExportButton } from './ExportToRenpy';
+import { useAppContext } from '../../App.context';
 
 const HistoryActions = () => {
-  const dispatch = useAppDispatch()
-  const state = useAppSelector((state) => state)
-  const hasInteractions = useAppSelector(
-    (state) => Object.keys(state.narration.interactions).length > 0
-  )
+  const dispatch = useAppDispatch();
+  const state = useAppSelector((state) => state);
+  const hasInteractions = useAppSelector((state) => Object.keys(state.narration.interactions).length > 0);
+
+  const { isMobileApp } = useAppContext();
 
   const handleSave = () => {
-    const clonedState = JSON.parse(JSON.stringify(state))
-    clonedState.settings.modals.history = false
-    const json = JSON.stringify(clonedState)
-    const blob = new Blob([json], { type: 'application/json' })
-    const a = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    a.href = url
-    a.download = `${clonedState.novel.title}_history_${Date.now()}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-    trackEvent('download-history-click')
-  }
+    const clonedState = JSON.parse(JSON.stringify(state));
+    clonedState.settings.modals.history = false;
+    const json = JSON.stringify(clonedState);
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = `${clonedState.novel.title}_history_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    trackEvent('download-history-click');
+  };
 
   const handleLoad = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    event.target.value = ''
+    const file = event.target.files?.[0];
+    event.target.value = '';
     if (!file) {
-      return
+      return;
     }
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = async () => {
       try {
-        const stateJsonString = reader.result as string
-        let stateJson = JSON.parse(stateJsonString)
+        const stateJsonString = reader.result as string;
+        let stateJson = JSON.parse(stateJsonString);
         if (stateJson.version === V1VersionId) {
-          stateJson = migrateV2toV3(migrateV1toV2(stateJson))
+          stateJson = migrateV2toV3(migrateV1toV2(stateJson));
         } else if (stateJson.version === V2VersionId) {
-          stateJson = migrateV2toV3(stateJson)
+          stateJson = migrateV2toV3(stateJson);
         }
 
         if (stateJson.version !== V3VersionId) {
-          throw new Error('Narration version mismatch')
+          throw new Error('Narration version mismatch');
         }
 
-        const params = getCongurationFromParams()
+        const params = getCongurationFromParams();
 
         dispatch(
           replaceState({
             ...stateJson,
-            objectives: [...scenesToObjectives(stateJson.novel.scenes)],
+            objectives: [...scenesToObjectives(stateJson.novel.scenes), ...(stateJson.novel.objectives || [])],
             inventory: {
               ...initialInventoryState,
               ...(stateJson.inventory || {}),
@@ -91,24 +87,22 @@ const HistoryActions = () => {
             },
             creation: initialCreationState,
             settings: mergeWith(
-              mergeWith(
-                mergeWith({}, initialSettingsState),
-                stateJson.settings || {}
-              ),
-              params.settings || {}
+              mergeWith(mergeWith({}, initialSettingsState), stateJson.settings || {}),
+              params.settings || {},
             ),
-          })
-        )
+          }),
+        );
       } catch (e) {
-        toast.error('Error reading history file')
+        toast.error('Error reading history file');
       }
-    }
-    reader.readAsText(file)
-  }
+    };
+    reader.readAsText(file);
+  };
 
   return (
     <div className="History__actions">
       <Tooltip id="history-actions-tooltip" place="bottom" />
+      {!isMobileApp && hasInteractions ? <RenPyExportButton state={state} /> : null}
       {!hasInteractions ? (
         <label
           className="icon-button"
@@ -133,65 +127,60 @@ const HistoryActions = () => {
       >
         <BiCloudDownload />
       </button>
-      <button
-        className="icon-button"
-        onClick={() => dispatch(setHistoryModal(false))}
-      >
+      <button className="icon-button" onClick={() => dispatch(setHistoryModal(false))}>
         <FaTimes />
       </button>
     </div>
-  )
-}
+  );
+};
 const nodeTypes: NodeTypes = {
   // eslint-disable-next-line
   // @ts-ignore
   dialogueNode: DialogueNode,
-}
+};
 const HistoryModal = (): ReactElement => {
-  const dispatch = useAppDispatch()
-  const narration = useAppSelector((state) => state.narration)
-  const novel = useAppSelector((state) => state.novel)
-  const inventoryItems = useAppSelector((state) => state.inventory.items)
+  const dispatch = useAppDispatch();
+  const { isMobileApp } = useAppContext();
+  const narration = useAppSelector((state) => state.narration);
+  const novel = useAppSelector((state) => state.novel);
+  const inventoryItems = useAppSelector((state) => state.inventory.items);
 
   const [nodes, edges, startPos] = (() => {
     const parentIds = (() => {
-      const parentIds: string[] = []
-      let currentId = narration.currentResponseId
+      const parentIds: string[] = [];
+      let currentId = narration.currentResponseId;
       while (currentId) {
-        parentIds.push(currentId)
+        parentIds.push(currentId);
         currentId =
           narration.responses[currentId]?.parentInteractionId ||
           narration.interactions[currentId]?.parentResponseId ||
-          ''
+          '';
       }
-      return parentIds
-    })()
-    const topResponse = narration.responses[parentIds[parentIds.length - 1]]
-    const parentIdsSet = new Set(parentIds)
+      return parentIds;
+    })();
+    const topResponse = narration.responses[parentIds[parentIds.length - 1]];
+    const parentIdsSet = new Set(parentIds);
 
-    const nodes: Node<DialogueNodeData>[] = []
-    const edges: Edge[] = []
+    const nodes: Node<DialogueNodeData>[] = [];
+    const edges: Edge[] = [];
 
     function dfs(response: NarrationResponse) {
       // get parent scene
       const parentSceneId = response.parentInteractionId
         ? narration.interactions[response.parentInteractionId]?.sceneId
-        : novel.starts.find((start) => start.id === response.id)?.sceneId
+        : novel.starts.find((start) => start.id === response.id)?.sceneId;
 
-      const parentScene = novel.scenes.find(
-        (scene) => scene.id === parentSceneId
-      )
+      const parentScene = novel.scenes.find((scene) => scene.id === parentSceneId);
 
       const avatars = response.characters.map(({ characterId }) => {
         const id =
-          parentScene?.characters.find(
-            ({ characterId: _characterId }) => _characterId === characterId
-          )?.characterId || ''
-        return novel.characters.find((c) => c.id === id)?.profile_pic || ''
-      })
+          parentScene?.characters.find(({ characterId: _characterId }) => _characterId === characterId)?.characterId ||
+          '';
+        return novel.characters.find((c) => c.id === id)?.profile_pic || '';
+      });
 
-      const isLastResponse = parentIds[0] === response.id
-      const isRoot = response.id === topResponse?.id
+      const isLastResponse = parentIds[0] === response.id;
+      const isRoot = response.id === topResponse?.id;
       nodes.push({
         id: response.id,
         sourcePosition: Position.Bottom,
@@ -210,18 +199,18 @@ const HistoryModal = (): ReactElement => {
         type: 'dialogueNode',
         position: { x: 0, y: 0 },
         draggable: false,
-      })
+      });
 
       response.childrenInteractions.forEach(({ interactionId }) => {
-        const interaction = narration.interactions[interactionId]
+        const interaction = narration.interactions[interactionId];
 
         if (interaction?.id) {
-          const item = getItemByActionPrompt(inventoryItems, interaction.query)
-          let query = ''
+          const item = getItemByActionPrompt(inventoryItems, interaction.query);
+          let query = '';
           if (item) {
-            query = `The user used the ${item.name} item.`
+            query = `The user used the ${item.name} item.`;
           } else {
-            query = interaction.query.substring(0, 100) || ''
+            query = interaction.query.substring(0, 100) || '';
           }
 
           nodes.push({
@@ -242,7 +231,7 @@ const HistoryModal = (): ReactElement => {
               isItemAction: !!item,
             },
             position: { x: 0, y: 0 },
-          })
+          });
         }
         edges.push({
           id: `vertical_${response.id}_${interaction?.id}`,
@@ -251,13 +240,11 @@ const HistoryModal = (): ReactElement => {
           target: interactionId,
           focusable: false,
           selected: false,
-          animated:
-            parentIdsSet.has(interactionId) &&
-            (!response.parentInteractionId || parentIdsSet.has(response.id)),
-        })
+          animated: parentIdsSet.has(interactionId) && (!response.parentInteractionId || parentIdsSet.has(response.id)),
+        });
         interaction?.responsesId.forEach((responseId) => {
-          const childResponse = narration.responses[responseId]
-          if (!childResponse) return
+          const childResponse = narration.responses[responseId];
+          if (!childResponse) return;
           edges.push({
             id: `vertical_${interaction?.id}_${childResponse.id}`,
             source: interaction?.id,
@@ -265,28 +252,22 @@ const HistoryModal = (): ReactElement => {
             target: childResponse.id,
             focusable: false,
             selected: false,
-            animated:
-              parentIdsSet.has(interaction?.id) &&
-              parentIdsSet.has(childResponse.id),
-          })
-          dfs(childResponse)
-        })
-      })
+            animated: parentIdsSet.has(interaction?.id) && parentIdsSet.has(childResponse.id),
+          });
+          dfs(childResponse);
+        });
+      });
     }
 
     // eslint-disable-next-line
     // @ts-ignore
-    dfs(topResponse)
+    dfs(topResponse);
 
-    return [
-      nodes,
-      edges,
-      setAllNodesPosition(nodes, edges, topResponse?.id || ''),
-    ]
-  })()
+    return [nodes, edges, setAllNodesPosition(nodes, edges, topResponse?.id || '')];
+  })();
 
   return (
-    <div className="History__modal">
+    <div className={`History__modal ${isMobileApp ? 'History__modal--mobile' : ''}`}>
       {/* eslint-disable-next-line */}
       {/* @ts-ignore */}
       <ReactFlow
@@ -294,11 +275,8 @@ const HistoryModal = (): ReactElement => {
         edges={edges}
         defaultViewport={{
           zoom: 1.5,
-          x:
-            -startPos.x * 1.5 +
-            (document.body.clientWidth * 0.8) / 2 -
-            200 / 1.5,
-          y: -startPos.y * 1.5 + document.body.clientHeight * 0.8 - 80,
+          x: -startPos.x * 1.5 + (document.body.clientWidth * 0.8) / 2 - 200 / 1.5,
+          y: -startPos.y * 1.5 + document.body.clientHeight * (isMobileApp ? 0.7 : 0.8) - 80,
         }}
         attributionPosition="bottom-left"
         draggable={false}
@@ -307,31 +285,28 @@ const HistoryModal = (): ReactElement => {
         nodeTypes={nodeTypes}
         onNodeClick={(_event, node) => {
           if (narration.responses[node.id]) {
-            dispatch(swipeResponse(node.id))
+            dispatch(swipeResponse(node.id));
           }
         }}
       />
     </div>
-  )
-}
+  );
+};
 
 const History = (): JSX.Element => {
-  const dispatch = useAppDispatch()
-  const historyOpened = useAppSelector((state) => state.settings.modals.history)
-  const { opened: editOpened, id: editId } = useAppSelector(
-    (state) => state.settings.modals.edit
-  )
-  const { disabled: inputDisabled } = useAppSelector(
-    (state) => state.narration.input
-  )
+  const dispatch = useAppDispatch();
+  const { isMobileApp } = useAppContext();
+  const historyOpened = useAppSelector((state) => state.settings.modals.history);
+  const { opened: editOpened, id: editId } = useAppSelector((state) => state.settings.modals.edit);
+  const { disabled: inputDisabled } = useAppSelector((state) => state.narration.input);
 
   return (
     <div className="History">
       <button
         className="History__trigger icon-button"
         onClick={() => {
-          dispatch(setHistoryModal(true))
-          trackEvent('history-click')
+          dispatch(setHistoryModal(true));
+          trackEvent('history-click');
         }}
         disabled={inputDisabled}
       >
@@ -343,7 +318,7 @@ const History = (): JSX.Element => {
         onCloseModal={() => dispatch(setHistoryModal(false))}
         shouldCloseOnOverlayClick
         overlayClassName="History__modal-overlay"
-        className="History__modal-container"
+        className={`History__modal-container ${isMobileApp ? 'History__modal-container--mobile' : ''}`}
       >
         <HistoryModal />
         <HistoryActions />
@@ -362,13 +337,13 @@ const History = (): JSX.Element => {
               setEditModal({
                 opened: false,
                 id: '',
-              })
+              }),
             )
           }
         />
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default History
+export default History;

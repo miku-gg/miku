@@ -1,7 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { VersionId } from '../versioning'
+import { createSlice } from '@reduxjs/toolkit';
+import { VersionId } from '../versioning';
 
-const initialState: string = VersionId
+const initialState: string = VersionId;
 
 export const versionSlice = createSlice({
   name: 'version',
@@ -11,9 +11,9 @@ export const versionSlice = createSlice({
     builder.addCase('global/replaceState', (_state, action) => {
       // eslint-disable-next-line
       // @ts-ignore
-      return action.payload.version
-    })
+      return action.payload.version;
+    });
   },
-})
+});
 
-export default versionSlice.reducer
+export default versionSlice.reducer;

@@ -1,28 +1,23 @@
-import { Button, Input } from "@mikugg/ui-kit";
-import { BsStars } from "react-icons/bs";
-import textCompletion from "../../libs/textCompletion";
-import { ModelType, descriptionAgent } from "../../libs/utils";
-import { updateCharacter } from "../../state/slices/novelFormSlice";
-import { useAppDispatch, useAppSelector } from "../../state/store";
+import { Button, Input } from '@mikugg/ui-kit';
+import { BsStars } from 'react-icons/bs';
+import textCompletion from '../../libs/textCompletion';
+import { ModelType, descriptionAgent } from '../../libs/utils';
+import { updateCharacter } from '../../state/slices/novelFormSlice';
+import { useAppDispatch, useAppSelector } from '../../state/store';
 
-import { useState } from "react";
-import { closeModal } from "../../state/slices/inputSlice";
-import "./CharacterDescriptionGeneration.scss";
+import { useState } from 'react';
+import { closeModal } from '../../state/slices/inputSlice';
+import './CharacterDescriptionGeneration.scss';
 
 interface CharacterGenerationProps {
   characterID: string;
 }
-const SERVICES_ENDPOINT =
-  import.meta.env.VITE_SERVICES_ENDPOINT || "http://localhost:8484";
+const SERVICES_ENDPOINT = import.meta.env.VITE_SERVICES_ENDPOINT || 'http://localhost:8484';
 
-export const CharacterDescriptionGeneration = ({
-  characterID,
-}: CharacterGenerationProps) => {
+export const CharacterDescriptionGeneration = ({ characterID }: CharacterGenerationProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const dispatch = useAppDispatch();
-  const character = useAppSelector((state) =>
-    state.novel.characters.find((c) => c.id === characterID)
-  );
+  const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === characterID));
   if (!character || !characterID) {
     return null;
   }
@@ -37,7 +32,7 @@ export const CharacterDescriptionGeneration = ({
         model: ModelType.RP,
         variables: {},
         serviceBaseUrl: SERVICES_ENDPOINT,
-        identifier: "character-description-generations",
+        identifier: 'character-description-generations',
       });
 
       for await (const result of stream) {
@@ -49,30 +44,22 @@ export const CharacterDescriptionGeneration = ({
               data: {
                 ...character.card.data,
                 description:
-                  `${character.name}'s Description: "${result.get(
-                    "description"
-                  )}"\n` +
-                  `${character.name}'s Personality: [${result.get(
-                    "personality"
-                  )}]\n` +
-                  `${character.name}'s Body: [${result.get("body")}]`,
+                  `${character.name}'s Description: "${result.get('description')}"\n` +
+                  `${character.name}'s Personality: [${result.get('personality')}]\n` +
+                  `${character.name}'s Body: [${result.get('body')}]`,
               },
             },
-          })
+          }),
         );
       }
-      dispatch(closeModal({ modalType: "characterGeneration" }));
+      dispatch(closeModal({ modalType: 'characterGeneration' }));
       setIsGenerating(false);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const isDisabled =
-    !character.short_description ||
-    isGenerating ||
-    character.name === "char1" ||
-    !character.name;
+  const isDisabled = !character.short_description || isGenerating || character.name === 'char1' || !character.name;
 
   return (
     <div className="CharacterGenerationModal">
@@ -83,7 +70,7 @@ export const CharacterDescriptionGeneration = ({
           name="name"
           label="Character name"
           description="The name of your character"
-          value={character.name || ""}
+          value={character.name || ''}
           onChange={(e) =>
             dispatch(
               updateCharacter({
@@ -96,7 +83,7 @@ export const CharacterDescriptionGeneration = ({
                     name: e.target.value,
                   },
                 },
-              })
+              }),
             )
           }
           className="CharacterDescriptionEdit__input"
@@ -109,33 +96,29 @@ export const CharacterDescriptionGeneration = ({
           name="short_description"
           placeHolder="E.g *A character based in...*"
           label="Character short description"
-          value={character.short_description || ""}
+          value={character.short_description || ''}
           maxLength={256}
           onChange={(e) =>
             dispatch(
               updateCharacter({
                 ...character,
                 short_description: e.target.value,
-              })
+              }),
             )
           }
           className="CharacterGenerationModal__textArea"
         />
       </div>
-      <div
-        className={`CharacterGenerationModal__button ${
-          isDisabled ? "disabled" : ""
-        }`}
-      >
+      <div className={`CharacterGenerationModal__button ${isDisabled ? 'disabled' : ''}`}>
         <Button
-          theme={isDisabled ? "primary" : "gradient"}
+          theme={isDisabled ? 'primary' : 'gradient'}
           disabled={isDisabled}
           onClick={() => {
             generateDescriptionPrompt();
           }}
         >
           <BsStars />
-          {isGenerating ? "Generating..." : "Generate"}
+          {isGenerating ? 'Generating...' : 'Generate'}
         </Button>
       </div>
     </div>

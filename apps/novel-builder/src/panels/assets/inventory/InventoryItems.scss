@@ -1,0 +1,17 @@
+@import '../../../styles/variables.scss';
+
+.InventoryItems {
+  &__header {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+
+    & h3 {
+      margin: 0;
+    }
+
+    & svg {
+      color: #8489bd;
+    }
+  }
+}

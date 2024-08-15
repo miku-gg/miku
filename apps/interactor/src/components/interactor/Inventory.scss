@@ -10,6 +10,7 @@
   background-color: #0c1225ee;
 
   border: solid 1px $secondary-color;
+  box-shadow: 0 0 8px 0 #9747ff;
   border-left: none;
   border-radius: 0 10px 10px 0;
 
@@ -84,7 +85,6 @@
     width: 74px;
     height: 74px;
 
-    opacity: 0.5;
     background-color: $background-1;
 
     border-radius: 10px;
@@ -153,11 +153,11 @@
     &.disabled {
       // back and white filter
       filter: grayscale(100%);
-      opacity: 0.5;
+      opacity: 0.7;
 
       &:hover {
         border: 2px solid transparent;
-        opacity: 0.5;
+        opacity: 0.7;
 
         .Inventory__item-price {
           background-color: $background-1;
@@ -165,6 +165,22 @@
 
         .Inventory__item-name {
           opacity: 0;
+        }
+      }
+    }
+
+    &.highlighted {
+      border: 2px solid $color-gold !important;
+      opacity: 1;
+      // animate box shadow
+      animation: box-shadow-animation 0.5s ease-in-out infinite alternate;
+
+      @keyframes box-shadow-animation {
+        0% {
+          box-shadow: 0 0 0px $color-gold;
+        }
+        100% {
+          box-shadow: 0 0 20px $color-gold;
         }
       }
     }
@@ -194,6 +210,10 @@
     opacity: 1;
     z-index: 3;
   }
+}
+
+.hidden {
+  display: none;
 }
 
 .InventoryItemModal {

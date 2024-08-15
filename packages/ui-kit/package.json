@@ -1,6 +1,6 @@
 {
   "name": "@mikugg/ui-kit",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "description": "",
   "repository": {
     "type": "git",
@@ -24,8 +24,6 @@
     "lint:ts": "tslint 'src/**/*.{ts,tsx}'",
     "lint:es": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "lint:scss": "stylelint 'src/**/*.scss'",
-    "format": "prettier --write --loglevel warn 'src/**/*.{js,jsx,ts,tsx,json,md,scss}'",
-    "format:check": "prettier --check 'src/**/*.{js,jsx,ts,tsx,json,md,scss}'",
     "_test": "npm run lint:ts && npm run lint:es && npm run lint:scss && npm run format:check"
   },
   "keywords": [],

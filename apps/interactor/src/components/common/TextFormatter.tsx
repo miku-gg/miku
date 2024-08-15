@@ -1,92 +1,85 @@
-import classNames from 'classnames'
-import React, { useEffect, useState } from 'react'
-import { useAppSelector } from '../../state/store'
-import { FontSize, Speed } from '../../state/versioning'
-import { ShareConversation } from '../chat-box/ShareConversation'
-import './TextFormatter.scss'
+import classNames from 'classnames';
+import React, { useEffect, useState } from 'react';
+import { useAppSelector } from '../../state/store';
+import { FontSize, Speed } from '../../state/versioning';
+import { ShareConversation } from '../chat-box/ShareConversation';
+import './TextFormatter.scss';
 
 interface TextFormatterProps {
-  text: string
-  children?: React.ReactNode
+  text: string;
+  children?: React.ReactNode;
 }
 
-export const TextFormatterStatic: React.FC<TextFormatterProps> = ({
-  text,
-  children,
-}) => {
-  const fontSize = useAppSelector((state) => state.settings.text.fontSize)
-  const textFormatterDiv = React.useRef<HTMLDivElement>(null)
-  const [userScrolled, setUserScrolled] = useState(false)
-  const elements: JSX.Element[] = []
-  let buffer = ''
-  const stack: ('em' | 'q')[] = []
+export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, children }) => {
+  const fontSize = useAppSelector((state) => state.settings.text.fontSize);
+  const textFormatterDiv = React.useRef<HTMLDivElement>(null);
+  const [userScrolled, setUserScrolled] = useState(false);
+  const elements: JSX.Element[] = [];
+  let buffer = '';
+  const stack: ('em' | 'q')[] = [];
 
   const flushBuffer = (endTag?: 'em' | 'q') => {
     if (buffer) {
-      let element: JSX.Element = <span key={elements.length}>{buffer}</span>
+      let element: JSX.Element = <span key={elements.length}>{buffer}</span>;
 
       if (!stack.length) {
         // Wrap in <p> if not within em or q
-        element = <p key={elements.length}>{buffer}</p>
+        element = <p key={elements.length}>{buffer}</p>;
       }
 
       while (stack.length) {
-        const tag = stack.pop()
+        const tag = stack.pop();
         if (tag === 'em') {
-          element = <em key={elements.length}>{element}</em>
+          element = <em key={elements.length}>{element}</em>;
         } else if (tag === 'q') {
-          element = <q key={elements.length}>{element}</q>
+          element = <q key={elements.length}>{element}</q>;
         }
-        if (tag === endTag) break
+        if (tag === endTag) break;
       }
 
-      elements.push(element)
-      buffer = ''
+      elements.push(element);
+      buffer = '';
     }
-  }
+  };
 
   for (const char of text) {
     switch (char) {
       case '*':
         if (stack[stack.length - 1] === 'em') {
-          flushBuffer('em')
+          flushBuffer('em');
         } else {
-          flushBuffer()
-          stack.push('em')
+          flushBuffer();
+          stack.push('em');
         }
-        break
+        break;
       case '"':
         if (stack[stack.length - 1] === 'q') {
-          flushBuffer('q')
+          flushBuffer('q');
         } else {
-          flushBuffer()
-          stack.push('q')
+          flushBuffer();
+          stack.push('q');
         }
-        break
+        break;
       case '\n':
-        flushBuffer()
-        elements.push(<br key={elements.length} />)
-        break
+        flushBuffer();
+        elements.push(<br key={elements.length} />);
+        break;
       default:
-        buffer += char
+        buffer += char;
     }
   }
 
-  flushBuffer() // Flush remaining buffer
+  flushBuffer(); // Flush remaining buffer
 
   useEffect(() => {
     if (textFormatterDiv.current) {
-      if (
-        textFormatterDiv.current.scrollHeight <=
-        textFormatterDiv.current.clientHeight
-      ) {
-        setUserScrolled(false)
+      if (textFormatterDiv.current.scrollHeight <= textFormatterDiv.current.clientHeight) {
+        setUserScrolled(false);
       } else if (!userScrolled) {
-        textFormatterDiv.current.scrollTop =
-          textFormatterDiv.current.scrollHeight
+        textFormatterDiv.current.scrollTop = textFormatterDiv.current.scrollHeight;
       }
     }
-  }, [text, userScrolled])
+  }, [text, userScrolled]);
 
   return (
     <div
@@ -98,11 +91,10 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({
       ref={textFormatterDiv}
       onScroll={(event) => {
         if (
-          (textFormatterDiv.current?.scrollTop || 0) +
-            (textFormatterDiv.current?.clientHeight || 0) <
+          (textFormatterDiv.current?.scrollTop || 0) + (textFormatterDiv.current?.clientHeight || 0) <
           event.currentTarget.scrollHeight
         ) {
-          setUserScrolled(true)
+          setUserScrolled(true);
         }
       }}
     >
@@ -113,50 +105,45 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({
         </>
       </ShareConversation>
     </div>
-  )
-}
+  );
+};
 
 const SpeedToMs = new Map<Speed, number>([
   [Speed.Presto, 2],
   [Speed.Fast, 10],
   [Speed.Normal, 20],
   [Speed.Slow, 30],
-])
+]);
 
 const TextFormatter: React.FC<TextFormatterProps> = ({ text, children }) => {
-  const [displayedText, setDisplayedText] = useState('')
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const speed = useAppSelector((state) => state.settings.text.speed)
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const speed = useAppSelector((state) => state.settings.text.speed);
 
   useEffect(() => {
     if (!text.startsWith(displayedText)) {
       if (displayedText.startsWith(text)) {
-        setDisplayedText(text)
-        setCurrentIndex(text.length)
+        setDisplayedText(text);
+        setCurrentIndex(text.length);
       } else {
-        setDisplayedText('')
-        setCurrentIndex(0)
+        setDisplayedText('');
+        setCurrentIndex(0);
       }
     }
-  }, [text, displayedText])
+  }, [text, displayedText]);
 
   useEffect(() => {
     if (currentIndex < text.length) {
       const timer = setTimeout(() => {
-        setDisplayedText((prevText) => prevText + text[currentIndex])
-        setCurrentIndex(currentIndex + 1)
-      }, SpeedToMs.get(speed)) // Set typing speed here
+        setDisplayedText((prevText) => prevText + text[currentIndex]);
+        setCurrentIndex(currentIndex + 1);
+      }, SpeedToMs.get(speed)); // Set typing speed here
 
-      return () => clearTimeout(timer)
+      return () => clearTimeout(timer);
     }
-  }, [currentIndex, text, speed])
+  }, [currentIndex, text, speed]);
 
-  return (
-    <TextFormatterStatic
-      text={displayedText}
-      children={displayedText === text ? children : null}
-    />
-  )
-}
+  return <TextFormatterStatic text={displayedText} children={displayedText === text ? children : null} />;
+};
 
-export default TextFormatter
+export default TextFormatter;

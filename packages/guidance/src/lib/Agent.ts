@@ -1,14 +1,14 @@
 function replaceTemplate(template: string, key: string, value: string): string {
-  let regex = new RegExp(`{{GEN ${key}[^}]*}}`, "g");
+  let regex = new RegExp(`{{GEN ${key}[^}]*}}`, 'g');
   template = template.replace(regex, value);
-  regex = new RegExp(`{{SEL ${key}[^}]*}}`, "g");
+  regex = new RegExp(`{{SEL ${key}[^}]*}}`, 'g');
   return template.replace(regex, value);
 }
 
 export interface AgentPromptConfiguration<
   // extends type array of constant strings
   AgentInputs extends string[],
-  AgentOutputs extends string[]
+  AgentOutputs extends string[],
 > {
   instruction: string;
   description: string;
@@ -28,10 +28,7 @@ export interface AgentPromptConfiguration<
   };
 }
 
-export class AgentPrompt<
-  AgentInputs extends string[],
-  AgentOutputs extends string[]
-> {
+export class AgentPrompt<AgentInputs extends string[], AgentOutputs extends string[]> {
   private configuration: AgentPromptConfiguration<AgentInputs, AgentOutputs> & {
     instructSettings: {
       system: string;
@@ -41,16 +38,14 @@ export class AgentPrompt<
     };
   };
 
-  constructor(
-    configuration: AgentPromptConfiguration<AgentInputs, AgentOutputs>
-  ) {
+  constructor(configuration: AgentPromptConfiguration<AgentInputs, AgentOutputs>) {
     this.configuration = {
       ...configuration,
       instructSettings: {
-        system: "",
-        instruction: "\n### Instruction:\n",
-        input: "\n### Input:\n",
-        output: "\n### Response:\n",
+        system: '',
+        instruction: '\n### Instruction:\n',
+        input: '\n### Input:\n',
+        output: '\n### Response:\n',
         ...configuration.instructSettings,
       },
     };
@@ -66,13 +61,13 @@ export class AgentPrompt<
       prompt += this.configuration.shotTemplate.input;
       Object.keys(shot.inputs).forEach((key: AgentInputs[number]) => {
         const value = shot.inputs[key];
-        prompt = prompt.replace(new RegExp(`{{${key}}}`, "g"), value as string);
+        prompt = prompt.replace(new RegExp(`{{${key}}}`, 'g'), value as string);
       });
       prompt += this.configuration.instructSettings.output;
       prompt += this.configuration.shotTemplate.output;
       Object.keys(shot.outputs).forEach((key: AgentInputs[number]) => {
         const value = shot.outputs[key];
-        prompt = prompt.replace(new RegExp(`{{${key}}}`, "g"), value);
+        prompt = prompt.replace(new RegExp(`{{${key}}}`, 'g'), value);
         prompt = replaceTemplate(prompt, key, value as string);
       });
     });
@@ -80,7 +75,7 @@ export class AgentPrompt<
     prompt += this.configuration.shotTemplate.input;
     Object.keys(inputs).forEach((key: AgentInputs[number]) => {
       const value = inputs[key];
-      prompt = prompt.replace(new RegExp(`{{${key}}}`, "g"), value as string);
+      prompt = prompt.replace(new RegExp(`{{${key}}}`, 'g'), value as string);
     });
     prompt += this.configuration.instructSettings.output;
     prompt += this.configuration.shotTemplate.output;

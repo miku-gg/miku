@@ -1,0 +1,22 @@
+@import '../../variables.scss';
+
+.ModelSelectorModal {
+  .selected {
+    border-color: $color-geen;
+  }
+
+  &__model {
+    border: 1px solid $color-gray;
+    cursor: pointer;
+    padding: 1rem;
+    margin-top: 10px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &:hover {
+      border-color: $secondary-color;
+    }
+  }
+}

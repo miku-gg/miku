@@ -55,4 +55,4 @@ export const DEFAULT_MUSIC = [
   'dispersion_relation.mp3',
   'off_to_osaka.mp3',
   'zazie.mp3',
-]
+];

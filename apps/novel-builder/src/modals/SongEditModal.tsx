@@ -1,17 +1,11 @@
-import {
-  AreYouSure,
-  Button,
-  Input,
-  Modal,
-  TagAutocomplete,
-} from "@mikugg/ui-kit";
-import { useAppSelector } from "../state/store";
-import { selectEditingSong } from "../state/selectors";
-import { useDispatch } from "react-redux";
-import { closeModal } from "../state/slices/inputSlice";
-import config from "../config";
-import "./SongEditModal.scss";
-import { deleteSong, updateSong } from "../state/slices/novelFormSlice";
+import { AreYouSure, Button, Input, Modal, TagAutocomplete } from '@mikugg/ui-kit';
+import { useAppSelector } from '../state/store';
+import { selectEditingSong } from '../state/selectors';
+import { useDispatch } from 'react-redux';
+import { closeModal } from '../state/slices/inputSlice';
+import config from '../config';
+import './SongEditModal.scss';
+import { deleteSong, updateSong } from '../state/slices/novelFormSlice';
 
 export default function SongEditModal() {
   const song = useAppSelector(selectEditingSong);
@@ -20,10 +14,10 @@ export default function SongEditModal() {
 
   const handleDeleteSong = () => {
     openModal({
-      title: "Are you sure?",
-      description: "This action cannot be undone",
+      title: 'Are you sure?',
+      description: 'This action cannot be undone',
       onYes: () => {
-        dispatch(closeModal({ modalType: "song" }));
+        dispatch(closeModal({ modalType: 'song' }));
         if (song) {
           dispatch(deleteSong(song.id));
         }
@@ -37,7 +31,7 @@ export default function SongEditModal() {
       title="Edit Music"
       className="SongEditModal"
       shouldCloseOnOverlayClick
-      onCloseModal={() => dispatch(closeModal({ modalType: "song" }))}
+      onCloseModal={() => dispatch(closeModal({ modalType: 'song' }))}
     >
       {song ? (
         <div className="SongEditModal__content">
@@ -54,7 +48,7 @@ export default function SongEditModal() {
                   updateSong({
                     ...song,
                     name: e.target.value,
-                  })
+                  }),
                 )
               }
             />
@@ -67,7 +61,7 @@ export default function SongEditModal() {
                   updateSong({
                     ...song,
                     description: e.target.value,
-                  })
+                  }),
                 )
               }
             />
@@ -85,7 +79,7 @@ export default function SongEditModal() {
                     updateSong({
                       ...song,
                       tags: tags.target.value,
-                    })
+                    }),
                   )
                 }
               />

@@ -3,19 +3,16 @@ import FormData from 'form-data';
 import { Buffer } from 'buffer';
 
 // Function to create a CSV file from the EmotionGroup array
-function createCSVForEmbeddings(items: {id: string, text: string}[]): string {
+function createCSVForEmbeddings(items: { id: string; text: string }[]): string {
   const header = ['id', 'text'];
   const data = items.map((item) => [item.id, item.text]);
-
 
   const escapeField = (field: string) => {
     const escapedField = field.replace(/"/g, '""');
     return `"${escapedField}"`;
   };
 
-  const csvData = [header, ...data]
-    .map((row) => row.map((field) => escapeField(field)).join(','))
-    .join('\n');
+  const csvData = [header, ...data].map((row) => row.map((field) => escapeField(field)).join(',')).join('\n');
   return csvData;
 }
 
@@ -25,7 +22,7 @@ async function embeddCSV(csv: string, sentenceEmbedderAPIEndpoint: string): Prom
 
   formData.append('file', Buffer.from(csv, 'utf8'), 'data_to_embedd.csv');
 
-  const response: AxiosResponse<string>  = await axios.post(`${sentenceEmbedderAPIEndpoint}/encode_csv`, formData, {
+  const response: AxiosResponse<string> = await axios.post(`${sentenceEmbedderAPIEndpoint}/encode_csv`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -35,7 +32,10 @@ async function embeddCSV(csv: string, sentenceEmbedderAPIEndpoint: string): Prom
   return response.data;
 }
 
-export async function itemsEmbedder(items: {id: string, text: string}[], sentenceEmbedderAPIEndpoint: string): Promise<string> {
+export async function itemsEmbedder(
+  items: { id: string; text: string }[],
+  sentenceEmbedderAPIEndpoint: string,
+): Promise<string> {
   try {
     const csv = createCSVForEmbeddings(items);
     const base64Result = await embeddCSV(csv, sentenceEmbedderAPIEndpoint);

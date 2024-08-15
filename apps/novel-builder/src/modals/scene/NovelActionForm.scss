@@ -1,0 +1,50 @@
+@import '../../styles/variables.scss';
+
+.AddChildren {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+
+  &__childrenScenes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+.SuggestScene {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid $node-conector-color;
+    border-radius: 16px;
+    padding: 6px;
+
+    &__title {
+      margin: 0;
+      padding-left: 4px;
+    }
+  }
+}
+
+.ChildScenes {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 10px;
+  width: 100%;
+  gap: 10px;
+
+  &__children {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}

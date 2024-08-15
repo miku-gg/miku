@@ -1,4 +1,4 @@
-import { RootState } from '../../../../state/store'
+import { RootState } from '../../../../state/store';
 
 export default {
   objectives: [],
@@ -33,6 +33,7 @@ export default {
       prompt: { loading: false, value: '' },
       music: { opened: false, selected: '', source: '' },
       sceneSugestions: { opened: false, inferencing: false },
+      scenePreview: { opened: false, sceneId: '' },
     },
     inference: { fetching: false, backgrounds: [] },
   },
@@ -55,11 +56,15 @@ export default {
     },
     music: { enabled: true, volume: 0.2 },
     modals: {
+      map: false,
       settings: false,
       settingsTab: 'general',
       about: false,
       history: false,
+      debug: false,
+      testing: false,
       edit: { opened: false, id: '' },
+      modelSelector: false,
     },
     chatBox: {
       isDraggable: false,
@@ -651,7 +656,7 @@ export default {
         children: [],
         musicId: 'devonshire.mp3',
         prompt: '{{user}} and {{char}} are at the main hall of the mansion.',
-        parentMapId: null,
+        parentMapIds: null,
       },
       {
         id: '8dd9ca63-2b01-4d38-b265-a5b9e94eecd4',
@@ -669,7 +674,7 @@ export default {
         children: [],
         musicId: 'canon_d.mp3',
         prompt: "{{user}} and {{char}} are at the mansion's garden.",
-        parentMapId: null,
+        parentMapIds: null,
       },
       {
         id: '1b4583b6-9374-42aa-a431-063c13a7277b',
@@ -687,7 +692,7 @@ export default {
         children: [],
         musicId: 'nogoodlayabout.mp3',
         prompt: '{{user}} walks into the bathroom and sees {{char}} inside.',
-        parentMapId: null,
+        parentMapIds: null,
       },
       {
         id: 'f4d96e4d-0d55-43ef-bf4e-a112e385d226',
@@ -705,7 +710,7 @@ export default {
         children: [],
         musicId: 'gymnopedie.mp3',
         prompt: "{{user}} and {{char}} are at the mansion's living room.",
-        parentMapId: null,
+        parentMapIds: null,
       },
       {
         id: '497bad90-418d-4fc7-926b-f6f91bc45423',
@@ -724,9 +729,9 @@ export default {
         musicId: 'morning.mp3',
         prompt:
           "{{user}} and {{char}} are at the mansion's basement. The place is filled with wines and has a small table.",
-        parentMapId: null,
+        parentMapIds: null,
       },
     ],
   },
   version: 'v3',
-} as RootState
+} as RootState;

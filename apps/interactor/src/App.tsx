@@ -1,17 +1,17 @@
-import { useEffect } from 'react'
-import { Provider } from 'react-redux'
+import { useEffect } from 'react';
+import { Provider } from 'react-redux';
 
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-import { AppProps, AppProvider } from './App.context'
-import { store } from './state/store'
+import { AppProps, AppProvider } from './App.context';
+import { store } from './state/store';
 
-import Interactor from './components/interactor/Interactor'
-import NovelLoader from './components/novel-loader/NovelLoader'
+import Interactor from './components/interactor/Interactor';
+import NovelLoader from './components/novel-loader/NovelLoader';
 
-import 'normalize.css'
-import './App.scss'
+import 'normalize.css';
+import './App.scss';
 
 function App(props: AppProps) {
   const contextValue = {
@@ -27,13 +27,13 @@ function App(props: AppProps) {
     assetUploader: props.assetUploader,
     assetLinkLoader: props.assetLinkLoader,
     novelLoader: props.novelLoader,
-  }
+  };
 
   useEffect(() => {
     if (props.isMobileApp) {
-      document.body.classList.add('mobile-app')
+      document.body.classList.add('mobile-app');
     }
-  }, [])
+  }, []);
 
   return (
     <Provider store={store}>
@@ -47,7 +47,7 @@ function App(props: AppProps) {
         </div>
       </AppProvider>
     </Provider>
-  )
+  );
 }
 
-export default App
+export default App;

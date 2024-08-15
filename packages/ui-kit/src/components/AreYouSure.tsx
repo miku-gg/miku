@@ -27,9 +27,7 @@ interface AreYouSureContextProps {
   closeModal: () => void;
 }
 
-const AreYouSureContext = createContext<AreYouSureContextProps | undefined>(
-  undefined
-);
+const AreYouSureContext = createContext<AreYouSureContextProps | undefined>(undefined);
 
 export const useAreYouSure = (): AreYouSureContextProps => {
   const context = useContext(AreYouSureContext);
@@ -43,9 +41,7 @@ interface AreYouSureProviderProps {
   children: React.ReactNode;
 }
 
-export const AreYouSureProvider: React.FC<AreYouSureProviderProps> = ({
-  children,
-}) => {
+export const AreYouSureProvider: React.FC<AreYouSureProviderProps> = ({ children }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [settings, setSettings] = useState<AreYouSureSettings>();
   const [loadingOnYes, setLoadingOnYes] = useState<boolean>(false);
@@ -65,12 +61,7 @@ export const AreYouSureProvider: React.FC<AreYouSureProviderProps> = ({
   return (
     <AreYouSureContext.Provider value={{ isOpen, openModal, closeModal }}>
       {children}
-      <Modal
-        opened={isOpen}
-        onCloseModal={closeModal}
-        shouldCloseOnOverlayClick
-        title={settings?.title}
-      >
+      <Modal opened={isOpen} onCloseModal={closeModal} shouldCloseOnOverlayClick title={settings?.title}>
         <p className="AreYouSure__description">{settings?.description || ''}</p>
         <div className="AreYouSure__actions">
           <Button

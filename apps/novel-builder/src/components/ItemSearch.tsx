@@ -1,8 +1,8 @@
-import { Button, CheckBox, Input, Loader, Modal } from "@mikugg/ui-kit";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import debounce from "lodash.debounce";
-import "./ItemSearch.scss";
+import { Button, CheckBox, Input, Loader, Modal } from '@mikugg/ui-kit';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import debounce from 'lodash.debounce';
+import './ItemSearch.scss';
 
 export interface ItemResult<T> {
   id: string;
@@ -14,19 +14,14 @@ export interface ItemResult<T> {
 }
 
 const isAudioFile = (name: string) => {
-  const audioFormats = [".mp3", ".wav", ".ogg", ".flac", ".mpeg", ".m4a"];
+  const audioFormats = ['.mp3', '.wav', '.ogg', '.flac', '.mpeg', '.m4a'];
   return audioFormats.some((format) => name.endsWith(format));
 };
 
 export default function ItemSearch<T>(props: {
   opened: boolean;
   pageSize: number;
-  onSearch: (query: {
-    text: string;
-    skip: number;
-    take: number;
-    onlyPrivate: boolean;
-  }) => Promise<{
+  onSearch: (query: { text: string; skip: number; take: number; onlyPrivate: boolean }) => Promise<{
     success: boolean;
     result: {
       public: ItemResult<T>[];
@@ -38,7 +33,7 @@ export default function ItemSearch<T>(props: {
   onError?: (error: string) => void;
   title: string;
 }) {
-  const [query, setQuery] = useState<string>("");
+  const [query, setQuery] = useState<string>('');
   const [onlyPrivate, setOnlyPrivate] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [results, setResults] = useState<ItemResult<T>[]>([]);
@@ -56,21 +51,17 @@ export default function ItemSearch<T>(props: {
         });
         setLoading(false);
         if (!success) {
-          props.onError && props.onError("Error searching");
+          props.onError && props.onError('Error searching');
           return;
         }
-        setResults((existingResults) => [
-          ...existingResults,
-          ...result.private,
-          ...result.public,
-        ]);
+        setResults((existingResults) => [...existingResults, ...result.private, ...result.public]);
         setHasMore(result.private.length + result.public.length === take);
       } catch (e) {
         setLoading(false);
-        props.onError && props.onError("Error searching");
+        props.onError && props.onError('Error searching');
       }
     }, 500),
-    [props.onSearch]
+    [props.onSearch],
   );
 
   const handleLoadMore = () => {
@@ -98,11 +89,7 @@ export default function ItemSearch<T>(props: {
       <div className="ItemSearch">
         <div className="ItemSearch__input">
           <div className="ItemSearch__input-text">
-            <Input
-              placeHolder={`Search...`}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
+            <Input placeHolder={`Search...`} value={query} onChange={(e) => setQuery(e.target.value)} />
             {loading ? <Loader /> : null}
           </div>
         </div>
@@ -115,12 +102,7 @@ export default function ItemSearch<T>(props: {
         </div> */}
         <div className="ItemSearch__list">
           {results.map((result) => (
-            <div
-              key={result.id}
-              className="ItemSearch__item"
-              tabIndex={0}
-              onClick={() => props.onSelect(result.value)}
-            >
+            <div key={result.id} className="ItemSearch__item" tabIndex={0} onClick={() => props.onSelect(result.value)}>
               {isAudioFile(result.previewAssetUrl) ? (
                 <audio src={result.previewAssetUrl} controls preload="none" />
               ) : (
@@ -128,9 +110,7 @@ export default function ItemSearch<T>(props: {
               )}
               <div className="ItemSearch__item__content">
                 <div className="ItemSearch__item__title">{result.name}</div>
-                <div className="ItemSearch__item__description scrollbar">
-                  {result.description}
-                </div>
+                <div className="ItemSearch__item__description scrollbar">{result.description}</div>
                 {/* <div className="ItemSearch__item__tags">
                   {result.tags.map((tag, index) => (
                     <span key={`${tag}-${index}`}>{tag}</span>

@@ -1,86 +1,84 @@
 /* eslint-disable react-refresh/only-export-components */
-import { memo } from 'react'
-import { Handle, Position } from 'reactflow'
-import classNames from 'classnames'
-import { DialogueNodeData } from './utils'
-import { FaPencil } from 'react-icons/fa6'
-import { AreYouSure } from '@mikugg/ui-kit'
-import { useAppDispatch, useAppSelector } from '../../state/store'
-import { setEditModal } from '../../state/slices/settingsSlice'
-import { useFillTextTemplate } from '../../libs/hooks'
-import { useAppContext } from '../../App.context'
-import { FaTrash } from 'react-icons/fa'
-import { deleteNode, swipeResponse } from '../../state/slices/narrationSlice'
+import { memo } from 'react';
+import { Handle, Position } from 'reactflow';
+import classNames from 'classnames';
+import { DialogueNodeData } from './utils';
+import { FaPencil } from 'react-icons/fa6';
+import { AreYouSure } from '@mikugg/ui-kit';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import { setEditModal } from '../../state/slices/settingsSlice';
+import { useFillTextTemplate } from '../../libs/hooks';
+import { useAppContext } from '../../App.context';
+import { FaTrash } from 'react-icons/fa';
+import { deleteNode, swipeResponse } from '../../state/slices/narrationSlice';
 
 export default memo(({ data }: { data: DialogueNodeData }) => {
-  const dispatch = useAppDispatch()
-  const narration = useAppSelector((state) => state.narration)
-  const { openModal } = AreYouSure.useAreYouSure()
+  const dispatch = useAppDispatch();
+  const narration = useAppSelector((state) => state.narration);
+  const { openModal } = AreYouSure.useAreYouSure();
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
 
     openModal({
       onYes: () => {
-        const response = narration.responses[data.id]
+        const response = narration.responses[data.id];
         if (response) {
-          const parentInteractionID = response.parentInteractionId
+          const parentInteractionID = response.parentInteractionId;
           if (parentInteractionID) {
-            const parentInteraction =
-              narration.interactions[parentInteractionID]
+            const parentInteraction = narration.interactions[parentInteractionID];
             if (parentInteraction) {
-              let index = parentInteraction.responsesId.indexOf(data.id) - 1
-              if (index === -1)
-                index = parentInteraction.responsesId.indexOf(data.id) + 1
+              let index = parentInteraction.responsesId.indexOf(data.id) - 1;
+              if (index === -1) index = parentInteraction.responsesId.indexOf(data.id) + 1;
 
-              dispatch(swipeResponse(parentInteraction.responsesId[index]))
-              dispatch(deleteNode(data.id))
+              dispatch(swipeResponse(parentInteraction.responsesId[index]));
+              dispatch(deleteNode(data.id));
             }
           }
         }
 
-        const interaction = narration.interactions[data.id]
+        const interaction = narration.interactions[data.id];
         if (interaction) {
-          const parentResponseId = interaction.parentResponseId
+          const parentResponseId = interaction.parentResponseId;
           if (parentResponseId) {
-            dispatch(swipeResponse(parentResponseId))
-            dispatch(deleteNode(data.id))
+            dispatch(swipeResponse(parentResponseId));
+            dispatch(deleteNode(data.id));
           }
         }
       },
       title: 'Are you sure you want to delete this node?',
       yesLabel: 'Delete',
-    })
-  }
+    });
+  };
 
   const canDelete = () => {
-    let hasSwipes = false
-    const response = narration.responses[data.id]
+    let hasSwipes = false;
+    const response = narration.responses[data.id];
     if (response) {
-      const parentInteractionID = response.parentInteractionId
+      const parentInteractionID = response.parentInteractionId;
       if (parentInteractionID) {
-        const parentInteraction = narration.interactions[parentInteractionID]
+        const parentInteraction = narration.interactions[parentInteractionID];
         if (parentInteraction) {
-          hasSwipes = parentInteraction.responsesId.length > 1
+          hasSwipes = parentInteraction.responsesId.length > 1;
         }
       }
     }
 
-    return !data.isRoot && (hasSwipes || data.isUser)
-  }
+    return !data.isRoot && (hasSwipes || data.isUser);
+  };
 
-  const { assetLinkLoader } = useAppContext()
+  const { assetLinkLoader } = useAppContext();
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
     dispatch(
       setEditModal({
         opened: true,
         id: data.id,
-      })
-    )
-  }
-  const displayText = useFillTextTemplate(data.text)
+      }),
+    );
+  };
+  const displayText = useFillTextTemplate(data.text);
 
   return (
     <div
@@ -117,9 +115,7 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
       )}
       {canDelete() && (
         <button
-          className={`DialogueNode__delete-btn ${
-            data.isItemAction ? 'is-item-action' : ''
-          }`}
+          className={`DialogueNode__delete-btn ${data.isItemAction ? 'is-item-action' : ''}`}
           onClick={handleDelete}
         >
           <FaTrash />
@@ -141,5 +137,5 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
         isConnectable={false}
       />
     </div>
-  )
-})
+  );
+});

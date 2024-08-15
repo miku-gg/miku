@@ -1,4 +1,4 @@
-import { RootState } from '../state/store'
+import { RootState } from '../state/store';
 
 export enum StateEventType {
   NEW_NARRATION = 'NEW_NARRATION',
@@ -9,21 +9,19 @@ export enum CustomEventType {
   OPEN_PREMIUM = 'OPEN_PREMIUM',
   SHARE_CONVERSATION = 'SHARE_CONVERSATION',
   ACHIEVEMENT_UNLOCKED = 'ACHIEVEMENT_UNLOCKED',
+  NOVEL_PROFILE_CLICK = 'NOVEL_PROFILE_CLICK',
 }
 
-export const postMessage = (
-  type: StateEventType | CustomEventType,
-  payload?: unknown
-) => {
-  window.parent?.postMessage({ type, payload }, '*')
-}
+export const postMessage = (type: StateEventType | CustomEventType, payload?: unknown) => {
+  window.parent?.postMessage({ type, payload }, '*');
+};
 
 export const emitStateEvent = (
   type: StateEventType,
   payload: {
-    state: RootState
-    isNewInteraction: boolean
-  }
+    state: RootState;
+    isNewInteraction: boolean;
+  },
 ) => {
-  postMessage(type, payload)
-}
+  postMessage(type, payload);
+};

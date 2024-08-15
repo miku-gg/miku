@@ -22,9 +22,7 @@ const CheckBox = ({ id, label, name, onChange, value }: CheckBoxProps) => {
         name={name}
         id={id}
       />
-      <div className="CheckBox">
-        {value ? <SquareCheckFilled /> : <SquareCheckEmpty />}
-      </div>
+      <div className="CheckBox">{value ? <SquareCheckFilled /> : <SquareCheckEmpty />}</div>
       <span className="CheckBox__label">{label}</span>
     </label>
   );

@@ -1,0 +1,126 @@
+@import '../../styles/variables.scss';
+
+.SceneSelectorModal {
+  .Modal__header {
+    margin: 0 !important;
+  }
+  &__closeModal {
+    position: absolute;
+    width: 1.5rem;
+    height: 1.5rem;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    &:hover {
+      color: $secondary-color;
+    }
+  }
+
+  &__item {
+    position: relative;
+    background-color: $background-2;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+
+    .SceneNode {
+      width: 250px;
+      height: 100px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  }
+
+  &__scene-selection-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 40px;
+  }
+
+  &__scene-selection-item {
+    min-width: 150px;
+    flex: 1;
+    opacity: 0.5;
+    transition: all 0.2s ease-out;
+    cursor: pointer;
+
+    .SceneNode {
+      width: 100%;
+      height: 100px;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &--selected {
+      border: 2px solid $secondary-color;
+      opacity: 1;
+      border-radius: 10px;
+    }
+  }
+}
+
+.SceneSelector {
+  background-color: rgba(black, 0.2);
+  padding: 10px;
+  border-radius: 10px;
+  width: 100%;
+
+  &__title {
+    margin-bottom: 10px;
+  }
+
+  &__selected-scenes {
+    display: flex;
+    gap: 10px;
+  }
+
+  .SceneNode {
+    width: 200px;
+    height: 100px;
+
+    &__title {
+      top: 0px;
+      left: 0px;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      width: 100%;
+      text-align: left;
+      padding: 3px;
+      padding-left: 10px;
+    }
+
+    &__delete {
+      color: white;
+      position: absolute;
+      top: 5px;
+      right: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease-out;
+
+      &:hover {
+        color: red;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .SceneSelectorModal {
+    &__item-spec {
+      flex-direction: column;
+      gap: 1rem;
+
+      & > div {
+        width: 100%;
+      }
+    }
+    .SceneNode {
+      width: 200px;
+    }
+  }
+}

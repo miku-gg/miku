@@ -1,4 +1,4 @@
-import { EMOTION_GROUP_TEMPLATES } from "@mikugg/bot-utils";
+import { EMOTION_GROUP_TEMPLATES } from '@mikugg/bot-utils';
 
 export type EmotionTemplate = {
   id: string;
@@ -6,9 +6,7 @@ export type EmotionTemplate = {
   emotionIds: string[];
 };
 
-export const emotionTemplates: EmotionTemplate[] = Object.values(
-  EMOTION_GROUP_TEMPLATES
-).map((template) => ({
+export const emotionTemplates: EmotionTemplate[] = Object.values(EMOTION_GROUP_TEMPLATES).map((template) => ({
   id: template.id,
   name: template.label,
   emotionIds: template.emotionIds,

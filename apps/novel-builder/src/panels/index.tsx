@@ -1,37 +1,41 @@
-import AssetsPanel from "./assets/AssetsPanel";
-import ButtonGroup from "../components/ButtonGroup";
-import SceneGraph from "./scenes/SceneGraph";
-import StartsPanel from "./starts/StartsPanel";
-import PreviewPanel from "./preview/PreviewPanel";
-import HomePanel from "./HomePanel";
-import { useAppDispatch, useAppSelector } from "../state/store";
-import {
-  closeModal,
-  isPanelType,
-  navigatePage,
-  navigatePanel,
-  openModal,
-} from "../state/slices/inputSlice";
-import { allowUntilStep, downloadNovelState } from "../libs/utils";
-import { toast } from "react-toastify";
-import { MdOutlinePermMedia } from "react-icons/md";
-import { BiCameraMovie } from "react-icons/bi";
-import { TbBoxMultiple } from "react-icons/tb";
-import { LuMonitorPlay } from "react-icons/lu";
-import { BiSolidSave } from "react-icons/bi";
-import { LuTextQuote } from "react-icons/lu";
-import DetailsPanel from "./details/DetailsPanel";
-import "./PanelExplorer.scss";
-import { AreYouSure } from "@mikugg/ui-kit";
-import cloneDeep from "lodash.clonedeep";
-import { clearNovelState } from "../state/slices/novelFormSlice";
-import ErrorsDisplay from "../components/ErrorsDisplay";
+import { AreYouSure } from '@mikugg/ui-kit';
+import cloneDeep from 'lodash.clonedeep';
+import { useEffect } from 'react';
+import { BiCameraMovie, BiSolidSave } from 'react-icons/bi';
+import { GiPathDistance } from 'react-icons/gi';
+import { LuMonitorPlay, LuTextQuote } from 'react-icons/lu';
+import { MdOutlinePermMedia, MdOutlineRestartAlt } from 'react-icons/md';
+import { TbBoxMultiple } from 'react-icons/tb';
+import { toast } from 'react-toastify';
+import ButtonGroup from '../components/ButtonGroup';
+import ErrorsDisplay from '../components/ErrorsDisplay';
+import { TokenDisplayer } from '../components/TokenDisplayer';
+import { TOKEN_LIMITS } from '../data/tokenLimits';
+import { allowUntilStep, downloadNovelState } from '../libs/utils';
+import { selectTotalTokenCount } from '../state/selectors';
+import { closeModal, isPanelType, navigatePage, navigatePanel, openModal } from '../state/slices/inputSlice';
+import { clearNovelState } from '../state/slices/novelFormSlice';
+import { useAppDispatch, useAppSelector } from '../state/store';
+import HomePanel from './HomePanel';
+import './PanelExplorer.scss';
+import AssetsPanel from './assets/AssetsPanel';
+import DetailsPanel from './details/DetailsPanel';
+import { MapList } from './maps/MapList';
+import PreviewPanel from './preview/PreviewPanel';
+import SceneGraph from './scenes/SceneGraph';
+import StartsPanel from './starts/StartsPanel';
 
 function PanelExplorer() {
   const novel = useAppSelector((state) => state.novel);
   const selectedPanel = useAppSelector((state) => state.input.navigation.panel);
   const dispatch = useAppDispatch();
   const { openModal: openAreYouSure } = AreYouSure.useAreYouSure();
+
+  useEffect(() => {
+    if (!window.onbeforeunload && novel) {
+      window.onbeforeunload = () => true;
+    }
+  }, [novel]);
 
   const maxStep = allowUntilStep(novel);
   return (
@@ -46,7 +50,7 @@ function PanelExplorer() {
                     <LuTextQuote /> <span>Details</span>
                   </>
                 ),
-                value: "details",
+                value: 'details',
               },
               {
                 content: (
@@ -54,7 +58,7 @@ function PanelExplorer() {
                     <MdOutlinePermMedia /> <span>Assets</span>
                   </>
                 ),
-                value: "assets",
+                value: 'assets',
               },
               {
                 content: (
@@ -62,10 +66,20 @@ function PanelExplorer() {
                     <BiCameraMovie /> <span>Scenes</span>
                   </>
                 ),
-                value: "scenes",
+                value: 'scenes',
                 disabled: maxStep < 1,
-                tooltip:
-                  maxStep < 1 ? "Please add at least one asset for each" : "",
+                tooltip: maxStep < 1 ? 'Please add at least one asset for each' : '',
+              },
+              {
+                content: (
+                  <>
+                    <GiPathDistance />
+                    <span>Maps</span>
+                  </>
+                ),
+                value: 'maps',
+                disabled: maxStep < 2,
+                tooltip: maxStep < 2 ? 'Please add a scene' : '',
               },
               {
                 content: (
@@ -73,9 +87,9 @@ function PanelExplorer() {
                     <TbBoxMultiple /> <span>Starts</span>
                   </>
                 ),
-                value: "starts",
+                value: 'starts',
                 disabled: maxStep < 2,
-                tooltip: maxStep < 2 ? "Please add a scene" : "",
+                tooltip: maxStep < 2 ? 'Please add a scene' : '',
               },
               {
                 content: (
@@ -83,9 +97,9 @@ function PanelExplorer() {
                     <LuMonitorPlay /> <span>Preview</span>
                   </>
                 ),
-                value: "preview",
+                value: 'preview',
                 disabled: maxStep < 3,
-                tooltip: maxStep < 3 ? "Please add a start" : "",
+                tooltip: maxStep < 3 ? 'Please add a start' : '',
               },
             ]}
             selected={selectedPanel}
@@ -96,16 +110,17 @@ function PanelExplorer() {
             }}
           />
           <ErrorsDisplay />
+          <TokenDisplayer tokens={useAppSelector(selectTotalTokenCount)} limits={TOKEN_LIMITS.TOTAL} size="large" />
         </div>
         <ButtonGroup
           buttons={[
             {
               content: (
                 <>
-                  <BiSolidSave /> <span>Restart</span>
+                  <MdOutlineRestartAlt /> <span>Restart</span>
                 </>
               ),
-              value: "restart",
+              value: 'restart',
             },
             {
               content: (
@@ -113,37 +128,33 @@ function PanelExplorer() {
                   <BiSolidSave /> <span>Save</span>
                 </>
               ),
-              value: "save",
+              value: 'save',
             },
           ]}
           selected={selectedPanel}
           onButtonClick={async (value) => {
-            if (value === "save") {
+            if (value === 'save') {
               try {
-                await downloadNovelState(
-                  cloneDeep(novel),
-                  false,
-                  (text: string) => {
-                    dispatch(
-                      openModal({
-                        modalType: "loading",
-                        text,
-                      })
-                    );
-                  }
-                );
+                await downloadNovelState(cloneDeep(novel), false, (text: string) => {
+                  dispatch(
+                    openModal({
+                      modalType: 'loading',
+                      text,
+                    }),
+                  );
+                });
               } catch (e) {
                 console.error(e);
-                toast.error("Failed to save novel");
+                toast.error('Failed to save novel');
               }
-              dispatch(closeModal({ modalType: "loading" }));
-            } else if (value === "restart") {
+              dispatch(closeModal({ modalType: 'loading' }));
+            } else if (value === 'restart') {
               openAreYouSure({
-                title: "Are you sure you want to restart?",
-                description: "This will delete your current progress.",
+                title: 'Are you sure you want to restart?',
+                description: 'This will delete your current progress.',
                 onYes: () => {
                   dispatch(clearNovelState());
-                  dispatch(navigatePage("homepage"));
+                  dispatch(navigatePage('homepage'));
                 },
               });
             }
@@ -151,11 +162,12 @@ function PanelExplorer() {
         />
       </div>
       <div className="PanelExplorer__content">
-        {selectedPanel === "details" ? <DetailsPanel /> : null}
-        {selectedPanel === "assets" ? <AssetsPanel /> : null}
-        {selectedPanel === "scenes" ? <SceneGraph /> : null}
-        {selectedPanel === "starts" ? <StartsPanel /> : null}
-        {selectedPanel === "preview" ? <PreviewPanel /> : null}
+        {selectedPanel === 'details' ? <DetailsPanel /> : null}
+        {selectedPanel === 'assets' ? <AssetsPanel /> : null}
+        {selectedPanel === 'scenes' ? <SceneGraph /> : null}
+        {selectedPanel === 'maps' ? <MapList /> : null}
+        {selectedPanel === 'starts' ? <StartsPanel /> : null}
+        {selectedPanel === 'preview' ? <PreviewPanel /> : null}
       </div>
     </div>
   );
@@ -163,5 +175,5 @@ function PanelExplorer() {
 
 export default function App() {
   const page = useAppSelector((state) => state.input.navigation.page);
-  return page === "homepage" ? <HomePanel /> : <PanelExplorer />;
+  return page === 'homepage' ? <HomePanel /> : <PanelExplorer />;
 }

@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import { MuteIcon, UnmuteIcon } from '@primer/octicons-react'
-import "./AudioPreview.scss";
+import React, { useEffect, useRef, useState } from 'react';
+import { MuteIcon, UnmuteIcon } from '@primer/octicons-react';
+import './AudioPreview.scss';
 
-const AudioPreview: React.FC<{src: string}> = ({ src }) => {
+const AudioPreview: React.FC<{ src: string }> = ({ src }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -26,10 +26,7 @@ const AudioPreview: React.FC<{src: string}> = ({ src }) => {
 
   return (
     <div className="AudioPreview">
-      <audio
-        ref={audioRef}
-        src={src}
-        onEnded={() => setIsPlaying(false)}>
+      <audio ref={audioRef} src={src} onEnded={() => setIsPlaying(false)}>
         Your browser does not support the audio element.
       </audio>
       <button onClick={togglePlayPause} className="AudioPreview__play-button">
@@ -37,6 +34,6 @@ const AudioPreview: React.FC<{src: string}> = ({ src }) => {
       </button>
     </div>
   );
-}
+};
 
 export default AudioPreview;

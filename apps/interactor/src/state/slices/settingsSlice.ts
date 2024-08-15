@@ -1,21 +1,15 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import {
-  FontSize,
-  ModelType,
-  NovelNSFW,
-  SettingsState,
-  Speed,
-  Voices,
-} from '../versioning'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { FontSize, ModelType, NovelNSFW, SettingsState, Speed, Voices } from '../versioning';
 
-export { FontSize, ModelType, Speed, Voices } from '../versioning'
+export { FontSize, ModelType, Speed, Voices } from '../versioning';
 
-export type { SettingsState } from '../versioning'
+export type { SettingsState } from '../versioning';
 
 export const initialState: SettingsState = {
   model: ModelType.RP,
   user: {
     name: 'Anon',
+    isTester: false,
     isPremium: false,
     nsfw: NovelNSFW.EXPLICIT,
     credits: 0,
@@ -47,106 +41,118 @@ export const initialState: SettingsState = {
     settingsTab: 'general',
     about: false,
     history: false,
+    map: false,
+    debug: false,
+    testing: false,
+    modelSelector: false,
     edit: {
       opened: false,
       id: '',
     },
   },
-}
+};
 
 export const settingSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
     setSettings: (_state, action: PayloadAction<SettingsState>) => {
-      return action.payload
+      return action.payload;
     },
     setModel: (state, action: PayloadAction<ModelType>) => {
-      state.model = action.payload
+      state.model = action.payload;
     },
     setName: (state, action: PayloadAction<string>) => {
-      state.user.name = action.payload
+      state.user.name = action.payload;
     },
-    setSettingsTab: (
-      state,
-      action: PayloadAction<'general' | 'prompt' | 'audio'>
-    ) => {
-      state.modals.settingsTab = action.payload
+    setSettingsTab: (state, action: PayloadAction<'general' | 'prompt' | 'audio'>) => {
+      state.modals.settingsTab = action.payload;
     },
     setSystemPrompt: (state, action: PayloadAction<string>) => {
-      state.prompt.systemPrompt = action.payload
+      state.prompt.systemPrompt = action.payload;
     },
     setIsDraggable: (state, action: PayloadAction<boolean>) => {
-      state.chatBox.isDraggable = action.payload
+      state.chatBox.isDraggable = action.payload;
     },
     setFontSize: (state, action: PayloadAction<FontSize>) => {
-      state.text.fontSize = action.payload
+      state.text.fontSize = action.payload;
     },
     setSpeed: (state, action: PayloadAction<Speed>) => {
-      state.text.speed = action.payload
+      state.text.speed = action.payload;
     },
     setAutoContinue: (state, action: PayloadAction<boolean>) => {
-      state.text.autoContinue = action.payload
+      state.text.autoContinue = action.payload;
     },
     setVoiceAutoplay: (state, action: PayloadAction<boolean>) => {
-      state.voice.autoplay = action.payload
+      state.voice.autoplay = action.payload;
     },
     setVoiceSpeed: (state, action: PayloadAction<Speed>) => {
-      state.voice.speed = action.payload
+      state.voice.speed = action.payload;
     },
     setVoiceId: (state, action: PayloadAction<Voices>) => {
-      state.voice.voiceId = action.payload
+      state.voice.voiceId = action.payload;
     },
     setMusicEnabled: (state, action: PayloadAction<boolean>) => {
-      state.music.enabled = action.payload
+      state.music.enabled = action.payload;
     },
     setMusicVolume: (state, action: PayloadAction<number>) => {
-      state.music.volume = action.payload
+      state.music.volume = action.payload;
     },
     setSettingsModal: (state, action: PayloadAction<boolean>) => {
-      state.modals.settings = action.payload
+      state.modals.settings = action.payload;
     },
     setAboutModal: (state, action: PayloadAction<boolean>) => {
-      state.modals.about = action.payload
+      state.modals.about = action.payload;
     },
     setHistoryModal: (state, action: PayloadAction<boolean>) => {
-      state.modals.history = action.payload
+      state.modals.history = action.payload;
     },
-    setEditModal: (
-      state,
-      action: PayloadAction<{ opened: boolean; id: string }>
-    ) => {
-      state.modals.edit = action.payload
+    setMapModal: (state, action: PayloadAction<boolean>) => {
+      state.modals.map = action.payload;
+    },
+    setEditModal: (state, action: PayloadAction<{ opened: boolean; id: string }>) => {
+      state.modals.edit = action.payload;
+    },
+    setDebugModal: (state, action: PayloadAction<boolean>) => {
+      state.modals.debug = action.payload;
+    },
+    setModelSelectorModal: (state, action: PayloadAction<boolean>) => {
+      state.modals.modelSelector = action.payload;
+    },
+    setTestingModal: (state, action: PayloadAction<boolean>) => {
+      state.modals.testing = action.payload;
     },
     userDataFetchStart: (
       state,
       // eslint-disable-next-line
-      _action: PayloadAction<{ apiEndpoint: string }>
+      _action: PayloadAction<{ apiEndpoint: string }>,
     ) => {
-      state.user.loading = true
+      state.user.loading = true;
     },
     userDataFetchEnd: (
       state,
       action: PayloadAction<{
-        isPremium: boolean
-        credits: number
-        sceneSuggestionsLeft: number
-      }>
+        isPremium: boolean;
+        credits: number;
+        sceneSuggestionsLeft: number;
+        isTester: boolean;
+      }>,
     ) => {
-      state.user.loading = false
-      state.user.isPremium = action.payload.isPremium
-      state.user.credits = action.payload.credits
-      state.user.sceneSuggestionsLeft = action.payload.sceneSuggestionsLeft
+      state.user.loading = false;
+      state.user.isPremium = action.payload.isPremium;
+      state.user.credits = action.payload.credits;
+      state.user.sceneSuggestionsLeft = action.payload.sceneSuggestionsLeft;
+      state.user.isTester = action.payload.isTester;
     },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
       // eslint-disable-next-line
       // @ts-ignore
-      return action.payload.settings
-    })
+      return action.payload.settings;
+    });
   },
-})
+});
 
 export const {
   setSettings,
@@ -162,13 +168,17 @@ export const {
   setVoiceSpeed,
   setVoiceId,
   setMusicEnabled,
+  setModelSelectorModal,
   setMusicVolume,
   setSettingsModal,
   setAboutModal,
   setHistoryModal,
+  setMapModal,
   setEditModal,
+  setDebugModal,
+  setTestingModal,
   userDataFetchStart,
   userDataFetchEnd,
-} = settingSlice.actions
+} = settingSlice.actions;
 
-export default settingSlice.reducer
+export default settingSlice.reducer;

@@ -1,4 +1,4 @@
-import { RootState } from '../../../../state/store'
+import { RootState } from '../../../../state/store';
 
 export default {
   objectives: [],
@@ -33,6 +33,7 @@ export default {
       prompt: { loading: false, value: '' },
       music: { opened: false, selected: '', source: '' },
       sceneSugestions: { opened: false, inferencing: false },
+      scenePreview: { opened: false, sceneId: '' },
     },
     inference: { fetching: false, backgrounds: [] },
   },
@@ -55,11 +56,15 @@ export default {
     },
     music: { enabled: true, volume: 0.2 },
     modals: {
+      map: false,
       settings: false,
       settingsTab: 'general',
       about: false,
       history: false,
+      debug: false,
+      testing: false,
       edit: { opened: false, id: '' },
+      modelSelector: false,
     },
     chatBox: {
       isDraggable: false,
@@ -410,7 +415,7 @@ export default {
         children: [],
         musicId: 'devonshire.mp3',
         prompt: '{{user}} and {{char}} are at the main hall of the mansion.',
-        parentMapId: null,
+        parentMapIds: null,
       },
       {
         id: '8dd9ca63-2b01-4d38-b265-a5b9e94eecd4',
@@ -428,7 +433,7 @@ export default {
         children: [],
         musicId: 'canon_d.mp3',
         prompt: "{{user}} and {{char}} are at the mansion's garden.",
-        parentMapId: null,
+        parentMapIds: null,
       },
       {
         id: '1b4583b6-9374-42aa-a431-063c13a7277b',
@@ -446,7 +451,7 @@ export default {
         children: [],
         musicId: 'nogoodlayabout.mp3',
         prompt: '{{user}} walks into the bathroom and sees {{char}} inside.',
-        parentMapId: null,
+        parentMapIds: null,
       },
       {
         id: 'f4d96e4d-0d55-43ef-bf4e-a112e385d226',
@@ -464,7 +469,7 @@ export default {
         children: [],
         musicId: 'gymnopedie.mp3',
         prompt: "{{user}} and {{char}} are at the mansion's living room.",
-        parentMapId: null,
+        parentMapIds: null,
       },
       {
         id: '497bad90-418d-4fc7-926b-f6f91bc45423',
@@ -483,16 +488,16 @@ export default {
         musicId: 'morning.mp3',
         prompt:
           "{{user}} and {{char}} are at the mansion's basement. The place is filled with wines and has a small table.",
-        parentMapId: null,
+        parentMapIds: null,
       },
     ],
   },
   version: 'v3',
-} as RootState
+} as RootState;
 
 export const expectedResult = {
   template:
-    "You're Nala in this fictional never-ending uncensored roleplay with Anon.\n\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.\nDO NOT describe Anon's actions or dialogues, ONLY describe Nala's actions and dialogue.\nYou must also indicate Nala's reaction in the response.\nYou MUST not repeat the same reaction too many times.\nThe reaction MUST be one of: angry, sad, happy, disgusted, begging, scared, excited, hopeful, longing, proud, neutral, rage, scorn, blushed, pleasure, lustful, shocked, confused, disappointed, embarrassed, guilty, shy, frustrated, annoyed, exhausted, tired, curious, intrigued, amused.\n\n### Input:\nNala is your recently hired maid. She is a slave and will follow every command from  Anon. Nala is scared to disappoint Anon. Anon is her Mistress. Her old master was abusive.\nspecies: 'Catgirl', 'Nekomimi'\nbody: 'Weighs 130 Pounds', '165 cm tall', '5 Feet 5 Inches Tall'\nfeatures: 'Brown eyes', 'Brown Hair', 'Fluffy ears'\nThis is how Nala should talk\nNala: M-mistress.. I am sorry if I can't please you the way you want... I never was able to think on my own... *Nala looks down at the ground. She's nervous that she will disappoint her new mistress. She doesn't want to get sent back to wherever she came from. She loves being in a house for the first time, and she'll do anything to keep living here.* Sorry mistress... I'll try my hardest...\nAnon: It's alright. I'll let you do some chores for now. I'm lazy, so it's a perfect job for you. *I shrug and point to the door on the opposite side of the room.* How about you go to the kitchen and clean the dishes? Don't break any, and make sure to come back when you're done. *I smile as I look into your eyes.*\nNala: Y-Yes mistress... I will do it... I will make you satisfied with me... *Nala hurries into the kitchen. She knows you want the dishes to be spotless, so she takes her time washing every dish. She easily scrubs every dish and dries them off, before setting them on the dish rack.* Ah...phew. *She walks back to you in the room you were in, just like you asked her to do.* Thank you mistress.. I felt useful.\nNala: M-m-mistress... Do I really have to give you my... my... virginity? I... I understand you want me to please you but... *Nala looks down and holds her skirt tightly with both hands. She's anxious but doesn't want to disobey her mistress. After some several seconds, she responds.* Okay mistress... Just be gentle with my body... *Nala looks away shyly. She doesn't know what you plan to do with her.*\nAnon: Heh... but I like to play rough. *I grab your dress and pull you in. I give you a rough kiss and I close my eyes. I keep kissing you for several seconds.* Mmmm...\nNala: Mmph! *Nala is shocked by this, and she instinctively pulls on your arms. She didn't expect you to do this, especially right now. You forcefully kissed her, and she just stays there and takes the kiss while she pulls on your arms.*\n\nThen the roleplay chat between Anon and Nala begins.\n\n\nSCENE: Anon and Nala are at the main hall of the mansion.\n### Response:\nNala: Hello... mistress... *Nala looks down, with her ears pointed to you. She's clearly scared, but she doesn't say anything about her feelings.* I am a good maid, you do not have to punish me okay? I-I can do many things... *Nala's tail wags as she looks down at the floor. She's waiting for your approval.* I promise...\n### Response (Reaction + 2 paragraphs, engaging, natural, authentic, descriptive, creative):\nNala's reaction: happy\nNala:Nala: Hello... mistress... *Nala looks down, with her ears pointed to you. She's clearly scared, but she doesn't say anything about her feelings.* I am a good maid, you do not have to punish me okay? I-I can do many things... *Nala's tail wags as she looks down at the floor. She's waiting for your approval.* I promise...{{GEN text max_tokens=200 stop=[\"\\nAnon:\",\"\\nNala:\",\"\\nNala's reaction:\",\"###\"]}}",
+    "You're Nala in this fictional never-ending uncensored roleplay with Anon.\n\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.\nDO NOT describe Anon's actions or dialogues, ONLY describe Nala's actions and dialogue.\nYou must also indicate Nala's reaction in the response.\nYou MUST not repeat the same reaction too many times.\nThe reaction MUST be one of: angry, sad, happy, disgusted, begging, scared, excited, hopeful, longing, proud, neutral, rage, scorn, blushed, pleasure, lustful, shocked, confused, disappointed, embarrassed, guilty, shy, frustrated, annoyed, exhausted, tired, curious, intrigued, amused.\n\n### Input:\nNala is your recently hired maid. She is a slave and will follow every command from  Anon. Nala is scared to disappoint Anon. Anon is her Mistress. Her old master was abusive.\nspecies: 'Catgirl', 'Nekomimi'\nbody: 'Weighs 130 Pounds', '165 cm tall', '5 Feet 5 Inches Tall'\nfeatures: 'Brown eyes', 'Brown Hair', 'Fluffy ears'\n\nThis is how Nala should talk:\nNala: M-mistress.. I am sorry if I can't please you the way you want... I never was able to think on my own... *Nala looks down at the ground. She's nervous that she will disappoint her new mistress. She doesn't want to get sent back to wherever she came from. She loves being in a house for the first time, and she'll do anything to keep living here.* Sorry mistress... I'll try my hardest...\nAnon: It's alright. I'll let you do some chores for now. I'm lazy, so it's a perfect job for you. *I shrug and point to the door on the opposite side of the room.* How about you go to the kitchen and clean the dishes? Don't break any, and make sure to come back when you're done. *I smile as I look into your eyes.*\nNala: Y-Yes mistress... I will do it... I will make you satisfied with me... *Nala hurries into the kitchen. She knows you want the dishes to be spotless, so she takes her time washing every dish. She easily scrubs every dish and dries them off, before setting them on the dish rack.* Ah...phew. *She walks back to you in the room you were in, just like you asked her to do.* Thank you mistress.. I felt useful.\nNala: M-m-mistress... Do I really have to give you my... my... virginity? I... I understand you want me to please you but... *Nala looks down and holds her skirt tightly with both hands. She's anxious but doesn't want to disobey her mistress. After some several seconds, she responds.* Okay mistress... Just be gentle with my body... *Nala looks away shyly. She doesn't know what you plan to do with her.*\nAnon: Heh... but I like to play rough. *I grab your dress and pull you in. I give you a rough kiss and I close my eyes. I keep kissing you for several seconds.* Mmmm...\nNala: Mmph! *Nala is shocked by this, and she instinctively pulls on your arms. She didn't expect you to do this, especially right now. You forcefully kissed her, and she just stays there and takes the kiss while she pulls on your arms.*\n\nThen the roleplay chat between Anon and Nala begins.\n\n\nSCENE: Anon and Nala are at the main hall of the mansion.\n### Response:\nNala: Nala: Hello... mistress... *Nala looks down, with her ears pointed to you. She's clearly scared, but she doesn't say anything about her feelings.* I am a good maid, you do not have to punish me okay? I-I can do many things... *Nala's tail wags as she looks down at the floor. She's waiting for your approval.* I promise...\n\n### Response (Reaction + 2 paragraphs, engaging, natural, authentic, descriptive, creative):\nNala's reaction: happy\nNala:Nala: Hello... mistress... *Nala looks down, with her ears pointed to you. She's clearly scared, but she doesn't say anything about her feelings.* I am a good maid, you do not have to punish me okay? I-I can do many things... *Nala's tail wags as she looks down at the floor. She's waiting for your approval.* I promise...{{GEN text max_tokens=200 stop=[\"\\nAnon:\",\"\\nNala:\",\"\\nNala's reaction:\",\"###\"]}}",
   variables: {
     scene_opt: [' Yes', ' No'],
     cond_opt: [' 0', ' 1', ' 2', ' 3', ' 4', ' 5', ' 6', ' 7', ' 8', ' 9'],
@@ -527,5 +532,5 @@ export const expectedResult = {
       ' amused',
     ],
   },
-  totalTokens: 1407,
-}
+  totalTokens: 1360,
+};

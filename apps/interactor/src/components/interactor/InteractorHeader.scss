@@ -62,6 +62,13 @@
     }
   }
 
+  &__header-name {
+    height: 1rem;
+    max-width: 150px;
+    overflow: hidden;
+    position: relative;
+  }
+
   &__header-info {
     color: white;
     transition: all 0.2s ease-out;

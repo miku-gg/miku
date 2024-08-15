@@ -1,0 +1,130 @@
+@import '../../styles/variables.scss';
+
+.MapList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 16px;
+  margin-top: 1rem;
+  background-color: $background-1;
+  padding: 20px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &__infoIcon {
+        width: 1.2rem;
+        height: 1.2rem;
+        color: #8489bd;
+      }
+    }
+
+    & h2 {
+      margin: 0;
+    }
+  }
+  &__container {
+    display: flex;
+
+    flex-wrap: wrap;
+    width: 100%;
+
+    &__box {
+      display: flex;
+      width: 50%;
+      padding: 8px;
+      min-width: 300px;
+      min-height: 300px;
+    }
+
+    &__map {
+      position: relative;
+      border: 1px solid $node-conector-color;
+      padding: 16px;
+      border-radius: 16px;
+      width: 100%;
+      z-index: 1;
+
+      &__preview {
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0.3;
+        z-index: 0;
+        object-fit: cover;
+      }
+
+      & h3,
+      & p {
+        margin: 0;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.897);
+        z-index: 1;
+      }
+
+      &:hover {
+        .MapList__container__edit {
+          opacity: 1;
+        }
+      }
+    }
+
+    &__edit {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: white;
+      width: fit-content;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0;
+      z-index: 1;
+
+      &:hover {
+        color: $secondary-color;
+      }
+    }
+  }
+}
+.MapSelection {
+  .MapList__container__box {
+    min-width: 200px;
+    min-height: 200px;
+    width: 200px;
+    height: 200px;
+  }
+
+  .MapList__container__map {
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(27, 33, 66, 0.6);
+      .MapList__container__edit {
+        opacity: 0;
+      }
+    }
+  }
+  .selected {
+    border-color: $secondary-color;
+    background-color: #1b2142;
+
+    &__badge {
+      position: absolute;
+      right: 10px;
+      bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #16a34a;
+      user-select: none;
+    }
+  }
+}

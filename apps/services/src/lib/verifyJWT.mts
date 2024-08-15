@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { GuidanceQuery } from "../services/text/lib/queryValidation.mjs";
+import modelServerSettingsStore from "../services/text/lib/modelServerSettingsStore.mjs";
+import { RPModelPermission } from "../services/text/data/rpModelTypes.mjs";
 
 const verifyJWT = async (
   headers: Record<string, any>,
-  permissionType?: "tts" | "smart"
+  permissionType?: "tts" | "smart" | "tester"
 ): Promise<boolean> => {
   return new Promise((resolve) => {
     const authCookie = headers.cookie
@@ -24,6 +26,8 @@ const verifyJWT = async (
               resolve(!!decodedData.tts);
             } else if (permissionType === "smart") {
               resolve(!!decodedData.smart);
+            } else if (permissionType === "tester") {
+              resolve(!!decodedData.tester);
             } else {
               resolve(true);
             }
@@ -44,8 +48,20 @@ const jwtPermissionMiddleware = async (
   if (req.method === "POST") {
     if (req.path === "/text") {
       const query = req.body as GuidanceQuery;
-      if (query.model === "RP_SMART") {
+      const model = modelServerSettingsStore
+        .getRPModels()
+        .find((m) => m.id === query.model);
+      if (model?.permission === RPModelPermission.PREMIUM) {
         const permission = await verifyJWT(req.headers, "smart");
+
+        if (!permission) {
+          return res.status(401).send("Unauthorized: Token expired or missing");
+        } else {
+          next();
+        }
+      }
+      if (model?.permission === RPModelPermission.TESTER) {
+        const permission = await verifyJWT(req.headers, "tester");
 
         if (!permission) {
           return res.status(401).send("Unauthorized: Token expired or missing");

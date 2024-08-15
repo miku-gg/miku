@@ -1,57 +1,61 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { NovelCharacter, NovelBackground } from '../versioning'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { NovelCharacter, NovelBackground } from '../versioning';
 
 interface CreationState {
-  importedBackgrounds: NovelBackground[]
-  importedCharacters: NovelCharacter[]
+  importedBackgrounds: NovelBackground[];
+  importedCharacters: NovelCharacter[];
   scene: {
-    slidePanelOpened: boolean
-    sceneOpened: boolean
-    title: string
-    submitting: boolean
+    slidePanelOpened: boolean;
+    sceneOpened: boolean;
+    title: string;
+    submitting: boolean;
     background: {
-      opened: boolean
-      selected: string
+      opened: boolean;
+      selected: string;
       search: {
-        opened: boolean
-      }
+        opened: boolean;
+      };
       gen: {
-        opened: boolean
-      }
-    }
+        opened: boolean;
+      };
+    };
     characters: {
-      openedIndex: number
+      openedIndex: number;
       selected: {
-        id: string
-        outfit: string
-      }[]
+        id: string;
+        outfit: string;
+      }[];
       search: {
-        opened: boolean
-      }
-    }
+        opened: boolean;
+      };
+    };
     prompt: {
-      loading: boolean
-      value: string
-    }
+      loading: boolean;
+      value: string;
+    };
     music: {
-      opened: boolean
-      selected: string
-      source: string
-    }
+      opened: boolean;
+      selected: string;
+      source: string;
+    };
     sceneSugestions: {
-      opened: boolean
-      inferencing: boolean
-    }
-  }
+      opened: boolean;
+      inferencing: boolean;
+    };
+    scenePreview: {
+      opened: boolean;
+      sceneId: string;
+    };
+  };
   inference: {
-    fetching: boolean
+    fetching: boolean;
     backgrounds: {
-      id: string
-      inferenceId?: string
-      prompt: string
-      queuePosition: number
-    }[]
-  }
+      id: string;
+      inferenceId?: string;
+      prompt: string;
+      queuePosition: number;
+    }[];
+  };
 }
 
 export const initialState: CreationState = {
@@ -101,12 +105,16 @@ export const initialState: CreationState = {
       opened: false,
       inferencing: false,
     },
+    scenePreview: {
+      opened: false,
+      sceneId: '',
+    },
   },
   inference: {
     fetching: false,
     backgrounds: [],
   },
-}
+};
 
 export const creationSlice = createSlice({
   name: 'creation',
@@ -124,64 +132,67 @@ export const creationSlice = createSlice({
           | 'characters-search'
           | 'background-gen'
           | 'scene-suggestions'
-        opened: boolean
-      }>
+          | 'scene-preview';
+        opened: boolean;
+        itemId?: string;
+      }>,
     ) => {
       if (action.payload.id === 'scene') {
-        state.scene.sceneOpened = action.payload.opened
+        state.scene.sceneOpened = action.payload.opened;
       } else if (action.payload.id === 'slidepanel') {
-        state.scene.slidePanelOpened = action.payload.opened
+        state.scene.slidePanelOpened = action.payload.opened;
       } else if (action.payload.id === 'background-search') {
-        state.scene.background.search.opened = action.payload.opened
+        state.scene.background.search.opened = action.payload.opened;
       } else if (action.payload.id === 'characters-search') {
-        state.scene.characters.search.opened = action.payload.opened
+        state.scene.characters.search.opened = action.payload.opened;
       } else if (action.payload.id === 'background-gen') {
-        state.scene.background.gen.opened = action.payload.opened
+        state.scene.background.gen.opened = action.payload.opened;
       } else if (action.payload.id === 'scene-suggestions') {
-        state.scene.sceneSugestions.opened = action.payload.opened
+        state.scene.sceneSugestions.opened = action.payload.opened;
+      } else if (action.payload.id === 'scene-preview') {
+        state.scene.scenePreview.opened = action.payload.opened;
+        state.scene.scenePreview.sceneId = action.payload.itemId || state.scene.scenePreview.sceneId;
       } else {
-        state.scene[action.payload.id].opened = action.payload.opened
+        state.scene[action.payload.id].opened = action.payload.opened;
       }
     },
     setBackground: (state, action: PayloadAction<string>) => {
-      state.scene.background.selected = action.payload
+      state.scene.background.selected = action.payload;
     },
     setMusic: (
       state,
       action: PayloadAction<{
-        name: string
-        source: string
-      }>
+        name: string;
+        source: string;
+      }>,
     ) => {
-      state.scene.music.selected = action.payload.name
-      state.scene.music.source = action.payload.source
+      state.scene.music.selected = action.payload.name;
+      state.scene.music.source = action.payload.source;
     },
     setCharacterModalOpened: (state, action: PayloadAction<number>) => {
-      state.scene.characters.openedIndex = action.payload
+      state.scene.characters.openedIndex = action.payload;
     },
     selectCharacter: (
       state,
       action: PayloadAction<{
-        index: number
-        id: string
-        outfit: string
-      }>
+        index: number;
+        id: string;
+        outfit: string;
+      }>,
     ) => {
       if (state.scene.characters.selected[action.payload.index]) {
-        state.scene.characters.selected[action.payload.index].id =
-          action.payload.id
-        state.scene.characters.selected[action.payload.index].outfit =
-          action.payload.outfit
+        state.scene.characters.selected[action.payload.index].id = action.payload.id;
+        state.scene.characters.selected[action.payload.index].outfit = action.payload.outfit;
       }
     },
     setPromptValue: (state, action: PayloadAction<string>) => {
-      state.scene.prompt.value = action.payload
+      state.scene.prompt.value = action.payload;
     },
     setTitleValue: (state, action: PayloadAction<string>) => {
-      state.scene.title = action.payload
+      state.scene.title = action.payload;
     },
     setSubmitting: (state, action: PayloadAction<boolean>) => {
-      state.scene.submitting = action.payload
+      state.scene.submitting = action.payload;
     },
     addImportedBackground: (state, action: PayloadAction<string>) => {
       state.importedBackgrounds.push({
@@ -192,76 +203,65 @@ export const creationSlice = createSlice({
         source: {
           jpg: action.payload,
         },
-      })
+      });
     },
     removeImportedBackground: (state, action: PayloadAction<string>) => {
-      state.importedBackgrounds = state.importedBackgrounds.filter(
-        (background) => background.id !== action.payload
-      )
+      state.importedBackgrounds = state.importedBackgrounds.filter((background) => background.id !== action.payload);
     },
     addImportedCharacter: (state, action: PayloadAction<NovelCharacter>) => {
-      state.importedCharacters.push(action.payload)
+      state.importedCharacters.push(action.payload);
     },
     clearImportedCharacters: (state) => {
-      state.importedCharacters = []
+      state.importedCharacters = [];
     },
     backgroundInferenceStart: (
       state,
       action: PayloadAction<{
-        id: string
-        prompt: string
-        apiEndpoint: string
-        servicesEndpoint: string
-      }>
+        id: string;
+        prompt: string;
+        apiEndpoint: string;
+        servicesEndpoint: string;
+      }>,
     ) => {
       state.inference.backgrounds.push({
         id: action.payload.id,
         prompt: action.payload.prompt,
         queuePosition: 0,
-      })
-      state.inference.fetching = true
+      });
+      state.inference.fetching = true;
     },
     backgroundInferenceUpdate: (
       state,
       action: PayloadAction<{
-        id: string
-        inferenceId?: string
-        queuePosition?: number
-      }>
+        id: string;
+        inferenceId?: string;
+        queuePosition?: number;
+      }>,
     ) => {
-      state.inference.backgrounds = state.inference.backgrounds.map(
-        (background) => {
-          if (background.id === action.payload.id) {
-            return {
-              ...background,
-              queuePosition:
-                action.payload.queuePosition !== undefined
-                  ? action.payload.queuePosition
-                  : background.queuePosition,
-              inferenceId:
-                action.payload.inferenceId !== undefined
-                  ? action.payload.inferenceId
-                  : background.inferenceId,
-            }
-          }
-          return background
+      state.inference.backgrounds = state.inference.backgrounds.map((background) => {
+        if (background.id === action.payload.id) {
+          return {
+            ...background,
+            queuePosition:
+              action.payload.queuePosition !== undefined ? action.payload.queuePosition : background.queuePosition,
+            inferenceId: action.payload.inferenceId !== undefined ? action.payload.inferenceId : background.inferenceId,
+          };
         }
-      )
+        return background;
+      });
     },
     backgroundInferenceEnd: (
       state,
       action: PayloadAction<{
-        id: string
-        result: string
-        servicesEndpoint: string
-        apiEndpoint: string
-      }>
+        id: string;
+        result: string;
+        servicesEndpoint: string;
+        apiEndpoint: string;
+      }>,
     ) => {
-      const background = state.inference.backgrounds.find(
-        (background) => background.id === action.payload.id
-      )
+      const background = state.inference.backgrounds.find((background) => background.id === action.payload.id);
       if (!background) {
-        return
+        return;
       }
       state.importedBackgrounds.push({
         id: background.id,
@@ -271,25 +271,25 @@ export const creationSlice = createSlice({
         source: {
           jpg: action.payload.result,
         },
-      })
+      });
       state.inference.backgrounds = state.inference.backgrounds.filter(
-        (background) => background.id !== action.payload.id
-      )
-      state.inference.fetching = false
+        (background) => background.id !== action.payload.id,
+      );
+      state.inference.fetching = false;
     },
     backgroundInferenceFailure: (state, action: PayloadAction<string>) => {
       state.inference.backgrounds = state.inference.backgrounds.filter(
-        (background) => background.id !== action.payload
-      )
+        (background) => background.id !== action.payload,
+      );
     },
     startInferencingScene: (state) => {
-      state.scene.sceneSugestions.inferencing = true
+      state.scene.sceneSugestions.inferencing = true;
     },
     endInferencingScene: (state) => {
-      state.scene.sceneSugestions.inferencing = false
+      state.scene.sceneSugestions.inferencing = false;
     },
   },
-})
+});
 
 export const {
   setModalOpened,
@@ -310,6 +310,6 @@ export const {
   backgroundInferenceFailure,
   startInferencingScene,
   endInferencingScene,
-} = creationSlice.actions
+} = creationSlice.actions;
 
-export default creationSlice.reducer
+export default creationSlice.reducer;

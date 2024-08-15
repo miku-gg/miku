@@ -1,0 +1,103 @@
+@import '../../styles/variables.scss';
+
+.NovelObjectives {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &__infoIcon {
+        width: 1.2rem;
+        height: 1.2rem;
+        color: #8489bd;
+      }
+    }
+
+    & h2 {
+      margin: 0;
+    }
+  }
+  &__container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+
+    &__box {
+      display: flex;
+      width: 33.3%;
+      padding: 8px;
+      min-width: 310px;
+      min-height: 125px;
+    }
+
+    &__objective {
+      position: relative;
+      border: 1px solid $node-conector-color;
+      padding: 12px;
+      border-radius: 16px;
+      width: 100%;
+      z-index: 1;
+      max-height: 110px;
+      text-overflow: hidden;
+      overflow: hidden;
+
+      & p {
+        margin: 0;
+        z-index: 1;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      &:hover {
+        .NovelObjectives__container__edit {
+          opacity: 1;
+        }
+      }
+    }
+
+    &__edit {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: white;
+      width: fit-content;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0;
+      z-index: 1;
+
+      &:hover {
+        color: $secondary-color;
+      }
+    }
+  }
+}
+.ObjectiveSelection {
+  .NovelObjectives__container__objective {
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(27, 33, 66, 0.6);
+    }
+  }
+  .selected {
+    border-color: $secondary-color;
+    background-color: #1b2142;
+
+    &__badge {
+      position: absolute;
+      right: 6px;
+      bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #16a34a;
+      user-select: none;
+    }
+  }
+}

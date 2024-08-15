@@ -1,35 +1,25 @@
-import { Button, Tooltip } from '@mikugg/ui-kit'
-import { useAppDispatch, useAppSelector } from '../../state/store'
-import { NovelV3 } from '@mikugg/bot-utils'
-import {
-  setInventoryVisibility,
-  setItemModalVisibility,
-  setSelectedItem,
-} from '../../state/slices/inventorySlice'
-import { FaTimes } from 'react-icons/fa'
-import './Inventory.scss'
-import { useAppContext } from '../../App.context'
-import { interactionStart } from '../../state/slices/narrationSlice'
-import {
-  selectCurrentScene,
-  selectLastLoadedResponse,
-} from '../../state/selectors'
-import { toast } from 'react-toastify'
+import { NovelV3 } from '@mikugg/bot-utils';
+import { Button, Tooltip } from '@mikugg/ui-kit';
+import { FaTimes } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import { useAppContext } from '../../App.context';
+import { novelActionToStateAction } from '../../state/mutations';
+import { selectConditionStatus, selectCurrentScene, selectLastLoadedResponse } from '../../state/selectors';
+import { setInventoryVisibility, setItemModalVisibility, setSelectedItem } from '../../state/slices/inventorySlice';
+import { interactionStart } from '../../state/slices/narrationSlice';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import './Inventory.scss';
+import classNames from 'classnames';
+import { GiLockedChest } from 'react-icons/gi';
 
 export default function Inventory() {
-  const dispatch = useAppDispatch()
-  const { isPremium } = useAppSelector((state) => state.settings.user)
-  const { showInventory, selectedItem, items } = useAppSelector(
-    (state) => state.inventory
-  )
-  const {
-    servicesEndpoint,
-    isInteractionDisabled,
-    apiEndpoint,
-    assetLinkLoader,
-  } = useAppContext()
-  const scene = useAppSelector(selectCurrentScene)
-  const lastResponse = useAppSelector(selectLastLoadedResponse)
+  const dispatch = useAppDispatch();
+  const { isPremium } = useAppSelector((state) => state.settings.user);
+  const { showInventory, selectedItem, items } = useAppSelector((state) => state.inventory);
+  const currentScene = useAppSelector(selectCurrentScene);
+  const { servicesEndpoint, isInteractionDisabled, apiEndpoint, assetLinkLoader } = useAppContext();
+  const scene = useAppSelector(selectCurrentScene);
+  const lastResponse = useAppSelector(selectLastLoadedResponse);
 
   return (
     <div className={`Inventory ${showInventory}`}>
@@ -38,7 +28,7 @@ export default function Inventory() {
 
         <button
           onClick={() => {
-            dispatch(setInventoryVisibility('closed'))
+            dispatch(setInventoryVisibility('closed'));
           }}
           className="Inventory__close-button"
         >
@@ -48,37 +38,39 @@ export default function Inventory() {
       <div className="Inventory__content">
         <div className="Inventory__items scrollbar">
           {items.map((item) => {
-            const speed = 5
-            const position = Math.max(item.name.length + 10, 20)
-            const animationDuration = Math.max(item.name.length / speed, 3)
-            const isSelectedItem = item.id === selectedItem?.id
-            const disabled = !isPremium && item.isPremium
-
+            const speed = 5;
+            const position = Math.max(item.name.length + 10, 20);
+            const animationDuration = Math.max(item.name.length / speed, 3);
+            const isSelectedItem = item.id === selectedItem?.id;
+            const isLocked = item.locked?.config.sceneIds.includes(currentScene?.id || '');
+            const disabled = (!isPremium && item.isPremium) || (item.locked && !isLocked);
+            const isHidden = item.hidden;
             return (
               <div
                 key={item.id}
-                className={`Inventory__item ${
-                  isSelectedItem ? 'selected' : ''
-                } ${disabled ? 'disabled' : ''}
-                `}
+                className={classNames({
+                  Inventory__item: true,
+                  selected: isSelectedItem,
+                  disabled: disabled,
+                  hidden: isHidden,
+                  highlighted: item.isNovelOnly && !disabled,
+                })}
                 onClick={() => {
-                  if (disabled) return
+                  if (disabled) return;
                   if (!isSelectedItem) {
-                    dispatch(setItemModalVisibility('open'))
-                    dispatch(setSelectedItem(item))
+                    dispatch(setItemModalVisibility('open'));
+                    dispatch(setSelectedItem(item));
                   } else {
-                    dispatch(setItemModalVisibility('closed'))
+                    dispatch(setItemModalVisibility('closed'));
 
                     setTimeout(() => {
-                      dispatch(setSelectedItem(null))
-                    }, 150)
+                      dispatch(setSelectedItem(null));
+                    }, 150);
                   }
                 }}
-                data-tooltip-id={disabled ? 'premium-item-invetory' : undefined}
+                data-tooltip-id={disabled ? 'premium-item-inventory' : undefined}
                 data-tooltip-varaint="light"
-                data-tooltip-content={
-                  disabled ? 'This is a premium-only item' : undefined
-                }
+                data-tooltip-content={disabled && item.isPremium ? 'This is a premium-only item' : undefined}
               >
                 <img
                   className="Inventory__item-image"
@@ -86,9 +78,7 @@ export default function Inventory() {
                   alt={item.name}
                 />
                 <div
-                  className={`Inventory__item-name ${
-                    7 < item.name.length ? 'animated-item-name' : ''
-                  }`}
+                  className={`Inventory__item-name ${7 < item.name.length ? 'animated-item-name' : ''}`}
                   style={
                     {
                       '--initial-text-position': `100%`,
@@ -100,15 +90,15 @@ export default function Inventory() {
                   {item.name}
                 </div>
               </div>
-            )
+            );
           })}
         </div>
-        <Tooltip id="premium-item-invetory" place="right" />
+        <Tooltip id="premium-item-inventory" place="right" />
         <Tooltip id="item-name" place="top" />
         <InventoryItemModal
           item={selectedItem}
           onUse={(action) => {
-            dispatch(setInventoryVisibility('closed'))
+            dispatch(setInventoryVisibility('closed'));
 
             if (isInteractionDisabled) {
               toast.warn('Please log in to interact.', {
@@ -116,44 +106,50 @@ export default function Inventory() {
                 style: {
                   top: 10,
                 },
-              })
-              return
+              });
+              return;
             }
-            dispatch(
-              interactionStart({
-                text: action.prompt,
-                sceneId: scene?.id || '',
-                characters: scene?.characters.map((r) => r.characterId) || [],
-                apiEndpoint,
-                servicesEndpoint,
-                selectedCharacterId: lastResponse?.selectedCharacterId || '',
-              })
-            )
+            if (action.prompt) {
+              dispatch(
+                interactionStart({
+                  text: action.prompt,
+                  sceneId: scene?.id || '',
+                  characters: scene?.characters.map((r) => r.characterId) || [],
+                  apiEndpoint,
+                  servicesEndpoint,
+                  selectedCharacterId: lastResponse?.selectedCharacterId || '',
+                }),
+              );
+            }
+            if (action.usageActions) {
+              action.usageActions.forEach((novelAction) => {
+                const action = novelActionToStateAction(novelAction);
+                if (action) dispatch(action);
+              });
+            }
           }}
         />
       </div>
     </div>
-  )
+  );
 }
 
 export const InventoryItemModal = ({
   item,
   onUse,
 }: {
-  item: NovelV3.InventoryItem | null
-  onUse: (action: NovelV3.InventoryAction) => void
+  item: NovelV3.InventoryItem | null;
+  onUse: (action: NovelV3.InventoryAction) => void;
 }) => {
-  const { assetLinkLoader } = useAppContext()
-  const showItemModal = useAppSelector((state) => state.inventory.showItemModal)
+  const { assetLinkLoader } = useAppContext();
+  const showItemModal = useAppSelector((state) => state.inventory.showItemModal);
+  const state = useAppSelector((state) => state);
 
   return (
     <div className={`InventoryItemModal scrollbar ${showItemModal}`}>
       <div className="InventoryItemModal__content">
         <div className="InventoryItemModal__image">
-          <img
-            src={assetLinkLoader(item?.icon || 'default_item.jpg')}
-            alt={item?.name}
-          />
+          <img src={assetLinkLoader(item?.icon || 'default_item.jpg')} alt={item?.name} />
         </div>
       </div>
       <header className="InventoryItemModal__header">
@@ -165,9 +161,7 @@ export const InventoryItemModal = ({
         >
           {item?.name}
         </div>
-        <div className="InventoryItemModal__description">
-          {item?.description}
-        </div>
+        <div className="InventoryItemModal__description">{item?.description}</div>
       </header>
       <footer className="InventoryItemModal__footer">
         {item?.actions.map((action) => (
@@ -176,11 +170,29 @@ export const InventoryItemModal = ({
             className="InventoryItemModal__button"
             theme="transparent"
             onClick={() => onUse(action)}
+            disabled={action.usageCondition ? !selectConditionStatus(state, action.usageCondition) : false}
           >
             {action.name}
           </Button>
         ))}
       </footer>
     </div>
-  )
-}
+  );
+};
+
+export const InventoryTrigger = () => {
+  const dispatch = useAppDispatch();
+  const showInventory = useAppSelector((state) => state.inventory.showInventory);
+  const { disabled: inputDisabled } = useAppSelector((state) => state.narration.input);
+  return (
+    <button
+      className="InteractiveMap__toggle"
+      disabled={inputDisabled}
+      onClick={() => {
+        dispatch(setInventoryVisibility(showInventory === 'initial' || showInventory === 'closed' ? 'open' : 'closed'));
+      }}
+    >
+      <GiLockedChest />
+    </button>
+  );
+};

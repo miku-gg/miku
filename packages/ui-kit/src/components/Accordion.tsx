@@ -9,9 +9,7 @@ type AccordionContextType = {
   items: { [title: string]: number };
 };
 
-export const AccordionContext = createContext<AccordionContextType | null>(
-  null
-);
+export const AccordionContext = createContext<AccordionContextType | null>(null);
 
 type AccordionProps = {
   selectedIndex: number;
@@ -20,26 +18,18 @@ type AccordionProps = {
   children: React.ReactNode;
 };
 
-const Accordion: React.FC<AccordionProps> = ({
-  selectedIndex,
-  onChange,
-  onRemoveItem,
-  children,
-}) => {
+const Accordion: React.FC<AccordionProps> = ({ selectedIndex, onChange, onRemoveItem, children }) => {
   const handleChange = (index: number) => {
     onChange(index === selectedIndex ? -1 : index);
   };
 
-  const items = React.Children.toArray(children).reduce(
-    (_items, child, index) => {
-      if (React.isValidElement<AccordionItemProps>(child)) {
-        return { ..._items, [child.props.title]: index };
-      }
+  const items = React.Children.toArray(children).reduce((_items, child, index) => {
+    if (React.isValidElement<AccordionItemProps>(child)) {
+      return { ..._items, [child.props.title]: index };
+    }
 
-      return _items;
-    },
-    {}
-  );
+    return _items;
+  }, {});
 
   return (
     <AccordionContext.Provider

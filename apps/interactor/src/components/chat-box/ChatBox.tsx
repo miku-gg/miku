@@ -1,16 +1,14 @@
-import { Rnd } from 'react-rnd'
-import { useAppContext } from '../../App.context'
-import { useAppSelector } from '../../state/store'
-import './ChatBox.scss'
-import InputBox from './InputBox'
-import ResponseBox from './ResponseBox'
+import { Rnd } from 'react-rnd';
+import { useAppContext } from '../../App.context';
+import { useAppSelector } from '../../state/store';
+import './ChatBox.scss';
+import InputBox from './InputBox';
+import ResponseBox from './ResponseBox';
 
 const ChatBox = (): JSX.Element | null => {
-  const { isMobileApp } = useAppContext()
-  const isDraggable = useAppSelector(
-    (state) => state.settings.chatBox.isDraggable
-  )
-  const centeredPositionX = (window.innerWidth - window.innerWidth * 0.75) / 2
+  const { isMobileApp } = useAppContext();
+  const isDraggable = useAppSelector((state) => state.settings.chatBox.isDraggable);
+  const centeredPositionX = (window.innerWidth - window.innerWidth * 0.75) / 2;
 
   if (isMobileApp || window.innerWidth < 820) {
     return (
@@ -18,7 +16,7 @@ const ChatBox = (): JSX.Element | null => {
         <ResponseBox />
         <InputBox />
       </div>
-    )
+    );
   } else {
     return (
       <div className="ChatBox">
@@ -39,8 +37,8 @@ const ChatBox = (): JSX.Element | null => {
           <InputBox />
         </Rnd>
       </div>
-    )
+    );
   }
-}
+};
 
-export default ChatBox
+export default ChatBox;

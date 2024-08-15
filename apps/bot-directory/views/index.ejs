@@ -84,26 +84,14 @@
             <%if (novel.tags.includes("NSFW")) { %>
             <span class="nsfw w-18 rounded-lg p-1">NSFW</span>
             <% } %> <%if (novel.scenes.length > 1) { %>
-            <span class="scenarios-box w-18 rounded-lg p-1 right-0"
-              ><%= novel.scenes.length %> scenes</span
-            >
+            <span class="scenarios-box w-18 rounded-lg p-1 right-0"><%= novel.scenes.length %> scenes</span>
             <% } %>
             <div class="image">
-              <img
-                src="/s3/assets/<%= novel.logoPic %>"
-                style="object-fit: scale-down; width: 200px; height: 200px"
-              />
+              <img src="/s3/assets/<%= novel.logoPic %>" style="object-fit: scale-down; width: 200px; height: 200px" />
             </div>
             <div class="content">
-              <a
-                class="header"
-                href="http://localhost:5173/?cardId=<%= hash%>"
-                target="_blank"
-                ><%= novel.title %></a
-              >
-              <div class="description h-12 overflow-auto">
-                <%= novel.description || 'No description' %>
-              </div>
+              <a class="header" href="http://localhost:5173/?cardId=<%= hash%>" target="_blank"><%= novel.title %></a>
+              <div class="description h-12 overflow-auto"><%= novel.description || 'No description' %></div>
             </div>
             <div class="extra content">
               <p>Author: <%= novel.author || 'Unknown' %></p>
@@ -114,10 +102,7 @@
                 method="POST"
                 onsubmit="return confirm('Do you really want to delete <%= novel.title %>?');"
               >
-                <button
-                  type="submit"
-                  class="absolute text-red-600 right-2 bottom-4"
-                >
+                <button type="submit" class="absolute text-red-600 right-2 bottom-4">
                   <i class="trash icon"></i>
                 </button>
               </form>
@@ -130,12 +115,7 @@
       <div class="blocker invisible"></div>
 
       <div class="modal upload-modal px-8 pt-6 pb-4 w-5/12 invisible">
-        <form
-          action="/bot"
-          method="post"
-          enctype="multipart/form-data"
-          class="ui form"
-        >
+        <form action="/bot" method="post" enctype="multipart/form-data" class="ui form">
           <label>
             <div class="flex">
               <h3 class="ui header">Upload a bot</h3>
@@ -143,14 +123,7 @@
                 <i class="modal-close close icon"></i>
               </button>
             </div>
-            <input
-              type="file"
-              value="file"
-              required
-              accept=".json"
-              name="file"
-              id="file"
-            />
+            <input type="file" value="file" required accept=".json" name="file" id="file" />
           </label>
           <div class="mt-6">
             <button class="ui button" type="submit">Upload</button>
@@ -191,20 +164,13 @@
         </div>
         <div class="flex gap-2">
           <p class="text-white w-24">Model Name</p>
-          <input
-            class="mb-8 w-full mr-8"
-            type="text"
-            value=""
-            placeholder="default"
-            required
-            name="model"
-            id="model"
-          />
+          <input class="mb-8 w-full mr-8" type="text" value="" placeholder="default" required name="model" id="model" />
         </div>
         <div class="flex gap-2">
           <p class="text-white w-24">Prompt Strategy</p>
           <select class="ui dropdown" id="strategy">
             <option value="alpacarp">Alpaca</option>
+            <option value="mistralrp">Mistral</option>
             <option value="metharmerp">Metharme</option>
             <option value="vicunarp">Vicuna</option>
             <option value="llama3rp">LLaMA 3</option>
@@ -219,6 +185,7 @@
             <option value="solar">Solar</option>
             <option value="cohere">Cohere</option>
             <option value="wizardlm2">WizardLM-2</option>
+            <option value="nemo">Nemo</option>
           </select>
         </div>
         <div class="flex gap-2">
@@ -245,10 +212,7 @@
             id="max_new_tokens"
           />
         </div>
-        <button
-          class="ui button save-button w-64"
-          onclick="save_backend_config(); toggle_backend_modal(false)"
-        >
+        <button class="ui button save-button w-64" onclick="save_backend_config(); toggle_backend_modal(false)">
           Save
         </button>
       </div>
@@ -264,87 +228,85 @@
     <script src="/public/form.min.js"></script>
     <script>
       $(document).ready(async function () {
-        $(".dropdown").dropdown();
+        $('.dropdown').dropdown();
 
         // toggle button formatting
-        $(".ui.checkbox").checkbox();
+        $('.ui.checkbox').checkbox();
 
         // listen for changes to dark mode toggle buttons
-        $(".dark_mode_toggle:checkbox").on("change", function () {
-          change_theme($(this).is(":checked"));
+        $('.dark_mode_toggle:checkbox').on('change', function () {
+          change_theme($(this).is(':checked'));
         });
 
-        const getResult = await fetch("/get", {
-          method: "GET",
+        const getResult = await fetch('/get', {
+          method: 'GET',
           headers: {
-            "Content-type": "application/json",
+            'Content-type': 'application/json',
           },
         });
         const data = await getResult.json();
 
-        document.getElementById("apiUrl").value = data.apiUrl || "";
-        document.getElementById("apiKey").value = data.apiKey || "";
-        document.getElementById("model").value = data.model || "";
-        $("#strategy").dropdown("set selected", data.strategy);
-        $("#tokenizer").dropdown("set selected", data.tokenizer);
-        document.getElementById("truncation_length").value =
-          data.truncation_length;
-        document.getElementById("max_new_tokens").value = data.max_new_tokens;
+        document.getElementById('apiUrl').value = data.apiUrl || '';
+        document.getElementById('apiKey').value = data.apiKey || '';
+        document.getElementById('model').value = data.model || '';
+        $('#strategy').dropdown('set selected', data.strategy);
+        $('#tokenizer').dropdown('set selected', data.tokenizer);
+        document.getElementById('truncation_length').value = data.truncation_length;
+        document.getElementById('max_new_tokens').value = data.max_new_tokens;
       });
 
       function change_theme(dark_mode) {
         if (dark_mode) {
           // for contrast with child segments
-          $("body").css("background-color", "#282c34");
+          $('body').css('background-color', '#282c34');
           // most Semantic UI elements have the "ui" class
           // useful to skip over elements with some class, such as "ignore_dark_mode"
-          $(".ui").not(".ignore_dark_mode").addClass("inverted");
+          $('.ui').not('.ignore_dark_mode').addClass('inverted');
           // change the state of all dark mode toggle buttons
-          $(".dark_mode_toggle:checkbox").prop("checked", true);
+          $('.dark_mode_toggle:checkbox').prop('checked', true);
         } else {
-          $("body").css("background-color", "");
-          $(".inverted").not(".ignore_dark_mode").removeClass("inverted");
-          $(".dark_mode_toggle:checkbox").prop("checked", false);
+          $('body').css('background-color', '');
+          $('.inverted').not('.ignore_dark_mode').removeClass('inverted');
+          $('.dark_mode_toggle:checkbox').prop('checked', false);
         }
       }
 
       function toggle_open_modal(open) {
         if (open) {
-          $(".upload-modal").removeClass("invisible");
-          $(".upload-modal").addClass("visible");
-          $(".blocker").removeClass("invisible");
-          $(".blocker").addClass("visible");
+          $('.upload-modal').removeClass('invisible');
+          $('.upload-modal').addClass('visible');
+          $('.blocker').removeClass('invisible');
+          $('.blocker').addClass('visible');
         } else {
-          $(".upload-modal").removeClass("visible");
-          $(".upload-modal").addClass("invisible");
-          $(".blocker").removeClass("visible");
-          $(".blocker").addClass("invisible");
+          $('.upload-modal').removeClass('visible');
+          $('.upload-modal').addClass('invisible');
+          $('.blocker').removeClass('visible');
+          $('.blocker').addClass('invisible');
         }
       }
 
       function toggle_backend_modal(open) {
         if (open) {
-          $(".backend-modal").removeClass("invisible");
-          $(".backend-modal").addClass("visible");
-          $(".blocker").removeClass("invisible");
-          $(".blocker").addClass("visible");
+          $('.backend-modal').removeClass('invisible');
+          $('.backend-modal').addClass('visible');
+          $('.blocker').removeClass('invisible');
+          $('.blocker').addClass('visible');
         } else {
-          $(".backend-modal").removeClass("visible");
-          $(".backend-modal").addClass("invisible");
-          $(".blocker").removeClass("visible");
-          $(".blocker").addClass("invisible");
+          $('.backend-modal').removeClass('visible');
+          $('.backend-modal').addClass('invisible');
+          $('.blocker').removeClass('visible');
+          $('.blocker').addClass('invisible');
         }
       }
 
       function save_backend_config() {
-        const apiUrl = document.getElementById("apiUrl").value;
-        const apiKey = document.getElementById("apiKey").value;
-        const model = document.getElementById("model").value;
-        const strategy = document.getElementById("strategy").value;
-        const tokenizer = document.getElementById("tokenizer").value;
-        const truncation_length =
-          document.getElementById("truncation_length").value;
-        const max_new_tokens = document.getElementById("max_new_tokens").value;
+        const apiUrl = document.getElementById('apiUrl').value;
+        const apiKey = document.getElementById('apiKey').value;
+        const model = document.getElementById('model').value;
+        const strategy = document.getElementById('strategy').value;
+        const tokenizer = document.getElementById('tokenizer').value;
+        const truncation_length = document.getElementById('truncation_length').value;
+        const max_new_tokens = document.getElementById('max_new_tokens').value;
 
         const config = {
           apiUrl: apiUrl,
@@ -355,11 +317,11 @@
           truncation_length: Number(truncation_length || 0) || 0,
           max_new_tokens: Number(max_new_tokens || 0) || 0,
         };
-        fetch("/save", {
-          method: "POST",
+        fetch('/save', {
+          method: 'POST',
           body: JSON.stringify(config),
           headers: {
-            "Content-type": "application/json",
+            'Content-type': 'application/json',
           },
         });
       }

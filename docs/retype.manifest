@@ -1,6 +1,6 @@
 {
-  "version": "3.0.3",
-  "created": "2024-02-25T02:46:18Z",
+  "version": "3.5.0",
+  "created": "2024-08-05T18:53:24Z",
   "files": [
     {
       "path": ".nojekyll"
@@ -161,6 +161,24 @@
       "path": "assets/miku_file.png"
     },
     {
+      "path": "assets/novel-builder/homepage.png"
+    },
+    {
+      "path": "assets/novel-builder/tutorial_1.mp4"
+    },
+    {
+      "path": "assets/novel-builder/tutorial_2.mp4"
+    },
+    {
+      "path": "assets/novel-builder/tutorial_3.mp4"
+    },
+    {
+      "path": "assets/novel-builder/tutorial_4.mp4"
+    },
+    {
+      "path": "assets/novel-builder/tutorial_5.mp4"
+    },
+    {
       "path": "assets/openai_key.png"
     },
     {
@@ -189,6 +207,15 @@
     },
     {
       "path": "guides/how-to-interact/index.html"
+    },
+    {
+      "path": "guides/novel-builder/1-get-started/index.html"
+    },
+    {
+      "path": "guides/novel-builder/2-lorebooks/index.html"
+    },
+    {
+      "path": "guides/novel-builder/3-characters/index.html"
     },
     {
       "path": "guides/run-live/index.html"

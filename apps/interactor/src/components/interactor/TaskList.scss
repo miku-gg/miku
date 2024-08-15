@@ -1,0 +1,85 @@
+@import '../../variables';
+
+.TaskList {
+  position: absolute;
+  top: 100px;
+  right: 10px;
+
+  &__trigger {
+  }
+
+  &__popup {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background-color: rgba(12, 18, 37, 0.9333333333);
+    border: 1px solid #9747ff;
+    border-radius: 10px;
+    box-shadow: 0 0 8px 0 #9747ff;
+    width: 300px;
+    font-size: 0.8rem;
+  }
+
+  &__task {
+    text-align: left;
+    padding: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    user-select: none;
+    transition: all 0.2s ease-out;
+    cursor: pointer;
+
+    &:first-child {
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+
+    &:hover {
+      .TaskList__task-check {
+        filter: drop-shadow(0 -1px 8px $color-blue);
+      }
+
+      .TaskList__task-text {
+        text-shadow: 0 0 5px $color-white;
+      }
+    }
+
+    &--checked {
+      color: $text-2;
+      cursor: default;
+
+      &:hover {
+        .TaskList__task-check {
+          filter: none;
+        }
+
+        .TaskList__task-text {
+          text-shadow: none;
+        }
+      }
+
+      .TaskList__task-check {
+        color: $text-2;
+      }
+
+      &:hover {
+        background-color: initial;
+      }
+    }
+  }
+
+  &__task-check {
+    display: inline-block;
+    margin-right: 3px;
+    font-size: 1.3rem;
+    color: $color-blue;
+    transition: all 0.2s ease-out;
+  }
+}

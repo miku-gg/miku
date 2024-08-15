@@ -1,4 +1,4 @@
-import { EmotionTemplateSlug, MikuCard } from "../MikuCardValidator";
+import { EmotionTemplateSlug, MikuCard } from '../MikuCardValidator';
 
 export interface NovelScene {
   id: string;

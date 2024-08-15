@@ -17,15 +17,13 @@ type TrackableEvent =
   | 'voice-gen-click'
   | 'edit-click'
   | 'credits-buy-click'
-  | 'download-history-click'
+  | 'download-history-click';
 
-const sessionData: Record<string, string | boolean | number> = {}
+const sessionData: Record<string, string | boolean | number> = {};
 
-export const registerTrackSessionData = (
-  data: Record<string, string | boolean | number>
-) => {
-  Object.assign(sessionData, data)
-}
+export const registerTrackSessionData = (data: Record<string, string | boolean | number>) => {
+  Object.assign(sessionData, data);
+};
 
 // eslint-disable-next-line
 export const trackEvent = (event: TrackableEvent, data: any = {}) => {
@@ -39,9 +37,9 @@ export const trackEvent = (event: TrackableEvent, data: any = {}) => {
           ...data,
         },
       },
-      '*'
-    )
+      '*',
+    );
   } catch (e) {
-    return
+    return;
   }
-}
+};

@@ -1,0 +1,58 @@
+@import '../../variables';
+
+.DebugModal {
+  &__container {
+    max-width: 1200px;
+    width: 100%;
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: end;
+    overflow: auto;
+    gap: 10px;
+    margin-top: 10px;
+    height: 30px;
+  }
+
+  &__item {
+    font-size: 0.7rem;
+    min-width: 130px;
+    height: 20px;
+  }
+
+  &__stats {
+    padding: 10px;
+    background-color: black;
+    margin-top: 20px;
+    border-radius: 6px;
+    height: 100px;
+    overflow: auto;
+    font-size: 0.8rem;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1rem;
+    color: $text-3;
+  }
+
+  &__template {
+    padding: 10px;
+    background-color: black;
+    margin-top: 10px;
+    border-radius: 6px;
+    height: 300px;
+    overflow: auto;
+    font-size: 0.8rem;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1rem;
+    color: $text-2;
+
+    &__line--system {
+      color: $color-blue;
+    }
+
+    &__line--gen {
+      color: $secondary-color;
+    }
+  }
+}

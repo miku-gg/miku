@@ -1,4 +1,4 @@
-@import "../../styles/variables.scss";
+@import '../../styles/variables.scss';
 
 .StartsPanel {
   &__list {
@@ -17,6 +17,18 @@
       height: 100px;
       margin-top: 10px;
       cursor: pointer;
+    }
+  }
+
+  &__item-scene {
+    .SceneSelector {
+      background: transparent;
+      padding: 0;
+      margin: 0;
+    }
+
+    .SceneNode {
+      margin: 0;
     }
   }
 
@@ -63,6 +75,16 @@
 
   &__item-prompt-character-emotion {
     width: 200px;
+  }
+
+  &__item-prompt-character-title-right {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+
+    > .TokenDisplayer {
+      margin-bottom: 8px;
+    }
   }
 
   &__scene-selection-list {

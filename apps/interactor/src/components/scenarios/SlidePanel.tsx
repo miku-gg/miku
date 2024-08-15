@@ -1,14 +1,14 @@
-import React from 'react'
-import Modal from 'react-modal'
-import { MdOutlineKeyboardArrowLeft } from 'react-icons/md'
-import './SlidePanel.scss'
+import React from 'react';
+import Modal from 'react-modal';
+import { MdOutlineKeyboardArrowLeft } from 'react-icons/md';
+import './SlidePanel.scss';
 
-Modal.setAppElement('#root')
+Modal.setAppElement('#root');
 
 const SlidePanel: React.FC<{
-  children: React.ReactNode
-  opened: boolean
-  onClose: () => void
+  children: React.ReactNode;
+  opened: boolean;
+  onClose: () => void;
 }> = ({ opened, onClose, children }): JSX.Element => {
   return (
     <Modal
@@ -24,7 +24,7 @@ const SlidePanel: React.FC<{
         <MdOutlineKeyboardArrowLeft />
       </button>
     </Modal>
-  )
-}
+  );
+};
 
-export default SlidePanel
+export default SlidePanel;

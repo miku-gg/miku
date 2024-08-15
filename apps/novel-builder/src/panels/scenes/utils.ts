@@ -1,5 +1,5 @@
-import { type } from "os";
-import { Position, MarkerType, Node, Edge } from "reactflow";
+import { type } from 'os';
+import { Position, MarkerType, Node, Edge } from 'reactflow';
 
 // this helper function returns the intersection point
 // of the line between the center of the intersectionNode and the target node
@@ -78,7 +78,7 @@ export function createNodesAndEdges() {
   const edges = [];
   const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-  nodes.push({ id: "target", data: { label: "Target" }, position: center });
+  nodes.push({ id: 'target', data: { label: 'Target' }, position: center });
 
   for (let i = 0; i < 8; i++) {
     const degrees = i * (360 / 8);
@@ -86,13 +86,13 @@ export function createNodesAndEdges() {
     const x = 250 * Math.cos(radians) + center.x;
     const y = 250 * Math.sin(radians) + center.y;
 
-    nodes.push({ id: `${i}`, data: { label: "Source" }, position: { x, y } });
+    nodes.push({ id: `${i}`, data: { label: 'Source' }, position: { x, y } });
 
     edges.push({
       id: `edge-${i}`,
-      target: "target",
+      target: 'target',
       source: `${i}`,
-      type: "floating",
+      type: 'floating',
       markerEnd: {
         type: MarkerType.Arrow,
       },
@@ -137,11 +137,7 @@ export function graphToTree(startNodes: string[], edges: Edge[]): Edge[] {
   return treeEdges;
 }
 
-export const setAllNodesPosition = (
-  nodes: Node[],
-  edges: Edge[],
-  startNodes: string[]
-): { x: number; y: number } => {
+export const setAllNodesPosition = (nodes: Node[], edges: Edge[], startNodes: string[]): { x: number; y: number } => {
   const nodeMap = new Map<
     string,
     {
@@ -197,9 +193,7 @@ export const setAllNodesPosition = (
       currentX += childSubtreeWidth + SIBLINGS_DISTANCE_GAP;
     });
 
-    return node.children.length
-      ? currentX
-      : currentX + NODE_WIDTH + SIBLINGS_DISTANCE_GAP;
+    return node.children.length ? currentX : currentX + NODE_WIDTH + SIBLINGS_DISTANCE_GAP;
   }
 
   let prevResult = 0;

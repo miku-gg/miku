@@ -1,37 +1,29 @@
-import { FaPencil, FaUpload } from "react-icons/fa6";
-import config from "../../../config";
-import { openModal } from "../../../state/slices/inputSlice";
-import { useAppDispatch, useAppSelector } from "../../../state/store";
-import "./Songs.scss";
-import { Blocks } from "@mikugg/ui-kit";
-import { useRef, useState } from "react";
-import { toast } from "react-toastify";
-import { v4 as randomUUID } from "uuid";
-import { addSong } from "../../../state/slices/novelFormSlice";
-import { MdSearch } from "react-icons/md";
+import { FaPencil, FaUpload } from 'react-icons/fa6';
+import config from '../../../config';
+import { openModal } from '../../../state/slices/inputSlice';
+import { useAppDispatch, useAppSelector } from '../../../state/store';
+import './Songs.scss';
+import { Blocks } from '@mikugg/ui-kit';
+import { useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import { v4 as randomUUID } from 'uuid';
+import { addSong } from '../../../state/slices/novelFormSlice';
+import { MdSearch } from 'react-icons/md';
 
-export default function Songs({
-  selected,
-  onSelect,
-}: {
-  selected?: string;
-  onSelect?: (id: string) => void;
-}) {
+export default function Songs({ selected, onSelect }: { selected?: string; onSelect?: (id: string) => void }) {
   const songs = useAppSelector((state) => state.novel.songs);
   const dispatch = useAppDispatch();
   const [songUploading, setSongUploading] = useState<boolean>(false);
   const uploadSong = useRef<HTMLInputElement>(null);
 
-  const handleUploadSong = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleUploadSong = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     setSongUploading(true);
     const { success, assetId } = await config.uploadAsset(file);
     if (!success || !assetId) {
       setSongUploading(false);
-      toast.error("Failed to upload song");
+      toast.error('Failed to upload song');
       return;
     }
     setSongUploading(false);
@@ -41,12 +33,12 @@ export default function Songs({
       addSong({
         id,
         tags: [],
-        description: "",
+        description: '',
         name: `song-${songs.length + 1}`,
         source: assetId,
-      })
+      }),
     );
-    dispatch(openModal({ modalType: "song", editId: id }));
+    dispatch(openModal({ modalType: 'song', editId: id }));
   };
 
   return (
@@ -65,40 +57,34 @@ export default function Songs({
               onEditClick: () =>
                 dispatch(
                   openModal({
-                    modalType: "song",
+                    modalType: 'song',
                     editId: song.id,
-                  })
+                  }),
                 ),
               editIcon: <FaPencil />,
               onClick: () => onSelect?.(song.id),
             })),
             {
-              id: "upload",
+              id: 'upload',
               content: {
                 icon: <FaUpload />,
-                text: "Upload",
+                text: 'Upload',
               },
               onClick: () => uploadSong?.current?.click(),
               loading: songUploading,
               disabled: songUploading,
             },
             {
-              id: "search",
+              id: 'search',
               content: {
                 icon: <MdSearch />,
-                text: "Search",
+                text: 'Search',
               },
-              onClick: () => dispatch(openModal({ modalType: "songSearch" })),
+              onClick: () => dispatch(openModal({ modalType: 'songSearch' })),
             },
           ]}
         />
-        <input
-          type="file"
-          onChange={handleUploadSong}
-          ref={uploadSong}
-          accept="audio/*"
-          hidden
-        />
+        <input type="file" onChange={handleUploadSong} ref={uploadSong} accept="audio/*" hidden />
       </div>
     </div>
   );

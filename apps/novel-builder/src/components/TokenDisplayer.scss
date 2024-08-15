@@ -1,0 +1,54 @@
+@import '../styles/variables';
+
+.TokenDisplayer {
+  margin-right: 4px;
+  cursor: pointer;
+
+  &.green {
+    color: $color-green;
+  }
+
+  &.yellow {
+    color: $color-gold;
+  }
+
+  &.red {
+    color: $color-red;
+  }
+
+  &.small {
+    font-size: 0.875rem;
+  }
+
+  &.medium {
+    font-size: 1rem;
+  }
+
+  &.large {
+    font-size: 1.125rem;
+  }
+
+  &__Modal {
+    &__item {
+      margin: 4px 0;
+    }
+
+    &__green-text,
+    &__yellow-text,
+    &__red-text {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    &__green-text {
+      color: $color-green;
+    }
+    &__yellow-text {
+      color: $color-gold;
+    }
+    &__red-text {
+      color: $color-red;
+    }
+  }
+}

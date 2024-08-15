@@ -1,49 +1,38 @@
-import { useState, useEffect } from 'react'
-import classNames from 'classnames'
-import {
-  selectCharacterOfResponse,
-  updateInteraction,
-  updateResponse,
-} from '../../state/slices/narrationSlice'
-import { useAppDispatch, useAppSelector } from '../../state/store'
-import { NarrationInteraction, NarrationResponse } from '../../state/versioning'
-import { Button, Dropdown } from '@mikugg/ui-kit'
-import {
-  selectCharacterOutfits,
-  selectSceneFromResponse,
-} from '../../state/selectors'
-import { useAppContext } from '../../App.context'
-import './NodeEditor.scss'
+import { useState, useEffect } from 'react';
+import classNames from 'classnames';
+import { selectCharacterOfResponse, updateInteraction, updateResponse } from '../../state/slices/narrationSlice';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import { NarrationInteraction, NarrationResponse } from '../../state/versioning';
+import { Button, Dropdown } from '@mikugg/ui-kit';
+import { selectCharacterOutfits, selectSceneFromResponse } from '../../state/selectors';
+import { useAppContext } from '../../App.context';
+import './NodeEditor.scss';
 
 const TextEditor = ({
   text,
   onChange,
   onCancel,
 }: {
-  text: string
-  onChange: (text: string) => void
-  onCancel: () => void
+  text: string;
+  onChange: (text: string) => void;
+  onCancel: () => void;
 }) => {
-  const [_text, _setText] = useState(text)
+  const [_text, _setText] = useState(text);
 
   useEffect(() => {
-    _setText(text)
-  }, [text])
+    _setText(text);
+  }, [text]);
 
   return (
     <form
       className="NodeEditor__text-editor"
       onSubmit={(e) => {
-        e.stopPropagation()
-        e.preventDefault()
-        onChange(_text)
+        e.stopPropagation();
+        e.preventDefault();
+        onChange(_text);
       }}
     >
-      <textarea
-        className="NodeEditor__textarea scrollbar"
-        value={_text}
-        onChange={(e) => _setText(e.target.value)}
-      />
+      <textarea className="NodeEditor__textarea scrollbar" value={_text} onChange={(e) => _setText(e.target.value)} />
       <div className="NodeEditor__actions">
         <Button theme="secondary" type="submit">
           Update
@@ -51,44 +40,30 @@ const TextEditor = ({
         <Button
           theme="transparent"
           onClick={() => {
-            _setText(text)
-            onCancel()
+            _setText(text);
+            onCancel();
           }}
         >
           Cancel
         </Button>
       </div>
     </form>
-  )
-}
+  );
+};
 
-const ResponseEditor = ({
-  response,
-  onClose,
-}: {
-  response: NarrationResponse
-  onClose: () => void
-}) => {
-  const dispatch = useAppDispatch()
-  const { assetLinkLoader } = useAppContext()
-  const characterId = response.selectedCharacterId || ''
-  const charResponse = response.characters.find(
-    (_charResponse) => _charResponse.characterId === characterId
-  )
-  const scene = useAppSelector((state) =>
-    selectSceneFromResponse(state, response)
-  )
-  const outfits = useAppSelector((state) =>
-    selectCharacterOutfits(state, characterId)
-  )
-  const characters = useAppSelector((state) => state.novel.characters)
-  const characterOutfitId =
-    scene?.characters.find((c) => c.characterId === characterId)?.outfit || ''
-  const emotions =
-    outfits.find((o) => o.id === characterOutfitId)?.emotions || []
-  const [_emotion, _setEmotion] = useState(charResponse?.emotion || '')
+const ResponseEditor = ({ response, onClose }: { response: NarrationResponse; onClose: () => void }) => {
+  const dispatch = useAppDispatch();
+  const { assetLinkLoader } = useAppContext();
+  const characterId = response.selectedCharacterId || '';
+  const charResponse = response.characters.find((_charResponse) => _charResponse.characterId === characterId);
+  const scene = useAppSelector((state) => selectSceneFromResponse(state, response));
+  const outfits = useAppSelector((state) => selectCharacterOutfits(state, characterId));
+  const characters = useAppSelector((state) => state.novel.characters);
+  const characterOutfitId = scene?.characters.find((c) => c.characterId === characterId)?.outfit || '';
+  const emotions = outfits.find((o) => o.id === characterOutfitId)?.emotions || [];
+  const [_emotion, _setEmotion] = useState(charResponse?.emotion || '');
 
-  if (!charResponse || !characterOutfitId) return null
+  if (!charResponse || !characterOutfitId) return null;
 
   const handleChange = (text: string) => {
     dispatch(
@@ -97,33 +72,30 @@ const ResponseEditor = ({
         characterId,
         emotion: _emotion,
         text,
-      })
-    )
-    onClose()
-  }
+      }),
+    );
+    onClose();
+  };
 
   return (
     <div>
       {scene?.characters.length ? (
         <div className="NodeEditor__characters">
           {response.characters.map((_charResponse) => {
-            const character = characters.find(
-              (c) => c.id === _charResponse.characterId
-            )
+            const character = characters.find((c) => c.id === _charResponse.characterId);
             return (
               <button
                 key={response.id}
                 className={classNames({
                   NodeEditor__character: true,
-                  'NodeEditor__character--selected':
-                    _charResponse.characterId === characterId,
+                  'NodeEditor__character--selected': _charResponse.characterId === characterId,
                 })}
                 onClick={() =>
                   dispatch(
                     selectCharacterOfResponse({
                       responseId: response.id,
                       characterId: _charResponse.characterId,
-                    })
+                    }),
                   )
                 }
               >
@@ -133,15 +105,11 @@ const ResponseEditor = ({
                   alt={character?.name}
                 />
               </button>
-            )
+            );
           })}
         </div>
       ) : null}
-      <TextEditor
-        text={charResponse.text}
-        onChange={handleChange}
-        onCancel={onClose}
-      />
+      <TextEditor text={charResponse.text} onChange={handleChange} onCancel={onClose} />
       <Dropdown
         items={emotions.map((emotion) => ({
           name: emotion.id,
@@ -151,56 +119,36 @@ const ResponseEditor = ({
         onChange={(index) => _setEmotion(emotions[index].id)}
       />
     </div>
-  )
-}
+  );
+};
 
-const InteractionEditor = ({
-  interaction,
-  onClose,
-}: {
-  interaction: NarrationInteraction
-  onClose: () => void
-}) => {
-  const dispatch = useAppDispatch()
+const InteractionEditor = ({ interaction, onClose }: { interaction: NarrationInteraction; onClose: () => void }) => {
+  const dispatch = useAppDispatch();
 
   const handleChange = (text: string) => {
     dispatch(
       updateInteraction({
         id: interaction.id,
         text,
-      })
-    )
-    onClose()
-  }
+      }),
+    );
+    onClose();
+  };
 
-  return (
-    <TextEditor
-      text={interaction.query}
-      onChange={handleChange}
-      onCancel={onClose}
-    />
-  )
-}
+  return <TextEditor text={interaction.query} onChange={handleChange} onCancel={onClose} />;
+};
 
-export const NodeEditor = ({
-  id,
-  onClose,
-}: {
-  id: string
-  onClose: () => void
-}) => {
-  const response = useAppSelector((state) => state.narration.responses[id])
-  const interaction = useAppSelector(
-    (state) => state.narration.interactions[id]
-  )
+export const NodeEditor = ({ id, onClose }: { id: string; onClose: () => void }) => {
+  const response = useAppSelector((state) => state.narration.responses[id]);
+  const interaction = useAppSelector((state) => state.narration.interactions[id]);
 
-  let content: JSX.Element | null = null
+  let content: JSX.Element | null = null;
 
   if (response) {
-    content = <ResponseEditor response={response} onClose={onClose} />
+    content = <ResponseEditor response={response} onClose={onClose} />;
   } else if (interaction) {
-    content = <InteractionEditor interaction={interaction} onClose={onClose} />
+    content = <InteractionEditor interaction={interaction} onClose={onClose} />;
   }
 
-  return <div className="NodeEditor">{content}</div>
-}
+  return <div className="NodeEditor">{content}</div>;
+};

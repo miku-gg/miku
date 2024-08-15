@@ -2,3 +2,5 @@ node_modules
 dist
 _temp
 db
+!db/assets/RenPyExport.zip
+!db/assets/add_item.jpg
