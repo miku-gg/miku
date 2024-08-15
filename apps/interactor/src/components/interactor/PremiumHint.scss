@@ -10,16 +10,14 @@
 
   &__icon,
   &__text {
-    display: inline-block;
     overflow: hidden;
-    white-space: nowrap;
   }
 
   &__icon {
     animation: showup 7s forwards;
-    color: #ffe23f;
+    color: #ffdc3f;
     transition: all 0.2s ease-out;
-    filter: drop-shadow(0px 0px 4px #ff3f3f);
+    filter: drop-shadow(0px 0px 4px #ffc23f);
 
     font-size: 20px;
   }
@@ -27,46 +25,34 @@
   &__content {
     text-align: left;
     padding: 0.5rem;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 0.2rem;
-    width: 100%;
+    gap: 6px;
     user-select: none;
     transition: all 0.2s ease-out;
     cursor: pointer;
   }
 
   &__text {
-    width: 0px;
     animation: reveal 7s forwards;
+    height: 37px;
   }
 
   &__text-span {
-    margin-left: -355px;
+    margin-left: -330px;
     animation: slidein 7s forwards;
     text-shadow: 1.41px 1.41px black, 2px 0 black, 1.41px -1.41px black, 0 -2px black, -1.41px -1.41px black,
       -2px 0 black, -1.41px 1.41px black, 0 2px black;
   }
 
   &__text-label {
-    margin-right: 4px;
     color: rgb(225, 138, 36);
     display: inline-block;
-    animation: infiniteSlide var(--animation-duration) linear infinite;
   }
 
   &--hidden {
     opacity: 0;
-  }
-
-  @keyframes infiniteSlide {
-    30% {
-      transform: translateX(var(--initial-text-position));
-    }
-    100% {
-      transform: translateX(var(--ending-text-position));
-    }
   }
 
   @keyframes showup {
@@ -103,13 +89,13 @@
       width: 0px;
     }
     30% {
-      width: 355px;
+      width: 330px;
     }
     80% {
       opacity: 1;
     }
     100% {
-      width: 355px;
+      width: 330px;
     }
   }
 }
