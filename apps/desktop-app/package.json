@@ -25,7 +25,7 @@
       "main.js"
     ],
     "directories": {
-      "buildResources": "assets",
+      "buildResources": "./public",
       "output": "release/${version}"
     },
     "win": {
@@ -37,15 +37,16 @@
           ]
         }
       ],
-      "icon": "assets/icon.ico"
+      "icon": "./public/logo.png"
     },
     "mac": {
       "target": "dmg",
-      "icon": "assets/icon.icns"
+      "icon": "./public/logo.png"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "assets/icon.png"
+      "icon": "./public/logo.png",
+      "category": "Utility"
     }
   },
   "scripts": {
