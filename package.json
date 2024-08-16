@@ -11,7 +11,8 @@
     "format": "prettier --write --loglevel warn '**/src/**/*.{js,jsx,ts,tsx,json,md,scss}'",
     "format:check": "prettier --check '**/src/**/*.{js,jsx,ts,tsx,json,md,scss}'",
     "pull": "git reset --hard HEAD && git pull origin master && pnpm install",
-    "build": "npx lerna run build"
+    "build": "npx lerna run build",
+    "electron": "cd apps/desktop-app && pnpm electron ."
   },
   "workspaces": [
     "packages/*",

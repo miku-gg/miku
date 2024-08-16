@@ -1,11 +1,11 @@
-const http = require("http");
-const { exec } = require("child_process");
+const http = require('http');
+const { exec } = require('child_process');
 
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow } = require('electron');
 
 function createWindow() {
-  console.log("Starting Vite server...");
-  const serverProcess = exec("pnpm start", (error, stdout, stderr) => {
+  console.log('Starting Vite server...');
+  const serverProcess = exec('pnpm start', (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return;
@@ -15,29 +15,24 @@ function createWindow() {
     console.error(`stderr: ${stderr}`);
   });
 
-  serverProcess.stdout.on("data", (data) => {
+  serverProcess.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
   });
 
-  serverProcess.stderr.on("data", (data) => {
+  serverProcess.stderr.on('data', (data) => {
     console.error(`stderr: ${data}`);
   });
 
-  serverProcess.on("error", (error) => {
+  serverProcess.on('error', (error) => {
     console.error(`exec error: ${error}`);
   });
 
   // Check if the server is running
   const checkServer = setInterval(() => {
     http
-      .get("http://localhost:8181", (res) => {
+      .get('http://localhost:8182/index.html', (res) => {
         const { statusCode } = res;
-        console.log(
-          "Server is running...",
-          statusCode,
-          res.headers["content-type"],
-          res.headers["content-length"]
-        );
+        console.log('Server is running...', statusCode, res.headers['content-type'], res.headers['content-length']);
 
         if (statusCode === 200) {
           clearInterval(checkServer);
@@ -47,15 +42,16 @@ function createWindow() {
             height: 600,
             webPreferences: {
               contextIsolation: true,
-              webSecurity: false // disable webSecurity
-            }
+              webSecurity: false, // disable webSecurity
+              allowRunningInsecureContent: true, // allow running insecure content
+            },
           });
 
-          win.loadURL("http://localhost:8181");
+          win.loadURL('http://localhost:8182');
         }
       })
-      .on("error", (err) => {
-        console.log("Waiting for the server start...", err);
+      .on('error', (err) => {
+        console.log('Waiting for the server start...', err);
       });
   }, 2000);
 }
@@ -63,15 +59,15 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 
-  app.on("activate", () => {
+  app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
     }
   });
 });
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
     app.quit();
   }
 });

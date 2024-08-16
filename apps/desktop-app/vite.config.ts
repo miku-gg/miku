@@ -1,36 +1,30 @@
-import react from "@vitejs/plugin-react";
-import { fileURLToPath, URL } from "url";
-import { defineConfig } from "vite";
-import plainText from "vite-plugin-plain-text";
+import react from '@vitejs/plugin-react';
+import { fileURLToPath, URL } from 'url';
+import { defineConfig } from 'vite';
+import plainText from 'vite-plugin-plain-text';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: './',
   server: {
-    port: 8181,
+    port: 8182,
   },
-  plugins: [react(), plainText([/\/LICENSE$/, "**/*.text", /\.glsl$/])],
+  plugins: [react(), plainText([/\/LICENSE$/, '**/*.text', /\.glsl$/])],
   define: {
-    setImmediate: "setTimeout.bind(null)",
+    setImmediate: 'setTimeout.bind(null)',
   },
   optimizeDeps: {
-    include: ["@mikugg/bot-utils", "@mikugg/ui-kit", "@mikugg/guidance"],
+    include: ['@mikugg/bot-utils', '@mikugg/ui-kit', '@mikugg/guidance'],
   },
   build: {
     commonjsOptions: {
-      include: [
-        /core/,
-        /extensions/,
-        /ui-kit/,
-        /bot-utils/,
-        /guidance/,
-        /node_modules/,
-      ],
+      include: [/core/, /extensions/, /ui-kit/, /bot-utils/, /guidance/, /node_modules/],
     },
   },
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-      util: "rollup-plugin-node-polyfills/polyfills/util",
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      util: 'rollup-plugin-node-polyfills/polyfills/util',
     },
   },
 });

@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -10,9 +14,6 @@ importers:
       dotenv:
         specifier: ^16.0.3
         version: 16.0.3
-      electron:
-        specifier: ^16.0.0
-        version: 16.0.0
       lerna:
         specifier: ^6.4.1
         version: 6.4.1
@@ -177,6 +178,187 @@ importers:
       vite-plugin-plain-text:
         specifier: ^1.4.2
         version: 1.4.2
+
+  apps/desktop-app:
+    dependencies:
+      '@aws-crypto/crc32':
+        specifier: ^4.0.0
+        version: 4.0.0
+      '@ipld/dag-pb':
+        specifier: ^4.0.2
+        version: 4.1.0
+      '@mikugg/bot-utils':
+        specifier: workspace:^
+        version: link:../../packages/bot-utils
+      '@mikugg/guidance':
+        specifier: workspace:^
+        version: link:../../packages/guidance
+      '@mikugg/ui-kit':
+        specifier: workspace:^
+        version: link:../../packages/ui-kit
+      '@primer/octicons-react':
+        specifier: ^17.12.0
+        version: 17.12.0(react@18.2.0)
+      '@reactflow/node-resizer':
+        specifier: ^2.2.9
+        version: 2.2.9(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)
+      '@reduxjs/toolkit':
+        specifier: ^2.0.1
+        version: 2.0.1(react-redux@9.0.4)(react@18.2.0)
+      '@types/axios':
+        specifier: ^0.14.0
+        version: 0.14.0
+      '@types/base-64':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@types/polycrc':
+        specifier: ^0.1.0
+        version: 0.1.2
+      '@types/prop-types':
+        specifier: ^15.7.5
+        version: 15.7.5
+      '@types/uuid':
+        specifier: ^9.0.1
+        version: 9.0.1
+      axios:
+        specifier: ^1.2.4
+        version: 1.2.4
+      base-64:
+        specifier: ^1.0.0
+        version: 1.0.0
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
+      classnames:
+        specifier: ^2.3.2
+        version: 2.3.2
+      digest:
+        specifier: link:multiformats/hashes/digest
+        version: link:multiformats/hashes/digest
+      ipfs-only-hash:
+        specifier: ^4.0.0
+        version: 4.0.0
+      ipld-dag-pb:
+        specifier: ^0.22.3
+        version: 0.22.3
+      lodash.clonedeep:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.debounce:
+        specifier: ^4.0.8
+        version: 4.0.8
+      multiformats:
+        specifier: ^11.0.2
+        version: 11.0.2
+      png-chunk-text:
+        specifier: ^1.0.0
+        version: 1.0.0
+      png-chunks-extract:
+        specifier: ^1.0.0
+        version: 1.0.0
+      prop-types:
+        specifier: ^15.8.1
+        version: 15.8.1
+      query-string:
+        specifier: ^8.1.0
+        version: 8.1.0
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-icons:
+        specifier: ^4.12.0
+        version: 4.12.0(react@18.2.0)
+      react-redux:
+        specifier: ^9.0.4
+        version: 9.0.4(@types/react@18.2.45)(react@18.2.0)(redux@5.0.0)
+      react-toastify:
+        specifier: ^9.1.1
+        version: 9.1.1(react-dom@18.2.0)(react@18.2.0)
+      reactflow:
+        specifier: ^11.10.1
+        version: 11.10.1(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)
+      remove:
+        specifier: ^0.1.5
+        version: 0.1.5
+      utf8:
+        specifier: ^3.0.0
+        version: 3.0.0
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.0
+      vite-plugin-plain-text:
+        specifier: ^1.4.2
+        version: 1.4.2
+    devDependencies:
+      '@babel/core':
+        specifier: ^7.21.3
+        version: 7.23.6
+      '@babel/preset-env':
+        specifier: ^7.20.2
+        version: 7.20.2(@babel/core@7.23.6)
+      '@babel/preset-react':
+        specifier: ^7.18.6
+        version: 7.18.6(@babel/core@7.23.6)
+      '@babel/register':
+        specifier: ^7.21.0
+        version: 7.21.0(@babel/core@7.23.6)
+      '@originjs/vite-plugin-commonjs':
+        specifier: ^1.0.3
+        version: 1.0.3
+      '@types/lodash.clonedeep':
+        specifier: ^4.5.9
+        version: 4.5.9
+      '@types/lodash.debounce':
+        specifier: ^4.0.9
+        version: 4.0.9
+      '@types/node':
+        specifier: ^18.14.1
+        version: 18.15.5
+      '@types/react':
+        specifier: ^18.2.45
+        version: 18.2.45
+      '@types/react-dom':
+        specifier: ^18.2.18
+        version: 18.2.18
+      '@types/utf8':
+        specifier: ^3.0.1
+        version: 3.0.1
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^5.48.2
+        version: 5.48.2(@typescript-eslint/parser@5.48.2)(eslint@8.56.0)(typescript@4.9.5)
+      '@typescript-eslint/parser':
+        specifier: ^5.48.2
+        version: 5.48.2(eslint@8.56.0)(typescript@4.9.5)
+      '@vitejs/plugin-react':
+        specifier: ^3.1.0
+        version: 3.1.0(vite@4.0.0)
+      electron:
+        specifier: ^16.0.0
+        version: 16.0.0
+      eslint:
+        specifier: ^8.32.0
+        version: 8.56.0
+      fs:
+        specifier: 0.0.1-security
+        version: 0.0.1-security
+      path:
+        specifier: ^0.12.7
+        version: 0.12.7
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
+      sass:
+        specifier: ^1.59.3
+        version: 1.59.3
+      ts-node:
+        specifier: ^10.9.1
+        version: 10.9.1(@types/node@18.15.5)(typescript@4.9.5)
+      typescript:
+        specifier: ^4.9.4
+        version: 4.9.5
+      vite:
+        specifier: ^4.0.0
+        version: 4.0.0(@types/node@18.15.5)(sass@1.59.3)
 
   apps/interactor:
     dependencies:
@@ -7722,7 +7904,7 @@ packages:
     engines: {node: '>=14.15.0'}
     dependencies:
       js-yaml: 3.14.1
-      tslib: 2.5.0
+      tslib: 2.6.2
     dev: true
 
   /@zkochan/js-yaml@0.0.6:
@@ -8143,10 +8325,10 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
     dependencies:
-      '@babel/compat-data': 7.21.7
+      '@babel/compat-data': 7.23.5
       '@babel/core': 7.23.6
       '@babel/helper-define-polyfill-provider': 0.3.3(@babel/core@7.23.6)
-      semver: 6.3.0
+      semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8353,6 +8535,7 @@ packages:
 
   /boolean@3.2.0:
     resolution: {integrity: sha512-d0II/GO9uf9lfUHH2BQsjxzRJZBdsjgsBiW4BvhWk/3qoKwQFjIDVN19PfX8F2D/r9PCMTtLWjYVCFrpeYUzsw==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -9353,6 +9536,7 @@ packages:
 
   /detect-node@2.1.0:
     resolution: {integrity: sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -9662,6 +9846,7 @@ packages:
 
   /es6-error@4.1.1:
     resolution: {integrity: sha512-Um/+FxMr9CISWh0bi5Zv0iOD+4cFh5qLeks1qhAopKVAJw3drgKbKySikp7wGhDL0HPeaja0P5ULZrxLkniUVg==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -13006,6 +13191,7 @@ packages:
   /matcher@3.0.0:
     resolution: {integrity: sha512-OkeDaAZ/bQCxeFAozM55PKcKU0yJMPGifLwV4Qgjitu+5MoAfSQN4lsLJeXZ1b8w0x+/Emda6MZgXS1jvsapng==}
     engines: {node: '>=10'}
+    requiresBuild: true
     dependencies:
       escape-string-regexp: 4.0.0
     dev: true
@@ -13614,6 +13800,7 @@ packages:
   /npm-conf@1.1.3:
     resolution: {integrity: sha512-Yic4bZHJOt9RCFbRP3GgpqhScOY4HH3V2P8yBj6CeYq118Qr+BLXqT2JvpJ00mryLESpgOxf5XlFv4ZjXxLScw==}
     engines: {node: '>=4'}
+    requiresBuild: true
     dependencies:
       config-chain: 1.1.13
       pify: 3.0.0
@@ -15103,6 +15290,7 @@ packages:
   /roarr@2.15.4:
     resolution: {integrity: sha512-CHhPh+UNHD2GTXNYhPWLnU8ONHdI+5DI+4EYIAOaiD63rHeYlZvyh8P+in5999TTSFgUYuKUAjzRI4mdh/p+2A==}
     engines: {node: '>=8.0'}
+    requiresBuild: true
     dependencies:
       boolean: 3.2.0
       detect-node: 2.1.0
@@ -15277,6 +15465,7 @@ packages:
 
   /semver-compare@1.0.0:
     resolution: {integrity: sha512-YM3/ITh2MJ5MtzaM429anh+x2jiLVjqILF4m4oyQB18W7Ggea7BfqdH/wGMK7dDiMghv/6WG7znWMwUDzJiXow==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -15352,6 +15541,7 @@ packages:
   /serialize-error@7.0.1:
     resolution: {integrity: sha512-8I8TjW5KMOKsZQTvoxjuSIa7foAwPWGOts+6o7sgjz41/qMD9VQHEDxi6PBvK2l0MXUmqZyNpUK+T2tQaaElvw==}
     engines: {node: '>=10'}
+    requiresBuild: true
     dependencies:
       type-fest: 0.13.1
     dev: true
@@ -15655,6 +15845,7 @@ packages:
 
   /sprintf-js@1.1.3:
     resolution: {integrity: sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -16302,7 +16493,6 @@ packages:
 
   /tslib@2.6.2:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
-    dev: false
 
   /tslint-react@5.0.0(tslint@6.1.3)(typescript@5.0.2):
     resolution: {integrity: sha512-/IbcSmoBPlFic8kQaRfQ4knTY4mivwo5LVzvozvX6Dyu2ynEnrh1dIcR2ujjyp/IodXqY/H5GbxFxSMo/Kf2Hg==}
@@ -16378,6 +16568,7 @@ packages:
   /tunnel@0.0.6:
     resolution: {integrity: sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==}
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -16396,6 +16587,7 @@ packages:
   /type-fest@0.13.1:
     resolution: {integrity: sha512-34R7HTnG0XIJcBSn5XhDd7nNFPRcXYRZrBB2O2jdKqYODldSzBAqzsWoZYYvduky73toYS/ESqxPvkDf/F0XMg==}
     engines: {node: '>=10'}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -17067,7 +17259,3 @@ packages:
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
