@@ -117,6 +117,8 @@ const interactionEffect = async (
             completed: false,
           }),
         );
+      } else {
+        throw new Error('Novel prompt is too big');
       }
     }
 
