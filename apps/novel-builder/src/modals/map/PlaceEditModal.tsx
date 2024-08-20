@@ -8,7 +8,6 @@ import { closeModal } from '../../state/slices/inputSlice';
 import { deletePlace, updatePlace } from '../../state/slices/novelFormSlice';
 import { useAppSelector } from '../../state/store';
 
-import { useState } from 'react';
 import { toast } from 'react-toastify';
 import config from '../../config';
 import { checkFileType } from '../../libs/utils';
@@ -34,29 +33,88 @@ export default function PlaceEditModal() {
   const dispatch = useDispatch();
   const areYouSure = AreYouSure.useAreYouSure();
   const map = useAppSelector(selectEditingMap);
-  const [selectSceneOpened, setSelectSceneOpened] = useState(false);
   const place = useAppSelector(selectEditingPlace);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
-  const scenes = useAppSelector((state) => state.novel.scenes);
+
+  const validateMaskImage = async (file: File) => {
+    const mapImageSrc = map?.source.png;
+    if (!mapImageSrc) {
+      toast.error('Please upload a map image first.');
+      return false;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('File size should be less than 1MB');
+      return false;
+    }
+    if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+      toast.error('Invalid file type. Please upload a jpg file.');
+      return false;
+    }
+    const image = new Image();
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      image.src = e.target?.result as string;
+    };
+    return new Promise((resolve) => {
+      image.onload = () => {
+        // check if the mask contains only black and white pixels
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(false);
+          return;
+        }
+        canvas.width = image.width;
+        canvas.height = image.height;
+        ctx.drawImage(image, 0, 0, image.width, image.height);
+        const pixels = ctx.getImageData(0, 0, image.width, image.height).data;
+
+        if (!isBlackAndWhite(pixels)) {
+          toast.error('Mask should be all black and have a white area for the place.');
+          resolve(false);
+          return;
+        }
+        // check if the mask is the same size as the map image
+        const mapImage = new Image();
+        mapImage.src = config.genAssetLink(mapImageSrc);
+        mapImage.onload = () => {
+          if (mapImage.width !== image.width || mapImage.height !== image.height) {
+            toast.error('Mask should be the same size as the map image.');
+            resolve(false);
+            return;
+          }
+          resolve(true);
+        };
+      };
+    });
+  };
 
   const handleUploadImage = async (file: File, source: 'preview' | 'mask') => {
     if (file && place) {
       try {
-        const asset = await config.uploadAsset(file);
+        const { assetId } = await config.uploadAsset(file);
+
         switch (source) {
           case 'preview':
             dispatch(
               updatePlace({
                 mapId: map!.id,
-                place: { id: place.id, previewSource: asset.assetId },
+                place: { id: place.id, previewSource: assetId },
               }),
             );
             return;
           case 'mask':
+            const fileUrl = config.genAssetLink(assetId);
+            const response = await fetch(fileUrl);
+            const responseBlob = await response.blob();
+            const maskFile = new File([responseBlob], file.name, { type: responseBlob.type });
+            if (!validateMaskImage(maskFile)) return;
+
             dispatch(
               updatePlace({
                 mapId: map!.id,
-                place: { id: place.id, maskSource: asset.assetId },
+                place: { id: place.id, maskSource: assetId },
               }),
             );
             return;
@@ -82,12 +140,6 @@ export default function PlaceEditModal() {
         );
       },
     });
-  };
-
-  const getSceneData = (sceneId: string) => {
-    const scene = scenes.find((s) => s.id === sceneId);
-
-    return scene;
   };
 
   return (
@@ -126,59 +178,6 @@ export default function PlaceEditModal() {
               className="PlaceEdit__maskImage__mask"
               previewImage={place.maskSource && config.genAssetLink(place.maskSource)}
               handleChange={(file) => handleUploadImage(file, 'mask')}
-              onFileValidate={async (file) => {
-                const mapImageSrc = map?.source.png;
-                if (!mapImageSrc) {
-                  toast.error('Please upload a map image first.');
-                  return false;
-                }
-                if (file.size > 2 * 1024 * 1024) {
-                  toast.error('File size should be less than 1MB');
-                  return false;
-                }
-                if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
-                  toast.error('Invalid file type. Please upload a jpg file.');
-                  return false;
-                }
-                const image = new Image();
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                  image.src = e.target?.result as string;
-                };
-                return new Promise((resolve) => {
-                  image.onload = () => {
-                    // check if the mask contains only black and white pixels
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    if (!ctx) {
-                      resolve(false);
-                      return;
-                    }
-                    canvas.width = image.width;
-                    canvas.height = image.height;
-                    ctx.drawImage(image, 0, 0, image.width, image.height);
-                    const pixels = ctx.getImageData(0, 0, image.width, image.height).data;
-
-                    if (!isBlackAndWhite(pixels)) {
-                      toast.error('Mask should be all black and have a white area for the place.');
-                      resolve(false);
-                      return;
-                    }
-                    // check if the mask is the same size as the map image
-                    const mapImage = new Image();
-                    mapImage.src = config.genAssetLink(mapImageSrc);
-                    mapImage.onload = () => {
-                      if (mapImage.width !== image.width || mapImage.height !== image.height) {
-                        toast.error('Mask should be the same size as the map image.');
-                        resolve(false);
-                        return;
-                      }
-                      resolve(true);
-                    };
-                  };
-                });
-              }}
             />
           </div>
           <div className="PlaceEdit__form">
