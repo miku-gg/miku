@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import './MusicPlayer.scss';
+import React, { useEffect, useRef } from 'react';
 import { useAppContext } from '../../App.context';
-import { useAppDispatch, useAppSelector } from '../../state/store';
+import { trackEvent } from '../../libs/analytics';
 import { selectCurrentScene } from '../../state/selectors';
 import { setMusicEnabled, setMusicVolume } from '../../state/slices/settingsSlice';
-import { trackEvent } from '../../libs/analytics';
+import { useAppDispatch, useAppSelector } from '../../state/store';
+import './MusicPlayer.scss';
 
 export const Music = () => {
   return (
@@ -39,7 +39,6 @@ const MusicPlayer: React.FC = () => {
   const src = _src ? assetLinkLoader(_src) : '';
 
   const volume = enabled ? _volume : 0;
-  const [wasPlaying, setWasPlaying] = useState(false);
 
   const togglePlay = () => {
     if (volume) {
@@ -63,17 +62,14 @@ const MusicPlayer: React.FC = () => {
         console.error('Autoplay error:', error);
       });
     }
-  }, [src, volume]);
-
-  useEffect(() => {
+    
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        setWasPlaying(!!volume && !audioRef.current?.paused);
         if (audioRef.current) {
           audioRef.current.pause();
         }
-      } else {
-        if (wasPlaying && audioRef.current && volume > 0) {
+      } else if (volume > 0) {
+        if (audioRef.current) {
           audioRef.current.play().catch((error) => {
             console.error('Autoplay error:', error);
           });
@@ -86,7 +82,7 @@ const MusicPlayer: React.FC = () => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [volume, wasPlaying]);
+  }, [src, volume]);
 
   return (
     <div className="MusicPlayer">
