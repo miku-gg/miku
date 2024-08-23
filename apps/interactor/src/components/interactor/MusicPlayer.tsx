@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './MusicPlayer.scss';
 import { useAppContext } from '../../App.context';
 import { useAppDispatch, useAppSelector } from '../../state/store';
@@ -39,6 +39,7 @@ const MusicPlayer: React.FC = () => {
   const src = _src ? assetLinkLoader(_src) : '';
 
   const volume = enabled ? _volume : 0;
+  const [wasPlaying, setWasPlaying] = useState(false);
 
   const togglePlay = () => {
     if (volume) {
@@ -63,6 +64,29 @@ const MusicPlayer: React.FC = () => {
       });
     }
   }, [src, volume]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setWasPlaying(!!volume && !audioRef.current?.paused);
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
+      } else {
+        if (wasPlaying && audioRef.current && volume > 0) {
+          audioRef.current.play().catch((error) => {
+            console.error('Autoplay error:', error);
+          });
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [volume, wasPlaying]);
 
   return (
     <div className="MusicPlayer">
