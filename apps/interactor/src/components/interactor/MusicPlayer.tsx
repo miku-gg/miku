@@ -30,6 +30,7 @@ export const MusicNegated = () => {
 const MusicPlayer: React.FC = () => {
   const dispatch = useAppDispatch();
   const { assetLinkLoader } = useAppContext();
+
   const _volume = useAppSelector((state) => state.settings.music.volume);
   const enabled = useAppSelector((state) => state.settings.music.enabled);
   const songs = useAppSelector((state) => state.novel.songs);
@@ -41,7 +42,18 @@ const MusicPlayer: React.FC = () => {
   const volume = enabled ? _volume : 0;
 
   const togglePlay = () => {
-    dispatch(setMusicEnabled(!enabled));
+    if (audioRef.current) {
+      if (enabled) {
+        audioRef.current.pause();
+        dispatch(setMusicEnabled(false));
+      } else {
+        audioRef.current.play().catch((error) => {
+          console.error('Autoplay blocked:', error);
+          alert('Por favor, toca el botón de reproducir para escuchar la música.');
+        });
+        dispatch(setMusicEnabled(true));
+      }
+    }
     trackEvent('music-toggle-click', { enabledMusic: !volume });
   };
 
@@ -53,24 +65,19 @@ const MusicPlayer: React.FC = () => {
   if (audioRef.current) audioRef.current.volume = volume;
 
   useEffect(() => {
-    const handlePageHide = () => {
-      pauseAudio();
-    };
-
-    const handleBlur = () => {
-      pauseAudio();
-    };
-
     const pauseAudio = () => {
       if (audioRef.current) {
         audioRef.current.pause();
       }
+      dispatch(setMusicEnabled(false));
     };
+
     const resumeAudio = () => {
       if (audioRef.current) {
         audioRef.current.play().catch((error) => {
           console.error('Autoplay error:', error);
         });
+        dispatch(setMusicEnabled(true));
       }
     };
 
@@ -82,17 +89,20 @@ const MusicPlayer: React.FC = () => {
       }
     };
 
-    if (audioRef.current && volume > 0) {
+    if (audioRef.current && volume > 0 && !document.hidden) {
       resumeAudio();
     }
-    window.addEventListener('pagehide', handlePageHide);
-    window.addEventListener('blur', handleBlur);
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [src, volume, enabled]);
 
   return (
     <div className="MusicPlayer">
-      <audio ref={audioRef} src={src} autoPlay loop />
+      <audio ref={audioRef} src={src} loop />
       <button onClick={togglePlay} className="MusicPlayer__icon icon-button">
         {volume ? <Music /> : <MusicNegated />}
       </button>
