@@ -41,11 +41,7 @@ const MusicPlayer: React.FC = () => {
   const volume = enabled ? _volume : 0;
 
   const togglePlay = () => {
-    if (volume) {
-      dispatch(setMusicEnabled(false));
-    } else {
-      dispatch(setMusicEnabled(true));
-    }
+    dispatch(setMusicEnabled(!enabled));
     trackEvent('music-toggle-click', { enabledMusic: !volume });
   };
 
@@ -57,43 +53,24 @@ const MusicPlayer: React.FC = () => {
   if (audioRef.current) audioRef.current.volume = volume;
 
   useEffect(() => {
-    if (audioRef.current && volume > 0) {
-      audioRef.current.play().catch((error) => {
-        console.error('Autoplay error:', error);
-      });
-    }
-    
     const handleVisibilityChange = () => {
       if (document.hidden) {
         if (audioRef.current) {
           audioRef.current.pause();
         }
-      } else if (volume > 0) {
-        if (audioRef.current) {
-          audioRef.current.play().catch((error) => {
-            console.error('Autoplay error:', error);
-          });
-        }
+      } else if (audioRef.current && enabled) {
+        audioRef.current.play().catch((error) => {
+          console.error('Autoplay error:', error);
+        });
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [src, volume]);
+  }, [src, volume, enabled]);
 
   return (
     <div className="MusicPlayer">
-      <audio
-        ref={audioRef}
-        src={src}
-        autoPlay
-        loop
-        onPause={() => dispatch(setMusicEnabled(false))}
-        onPlay={() => dispatch(setMusicEnabled(true))}
-      />
+      <audio ref={audioRef} src={src} autoPlay loop />
       <button onClick={togglePlay} className="MusicPlayer__icon icon-button">
         {volume ? <Music /> : <MusicNegated />}
       </button>
