@@ -29,7 +29,7 @@ export const MusicNegated = () => {
 
 const MusicPlayer: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { assetLinkLoader } = useAppContext();
+  const { assetLinkLoader, isMobileApp } = useAppContext();
 
   const _volume = useAppSelector((state) => state.settings.music.volume);
   const enabled = useAppSelector((state) => state.settings.music.enabled);
@@ -49,7 +49,6 @@ const MusicPlayer: React.FC = () => {
       } else {
         audioRef.current.play().catch((error) => {
           console.error('Autoplay blocked:', error);
-          alert('Por favor, toca el botón de reproducir para escuchar la música.');
         });
         dispatch(setMusicEnabled(true));
       }
@@ -59,6 +58,7 @@ const MusicPlayer: React.FC = () => {
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
+    if(audioRef.current && isMobileApp) audioRef.current.volume = newVolume;
     dispatch(setMusicVolume(newVolume));
   };
 
