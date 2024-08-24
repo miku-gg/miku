@@ -29,7 +29,7 @@ export const MusicNegated = () => {
 
 const MusicPlayer: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { assetLinkLoader, isMobileApp } = useAppContext();
+  const { assetLinkLoader } = useAppContext();
 
   const _volume = useAppSelector((state) => state.settings.music.volume);
   const enabled = useAppSelector((state) => state.settings.music.enabled);
@@ -58,11 +58,11 @@ const MusicPlayer: React.FC = () => {
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
-    if(audioRef.current && isMobileApp) audioRef.current.volume = newVolume;
     dispatch(setMusicVolume(newVolume));
+    if (audioRef.current) audioRef.current.volume = newVolume;
   };
 
-  if (audioRef.current) audioRef.current.volume = volume;
+  // if (audioRef.current) audioRef.current.volume = volume;
 
   useEffect(() => {
     const pauseAudio = () => {
