@@ -103,41 +103,40 @@ export default function SceneSelector(): JSX.Element | null {
                 <div className="SceneSelector__item-background" style={{ backgroundColor: 'gray' }} />
                 <div className="SceneSelector__item-text">Create new scene</div>
               </button>
-              {!isMobileApp && (
-                <button
-                  className="SceneSelector__item"
-                  onClick={() => {
-                    if (isInteractionDisabled) {
-                      toast.warn('Please log in to interact.', {
-                        position: 'top-center',
-                        style: {
-                          top: 10,
-                        },
-                      });
-                      return;
-                    }
-                    dispatch(
-                      setModalOpened({
-                        id: 'scene-suggestions',
-                        opened: true,
-                      }),
-                    );
-                    dispatch(
-                      userDataFetchStart({
-                        apiEndpoint,
-                      }),
-                    );
-                    trackEvent('scene-generate');
-                  }}
-                >
-                  <div className="SceneSelector__item-background SceneSelector__item-background--aero">
-                    <StarsEffect />
-                  </div>
-                  <div className="SceneSelector__item-text">
-                    Generate Scene <BsStars />
-                  </div>
-                </button>
-              )}
+
+              <button
+                className="SceneSelector__item"
+                onClick={() => {
+                  if (isInteractionDisabled) {
+                    toast.warn('Please log in to interact.', {
+                      position: 'top-center',
+                      style: {
+                        top: 10,
+                      },
+                    });
+                    return;
+                  }
+                  dispatch(
+                    setModalOpened({
+                      id: 'scene-suggestions',
+                      opened: true,
+                    }),
+                  );
+                  dispatch(
+                    userDataFetchStart({
+                      apiEndpoint,
+                    }),
+                  );
+                  trackEvent('scene-generate');
+                }}
+              >
+                <div className="SceneSelector__item-background SceneSelector__item-background--aero">
+                  <StarsEffect />
+                </div>
+                <div className="SceneSelector__item-text">
+                  Generate Scene <BsStars />
+                </div>
+              </button>
             </div>
           )}
         </div>
