@@ -81,6 +81,10 @@ const MusicPlayer: React.FC = () => {
         resumeAudio();
       }
     };
+
+    if (audioRef.current && volume > 0) {
+      resumeAudio();
+    }
     window.addEventListener('pagehide', handlePageHide);
     window.addEventListener('blur', handleBlur);
     document.addEventListener('visibilitychange', handleVisibilityChange);
