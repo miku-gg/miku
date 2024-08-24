@@ -29,7 +29,7 @@ export const MusicNegated = () => {
 
 const MusicPlayer: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { assetLinkLoader } = useAppContext();
+  const { assetLinkLoader, isMobileApp } = useAppContext();
 
   const _volume = useAppSelector((state) => state.settings.music.volume);
   const enabled = useAppSelector((state) => state.settings.music.enabled);
@@ -59,10 +59,9 @@ const MusicPlayer: React.FC = () => {
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
     dispatch(setMusicVolume(newVolume));
-    if (audioRef.current) audioRef.current.volume = newVolume;
   };
 
-  // if (audioRef.current) audioRef.current.volume = volume;
+  if (audioRef.current) audioRef.current.volume = volume;
 
   useEffect(() => {
     const pauseAudio = () => {
@@ -106,9 +105,11 @@ const MusicPlayer: React.FC = () => {
       <button onClick={togglePlay} className="MusicPlayer__icon icon-button">
         {volume ? <Music /> : <MusicNegated />}
       </button>
-      <div className="MusicPlayer__range">
-        <input type="range" min="0" max="1" step="0.01" value={_volume} onChange={handleVolumeChange} />
-      </div>
+      {!isMobileApp ? (
+        <div className="MusicPlayer__range">
+          <input type="range" min="0" max="1" step="0.01" value={_volume} onChange={handleVolumeChange} />
+        </div>
+      ) : null}
     </div>
   );
 };
