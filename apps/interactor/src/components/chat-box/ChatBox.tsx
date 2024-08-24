@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Rnd } from 'react-rnd';
 import { useAppContext } from '../../App.context';
 import { useAppSelector } from '../../state/store';
@@ -7,12 +8,26 @@ import ResponseBox from './ResponseBox';
 
 const ChatBox = (): JSX.Element | null => {
   const { isMobileApp } = useAppContext();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [lastTap, setLastTap] = useState<number>(0);
+
   const isDraggable = useAppSelector((state) => state.settings.chatBox.isDraggable);
   const centeredPositionX = (window.innerWidth - window.innerWidth * 0.75) / 2;
 
+  const handleTouch = () => {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+
+    if (tapLength < 300 && tapLength > 0) {
+      setIsExpanded(!isExpanded);
+    }
+
+    setLastTap(currentTime);
+  };
+
   if (isMobileApp || window.innerWidth < 820) {
     return (
-      <div className="ChatBox">
+      <div className={`ChatBox ${isExpanded ? 'expanded' : ''}`} onTouchEnd={handleTouch}>
         <ResponseBox />
         <InputBox />
       </div>
