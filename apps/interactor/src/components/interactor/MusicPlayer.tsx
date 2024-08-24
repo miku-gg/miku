@@ -53,18 +53,36 @@ const MusicPlayer: React.FC = () => {
   if (audioRef.current) audioRef.current.volume = volume;
 
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        if (audioRef.current) {
-          audioRef.current.pause();
-        }
-      } else if (audioRef.current && enabled) {
+    const handlePageHide = () => {
+      pauseAudio();
+    };
+
+    const handleBlur = () => {
+      pauseAudio();
+    };
+
+    const pauseAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+    const resumeAudio = () => {
+      if (audioRef.current) {
         audioRef.current.play().catch((error) => {
           console.error('Autoplay error:', error);
         });
       }
     };
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        pauseAudio();
+      } else {
+        resumeAudio();
+      }
+    };
+    window.addEventListener('pagehide', handlePageHide);
+    window.addEventListener('blur', handleBlur);
     document.addEventListener('visibilitychange', handleVisibilityChange);
   }, [src, volume, enabled]);
 
