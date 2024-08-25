@@ -15,7 +15,7 @@ import SlidePanel from './SlidePanel';
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch();
   const scenes = useAppSelector(selectAvailableScenes);
-  const { apiEndpoint, assetLinkLoader, isInteractionDisabled, isMobileApp } = useAppContext();
+  const { apiEndpoint, assetLinkLoader, isInteractionDisabled } = useAppContext();
 
   const slidePanelOpened = useAppSelector((state) => state.creation.scene.slidePanelOpened);
   const createSceneOpened = useAppSelector((state) => state.creation.scene.sceneOpened);

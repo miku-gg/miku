@@ -9,20 +9,20 @@ import ResponseBox from './ResponseBox';
 const ChatBox = (): JSX.Element | null => {
   const { isMobileApp } = useAppContext();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [lastTap, setLastTap] = useState<number>(0);
+  const [lastTapTime, setLastTapTime] = useState<number>(0);
 
   const isDraggable = useAppSelector((state) => state.settings.chatBox.isDraggable);
   const centeredPositionX = (window.innerWidth - window.innerWidth * 0.75) / 2;
 
   const handleTouch = () => {
     const currentTime = new Date().getTime();
-    const tapLength = currentTime - lastTap;
+    const tapTimeDiff = currentTime - lastTapTime;
 
-    if (tapLength < 300 && tapLength > 0) {
+    if (tapTimeDiff < 300 && tapTimeDiff > 0) {
       setIsExpanded(!isExpanded);
     }
 
-    setLastTap(currentTime);
+    setLastTapTime(currentTime);
   };
 
   if (isMobileApp || window.innerWidth < 820) {

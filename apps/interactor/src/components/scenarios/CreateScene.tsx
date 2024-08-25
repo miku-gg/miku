@@ -59,7 +59,7 @@ async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
 
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
-  const { assetLinkLoader, assetUploader, servicesEndpoint, apiEndpoint } = useAppContext();
+  const { assetLinkLoader, assetUploader, servicesEndpoint, apiEndpoint, isMobileApp } = useAppContext();
   const currentScene = useAppSelector(selectCurrentScene);
   const songs = useAppSelector((state) =>
     state.novel.songs.filter((song) => state.novel.scenes.find((scene) => scene.musicId === song.id)),
@@ -77,7 +77,6 @@ const CreateScene = () => {
   ];
 
   const dispatch = useAppDispatch();
-  const { isMobileApp } = useAppContext();
 
   const charactersSelected = useAppSelector((state) => state.creation.scene.characters.selected);
   const backgroundSelectedId = useAppSelector((state) => state.creation.scene.background.selected);
@@ -549,40 +548,40 @@ const CreateSceneBackgroundModal = () => {
             <p>Search</p>
           </div>{' '}
           {!isMobileApp && (
-            <div className="CreateScene__selector__item CreateScene__selector__item--upload">
-              <DragAndDropImages
-                placeHolder="Upload background"
-                errorMessage="Error uploading images"
-                handleChange={(file: File) => {
-                  // transform file to base64 string
-                  const reader = new FileReader();
-                  reader.readAsDataURL(file);
-                  reader.onload = () => {
-                    const base64String = reader.result;
-                    if (typeof base64String === 'string') {
-                      dispatch(addImportedBackground(base64String));
-                      dispatch(setBackground(base64String));
-                    }
-                  };
+            <>
+              <div className="CreateScene__selector__item CreateScene__selector__item--upload">
+                <DragAndDropImages
+                  placeHolder="Upload background"
+                  errorMessage="Error uploading images"
+                  handleChange={(file: File) => {
+                    // transform file to base64 string
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                      const base64String = reader.result;
+                      if (typeof base64String === 'string') {
+                        dispatch(addImportedBackground(base64String));
+                        dispatch(setBackground(base64String));
+                      }
+                    };
+                  }}
+                />
+              </div>
+              <div
+                className="CreateScene__selector__item CreateScene__selector__item--upload"
+                onClick={() => {
+                  dispatch(
+                    setModalOpened({
+                      id: 'background-gen',
+                      opened: true,
+                    }),
+                  );
                 }}
-              />
-            </div>
-          )}
-          {!isMobileApp && (
-            <div
-              className="CreateScene__selector__item CreateScene__selector__item--upload"
-              onClick={() => {
-                dispatch(
-                  setModalOpened({
-                    id: 'background-gen',
-                    opened: true,
-                  }),
-                );
-              }}
-            >
-              <BsStars />
-              <p>Generate</p>
-            </div>
+              >
+                <BsStars />
+                <p>Generate</p>
+              </div>
+            </>
           )}
         </div>
       </div>
