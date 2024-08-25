@@ -3,8 +3,8 @@
 .Inventory {
   display: flex;
   flex-direction: column;
-  height: 70%;
-  min-width: 200px;
+  max-height: 50%;
+  min-width: 190px;
   max-width: 95%;
 
   background-color: #0c1225ee;
@@ -69,7 +69,7 @@
   }
 
   &__items {
-    width: 220px;
+    width: 192px;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
     grid-auto-rows: 74px;
@@ -217,11 +217,11 @@
 }
 
 .InventoryItemModal {
-  width: 163px;
-  min-width: 163px;
+  width: 164px;
+  min-width: 164px;
+  max-width: 164px;
   height: 100%;
-  padding: 0.5rem;
-  padding-right: 1rem;
+  padding: 8px 20px 10px 8px;
 
   display: flex;
   flex-direction: column;
@@ -235,11 +235,11 @@
   }
 
   &.open {
-    animation: slideOpen 0.5s ease-in-out;
+    animation: slideOpen 0.5s linear;
   }
 
   &.closed {
-    animation: slideClose 0.5s ease-in-out both;
+    animation: slideClose 0.25s linear both;
   }
 
   &__content {
@@ -317,6 +317,12 @@
       box-shadow: 0 0 10px $secondary-color;
     }
   }
+
+  &.hidden-after-close {
+    display: none;
+    visibility: hidden;
+    position: absolute;
+  }
 }
 
 @keyframes infiniteSlide {
@@ -369,12 +375,9 @@
   }
   75% {
     opacity: 0;
-    transform: translateY(-100%);
   }
   100% {
-    transform: translateY(-100%);
     opacity: 0;
-    display: none;
-    z-index: -1;
+    transform: translateY(-100%);
   }
 }
