@@ -20,7 +20,7 @@
     background: linear-gradient(to top, rgba(#171717, 0.9), rgba(#171717, 0.6));
   }
   &.expanded {
-    height: 60%;
+    height: calc(100vh - 240px);
 
     .ResposeBox {
       max-height: unset;
