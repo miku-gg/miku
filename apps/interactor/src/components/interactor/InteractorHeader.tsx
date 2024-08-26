@@ -1,19 +1,19 @@
 import { useAppContext } from '../../App.context';
+import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { useAppSelector } from '../../state/store';
-import SceneSelector from '../scenarios/SceneSelector';
+import AnimatedText from '../common/AnimatedText';
 import History from '../history/History';
-import MusicPlayer from './MusicPlayer';
-import ScreenSizer from './ScreenSizer';
-import './InteractorHeader.scss';
-import Settings from './Settings';
-import ModelSelector from './ModelSelector';
 import InteractiveMap from '../scenarios/InteractiveMap';
 import { SceneChangeModal } from '../scenarios/SceneChangeModal';
-import { InventoryTrigger } from './Inventory';
-import AnimatedText from '../common/AnimatedText';
-import { CustomEventType, postMessage } from '../../libs/stateEvents';
-import PremiumHint from './PremiumHint';
+import SceneSelector from '../scenarios/SceneSelector';
 import Hint from './Hint';
+import './InteractorHeader.scss';
+import { InventoryTrigger } from './Inventory';
+import ModelSelector from './ModelSelector';
+import MusicPlayer from './MusicPlayer';
+import PremiumHint from './PremiumHint';
+import ScreenSizer from './ScreenSizer';
+import Settings from './Settings';
 
 const InteractorHeader = () => {
   const { assetLinkLoader } = useAppContext();
@@ -27,32 +27,36 @@ const InteractorHeader = () => {
 
   return (
     <div className="InteractorHeader">
-      <div className="InteractorHeader__left">
-        <div
-          className="InteractorHeader__profile_pic"
-          style={{
-            backgroundImage: firstCharacter.profile_pic
-              ? `url(${assetLinkLoader(firstCharacter.profile_pic, true)})`
-              : '',
-          }}
-          onClick={() => postMessage(CustomEventType.NOVEL_PROFILE_CLICK, true)}
-        />
-        {!isMobileWidth && (
-          <div className="InteractorHeader__header-name">{<AnimatedText text={title} minLength={20} />}</div>
-        )}
-        <SceneSelector />
-        <InventoryTrigger />
-        <InteractiveMap />
+      <div className="InteractorHeader__container">
+        <div className="InteractorHeader__left">
+          <div
+            className="InteractorHeader__profile_pic"
+            style={{
+              backgroundImage: firstCharacter.profile_pic
+                ? `url(${assetLinkLoader(firstCharacter.profile_pic, true)})`
+                : '',
+            }}
+            onClick={() => postMessage(CustomEventType.NOVEL_PROFILE_CLICK, true)}
+          />
+          {!isMobileWidth && (
+            <div className="InteractorHeader__header-name">{<AnimatedText text={title} minLength={20} />}</div>
+          )}
+          <SceneSelector />
+          <InventoryTrigger />
+          <InteractiveMap />
+          <SceneChangeModal />
+        </div>
+        <div className="InteractorHeader__right">
+          <ModelSelector />
+          <MusicPlayer />
+          <History />
+          <ScreenSizer />
+          <Settings />
+        </div>
+      </div>
+      <div className="InteractorHeader__hints">
         <Hint />
         <PremiumHint />
-        <SceneChangeModal />
-      </div>
-      <div className="InteractorHeader__right">
-        <ModelSelector />
-        <MusicPlayer />
-        <History />
-        <ScreenSizer />
-        <Settings />
       </div>
     </div>
   );

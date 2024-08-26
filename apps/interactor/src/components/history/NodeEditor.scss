@@ -1,10 +1,44 @@
+@import '../../variables';
+
 .NodeEditor {
+  margin-top: 1rem;
+
+  &__textarea {
+    font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+    background-color: #171717;
+    color: lightgray;
+    padding: 0.5rem;
+    border: 1px solid rgba($secondary-color, 0.3);
+    border-radius: 6px;
+    height: 18em;
+
+    &:focus {
+      outline: none;
+      border: 1px solid $secondary-color;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .dropdown {
+    position: absolute;
+    bottom: 13px;
+    width: 200px;
+  }
+
   &__characters {
     display: flex;
     justify-content: center;
     gap: 20px;
     margin-bottom: 10px;
   }
+
   &__character {
     opacity: 0.4;
     transition: all 0.2s ease-out;
@@ -23,6 +57,12 @@
     &--selected,
     &--selected:hover {
       opacity: 1;
+    }
+  }
+
+  &.NodeEditor__mobile-app {
+    .dropdown {
+      width: 135px;
     }
   }
 }
