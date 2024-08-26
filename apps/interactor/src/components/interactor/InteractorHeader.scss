@@ -14,8 +14,9 @@
     border-radius: 0.75rem;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    z-index: 2;
+    z-index: 3;
   }
+
   &__left {
     display: flex;
     flex-direction: row;
