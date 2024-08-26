@@ -25,4 +25,10 @@
       opacity: 1;
     }
   }
+
+  &__mobile-app {
+    .dropdown {
+      width: 135px !important;
+    }
+  }
 }
