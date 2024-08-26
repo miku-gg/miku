@@ -63,7 +63,7 @@
   }
 
   &__content {
-    height: 100%;
+    min-height: 100%;
     display: flex;
     overflow: hidden;
   }
@@ -220,7 +220,7 @@
   width: 164px;
   min-width: 164px;
   max-width: 164px;
-  height: 100%;
+  min-height: 100%;
   padding: 8px 20px 10px 8px;
 
   display: flex;
