@@ -7,8 +7,8 @@ import { setMemoryCapacityModal } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './MemoryCapacityView.scss';
 
-const REGULAR_USERS_MEMORY_CAPACITY = 3;
-const PREMIUM_USERS_MEMORY_CAPACITY = 8;
+const REGULAR_USERS_MEMORY_CAPACITY = 15;
+const PREMIUM_USERS_MEMORY_CAPACITY = 85;
 
 export default function MemoryCapacityView() {
   const { isProduction } = useAppContext();
