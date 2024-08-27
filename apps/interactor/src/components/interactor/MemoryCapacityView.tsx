@@ -27,6 +27,7 @@ export default function MemoryCapacityView() {
     showFillPercent,
     onClick,
     showTooltip,
+    useColors,
   }: {
     isPremium: boolean;
     currentMessagesCount: number;
@@ -34,11 +35,13 @@ export default function MemoryCapacityView() {
     onClick?: () => void;
     showFillPercent?: boolean;
     showTooltip?: boolean;
+    useColors?: boolean;
   }) => {
     const maxCapacity = isPremium ? PREMIUM_USERS_MEMORY_CAPACITY : REGULAR_USERS_MEMORY_CAPACITY;
     const fillPercentage = Math.min((currentMessagesCount / maxCapacity) * 100, 100);
 
     const getColorFromPercentage = (percentage: number) => {
+      if (!useColors) return 'white';
       if (percentage < 25) return 'green';
       if (percentage < 50) return 'yellow';
       if (percentage < 75) return 'orange';
@@ -47,7 +50,7 @@ export default function MemoryCapacityView() {
     const fillColor = getColorFromPercentage(fillPercentage);
     return (
       <div
-        className={`MemoryCapacityView ${onClick && !isPremium ? 'MemoryCapacityView__clickable' : ''}`}
+        className={`MemoryCapacityView ${onClick && !isPremium ? 'clickable' : ''}`}
         data-tooltip-id="character-memory-tooltip"
         data-tooltip-content={`Memory usage: ${Math.round(fillPercentage)}%`}
         style={{ width: sizeInPixels, height: sizeInPixels }}
@@ -55,7 +58,7 @@ export default function MemoryCapacityView() {
       >
         <GiBrain
           className="MemoryCapacityView__unfilled-icon"
-          style={{ width: `${sizeInPixels}`, height: `${sizeInPixels}` }}
+          style={{ width: `${sizeInPixels}`, height: `${sizeInPixels}`, color: `${!useColors ? '#121a36' : 'white'}` }}
         />
         {showTooltip && <Tooltip id="character-memory-tooltip" style={{ fontSize: '1rem' }} place="bottom" />}
         <div
@@ -103,14 +106,13 @@ export default function MemoryCapacityView() {
                   currentMessagesCount: narrationMessagesCount,
                   sizeInPixels: 150,
                   showFillPercent: true,
+                  useColors: true,
                 })}
               </div>
               <h2>Premium memory capacity</h2>
 
-              <p>
-                Upgrading to premium increase significatively the memory of the character. the character can remember
-                arround {PREMIUM_USERS_MEMORY_CAPACITY} previous messages
-              </p>
+              <p>Upgrading to premium increase significatively the memory of the character.</p>
+              <p> the character can remember arround {PREMIUM_USERS_MEMORY_CAPACITY} previous messages</p>
             </div>
             <Button
               theme="gradient"
@@ -129,6 +131,7 @@ export default function MemoryCapacityView() {
                   currentMessagesCount: narrationMessagesCount,
                   sizeInPixels: 150,
                   showFillPercent: true,
+                  useColors: true,
                 })}
               </div>
               <h2>Regular memory capacity</h2>

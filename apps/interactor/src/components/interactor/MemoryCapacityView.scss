@@ -6,13 +6,6 @@
   position: relative;
   transition: ease-in-out 0.2s;
 
-  &__clickable {
-    cursor: pointer;
-    &:hover {
-      opacity: 0.65;
-    }
-  }
-
   &__fill {
     position: absolute;
     bottom: 0;
@@ -33,7 +26,8 @@
   }
 
   &__unfilled-icon {
-    color: white;
+    color: $background-color-darker;
+    filter: drop-shadow(0 0 1px #cd5fea);
   }
 
   &__percentage {
@@ -82,9 +76,25 @@
     }
   }
 }
+.clickable {
+  cursor: pointer;
+  &:hover {
+    animation: neon1 0.3s ease-in-out infinite alternate;
+    color: $background-color-darker;
+  }
+}
+
 .MemoryCapacityViewModal {
   background: transparent !important;
   max-width: 55rem !important;
   padding: 0 !important;
-  border: 1px solid $color-gray !important;
+}
+
+@keyframes neon1 {
+  from {
+    filter: drop-shadow(0 0 2px #cd5fea);
+  }
+  to {
+    filter: drop-shadow(0 0 10px #9b47b3);
+  }
 }
