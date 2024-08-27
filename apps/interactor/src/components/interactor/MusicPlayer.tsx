@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../../App.context';
 import { trackEvent } from '../../libs/analytics';
 import { selectCurrentScene } from '../../state/selectors';
@@ -30,7 +30,7 @@ export const MusicNegated = () => {
 const MusicPlayer: React.FC = () => {
   const dispatch = useAppDispatch();
   const { assetLinkLoader, isMobileApp } = useAppContext();
-
+  const [isToggledByUser, setIsToggledByUser] = useState<boolean>(false);
   const _volume = useAppSelector((state) => state.settings.music.volume);
   const enabled = useAppSelector((state) => state.settings.music.enabled);
   const songs = useAppSelector((state) => state.novel.songs);
@@ -45,11 +45,13 @@ const MusicPlayer: React.FC = () => {
     if (audioRef.current) {
       if (enabled) {
         audioRef.current.pause();
+        setIsToggledByUser(true);
         dispatch(setMusicEnabled(false));
       } else {
         audioRef.current.play().catch((error) => {
           console.error('Autoplay blocked:', error);
         });
+        setIsToggledByUser(false);
         dispatch(setMusicEnabled(true));
       }
     }
@@ -83,7 +85,7 @@ const MusicPlayer: React.FC = () => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         pauseAudio();
-      } else {
+      } else if (!isToggledByUser) {
         resumeAudio();
       }
     };
