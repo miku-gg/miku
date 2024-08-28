@@ -1,5 +1,11 @@
 @import '../../variables';
 
+.MemoryCapacityViewModal {
+  background: transparent !important;
+  max-width: 55rem !important;
+  padding: 0 !important;
+}
+
 .MemoryCapacityView {
   min-width: 1.75rem;
   min-height: 1.75rem;
@@ -32,14 +38,13 @@
 
   &__percentage {
     position: absolute;
-    bottom: 10px;
+    bottom: 0;
     left: 60%;
   }
 
   &__modal {
     width: 100%;
     display: flex;
-    flex-direction: row-reverse;
     align-items: center;
     border-radius: 16px;
     background-color: $background-2;
@@ -76,18 +81,62 @@
     }
   }
 }
+
+//media query for views smaller than 768px
+@media screen and (max-width: 768px) {
+  .MemoryCapacityView {
+    &__modal {
+      &h2 {
+        font-size: 1rem;
+      }
+      & p {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
+
+.mobile-view {
+  flex-direction: column;
+
+  .MemoryCapacityView {
+    &__modal {
+      flex-direction: column;
+
+      &-left,
+      &-right {
+        width: 100%;
+        height: 100%;
+        gap: 0.5rem;
+      }
+
+      &-right {
+        border-right: none;
+        border-bottom: 1px solid $color-gray;
+      }
+      &-left {
+        background-color: $background-1;
+      }
+
+      &__container {
+        gap: 0.5rem;
+        &h2 {
+          font-size: 1rem;
+        }
+        & p {
+          font-size: 0.75rem;
+        }
+      }
+    }
+  }
+}
+
 .clickable {
   cursor: pointer;
   &:hover {
     animation: neon1 0.3s ease-in-out infinite alternate;
     color: $background-color-darker;
   }
-}
-
-.MemoryCapacityViewModal {
-  background: transparent !important;
-  max-width: 55rem !important;
-  padding: 0 !important;
 }
 
 @keyframes neon1 {
