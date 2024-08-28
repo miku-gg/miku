@@ -33,7 +33,7 @@ export const initialState: SettingsState = {
     voiceId: Voices.SaraWhispering,
   },
   music: {
-    enabled: false,
+    enabled: true,
     volume: 0.2,
   },
   modals: {
