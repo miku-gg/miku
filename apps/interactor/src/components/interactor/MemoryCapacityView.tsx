@@ -128,7 +128,7 @@ export default function MemoryCapacityView() {
       })}
       <Modal
         opened={isMemoryModalOpen && !isPremiumUser}
-        className="MemoryCapacityViewModal"
+        className={`MemoryCapacityViewModal ${isMobileSize ? 'mobile-view__modal' : ''}`}
         onCloseModal={() => {
           dispatch(setMemoryCapacityModal(false));
         }}
