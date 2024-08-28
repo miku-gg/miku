@@ -42,19 +42,7 @@ const MusicPlayer: React.FC = () => {
   const volume = enabled ? _volume : 0;
 
   const togglePlay = () => {
-    if (audioRef.current) {
-      if (enabled) {
-        audioRef.current.pause();
-        setIsToggledByUser(true);
-        dispatch(setMusicEnabled(false));
-      } else {
-        audioRef.current.play().catch((error) => {
-          console.error('Autoplay blocked:', error);
-        });
-        setIsToggledByUser(false);
-        dispatch(setMusicEnabled(true));
-      }
-    }
+    dispatch(setMusicEnabled(!enabled));
     trackEvent('music-toggle-click', { enabledMusic: !volume });
   };
 
@@ -70,7 +58,6 @@ const MusicPlayer: React.FC = () => {
       if (audioRef.current) {
         audioRef.current.pause();
       }
-      dispatch(setMusicEnabled(false));
     };
 
     const resumeAudio = () => {
@@ -78,14 +65,13 @@ const MusicPlayer: React.FC = () => {
         audioRef.current.play().catch((error) => {
           console.error('Autoplay error:', error);
         });
-        dispatch(setMusicEnabled(true));
       }
     };
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
         pauseAudio();
-      } else if (!isToggledByUser) {
+      } else if (enabled && volume > 0) {
         resumeAudio();
       }
     };
