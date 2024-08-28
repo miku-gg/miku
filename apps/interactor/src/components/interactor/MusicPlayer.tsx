@@ -30,7 +30,6 @@ export const MusicNegated = () => {
 const MusicPlayer: React.FC = () => {
   const dispatch = useAppDispatch();
   const { assetLinkLoader, isMobileApp } = useAppContext();
-  const [isToggledByUser, setIsToggledByUser] = useState<boolean>(false);
   const _volume = useAppSelector((state) => state.settings.music.volume);
   const enabled = useAppSelector((state) => state.settings.music.enabled);
   const songs = useAppSelector((state) => state.novel.songs);
