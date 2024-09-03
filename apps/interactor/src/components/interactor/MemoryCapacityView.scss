@@ -1,11 +1,5 @@
 @import '../../variables';
 
-.MemoryCapacityViewModal {
-  background: transparent !important;
-  max-width: 55rem !important;
-  padding: 0 !important;
-}
-
 .MemoryCapacityView {
   min-width: 1.75rem;
   min-height: 1.75rem;
@@ -39,100 +33,55 @@
   &__percentage {
     position: absolute;
     bottom: 0;
-    left: 60%;
+    left: 65%;
   }
 
   &__modal {
     width: 100%;
     display: flex;
-    align-items: center;
-    border-radius: 16px;
-    background-color: $background-2;
+    flex-direction: column;
 
-    &-left,
-    &-right {
-      width: 50%;
-      height: 25rem;
+    &-header {
+      &__subtitle {
+        margin-top: 4px;
+        font-size: 0.85rem;
+        font-style: italic;
+        color: $color-gray;
+      }
+    }
+
+    &-top,
+    &-bottom {
       display: flex;
       align-items: center;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px 10px;
+      gap: 1rem;
+      padding: 10px 0 10px 10px;
+      border-radius: 10px;
+      margin-top: 10px;
 
-      &:hover {
-        background-color: $background-1;
-      }
-
-      &__container {
+      &__text {
         display: flex;
-        align-items: center;
         flex-direction: column;
-
-        & p {
-          width: 95%;
-          font-size: 0.85rem;
-          margin-top: 4px;
-        }
-      }
-    }
-
-    &-right {
-      border-right: 1px solid $color-gray;
-    }
-  }
-}
-
-//media query for views smaller than 768px
-@media screen and (max-width: 768px) {
-  .MemoryCapacityView {
-    &__modal {
-      &h2 {
-        font-size: 1rem;
-      }
-      & p {
-        font-size: 0.75rem;
-      }
-    }
-  }
-}
-
-.mobile-view {
-  flex-direction: column;
-
-  &__modal {
-    max-width: 80% !important;
-  }
-
-  .MemoryCapacityView {
-    &__modal {
-      flex-direction: column;
-
-      &-left,
-      &-right {
-        width: 100%;
-        height: 100%;
         gap: 0.5rem;
 
-        &__container {
-          gap: 0.5rem;
-
-          & h2 {
-            font-size: 1.1rem;
-          }
-          & p {
-            font-size: 0.75rem;
-            width: 80%;
-          }
+        & p {
+          font-size: 0.85rem;
         }
       }
+    }
 
-      &-right {
-        border-right: none;
-        border-bottom: 1px solid $color-gray;
-      }
-      &-left {
-        background-color: $background-1;
-      }
+    &-bottom {
+      background-color: $background-color-darker;
+      border: 1px solid $color-gray;
+    }
+
+    &-buttons {
+      width: 100%;
+      display: flex;
+      gap: 1rem;
+      justify-content: end;
+      align-items: center;
+      margin-top: 10px;
     }
   }
 }

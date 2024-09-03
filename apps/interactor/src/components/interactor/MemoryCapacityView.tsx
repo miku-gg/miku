@@ -1,30 +1,35 @@
 import { Button, Modal, Tooltip } from '@mikugg/ui-kit';
+import { useMemo } from 'react';
 import { GiBrain } from 'react-icons/gi';
 import { useAppContext } from '../../App.context';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
-import { selectChatHistory } from '../../state/selectors';
+import { selectTokensCount } from '../../state/selectors';
 import { setMemoryCapacityModal } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './MemoryCapacityView.scss';
 
-const REGULAR_USERS_MEMORY_CAPACITY = 15;
-const PREMIUM_USERS_MEMORY_CAPACITY = 85;
+const REGULAR_USERS_TOKENS_CAPACITY = 4096;
+const PREMIUM_USERS_TOKENS_CAPACITY = 32768;
 
 export default function MemoryCapacityView() {
   const { isProduction, isMobileApp } = useAppContext();
   const dispatch = useAppDispatch();
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
-  const chatHistory = useAppSelector(selectChatHistory);
-  const narrationMessagesCount = chatHistory.length;
   const isMemoryModalOpen = useAppSelector((state) => state.settings.modals.memoryCapacity);
+  const state = useAppSelector((state) => state);
+  const inputDisabled = useAppSelector((state) => state.narration.input.disabled);
+
+  const currentTokens = useMemo(() => {
+    return selectTokensCount(state);
+  }, [inputDisabled]);
 
   const isMobileSize = isMobileApp || window.innerWidth < 600;
 
-  if (!isProduction) return null;
+  // if (!isProduction) return null;
 
-  const fillBrain = ({
+  const FillBrain = ({
     isPremium,
-    currentMessagesCount,
+    currentTokensCount,
     sizeInPixels,
     showFillPercent,
     onClick,
@@ -32,15 +37,15 @@ export default function MemoryCapacityView() {
     useColours,
   }: {
     isPremium: boolean;
-    currentMessagesCount: number;
+    currentTokensCount: number;
     sizeInPixels: number;
     onClick?: () => void;
     showFillPercent?: boolean;
     showTooltip?: boolean;
     useColours?: boolean;
   }) => {
-    const maxCapacity = isPremium ? PREMIUM_USERS_MEMORY_CAPACITY : REGULAR_USERS_MEMORY_CAPACITY;
-    const fillPercentage = Math.min((currentMessagesCount / maxCapacity) * 100, 100);
+    const maxCapacity = isPremium ? PREMIUM_USERS_TOKENS_CAPACITY : REGULAR_USERS_TOKENS_CAPACITY;
+    const fillPercentage = Math.min((currentTokensCount / maxCapacity) * 100, 100);
 
     const getColorFromPercentage = (percentage: number) => {
       if (!useColours) return 'white';
@@ -55,16 +60,16 @@ export default function MemoryCapacityView() {
     return (
       <div
         className={`MemoryCapacityView ${onClick && !isPremium ? 'clickable' : ''}`}
-        data-tooltip-id="character-memory-tooltip"
+        data-tooltip-id={`character-memory-tooltip${showTooltip ? '-yes' : ''}`}
         data-tooltip-content={`Memory usage: ${Math.round(fillPercentage)}%`}
-        style={{ width: sizeInPixels, height: sizeInPixels }}
+        style={{ width: sizeInPixels, height: sizeInPixels, minWidth: sizeInPixels, minHeight: sizeInPixels }}
         onClick={onClick}
       >
         <GiBrain
           className="MemoryCapacityView__unfilled-icon"
           style={{ width: `${sizeInPixels}`, height: `${sizeInPixels}`, color: `${!useColours ? '#121a36' : 'white'}` }}
         />
-        {showTooltip && <Tooltip id="character-memory-tooltip" style={{ fontSize: '1rem' }} place="bottom" />}
+
         <style>
           {`
             @keyframes ${uniqueKeyframeName} {
@@ -92,6 +97,7 @@ export default function MemoryCapacityView() {
             }
           `}
         </style>
+
         <div
           className="MemoryCapacityView__fill"
           style={{
@@ -109,6 +115,13 @@ export default function MemoryCapacityView() {
             }}
           />
         </div>
+        {showTooltip && (
+          <Tooltip
+            id={`character-memory-tooltip${showTooltip ? '-yes' : ''}`}
+            style={{ fontSize: '1rem' }}
+            place="bottom"
+          />
+        )}
         {showFillPercent && <p className="MemoryCapacityView__percentage">{Math.round(fillPercentage)}%</p>}
       </div>
     );
@@ -116,16 +129,16 @@ export default function MemoryCapacityView() {
 
   return (
     <>
-      {fillBrain({
-        isPremium: isPremiumUser,
-        currentMessagesCount: narrationMessagesCount,
-        sizeInPixels: 28,
-        showFillPercent: false,
-        showTooltip: true,
-        onClick: () => {
+      <FillBrain
+        isPremium={isPremiumUser}
+        currentTokensCount={currentTokens || 0}
+        sizeInPixels={28}
+        showFillPercent={false}
+        showTooltip={true}
+        onClick={() => {
           dispatch(setMemoryCapacityModal(true));
-        },
-      })}
+        }}
+      />
       <Modal
         opened={isMemoryModalOpen && !isPremiumUser}
         className={`MemoryCapacityViewModal ${isMobileSize ? 'mobile-view__modal' : ''}`}
@@ -134,23 +147,39 @@ export default function MemoryCapacityView() {
         }}
       >
         <div className={`MemoryCapacityView__modal ${isMobileSize ? 'mobile-view' : ''}`}>
-          <div className="MemoryCapacityView__modal-right">
-            <div className="MemoryCapacityView__modal-right__container">
-              <div className="MemoryCapacityView__modal-right__icon">
-                {fillBrain({
-                  isPremium: isPremiumUser,
-                  currentMessagesCount: narrationMessagesCount,
-                  sizeInPixels: isMobileSize ? 70 : 150,
-                  showFillPercent: true,
-                  useColours: true,
-                })}
-              </div>
-              <h2>Regular memory capacity</h2>
-              <p>
-                Using the regular account, the character can remember arround {REGULAR_USERS_MEMORY_CAPACITY} previous
-                messages
-              </p>
+          <div className="MemoryCapacityView__modal-header">
+            <h3 className="MemoryCapacityView__modal-header_title">Memory Capacity</h3>
+            <p className="MemoryCapacityView__modal-header__subtitle">
+              The character can remember a certain number of previous messages.
+            </p>
+          </div>
+          <div className="MemoryCapacityView__modal-top">
+            <FillBrain
+              isPremium={isPremiumUser}
+              currentTokensCount={currentTokens || 0}
+              sizeInPixels={70}
+              showFillPercent={true}
+              useColours={true}
+            />
+            <div className="MemoryCapacityView__modal-top__text">
+              <h4>Free membership</h4>
+              <p>Using the regular account, the character can remember up the last 15 messages</p>
             </div>
+          </div>
+          <div className="MemoryCapacityView__modal-bottom">
+            <FillBrain
+              isPremium={true}
+              currentTokensCount={currentTokens || 0}
+              sizeInPixels={70}
+              showFillPercent={true}
+              useColours={true}
+            />
+            <div className="MemoryCapacityView__modal-bottom__text">
+              <h4>Premium membership</h4>
+              <p>Using the premium account, the character can remember up the last 170 messages</p>
+            </div>
+          </div>
+          <div className="MemoryCapacityView__modal-buttons">
             <Button
               theme="transparent"
               onClick={() => {
@@ -159,27 +188,11 @@ export default function MemoryCapacityView() {
             >
               Continue as Regular
             </Button>
-          </div>
-          <div className="MemoryCapacityView__modal-left">
-            <div className="MemoryCapacityView__modal-left__container">
-              <div className="MemoryCapacityView__modal-left__icon">
-                {fillBrain({
-                  isPremium: true,
-                  currentMessagesCount: narrationMessagesCount,
-                  sizeInPixels: isMobileSize ? 70 : 150,
-                  showFillPercent: true,
-                  useColours: true,
-                })}
-              </div>
-              <h2>Premium memory capacity</h2>
-
-              <p>Upgrading to premium increase significatively the memory of the character.</p>
-              <p> the character can remember arround {PREMIUM_USERS_MEMORY_CAPACITY} previous messages</p>
-            </div>
             <Button
               theme="gradient"
               onClick={() => {
                 postMessage(CustomEventType.OPEN_PREMIUM);
+                dispatch(setMemoryCapacityModal(false));
               }}
             >
               Upgrade to Premium
