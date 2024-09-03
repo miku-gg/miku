@@ -14,23 +14,39 @@ import { checkFileType } from '../../libs/utils';
 import SceneSelector from '../scene/SceneSelector';
 import './PlaceEditModal.scss';
 
-function isBlackAndWhite(pixels: Uint8ClampedArray, tolerance: number = 5): boolean {
+function isBlackAndWhite(pixels: Uint8ClampedArray): boolean {
+  const tolerance = 50;
+
+  const isNearBlack = (r: number, g: number, b: number) => {
+    return r <= tolerance && g <= tolerance && b <= tolerance;
+  };
+
+  const isNearWhite = (r: number, g: number, b: number) => {
+    return r >= 255 - tolerance && g >= 255 - tolerance && b >= 255 - tolerance;
+  };
+
+  let hasBlack = false;
+  let hasWhite = false;
+
   for (let i = 0; i < pixels.length; i += 4) {
     const r = pixels[i];
     const g = pixels[i + 1];
     const b = pixels[i + 2];
-    const a = pixels[i + 3];
 
-    // Skip fully transparent pixels
-    if (a === 0) continue;
+    if (isNearBlack(r, g, b)) {
+      hasBlack = true;
+    }
 
-    // Check if the pixel is close to grayscale
-    const avg = (r + g + b) / 3;
-    if (Math.abs(r - avg) > tolerance || Math.abs(g - avg) > tolerance || Math.abs(b - avg) > tolerance) {
-      return false;
+    if (isNearWhite(r, g, b)) {
+      hasWhite = true;
+    }
+
+    if (hasBlack && hasWhite) {
+      return true;
     }
   }
-  return true;
+
+  return false;
 }
 
 export default function PlaceEditModal() {
@@ -60,6 +76,7 @@ export default function PlaceEditModal() {
     reader.onload = (e) => {
       image.src = e.target?.result as string;
     };
+
     return new Promise((resolve) => {
       image.onload = () => {
         // check if the mask contains only black and white pixels
@@ -69,12 +86,23 @@ export default function PlaceEditModal() {
           resolve(false);
           return;
         }
-        canvas.width = image.width;
-        canvas.height = image.height;
+
+        const mapImage = new Image();
+        mapImage.src = config.genAssetLink(mapImageSrc);
+
+        if (image.width > 1024) {
+          const width = mapImage.width;
+          const aspectRatio = image.width / image.height;
+          const height = width / aspectRatio;
+          canvas.width = width;
+          canvas.height = height;
+        } else {
+          canvas.width = image.width;
+          canvas.height = image.height;
+        }
+
         ctx.drawImage(image, 0, 0, image.width, image.height);
         const pixels = ctx.getImageData(0, 0, image.width, image.height).data;
-
-        console.log(isBlackAndWhite(pixels));
 
         if (!isBlackAndWhite(pixels)) {
           toast.error('Mask should be all black and have a white area for the place.');
@@ -82,11 +110,9 @@ export default function PlaceEditModal() {
           return;
         }
         // check if the mask is the same size as the map image
-        const mapImage = new Image();
-        mapImage.src = config.genAssetLink(mapImageSrc);
+
         mapImage.onload = () => {
           if (mapImage.width !== image.width || mapImage.height !== image.height) {
-            console.log('test2');
             toast.error('Mask should be the same size as the map image.');
             resolve(false);
             return;
