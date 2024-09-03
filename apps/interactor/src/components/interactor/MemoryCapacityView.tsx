@@ -25,7 +25,7 @@ export default function MemoryCapacityView() {
 
   const isMobileSize = isMobileApp || window.innerWidth < 600;
 
-  // if (!isProduction) return null;
+  if (!isProduction) return null;
 
   const FillBrain = ({
     isPremium,
