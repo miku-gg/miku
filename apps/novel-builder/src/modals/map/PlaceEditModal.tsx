@@ -14,15 +14,19 @@ import { checkFileType } from '../../libs/utils';
 import SceneSelector from '../scene/SceneSelector';
 import './PlaceEditModal.scss';
 
-function isBlackAndWhite(pixels: Uint8ClampedArray): boolean {
+function isBlackAndWhite(pixels: Uint8ClampedArray, tolerance: number = 5): boolean {
   for (let i = 0; i < pixels.length; i += 4) {
     const r = pixels[i];
     const g = pixels[i + 1];
     const b = pixels[i + 2];
     const a = pixels[i + 3];
 
-    // Check if the pixel is grayscale (r, g, b values are the same) and fully opaque (a is 255)
-    if (!(r === g && g === b && a === 255)) {
+    // Skip fully transparent pixels
+    if (a === 0) continue;
+
+    // Check if the pixel is close to grayscale
+    const avg = (r + g + b) / 3;
+    if (Math.abs(r - avg) > tolerance || Math.abs(g - avg) > tolerance || Math.abs(b - avg) > tolerance) {
       return false;
     }
   }
@@ -70,6 +74,8 @@ export default function PlaceEditModal() {
         ctx.drawImage(image, 0, 0, image.width, image.height);
         const pixels = ctx.getImageData(0, 0, image.width, image.height).data;
 
+        console.log(isBlackAndWhite(pixels));
+
         if (!isBlackAndWhite(pixels)) {
           toast.error('Mask should be all black and have a white area for the place.');
           resolve(false);
@@ -80,6 +86,7 @@ export default function PlaceEditModal() {
         mapImage.src = config.genAssetLink(mapImageSrc);
         mapImage.onload = () => {
           if (mapImage.width !== image.width || mapImage.height !== image.height) {
+            console.log('test2');
             toast.error('Mask should be the same size as the map image.');
             resolve(false);
             return;
@@ -93,10 +100,9 @@ export default function PlaceEditModal() {
   const handleUploadImage = async (file: File, source: 'preview' | 'mask') => {
     if (file && place) {
       try {
-        const { assetId } = await config.uploadAsset(file);
-
         switch (source) {
           case 'preview':
+            const { assetId } = await config.uploadAsset(file);
             dispatch(
               updatePlace({
                 mapId: map!.id,
@@ -105,18 +111,17 @@ export default function PlaceEditModal() {
             );
             return;
           case 'mask':
-            const fileUrl = config.genAssetLink(assetId);
-            const response = await fetch(fileUrl);
-            const responseBlob = await response.blob();
-            const maskFile = new File([responseBlob], file.name, { type: responseBlob.type });
-            if (!validateMaskImage(maskFile)) return;
+            const validatedFile = await validateMaskImage(file);
+            if (!validatedFile) return;
 
+            const uploadedAsset = await config.uploadAsset(file);
             dispatch(
               updatePlace({
                 mapId: map!.id,
-                place: { id: place.id, maskSource: assetId },
+                place: { id: place.id, maskSource: uploadedAsset.assetId },
               }),
             );
+
             return;
         }
       } catch (e) {
