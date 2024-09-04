@@ -25,7 +25,7 @@ export default function MemoryCapacityView() {
 
   const isMobileSize = isMobileApp || window.innerWidth < 600;
 
-  if (!isProduction) return null;
+  // if (!isProduction) return null;
 
   const FillBrain = ({
     isPremium,
@@ -58,20 +58,25 @@ export default function MemoryCapacityView() {
     const uniqueKeyframeName = `fill-${Math.random().toString(36).slice(2, 9)}`;
 
     return (
-      <div
-        className={`MemoryCapacityView ${onClick && !isPremium ? 'clickable' : ''}`}
-        data-tooltip-id={`character-memory-tooltip${showTooltip ? '-yes' : ''}`}
-        data-tooltip-content={`Memory usage: ${Math.round(fillPercentage)}%`}
-        style={{ width: sizeInPixels, height: sizeInPixels, minWidth: sizeInPixels, minHeight: sizeInPixels }}
-        onClick={onClick}
-      >
-        <GiBrain
-          className="MemoryCapacityView__unfilled-icon"
-          style={{ width: `${sizeInPixels}`, height: `${sizeInPixels}`, color: `${!useColours ? '#121a36' : 'white'}` }}
-        />
+      <>
+        <div
+          className={`MemoryCapacityView ${onClick && !isPremium ? 'clickable' : ''}`}
+          data-tooltip-id={`character-memory-tooltip${showTooltip ? '-yes' : ''}`}
+          data-tooltip-content={`Memory usage: ${Math.round(fillPercentage)}%`}
+          style={{ width: sizeInPixels, height: sizeInPixels, minWidth: sizeInPixels, minHeight: sizeInPixels }}
+          onClick={onClick}
+        >
+          <GiBrain
+            className="MemoryCapacityView__unfilled-icon"
+            style={{
+              width: `${sizeInPixels}`,
+              height: `${sizeInPixels}`,
+              color: `${!useColours ? '#121a36' : 'white'}`,
+            }}
+          />
 
-        <style>
-          {`
+          <style>
+            {`
             @keyframes ${uniqueKeyframeName} {
               0% {
                 height: ${fillPercentage}%;
@@ -96,24 +101,27 @@ export default function MemoryCapacityView() {
               }
             }
           `}
-        </style>
+          </style>
 
-        <div
-          className="MemoryCapacityView__fill"
-          style={{
-            height: `${fillPercentage}%`,
-            filter: `drop-shadow(0 0 1px ${fillColor})`,
-            animation: `${uniqueKeyframeName} 2s infinite ease-in-out`,
-          }}
-        >
-          <GiBrain
-            className="MemoryCapacityView__icon"
+          <div
+            className="MemoryCapacityView__fill"
             style={{
-              color: fillColor,
-              width: `${sizeInPixels}`,
-              height: `${sizeInPixels}`,
+              height: `${fillPercentage}%`,
+              filter: `drop-shadow(0 0 1px ${fillColor})`,
+              animation: `${uniqueKeyframeName} 2s infinite ease-in-out`,
             }}
-          />
+          >
+            <GiBrain
+              className="MemoryCapacityView__icon"
+              style={{
+                color: fillColor,
+                width: `${sizeInPixels}`,
+                height: `${sizeInPixels}`,
+              }}
+            />
+          </div>
+
+          {showFillPercent && <p className="MemoryCapacityView__percentage">{Math.round(fillPercentage)}%</p>}
         </div>
         {showTooltip && (
           <Tooltip
@@ -122,8 +130,7 @@ export default function MemoryCapacityView() {
             place="bottom"
           />
         )}
-        {showFillPercent && <p className="MemoryCapacityView__percentage">{Math.round(fillPercentage)}%</p>}
-      </div>
+      </>
     );
   };
 
