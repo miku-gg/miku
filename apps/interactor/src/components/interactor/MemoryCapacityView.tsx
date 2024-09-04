@@ -71,7 +71,7 @@ export default function MemoryCapacityView() {
             style={{
               width: `${sizeInPixels}`,
               height: `${sizeInPixels}`,
-              color: `${!useColours ? '#121a36' : 'white'}`,
+              color: '#121a36',
             }}
           />
 
