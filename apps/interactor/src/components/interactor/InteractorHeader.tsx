@@ -9,6 +9,7 @@ import SceneSelector from '../scenarios/SceneSelector';
 import Hint from './Hint';
 import './InteractorHeader.scss';
 import { InventoryTrigger } from './Inventory';
+import MemoryCapacityView from './MemoryCapacityView';
 import ModelSelector from './ModelSelector';
 import MusicPlayer from './MusicPlayer';
 import PremiumHint from './PremiumHint';
@@ -47,6 +48,7 @@ const InteractorHeader = () => {
           <SceneChangeModal />
         </div>
         <div className="InteractorHeader__right">
+          <MemoryCapacityView />
           <ModelSelector />
           <MusicPlayer />
           <History />
