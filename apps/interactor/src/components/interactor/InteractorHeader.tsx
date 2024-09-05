@@ -10,7 +10,7 @@ import Hint from './Hint';
 import './InteractorHeader.scss';
 import { InventoryTrigger } from './Inventory';
 import MemoryCapacityView from './MemoryCapacityView';
-import ModelSelector from './ModelSelector';
+// import ModelSelector from './ModelSelector';
 import MusicPlayer from './MusicPlayer';
 import PremiumHint from './PremiumHint';
 import ScreenSizer from './ScreenSizer';
