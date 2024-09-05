@@ -133,7 +133,7 @@ export default function MemoryCapacityView() {
       <FillBrain
         isPremium={isPremiumUser}
         currentTokensCount={currentTokens || 0}
-        sizeInPixels={28}
+        sizeInPixels={32}
         showFillPercent={false}
         showTooltip={true}
         onClick={() => {
