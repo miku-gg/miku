@@ -49,7 +49,7 @@ const InteractorHeader = () => {
         </div>
         <div className="InteractorHeader__right">
           <MemoryCapacityView />
-          <ModelSelector />
+          {/* <ModelSelector /> */}
           <MusicPlayer />
           <History />
           <ScreenSizer />
