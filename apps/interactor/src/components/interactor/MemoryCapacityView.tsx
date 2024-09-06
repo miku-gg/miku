@@ -99,7 +99,7 @@ export default function MemoryCapacityView() {
                 height: `${realFillPercentage}%`,
                 filter: `drop-shadow(0 0 1px ${fillColor})`,
                 animation: `${uniqueKeyframeName}wave${index + 1} 1.5s infinite ease-in-out`,
-                width: '20%',
+                width: '22%',
                 left: `${sizeInPixels * index * 0.2}px`,
               }}
             >
