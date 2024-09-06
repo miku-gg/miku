@@ -93,6 +93,8 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
     const currentCharacterResponse = response.characters.find(
       ({ characterId }) => characterId === input.currentCharacterId,
     );
+    const currentCharacterName =
+      input.state.novel.characters.find((character) => character.id === input.currentCharacterId)?.name || '';
     const characterResponse = {
       characterId: currentCharacterResponse?.characterId || input.currentCharacterId,
       text: currentCharacterResponse?.text || '',
@@ -100,7 +102,7 @@ export abstract class AbstractRoleplayStrategy extends AbstractPromptStrategy<
       pose: currentCharacterResponse?.pose || '',
     };
     characterResponse.emotion = variables.get('emotion')?.trim() || characterResponse.emotion;
-    characterResponse.text = parseLLMResponse(variables.get('text')?.trim() || '');
+    characterResponse.text = parseLLMResponse(variables.get('text')?.trim() || '', currentCharacterName);
 
     const index = response.characters.findIndex(({ characterId }) => characterId === input.currentCharacterId);
 
