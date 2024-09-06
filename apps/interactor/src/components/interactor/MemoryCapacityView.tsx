@@ -46,16 +46,26 @@ export default function MemoryCapacityView() {
   }) => {
     const maxCapacity = isPremium ? PREMIUM_USERS_TOKENS_CAPACITY : REGULAR_USERS_TOKENS_CAPACITY;
     const fillPercentage = Math.min((currentTokensCount / maxCapacity) * 100, 100);
-
-    const getColorFromPercentage = (percentage: number) => {
-      if (!useColours) return 'white';
-      if (percentage < 25) return '#16a34a';
-      if (percentage < 50) return '#f7b500';
-      if (percentage < 75) return '#ff8c00';
-      if (percentage <= 100 && percentage > 75) return '#ff4e67';
-    };
-    const fillColor = getColorFromPercentage(fillPercentage);
+    const fillColor = useColours ? '#ffbe33' : '#fafafa';
+    const realFillPercentage = (fillPercentage + 8) * 0.835;
     const uniqueKeyframeName = `fill-${Math.random().toString(36).slice(2, 9)}`;
+
+    const keyframes = [
+      `@keyframes ${uniqueKeyframeName}wave1 {
+        0%, 100% { height: ${realFillPercentage}%; border-radius: 0 0 0 0; }
+        50% { height: ${realFillPercentage + 2}%; border-radius: 5% 5% 0 0; }
+      }`,
+      `@keyframes ${uniqueKeyframeName}wave2 {}`,
+      `@keyframes ${uniqueKeyframeName}wave3 {
+        0%, 100% { height: ${realFillPercentage}%; border-radius: 0 0 0 0; }
+        50% { height: ${realFillPercentage + 1.5}%; border-radius: 5% 5% 0 0; }
+      }`,
+      `@keyframes ${uniqueKeyframeName}wave4 {}`,
+      `@keyframes ${uniqueKeyframeName}wave5 {
+        0%, 100% { height: ${realFillPercentage}%; border-radius: 0 0 0 0; }
+        50% { height: ${realFillPercentage + 1}%; border-radius: 5% 5% 0 0; }
+      }`,
+    ];
 
     return (
       <>
@@ -76,50 +86,34 @@ export default function MemoryCapacityView() {
           />
 
           <style>
-            {`
-            @keyframes ${uniqueKeyframeName} {
-              0% {
-                height: ${fillPercentage}%;
-                border-radius: 30% 25% 0;
-
-              }
-              25% {
-                height: ${fillPercentage - 1}%;
-                 border-radius: 10% 30% 0 0;
-              }
-              50% {
-                height: ${fillPercentage + 1}%;
-                border-radius: 0 0 0 0;
-              }
-              75% {
-                height: ${fillPercentage - 0.5}%;
-                border-radius: 20% 0 0 0;
-              }
-              100% {
-                height: ${fillPercentage}%;
-                border-radius: 30% 25% 0 0;
-              }
-            }
-          `}
+            {keyframes.map((keyframe, index) => (
+              <style key={index}>{keyframe}</style>
+            ))}
           </style>
 
-          <div
-            className="MemoryCapacityView__fill"
-            style={{
-              height: `${fillPercentage}%`,
-              filter: `drop-shadow(0 0 1px ${fillColor})`,
-              animation: `${uniqueKeyframeName} 2s infinite ease-in-out`,
-            }}
-          >
-            <GiBrain
-              className="MemoryCapacityView__icon"
+          {[...Array(5)].map((_, index) => (
+            <div
+              key={index}
+              className="MemoryCapacityView__fill"
               style={{
-                color: fillColor,
-                width: `${sizeInPixels}`,
-                height: `${sizeInPixels}`,
+                height: `${realFillPercentage}%`,
+                filter: `drop-shadow(0 0 1px ${fillColor})`,
+                animation: `${uniqueKeyframeName}wave${index + 1} 1.5s infinite ease-in-out`,
+                width: '20%',
+                left: `${sizeInPixels * index * 0.2}px`,
               }}
-            />
-          </div>
+            >
+              <GiBrain
+                className="MemoryCapacityView__icon"
+                style={{
+                  color: fillColor,
+                  width: `${sizeInPixels}`,
+                  height: `${sizeInPixels}`,
+                  left: `-${sizeInPixels * index * 0.2}px`,
+                }}
+              />
+            </div>
+          ))}
 
           {showFillPercent && <p className="MemoryCapacityView__percentage">{Math.round(fillPercentage)}%</p>}
         </div>
@@ -139,7 +133,7 @@ export default function MemoryCapacityView() {
       <FillBrain
         isPremium={isPremiumUser}
         currentTokensCount={currentTokens || 0}
-        sizeInPixels={28}
+        sizeInPixels={32}
         showFillPercent={false}
         showTooltip={true}
         onClick={() => {
@@ -166,7 +160,6 @@ export default function MemoryCapacityView() {
               currentTokensCount={currentTokens || 0}
               sizeInPixels={70}
               showFillPercent={true}
-              useColours={true}
             />
             <div className="MemoryCapacityView__modal-top__text">
               <h4>Free membership</h4>
