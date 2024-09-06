@@ -51,7 +51,9 @@ const buildTextStops = (character: string = ''): string[] => {
     '<|model|>',
     '<|system|>',
     'INST',
-    ...(character ? [`\n${character}'s reaction`, `\n${character}:`] : []),
+    ...(character
+      ? [`\n${character}'s reaction:`, `\n${character}:`, `\n*${character}:`, `\n*${character}'s reaction:`]
+      : []),
   ];
 };
 
