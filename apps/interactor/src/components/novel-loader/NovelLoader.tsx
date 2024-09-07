@@ -1,57 +1,73 @@
 import { EMOTION_GROUP_TEMPLATES } from '@mikugg/bot-utils';
 import { Modal } from '@mikugg/ui-kit';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppContext } from '../../App.context';
 import { registerTrackSessionData } from '../../libs/analytics';
 import { replaceState } from '../../state/slices/replaceState';
 import { setName, setSystemPrompt } from '../../state/slices/settingsSlice';
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
+import { NovelNSFW } from '../../state/versioning';
 import { Loader } from '../common/Loader';
 import './NovelLoader.scss';
 
 const NovelLoader = (): JSX.Element => {
-  const { novelLoader, persona, isMobileApp } = useAppContext();
+  const { novelLoader, persona, isMobileApp, completelyNSFW } = useAppContext();
+  const [isCompletelyNSFW, setIsCompletelyNSFW] = useState<boolean | undefined>(completelyNSFW);
   const novelFetching = useAppSelector((state) => !state.novel.starts.length);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    novelLoader().then((state: RootState) => {
-      state.novel.characters.forEach((character) => {
-        character.card.data.extensions.mikugg_v2.outfits.forEach((outfit) => {
-          if (outfit.template === 'single-emotion') {
-            outfit.template = 'base-emotions';
-            const neutralImage = outfit.emotions.find((emotion) => emotion.id === 'neutral')?.sources.png;
-            outfit.emotions = EMOTION_GROUP_TEMPLATES['base-emotions'].emotionIds.map((emotionId) => {
-              return {
-                id: emotionId,
-                sources: { png: neutralImage || '' },
-              };
-            });
+    if (!isCompletelyNSFW) {
+      novelLoader().then((state: RootState) => {
+        state.novel.characters.forEach((character) => {
+          character.card.data.extensions.mikugg_v2.outfits.forEach((outfit) => {
+            if (outfit.template === 'single-emotion') {
+              outfit.template = 'base-emotions';
+              const neutralImage = outfit.emotions.find((emotion) => emotion.id === 'neutral')?.sources.png;
+              outfit.emotions = EMOTION_GROUP_TEMPLATES['base-emotions'].emotionIds.map((emotionId) => {
+                return {
+                  id: emotionId,
+                  sources: { png: neutralImage || '' },
+                };
+              });
+            }
+          });
+        });
+
+        if (state.settings.user.nsfw === NovelNSFW.NONE) {
+          let starts = state.novel.starts;
+          starts = starts.filter((start) => {
+            return state.novel.scenes.find((scene) => scene.id === start.sceneId)?.nsfw === NovelNSFW.NONE;
+          });
+          let interactionsCount = Object.keys(state.narration.interactions).length;
+
+          if ((starts.length === 0 && interactionsCount === 0) || completelyNSFW) {
+            setIsCompletelyNSFW(true);
+            return new Error('This novel is NSFW.');
           }
+        }
+
+        dispatch(replaceState(state));
+        if (persona?.name) {
+          if (persona?.description) {
+            dispatch(setSystemPrompt(`${persona.name} Description: ${persona.description}`));
+          }
+          dispatch(setName(persona.name));
+        }
+        registerTrackSessionData({
+          name: state.novel.title,
+          isPremium: state.settings.user.isPremium,
+          nsfw: state.settings.user.nsfw,
         });
       });
-      dispatch(replaceState(state));
-      if (persona?.name) {
-        if (persona?.description) {
-          dispatch(setSystemPrompt(`${persona.name} Description: ${persona.description}`));
-        }
-        dispatch(setName(persona.name));
-      }
-      registerTrackSessionData({
-        name: state.novel.title,
-        isPremium: state.settings.user.isPremium,
-        nsfw: state.settings.user.nsfw,
-      });
-    });
+    }
   }, [dispatch, novelLoader, persona?.name, persona?.description]);
 
   return (
     <Modal className={isMobileApp ? 'NovelLoaderModal' : ''} opened={novelFetching}>
       <div className="NovelLoader">
-        <div className="NovelLoader__text">Loading Novel</div>
-        <div className="NovelLoader__loader">
-          <Loader />
-        </div>
+        <div className="NovelLoader__text">{isCompletelyNSFW ? 'This novel is NSFW.' : 'Loading Novel'}</div>
+        <div className="NovelLoader__loader">{!isCompletelyNSFW && <Loader />}</div>
       </div>
     </Modal>
   );

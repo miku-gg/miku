@@ -14,6 +14,7 @@ export interface AppProps {
   freeTTS: boolean;
   freeSmart: boolean;
   persona: PersonaResult;
+  completelyNSFW?: boolean;
   novelLoader: () => Promise<RootState>;
   assetLinkLoader: (asset: string, lowres?: boolean) => string;
   assetUploader: (data: File) => Promise<{
@@ -32,6 +33,7 @@ const AppContext = createContext<AppProps>({
   freeTTS: false,
   freeSmart: false,
   persona: {} as PersonaResult,
+  completelyNSFW: false,
   novelLoader: () => Promise.resolve({} as RootState),
   assetLinkLoader: () => '',
   assetUploader: () =>

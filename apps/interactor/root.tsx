@@ -71,6 +71,7 @@ export function getCongurationFromParams(): {
   cardEndpoint: string
   servicesEndpoint: string
   persona: PersonaResult
+  completelyNSFW?: boolean
   settings: object
 } {
   const queryParams = queryString.parse(window.location.search)
@@ -94,6 +95,7 @@ export function getCongurationFromParams(): {
       freeTTS: boolean
       freeSmart: boolean
       persona: PersonaResult
+      completelyNSFW: boolean
       settings?: RootState['settings']
     }
 
@@ -118,6 +120,7 @@ export function getCongurationFromParams(): {
       cardEndpoint: configurationJson.cardEndpoint || API_ENDPOINT,
       servicesEndpoint: configurationJson.servicesEndpoint || SERVICES_ENDPOINT,
       persona: configurationJson.persona,
+      completelyNSFW: configurationJson.completelyNSFW || false,
       settings: configurationJson.settings || {},
     }
   } catch (e) {
@@ -150,6 +153,7 @@ export function getCongurationFromParams(): {
           username: '',
         },
       },
+      completelyNSFW: false,
       settings: mergeWith({}, initialSettingsState),
     }
   }
@@ -313,6 +317,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       isMobileApp={params.isMobileApp}
       freeTTS={params.freeTTS}
       persona={params.persona}
+      completelyNSFW={params.completelyNSFW}
       novelLoader={loadNarration}
       assetUploader={(file: File) =>
         uploadAsset(params.assetsUploadEndpoint, file)
