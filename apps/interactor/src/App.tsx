@@ -24,6 +24,7 @@ function App(props: AppProps) {
     apiEndpoint: props.apiEndpoint,
     cardEndpoint: props.cardEndpoint,
     persona: props.persona,
+    completelyNSFW: props.completelyNSFW,
     assetUploader: props.assetUploader,
     assetLinkLoader: props.assetLinkLoader,
     novelLoader: props.novelLoader,
