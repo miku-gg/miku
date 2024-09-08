@@ -30,23 +30,26 @@ export const MusicNegated = () => {
 const MusicPlayer: React.FC = () => {
   const dispatch = useAppDispatch();
   const { assetLinkLoader } = useAppContext();
-  const _volume = useAppSelector((state) => state.settings.music.volume);
+  const volume = useAppSelector((state) => state.settings.music.volume);
   const enabled = useAppSelector((state) => state.settings.music.enabled);
+  const novelFetching = useAppSelector((state) => !state.novel.starts.length);
   const songs = useAppSelector((state) => state.novel.songs);
   const scene = useAppSelector(selectCurrentScene);
   const audioRef = useRef<HTMLAudioElement>(null);
   const _src = songs.find((s) => s.id === scene?.musicId)?.source || scene?.musicId;
   const src = _src ? assetLinkLoader(_src) : '';
 
-  const volume = enabled ? _volume : 0;
-
   const togglePlay = () => {
-    if (volume) {
-      dispatch(setMusicEnabled(false));
-    } else {
-      dispatch(setMusicEnabled(true));
+    if (audioRef.current) {
+      if (enabled) {
+        audioRef.current.pause();
+        dispatch(setMusicEnabled(false));
+      } else {
+        audioRef.current.play();
+        dispatch(setMusicEnabled(true));
+      }
     }
-    trackEvent('music-toggle-click', { enabledMusic: !volume });
+    trackEvent('music-toggle-click', { enabledMusic: enabled });
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,31 +57,26 @@ const MusicPlayer: React.FC = () => {
     dispatch(setMusicVolume(newVolume));
   };
 
-  if (audioRef.current) audioRef.current.volume = volume;
-
   useEffect(() => {
-    if (audioRef.current && volume > 0) {
-      audioRef.current.play().catch((error) => {
-        console.error('Autoplay error:', error);
-      });
+    if (!novelFetching) {
+      setTimeout(() => {
+        if (audioRef.current?.paused) {
+          dispatch(setMusicEnabled(false));
+        }
+      }, 200);
     }
-  }, [src, volume]);
+  }, [novelFetching]);
+
+  if (audioRef.current) audioRef.current.volume = volume;
 
   return (
     <div className="MusicPlayer">
-      <audio
-        ref={audioRef}
-        src={src}
-        autoPlay
-        loop
-        onPause={() => dispatch(setMusicEnabled(false))}
-        onPlay={() => dispatch(setMusicEnabled(true))}
-      />
+      <audio ref={audioRef} src={src} autoPlay loop />
       <button onClick={togglePlay} className="MusicPlayer__icon icon-button">
-        {volume ? <Music /> : <MusicNegated />}
+        {enabled ? <Music /> : <MusicNegated />}
       </button>
       <div className="MusicPlayer__range">
-        <input type="range" min="0" max="1" step="0.01" value={_volume} onChange={handleVolumeChange} />
+        <input type="range" min="0" max="1" step="0.01" value={volume} onChange={handleVolumeChange} />
       </div>
     </div>
   );

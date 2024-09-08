@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { Button, Dropdown } from '@mikugg/ui-kit';
 import classNames from 'classnames';
+import { useEffect, useState } from 'react';
+import { useAppContext } from '../../App.context';
+import { selectCharacterOutfits, selectSceneFromResponse } from '../../state/selectors';
 import { selectCharacterOfResponse, updateInteraction, updateResponse } from '../../state/slices/narrationSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NarrationInteraction, NarrationResponse } from '../../state/versioning';
-import { Button, Dropdown } from '@mikugg/ui-kit';
-import { selectCharacterOutfits, selectSceneFromResponse } from '../../state/selectors';
-import { useAppContext } from '../../App.context';
 import './NodeEditor.scss';
 
 const TextEditor = ({
@@ -141,7 +141,8 @@ const InteractionEditor = ({ interaction, onClose }: { interaction: NarrationInt
 export const NodeEditor = ({ id, onClose }: { id: string; onClose: () => void }) => {
   const response = useAppSelector((state) => state.narration.responses[id]);
   const interaction = useAppSelector((state) => state.narration.interactions[id]);
-
+  const { isMobileApp } = useAppContext();
+  const mobileWidth = window.innerWidth < 450;
   let content: JSX.Element | null = null;
 
   if (response) {
@@ -150,5 +151,5 @@ export const NodeEditor = ({ id, onClose }: { id: string; onClose: () => void })
     content = <InteractionEditor interaction={interaction} onClose={onClose} />;
   }
 
-  return <div className="NodeEditor">{content}</div>;
+  return <div className={`NodeEditor ${isMobileApp || mobileWidth ? 'NodeEditor__mobile-app' : ''}`}>{content}</div>;
 };

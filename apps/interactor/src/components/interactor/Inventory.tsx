@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { Button, Tooltip } from '@mikugg/ui-kit';
 import { FaTimes } from 'react-icons/fa';
@@ -144,6 +145,24 @@ export const InventoryItemModal = ({
   const { assetLinkLoader } = useAppContext();
   const showItemModal = useAppSelector((state) => state.inventory.showItemModal);
   const state = useAppSelector((state) => state);
+
+  const element = document.querySelector('.InventoryItemModal') as HTMLElement;
+
+  useEffect(() => {
+    element?.addEventListener('animationend', (event) => {
+      if (event.animationName === 'slideClose') {
+        element.classList.add('hidden-after-close');
+      }
+    });
+
+    if (showItemModal === 'open') {
+      element.classList.remove('hidden-after-close');
+    }
+
+    return () => {
+      element?.removeEventListener('animationend', () => {});
+    };
+  }, [showItemModal]);
 
   return (
     <div className={`InventoryItemModal scrollbar ${showItemModal}`}>

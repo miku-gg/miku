@@ -7,6 +7,7 @@ import textHandler, { tokenizeHandler } from './services/text/index.mjs';
 import { TokenizerType, loadTokenizer } from './services/text/lib/tokenize.mjs';
 import monitor from 'express-status-monitor';
 import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
+import { getModelHealth } from './services/text/lib/healthChecker.mjs';
 const PORT = process.env.SERVICES_PORT || 8484;
 
 const app: express.Application = express();
@@ -76,6 +77,13 @@ app.post('/audio', async (req: Request<string>, res: Response) => {
 
 app.get('/', (req, res) => {
   res.status(200).send('Miku Services');
+});
+
+app.get('/health', (req, res) => {
+  res.send({
+    rp: getModelHealth('RP'),
+    rp_smart: getModelHealth('RP_SMART'),
+  });
 });
 
 app.get('/text/metadata/:model', async (req, res) => {

@@ -13,6 +13,7 @@ interface DragAndDropImagesProps {
   handleChange?: ((file: File) => void) | ((file: File) => Promise<void>);
   previewImage?: string;
   size?: 'sm' | 'md' | 'lg';
+  accept?: string;
   placeHolderImage?: React.ReactNode;
 }
 
@@ -25,6 +26,7 @@ const DragAndDropImages = ({
   handleChange,
   previewImage = '',
   size = 'md',
+  accept = 'image/*',
   placeHolderImage = <DefaultImage />,
 }: DragAndDropImagesProps) => {
   const [dragOver, setDragOver] = useState<boolean>(false);
@@ -71,6 +73,7 @@ const DragAndDropImages = ({
         type="file"
         ref={fileInputRef}
         style={{ display: 'none' }} // Hide the file input
+        accept={accept}
         onChange={(event) => {
           const file = event.target.files?.[0];
           file && handleDropZoneChange(file, event);
@@ -91,7 +94,9 @@ const DragAndDropImages = ({
           </div>
         ) : (
           <div className="dragAndDropImages__preview">
-            {previewImage.indexOf('video/webm') !== -1 || previewImage.endsWith('.webm') ? (
+            {previewImage.indexOf('video/') !== -1 ||
+            previewImage.endsWith('.webm') ||
+            previewImage.endsWith('.mp4') ? (
               <video src={previewImage} autoPlay={true} loop={true} muted={true} />
             ) : (
               <LazyLoadImage effect="blur" src={previewImage} />

@@ -1,42 +1,42 @@
+import { DEFAULT_MUSIC } from '@mikugg/bot-utils';
 import { Button, DragAndDropImages, Input, Modal, MusicSelector, Tooltip } from '@mikugg/ui-kit';
-import { MdOutlineImageSearch } from 'react-icons/md';
+import { createSelector } from '@reduxjs/toolkit';
+import classNames from 'classnames';
+import debounce from 'lodash.debounce';
+import { useCallback, useEffect, useState } from 'react';
 import { BsStars } from 'react-icons/bs';
 import { FaCoins } from 'react-icons/fa6';
-import { DEFAULT_MUSIC } from '@mikugg/bot-utils';
-import debounce from 'lodash.debounce';
-import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
-import { useAppContext } from '../../App.context';
+import { MdOutlineImageSearch } from 'react-icons/md';
+import { toast } from 'react-toastify';
 import { v4 as randomUUID } from 'uuid';
-import './CreateScene.scss';
+import { useAppContext } from '../../App.context';
+import { trackEvent } from '../../libs/analytics';
+import { BackgroundResult, CharacterResult, listSearch, SearchType } from '../../libs/listSearch';
+import { loadNovelFromSingleCard } from '../../libs/loadNovel';
+import { selectCurrentScene } from '../../state/selectors';
 import {
   addImportedBackground,
+  addImportedCharacter,
+  backgroundInferenceStart,
+  clearImportedCharacters,
+  removeImportedBackground,
   selectCharacter,
+  setBackground,
   setCharacterModalOpened,
   setModalOpened,
-  setPromptValue,
-  setTitleValue,
-  setSubmitting,
-  removeImportedBackground,
-  setBackground,
   setMusic,
-  addImportedCharacter,
-  clearImportedCharacters,
-  backgroundInferenceStart,
+  setPromptValue,
+  setSubmitting,
+  setTitleValue,
 } from '../../state/slices/creationSlice';
-import classNames from 'classnames';
 import { interactionStart } from '../../state/slices/narrationSlice';
 import { addScene } from '../../state/slices/novelSlice';
-import { toast } from 'react-toastify';
-import { createSelector } from '@reduxjs/toolkit';
-import { Loader } from '../common/Loader';
-import { useCallback, useEffect, useState } from 'react';
-import { BackgroundResult, CharacterResult, listSearch, SearchType } from '../../libs/listSearch';
-import EmotionRenderer from '../emotion-render/EmotionRenderer';
-import { loadNovelFromSingleCard } from '../../libs/loadNovel';
 import { userDataFetchStart } from '../../state/slices/settingsSlice';
+import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
+import { Loader } from '../common/Loader';
+import EmotionRenderer from '../emotion-render/EmotionRenderer';
+import './CreateScene.scss';
 import CreditsDisplayer from './CreditsDisplayer';
-import { selectCurrentScene } from '../../state/selectors';
-import { trackEvent } from '../../libs/analytics';
 
 const selectSelectableCharacters = createSelector(
   [(state: RootState) => state.novel.characters, (state: RootState) => state.creation.importedCharacters],
@@ -59,7 +59,7 @@ async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
 
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
-  const { assetLinkLoader, assetUploader, servicesEndpoint, apiEndpoint } = useAppContext();
+  const { assetLinkLoader, assetUploader, servicesEndpoint, apiEndpoint, isMobileApp } = useAppContext();
   const currentScene = useAppSelector(selectCurrentScene);
   const songs = useAppSelector((state) =>
     state.novel.songs.filter((song) => state.novel.scenes.find((scene) => scene.musicId === song.id)),
@@ -237,6 +237,7 @@ const CreateScene = () => {
               name: selectedMusic.name,
               source: assetLinkLoader(selectedMusic.source),
             }}
+            hideUpload={isMobileApp}
             onChange={(value) => {
               dispatch(
                 setMusic(
@@ -546,39 +547,41 @@ const CreateSceneBackgroundModal = () => {
             <MdOutlineImageSearch />
             <p>Search</p>
           </div>{' '}
-          <div className="CreateScene__selector__item CreateScene__selector__item--upload">
-            <DragAndDropImages
-              placeHolder="Upload background"
-              errorMessage="Error uploading images"
-              handleChange={(file: File) => {
-                // transform file to base64 string
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                  const base64String = reader.result;
-                  if (typeof base64String === 'string') {
-                    dispatch(addImportedBackground(base64String));
-                    dispatch(setBackground(base64String));
-                  }
-                };
-              }}
-            />
-          </div>
           {!isMobileApp && (
-            <div
-              className="CreateScene__selector__item CreateScene__selector__item--upload"
-              onClick={() => {
-                dispatch(
-                  setModalOpened({
-                    id: 'background-gen',
-                    opened: true,
-                  }),
-                );
-              }}
-            >
-              <BsStars />
-              <p>Generate</p>
-            </div>
+            <>
+              <div className="CreateScene__selector__item CreateScene__selector__item--upload">
+                <DragAndDropImages
+                  placeHolder="Upload background"
+                  errorMessage="Error uploading images"
+                  handleChange={(file: File) => {
+                    // transform file to base64 string
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                      const base64String = reader.result;
+                      if (typeof base64String === 'string') {
+                        dispatch(addImportedBackground(base64String));
+                        dispatch(setBackground(base64String));
+                      }
+                    };
+                  }}
+                />
+              </div>
+              <div
+                className="CreateScene__selector__item CreateScene__selector__item--upload"
+                onClick={() => {
+                  dispatch(
+                    setModalOpened({
+                      id: 'background-gen',
+                      opened: true,
+                    }),
+                  );
+                }}
+              >
+                <BsStars />
+                <p>Generate</p>
+              </div>
+            </>
           )}
         </div>
       </div>

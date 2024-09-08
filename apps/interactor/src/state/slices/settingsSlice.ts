@@ -33,7 +33,7 @@ export const initialState: SettingsState = {
     voiceId: Voices.SaraWhispering,
   },
   music: {
-    enabled: false,
+    enabled: true,
     volume: 0.2,
   },
   modals: {
@@ -45,6 +45,7 @@ export const initialState: SettingsState = {
     debug: false,
     testing: false,
     modelSelector: false,
+    memoryCapacity: false,
     edit: {
       opened: false,
       id: '',
@@ -58,6 +59,9 @@ export const settingSlice = createSlice({
   reducers: {
     setSettings: (_state, action: PayloadAction<SettingsState>) => {
       return action.payload;
+    },
+    setMemoryCapacityModal: (state, action: PayloadAction<boolean>) => {
+      state.modals.memoryCapacity = action.payload;
     },
     setModel: (state, action: PayloadAction<ModelType>) => {
       state.model = action.payload;
@@ -156,6 +160,7 @@ export const settingSlice = createSlice({
 
 export const {
   setSettings,
+  setMemoryCapacityModal,
   setModel,
   setName,
   setIsDraggable,
