@@ -107,8 +107,10 @@ const generateNodes = (scenes: ReturnType<typeof selectScenes>) => [
       position: { x: startPos.x + 200 * index, y: startPos.y },
       data: {
         title: scene.name,
-        background: config.genAssetLink(scene.background?.source.jpg || ''),
-        characters: scene.characters.map((char) => config.genAssetLink(char.profile_pic || '')),
+        background: config.genAssetLink(scene.background?.source.jpg || '', AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL),
+        characters: scene.characters.map((char) =>
+          config.genAssetLink(char.profile_pic || '', AssetDisplayPrefix.PROFILE_PIC_SMALL),
+        ),
       },
     };
   }),
@@ -252,3 +254,4 @@ export default function SceneGraph() {
   );
 }
 import { openModal } from '../../state/slices/inputSlice';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';

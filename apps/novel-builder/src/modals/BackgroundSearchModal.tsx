@@ -1,6 +1,6 @@
 import ItemSearch from '../components/ItemSearch';
 import config from '../config';
-import { NovelV3 } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import { closeModal } from '../state/slices/inputSlice';
 import { addBackground } from '../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../state/store';
@@ -22,7 +22,7 @@ export default function BackgroundSearchModal() {
             id: item.id,
             description: item.description,
             name: item.name,
-            previewAssetUrl: config.genAssetLink(item.source.jpg, true),
+            previewAssetUrl: config.genAssetLink(item.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL),
             tags: item.attributes.map((attr) => (attr?.length && attr[1]) || '').filter((x) => x),
             value: item,
           };

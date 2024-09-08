@@ -12,10 +12,10 @@ import { useState } from 'react';
 import { FaPencil } from 'react-icons/fa6';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { toast } from 'react-toastify';
-import config from '../../config';
+import config, { MAX_FILE_SIZE } from '../../config';
 import { checkFileType } from '../../libs/utils';
 import './MapEditModal.scss';
-import { AssetType } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 export default function MapEditModal() {
   const dispatch = useDispatch();
@@ -134,7 +134,7 @@ export default function MapEditModal() {
                     place.maskSource && (
                       <img
                         className={`MapEdit__form__placePreview ${place.id === hoveredPlace ? 'hovered' : ''}`}
-                        src={config.genAssetLink(place.maskSource || '')}
+                        src={config.genAssetLink(place.maskSource || '', AssetDisplayPrefix.MAP_MASK)}
                       />
                     ),
                 )}
@@ -142,13 +142,13 @@ export default function MapEditModal() {
                 placeHolder="Upload map image."
                 className="MapEdit__form__uploadMap"
                 handleChange={(file) => handleUploadMapImage(file)}
-                previewImage={map?.source.png && config.genAssetLink(map.source.png)}
+                previewImage={map?.source.png && config.genAssetLink(map.source.png, AssetDisplayPrefix.MAP_IMAGE)}
                 onFileValidate={async (file) => {
-                  if (file.size > 2 * 1024 * 1024) {
-                    toast.error('File size should be less than 1MB');
+                  if (file.size > MAX_FILE_SIZE) {
+                    toast.error('File size should be less than 5MB');
                     return false;
                   }
-                  if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+                  if (!checkFileType(file, ['image/png', 'image/jpeg', 'image/webp'])) {
                     toast.error('Invalid file type. Please upload a jpg file.');
                     return false;
                   }
@@ -173,7 +173,12 @@ export default function MapEditModal() {
                       onMouseEnter={() => setHoveredPlace(place.id)}
                       onMouseLeave={() => setHoveredPlace(null)}
                     >
-                      {mapPlace && <img className="MapEdit__place__previewImage" src={config.genAssetLink(mapPlace)} />}
+                      {mapPlace && (
+                        <img
+                          className="MapEdit__place__previewImage"
+                          src={config.genAssetLink(mapPlace, AssetDisplayPrefix.MAP_IMAGE_PREVIEW)}
+                        />
+                      )}
                       <FaPencil
                         className="MapEdit__place__edit"
                         onClick={(e: React.MouseEvent) => {

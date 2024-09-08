@@ -1,29 +1,18 @@
-import { AssetType, NovelV3, _browser_convertAsset, _browser_convertToWebP, uploadAsset } from '@mikugg/bot-utils';
+import {
+  AssetType,
+  dataURLtoFile,
+  NovelV3,
+  convertToWebP,
+  getAssetLink,
+  AssetDisplayPrefix,
+  uploadAsset,
+} from '@mikugg/bot-utils';
 import { BackgroundResult, listSearch, SearchType, SongResult } from './libs/listSearch';
-import { API_ENDPOINT } from './libs/utils';
 
-async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
-  const response = await fetch(dataURI);
-  const blob = await response.blob();
-  return new File([blob], filename, { type: blob.type });
-}
-
-async function fileToDataURI(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target) {
-        resolve(e.target.result as string);
-      } else {
-        reject('Failed to read file');
-      }
-    };
-    reader.readAsDataURL(file);
-  });
-}
+export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 interface BuilderConfig {
-  genAssetLink: (asset: string, lowres?: boolean) => string;
+  genAssetLink: (asset: string, displayPrefix: AssetDisplayPrefix) => string;
   uploadAsset: (
     file: File | string,
     type: AssetType,
@@ -63,20 +52,22 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
   [
     'development',
     {
-      genAssetLink: (asset: string, lowres?: boolean) => {
+      genAssetLink: (asset: string) => {
         if (asset.startsWith('data')) {
           return asset;
         } else {
-          return `http://localhost:8585/s3/assets/${lowres ? `480p_${asset}` : asset}`;
+          return `http://localhost:8585/s3/assets/${asset}`;
         }
       },
       uploadAsset: async (file: File | string, type) => {
         if (typeof file === 'string') {
-          file = await dataURItoFile(file, 'asset');
+          file = await dataURLtoFile(file, 'asset');
         }
-        const assets = _browser_convertAsset(file, type);
 
-        const result = await uploadAsset('http://localhost:8585/asset-upload', file);
+        const result = await fetch('http://localhost:8585/asset-upload', {
+          method: 'POST',
+          body: file,
+        }).then((res) => res.json());
 
         return {
           success: !!result.fileName,
@@ -157,23 +148,33 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
   [
     'staging',
     {
-      genAssetLink: (asset: string, lowres?: boolean) => {
+      genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
           return asset;
         } else {
-          return `https://assets.miku.gg/${lowres ? `480p_${asset}` : asset}`;
+          return getAssetLink(
+            {
+              optimized: 'https://mikugg-assets.nyc3.digitaloceanspaces.com',
+              fallback: 'https://assets.miku.gg',
+            },
+            asset,
+            displayPrefix || AssetDisplayPrefix.NOVEL_AD_VIDEO,
+          );
         }
       },
-      uploadAsset: async (file: File | string) => {
+      uploadAsset: async (file: File | string, type: AssetType) => {
         if (typeof file === 'string') {
-          file = await dataURItoFile(file, 'asset');
+          file = await dataURLtoFile(file, 'asset');
+        }
+        if (file.type.startsWith('image')) {
+          file = new File([await convertToWebP(file)], 'asset.webp', { type: 'image/webp' });
         }
 
-        const result = await uploadAsset(import.meta.env.VITE_ASSETS_UPLOAD_URL || '', file);
+        const result = await uploadAsset(import.meta.env.VITE_ASSETS_UPLOAD_URL, file, type);
 
         return {
-          success: !!result.fileName,
-          assetId: result.fileName,
+          success: result.status === 200 || result.status === 201,
+          assetId: result.data,
         };
       },
       previewIframe: 'https://alpha.miku.gg',
@@ -240,23 +241,33 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
   [
     'production',
     {
-      genAssetLink: (asset: string, lowres?: boolean) => {
+      genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
           return asset;
         } else {
-          return `https://assets.miku.gg/${lowres ? `480p_${asset}` : asset}`;
+          return getAssetLink(
+            {
+              optimized: 'https://mikugg-assets.nyc3.digitaloceanspaces.com',
+              fallback: 'https://assets.miku.gg',
+            },
+            asset,
+            displayPrefix || AssetDisplayPrefix.NOVEL_AD_VIDEO,
+          );
         }
       },
-      uploadAsset: async (file: File | string) => {
+      uploadAsset: async (file: File | string, type) => {
         if (typeof file === 'string') {
-          file = await dataURItoFile(file, 'asset');
+          file = await dataURLtoFile(file, 'asset');
+        }
+        if (file.type.startsWith('image')) {
+          file = new File([await convertToWebP(file)], 'asset.webp', { type: 'image/webp' });
         }
 
-        const result = await uploadAsset(import.meta.env.VITE_ASSETS_UPLOAD_URL || '', file);
+        const result = await uploadAsset(import.meta.env.VITE_ASSETS_UPLOAD_URL, file, type);
 
         return {
-          success: !!result.fileName,
-          assetId: result.fileName,
+          success: result.status === 200 || result.status === 201,
+          assetId: result.data,
         };
       },
       previewIframe: 'https://interactor.miku.gg',

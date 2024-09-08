@@ -10,11 +10,11 @@ import { useAppSelector } from '../../state/store';
 
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import config from '../../config';
+import config, { MAX_FILE_SIZE } from '../../config';
 import { checkFileType } from '../../libs/utils';
 import SceneSelector from '../scene/SceneSelector';
 import './PlaceEditModal.scss';
-import { AssetType } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 function isBlackAndWhite(pixels: Uint8ClampedArray): boolean {
   for (let i = 0; i < pixels.length; i += 4) {
@@ -122,13 +122,17 @@ export default function PlaceEditModal() {
           </div>
           <div className="PlaceEdit__maskImage">
             {map?.source.png && (
-              <img className="PlaceEdit__maskImage__map" src={config.genAssetLink(map.source.png)} alt="map" />
+              <img
+                className="PlaceEdit__maskImage__map"
+                src={config.genAssetLink(map.source.png, AssetDisplayPrefix.MAP_IMAGE)}
+                alt="map"
+              />
             )}
 
             <DragAndDropImages
               placeHolder="Add a mask for the place."
               className="PlaceEdit__maskImage__mask"
-              previewImage={place.maskSource && config.genAssetLink(place.maskSource)}
+              previewImage={place.maskSource && config.genAssetLink(place.maskSource, AssetDisplayPrefix.MAP_MASK)}
               handleChange={(file) => handleUploadImage(file, 'mask')}
               onFileValidate={async (file) => {
                 const mapImageSrc = map?.source.png;
@@ -136,11 +140,11 @@ export default function PlaceEditModal() {
                   toast.error('Please upload a map image first.');
                   return false;
                 }
-                if (file.size > 2 * 1024 * 1024) {
-                  toast.error('File size should be less than 1MB');
+                if (file.size > MAX_FILE_SIZE) {
+                  toast.error('File size should be less than 5MB');
                   return false;
                 }
-                if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+                if (!checkFileType(file, ['image/png', 'image/jpeg', 'image/webp'])) {
                   toast.error('Invalid file type. Please upload a jpg file.');
                   return false;
                 }
@@ -171,9 +175,9 @@ export default function PlaceEditModal() {
                     }
                     // check if the mask is the same size as the map image
                     const mapImage = new Image();
-                    mapImage.src = config.genAssetLink(mapImageSrc);
+                    mapImage.src = config.genAssetLink(mapImageSrc, AssetDisplayPrefix.MAP_IMAGE);
                     mapImage.onload = () => {
-                      if (mapImage.width !== image.width || mapImage.height !== image.height) {
+                      if (mapImage.width / mapImage.height - image.width / image.height < 0.05) {
                         toast.error('Mask should be the same size as the map image.');
                         resolve(false);
                         return;
@@ -238,16 +242,17 @@ export default function PlaceEditModal() {
                 place.previewSource
                   ? config.genAssetLink(
                       backgrounds.find((b) => b.id === place.previewSource)?.source.jpg || place.previewSource,
+                      AssetDisplayPrefix.MAP_IMAGE_PREVIEW,
                     )
                   : ''
               }
               handleChange={(file) => handleUploadImage(file, 'preview')}
               onFileValidate={async (file) => {
-                if (file.size > 2 * 1024 * 1024) {
-                  toast.error('File size should be less than 1MB');
+                if (file.size > MAX_FILE_SIZE) {
+                  toast.error('File size should be less than 5MB');
                   return false;
                 }
-                if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+                if (!checkFileType(file, ['image/png', 'image/jpeg', 'image/webp'])) {
                   toast.error('Invalid file type. Please upload a valid image file');
                   return false;
                 }

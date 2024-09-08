@@ -9,6 +9,7 @@ import { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { v4 as randomUUID } from 'uuid';
 import { createCharacter } from '../../../state/slices/novelFormSlice';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 export default function Characters({
   selected,
@@ -55,7 +56,7 @@ export default function Characters({
         tooltip: character.name,
         highlighted: selected === character.id,
         content: {
-          image: config.genAssetLink(character.profile_pic),
+          image: config.genAssetLink(character.profile_pic, AssetDisplayPrefix.PROFILE_PIC_SMALL),
         },
         onEditClick: () =>
           dispatch(

@@ -9,6 +9,7 @@ import { openModal } from '../../../state/slices/inputSlice';
 import { createNewInventoryItem } from '../../../state/slices/novelFormSlice';
 import { useAppSelector } from '../../../state/store';
 import './InventoryItems.scss'; // Import the SCSS file
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const InventoryItems = ({
   selectedItemIds,
@@ -40,7 +41,7 @@ const InventoryItems = ({
       highlighted: selectedItemIds && selectedItemIds.includes(item.id),
       content: {
         text: !item.icon && item.name,
-        image: item.icon && config.genAssetLink(item.icon),
+        image: item.icon && config.genAssetLink(item.icon, AssetDisplayPrefix.ITEM_IMAGE_SMALL),
       },
       onEditClick: () =>
         dispatch(

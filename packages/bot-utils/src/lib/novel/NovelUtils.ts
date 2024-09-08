@@ -478,6 +478,11 @@ export enum AssetType {
   MAP_VIDEO = 'MAP_VIDEO',
   MUSIC = 'MUSIC',
   ITEM_IMAGE = 'ITEM_IMAGE',
+  PROFILE_PIC = 'PROFILE_PIC',
+  NOVEL_AD = 'NOVEL_AD',
+  NOVEL_SCREENSHOT = 'NOVEL_SCREENSHOT',
+  NOVEL_AD_VIDEO = 'NOVEL_AD_VIDEO',
+  NOVEL_SHARE = 'NOVEL_SHARE',
 }
 
 export const importAndReplaceNovelStateAssets = async (

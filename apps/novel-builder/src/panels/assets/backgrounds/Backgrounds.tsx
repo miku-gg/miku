@@ -13,7 +13,7 @@ import { selectBackgrounds } from '../../../state/selectors';
 import { openModal } from '../../../state/slices/inputSlice';
 import { addBackground } from '../../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../../state/store';
-import { AssetType } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 export default function Backgrounds({ selected, onSelect }: { selected?: string; onSelect?: (id: string) => void }) {
   const backgrounds = useAppSelector(selectBackgrounds);
@@ -70,7 +70,7 @@ export default function Backgrounds({ selected, onSelect }: { selected?: string;
               );
             },
             content: {
-              image: config.genAssetLink(background.source.jpg, true),
+              image: config.genAssetLink(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE),
             },
             onClick: () => {
               onSelect?.(background.id);

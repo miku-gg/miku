@@ -1,13 +1,13 @@
 import { DragAndDropImages, Input } from '@mikugg/ui-kit';
 import { toast } from 'react-toastify';
-import config from '../../config';
+import config, { MAX_FILE_SIZE } from '../../config';
 import { checkFileType } from '../../libs/utils';
 import { updateDetails } from '../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 
 import './DetailsPanel.scss';
 import { LorebookList } from './LorebookList';
-import { AssetType } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 export default function DetailsPanel() {
   const dispatch = useAppDispatch();
 
@@ -97,14 +97,14 @@ export default function DetailsPanel() {
             size="lg"
             className="DetailsPanel__logoPic"
             handleChange={handleLogoPicChange}
-            previewImage={logoPic && config.genAssetLink(logoPic)}
+            previewImage={logoPic && config.genAssetLink(logoPic, AssetDisplayPrefix.PROFILE_PIC)}
             placeHolder="(256x256)"
             onFileValidate={async (file) => {
-              if (file.size > 2 * 1024 * 1024) {
-                toast.error('File size should be less than 1MB');
+              if (file.size > MAX_FILE_SIZE) {
+                toast.error('File size should be less than 5MB');
                 return false;
               }
-              if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+              if (!checkFileType(file, ['image/png', 'image/jpeg', 'image/webp'])) {
                 toast.error('Invalid file type. Please upload a valid image file');
                 return false;
               }

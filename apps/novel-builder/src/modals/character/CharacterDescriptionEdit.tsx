@@ -2,7 +2,7 @@ import { DragAndDropImages, Input, Modal, TagAutocomplete } from '@mikugg/ui-kit
 import { useState } from 'react';
 import { BsStars } from 'react-icons/bs';
 import { toast } from 'react-toastify';
-import config from '../../config';
+import config, { MAX_FILE_SIZE } from '../../config';
 import textCompletion from '../../libs/textCompletion';
 import { ModelType, SERVICES_ENDPOINT, checkFileType, conversationAgent } from '../../libs/utils';
 import { LorebookList } from '../../panels/details/LorebookList';
@@ -13,7 +13,7 @@ import './CharacterDescriptionEdit.scss';
 import { CharacterDescriptionGeneration } from './CharacterDescriptionGeneration';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
-import { AssetType } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 const DEFAULT_TAGS = [
   { value: 'Male' },
@@ -252,11 +252,11 @@ export default function CharacterDescriptionEdit({ characterId }: { characterId?
             size="lg"
             className="CharacterDescriptionEdit__dragAndDropImages"
             handleChange={handleAvatarChange}
-            previewImage={config.genAssetLink(character.profile_pic)}
+            previewImage={config.genAssetLink(character.profile_pic, AssetDisplayPrefix.PROFILE_PIC)}
             placeHolder="(256x256)"
             onFileValidate={(file) => {
-              if (file.size > 1000000) {
-                toast.error('File size should be less than 1MB');
+              if (file.size > MAX_FILE_SIZE) {
+                toast.error('File size should be less than 5MB');
                 return false;
               }
               if (!checkFileType(file)) {

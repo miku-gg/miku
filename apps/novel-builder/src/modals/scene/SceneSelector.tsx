@@ -7,6 +7,7 @@ import './SceneSelector.scss';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 interface SceneSelectorProps {
   opened: boolean;
@@ -52,7 +53,10 @@ export const SceneSelectorModal = ({
               <div
                 className="SceneNode"
                 style={{
-                  backgroundImage: `url(${config.genAssetLink(scene.background?.source.jpg || '')})`,
+                  backgroundImage: `url(${config.genAssetLink(
+                    scene.background?.source.jpg || '',
+                    AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL,
+                  )})`,
                 }}
               >
                 <div className="SceneNode__title">{scene.name}</div>
@@ -60,7 +64,7 @@ export const SceneSelectorModal = ({
                   {scene.characters.map((character, index) => (
                     <img
                       key={index}
-                      src={config.genAssetLink(character.profile_pic || '')}
+                      src={config.genAssetLink(character.profile_pic || '', AssetDisplayPrefix.PROFILE_PIC_SMALL)}
                       alt={`Character ${index}`}
                       className="SceneNode__character"
                     />
@@ -118,7 +122,10 @@ export default function SceneSelector({
                 setEditingIndex(index);
               }}
               style={{
-                backgroundImage: `url(${config.genAssetLink(scene.background?.source.jpg || '')})`,
+                backgroundImage: `url(${config.genAssetLink(
+                  scene.background?.source.jpg || '',
+                  AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL,
+                )})`,
               }}
             >
               <div className="SceneNode__title">{scene.name}</div>
@@ -140,7 +147,7 @@ export default function SceneSelector({
                 {scene.characters.map((character, index) => (
                   <img
                     key={index}
-                    src={config.genAssetLink(character.profile_pic || '')}
+                    src={config.genAssetLink(character.profile_pic || '', AssetDisplayPrefix.PROFILE_PIC_SMALL)}
                     alt={`Character ${index}`}
                     className="SceneNode__character"
                   />
@@ -157,7 +164,7 @@ export default function SceneSelector({
                 setEditingIndex(value.length);
               }}
               style={{
-                backgroundImage: `url(${config.genAssetLink('add_item.jpg')})`,
+                backgroundImage: `url(${config.genAssetLink('add_item.jpg', AssetDisplayPrefix.ITEM_IMAGE)})`,
               }}
             ></div>
           ) : null}

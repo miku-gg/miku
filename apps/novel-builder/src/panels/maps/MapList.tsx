@@ -8,6 +8,7 @@ import { openModal } from '../../state/slices/inputSlice';
 import { createMap } from '../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './MapList.scss';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 interface MapListProps {
   onSelectMap?: (mapId: string) => void;
@@ -75,7 +76,7 @@ export const MapList = ({ onSelectMap, tooltipText, selectedMapId }: MapListProp
                   {map.source.png && (
                     <img
                       className="MapList__container__map__preview"
-                      src={config.genAssetLink(map.source.png)}
+                      src={config.genAssetLink(map.source.png, AssetDisplayPrefix.MAP_IMAGE)}
                       alt="map"
                     />
                   )}

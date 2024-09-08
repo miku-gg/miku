@@ -1,4 +1,4 @@
-import { DEFAULT_MUSIC } from '@mikugg/bot-utils';
+import { DEFAULT_MUSIC, dataURLtoFile } from '@mikugg/bot-utils';
 import { Button, DragAndDropImages, Input, Modal, MusicSelector, Tooltip } from '@mikugg/ui-kit';
 import { createSelector } from '@reduxjs/toolkit';
 import classNames from 'classnames';
@@ -50,12 +50,6 @@ const selectSelectableCharacters = createSelector(
       };
     }),
 );
-
-async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
-  const response = await fetch(dataURI);
-  const blob = await response.blob();
-  return new File([blob], filename, { type: blob.type });
-}
 
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
@@ -129,10 +123,10 @@ const CreateScene = () => {
       try {
         dispatch(setSubmitting(true));
         _background = backgroundSelected.startsWith('data:image')
-          ? (await assetUploader(await dataURItoFile(backgroundSelected, 'asset'))).fileName
+          ? (await assetUploader(await dataURLtoFile(backgroundSelected, 'asset'))).fileName
           : backgroundSelected;
         _music = selectedMusic.source.startsWith('data:audio')
-          ? (await assetUploader(await dataURItoFile(selectedMusic.source, 'asset'))).fileName
+          ? (await assetUploader(await dataURLtoFile(selectedMusic.source, 'asset'))).fileName
           : selectedMusic.source;
         dispatch(removeImportedBackground(backgroundSelected));
         dispatch(setBackground(_background));
