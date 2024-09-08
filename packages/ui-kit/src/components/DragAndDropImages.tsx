@@ -91,7 +91,9 @@ const DragAndDropImages = ({
           </div>
         ) : (
           <div className="dragAndDropImages__preview">
-            {previewImage.indexOf('video/webm') !== -1 || previewImage.endsWith('.webm') ? (
+            {previewImage.indexOf('video/') !== -1 ||
+            previewImage.endsWith('.webm') ||
+            previewImage.endsWith('.mp4') ? (
               <video src={previewImage} autoPlay={true} loop={true} muted={true} />
             ) : (
               <LazyLoadImage effect="blur" src={previewImage} />
