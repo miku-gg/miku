@@ -51,6 +51,27 @@ export enum AssetDisplayPrefix {
   NOVEL_AD_VIDEO = '',
 }
 
+export const assetTypeToAssetDisplayPrefix: Record<AssetType, AssetDisplayPrefix> = {
+  NOVEL_PIC: AssetDisplayPrefix.NOVEL_PIC,
+  CHARACTER_PIC: AssetDisplayPrefix.CHARACTER_PIC,
+  EMOTION_IMAGE: AssetDisplayPrefix.EMOTION_IMAGE,
+  EMOTION_ANIMATED: AssetDisplayPrefix.EMOTION_ANIMATED,
+  EMOTION_SOUND: AssetDisplayPrefix.EMOTION_SOUND,
+  BACKGROUND_IMAGE: AssetDisplayPrefix.BACKGROUND_IMAGE,
+  BACKGROUND_VIDEO: AssetDisplayPrefix.BACKGROUND_VIDEO,
+  MAP_IMAGE: AssetDisplayPrefix.MAP_IMAGE,
+  MAP_MASK: AssetDisplayPrefix.MAP_MASK,
+  MAP_IMAGE_PREVIEW: AssetDisplayPrefix.MAP_IMAGE_PREVIEW,
+  MAP_VIDEO: AssetDisplayPrefix.MAP_VIDEO,
+  MUSIC: AssetDisplayPrefix.MUSIC,
+  ITEM_IMAGE: AssetDisplayPrefix.ITEM_IMAGE,
+  PROFILE_PIC: AssetDisplayPrefix.PROFILE_PIC,
+  NOVEL_AD: AssetDisplayPrefix.NOVEL_AD,
+  NOVEL_SCREENSHOT: AssetDisplayPrefix.NOVEL_SCREENSHOT,
+  NOVEL_AD_VIDEO: AssetDisplayPrefix.NOVEL_AD_VIDEO,
+  NOVEL_SHARE: AssetDisplayPrefix.NOVEL_SHARE,
+};
+
 export const getAssetLink = (
   sources: {
     optimized: string;

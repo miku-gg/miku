@@ -11,6 +11,7 @@ import { useFillTextTemplate } from '../../libs/hooks';
 import { useAppContext } from '../../App.context';
 import { FaTrash } from 'react-icons/fa';
 import { deleteNode, swipeResponse } from '../../state/slices/narrationSlice';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 export default memo(({ data }: { data: DialogueNodeData }) => {
   const dispatch = useAppDispatch();
@@ -102,7 +103,7 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
         {data.avatars.map((avatar, index) => (
           <img
             className="DialogueNode__avatar"
-            src={assetLinkLoader(avatar)}
+            src={assetLinkLoader(avatar, AssetDisplayPrefix.CHARACTER_PIC_SMALL)}
             key={`avatar-${data.id}-${avatar}`}
             style={{ marginLeft: (data.avatars.length - index - 1) * 10 }}
           />

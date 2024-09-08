@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { migrateNovelV2ToV3, tavernCardToNovelState } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, migrateNovelV2ToV3, tavernCardToNovelState } from '@mikugg/bot-utils';
 import { NovelState } from '../state/slices/novelSlice';
 import { NarrationState } from '../state/slices/narrationSlice';
 import { v4 as randomUUID } from 'uuid';
@@ -14,7 +14,7 @@ export async function loadNovelFromSingleCard({
 }: {
   cardId: string;
   cardEndpoint: string;
-  assetLinkLoader: (asset: string, lowres?: boolean) => string;
+  assetLinkLoader: (asset: string, type: AssetDisplayPrefix) => string;
 }): Promise<{
   novel: NovelState;
   narration: NarrationState;
@@ -83,10 +83,13 @@ export async function loadNovelFromSingleCard({
       throw new Error('Invalid novel');
     }
 
-    const assets = new Set<string>();
-    assets.add(novel.logoPic);
+    const assets = new Set<{ asset: string; type: AssetDisplayPrefix }>();
+    assets.add({ asset: novel.logoPic, type: AssetDisplayPrefix.NOVEL_PIC_SMALL });
     novel.characters.forEach((character) => {
-      assets.add(character.profile_pic);
+      assets.add({
+        asset: character.profile_pic,
+        type: AssetDisplayPrefix.CHARACTER_PIC_SMALL,
+      });
     });
     const start = novel.starts[0];
     const narration: NarrationState = {
@@ -120,18 +123,22 @@ export async function loadNovelFromSingleCard({
         ?.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === character.outfit);
       const startCharacter = start?.characters.find((c) => c.characterId === character.characterId);
       const firstImage = outfit?.emotions.find((e) => e.id === startCharacter?.emotion)?.sources.png;
-      if (firstImage) assets.add(firstImage);
+      if (firstImage) assets.add({ asset: firstImage, type: AssetDisplayPrefix.EMOTION_IMAGE_SMALL });
     });
 
     const firstSceneBackground = novel.backgrounds.find((b) => b.id === startScene?.backgroundId)?.source.jpg;
-    if (firstSceneBackground) assets.add(firstSceneBackground);
+    if (firstSceneBackground)
+      assets.add({
+        asset: firstSceneBackground,
+        type: AssetDisplayPrefix.BACKGROUND_IMAGE,
+      });
 
     // await all assets load dummy fetch
     if (assetLinkLoader) {
       try {
         await Promise.all(
-          Array.from(assets).map(async (_asset) => {
-            const asset = assetLinkLoader(_asset);
+          Array.from(assets).map(async (data) => {
+            const asset = assetLinkLoader(data.asset, data.type);
             return !asset.startsWith('data:') ? axios.get(asset) : asset;
           }),
         );

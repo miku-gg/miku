@@ -7,7 +7,7 @@ import App from './src/App';
 
 import './root.scss';
 
-import { AssetType, decodeText, uploadAsset } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, AssetType, decodeText, getAssetLink, uploadAsset } from '@mikugg/bot-utils';
 import * as Sentry from '@sentry/react';
 import mergeWith from 'lodash.mergewith';
 import queryString from 'query-string';
@@ -54,6 +54,7 @@ export function getCongurationFromParams(): {
   characterSearchEndpoint: string;
   assetsUploadEndpoint: string;
   assetsEndpoint: string;
+  assetsEndpointOptimized: string;
   apiEndpoint: string;
   cardEndpoint: string;
   servicesEndpoint: string;
@@ -75,6 +76,7 @@ export function getCongurationFromParams(): {
       backgroundSearchEndpoint: string;
       assetsUploadEndpoint: string;
       assetsEndpoint: string;
+      assetsEndpointOptimized: string;
       apiEndpoint: string;
       cardEndpoint: string;
       servicesEndpoint: string;
@@ -97,6 +99,7 @@ export function getCongurationFromParams(): {
       backgroundSearchEndpoint: configurationJson.backgroundSearchEndpoint || BACKGROUND_SEARCH_ENDPOINT,
       assetsUploadEndpoint: configurationJson.assetsUploadEndpoint || ASSETS_UPLOAD_ENDPOINT,
       assetsEndpoint: configurationJson.assetsEndpoint || ASSETS_ENDPOINT,
+      assetsEndpointOptimized: configurationJson.assetsEndpointOptimized || ASSETS_ENDPOINT,
       apiEndpoint: configurationJson.apiEndpoint || '',
       cardEndpoint: configurationJson.cardEndpoint || API_ENDPOINT,
       servicesEndpoint: configurationJson.servicesEndpoint || SERVICES_ENDPOINT,
@@ -117,6 +120,7 @@ export function getCongurationFromParams(): {
       backgroundSearchEndpoint: BACKGROUND_SEARCH_ENDPOINT,
       assetsUploadEndpoint: ASSETS_UPLOAD_ENDPOINT,
       assetsEndpoint: ASSETS_ENDPOINT,
+      assetsEndpointOptimized: ASSETS_ENDPOINT,
       apiEndpoint: '',
       cardEndpoint: CARD_ENDPOINT,
       servicesEndpoint: SERVICES_ENDPOINT,
@@ -140,14 +144,18 @@ export function getCongurationFromParams(): {
 
 const params = getCongurationFromParams();
 
-const assetLinkLoader = (asset: string, lowres?: boolean) => {
+const assetLinkLoader = (asset: string, type: AssetDisplayPrefix) => {
   if (asset.startsWith('data')) {
     return asset;
   }
-  if (lowres) {
-    return `${params.assetsEndpoint}/480p_${asset}`;
-  }
-  return `${params.assetsEndpoint}/${asset}`;
+  return getAssetLink(
+    {
+      fallback: params.assetsEndpoint,
+      optimized: params.assetsEndpointOptimized,
+    },
+    asset,
+    type,
+  );
 };
 
 const narrationData: Promise<RootState> = new Promise((resolve) => {
@@ -263,8 +271,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       freeTTS={params.freeTTS}
       persona={params.persona}
       novelLoader={loadNarration}
-      assetUploader={async (file: File) => {
-        const uploadResponse = await uploadAsset(params.assetsUploadEndpoint, file, AssetType.NOVEL_AD);
+      assetUploader={async (file: File, type: AssetType) => {
+        const uploadResponse = await uploadAsset(params.assetsUploadEndpoint, file, type);
         return {
           fileName: uploadResponse.data,
           fileSize: file.size,

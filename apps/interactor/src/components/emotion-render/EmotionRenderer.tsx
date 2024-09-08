@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './EmotionRenderer.scss';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const assets = new Map<
   string,
@@ -14,11 +15,13 @@ export default function EmotionRenderer({
   className = '',
   upDownAnimation = false,
   assetLinkLoader,
+  isSmall = false,
 }: {
   assetUrl: string;
   className?: string;
   upDownAnimation?: boolean;
-  assetLinkLoader: (asset: string, lowres?: boolean) => string;
+  assetLinkLoader: (asset: string, type: AssetDisplayPrefix) => string;
+  isSmall?: boolean;
 }): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const [currentAsset, setCurrentAsset] = useState<{
@@ -33,8 +36,10 @@ export default function EmotionRenderer({
   useEffect(() => {
     const currentVersion = ++assetVersion.current;
     const controller = new AbortController();
-    async function fetchAndSetAsset(url: string, lowres?: boolean) {
-      const response = await fetch(assetLinkLoader(url, lowres));
+    async function fetchAndSetAsset(url: string) {
+      const response = await fetch(
+        assetLinkLoader(url, isSmall ? AssetDisplayPrefix.EMOTION_IMAGE_SMALL : AssetDisplayPrefix.EMOTION_IMAGE),
+      );
       if (response.ok && response.status === 200) {
         const contentType = response.headers.get('Content-Type');
         const data = await response.blob();
@@ -52,12 +57,8 @@ export default function EmotionRenderer({
 
     async function fetchAssets() {
       setLoading(true);
-
-      await fetchAndSetAsset(assetUrl, true);
-
-      fetchAndSetAsset(assetUrl).then(() => {
-        setLoading(false);
-      });
+      await fetchAndSetAsset(assetUrl);
+      setLoading(false);
     }
 
     // Fetch assets only if they haven't been fetched before or if assetUrl changes.

@@ -7,6 +7,7 @@ import { selectCharacterOfResponse, updateInteraction, updateResponse } from '..
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NarrationInteraction, NarrationResponse } from '../../state/versioning';
 import './NodeEditor.scss';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const TextEditor = ({
   text,
@@ -101,7 +102,7 @@ const ResponseEditor = ({ response, onClose }: { response: NarrationResponse; on
               >
                 <img
                   className="NodeEditor__character-img"
-                  src={assetLinkLoader(character?.profile_pic || '')}
+                  src={assetLinkLoader(character?.profile_pic || '', AssetDisplayPrefix.CHARACTER_PIC_SMALL)}
                   alt={character?.name}
                 />
               </button>

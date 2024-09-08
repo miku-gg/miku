@@ -266,14 +266,8 @@ export default function CharacterDescriptionEdit({ characterId }: { characterId?
               // check size
               const img = new Image();
               img.src = URL.createObjectURL(file);
-              img.onload = function () {
-                if (img.width !== 256 || img.height !== 256) {
-                  toast.error('Please upload an avatar with dimensions of 256x256 pixels.');
-                }
-              };
               return true;
             }}
-            errorMessage="Please upload an avatar with dimensions of 256x256 pixels."
           />
         </div>
       </div>

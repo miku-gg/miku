@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { interactionStart } from '../../state/slices/narrationSlice';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { setMapModal } from '../../state/slices/settingsSlice';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 export const SceneChangeModal = () => {
   const { assetLinkLoader, isInteractionDisabled, servicesEndpoint, apiEndpoint } = useAppContext();
@@ -76,7 +77,10 @@ export const SceneChangeModal = () => {
   return (
     <Modal className="SceneChangeModal" opened={opened} onCloseModal={() => handleCloseModal()}>
       <div className="SceneChangeModal__content">
-        <img className="SceneChangeModal__background-image" src={assetLinkLoader(scene?.backgroundImage || '', true)} />
+        <img
+          className="SceneChangeModal__background-image"
+          src={assetLinkLoader(scene?.backgroundImage || '', AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL)}
+        />
         <div className="SceneChangeModal__characters">
           {scene?.characterImages?.map((image, index) => {
             return (

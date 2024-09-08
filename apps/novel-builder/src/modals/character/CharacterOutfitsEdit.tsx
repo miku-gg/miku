@@ -280,7 +280,7 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
                 }
                 placeHolder="(1024x1024)"
                 onFileValidate={(file) => {
-                  return checkFileType(file, ['image/png', 'image/gif', 'video/webm', 'audio/mpeg']);
+                  return checkFileType(file, ['image/png', 'image/gif', 'image/webp', 'video/webm', 'audio/mpeg']);
                 }}
               />
               {emotion?.sources.sound ? (

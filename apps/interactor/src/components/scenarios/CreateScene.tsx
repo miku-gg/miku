@@ -1,4 +1,4 @@
-import { DEFAULT_MUSIC, dataURLtoFile } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, AssetType, DEFAULT_MUSIC, dataURLtoFile } from '@mikugg/bot-utils';
 import { Button, DragAndDropImages, Input, Modal, MusicSelector, Tooltip } from '@mikugg/ui-kit';
 import { createSelector } from '@reduxjs/toolkit';
 import classNames from 'classnames';
@@ -123,10 +123,10 @@ const CreateScene = () => {
       try {
         dispatch(setSubmitting(true));
         _background = backgroundSelected.startsWith('data:image')
-          ? (await assetUploader(await dataURLtoFile(backgroundSelected, 'asset'))).fileName
+          ? (await assetUploader(await dataURLtoFile(backgroundSelected, 'asset'), AssetType.BACKGROUND_IMAGE)).fileName
           : backgroundSelected;
         _music = selectedMusic.source.startsWith('data:audio')
-          ? (await assetUploader(await dataURLtoFile(selectedMusic.source, 'asset'))).fileName
+          ? (await assetUploader(await dataURLtoFile(selectedMusic.source, 'asset'), AssetType.MUSIC)).fileName
           : selectedMusic.source;
         dispatch(removeImportedBackground(backgroundSelected));
         dispatch(setBackground(_background));
@@ -176,13 +176,10 @@ const CreateScene = () => {
           <button
             className="CreateScene__background__button"
             style={{
-              backgroundImage: `url(${
-                backgroundSelected
-                  ? backgroundSelected.startsWith('data:image')
-                    ? backgroundSelected
-                    : assetLinkLoader(backgroundSelected, true)
-                  : assetLinkLoader('default_background.png')
-              })`,
+              backgroundImage: `url(${assetLinkLoader(
+                backgroundSelected || 'default_background.png',
+                AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL,
+              )})`,
             }}
             onClick={() =>
               dispatch(
@@ -225,11 +222,11 @@ const CreateScene = () => {
           <MusicSelector
             musicList={musicList.map((m) => ({
               name: m.name,
-              source: assetLinkLoader(m.source),
+              source: assetLinkLoader(m.source, AssetDisplayPrefix.MUSIC),
             }))}
             selectedMusic={{
               name: selectedMusic.name,
-              source: assetLinkLoader(selectedMusic.source),
+              source: assetLinkLoader(selectedMusic.source, AssetDisplayPrefix.MUSIC),
             }}
             hideUpload={isMobileApp}
             onChange={(value) => {
@@ -370,7 +367,7 @@ const SearchBackgroundModal = () => {
       modalId="background"
       searcher={(params) => listSearch<BackgroundResult>(apiEndpoint, SearchType.BACKGROUND, params)}
       renderResult={(result: BackgroundResult, index) => {
-        const backgroundURL = assetLinkLoader(result.asset, true);
+        const backgroundURL = assetLinkLoader(result.asset, AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL);
         return (
           <div
             key={`background-search-${index}-${result.asset}`}
@@ -439,7 +436,7 @@ const SearchCharacterModal = () => {
               data-tooltip-content={result.description}
               data-tooltip-varaint="dark"
             >
-              <img src={assetLinkLoader(result.profilePic)} />
+              <img src={assetLinkLoader(result.profilePic, AssetDisplayPrefix.PROFILE_PIC)} />
               <p className="CreateScene__selector__item-name">{result.name}</p>
               {loadingIndex === index ? <Loader /> : null}
             </div>
@@ -500,7 +497,7 @@ const CreateSceneBackgroundModal = () => {
                     background
                       ? background.source.jpg.startsWith('data:image')
                         ? background.source.jpg
-                        : assetLinkLoader(background.source.jpg, true)
+                        : assetLinkLoader(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL)
                       : ''
                   })`,
                 }}

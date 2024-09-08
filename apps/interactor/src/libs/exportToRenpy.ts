@@ -3,6 +3,7 @@ import { selectAllParentDialogues } from '../state/selectors';
 import { RootState } from '../state/store';
 import { NovelCharacterOutfit } from '../state/versioning';
 import { fillTextTemplate } from './prompts/strategies';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const assert = console.assert;
 
@@ -354,7 +355,7 @@ export const exportToRenPy = (state: RootState, linearStory = false) => {
 export const downloadRenPyProject = async (
   script: string,
   state: RootState,
-  assetLinkLoader: (asset: string) => string,
+  assetLinkLoader: (asset: string, type: AssetDisplayPrefix) => string,
 ) => {
   try {
     const allBackgroundAssets = state.novel.backgrounds.map((background) => background.source.jpg);
@@ -368,7 +369,9 @@ export const downloadRenPyProject = async (
       })
       .flat(2);
 
-    const response = await fetch(assetLinkLoader(cleanProjectFileName));
+    // eslint-disable-next-line
+    // @ts-ignore
+    const response = await fetch(assetLinkLoader(cleanProjectFileName, ''));
     const buffer = await response.arrayBuffer();
     const zip = await JSZip.loadAsync(buffer);
     const blob = new Blob([script], { type: 'text/plain' });
@@ -379,13 +382,13 @@ export const downloadRenPyProject = async (
     const imagesFolder = folder?.folder('images');
 
     for (const backgroundAsset of allBackgroundAssets) {
-      const assetResponse = await fetch(assetLinkLoader(backgroundAsset));
+      const assetResponse = await fetch(assetLinkLoader(backgroundAsset, AssetDisplayPrefix.BACKGROUND_IMAGE));
       const assetBlob = await assetResponse.blob();
       imagesFolder?.file(sanitizeId(backgroundAsset) + '.png', assetBlob);
     }
 
     for (const characterAsset of allCharactersImages) {
-      const assetResponse = await fetch(assetLinkLoader(characterAsset));
+      const assetResponse = await fetch(assetLinkLoader(characterAsset, AssetDisplayPrefix.EMOTION_IMAGE));
       const assetBlob = await assetResponse.blob();
       imagesFolder?.file(sanitizeId(characterAsset) + '.png', assetBlob);
     }

@@ -11,6 +11,7 @@ import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import CreateScene from './CreateScene';
 import './SceneSelector.scss';
 import SlidePanel from './SlidePanel';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch();
@@ -65,7 +66,10 @@ export default function SceneSelector(): JSX.Element | null {
                     <div
                       className="SceneSelector__item-background"
                       style={{
-                        backgroundImage: `url(${assetLinkLoader(scene.backgroundImage || '', true)})`,
+                        backgroundImage: `url(${assetLinkLoader(
+                          scene.backgroundImage || '',
+                          AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL,
+                        )})`,
                       }}
                     />
                     {scene.characterImages ? (

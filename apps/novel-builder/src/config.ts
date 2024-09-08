@@ -12,6 +12,9 @@ import { BackgroundResult, listSearch, SearchType, SongResult } from './libs/lis
 export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 interface BuilderConfig {
+  assetsEndpoint: string;
+  assetsEndpointOptimized: string;
+  uploadAssetEndpoint: string;
   genAssetLink: (asset: string, displayPrefix: AssetDisplayPrefix) => string;
   uploadAsset: (
     file: File | string,
@@ -52,6 +55,9 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
   [
     'development',
     {
+      assetsEndpoint: 'http://localhost:8585/s3/assets',
+      assetsEndpointOptimized: 'http://localhost:8585/s3/assets',
+      uploadAssetEndpoint: 'http://localhost:8585/asset-upload',
       genAssetLink: (asset: string) => {
         if (asset.startsWith('data')) {
           return asset;
@@ -148,6 +154,9 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
   [
     'staging',
     {
+      assetsEndpoint: 'https://assets.miku.gg',
+      assetsEndpointOptimized: 'https://mikugg-assets.nyc3.digitaloceanspaces.com',
+      uploadAssetEndpoint: 'https://apidev.miku.gg/asset/upload',
       genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
           return asset;
@@ -241,6 +250,9 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
   [
     'production',
     {
+      assetsEndpoint: 'https://assets.miku.gg',
+      assetsEndpointOptimized: 'https://mikugg-assets.nyc3.digitaloceanspaces.com',
+      uploadAssetEndpoint: 'https://api.miku.gg/asset/upload',
       genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
           return asset;

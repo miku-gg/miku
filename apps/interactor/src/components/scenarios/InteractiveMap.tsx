@@ -9,6 +9,7 @@ import { trackEvent } from '../../libs/analytics';
 import { interactionStart } from '../../state/slices/narrationSlice';
 import { useAppContext } from '../../App.context';
 import { setModalOpened } from '../../state/slices/creationSlice';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const isTouchScreen = window.navigator.maxTouchPoints > 0;
 
@@ -145,7 +146,7 @@ const InteractiveMapModal = ({
         map.places.forEach((place) => {
           const maskImage = new Image();
           maskImage.crossOrigin = 'Anonymous';
-          maskImage.src = assetLinkLoader(place.maskSource);
+          maskImage.src = assetLinkLoader(place.maskSource, AssetDisplayPrefix.MAP_MASK);
           maskImages.set(place.id, maskImage);
           offScreenCtx?.drawImage(
             maskImage,
@@ -275,7 +276,7 @@ const InteractiveMapModal = ({
     <div className="InteractiveMap__modal-content" id="interactive-map-modal-content">
       <img
         className="InteractiveMap__background-image"
-        src={assetLinkLoader(map?.source.png || '')}
+        src={assetLinkLoader(map?.source.png || '', AssetDisplayPrefix.MAP_IMAGE)}
         alt="Map"
         ref={mapBackgroundRef}
       />
