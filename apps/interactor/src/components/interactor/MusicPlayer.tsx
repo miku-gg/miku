@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import { selectCurrentScene } from '../../state/selectors';
 import { setMusicEnabled, setMusicVolume } from '../../state/slices/settingsSlice';
 import { trackEvent } from '../../libs/analytics';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 export const Music = () => {
   return (
@@ -37,7 +38,7 @@ const MusicPlayer: React.FC = () => {
   const scene = useAppSelector(selectCurrentScene);
   const audioRef = useRef<HTMLAudioElement>(null);
   const _src = songs.find((s) => s.id === scene?.musicId)?.source || scene?.musicId;
-  const src = _src ? assetLinkLoader(_src) : '';
+  const src = _src ? assetLinkLoader(_src, AssetDisplayPrefix.MUSIC) : '';
 
   const togglePlay = () => {
     if (audioRef.current) {

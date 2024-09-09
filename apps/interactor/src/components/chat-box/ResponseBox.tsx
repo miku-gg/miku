@@ -30,6 +30,7 @@ import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
 import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter';
 import './ResponseBox.scss';
 import TTSPlayer from './TTSPlayer';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch();
@@ -188,7 +189,7 @@ const ResponseBox = (): JSX.Element | null => {
                     }
                     disabled={disabled}
                   >
-                    <img src={assetLinkLoader(character?.profile_pic || '')} />
+                    <img src={assetLinkLoader(character?.profile_pic || '', AssetDisplayPrefix.CHARACTER_PIC_SMALL)} />
                   </button>
                   <Tooltip id="ResponseBox__character-tooltip" place="top"></Tooltip>
                 </div>

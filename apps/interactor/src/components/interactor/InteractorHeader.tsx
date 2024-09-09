@@ -1,3 +1,4 @@
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { useAppContext } from '../../App.context';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { useAppSelector } from '../../state/store';
@@ -34,7 +35,7 @@ const InteractorHeader = () => {
             className="InteractorHeader__profile_pic"
             style={{
               backgroundImage: firstCharacter.profile_pic
-                ? `url(${assetLinkLoader(firstCharacter.profile_pic, true)})`
+                ? `url(${assetLinkLoader(firstCharacter.profile_pic, AssetDisplayPrefix.CHARACTER_PIC_SMALL)})`
                 : '',
             }}
             onClick={() => postMessage(CustomEventType.NOVEL_PROFILE_CLICK, true)}

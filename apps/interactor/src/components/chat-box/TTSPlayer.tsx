@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import { Speed } from '../../state/versioning';
 import { useAppContext } from '../../App.context';
 import { trackEvent } from '../../libs/analytics';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 // eslint-disable-next-line
 // @ts-ignore
@@ -182,7 +183,7 @@ const TTSPlayer2: React.FC = () => {
         autoPlay={autoPlay}
         src={
           isFirstMessage && isProduction
-            ? assetLinkLoader(`${characterId}.${_voiceId}.${speakingStyle}.wav`)
+            ? assetLinkLoader(`${characterId}.${_voiceId}.${speakingStyle}.wav`, AssetDisplayPrefix.MUSIC)
             : undefined
         }
       >

@@ -1,4 +1,11 @@
-import { NovelV3, extractNovelAssets, replaceStringsInObject } from '@mikugg/bot-utils';
+import {
+  AssetDisplayPrefix,
+  AssetType,
+  NovelV3,
+  extractNovelAssets,
+  replaceStringsInObject,
+  assetTypeToAssetDisplayPrefix,
+} from '@mikugg/bot-utils';
 import Hash from 'ipfs-only-hash';
 
 import * as Guidance from '@mikugg/guidance';
@@ -19,7 +26,7 @@ export const hashBase64URI = async (base64Content: string): Promise<string> => {
   return hashBase64(base64Content.split(',')[1]);
 };
 
-export const checkFileType = (file: File, types = ['image/png', 'image/jpeg', 'image/jpg']): boolean => {
+export const checkFileType = (file: File, types = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']): boolean => {
   return types.includes(file.type);
 };
 
@@ -37,7 +44,7 @@ export const downloadAssetAsBase64URI = async (url: string): Promise<string> => 
 
 export const downloadNovelState = async (
   _novel: NovelV3.NovelState,
-  getAssetUrl: ((asset: string) => string) | false,
+  getAssetUrl: ((asset: string, type: AssetDisplayPrefix) => string) | false,
   onUpdate: (text: string) => void,
   asBuild = false,
 ) => {
@@ -48,7 +55,9 @@ export const downloadNovelState = async (
   const { assets, novel } = await extractNovelAssets(_novel);
 
   // DOWNLOAD ASSETS
-  const allAssets = Array.from(new Map<string, string>([...assets.audios, ...assets.images, ...assets.videos]));
+  const allAssets = Array.from(
+    new Map<string, { source: string; type: AssetType }>([...assets.audios, ...assets.images, ...assets.videos]),
+  );
 
   onUpdate(`Downloading assets 0/${allAssets.length}...`);
   let novelResult = novel;
@@ -57,13 +66,15 @@ export const downloadNovelState = async (
   for (let i = 0; i < allAssets.length; i += BATCH_SIZE) {
     const batch = allAssets.slice(i, i + BATCH_SIZE);
     const promises = batch.map(async ([key, value]) => {
-      if (value && !value.startsWith('data:') && getAssetUrl) {
-        const base64 = await downloadAssetAsBase64URI(getAssetUrl(value));
+      if (value && !value.source.startsWith('data:') && getAssetUrl) {
+        const base64 = await downloadAssetAsBase64URI(
+          getAssetUrl(value.source, assetTypeToAssetDisplayPrefix[value.type]),
+        );
         onUpdate(`Downloading assets ${++dl}/${allAssets.length}...`);
         return base64;
       } else {
         onUpdate(`Downloading assets ${++dl}/${allAssets.length}...`);
-        return value;
+        return value.source;
       }
     });
     const base64s = await Promise.all(promises);

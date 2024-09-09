@@ -9,7 +9,7 @@ import { emotionTemplates } from '../../data/emotions';
 import AudioPreview from '../../components/AudioPreview';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { updateCharacter } from '../../state/slices/novelFormSlice';
-import { MikuCardV2 } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, AssetType, MikuCardV2 } from '@mikugg/bot-utils';
 import config from '../../config';
 import './CharacterOutfitsEdit.scss';
 import { toast } from 'react-toastify';
@@ -146,7 +146,14 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
     isAudio?: boolean;
     outfits: MikuCardV2['data']['extensions']['mikugg_v2']['outfits'];
   }): Promise<MikuCardV2['data']['extensions']['mikugg_v2']['outfits']> => {
-    const { assetId, success } = await config.uploadAsset(file);
+    const { assetId, success } = await config.uploadAsset(
+      file,
+      file.type === 'video/webm'
+        ? AssetType.EMOTION_ANIMATED
+        : isAudio
+        ? AssetType.EMOTION_SOUND
+        : AssetType.EMOTION_IMAGE,
+    );
     if (!success) {
       toast.warn('Failed to upload asset');
       return _outfits;
@@ -159,7 +166,7 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
       return _outfits;
     }
 
-    const emotions = [...newGroups[groupIndex].emotions] || [];
+    const emotions = [...newGroups[groupIndex].emotions];
     const emotionIndex = emotions.findIndex((img) => img.id === emotionId);
 
     if (isAudio) {
@@ -268,17 +275,17 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
                 handleChange={(file) => handleImageChange(file, groupIndex, emotionId, file.type === 'audio/mpeg')}
                 previewImage={
                   emotion?.sources.webm || emotion?.sources.png
-                    ? config.genAssetLink(emotion?.sources.webm || emotion?.sources.png)
+                    ? config.genAssetLink(emotion?.sources.png, AssetDisplayPrefix.EMOTION_IMAGE)
                     : undefined
                 }
                 placeHolder="(1024x1024)"
                 onFileValidate={(file) => {
-                  return checkFileType(file, ['image/png', 'image/gif', 'video/webm', 'audio/mpeg']);
+                  return checkFileType(file, ['image/png', 'image/gif', 'image/webp', 'video/webm', 'audio/mpeg']);
                 }}
               />
               {emotion?.sources.sound ? (
                 <div className="CharacterOutfitsEdit__audioPreview">
-                  <AudioPreview src={config.genAssetLink(emotion?.sources.sound)} />
+                  <AudioPreview src={config.genAssetLink(emotion?.sources.sound, AssetDisplayPrefix.EMOTION_SOUND)} />
                 </div>
               ) : null}
             </div>

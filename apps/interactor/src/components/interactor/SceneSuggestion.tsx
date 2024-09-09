@@ -27,6 +27,7 @@ import { addScene } from '../../state/slices/novelSlice';
 import { BsStars } from 'react-icons/bs';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { spendSceneSuggestion } from '../../libs/platformAPI';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false);
@@ -172,7 +173,10 @@ const SceneSuggestionModal = () => {
     dispatch(
       setMusic({
         name: music?.title || currentScene?.musicId || '',
-        source: assetLinkLoader(music?.asset || currentMusic?.source || '') || currentScene?.musicId || '',
+        source:
+          assetLinkLoader(music?.asset || currentMusic?.source || '', AssetDisplayPrefix.MUSIC) ||
+          currentScene?.musicId ||
+          '',
       }),
     );
     dispatch(
