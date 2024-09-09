@@ -90,15 +90,18 @@ export default function PlaceEditModal() {
         const mapImage = new Image();
         mapImage.src = config.genAssetLink(mapImageSrc);
 
+        let maskRatio: number;
+
         if (image.width > 1024) {
           const width = mapImage.width;
-          const aspectRatio = image.width / image.height;
-          const height = width / aspectRatio;
+          maskRatio = image.width / image.height;
+          const height = width / maskRatio;
           canvas.width = width;
           canvas.height = height;
         } else {
           canvas.width = image.width;
           canvas.height = image.height;
+          maskRatio = image.width / image.height;
         }
 
         ctx.drawImage(image, 0, 0, image.width, image.height);
@@ -112,7 +115,8 @@ export default function PlaceEditModal() {
         // check if the mask is the same size as the map image
 
         mapImage.onload = () => {
-          if (mapImage.width !== image.width || mapImage.height !== image.height) {
+          const mapRatio = mapImage.width / mapImage.height;
+          if (maskRatio !== mapRatio) {
             toast.error('Mask should be the same size as the map image.');
             resolve(false);
             return;
