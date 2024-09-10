@@ -28,6 +28,7 @@
     "lodash.mergewith": "^4.6.2",
     "lodash.trim": "^4.5.1",
     "normalize.css": "^8.0.1",
+    "qrcode.react": "^4.0.1",
     "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
