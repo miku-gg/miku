@@ -1,9 +1,11 @@
-// import llamaTokenizer, { Tokenizer } from '../_llama-tokenizer';
+import llamaTokenizer, { Tokenizer } from '../_llama-tokenizer';
 
 export abstract class AbstractPromptStrategy<Input, Output> {
-  // private tokenizer: Tokenizer;
-  constructor() {
-    // this.tokenizer = llamaTokenizer;
+  // eslint-disable-next-line
+  // @ts-ignore
+  private tokenizer: Tokenizer;
+  constructor(_tokenizerSkug?: string) {
+    this.tokenizer = llamaTokenizer;
   }
   public abstract buildGuidancePrompt(
     maxNewTokens: number,
