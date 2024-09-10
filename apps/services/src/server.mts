@@ -26,7 +26,7 @@ app.use(
     ],
   }),
 );
-app.use(bodyParser.json({ limit: '256kb' }));
+app.use(bodyParser.json({ limit: '512kb' }));
 app.use(monitor());
 
 if (process.env.JWT_SECRET) {

@@ -89,7 +89,7 @@ const interactionEffect = async (
     if (!currentCharacterResponse?.emotion && secondary.id !== state.settings.model) {
       const emotionPrompt = secondaryPromptBuilder.buildPrompt(
         { state, currentCharacterId: selectedCharacterId },
-        maxMessages,
+        Math.min(truncation_length / 200, maxMessages),
       );
       const emotionTemplate = emotionPrompt.template.slice(
         0,
@@ -188,7 +188,7 @@ const interactionEffect = async (
         },
         currentCharacterId: selectedCharacterId,
       },
-      maxMessages,
+      Math.min(truncation_length / 200, maxMessages),
     ).template;
     finishedCompletionResult.get('text');
     prefixConditionPrompt = prefixConditionPrompt.replace(
