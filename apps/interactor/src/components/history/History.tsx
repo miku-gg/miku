@@ -27,6 +27,7 @@ import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations'
 import { VersionId as V1VersionId } from '../../state/versioning/v1.state';
 import { VersionId as V2VersionId } from '../../state/versioning/v2.state';
 import { VersionId as V3VersionId } from '../../state/versioning/v3.state';
+import { DeviceExport } from './DeviceExport';
 import { RenPyExportButton } from './ExportToRenpy';
 import './History.scss';
 
@@ -103,6 +104,7 @@ const HistoryActions = () => {
     <div className="History__actions">
       <Tooltip id="history-actions-tooltip" place="bottom" />
       {!isMobileApp && hasInteractions ? <RenPyExportButton state={state} /> : null}
+      <DeviceExport />
       {!hasInteractions ? (
         <label
           className="icon-button"
