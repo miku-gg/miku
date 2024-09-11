@@ -1,5 +1,24 @@
 import llamaTokenizer, { Tokenizer } from '../_llama-tokenizer';
 
+const cache: { [key: string]: number } = {};
+
+const memoizedTokenize = (line: string): number => {
+  if (line in cache) {
+    return cache[line];
+  }
+  const result = llamaTokenizer.encode(line).length;
+  cache[line] = result;
+  return result;
+};
+
+const TOKEN_OFFSET_CONSTANT = 10;
+function tokenizeAndSum(text: string): number {
+  const lines = text.split('\n');
+  const sum = lines.reduce((acc, line) => acc + memoizedTokenize(line), 0);
+
+  return sum + lines.length + TOKEN_OFFSET_CONSTANT;
+}
+
 export abstract class AbstractPromptStrategy<Input, Output> {
   // eslint-disable-next-line
   // @ts-ignore
@@ -20,24 +39,12 @@ export abstract class AbstractPromptStrategy<Input, Output> {
   public abstract completeResponse(input: Input, response: Output, variables: Map<string, string>): Output;
 
   protected countTokens(template: string): number {
-    // ESTIMATED TOKEN COUNT
-    const averageTokensPerWord = 1.3; // Pre-computed average, may vary based on your specific tokenizer
-
-    const words = template.trim().split(/\s+/);
-    const wordCount = words.length;
-
-    let specialCharCount = 0;
-    for (const word of words) {
-      specialCharCount += (word.match(/[^a-zA-Z0-9]/g) || []).length;
-    }
-
-    return Math.ceil(wordCount * averageTokensPerWord + specialCharCount * 0.5);
-    // let maxTokens: number = 0;
-    // template.replace(/max_tokens=(\d+)/g, (_, _maxTokens) => {
-    //   maxTokens += parseInt(_maxTokens) || 0;
-    //   return '';
-    // });
-    // const _template = template.replace(/{{.*?}}/g, '');
-    // return this.tokenizer.encode(_template).length + maxTokens;
+    let maxTokens: number = 0;
+    template.replace(/max_tokens=(\d+)/g, (_, _maxTokens) => {
+      maxTokens += parseInt(_maxTokens) || 0;
+      return '';
+    });
+    const _template = template.replace(/{{.*?}}/g, '');
+    return tokenizeAndSum(_template) + maxTokens;
   }
 }
