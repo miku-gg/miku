@@ -15,14 +15,12 @@ import './DeviceExport.scss';
 
 interface QRProps {
   id: string | null;
-  data: string | null;
   loading: boolean;
   copied: boolean;
 }
 
 const intialQRState: QRProps = {
   id: null,
-  data: null,
   loading: false,
   copied: false,
 };
@@ -33,10 +31,9 @@ export const DeviceExport = () => {
   const state = useAppSelector((state) => state);
   const { isPremium } = useAppSelector((state) => state.settings.user);
   const isModalOpen = useAppSelector((state) => state.settings.modals.deviceExport);
+  const user = { id: '1234' }; //mocked data
 
-  const { isProduction } = useAppContext();
-  const MOKED_USER_ID = randomUUID();
-  const MOCKED_NARRATION_HASH = `${MOKED_USER_ID}/${randomUUID()}`;
+  const { isProduction, servicesEndpoint } = useAppContext();
 
   if (!isProduction) return null;
 
@@ -46,32 +43,45 @@ export const DeviceExport = () => {
     const json = JSON.stringify(clonedState);
     const id = randomUUID();
     const encryptedData: string = CryptoJS.AES.encrypt(json, id).toString();
-    setQR({ ...QR, id: id, data: encryptedData });
     return { id: id, data: encryptedData };
   };
 
   const handleUpload = async (encryptedData: { data: string; id: string }) => {
-    console.log('encryptedData', encryptedData);
+    const response = await fetch(`${servicesEndpoint}/user/save-narration`, {
+      method: 'POST',
+      body: JSON.stringify({
+        id: `${user.id}/${encryptedData.id}`,
+        data: encryptedData.data,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const json = await response.json();
+    return json;
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     dispatch(setDeviceExportModal(true));
     setQR({ ...QR, loading: true });
 
     const json = getEncryptedJson();
 
-    handleUpload(json)
-      .then(() => {
-        setQR({ ...QR, loading: false });
+    await handleUpload(json)
+      .then((r) => {
+        setQR({ ...QR, loading: false, id: r.id });
+
+        toast.success('Data uploaded successfully');
       })
       .catch(() => {
         setQR({ ...QR, loading: false });
-        console.error('Error uploading the data');
+        dispatch(setDeviceExportModal(false));
+        toast.error('Error when generate export');
       });
   };
 
   const handleCopyHash = () => {
-    navigator.clipboard.writeText(MOCKED_NARRATION_HASH);
+    navigator.clipboard.writeText(QR.id || '');
     setQR({ ...QR, copied: true });
     toast.success('Hash copied to clipboard');
     setTimeout(() => {
@@ -119,7 +129,7 @@ export const DeviceExport = () => {
                 size={256}
                 bgColor="transparent"
                 fgColor="#ffffff"
-                value={QR.data || ''}
+                value={QR.id || ''}
                 imageSettings={{
                   src: '../../../public/images/logo.png',
                   x: undefined,
@@ -132,9 +142,9 @@ export const DeviceExport = () => {
               />{' '}
             </div>
             <div className="deviceExport__container__hash">
-              <p>{QR.data}</p>
+              <p>{QR.id}</p>
               <button disabled={QR.copied} onClick={handleCopyHash}>
-                {QR.copied ? <FaCheck /> : <FaClipboard />}
+                {QR.copied ? <FaCheck color="#00ff33" /> : <FaClipboard />}
               </button>
             </div>
           </div>

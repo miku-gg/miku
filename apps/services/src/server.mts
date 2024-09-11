@@ -1,13 +1,13 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
+import monitor from 'express-status-monitor';
 import jwtPermissionMiddleware from './lib/verifyJWT.mjs';
 import audioHandler from './services/audio/index.mjs';
 import textHandler, { tokenizeHandler } from './services/text/index.mjs';
-import { TokenizerType, loadTokenizer } from './services/text/lib/tokenize.mjs';
-import monitor from 'express-status-monitor';
-import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
 import { getModelHealth } from './services/text/lib/healthChecker.mjs';
+import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
+import { TokenizerType, loadTokenizer } from './services/text/lib/tokenize.mjs';
 const PORT = process.env.SERVICES_PORT || 8484;
 
 const app: express.Application = express();
@@ -137,6 +137,31 @@ app.get('/text/models', async (req, res) => {
       };
     }),
   );
+});
+
+app.post('/user/save-narration', async (req, res: Response<{ id: string }>) => {
+  try {
+    const { id, data } = req.body;
+    if (!id || !data) {
+      throw new Error('Invalid request');
+    }
+
+    res.send({ id });
+  } catch (error) {
+    res.status(400);
+  }
+});
+
+app.get('/user/save-narration/:narrationId', async (req, res) => {
+  try {
+    const { id } = req.query;
+    if (!id) {
+      throw new Error('Invalid request');
+    }
+    res.send({ narration: 'This is a test narration' });
+  } catch (error) {
+    res.status(400).send('Invalid request');
+  }
 });
 
 console.log('Loading tokenizers...');
