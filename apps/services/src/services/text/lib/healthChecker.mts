@@ -38,12 +38,8 @@ export const setModelHealthChecker = (modelSettings: RPModelSettings) => {
       for (const [modelId, model] of modelHealth) {
         try {
           const result = await axios.post(
-            model.endpoint.url + '/completions',
-            {
-              model: model.endpoint.model,
-              prompt: 'hello,',
-              max_tokens: 1,
-            },
+            model.endpoint.url + '/health',
+            {},
             {
               headers: {
                 Authorization: `Bearer ${model.endpoint.api_key}`,
