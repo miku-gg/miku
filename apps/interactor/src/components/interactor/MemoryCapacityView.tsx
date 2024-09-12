@@ -183,7 +183,7 @@ export default function MemoryCapacityView() {
               <h4>Free membership</h4>
               <div>
                 <FaCheck size={10} color="#9747ff" />
-                <p>Characters can remember around the last 10 messages</p>
+                <p>Characters can remember around the last 15 messages</p>
               </div>
             </div>
           </div>
