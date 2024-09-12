@@ -90,7 +90,7 @@ export default function MemoryCapacityView() {
           data-tooltip-content={
             !isPremium
               ? `Smart mode. Only available for premium`
-              : `${!isSmart ? 'Switch to smart model' : 'Switch to regular model'}`
+              : `${!isSmart ? 'Activate smart mode' : 'Deactivate smart mode'}`
           }
           style={{ width: sizeInPixels, height: sizeInPixels, minWidth: sizeInPixels, minHeight: sizeInPixels }}
           onClick={onClick}
