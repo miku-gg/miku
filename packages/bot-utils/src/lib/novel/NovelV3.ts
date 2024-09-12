@@ -76,6 +76,7 @@ export interface NovelBackground {
   attributes: string[][];
   source: {
     jpg: string;
+    jpgMobile?: string;
     mp4?: string;
     mp4Mobile?: string;
   };
@@ -95,7 +96,7 @@ export interface NovelMap {
   description: string;
   source: {
     png: string;
-    webm?: string;
+    mp4?: string;
     music?: string;
   };
   places: {

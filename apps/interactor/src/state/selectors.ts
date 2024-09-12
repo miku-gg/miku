@@ -1,8 +1,10 @@
-import { RootState } from './store';
-import { NovelCharacterOutfit, NovelScene } from './slices/novelSlice';
-import { NarrationInteraction, NarrationResponse } from './slices/narrationSlice';
-import { createSelector } from '@reduxjs/toolkit';
 import { EmotionTemplateSlug, NovelV3 } from '@mikugg/bot-utils';
+import { createSelector } from '@reduxjs/toolkit';
+import PromptBuilder from '../libs/prompts/PromptBuilder';
+import { AbstractRoleplayStrategy, RoleplayStrategyLlama3 } from '../libs/prompts/strategies';
+import { NarrationInteraction, NarrationResponse } from './slices/narrationSlice';
+import { NovelCharacterOutfit, NovelScene } from './slices/novelSlice';
+import { RootState } from './store';
 import { NovelNSFW } from './versioning';
 
 export const selectLastLoadedResponse = (state: RootState): NarrationResponse | undefined => {
@@ -18,6 +20,34 @@ export const selectLastLoadedResponse = (state: RootState): NarrationResponse | 
   } else {
     return response;
   }
+};
+
+export const selectTokensCount = (state: RootState) => {
+  const currentResponseState: NarrationResponse = state.narration.responses[state.narration.currentResponseId]!;
+
+  const responsePromptBuilder = new PromptBuilder<AbstractRoleplayStrategy>({
+    maxNewTokens: 200,
+    strategy: new RoleplayStrategyLlama3(),
+    truncationLength: 32000,
+  });
+
+  const tokens = responsePromptBuilder.buildPrompt(
+    {
+      state: {
+        ...state,
+        narration: {
+          ...state.narration,
+          responses: {
+            ...state.narration.responses,
+            [state.narration.currentResponseId]: currentResponseState,
+          },
+        },
+      },
+      currentCharacterId: currentResponseState.selectedCharacterId || '',
+    },
+    selectAllParentDialogues(state).length,
+  ).totalTokens;
+  return tokens;
 };
 
 export const selectSceneFromResponse = (

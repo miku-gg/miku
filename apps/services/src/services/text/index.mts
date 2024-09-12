@@ -4,6 +4,7 @@ import { presets } from './data/presets.mjs';
 import { GuidanceQuery, validateGuidanceQuery } from './lib/queryValidation.mjs';
 import { TokenizerType, tokenizers } from './lib/tokenize.mjs';
 import modelServerSettingsStore from './lib/modelServerSettingsStore.mjs';
+import { getModelHealth } from './lib/healthChecker.mjs';
 
 const getTokenizer = (_tokenizer: string): Guidance.Tokenizer.AbstractTokenizer => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -26,9 +27,15 @@ export default async (req: Request<string>, res: Response) => {
   const guidanceQuery: GuidanceQuery = req.body;
   validateGuidanceQuery(guidanceQuery);
   const models = modelServerSettingsStore.getRPModels();
-  const modelSettings = models.find((model) => model.id === guidanceQuery.model);
+  let modelSettings = models.find((model) => model.id === guidanceQuery.model);
   if (!modelSettings) {
     throw { message: 'Model not found.', status: 404 };
+  }
+  if (['RP', 'RP_SMART'].includes(modelSettings.id) && !getModelHealth(modelSettings.id)) {
+    modelSettings = models.find((model) => model.id === 'RP_FALLBACK');
+    if (!modelSettings) {
+      throw { message: 'Model down.', status: 500 };
+    }
   }
   const templateProcessor = new Guidance.Template.TemplateProcessor(
     getTokenizer(modelSettings.tokenizer),

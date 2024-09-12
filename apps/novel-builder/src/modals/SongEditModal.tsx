@@ -6,6 +6,7 @@ import { closeModal } from '../state/slices/inputSlice';
 import config from '../config';
 import './SongEditModal.scss';
 import { deleteSong, updateSong } from '../state/slices/novelFormSlice';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 export default function SongEditModal() {
   const song = useAppSelector(selectEditingSong);
@@ -36,7 +37,7 @@ export default function SongEditModal() {
       {song ? (
         <div className="SongEditModal__content">
           <div className="SongEditModal__preview">
-            <audio src={config.genAssetLink(song.source)} controls />
+            <audio src={config.genAssetLink(song.source, AssetDisplayPrefix.MUSIC)} controls />
           </div>
           <div className="SongEditModal__inputs">
             <Input

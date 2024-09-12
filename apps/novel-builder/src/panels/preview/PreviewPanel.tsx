@@ -21,10 +21,11 @@ export function generateAlphaLink({ botHash, chatId }: { botHash: string; chatId
     configuration: base64.encode(
       utf8.encode(
         JSON.stringify({
-          assetUploadEndpoint: 'http://localhost:8585/s3/asset-upload',
+          assetUploadEndpoint: config.uploadAssetEndpoint,
           characterSearchEndpoint: '',
           backgroundSearchEndpoint: '',
-          assetsEndpoint: STAGE === 'development' ? 'http://localhost:8585/s3/assets' : 'https://assets.miku.gg',
+          assetsEndpoint: config.assetsEndpoint,
+          assetsEndpointOptimized: config.assetsEndpointOptimized,
           cardEndpoint: 'http://localhost:8585/s3/bots',
           servicesEndpoint: STAGE === 'development' ? 'http://localhost:8484' : 'https://services.miku.gg',
           freeTTS: false,

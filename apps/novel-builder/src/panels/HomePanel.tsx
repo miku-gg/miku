@@ -37,9 +37,9 @@ export default function HomePanel() {
               }),
             );
           },
-          uploadAsset: async (assetBase64URI: string) => {
+          uploadAsset: async (assetBase64URI: string, type) => {
             if (assetBase64URI.startsWith('data:')) {
-              return await config.uploadAsset(assetBase64URI);
+              return await config.uploadAsset(assetBase64URI, type);
             } else {
               return { success: true, assetId: assetBase64URI };
             }

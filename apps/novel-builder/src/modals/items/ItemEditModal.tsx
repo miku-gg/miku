@@ -13,10 +13,11 @@ import { FaPencil } from 'react-icons/fa6';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import config from '../../config';
+import config, { MAX_FILE_SIZE } from '../../config';
 import { checkFileType } from '../../libs/utils';
 import SceneSelector from '../scene/SceneSelector';
 import './ItemEditModal.scss';
+import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 export default function ItemEditModal() {
   const dispatch = useDispatch();
@@ -28,7 +29,7 @@ export default function ItemEditModal() {
     if (file && item) {
       setIsUploading(true);
       try {
-        const asset = await config.uploadAsset(file);
+        const asset = await config.uploadAsset(file, AssetType.ITEM_IMAGE);
         dispatch(
           updateInventoryItem({
             ...item,
@@ -145,14 +146,14 @@ export default function ItemEditModal() {
               )}
               <DragAndDropImages
                 handleChange={(file) => handleUploadImage(file)}
-                previewImage={item.icon && config.genAssetLink(item.icon)}
+                previewImage={item.icon && config.genAssetLink(item.icon, AssetDisplayPrefix.ITEM_IMAGE)}
                 placeHolder="Icon for the item (512x512)"
                 onFileValidate={async (file) => {
-                  if (file.size > 2 * 512 * 512) {
-                    toast.error('File size should be less than 1MB');
+                  if (file.size > MAX_FILE_SIZE) {
+                    toast.error('File size should be less than 5MB');
                     return false;
                   }
-                  if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+                  if (!checkFileType(file, ['image/png', 'image/jpeg', 'image/webp'])) {
                     toast.error('Invalid file type. Please upload a jpg file.');
                     return false;
                   }

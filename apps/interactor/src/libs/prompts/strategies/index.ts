@@ -5,4 +5,7 @@ export * from './roleplay/RoleplayStrategyAlpaca';
 export * from './roleplay/RoleplayStrategyLlama3';
 export * from './roleplay/RoleplayStrategyVicuna';
 export * from './roleplay/AbstractRoleplayStrategy';
+export * from './roleplay/RoleplayStrategyChatML';
+export * from './roleplay/RoleplayStrategyMistral';
+export * from './roleplay/RoleplayStrategyLyra';
 export * from './suggestion/AlpacaSuggestionStrategy';

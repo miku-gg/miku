@@ -142,6 +142,7 @@ export interface SettingsState {
     debug: boolean;
     testing: boolean;
     modelSelector: boolean;
+    memoryCapacity: boolean;
     edit: {
       opened: boolean;
       id: string;

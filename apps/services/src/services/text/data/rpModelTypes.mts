@@ -14,6 +14,8 @@ export enum RPModelStrategy {
   METHARME = 'metharmerp',
   VICUNA = 'vicunarp',
   LLAMA3 = 'llama3rp',
+  CHATML = 'chatmlrp',
+  LYRA = 'lyrarp',
 }
 
 export enum PresetType {

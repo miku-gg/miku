@@ -1,42 +1,42 @@
+import { AssetDisplayPrefix, AssetType, DEFAULT_MUSIC, dataURLtoFile } from '@mikugg/bot-utils';
 import { Button, DragAndDropImages, Input, Modal, MusicSelector, Tooltip } from '@mikugg/ui-kit';
-import { MdOutlineImageSearch } from 'react-icons/md';
+import { createSelector } from '@reduxjs/toolkit';
+import classNames from 'classnames';
+import debounce from 'lodash.debounce';
+import { useCallback, useEffect, useState } from 'react';
 import { BsStars } from 'react-icons/bs';
 import { FaCoins } from 'react-icons/fa6';
-import { DEFAULT_MUSIC } from '@mikugg/bot-utils';
-import debounce from 'lodash.debounce';
-import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
-import { useAppContext } from '../../App.context';
+import { MdOutlineImageSearch } from 'react-icons/md';
+import { toast } from 'react-toastify';
 import { v4 as randomUUID } from 'uuid';
-import './CreateScene.scss';
+import { useAppContext } from '../../App.context';
+import { trackEvent } from '../../libs/analytics';
+import { BackgroundResult, CharacterResult, listSearch, SearchType } from '../../libs/listSearch';
+import { loadNovelFromSingleCard } from '../../libs/loadNovel';
+import { selectCurrentScene } from '../../state/selectors';
 import {
   addImportedBackground,
+  addImportedCharacter,
+  backgroundInferenceStart,
+  clearImportedCharacters,
+  removeImportedBackground,
   selectCharacter,
+  setBackground,
   setCharacterModalOpened,
   setModalOpened,
-  setPromptValue,
-  setTitleValue,
-  setSubmitting,
-  removeImportedBackground,
-  setBackground,
   setMusic,
-  addImportedCharacter,
-  clearImportedCharacters,
-  backgroundInferenceStart,
+  setPromptValue,
+  setSubmitting,
+  setTitleValue,
 } from '../../state/slices/creationSlice';
-import classNames from 'classnames';
 import { interactionStart } from '../../state/slices/narrationSlice';
 import { addScene } from '../../state/slices/novelSlice';
-import { toast } from 'react-toastify';
-import { createSelector } from '@reduxjs/toolkit';
-import { Loader } from '../common/Loader';
-import { useCallback, useEffect, useState } from 'react';
-import { BackgroundResult, CharacterResult, listSearch, SearchType } from '../../libs/listSearch';
-import EmotionRenderer from '../emotion-render/EmotionRenderer';
-import { loadNovelFromSingleCard } from '../../libs/loadNovel';
 import { userDataFetchStart } from '../../state/slices/settingsSlice';
+import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
+import { Loader } from '../common/Loader';
+import EmotionRenderer from '../emotion-render/EmotionRenderer';
+import './CreateScene.scss';
 import CreditsDisplayer from './CreditsDisplayer';
-import { selectCurrentScene } from '../../state/selectors';
-import { trackEvent } from '../../libs/analytics';
 
 const selectSelectableCharacters = createSelector(
   [(state: RootState) => state.novel.characters, (state: RootState) => state.creation.importedCharacters],
@@ -51,15 +51,9 @@ const selectSelectableCharacters = createSelector(
     }),
 );
 
-async function dataURItoFile(dataURI: string, filename: string): Promise<File> {
-  const response = await fetch(dataURI);
-  const blob = await response.blob();
-  return new File([blob], filename, { type: blob.type });
-}
-
 // Definition: Defines the CreateSceneModal component
 const CreateScene = () => {
-  const { assetLinkLoader, assetUploader, servicesEndpoint, apiEndpoint } = useAppContext();
+  const { assetLinkLoader, assetUploader, servicesEndpoint, apiEndpoint, isMobileApp } = useAppContext();
   const currentScene = useAppSelector(selectCurrentScene);
   const songs = useAppSelector((state) =>
     state.novel.songs.filter((song) => state.novel.scenes.find((scene) => scene.musicId === song.id)),
@@ -129,10 +123,10 @@ const CreateScene = () => {
       try {
         dispatch(setSubmitting(true));
         _background = backgroundSelected.startsWith('data:image')
-          ? (await assetUploader(await dataURItoFile(backgroundSelected, 'asset'))).fileName
+          ? (await assetUploader(await dataURLtoFile(backgroundSelected, 'asset'), AssetType.BACKGROUND_IMAGE)).fileName
           : backgroundSelected;
         _music = selectedMusic.source.startsWith('data:audio')
-          ? (await assetUploader(await dataURItoFile(selectedMusic.source, 'asset'))).fileName
+          ? (await assetUploader(await dataURLtoFile(selectedMusic.source, 'asset'), AssetType.MUSIC)).fileName
           : selectedMusic.source;
         dispatch(removeImportedBackground(backgroundSelected));
         dispatch(setBackground(_background));
@@ -182,13 +176,10 @@ const CreateScene = () => {
           <button
             className="CreateScene__background__button"
             style={{
-              backgroundImage: `url(${
-                backgroundSelected
-                  ? backgroundSelected.startsWith('data:image')
-                    ? backgroundSelected
-                    : assetLinkLoader(backgroundSelected, true)
-                  : assetLinkLoader('default_background.png')
-              })`,
+              backgroundImage: `url(${assetLinkLoader(
+                backgroundSelected || 'default_background.png',
+                AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL,
+              )})`,
             }}
             onClick={() =>
               dispatch(
@@ -231,12 +222,13 @@ const CreateScene = () => {
           <MusicSelector
             musicList={musicList.map((m) => ({
               name: m.name,
-              source: assetLinkLoader(m.source),
+              source: assetLinkLoader(m.source, AssetDisplayPrefix.MUSIC),
             }))}
             selectedMusic={{
               name: selectedMusic.name,
-              source: assetLinkLoader(selectedMusic.source),
+              source: assetLinkLoader(selectedMusic.source, AssetDisplayPrefix.MUSIC),
             }}
+            hideUpload={isMobileApp}
             onChange={(value) => {
               dispatch(
                 setMusic(
@@ -375,7 +367,7 @@ const SearchBackgroundModal = () => {
       modalId="background"
       searcher={(params) => listSearch<BackgroundResult>(apiEndpoint, SearchType.BACKGROUND, params)}
       renderResult={(result: BackgroundResult, index) => {
-        const backgroundURL = assetLinkLoader(result.asset, true);
+        const backgroundURL = assetLinkLoader(result.asset, AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL);
         return (
           <div
             key={`background-search-${index}-${result.asset}`}
@@ -444,7 +436,7 @@ const SearchCharacterModal = () => {
               data-tooltip-content={result.description}
               data-tooltip-varaint="dark"
             >
-              <img src={assetLinkLoader(result.profilePic)} />
+              <img src={assetLinkLoader(result.profilePic, AssetDisplayPrefix.PROFILE_PIC)} />
               <p className="CreateScene__selector__item-name">{result.name}</p>
               {loadingIndex === index ? <Loader /> : null}
             </div>
@@ -505,7 +497,7 @@ const CreateSceneBackgroundModal = () => {
                     background
                       ? background.source.jpg.startsWith('data:image')
                         ? background.source.jpg
-                        : assetLinkLoader(background.source.jpg, true)
+                        : assetLinkLoader(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL)
                       : ''
                   })`,
                 }}
@@ -546,39 +538,41 @@ const CreateSceneBackgroundModal = () => {
             <MdOutlineImageSearch />
             <p>Search</p>
           </div>{' '}
-          <div className="CreateScene__selector__item CreateScene__selector__item--upload">
-            <DragAndDropImages
-              placeHolder="Upload background"
-              errorMessage="Error uploading images"
-              handleChange={(file: File) => {
-                // transform file to base64 string
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                  const base64String = reader.result;
-                  if (typeof base64String === 'string') {
-                    dispatch(addImportedBackground(base64String));
-                    dispatch(setBackground(base64String));
-                  }
-                };
-              }}
-            />
-          </div>
           {!isMobileApp && (
-            <div
-              className="CreateScene__selector__item CreateScene__selector__item--upload"
-              onClick={() => {
-                dispatch(
-                  setModalOpened({
-                    id: 'background-gen',
-                    opened: true,
-                  }),
-                );
-              }}
-            >
-              <BsStars />
-              <p>Generate</p>
-            </div>
+            <>
+              <div className="CreateScene__selector__item CreateScene__selector__item--upload">
+                <DragAndDropImages
+                  placeHolder="Upload background"
+                  errorMessage="Error uploading images"
+                  handleChange={(file: File) => {
+                    // transform file to base64 string
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                      const base64String = reader.result;
+                      if (typeof base64String === 'string') {
+                        dispatch(addImportedBackground(base64String));
+                        dispatch(setBackground(base64String));
+                      }
+                    };
+                  }}
+                />
+              </div>
+              <div
+                className="CreateScene__selector__item CreateScene__selector__item--upload"
+                onClick={() => {
+                  dispatch(
+                    setModalOpened({
+                      id: 'background-gen',
+                      opened: true,
+                    }),
+                  );
+                }}
+              >
+                <BsStars />
+                <p>Generate</p>
+              </div>
+            </>
           )}
         </div>
       </div>

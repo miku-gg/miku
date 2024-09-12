@@ -78,7 +78,7 @@ const InputBox = (): JSX.Element | null => {
       return;
     }
 
-    if (text === '/model') {
+    if (text === '/test') {
       dispatch(setInputText(''));
       if (isTesterUser) {
         dispatch(setModelSelectorModal(true));
@@ -86,17 +86,19 @@ const InputBox = (): JSX.Element | null => {
       return;
     }
 
-    if (text === '/nemo') {
+    if (text === '/model' || text === '/nemo') {
       dispatch(setInputText(''));
 
+      // eslint-disable-next-line
       // @ts-ignore
-      if (model !== 'RP_NEMO' && model !== 'RP_NEMO_4K') {
+      if (model !== 'RP_TEST' && model !== 'RP_TEST_SMART') {
+        // eslint-disable-next-line
         // @ts-ignore
-        dispatch(setModel(isPremium ? 'RP_NEMO' : 'RP_NEMO_4K'));
-        toast.success(`${isPremium ? 'Nemo 32K' : 'Nemo 4K'} model selected`);
+        dispatch(setModel(isPremium ? 'RP_TEST' : 'RP_TEST_SMART'));
+        toast.success(`${isPremium ? 'TEST 32K' : 'TEST 4K'} model selected`);
       } else {
         dispatch(setModel(isPremium ? ModelType.RP_SMART : ModelType.RP));
-        toast.info('Nemo unselected');
+        toast.info('TEST model unselected');
       }
 
       return;

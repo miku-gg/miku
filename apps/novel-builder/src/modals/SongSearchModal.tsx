@@ -1,6 +1,6 @@
 import ItemSearch from '../components/ItemSearch';
 import config from '../config';
-import { NovelV3 } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import { closeModal } from '../state/slices/inputSlice';
 import { addSong } from '../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../state/store';
@@ -22,7 +22,7 @@ export default function SongSearchModal() {
             id: item.id,
             description: item.description,
             name: item.name,
-            previewAssetUrl: config.genAssetLink(item.source),
+            previewAssetUrl: config.genAssetLink(item.source, AssetDisplayPrefix.MUSIC),
             tags: item.tags,
             value: item,
           };

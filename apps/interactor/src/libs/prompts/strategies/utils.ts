@@ -39,27 +39,42 @@ export const fillTextTemplate = (
   return text;
 };
 
-const buildTextStops = (): string[] => {
+const buildTextStops = (character: string = ''): string[] => {
   // const subjects: string[] = _subjects.map((subject) => `${subject}:`)
-  return ['<|endoftext|>', '<START>', 'USER:', '\n\n\n', '###', '<|user|>', '<|model|>', '<|system|>'];
+  return [
+    '<|endoftext|>',
+    '<START>',
+    'USER:',
+    '\n\n\n',
+    '###',
+    '<|user|>',
+    '<|model|>',
+    '<|system|>',
+    '<|im_end|>',
+    '<|im_start|>',
+    'INST',
+    ...(character
+      ? [`\n${character}'s reaction:`, `\n${character}:`, `\n*${character}:`, `\n*${character}'s reaction:`]
+      : []),
+  ];
 };
 
-export const hasTextStop = (text: string): boolean => {
-  const stops = buildTextStops();
+export const hasTextStop = (text: string, character = ''): boolean => {
+  const stops = buildTextStops(character);
   return stops.reduce((prev, cur) => {
     return prev || text.includes(cur);
   }, false);
 };
 
-export const parseLLMResponse = (text: string): string => {
-  const hasStop = hasTextStop(text);
+export const parseLLMResponse = (text: string, character = ''): string => {
+  const hasStop = hasTextStop(text, character);
   const removeLastLineBreak = (text: string): string => {
     return text[text.length - 1] === '\n' ? text.substring(0, text.length - 1) : text;
   };
 
   text = trim(text);
   if (hasStop) {
-    const stops = buildTextStops();
+    const stops = buildTextStops(character);
     const firstStopIndex = stops.reduce((prev, cur) => {
       const subjectTextIndex = text.indexOf(cur);
       return subjectTextIndex === -1 ? prev : Math.min(prev, subjectTextIndex);

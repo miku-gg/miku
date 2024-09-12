@@ -9,6 +9,7 @@ import {
   validateServicesSettings,
 } from '../data/rpModelTypes.mjs';
 import backend_config from '../../../../backend_config.json' assert { type: 'json' };
+import { setModelHealthChecker } from './healthChecker.mjs';
 
 const DEFAULT_MODEL: RPModelSettings = {
   id: 'RP',
@@ -75,6 +76,8 @@ class ModelServerSettingsStore {
       }
 
       this.settings = result.data;
+      setModelHealthChecker(this.settings.rp_models.find((model) => model.id === 'RP') as RPModelSettings);
+      setModelHealthChecker(this.settings.rp_models.find((model) => model.id === 'RP_SMART') as RPModelSettings);
     } catch (error) {
       if (process.env.MODEL_SERVER_SETTINGS_URL) {
         console.error('Error while fetching model server settings', error);

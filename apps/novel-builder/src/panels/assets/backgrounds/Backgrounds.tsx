@@ -13,6 +13,7 @@ import { selectBackgrounds } from '../../../state/selectors';
 import { openModal } from '../../../state/slices/inputSlice';
 import { addBackground } from '../../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../../state/store';
+import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 export default function Backgrounds({ selected, onSelect }: { selected?: string; onSelect?: (id: string) => void }) {
   const backgrounds = useAppSelector(selectBackgrounds);
@@ -27,7 +28,7 @@ export default function Backgrounds({ selected, onSelect }: { selected?: string;
       return;
     }
     setBackgroundUploading(true);
-    const { success, assetId } = await config.uploadAsset(file);
+    const { success, assetId } = await config.uploadAsset(file, AssetType.BACKGROUND_IMAGE);
     if (!success || !assetId) {
       setBackgroundUploading(false);
       toast.error('Failed to upload background');
@@ -69,7 +70,7 @@ export default function Backgrounds({ selected, onSelect }: { selected?: string;
               );
             },
             content: {
-              image: config.genAssetLink(background.source.jpg, true),
+              image: config.genAssetLink(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE),
             },
             onClick: () => {
               onSelect?.(background.id);

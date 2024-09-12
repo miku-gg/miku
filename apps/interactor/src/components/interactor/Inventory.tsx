@@ -1,4 +1,5 @@
-import { NovelV3 } from '@mikugg/bot-utils';
+import { useEffect } from 'react';
+import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import { Button, Tooltip } from '@mikugg/ui-kit';
 import { FaTimes } from 'react-icons/fa';
 import { toast } from 'react-toastify';
@@ -74,7 +75,7 @@ export default function Inventory() {
               >
                 <img
                   className="Inventory__item-image"
-                  src={assetLinkLoader(item.icon || 'default_item.jpg')}
+                  src={assetLinkLoader(item.icon || 'default_item.jpg', AssetDisplayPrefix.ITEM_IMAGE)}
                   alt={item.name}
                 />
                 <div
@@ -145,11 +146,32 @@ export const InventoryItemModal = ({
   const showItemModal = useAppSelector((state) => state.inventory.showItemModal);
   const state = useAppSelector((state) => state);
 
+  const element = document.querySelector('.InventoryItemModal') as HTMLElement;
+
+  useEffect(() => {
+    element?.addEventListener('animationend', (event) => {
+      if (event.animationName === 'slideClose') {
+        element.classList.add('hidden-after-close');
+      }
+    });
+
+    if (showItemModal === 'open') {
+      element.classList.remove('hidden-after-close');
+    }
+
+    return () => {
+      element?.removeEventListener('animationend', () => {});
+    };
+  }, [showItemModal]);
+
   return (
     <div className={`InventoryItemModal scrollbar ${showItemModal}`}>
       <div className="InventoryItemModal__content">
         <div className="InventoryItemModal__image">
-          <img src={assetLinkLoader(item?.icon || 'default_item.jpg')} alt={item?.name} />
+          <img
+            src={assetLinkLoader(item?.icon || 'default_item.jpg', AssetDisplayPrefix.ITEM_IMAGE)}
+            alt={item?.name}
+          />
         </div>
       </div>
       <header className="InventoryItemModal__header">

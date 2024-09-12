@@ -18,6 +18,7 @@ import { deleteSceneById, updateObjective, updateScene } from '../../state/slice
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelObjectives } from './NovelObjectives';
 import './SceneEditModal.scss';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -99,7 +100,10 @@ export default function SceneEditModal() {
             <div className="SceneEditModal__background-container">
               <img
                 className="SceneEditModal__background"
-                src={config.genAssetLink(scene?.background?.source.jpg || backgrounds[0].source.jpg)}
+                src={config.genAssetLink(
+                  scene?.background?.source.jpg || backgrounds[0].source.jpg,
+                  AssetDisplayPrefix.BACKGROUND_IMAGE,
+                )}
               />
               <div
                 className="SceneEditModal__background-edit-btn"
@@ -158,7 +162,7 @@ export default function SceneEditModal() {
                     <div key={character.id} className="SceneEditModal__character">
                       <ImageSlider
                         images={outfits.map((outfit) => ({
-                          source: config.genAssetLink(selectedEmotion.sources.png),
+                          source: config.genAssetLink(selectedEmotion.sources.png, AssetDisplayPrefix.EMOTION_IMAGE),
                           label: outfit.name,
                         }))}
                         backgroundImageSource=""
@@ -415,7 +419,9 @@ export default function SceneEditModal() {
               <div className="SceneEditModal__scene-music-audio">
                 <audio
                   controls
-                  src={scene.music?.source ? config.genAssetLink(scene.music?.source) : undefined}
+                  src={
+                    scene.music?.source ? config.genAssetLink(scene.music?.source, AssetDisplayPrefix.MUSIC) : undefined
+                  }
                 ></audio>
               </div>
             </div>
@@ -431,7 +437,7 @@ export default function SceneEditModal() {
                   return (
                     <div className="SceneEditModal__scene-objective" key={`objective-${scene.id}-${character.id}`}>
                       <div className="SceneEditModal__scene-objective__character">
-                        <img src={config.genAssetLink(character.profile_pic || '')} />
+                        <img src={config.genAssetLink(character.profile_pic || '', AssetDisplayPrefix.PROFILE_PIC)} />
                         <span>{character.name}</span>
                       </div>
                       <div className="SceneEditModal__scene-objective__input">

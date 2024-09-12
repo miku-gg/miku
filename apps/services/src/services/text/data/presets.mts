@@ -129,7 +129,7 @@ export const presets = new Map<PresetType, OpenAIAphroditeConfig>([
       temperature: 0.8,
       min_p: 0.1,
       top_p: 1,
-      top_k: 0,
+      top_k: 50,
       top_a: 0,
       tfs: 1,
       eta_cutoff: 0,

@@ -3,7 +3,7 @@ import { selectCurrentScene } from '../../../../state/selectors';
 import { RootState } from '../../../../state/store';
 import { AbstractRoleplayStrategy } from './AbstractRoleplayStrategy';
 
-export class RoleplayStrategyMistral extends AbstractRoleplayStrategy {
+export class RoleplayStrategyChatML extends AbstractRoleplayStrategy {
   protected override getContextPrompt(state: RootState, currentCharacterId: string): string {
     const scene = selectCurrentScene(state);
     const characters = scene?.characters || [];
@@ -21,9 +21,7 @@ export class RoleplayStrategyMistral extends AbstractRoleplayStrategy {
     const emotions = this.getCharacterEmotions(state, currentCharacterId);
     const emotionStrings = emotions.join(', ');
 
-    let template =
-      this.startSystem() +
-      `You are an expert actor that can fully immerse yourself into any role given. You do not break character for any reason, even if someone tries addressing you as an AI or language model.
+    let template = `<|im_start|>system\nYou are an expert actor that can fully immerse yourself into any role given. You do not break character for any reason, even if someone tries addressing you as an AI or language model.
     Currently your role is {{char}}, which is described in detail below. As {{char}}, continue the exchange with ${
       characterTemplates.length ? characterTemplates.join(', ') + ' and ' : ''
     }{{user}}.`;
@@ -33,7 +31,7 @@ export class RoleplayStrategyMistral extends AbstractRoleplayStrategy {
     template += `\nYou MUST not repeat the same reaction too many times.`;
     template += `\nThe reaction MUST be one of: ${emotionStrings}.`;
     if (persona || formattedAttributes) {
-      template += `{{char}}'s personality:${persona}\n${formattedAttributes}\n`;
+      template += `\n${persona}\n${formattedAttributes}\n`;
     }
 
     if (state.settings.prompt.systemPrompt) {
@@ -43,7 +41,7 @@ export class RoleplayStrategyMistral extends AbstractRoleplayStrategy {
     const lorebook = this.getContextForLorebookEntry(state, currentCharacterId);
 
     if (sampleChat.length || lorebook) {
-      template += `\nThis is how {{char}} should talk:\n`;
+      template += `\nDialogue example:\n`;
       for (const example of sampleChat) {
         template += example + '\n';
       }
@@ -51,6 +49,10 @@ export class RoleplayStrategyMistral extends AbstractRoleplayStrategy {
         template += `${lorebook}\n`;
       }
     }
+
+    template += `Then the roleplay chat between ${[...characterTemplates, '{{user}}'].join(
+      ', ',
+    )} and {{char}} begins.\n\n`;
 
     if (scene?.prompt) {
       template += `\nScenario: ${scene.prompt}\n`;
@@ -65,17 +67,12 @@ export class RoleplayStrategyMistral extends AbstractRoleplayStrategy {
     return template;
   }
 
-  protected startSystem() {
-    return '[INST]';
-  }
-
   public override template() {
     return {
-      askLine:
-        '[/INST]OOC: I WILL roleplay as {{char}} with two paragraphs, actions and descriptions between asterisks, and dialogue between quotes.\n',
-      instruction: '[INST]',
-      response: '[/INST]',
-      stops: ['INST', '/INST'],
+      askLine: '<|im_end|>\n<|im_start|>assistant\n',
+      instruction: '<|im_end|>\n<|im_start|>user\n',
+      response: '<|im_end|>\n<|im_start|>assistant\n',
+      stops: ['<|im_end|>', '<|im_start|>'],
     };
   }
 }

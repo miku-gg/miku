@@ -1,6 +1,6 @@
 import ItemSearch from '../components/ItemSearch';
 import config from '../config';
-import { NovelV3 } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import { closeModal } from '../state/slices/inputSlice';
 import { addCharacter } from '../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../state/store';
@@ -22,7 +22,7 @@ export default function CharacterSearchModal() {
             id: item.id,
             description: item.short_description,
             name: item.name,
-            previewAssetUrl: config.genAssetLink(item.profile_pic, true),
+            previewAssetUrl: config.genAssetLink(item.profile_pic, AssetDisplayPrefix.PROFILE_PIC_SMALL),
             tags: item.tags,
             value: item,
           };

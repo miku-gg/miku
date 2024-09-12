@@ -12,6 +12,7 @@ import InteractorHeader from './InteractorHeader';
 import Inventory from './Inventory';
 import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const Interactor = () => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
@@ -39,19 +40,28 @@ const Interactor = () => {
                       (isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile
                         ? background.source.mp4Mobile
                         : background.source.mp4 || background.source.jpg,
+                      (isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile
+                        ? AssetDisplayPrefix.BACKGROUND_VIDEO
+                        : background.source.mp4
+                        ? AssetDisplayPrefix.BACKGROUND_VIDEO
+                        : AssetDisplayPrefix.BACKGROUND_IMAGE,
                     )
                   : ''
               }
-              placeholder={background ? assetLinkLoader(background.source.jpg, true) : ''}
+              placeholder={
+                background ? assetLinkLoader(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL) : ''
+              }
             >
               {(src) =>
                 (isMobileApp || window.innerWidth < 600) && background?.source.mp4Mobile ? (
                   <video className="Interactor__background-mobileVideo" loop autoPlay muted>
-                    <source src={assetLinkLoader(background.source.mp4Mobile)}></source>
+                    <source
+                      src={assetLinkLoader(background.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_IMAGE)}
+                    ></source>
                   </video>
                 ) : background?.source.mp4 ? (
                   <video className="Interactor__background-video" loop autoPlay muted>
-                    <source src={assetLinkLoader(background.source.mp4)}></source>
+                    <source src={assetLinkLoader(background.source.mp4, AssetDisplayPrefix.BACKGROUND_VIDEO)}></source>
                   </video>
                 ) : (
                   <img

@@ -11,6 +11,7 @@ import { closeModal } from '../state/slices/inputSlice';
 import { deleteBackground, updateBackground } from '../state/slices/novelFormSlice';
 import { useAppSelector } from '../state/store';
 import './BackgroundEditModal.scss';
+import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 export default function BackgroundEditModal() {
   const background = useAppSelector(selectEditingBackground);
@@ -46,7 +47,7 @@ export default function BackgroundEditModal() {
         return;
       }
       setBackgroundUploading(true);
-      config.uploadAsset(file).then(({ success, assetId }) => {
+      config.uploadAsset(file, AssetType.BACKGROUND_VIDEO).then(({ success, assetId }) => {
         if (!success || !assetId) {
           setBackgroundUploading(false);
           return;
@@ -135,7 +136,10 @@ export default function BackgroundEditModal() {
             <div
               className="BackgroundEditModal__background"
               style={{
-                backgroundImage: `url(${config.genAssetLink(background.source.jpg)})`,
+                backgroundImage: `url(${config.genAssetLink(
+                  background.source.jpg,
+                  AssetDisplayPrefix.BACKGROUND_IMAGE,
+                )})`,
               }}
             />
           ) : null}
@@ -146,7 +150,10 @@ export default function BackgroundEditModal() {
                 onClick={() => handleRemoveVideo(false)}
               />
               <video autoPlay loop muted>
-                <source src={config.genAssetLink(background.source.mp4)} type="video/mp4" />
+                <source
+                  src={config.genAssetLink(background.source.mp4, AssetDisplayPrefix.BACKGROUND_VIDEO)}
+                  type="video/mp4"
+                />
               </video>
             </div>
           ) : null}
@@ -157,7 +164,10 @@ export default function BackgroundEditModal() {
                 onClick={() => handleRemoveVideo(true)}
               />
               <video autoPlay loop muted>
-                <source src={config.genAssetLink(background.source.mp4Mobile)} type="video/mp4" />
+                <source
+                  src={config.genAssetLink(background.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_VIDEO)}
+                  type="video/mp4"
+                />
               </video>
             </div>
           ) : null}

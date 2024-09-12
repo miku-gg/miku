@@ -3,6 +3,7 @@ import { createContext, useContext } from 'react';
 import { RootState } from './state/store';
 
 import { PersonaResult } from './libs/listSearch';
+import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 export interface AppProps {
   isProduction: boolean;
@@ -15,8 +16,11 @@ export interface AppProps {
   freeSmart: boolean;
   persona: PersonaResult;
   novelLoader: () => Promise<RootState>;
-  assetLinkLoader: (asset: string, lowres?: boolean) => string;
-  assetUploader: (data: File) => Promise<{
+  assetLinkLoader: (asset: string, type: AssetDisplayPrefix) => string;
+  assetUploader: (
+    data: File,
+    type: AssetType,
+  ) => Promise<{
     fileName: string;
     fileSize: number;
   }>;

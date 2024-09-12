@@ -9,10 +9,11 @@ import { deletePlace, updatePlace } from '../../state/slices/novelFormSlice';
 import { useAppSelector } from '../../state/store';
 
 import { toast } from 'react-toastify';
-import config from '../../config';
+import config, { MAX_FILE_SIZE } from '../../config';
 import { checkFileType } from '../../libs/utils';
 import SceneSelector from '../scene/SceneSelector';
 import './PlaceEditModal.scss';
+import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 function isBlackAndWhite(pixels: Uint8ClampedArray): boolean {
   const tolerance = 50;
@@ -88,7 +89,7 @@ export default function PlaceEditModal() {
         }
 
         const mapImage = new Image();
-        mapImage.src = config.genAssetLink(mapImageSrc);
+        mapImage.src = config.genAssetLink(mapImageSrc, AssetDisplayPrefix.MAP_IMAGE);
 
         let maskRatio: number;
 
@@ -132,7 +133,7 @@ export default function PlaceEditModal() {
       try {
         switch (source) {
           case 'preview':
-            const { assetId } = await config.uploadAsset(file);
+            const { assetId } = await config.uploadAsset(file, AssetType.MAP_IMAGE_PREVIEW);
             dispatch(
               updatePlace({
                 mapId: map!.id,
@@ -144,7 +145,7 @@ export default function PlaceEditModal() {
             const validatedFile = await validateMaskImage(file);
             if (!validatedFile) return;
 
-            const uploadedAsset = await config.uploadAsset(file);
+            const uploadedAsset = await config.uploadAsset(file, AssetType.MAP_MASK);
             dispatch(
               updatePlace({
                 mapId: map!.id,
@@ -205,13 +206,17 @@ export default function PlaceEditModal() {
           </div>
           <div className="PlaceEdit__maskImage">
             {map?.source.png && (
-              <img className="PlaceEdit__maskImage__map" src={config.genAssetLink(map.source.png)} alt="map" />
+              <img
+                className="PlaceEdit__maskImage__map"
+                src={config.genAssetLink(map.source.png, AssetDisplayPrefix.MAP_IMAGE)}
+                alt="map"
+              />
             )}
 
             <DragAndDropImages
               placeHolder="Add a mask for the place."
               className="PlaceEdit__maskImage__mask"
-              previewImage={place.maskSource && config.genAssetLink(place.maskSource)}
+              previewImage={place.maskSource && config.genAssetLink(place.maskSource, AssetDisplayPrefix.MAP_MASK)}
               handleChange={(file) => handleUploadImage(file, 'mask')}
             />
           </div>
@@ -268,16 +273,17 @@ export default function PlaceEditModal() {
                 place.previewSource
                   ? config.genAssetLink(
                       backgrounds.find((b) => b.id === place.previewSource)?.source.jpg || place.previewSource,
+                      AssetDisplayPrefix.MAP_IMAGE_PREVIEW,
                     )
                   : ''
               }
               handleChange={(file) => handleUploadImage(file, 'preview')}
               onFileValidate={async (file) => {
-                if (file.size > 2 * 1024 * 1024) {
-                  toast.error('File size should be less than 1MB');
+                if (file.size > MAX_FILE_SIZE) {
+                  toast.error('File size should be less than 5MB');
                   return false;
                 }
-                if (!checkFileType(file, ['image/png', 'image/jpeg'])) {
+                if (!checkFileType(file, ['image/png', 'image/jpeg', 'image/webp'])) {
                   toast.error('Invalid file type. Please upload a valid image file');
                   return false;
                 }

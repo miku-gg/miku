@@ -86,10 +86,10 @@ const interactionEffect = async (
       }),
     ];
 
-    if (!currentCharacterResponse?.emotion) {
+    if (!currentCharacterResponse?.emotion && secondary.id !== state.settings.model) {
       const emotionPrompt = secondaryPromptBuilder.buildPrompt(
         { state, currentCharacterId: selectedCharacterId },
-        maxMessages,
+        Math.min(truncation_length / 200, maxMessages),
       );
       const emotionTemplate = emotionPrompt.template.slice(
         0,
@@ -123,8 +123,8 @@ const interactionEffect = async (
     }
 
     const startText =
-      currentResponseState.characters.find(({ characterId }) => characterId == selectedCharacterId)?.text || '';
-    let completionQuery = responsePromptBuilder.buildPrompt(
+      currentResponseState?.characters?.find(({ characterId }) => characterId == selectedCharacterId)?.text || '';
+    const completionQuery = responsePromptBuilder.buildPrompt(
       {
         state: {
           ...state,
@@ -188,7 +188,7 @@ const interactionEffect = async (
         },
         currentCharacterId: selectedCharacterId,
       },
-      maxMessages,
+      Math.min(truncation_length / 200, maxMessages),
     ).template;
     finishedCompletionResult.get('text');
     prefixConditionPrompt = prefixConditionPrompt.replace(
@@ -259,6 +259,7 @@ const interactionEffect = async (
               if (stateAction) {
                 dispatch(stateAction);
               }
+              let item: NovelV3.InventoryItem | undefined = undefined;
               switch (action.type) {
                 case NovelV3.NovelActionType.ACHIEVEMENT_UNLOCK:
                   postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
@@ -276,7 +277,7 @@ const interactionEffect = async (
                   dispatch(removeObjective(objective.id));
                   break;
                 case NovelV3.NovelActionType.SHOW_ITEM:
-                  const item = state.inventory.items.find((item) => item.id === action.params.itemId);
+                  item = state.inventory.items.find((item) => item.id === action.params.itemId);
                   if (!item) {
                     break;
                   }

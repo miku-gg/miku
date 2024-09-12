@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { v4 as randomUUID } from 'uuid';
 import { addSong } from '../../../state/slices/novelFormSlice';
 import { MdSearch } from 'react-icons/md';
+import { AssetType } from '@mikugg/bot-utils';
 
 export default function Songs({ selected, onSelect }: { selected?: string; onSelect?: (id: string) => void }) {
   const songs = useAppSelector((state) => state.novel.songs);
@@ -20,7 +21,7 @@ export default function Songs({ selected, onSelect }: { selected?: string; onSel
     const file = event.target.files?.[0];
     if (!file) return;
     setSongUploading(true);
-    const { success, assetId } = await config.uploadAsset(file);
+    const { success, assetId } = await config.uploadAsset(file, AssetType.MUSIC);
     if (!success || !assetId) {
       setSongUploading(false);
       toast.error('Failed to upload song');

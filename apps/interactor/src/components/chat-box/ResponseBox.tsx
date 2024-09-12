@@ -1,3 +1,5 @@
+import { Tooltip } from '@mikugg/ui-kit';
+
 import { useEffect, useRef } from 'react';
 
 import { FaDice, FaForward } from 'react-icons/fa';
@@ -28,6 +30,7 @@ import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
 import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter';
 import './ResponseBox.scss';
 import TTSPlayer from './TTSPlayer';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch();
@@ -163,6 +166,10 @@ const ResponseBox = (): JSX.Element | null => {
                     selected: displayCharacter?.id === characterId,
                   })}
                   key={`response-character-${characterId}`}
+                  data-tooltip-id={`ResponseBox__character-tooltip`}
+                  data-tooltip-content={character?.name || ''}
+                  data-tooltip-varaint="dark"
+                  data-tooltip-events="hover"
                 >
                   <button
                     className="ResponseBox__character-button"
@@ -182,8 +189,9 @@ const ResponseBox = (): JSX.Element | null => {
                     }
                     disabled={disabled}
                   >
-                    <img src={assetLinkLoader(character?.profile_pic || '')} />
+                    <img src={assetLinkLoader(character?.profile_pic || '', AssetDisplayPrefix.CHARACTER_PIC_SMALL)} />
                   </button>
+                  <Tooltip id="ResponseBox__character-tooltip" place="top"></Tooltip>
                 </div>
               );
             })}
