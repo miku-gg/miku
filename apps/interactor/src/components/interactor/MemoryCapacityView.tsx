@@ -199,7 +199,7 @@ export default function MemoryCapacityView() {
               <h4>Premium membership</h4>
               <div>
                 <FaCheck size={10} color="#9747ff" />
-                <p>Smarter, 70B AI Model</p>
+                <p>Smarter responses. 70B AI Model with 16k context</p>
               </div>
               <div>
                 <FaCheck size={10} color="#9747ff" />
