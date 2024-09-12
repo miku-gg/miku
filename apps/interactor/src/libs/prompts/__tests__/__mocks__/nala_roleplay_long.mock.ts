@@ -40,6 +40,7 @@ export default {
   settings: {
     model: 'RP',
     user: {
+      id: '',
       name: 'Anon',
       isPremium: false,
       nsfw: 0,
@@ -66,6 +67,7 @@ export default {
       edit: { opened: false, id: '' },
       modelSelector: false,
       memoryCapacity: false,
+      deviceExport: false,
     },
     chatBox: {
       isDraggable: false,
