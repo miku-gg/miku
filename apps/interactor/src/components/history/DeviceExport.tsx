@@ -31,10 +31,8 @@ export const DeviceExport = () => {
   const state = useAppSelector((state) => state);
   const { isPremium } = useAppSelector((state) => state.settings.user);
   const isModalOpen = useAppSelector((state) => state.settings.modals.deviceExport);
-  const user = { id: '1234' }; //mocked data
-
   const { isProduction, servicesEndpoint } = useAppContext();
-
+  const userId = useAppSelector((state) => state.settings.user.id);
   if (!isProduction) return null;
 
   const getEncryptedJson = () => {
@@ -50,7 +48,7 @@ export const DeviceExport = () => {
     const response = await fetch(`${servicesEndpoint}/user/save-narration`, {
       method: 'POST',
       body: JSON.stringify({
-        id: `${user.id}/${encryptedData.id}`,
+        id: `${userId}/${encryptedData.id}`,
         data: encryptedData.data,
       }),
       headers: {

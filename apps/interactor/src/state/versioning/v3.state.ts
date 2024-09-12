@@ -105,6 +105,7 @@ export enum Voices {
 export interface SettingsState {
   model: ModelType;
   user: {
+    id: string;
     name: string;
     isTester?: boolean;
     isPremium: boolean;
