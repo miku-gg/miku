@@ -1,22 +1,28 @@
 import { Button, Modal, Tooltip } from '@mikugg/ui-kit';
 import { useMemo } from 'react';
+import { FaCheck } from 'react-icons/fa';
 import { GiBrain } from 'react-icons/gi';
 import { useAppContext } from '../../App.context';
+import { trackEvent } from '../../libs/analytics';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { selectTokensCount } from '../../state/selectors';
-import { setMemoryCapacityModal } from '../../state/slices/settingsSlice';
+import { ModelType, setMemoryCapacityModal, setModel } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './MemoryCapacityView.scss';
 
 const REGULAR_USERS_TOKENS_CAPACITY = 4096;
-const PREMIUM_USERS_TOKENS_CAPACITY = 32768;
+const PREMIUM_USERS_TOKENS_CAPACITY = 16384;
 
 export default function MemoryCapacityView() {
   const { isProduction, isMobileApp } = useAppContext();
+  if (!isProduction) return null;
+
   const dispatch = useAppDispatch();
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const isMemoryModalOpen = useAppSelector((state) => state.settings.modals.memoryCapacity);
   const state = useAppSelector((state) => state);
+  const isSmart = useAppSelector((state) => state.settings.model === ModelType.RP_SMART);
+
   const inputDisabled = useAppSelector((state) => state.narration.input.disabled);
 
   const currentTokens = useMemo(() => {
@@ -25,7 +31,16 @@ export default function MemoryCapacityView() {
 
   const isMobileSize = isMobileApp || window.innerWidth < 600;
 
-  if (!isProduction) return null;
+  const handleBrainClick = () => {
+    if (!isPremiumUser) {
+      dispatch(setMemoryCapacityModal(true));
+    } else {
+      dispatch(setModel(isSmart ? ModelType.RP : ModelType.RP_SMART));
+      trackEvent('smart-toggle-click', {
+        modelSet: isSmart ? 'RP' : 'RP_SMART',
+      });
+    }
+  };
 
   const FillBrain = ({
     isPremium,
@@ -70,9 +85,13 @@ export default function MemoryCapacityView() {
     return (
       <>
         <div
-          className={`MemoryCapacityView ${onClick && !isPremium ? 'clickable' : ''}`}
+          className={`MemoryCapacityView ${onClick ? 'clickable' : ''}`}
           data-tooltip-id={`character-memory-tooltip${showTooltip ? '-yes' : ''}`}
-          data-tooltip-content={`Memory usage: ${Math.round(fillPercentage)}%`}
+          data-tooltip-content={
+            !isPremium
+              ? `Smart mode. Only available for premium`
+              : `${!isSmart ? 'Switch to smart model' : 'Switch to regular model'}`
+          }
           style={{ width: sizeInPixels, height: sizeInPixels, minWidth: sizeInPixels, minHeight: sizeInPixels }}
           onClick={onClick}
         >
@@ -120,7 +139,7 @@ export default function MemoryCapacityView() {
         {showTooltip && (
           <Tooltip
             id={`character-memory-tooltip${showTooltip ? '-yes' : ''}`}
-            style={{ fontSize: '1rem' }}
+            style={{ fontSize: '0.8rem' }}
             place="bottom"
           />
         )}
@@ -132,13 +151,12 @@ export default function MemoryCapacityView() {
     <>
       <FillBrain
         isPremium={isPremiumUser}
-        currentTokensCount={currentTokens || 0}
+        // currentTokensCount={currentTokens}
+        currentTokensCount={isSmart ? PREMIUM_USERS_TOKENS_CAPACITY : 0}
         sizeInPixels={32}
         showFillPercent={false}
         showTooltip={true}
-        onClick={() => {
-          dispatch(setMemoryCapacityModal(true));
-        }}
+        onClick={handleBrainClick}
       />
       <Modal
         opened={isMemoryModalOpen && !isPremiumUser}
@@ -163,7 +181,10 @@ export default function MemoryCapacityView() {
             />
             <div className="MemoryCapacityView__modal-top__text">
               <h4>Free membership</h4>
-              <p>Characters can remember around the last 15 messages</p>
+              <div>
+                <FaCheck size={10} color="#9747ff" />
+                <p>Characters can remember around the last 10 messages</p>
+              </div>
             </div>
           </div>
           <div className="MemoryCapacityView__modal-bottom">
@@ -176,7 +197,14 @@ export default function MemoryCapacityView() {
             />
             <div className="MemoryCapacityView__modal-bottom__text">
               <h4>Premium membership</h4>
-              <p>Characters can remember around the last 170 messages</p>
+              <div>
+                <FaCheck size={10} color="#9747ff" />
+                <p>New smarter AI model</p>
+              </div>
+              <div>
+                <FaCheck size={10} color="#9747ff" />
+                <p>Characters can remember around the last 80 messages</p>
+              </div>
             </div>
           </div>
           <div className="MemoryCapacityView__modal-buttons">
