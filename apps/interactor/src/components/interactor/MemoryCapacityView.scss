@@ -63,6 +63,12 @@
         flex-direction: column;
         gap: 0.5rem;
 
+        & div {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
         & p {
           font-size: 0.85rem;
         }
