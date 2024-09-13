@@ -1,4 +1,3 @@
-import http from 'http';
 import { Request, Response } from 'express';
 import * as Guidance from '@mikugg/guidance';
 import { presets } from './data/presets.mjs';
@@ -46,9 +45,7 @@ export default async (req: Request<string>, res: Response) => {
         baseURL: modelSettings.endpoint.url,
         model: modelSettings.endpoint.model,
       },
-      {
-        httpAgent: new http.Agent({ keepAlive: true }),
-      },
+      {},
       {
         ...presets.get(modelSettings.preset),
         max_tokens: modelSettings.new_tokens,
