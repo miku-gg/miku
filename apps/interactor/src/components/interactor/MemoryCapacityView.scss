@@ -75,6 +75,10 @@
       }
     }
 
+    &-top {
+      color: $text-2;
+    }
+
     &-bottom {
       background-color: $background-color-darker;
       border: 1px solid $color-gray;
@@ -105,5 +109,39 @@
   }
   to {
     filter: drop-shadow(0 0 10px #9b47b3);
+  }
+}
+
+.mobile-view {
+  .MemoryCapacityView__modal-top,
+  .MemoryCapacityView__modal-bottom {
+    position: relative;
+    padding-bottom: 15px;
+  }
+
+  .MemoryCapacityView {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+  }
+
+  .MemoryCapacityView__modal-top__text,
+  .MemoryCapacityView__modal-bottom__text {
+    h4 {
+      margin-top: 5px;
+      margin-left: 50px;
+      margin-bottom: 15px;
+    }
+  }
+
+  .MemoryCapacityView__percentage {
+    font-size: 0.7rem;
+  }
+
+  .MemoryCapacityView__modal-buttons {
+    margin-top: 20px;
+    .Button {
+      font-size: 0.75rem;
+    }
   }
 }
