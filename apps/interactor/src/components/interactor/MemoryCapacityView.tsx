@@ -21,7 +21,7 @@ const FillBrain = ({
   showFillPercent,
   onClick,
   showTooltip,
-  useColours,
+  fillColor = '#fafafa',
 }: {
   isSmart: boolean;
   isPremium: boolean;
@@ -30,11 +30,10 @@ const FillBrain = ({
   onClick?: () => void;
   showFillPercent?: boolean;
   showTooltip?: boolean;
-  useColours?: boolean;
+  fillColor?: string;
 }) => {
   const maxCapacity = isPremium ? PREMIUM_USERS_TOKENS_CAPACITY : REGULAR_USERS_TOKENS_CAPACITY;
   const fillPercentage = Math.min((currentTokensCount / maxCapacity) * 100, 100);
-  const fillColor = useColours ? '#ffbe33' : '#6f7396';
   const realFillPercentage = (fillPercentage + 8) * 0.835;
   const uniqueKeyframeName = `fill-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -178,6 +177,7 @@ export default function MemoryCapacityView() {
               currentTokensCount={currentTokens || 0}
               sizeInPixels={isMobileSize ? 35 : 70}
               showFillPercent={true}
+              fillColor="#6f7396"
             />
             <div className="MemoryCapacityView__modal-top__text">
               <h4>Free membership</h4>
@@ -198,7 +198,7 @@ export default function MemoryCapacityView() {
               currentTokensCount={currentTokens || 0}
               sizeInPixels={isMobileSize ? 35 : 70}
               showFillPercent={true}
-              useColours={true}
+              fillColor="#ffbe33"
             />
             <div className="MemoryCapacityView__modal-bottom__text">
               <h4>Premium membership</h4>
