@@ -1,3 +1,4 @@
+import http from 'http';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
@@ -9,6 +10,8 @@ import monitor from 'express-status-monitor';
 import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
 import { getModelHealth } from './services/text/lib/healthChecker.mjs';
 const PORT = process.env.SERVICES_PORT || 8484;
+
+http.globalAgent.maxSockets = Infinity;
 
 const app: express.Application = express();
 app.use(
