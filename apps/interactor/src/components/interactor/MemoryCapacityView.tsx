@@ -106,7 +106,7 @@ const FillBrain = ({
           </div>
         ))}
 
-        {showFillPercent && <p className="MemoryCapacityView__percentage">{Math.round(fillPercentage)}%</p>}
+        {showFillPercent && <p className="MemoryCapacityView__percentage">{Math.round(fillPercentage)}% Used</p>}
       </div>
       {showTooltip && (
         <Tooltip
