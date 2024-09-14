@@ -31,12 +31,12 @@ export default async (req: Request<string>, res: Response) => {
   if (!modelSettings) {
     throw { message: 'Model not found.', status: 404 };
   }
-  if (['RP', 'RP_SMART'].includes(modelSettings.id) && !getModelHealth(modelSettings.id)) {
-    modelSettings = models.find((model) => model.id === 'RP_FALLBACK');
-    if (!modelSettings) {
-      throw { message: 'Model down.', status: 500 };
-    }
-  }
+  // if (['RP', 'RP_SMART'].includes(modelSettings.id) && !getModelHealth(modelSettings.id)) {
+  //   modelSettings = models.find((model) => model.id === 'RP_FALLBACK');
+  //   if (!modelSettings) {
+  //     throw { message: 'Model down.', status: 500 };
+  //   }
+  // }
   const templateProcessor = new Guidance.Template.TemplateProcessor(
     getTokenizer(modelSettings.tokenizer),
     new Guidance.TokenGenerator.OpenAITokenGenerator(

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { RPModelSettings } from '../data/rpModelTypes.mjs';
 
 // Every 5 minutes
-const CHECK_INTERVAL = 5 * 60000;
+const CHECK_INTERVAL = 5 * 60 * 1000;
 
 const modelHealth: Map<
   string,
@@ -37,8 +37,12 @@ export const setModelHealthChecker = (modelSettings: RPModelSettings) => {
     fn: async () => {
       for (const [modelId, model] of modelHealth) {
         try {
+          // model.endpoint.url is of type "https://api.openai.com/v1"
+          // health is of type "https://api.openai.com/health"
+          // replace the v1 with health
+          const healthUrl = model.endpoint.url.replace(/v1$/, 'health');
           const result = await axios.post(
-            model.endpoint.url + '/health',
+            healthUrl,
             {},
             {
               headers: {
