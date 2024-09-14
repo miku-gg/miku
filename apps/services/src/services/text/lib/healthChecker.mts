@@ -38,15 +38,7 @@ export const setModelHealthChecker = (modelSettings: RPModelSettings) => {
       for (const [modelId, model] of modelHealth) {
         try {
           const healthUrl = model.endpoint.url.replace('/v1', '/health');
-          const result = await axios.post(
-            healthUrl,
-            {},
-            {
-              headers: {
-                Authorization: `Bearer ${model.endpoint.api_key}`,
-              },
-            },
-          );
+          const result = await axios.get(healthUrl, {});
           if (result.status !== 200) {
             model.status = false;
           } else {
