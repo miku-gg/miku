@@ -37,10 +37,7 @@ export const setModelHealthChecker = (modelSettings: RPModelSettings) => {
     fn: async () => {
       for (const [modelId, model] of modelHealth) {
         try {
-          // model.endpoint.url is of type "https://api.openai.com/v1"
-          // health is of type "https://api.openai.com/health"
-          // replace the v1 with health
-          const healthUrl = model.endpoint.url.replace(/v1$/, 'health');
+          const healthUrl = model.endpoint.url.replace('/v1', '/health');
           const result = await axios.post(
             healthUrl,
             {},
