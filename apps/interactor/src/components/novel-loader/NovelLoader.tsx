@@ -11,13 +11,14 @@ import { Loader } from '../common/Loader';
 import './NovelLoader.scss';
 
 const NovelLoader = (): JSX.Element => {
-  const { novelLoader, persona, isMobileApp, completelyNSFW } = useAppContext();
+  const { novelLoader, persona, isMobileApp, completelyNSFW,  } = useAppContext();
   const [isCompletelyNSFW, setIsCompletelyNSFW] = useState<boolean | undefined>(completelyNSFW);
+  const userNSFW = useAppSelector((state) => state.settings.user.nsfw);
   const novelFetching = useAppSelector((state) => !state.novel.starts.length);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (!isCompletelyNSFW) {
+    if (!isCompletelyNSFW && userNSFW !== NovelNSFW.NONE) {
       novelLoader().then((state: RootState) => {
         state.novel.characters.forEach((character) => {
           character.card.data.extensions.mikugg_v2.outfits.forEach((outfit) => {
