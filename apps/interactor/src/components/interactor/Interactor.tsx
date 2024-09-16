@@ -10,7 +10,6 @@ import ModelSelectorModal from './ModelSelectorModal';
 import './Interactor.scss';
 import InteractorHeader from './InteractorHeader';
 import Inventory from './Inventory';
-import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
@@ -31,7 +30,7 @@ const Interactor = () => {
       <div className="Interactor">
         <div className="Interactor__content">
           <InteractorHeader />
-          <SceneSuggestion />
+          {/* <SceneSuggestion /> */}
           <div className="Interactor__main-image-container">
             <ProgressiveImage
               src={
