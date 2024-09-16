@@ -360,6 +360,9 @@ export const downloadRenPyProject = async (
   try {
     let allBackgroundAssets: string[] = [];
     let allCharactersImages: string[] = [];
+    const removeDuplicates = (strings: string[]): string[] => {
+      return Array.from(new Set(strings));
+    };
     // const allBackgroundAssets = state.novel.backgrounds.map((background) => background.source.jpg);
     // const allCharactersImages = state.novel.characters
     //   .map((character) => {
@@ -405,11 +408,17 @@ export const downloadRenPyProject = async (
           }
           const sceneBackground = state.novel.backgrounds.find((background) => background.id === scene.backgroundId);
           if (sceneBackground) {
-            allBackgroundAssets.push(sceneBackground.source.jpg);
+            if (!allBackgroundAssets.includes(sceneBackground.source.jpg)) {
+              allBackgroundAssets.push(sceneBackground.source.jpg);
+            }
           }
         }
       }
     }
+    allCharactersImages = allCharactersImages.filter((item) => item !== '');
+
+    allBackgroundAssets = removeDuplicates(allBackgroundAssets);
+    allCharactersImages = removeDuplicates(allCharactersImages);
 
     // eslint-disable-next-line
     // @ts-ignore
