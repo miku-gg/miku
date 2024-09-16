@@ -52,3 +52,17 @@
     height: 100%;
   }
 }
+.disabled-export-button {
+  color: $color-gray;
+  border-color: $color-gray;
+  background-color: #5e5e5e67;
+  cursor: not-allowed;
+
+  & img {
+    filter: grayscale(100%);
+  }
+
+  &:hover {
+    background-color: #5e5e5e67;
+  }
+}

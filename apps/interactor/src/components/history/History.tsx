@@ -102,7 +102,8 @@ const HistoryActions = () => {
   return (
     <div className="History__actions">
       <Tooltip id="history-actions-tooltip" place="bottom" />
-      {!isMobileApp && hasInteractions ? <RenPyExportButton state={state} /> : null}
+      {hasInteractions ? <RenPyExportButton state={state} /> : null}
+
       {!hasInteractions ? (
         <label
           className="icon-button"
