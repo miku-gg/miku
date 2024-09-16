@@ -35,8 +35,6 @@ const HistoryActions = () => {
   const state = useAppSelector((state) => state);
   const hasInteractions = useAppSelector((state) => Object.keys(state.narration.interactions).length > 0);
 
-  const { isMobileApp } = useAppContext();
-
   const handleSave = () => {
     const clonedState = JSON.parse(JSON.stringify(state));
     clonedState.settings.modals.history = false;
