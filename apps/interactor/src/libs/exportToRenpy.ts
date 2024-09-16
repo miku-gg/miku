@@ -1,9 +1,9 @@
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import JSZip from 'jszip';
 import { selectAllParentDialogues } from '../state/selectors';
 import { RootState } from '../state/store';
 import { NovelCharacterOutfit } from '../state/versioning';
 import { fillTextTemplate } from './prompts/strategies';
-import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const assert = console.assert;
 
@@ -358,16 +358,58 @@ export const downloadRenPyProject = async (
   assetLinkLoader: (asset: string, type: AssetDisplayPrefix) => string,
 ) => {
   try {
-    const allBackgroundAssets = state.novel.backgrounds.map((background) => background.source.jpg);
-    const allCharactersImages = state.novel.characters
-      .map((character) => {
-        return character.card.data.extensions.mikugg_v2.outfits.map((outfit) => {
-          return outfit.emotions.map((emotion) => {
-            return emotion.sources.png;
-          });
+    let allBackgroundAssets: string[] = [];
+    let allCharactersImages: string[] = [];
+    // const allBackgroundAssets = state.novel.backgrounds.map((background) => background.source.jpg);
+    // const allCharactersImages = state.novel.characters
+    //   .map((character) => {
+    //     return character.card.data.extensions.mikugg_v2.outfits.map((outfit) => {
+    //       return outfit.emotions.map((emotion) => {
+    //         return emotion.sources.png;
+    //       });
+    //     });
+    //   })
+    //   .flat(2);
+
+    for (const interaction of Object.values(state.narration.interactions)) {
+      if (interaction) {
+        const sceneId = interaction.sceneId;
+        const scene = state.novel.scenes.find((scene) => scene.id === sceneId);
+        const responses = interaction.responsesId.map((responseId) => {
+          return state.narration.responses[responseId];
         });
-      })
-      .flat(2);
+        const emotions = responses
+          .map((response) => {
+            return response
+              ? response?.characters.map((character) => {
+                  return character.emotion;
+                })
+              : [];
+          })
+          .flat();
+        if (scene) {
+          const characterOutfits = scene.characters.map((character) => {
+            return character.outfit;
+          });
+          const outfits = characterOutfits
+            .map((outfit) => {
+              return state.novel.characters.find((character) => character.id === outfit)?.card.data.extensions.mikugg_v2
+                .outfits;
+            })
+            .flat();
+          for (const outfit of outfits) {
+            const emotionsInScene = outfit?.emotions.filter((emotion) => emotions.includes(emotion.id));
+            if (emotionsInScene) {
+              allCharactersImages = allCharactersImages.concat(emotionsInScene.map((emotion) => emotion.sources.png));
+            }
+          }
+          const sceneBackground = state.novel.backgrounds.find((background) => background.id === scene.backgroundId);
+          if (sceneBackground) {
+            allBackgroundAssets.push(sceneBackground.source.jpg);
+          }
+        }
+      }
+    }
 
     // eslint-disable-next-line
     // @ts-ignore
