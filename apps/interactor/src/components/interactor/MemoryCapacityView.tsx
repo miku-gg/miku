@@ -1,11 +1,11 @@
 import { Button, Modal, Tooltip } from '@mikugg/ui-kit';
-import { useMemo } from 'react';
+// import { useMemo } from 'react';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import { GiBrain } from 'react-icons/gi';
 import { useAppContext } from '../../App.context';
 import { trackEvent } from '../../libs/analytics';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
-import { selectTokensCount } from '../../state/selectors';
+// import { selectTokensCount } from '../../state/selectors';
 import { ModelType, setMemoryCapacityModal, setModel } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './MemoryCapacityView.scss';
@@ -125,11 +125,11 @@ export default function MemoryCapacityView() {
   const dispatch = useAppDispatch();
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const isMemoryModalOpen = useAppSelector((state) => state.settings.modals.memoryCapacity);
-  const state = useAppSelector((state) => state);
+  // const state = useAppSelector((state) => state);
   const isSmart = useAppSelector((state) => state.settings.model === ModelType.RP_SMART);
 
-  const inputDisabled = useAppSelector((state) => state.narration.input.disabled);
-  const currentTokens = useMemo(() => selectTokensCount(state), [inputDisabled]);
+  // const inputDisabled = useAppSelector((state) => state.narration.input.disabled);
+  // const currentTokens = useMemo(() => selectTokensCount(state), [inputDisabled]);
 
   const isMobileSize = isMobileApp || window.innerWidth < 600;
 
@@ -172,11 +172,11 @@ export default function MemoryCapacityView() {
           </div>
           <div className="MemoryCapacityView__modal-top">
             <FillBrain
-              isSmart={isSmart}
-              isPremium={isPremiumUser}
-              currentTokensCount={currentTokens || 0}
+              isSmart={false}
+              isPremium={false}
+              currentTokensCount={0}
               sizeInPixels={isMobileSize ? 35 : 70}
-              showFillPercent={true}
+              showFillPercent={false}
               fillColor="#6f7396"
             />
             <div className="MemoryCapacityView__modal-top__text">
@@ -193,22 +193,21 @@ export default function MemoryCapacityView() {
           </div>
           <div className="MemoryCapacityView__modal-bottom">
             <FillBrain
-              isSmart={isSmart}
-              isPremium={true}
-              currentTokensCount={currentTokens || 0}
+              isSmart={false}
+              isPremium={false}
+              currentTokensCount={REGULAR_USERS_TOKENS_CAPACITY}
               sizeInPixels={isMobileSize ? 35 : 70}
-              showFillPercent={true}
-              fillColor="#ffbe33"
+              showFillPercent={false}
             />
             <div className="MemoryCapacityView__modal-bottom__text">
               <h4>Premium membership</h4>
               <div>
                 <FaCheck size={10} color="#9747ff" />
-                <p>Smart Mode. 70B AI Model with 16k context</p>
+                <p>Smart Mode. 70B AI Model with 8k context</p>
               </div>
               <div>
                 <FaCheck size={10} color="#9747ff" />
-                <p>Characters remember 5 times more details</p>
+                <p>Characters remember more details</p>
               </div>
             </div>
           </div>
