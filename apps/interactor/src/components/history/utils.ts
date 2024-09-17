@@ -10,6 +10,7 @@ export type DialogueNodeData = {
   isLeaf: boolean;
   isRoot: boolean;
   isItemAction: boolean;
+  charName: string;
 };
 
 const NODE_WIDTH = 200;

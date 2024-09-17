@@ -47,7 +47,8 @@ const ResponseBox = (): JSX.Element | null => {
   const swipes = useAppSelector(selectCurrentSwipeResponses);
   const { disabled } = useAppSelector((state) => state.narration.input);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
-  const displayText = useFillTextTemplate(displayCharacter.text);
+  const displayCharacterData = characters.find((c) => c.id === displayCharacter.id);
+  const displayText = useFillTextTemplate(displayCharacter.text, displayCharacterData?.name || '');
   const { isMobileApp } = useAppContext();
 
   const handleRegenerateClick = () => {
