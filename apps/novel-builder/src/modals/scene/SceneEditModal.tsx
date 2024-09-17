@@ -1,3 +1,4 @@
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { AreYouSure, Button, Carousel, CheckBox, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import { useState } from 'react';
@@ -18,7 +19,6 @@ import { deleteSceneById, updateObjective, updateScene } from '../../state/slice
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelObjectives } from './NovelObjectives';
 import './SceneEditModal.scss';
-import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -81,6 +81,46 @@ export default function SceneEditModal() {
             ? scene.parentMapIds.filter((mid) => mid !== id)
             : [...scene.parentMapIds, id]
           : [id],
+      }),
+    );
+  };
+
+  const handleSelectObjective = (id: string) => {
+    const objective = getObjectiveData(id);
+    if (!objective || !scene) return;
+    if (objectiveLockedsByScenes?.length === 1) {
+      const currentSelectedObjective = objectiveLockedsByScenes[0];
+      dispatch(
+        updateObjective({
+          id: currentSelectedObjective.id,
+          objective: {
+            ...currentSelectedObjective,
+            stateCondition: {
+              type: 'IN_SCENE',
+              config: {
+                sceneIds: [
+                  ...currentSelectedObjective.stateCondition?.config?.sceneIds?.filter((id) => id !== scene?.id),
+                ],
+              },
+            },
+          },
+        }),
+      );
+    }
+    dispatch(
+      updateObjective({
+        id,
+        objective: {
+          ...objective,
+          stateCondition: {
+            type: 'IN_SCENE',
+            config: {
+              sceneIds: objective.stateCondition?.config?.sceneIds?.includes(scene?.id || '')
+                ? objective.stateCondition?.config?.sceneIds?.filter((id) => id !== scene?.id)
+                : [...(objective.stateCondition?.config?.sceneIds || []), scene?.id],
+            },
+          },
+        },
       }),
     );
   };
@@ -388,24 +428,7 @@ export default function SceneEditModal() {
                 tooltipText="Select objectives that are relevant to this scene."
                 selectedObjectiveIds={objectiveLockedsByScenes?.map((obj) => obj.id) || []}
                 onSelectObjective={(id) => {
-                  const objective = getObjectiveData(id);
-                  if (!objective) return;
-                  dispatch(
-                    updateObjective({
-                      id,
-                      objective: {
-                        ...objective,
-                        stateCondition: {
-                          type: 'IN_SCENE',
-                          config: {
-                            sceneIds: objective.stateCondition?.config?.sceneIds?.includes(scene?.id)
-                              ? objective.stateCondition?.config?.sceneIds?.filter((id) => id !== scene?.id)
-                              : [...(objective.stateCondition?.config?.sceneIds || []), scene?.id],
-                          },
-                        },
-                      },
-                    }),
-                  );
+                  handleSelectObjective(id);
                 }}
               />
             </div>
