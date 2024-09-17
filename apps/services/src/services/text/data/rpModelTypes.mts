@@ -9,13 +9,13 @@ export enum RPModelTokenizers {
 }
 
 export enum RPModelStrategy {
-  ALPACA = 'alpacarp',
-  MISTRAL = 'mistralrp',
-  METHARME = 'metharmerp',
-  VICUNA = 'vicunarp',
-  LLAMA3 = 'llama3rp',
-  CHATML = 'chatmlrp',
-  LYRA = 'lyrarp',
+  ALPACA = 'alpaca',
+  MISTRAL = 'mistral',
+  METHARME = 'metharme',
+  VICUNA = 'vicuna',
+  LLAMA3 = 'llama3',
+  CHATML = 'chatml',
+  LYRA = 'lyra',
 }
 
 export enum PresetType {

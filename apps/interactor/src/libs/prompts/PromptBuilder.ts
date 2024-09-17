@@ -22,8 +22,8 @@ class PromptBuilder<StrategyClass extends AbstractPromptStrategy<unknown, unknow
     maxMemorySize: number,
   ): {
     template: string;
-      variables: Record<string, string | string[]>;
-      totalTokens: number;
+    variables: Record<string, string | string[]>;
+    totalTokens: number;
   } {
     // binary search for the last message that fits within the max tokens
     const recursiveBinarySearch = (minIndex: number, maxIndex: number, maxTokens: number): number => {

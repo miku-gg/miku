@@ -1,4 +1,5 @@
 import llamaTokenizer, { Tokenizer } from '../_llama-tokenizer';
+import { getInstructTemplateFromSlug, InstructTemplate, InstructTemplateSlug } from './instructTemplates';
 
 const cache: { [key: string]: number } = {};
 
@@ -23,8 +24,11 @@ export abstract class AbstractPromptStrategy<Input, Output> {
   // eslint-disable-next-line
   // @ts-ignore
   private tokenizer: Tokenizer;
-  constructor(_tokenizerSkug?: string) {
+  protected instructTemplate: InstructTemplate;
+
+  constructor(_instructTemplate: InstructTemplateSlug = 'llama3') {
     this.tokenizer = llamaTokenizer;
+    this.instructTemplate = getInstructTemplateFromSlug(_instructTemplate);
   }
   public abstract buildGuidancePrompt(
     maxNewTokens: number,

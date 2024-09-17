@@ -10,7 +10,7 @@ import classNames from 'classnames';
 import React, { RefObject, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
-import { AlpacaSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSuggestionStrategy';
+import { ResponseSuggestionPromptStrategy } from '../../libs/prompts/strategies/suggestion/ResponseSuggestionPromptStrategy';
 import textCompletion from '../../libs/textCompletion';
 import {
   ModelType,
@@ -21,6 +21,7 @@ import {
 } from '../../state/slices/settingsSlice';
 import { Loader } from '../common/Loader';
 import './InputBox.scss';
+import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
 
 const InputBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch();
@@ -129,9 +130,10 @@ const InputBox = (): JSX.Element | null => {
     }
     setIsAutocompleteLoading(true);
     try {
-      const promptBuilder = new PromptBuilder<AlpacaSuggestionStrategy>({
+      const modelMetadata = await retrieveModelMetadata(servicesEndpoint, state.settings.model);
+      const promptBuilder = new PromptBuilder<ResponseSuggestionPromptStrategy>({
         maxNewTokens: 35,
-        strategy: new AlpacaSuggestionStrategy('llama'),
+        strategy: new ResponseSuggestionPromptStrategy(modelMetadata.strategy),
         truncationLength: 4096,
       });
       const prompt = promptBuilder.buildPrompt(state, 30);
