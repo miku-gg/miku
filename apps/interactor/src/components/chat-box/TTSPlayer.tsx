@@ -86,6 +86,7 @@ const TTSPlayer2: React.FC = () => {
   }, [disabled]);
 
   const inferAudio = useCallback(() => {
+    const _inferenceSignature = `${lastCharacterText}.${_voiceId}.${speakingStyle}`;
     if (!window.MediaSource || isFirefoxOrSafari()) {
       (async () => {
         // Full audio file fetch and playback
@@ -127,7 +128,6 @@ const TTSPlayer2: React.FC = () => {
       return;
     }
 
-    const _inferenceSignature = `${lastCharacterText}.${_voiceId}.${speakingStyle}`;
     // eslint-disable-next-line
     // @ts-ignore
     if (_inferenceSignature === window.currentInference) {
@@ -234,7 +234,7 @@ const TTSPlayer2: React.FC = () => {
     }
   }, [inferAudio, autoPlay]);
 
-  // if (!isProduction) return null;
+  if (!isProduction) return null;
 
   return (
     <>
