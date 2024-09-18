@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { v4 as randomUUID } from 'uuid';
-import { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
-import { toast } from 'react-toastify';
 import trim from 'lodash.trim';
+import { toast } from 'react-toastify';
+import { v4 as randomUUID } from 'uuid';
+import { NarrationInteraction, NarrationResponse, NarrationState } from '../versioning';
 import { NarrationSceneSuggestion } from '../versioning/v3.state';
 
-export type { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
+export type { NarrationInteraction, NarrationResponse, NarrationState } from '../versioning';
 
 const initialState: NarrationState = {
   id: '',
@@ -409,6 +409,9 @@ const narrationSlice = createSlice({
         state.seenHints = [action.payload];
       }
     },
+    setInputDisabled(state, action: PayloadAction<boolean>) {
+      state.input.disabled = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -421,6 +424,7 @@ const narrationSlice = createSlice({
 
 export const {
   setNarration,
+  setInputDisabled,
   setInputText,
   setSuggestions,
   interactionFailure,
