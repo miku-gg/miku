@@ -88,6 +88,7 @@ const TTSPlayer2: React.FC = () => {
   }, [disabled]);
 
   const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
 
   const playAudioViaBuffer = async (audioBuffer: ArrayBuffer, playSpeed: Speed) => {
     if (!audioContextRef.current) {
@@ -95,17 +96,31 @@ const TTSPlayer2: React.FC = () => {
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
 
+    // Stop the previous source if it exists
+    if (sourceNodeRef.current) {
+      sourceNodeRef.current.stop();
+    }
+
     const source = audioContextRef.current.createBufferSource();
-    const gainNode = audioContextRef.current.createGain();
+    sourceNodeRef.current = source;
 
     try {
       const decodedBuffer = await audioContextRef.current.decodeAudioData(audioBuffer);
       source.buffer = decodedBuffer;
+
+      // Create a GainNode for volume control
+      const gainNode = audioContextRef.current.createGain();
+
+      // Connect the source to the gain node and the gain node to the destination
       source.connect(gainNode);
       gainNode.connect(audioContextRef.current.destination);
 
       // Set playback rate based on playSpeed
-      source.playbackRate.value = getAudioSpeed(playSpeed);
+      const speed = getAudioSpeed(playSpeed);
+      source.playbackRate.value = speed;
+
+      // Enable pitch correction
+      source.detune.value = -1200 * Math.log2(speed);
 
       source.start(0);
     } catch (decodeError) {
@@ -257,7 +272,7 @@ const TTSPlayer2: React.FC = () => {
     }
   }, [inferAudio, autoPlay]);
 
-  if (!isProduction) return null;
+  // if (!isProduction) return null;
 
   return (
     <>
@@ -289,7 +304,7 @@ const TTSPlayer2: React.FC = () => {
             inferAudio();
           }
         }}
-        disabled={!inferencing && !isPremium && !freeTTS && !isFirstMessage}
+        // disabled={!inferencing && !isPremium && !freeTTS && !isFirstMessage}
         data-tooltip-id="smart-tooltip"
         data-tooltip-content={
           !isPremium && !freeTTS && !isFirstMessage
