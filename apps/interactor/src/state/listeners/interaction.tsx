@@ -123,22 +123,21 @@ const interactionEffect = async (
 
     const startText =
       currentResponseState?.characters?.find(({ characterId }) => characterId == selectedCharacterId)?.text || '';
-    const completionQuery = responsePromptBuilder.buildPrompt(
-      {
-        state: {
-          ...state,
-          narration: {
-            ...state.narration,
-            responses: {
-              ...state.narration.responses,
-              [state.narration.currentResponseId]: currentResponseState,
-            },
+    const completionState = {
+      state: {
+        ...state,
+        narration: {
+          ...state.narration,
+          responses: {
+            ...state.narration.responses,
+            [state.narration.currentResponseId]: currentResponseState,
           },
         },
-        currentCharacterId: selectedCharacterId,
       },
-      maxMessages,
-    );
+      currentCharacterId: selectedCharacterId,
+    };
+    const completionQuery = responsePromptBuilder.buildPrompt(completionState, maxMessages);
+    const secondaryCompletionQuery = secondaryPromptBuilder.buildPrompt(completionState, maxMessages);
 
     const stream = textCompletion({
       ...completionQuery,
@@ -173,22 +172,7 @@ const interactionEffect = async (
       }),
     );
     secondaryPromptBuilder.setTrucationLength(secondary.truncation_length - 150);
-    let prefixConditionPrompt = secondaryPromptBuilder.buildPrompt(
-      {
-        state: {
-          ...state,
-          narration: {
-            ...state.narration,
-            responses: {
-              ...state.narration.responses,
-              [state.narration.currentResponseId]: currentResponseState,
-            },
-          },
-        },
-        currentCharacterId: selectedCharacterId,
-      },
-      Math.min(truncation_length / 200, maxMessages),
-    ).template;
+    let prefixConditionPrompt = secondaryCompletionQuery.template;
     finishedCompletionResult.get('text');
     prefixConditionPrompt = prefixConditionPrompt.replace(
       /{{GEN text (.*?)}}/g,
