@@ -1,14 +1,36 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../../state/store';
 import { selectLastLoadedCharacters } from '../../state/selectors';
 import { replaceAll } from '../../libs/prompts/strategies/utils';
 import { MdRecordVoiceOver } from 'react-icons/md';
-import { Tooltip } from '@mikugg/ui-kit';
+import { Loader, Tooltip } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import { Speed } from '../../state/versioning';
 import { useAppContext } from '../../App.context';
 import { trackEvent } from '../../libs/analytics';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+
+function isFirefoxOrSafari(): boolean {
+  const userAgent = navigator.userAgent.toLowerCase();
+
+  // Check for Firefox
+  if (userAgent.indexOf('firefox') > -1) {
+    return true;
+  }
+
+  // Check for Safari
+  // Safari on iOS uses 'safari' in the user agent string
+  // Safari on macOS uses 'safari' and doesn't contain 'chrome'
+  if (
+    (userAgent.indexOf('safari') > -1 && userAgent.indexOf('chrome') === -1) ||
+    (userAgent.indexOf('iphone') > -1 && userAgent.indexOf('safari') > -1) ||
+    (userAgent.indexOf('ipad') > -1 && userAgent.indexOf('safari') > -1)
+  ) {
+    return true;
+  }
+
+  return false;
+}
 
 // eslint-disable-next-line
 // @ts-ignore
@@ -52,6 +74,7 @@ const TTSPlayer2: React.FC = () => {
   );
   const characterId = lastCharacter?.id;
   const isPremium = useAppSelector((state) => state.settings.user.isPremium);
+  const [inferencing, setInferencing] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_provider, _voiceId, speakingStyle = 'default'] = voiceId.split('.');
@@ -63,8 +86,44 @@ const TTSPlayer2: React.FC = () => {
   }, [disabled]);
 
   const inferAudio = useCallback(() => {
-    if (!window.MediaSource) {
-      console.error('MediaSource API is not supported in this browser.');
+    if (!window.MediaSource || isFirefoxOrSafari()) {
+      (async () => {
+        // Full audio file fetch and playback
+        try {
+          setInferencing(true);
+          fetchControllerRef.current = new AbortController();
+          const { signal } = fetchControllerRef.current;
+
+          const response = await fetch(`${servicesEndpoint}/audio`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: replaceAll(lastCharacterText, '*', ''),
+              voiceId: _voiceId,
+              speakingStyle: speakingStyle,
+            }),
+            signal,
+            credentials: 'include',
+          });
+
+          const audioBlob = await response.blob();
+          const audioUrl = URL.createObjectURL(audioBlob);
+
+          setInferencing(false);
+          if (audioRef.current) {
+            audioRef.current.src = audioUrl;
+            setAudioSpeed(audioRef, playSpeed);
+            audioRef.current.play();
+          }
+
+          // eslint-disable-next-line
+          // @ts-ignore
+          window.currentInference = _inferenceSignature;
+        } catch (error: unknown) {
+          console.error(error);
+          setInferencing(false);
+        }
+      })();
       return;
     }
 
@@ -102,6 +161,7 @@ const TTSPlayer2: React.FC = () => {
         fetchControllerRef.current = new AbortController();
         const { signal } = fetchControllerRef.current;
 
+        setInferencing(true);
         const response = await fetch(`${servicesEndpoint}/audio`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -117,6 +177,7 @@ const TTSPlayer2: React.FC = () => {
         if (!reader) return;
 
         let started = false;
+        setInferencing(false);
         /* eslint-disable no-constant-condition */
         while (true) {
           const { done, value } = await reader.read();
@@ -137,6 +198,7 @@ const TTSPlayer2: React.FC = () => {
           }
         }
       } catch (error: unknown) {
+        setInferencing(false);
         console.error(error);
       }
     }
@@ -172,7 +234,7 @@ const TTSPlayer2: React.FC = () => {
     }
   }, [inferAudio, autoPlay]);
 
-  if (!isProduction) return null;
+  // if (!isProduction) return null;
 
   return (
     <>
@@ -192,7 +254,7 @@ const TTSPlayer2: React.FC = () => {
       <button
         className={classNames({
           ResponseBox__voice: true,
-          'ResponseBox__voice--disabled': !isPremium && !freeTTS && !isFirstMessage,
+          'ResponseBox__voice--disabled': !inferencing && !isPremium && !freeTTS && !isFirstMessage,
         })}
         onClick={() => {
           trackEvent('voice-gen-click');
@@ -204,7 +266,7 @@ const TTSPlayer2: React.FC = () => {
             inferAudio();
           }
         }}
-        disabled={!isPremium && !freeTTS && !isFirstMessage}
+        disabled={!inferencing && !isPremium && !freeTTS && !isFirstMessage}
         data-tooltip-id="smart-tooltip"
         data-tooltip-content={
           !isPremium && !freeTTS && !isFirstMessage
@@ -214,7 +276,7 @@ const TTSPlayer2: React.FC = () => {
             : ''
         }
       >
-        <MdRecordVoiceOver />
+        {inferencing ? <Loader /> : <MdRecordVoiceOver />}
         <span>Listen</span>
       </button>
       <Tooltip id="audio-tooltip" place="top" />
