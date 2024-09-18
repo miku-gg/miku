@@ -69,6 +69,7 @@ export default {
     },
     chatBox: {
       isDraggable: false,
+      scrollable: true,
     },
   },
   narration: {

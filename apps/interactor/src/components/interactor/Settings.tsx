@@ -1,11 +1,13 @@
-import { CheckBox, Dropdown, Input, Modal, Slider } from '@mikugg/ui-kit';
+import { Button, CheckBox, Dropdown, Input, Modal, Slider } from '@mikugg/ui-kit';
 import { MdRecordVoiceOver } from 'react-icons/md';
 import { SlSettings } from 'react-icons/sl';
+import { trackEvent } from '../../libs/analytics';
 import {
   FontSize,
   Speed,
   Voices,
   setFontSize,
+  setIsScrollable,
   setName,
   setSettingsModal,
   setSettingsTab,
@@ -17,7 +19,6 @@ import {
 } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './Settings.scss';
-import { trackEvent } from '../../libs/analytics';
 const audio = new Audio();
 
 const Settings = (): JSX.Element => {
@@ -226,6 +227,23 @@ const Settings = (): JSX.Element => {
                       },
                     ]}
                   />
+                </div>
+              </div>
+              <div className="SettingsModal__theme">
+                <p>Response Theme</p>
+                <div className="SettingsModal__theme-toggle">
+                  <Button
+                    theme={settings.chatBox.scrollable ? 'gradient' : 'transparent'}
+                    onClick={() => dispatch(setIsScrollable(true))}
+                  >
+                    Scrollable
+                  </Button>
+                  <Button
+                    theme={settings.chatBox.scrollable ? 'transparent' : 'gradient'}
+                    onClick={() => dispatch(setIsScrollable(false))}
+                  >
+                    Visual Novel
+                  </Button>
                 </div>
               </div>
             </>
