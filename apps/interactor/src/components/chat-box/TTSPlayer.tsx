@@ -36,22 +36,24 @@ function isFirefoxOrSafari(): boolean {
 // @ts-ignore
 window.currentInference = '';
 
+const getAudioSpeed = (playSpeed: Speed): number => {
+  switch (playSpeed) {
+    case Speed.Slow:
+      return 0.85;
+    case Speed.Normal:
+      return 1.1;
+    case Speed.Fast:
+      return 1.35;
+    case Speed.Presto:
+      return 1.75;
+    default:
+      return 1.1;
+  }
+};
+
 const setAudioSpeed = (audioRef: React.RefObject<HTMLAudioElement>, playSpeed: Speed) => {
   if (audioRef.current) {
-    switch (playSpeed) {
-      case Speed.Slow:
-        audioRef.current.playbackRate = 0.85;
-        break;
-      case Speed.Normal:
-        audioRef.current.playbackRate = 1.1;
-        break;
-      case Speed.Fast:
-        audioRef.current.playbackRate = 1.35;
-        break;
-      case Speed.Presto:
-        audioRef.current.playbackRate = 1.75;
-        break;
-    }
+    audioRef.current.playbackRate = getAudioSpeed(playSpeed);
   }
 };
 
@@ -85,6 +87,32 @@ const TTSPlayer2: React.FC = () => {
     }
   }, [disabled]);
 
+  const audioContextRef = useRef<AudioContext | null>(null);
+
+  const playAudioViaBuffer = async (audioBuffer: ArrayBuffer, playSpeed: Speed) => {
+    if (!audioContextRef.current) {
+      // eslint-disable-next-line
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+
+    const source = audioContextRef.current.createBufferSource();
+    const gainNode = audioContextRef.current.createGain();
+
+    try {
+      const decodedBuffer = await audioContextRef.current.decodeAudioData(audioBuffer);
+      source.buffer = decodedBuffer;
+      source.connect(gainNode);
+      gainNode.connect(audioContextRef.current.destination);
+
+      // Set playback rate based on playSpeed
+      source.playbackRate.value = getAudioSpeed(playSpeed);
+
+      source.start(0);
+    } catch (decodeError) {
+      console.error('Error decoding audio data:', decodeError);
+    }
+  };
+
   const inferAudio = useCallback(() => {
     const _inferenceSignature = `${lastCharacterText}.${_voiceId}.${speakingStyle}`;
     if (!window.MediaSource || isFirefoxOrSafari()) {
@@ -107,15 +135,9 @@ const TTSPlayer2: React.FC = () => {
             credentials: 'include',
           });
 
-          const audioBlob = await response.blob();
-          const audioUrl = URL.createObjectURL(audioBlob);
-
           setInferencing(false);
-          if (audioRef.current) {
-            audioRef.current.src = audioUrl;
-            setAudioSpeed(audioRef, playSpeed);
-            audioRef.current.play();
-          }
+          setAudioSpeed(audioRef, playSpeed);
+          playAudioViaBuffer(await response.arrayBuffer(), playSpeed);
 
           // eslint-disable-next-line
           // @ts-ignore
@@ -177,7 +199,6 @@ const TTSPlayer2: React.FC = () => {
         if (!reader) return;
 
         let started = false;
-        setInferencing(false);
         /* eslint-disable no-constant-condition */
         while (true) {
           const { done, value } = await reader.read();
@@ -186,6 +207,7 @@ const TTSPlayer2: React.FC = () => {
             // @ts-ignore
             window.currentInference = _inferenceSignature;
             mediaSourceRef.current?.endOfStream();
+            setInferencing(false);
             break;
           }
           if (value) {
@@ -194,6 +216,7 @@ const TTSPlayer2: React.FC = () => {
             if (!started) {
               started = true;
               audioRef.current?.play();
+              setInferencing(false);
             }
           }
         }
