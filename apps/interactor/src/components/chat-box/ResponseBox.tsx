@@ -203,13 +203,13 @@ const ResponseBox = (): JSX.Element | null => {
         {!disabled && lastReponse?.parentInteractionId && (swipes?.length || 0) < 8 ? (
           <button className="ResponseBox__regenerate" onClick={handleRegenerateClick}>
             <FaDice />
-            <span>Regenerate</span>
+            <span className="ResponseBox__action-text">Regenerate</span>
           </button>
         ) : null}
         {!disabled && !isInteractionDisabled ? (
           <button className="ResponseBox__edit" onClick={handleEditClick}>
             <FaPencil />
-            <span>Edit</span>
+            <span className="ResponseBox__action-text">Edit</span>
           </button>
         ) : null}
       </div>

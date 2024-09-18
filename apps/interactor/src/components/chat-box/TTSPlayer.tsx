@@ -315,7 +315,7 @@ const TTSPlayer2: React.FC = () => {
         }
       >
         {inferencing ? <Loader /> : <MdRecordVoiceOver />}
-        <span>Listen</span>
+        <span className="ResponseBox__action-text">Listen</span>
       </button>
       <Tooltip id="audio-tooltip" place="top" />
     </>
