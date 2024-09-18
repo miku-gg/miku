@@ -118,6 +118,7 @@ export interface SettingsState {
   };
   chatBox: {
     isDraggable: boolean;
+    scrollable: boolean;
   };
   text: {
     speed: Speed;
