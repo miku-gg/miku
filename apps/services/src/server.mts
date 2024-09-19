@@ -139,31 +139,6 @@ app.get('/text/models', async (req, res) => {
   );
 });
 
-app.post('/user/save-narration', async (req, res: Response<{ id: string }>) => {
-  try {
-    const { id, data } = req.body;
-    if (!id || !data) {
-      throw new Error('Invalid request');
-    }
-
-    res.send({ id });
-  } catch (error) {
-    res.status(400);
-  }
-});
-
-app.get('/user/save-narration/:narrationId', async (req, res) => {
-  try {
-    const { id } = req.query;
-    if (!id) {
-      throw new Error('Invalid request');
-    }
-    res.send({ narration: 'This is a test narration' });
-  } catch (error) {
-    res.status(400).send('Invalid request');
-  }
-});
-
 console.log('Loading tokenizers...');
 Promise.all([
   loadTokenizer(TokenizerType.LLAMA_2),

@@ -8,7 +8,6 @@ export type { SettingsState } from '../versioning';
 export const initialState: SettingsState = {
   model: ModelType.RP,
   user: {
-    id: '',
     name: 'Anon',
     isTester: false,
     isPremium: false,

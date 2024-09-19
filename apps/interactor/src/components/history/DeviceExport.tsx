@@ -1,7 +1,7 @@
 import { Loader, Modal, Tooltip } from '@mikugg/ui-kit';
 import CryptoJS from 'crypto-js';
-import { QRCodeSVG } from 'qrcode.react';
-import { useState } from 'react';
+import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react';
+import React, { useState } from 'react';
 
 import { FaCheck, FaClipboard } from 'react-icons/fa';
 import { v4 as randomUUID } from 'uuid';
@@ -12,78 +12,109 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { toast } from 'react-toastify';
 import './DeviceExport.scss';
+import { uploadNarration } from '../../libs/platformAPI';
+
+function stringToBase64(str: string): string {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  let base64 = '';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const bytes = new Uint8Array(data);
+  const byteLength = bytes.byteLength;
+  const byteRemainder = byteLength % 3;
+  const mainLength = byteLength - byteRemainder;
+
+  let a, b, c, d;
+  let chunk;
+
+  // Main loop deals with bytes in chunks of 3
+  for (let i = 0; i < mainLength; i = i + 3) {
+    chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
+    a = (chunk & 16515072) >> 18;
+    b = (chunk & 258048) >> 12;
+    c = (chunk & 4032) >> 6;
+    d = chunk & 63;
+    base64 += chars[a] + chars[b] + chars[c] + chars[d];
+  }
+
+  // Remaining bytes and padding
+  if (byteRemainder == 1) {
+    chunk = bytes[mainLength];
+    a = (chunk & 252) >> 2;
+    b = (chunk & 3) << 4;
+    base64 += chars[a] + chars[b] + '==';
+  } else if (byteRemainder == 2) {
+    chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1];
+    a = (chunk & 64512) >> 10;
+    b = (chunk & 1008) >> 4;
+    c = (chunk & 15) << 2;
+    base64 += chars[a] + chars[b] + chars[c] + '=';
+  }
+
+  return base64;
+}
 
 interface QRProps {
-  id: string | null;
+  value: string | null;
+  expirationDate: number;
   loading: boolean;
   copied: boolean;
 }
 
 const intialQRState: QRProps = {
-  id: null,
+  value: null,
+  expirationDate: Date.now(),
   loading: false,
   copied: false,
 };
 
-export const DeviceExport = () => {
+export const DeviceExport = (): React.ReactNode => {
   const dispatch = useAppDispatch();
   const [QR, setQR] = useState<QRProps>(intialQRState);
   const state = useAppSelector((state) => state);
   const { isPremium } = useAppSelector((state) => state.settings.user);
   const isModalOpen = useAppSelector((state) => state.settings.modals.deviceExport);
-  const { isProduction, servicesEndpoint } = useAppContext();
-  const userId = useAppSelector((state) => state.settings.user.id);
-  if (!isProduction) return null;
+  const { isProduction, apiEndpoint } = useAppContext();
 
-  const getEncryptedJson = () => {
+  const getEncryptedJson = (): {
+    encryptionKey: string;
+    encryptedData: string;
+  } => {
     const clonedState = JSON.parse(JSON.stringify(state));
     clonedState.settings.modals.history = false;
     const json = JSON.stringify(clonedState);
-    const id = randomUUID();
-    const encryptedData: string = CryptoJS.AES.encrypt(json, id).toString();
-    return { id: id, data: encryptedData };
-  };
-
-  const handleUpload = async (encryptedData: { data: string; id: string }) => {
-    const response = await fetch(`${servicesEndpoint}/user/save-narration`, {
-      method: 'POST',
-      body: JSON.stringify({
-        id: `${userId}/${encryptedData.id}`,
-        data: encryptedData.data,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const json = await response.json();
-    return json;
+    const encryptionKey = randomUUID();
+    const encryptedData: string = CryptoJS.AES.encrypt(json, encryptionKey).toString();
+    return { encryptionKey, encryptedData };
   };
 
   const handleExport = async () => {
     dispatch(setDeviceExportModal(true));
-    setQR({ ...QR, loading: true });
+    setQR((qr) => ({ ...qr, loading: true }));
 
-    const json = getEncryptedJson();
-
-    await handleUpload(json)
-      .then((r) => {
-        setQR({ ...QR, loading: false, id: r.id });
-
-        toast.success('Data uploaded successfully');
-      })
-      .catch(() => {
-        setQR({ ...QR, loading: false });
-        dispatch(setDeviceExportModal(false));
-        toast.error('Error when generate export');
+    try {
+      const { encryptedData, encryptionKey } = getEncryptedJson();
+      const uploadResult = await uploadNarration(apiEndpoint, encryptedData);
+      const qrValue = uploadResult?.filename ? stringToBase64(`${uploadResult.filename}#${encryptionKey}`) : null;
+      setQR({
+        loading: false,
+        value: qrValue,
+        copied: false,
+        expirationDate: uploadResult?.expiration || Date.now(),
       });
+    } catch (error) {
+      setQR({ ...QR, loading: false });
+      dispatch(setDeviceExportModal(false));
+      toast.error('Error encrypting narration');
+    }
   };
 
   const handleCopyHash = () => {
-    navigator.clipboard.writeText(QR.id || '');
-    setQR({ ...QR, copied: true });
-    toast.success('Hash copied to clipboard');
+    navigator.clipboard.writeText(QR.value || '');
+    setQR((qr) => ({ ...qr, copied: true }));
+    toast.success('Key copied to clipboard');
     setTimeout(() => {
-      setQR({ ...QR, copied: false });
+      setQR((qr) => ({ ...qr, copied: false }));
     }, 4000);
   };
 
@@ -93,6 +124,7 @@ export const DeviceExport = () => {
     dispatch(setDeviceExportModal(false));
   };
 
+  if (!isProduction) return null;
   return (
     <>
       <button
@@ -113,34 +145,34 @@ export const DeviceExport = () => {
         {QR.loading ? (
           <div className="deviceExport__loading">
             <Loader />
-            <p>Generating QR code...</p>
+            <p>Encrypting narration as QR...</p>
           </div>
         ) : (
           <div className="deviceExport__container">
             <IoIosCloseCircleOutline onClick={handleCloseModal} size={20} className="deviceExport__container__close" />
             <div className="deviceExport__container__header">
               <h2>Export narration</h2>
-              <p>Scan the QR code or copy the hash to import this narration to another device.</p>
+              <p>Scan the QR code or copy the key to import this narration to another device.</p>
             </div>
             <div className="deviceExport__container__code">
-              <QRCodeSVG
+              <QRCodeCanvas
                 size={256}
                 bgColor="transparent"
                 fgColor="#ffffff"
-                value={QR.id || ''}
+                value={QR.value || ''}
                 imageSettings={{
                   src: '../../../public/images/logo.png',
                   x: undefined,
                   y: undefined,
-                  height: 100,
-                  width: 100,
+                  height: 50,
+                  width: 50,
                   opacity: 1,
                   excavate: true,
                 }}
-              />{' '}
+              />
             </div>
             <div className="deviceExport__container__hash">
-              <p>{QR.id}</p>
+              <p>{QR.value}</p>
               <button disabled={QR.copied} onClick={handleCopyHash}>
                 {QR.copied ? <FaCheck color="#00ff33" /> : <FaClipboard />}
               </button>
