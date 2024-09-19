@@ -213,7 +213,7 @@ const SceneSuggestionModal = () => {
         background: background?.asset || currentBackground?.source?.jpg || '',
         music: music?.asset || currentScene?.musicId || '',
         name: sceneSuggestion?.actionText || '',
-        prompt: sceneSuggestion?.textPrompt || '',
+        prompt: `*${sceneSuggestion?.textPrompt || ''}*`,
         children: currentScene?.children || [],
       }),
     );

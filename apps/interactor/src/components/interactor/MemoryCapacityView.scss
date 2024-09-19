@@ -33,6 +33,8 @@
     position: absolute;
     bottom: 0;
     left: 65%;
+    font-size: 0.65rem;
+    text-align: right;
   }
 
   &__modal {
@@ -63,10 +65,20 @@
         flex-direction: column;
         gap: 0.5rem;
 
+        & div {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
         & p {
           font-size: 0.85rem;
         }
       }
+    }
+
+    &-top {
+      color: $text-2;
     }
 
     &-bottom {
@@ -99,5 +111,39 @@
   }
   to {
     filter: drop-shadow(0 0 10px #9b47b3);
+  }
+}
+
+.mobile-view {
+  .MemoryCapacityView__modal-top,
+  .MemoryCapacityView__modal-bottom {
+    position: relative;
+    padding-bottom: 15px;
+  }
+
+  .MemoryCapacityView {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+  }
+
+  .MemoryCapacityView__modal-top__text,
+  .MemoryCapacityView__modal-bottom__text {
+    h4 {
+      margin-top: 5px;
+      margin-left: 50px;
+      margin-bottom: 15px;
+    }
+  }
+
+  .MemoryCapacityView__modal-buttons {
+    margin-top: 20px;
+    .Button {
+      font-size: 0.75rem;
+    }
+  }
+
+  .MemoryCapacityView__percentage {
+    font-size: 0.5rem;
   }
 }

@@ -1,6 +1,6 @@
 import PromptBuilder from '../PromptBuilder';
-import { AbstractPromptStrategy, AbstractRoleplayStrategy } from '../strategies';
-import { getRoleplayStrategyFromSlug } from '../strategies/roleplay';
+import { AbstractPromptStrategy } from '../strategies';
+import { RoleplayPromptStrategy } from '../strategies/roleplay/RoleplayPromptStrategy';
 import _nalaRPMock, { expectedResult as _nalaRPMock_expected } from './__mocks__/nala_roleplay.mock';
 import _nalaRPLongMock from './__mocks__/nala_roleplay_long.mock';
 
@@ -29,9 +29,9 @@ const testStrategy = new TestStrategy();
 
 describe('RoleplayPrompt', () => {
   test('should build a roleplay prompt', async () => {
-    const promptBuilder = new PromptBuilder<AbstractRoleplayStrategy>({
+    const promptBuilder = new PromptBuilder<RoleplayPromptStrategy>({
       maxNewTokens: 200,
-      strategy: getRoleplayStrategyFromSlug('alpacarp', 'llama'),
+      strategy: new RoleplayPromptStrategy('alpaca'),
       truncationLength: 4096,
     });
     const completionQuery = promptBuilder.buildPrompt(
@@ -46,9 +46,9 @@ describe('RoleplayPrompt', () => {
 
   test('should build a roleplay prompt and respect the trucation length', async () => {
     for (let i = 2099; i < 4096; i += 100) {
-      const promptBuilder = new PromptBuilder<AbstractRoleplayStrategy>({
+      const promptBuilder = new PromptBuilder<RoleplayPromptStrategy>({
         maxNewTokens: 200,
-        strategy: getRoleplayStrategyFromSlug('alpacarp', 'llama'),
+        strategy: new RoleplayPromptStrategy('alpaca'),
         truncationLength: i,
       });
       const completionQuery = promptBuilder.buildPrompt(

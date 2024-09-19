@@ -2,7 +2,7 @@ import { AbstractPromptStrategy } from '../AbstractPromptStrategy';
 import { selectChatHistory } from '../../../../state/selectors';
 import { RootState } from '../../../../state/store';
 
-export class AlpacaSuggestionStrategy extends AbstractPromptStrategy<RootState, string[]> {
+export class ResponseSuggestionPromptStrategy extends AbstractPromptStrategy<RootState, string[]> {
   public buildGuidancePrompt(
     maxNewTokens: number,
     memorySize: number,
@@ -17,15 +17,15 @@ export class AlpacaSuggestionStrategy extends AbstractPromptStrategy<RootState, 
       .filter(Boolean)
       .join('\n');
     const messages = this.getMessagesPrompt(input, memorySize);
-    let template = `You are a writing assistant that will help you write a story. You suggest replies to a conversation.\n`;
-    template += `### Input:\n`;
-    template += `${personas}\n${messages}`;
-    template += `### Instruction:\n`;
-    template += `Suggest 3 possible reply dialogs from ${input.settings.user.name} to continue the conversation. They MUST BE ONE SENTENCE EACH.\n`;
-    template += `### Response:\n`;
-    template += `Smart Reply: ${input.settings.user.name}: "{{GEN smart max_tokens=${maxNewTokens} stop=["\\n", "\\""]}}"\n`;
-    template += `Funny Reply: ${input.settings.user.name}: "{{GEN funny max_tokens=${maxNewTokens} stop=["\\n", "\\""]}}"\n`;
-    template += `Flirty Reply: ${input.settings.user.name}: "{{GEN flirt max_tokens=${maxNewTokens} stop=["\\n", "\\""]}}"\n`;
+    const { BOS, SYSTEM_START, SYSTEM_END, INPUT_START, INPUT_END, OUTPUT_START } = this.instructTemplate;
+    let template = `${BOS}${SYSTEM_START}You are a writing assistant that will help you write a story. You suggest replies to a conversation.\n`;
+    template += `\n${personas}\nConversation:\n${messages}`;
+    template += `${SYSTEM_END}${INPUT_START}`;
+    template += `Suggest 3 possible reply Smart/Funny/Flirty dialogs from ${input.settings.user.name} to continue the conversation. They MUST BE ONE SENTENCE EACH.\n`;
+    template += `${INPUT_END}${OUTPUT_START}`;
+    template += `Smart Reply: ${input.settings.user.name}: "{{GEN smart max_tokens=${maxNewTokens} stop=["\\"", "\\n"]}}"\n`;
+    template += `Funny Reply: ${input.settings.user.name}: "{{GEN funny max_tokens=${maxNewTokens} stop=["\\"", "\\n"]}}"\n`;
+    template += `Flirty Reply: ${input.settings.user.name}: "{{GEN flirt max_tokens=${maxNewTokens} stop=["\\"", "\\n"]}}"\n`;
 
     return {
       template,

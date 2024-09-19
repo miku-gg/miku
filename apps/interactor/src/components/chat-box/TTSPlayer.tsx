@@ -1,35 +1,59 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../../state/store';
 import { selectLastLoadedCharacters } from '../../state/selectors';
 import { replaceAll } from '../../libs/prompts/strategies/utils';
 import { MdRecordVoiceOver } from 'react-icons/md';
-import { Tooltip } from '@mikugg/ui-kit';
+import { Loader, Tooltip } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import { Speed } from '../../state/versioning';
 import { useAppContext } from '../../App.context';
 import { trackEvent } from '../../libs/analytics';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
+function isFirefoxOrSafari(): boolean {
+  const userAgent = navigator.userAgent.toLowerCase();
+
+  // Check for Firefox
+  if (userAgent.indexOf('firefox') > -1) {
+    return true;
+  }
+
+  // Check for Safari
+  // Safari on iOS uses 'safari' in the user agent string
+  // Safari on macOS uses 'safari' and doesn't contain 'chrome'
+  if (
+    (userAgent.indexOf('safari') > -1 && userAgent.indexOf('chrome') === -1) ||
+    (userAgent.indexOf('iphone') > -1 && userAgent.indexOf('safari') > -1) ||
+    (userAgent.indexOf('ipad') > -1 && userAgent.indexOf('safari') > -1)
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
 // eslint-disable-next-line
 // @ts-ignore
 window.currentInference = '';
 
+const getAudioSpeed = (playSpeed: Speed): number => {
+  switch (playSpeed) {
+    case Speed.Slow:
+      return 0.85;
+    case Speed.Normal:
+      return 1.1;
+    case Speed.Fast:
+      return 1.35;
+    case Speed.Presto:
+      return 1.75;
+    default:
+      return 1.1;
+  }
+};
+
 const setAudioSpeed = (audioRef: React.RefObject<HTMLAudioElement>, playSpeed: Speed) => {
   if (audioRef.current) {
-    switch (playSpeed) {
-      case Speed.Slow:
-        audioRef.current.playbackRate = 0.85;
-        break;
-      case Speed.Normal:
-        audioRef.current.playbackRate = 1.1;
-        break;
-      case Speed.Fast:
-        audioRef.current.playbackRate = 1.35;
-        break;
-      case Speed.Presto:
-        audioRef.current.playbackRate = 1.75;
-        break;
-    }
+    audioRef.current.playbackRate = getAudioSpeed(playSpeed);
   }
 };
 
@@ -52,23 +76,105 @@ const TTSPlayer2: React.FC = () => {
   );
   const characterId = lastCharacter?.id;
   const isPremium = useAppSelector((state) => state.settings.user.isPremium);
+  const [inferencing, setInferencing] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_provider, _voiceId, speakingStyle = 'default'] = voiceId.split('.');
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+
+  const stopAudio = useCallback(() => {
+    audioRef.current?.pause();
+    if (sourceNodeRef.current) {
+      sourceNodeRef.current.stop();
+      sourceNodeRef.current.disconnect();
+      sourceNodeRef.current = null;
+    }
+    if (gainNodeRef.current) {
+      gainNodeRef.current.disconnect();
+      gainNodeRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     if (disabled) {
-      audioRef.current?.pause();
+      stopAudio();
     }
-  }, [disabled]);
+  }, [disabled, stopAudio]);
+
+  const playAudioViaBuffer = async (audioBuffer: ArrayBuffer, playSpeed: Speed) => {
+    if (!audioContextRef.current) {
+      // eslint-disable-next-line
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+
+    const source = audioContextRef.current.createBufferSource();
+    sourceNodeRef.current = source;
+
+    try {
+      const decodedBuffer = await audioContextRef.current.decodeAudioData(audioBuffer);
+      source.buffer = decodedBuffer;
+
+      // Create a GainNode for volume control
+      const gainNode = audioContextRef.current.createGain();
+      gainNodeRef.current = gainNode;
+
+      // Connect the source to the gain node and the gain node to the destination
+      source.connect(gainNode);
+      gainNode.connect(audioContextRef.current.destination);
+
+      // Set playback rate based on playSpeed
+      const speed = getAudioSpeed(playSpeed);
+      source.playbackRate.value = speed;
+
+      // Enable pitch correction
+      source.detune.value = -1200 * Math.log2(speed);
+
+      source.start(0);
+    } catch (decodeError) {
+      console.error('Error decoding audio data:', decodeError);
+    }
+  };
 
   const inferAudio = useCallback(() => {
-    if (!window.MediaSource) {
-      console.error('MediaSource API is not supported in this browser.');
+    const _inferenceSignature = `${lastCharacterText}.${_voiceId}.${speakingStyle}`;
+    stopAudio();
+    if (!window.MediaSource || isFirefoxOrSafari()) {
+      (async () => {
+        // Full audio file fetch and playback
+        try {
+          setInferencing(true);
+          fetchControllerRef.current = new AbortController();
+          const { signal } = fetchControllerRef.current;
+
+          const response = await fetch(`${servicesEndpoint}/audio`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: replaceAll(lastCharacterText, '*', ''),
+              voiceId: _voiceId,
+              speakingStyle: speakingStyle,
+            }),
+            signal,
+            credentials: 'include',
+          });
+
+          setInferencing(false);
+          setAudioSpeed(audioRef, playSpeed);
+          playAudioViaBuffer(await response.arrayBuffer(), playSpeed);
+
+          // eslint-disable-next-line
+          // @ts-ignore
+          window.currentInference = _inferenceSignature;
+        } catch (error: unknown) {
+          console.error(error);
+          setInferencing(false);
+        }
+      })();
       return;
     }
 
-    const _inferenceSignature = `${lastCharacterText}.${_voiceId}.${speakingStyle}`;
     // eslint-disable-next-line
     // @ts-ignore
     if (_inferenceSignature === window.currentInference) {
@@ -102,6 +208,7 @@ const TTSPlayer2: React.FC = () => {
         fetchControllerRef.current = new AbortController();
         const { signal } = fetchControllerRef.current;
 
+        setInferencing(true);
         const response = await fetch(`${servicesEndpoint}/audio`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -125,6 +232,7 @@ const TTSPlayer2: React.FC = () => {
             // @ts-ignore
             window.currentInference = _inferenceSignature;
             mediaSourceRef.current?.endOfStream();
+            setInferencing(false);
             break;
           }
           if (value) {
@@ -133,10 +241,12 @@ const TTSPlayer2: React.FC = () => {
             if (!started) {
               started = true;
               audioRef.current?.play();
+              setInferencing(false);
             }
           }
         }
       } catch (error: unknown) {
+        setInferencing(false);
         console.error(error);
       }
     }
@@ -172,7 +282,7 @@ const TTSPlayer2: React.FC = () => {
     }
   }, [inferAudio, autoPlay]);
 
-  if (!isProduction) return null;
+  // if (!isProduction) return null;
 
   return (
     <>
@@ -192,7 +302,7 @@ const TTSPlayer2: React.FC = () => {
       <button
         className={classNames({
           ResponseBox__voice: true,
-          'ResponseBox__voice--disabled': !isPremium && !freeTTS && !isFirstMessage,
+          'ResponseBox__voice--disabled': !inferencing && !isPremium && !freeTTS && !isFirstMessage,
         })}
         onClick={() => {
           trackEvent('voice-gen-click');
@@ -204,7 +314,7 @@ const TTSPlayer2: React.FC = () => {
             inferAudio();
           }
         }}
-        disabled={!isPremium && !freeTTS && !isFirstMessage}
+        // disabled={!inferencing && !isPremium && !freeTTS && !isFirstMessage}
         data-tooltip-id="smart-tooltip"
         data-tooltip-content={
           !isPremium && !freeTTS && !isFirstMessage
@@ -214,8 +324,8 @@ const TTSPlayer2: React.FC = () => {
             : ''
         }
       >
-        <MdRecordVoiceOver />
-        <span>Listen</span>
+        {inferencing ? <Loader /> : <MdRecordVoiceOver />}
+        <span className="ResponseBox__action-text">Listen</span>
       </button>
       <Tooltip id="audio-tooltip" place="top" />
     </>

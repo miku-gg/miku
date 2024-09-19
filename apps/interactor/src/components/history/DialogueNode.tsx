@@ -79,7 +79,7 @@ export default memo(({ data }: { data: DialogueNodeData }) => {
       }),
     );
   };
-  const displayText = useFillTextTemplate(data.text);
+  const displayText = useFillTextTemplate(data.text, data.charName);
 
   return (
     <div

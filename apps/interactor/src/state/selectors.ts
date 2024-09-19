@@ -1,7 +1,7 @@
 import { EmotionTemplateSlug, NovelV3 } from '@mikugg/bot-utils';
 import { createSelector } from '@reduxjs/toolkit';
 import PromptBuilder from '../libs/prompts/PromptBuilder';
-import { AbstractRoleplayStrategy, RoleplayStrategyMistral } from '../libs/prompts/strategies';
+import { RoleplayPromptStrategy } from '../libs/prompts/strategies';
 import { NarrationInteraction, NarrationResponse } from './slices/narrationSlice';
 import { NovelCharacterOutfit, NovelScene } from './slices/novelSlice';
 import { RootState } from './store';
@@ -25,10 +25,10 @@ export const selectLastLoadedResponse = (state: RootState): NarrationResponse | 
 export const selectTokensCount = (state: RootState) => {
   const currentResponseState: NarrationResponse = state.narration.responses[state.narration.currentResponseId]!;
 
-  const responsePromptBuilder = new PromptBuilder<AbstractRoleplayStrategy>({
+  const responsePromptBuilder = new PromptBuilder<RoleplayPromptStrategy>({
     maxNewTokens: 200,
-    strategy: new RoleplayStrategyMistral(),
-    truncationLength: 60000,
+    strategy: new RoleplayPromptStrategy('llama3'),
+    truncationLength: 32000,
   });
 
   const tokens = responsePromptBuilder.buildPrompt(
@@ -45,7 +45,7 @@ export const selectTokensCount = (state: RootState) => {
       },
       currentCharacterId: currentResponseState.selectedCharacterId || '',
     },
-    60000,
+    selectAllParentDialogues(state).length,
   ).totalTokens;
   return tokens;
 };

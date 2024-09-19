@@ -2,11 +2,12 @@ import { Dispatch, createListenerMiddleware } from '@reduxjs/toolkit';
 import { sceneSuggestionsStart, sceneSuggestionsUpdate, sceneSuggestionsEnd } from '../slices/narrationSlice';
 import { RootState } from '../store';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
-import { AlpacaSceneSuggestionStrategy } from '../../libs/prompts/strategies/suggestion/AlpacaSceneSuggestionStrategy';
+import { SceneSuggestionPromptStrategy } from '../../libs/prompts/strategies/suggestion/SceneSuggestionPromptStrategy';
 import textCompletion from '../../libs/textCompletion';
 import { selectCharactersInCurrentScene } from '../selectors';
-import { ModelType, NarrationSceneSuggestion } from '../versioning/v3.state';
+import { NarrationSceneSuggestion } from '../versioning/v3.state';
 import { v4 as randomUUID } from 'uuid';
+import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
 
 const sceneSuggestionEffect = async (
   dispatch: Dispatch,
@@ -17,10 +18,11 @@ const sceneSuggestionEffect = async (
   const currentResponse = state.narration.responses[state.narration.currentResponseId];
   try {
     const currentSelectedCharacter = selectCharactersInCurrentScene(state) || [];
-    const promptBuilder = new PromptBuilder<AlpacaSceneSuggestionStrategy>({
+    const modelMetadata = await retrieveModelMetadata(servicesEndpoint, state.settings.model);
+    const promptBuilder = new PromptBuilder<SceneSuggestionPromptStrategy>({
       maxNewTokens: 35,
-      strategy: new AlpacaSceneSuggestionStrategy('llama'),
-      truncationLength: state.settings.model === ModelType.RP_SMART ? 8192 : 4096,
+      strategy: new SceneSuggestionPromptStrategy(modelMetadata.secondary.strategy),
+      truncationLength: modelMetadata.secondary.truncation_length,
     });
     const prompt = promptBuilder.buildPrompt({ state, singleScenePrompt }, 3);
     const stream = textCompletion({

@@ -12,8 +12,8 @@ import { RootState } from '../store';
 import textCompletion from '../../libs/textCompletion';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
-import { AbstractRoleplayStrategy, fillTextTemplate } from '../../libs/prompts/strategies';
-import { getRoleplayStrategyFromSlug } from '../../libs/prompts/strategies/roleplay';
+import { fillTextTemplate } from '../../libs/prompts/strategies';
+import { RoleplayPromptStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayPromptStrategy';
 import { selectAllParentDialogues, selectCurrentScene, selectCurrentSceneObjectives } from '../selectors';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
@@ -61,27 +61,26 @@ const interactionEffect = async (
     const currentCharacter = state.novel.characters.find((character) => character.id === selectedCharacterId);
     const identifier = simpleHash(state.settings.user.name + '_' + state.narration.id);
     const currentScene = selectCurrentScene(state);
-    const { secondary, strategy, truncation_length, tokenizer } = (await retrieveModelMetadata(
+    const { secondary, strategy, truncation_length } = (await retrieveModelMetadata(
       servicesEndpoint,
       state.settings.model,
     )) || {
-      strategy: 'alpacarp',
+      strategy: 'llama3',
       tokenizer: 'llama',
       truncation_length: 4096,
     };
     const maxMessages = selectAllParentDialogues(state).length;
-    const primaryStrategy = getRoleplayStrategyFromSlug(strategy, tokenizer);
-    const secondaryStrategy = getRoleplayStrategyFromSlug(secondary.strategy, secondary.tokenizer);
+    const primaryStrategy = new RoleplayPromptStrategy(strategy);
 
     const [responsePromptBuilder, secondaryPromptBuilder] = [
-      new PromptBuilder<AbstractRoleplayStrategy>({
+      new PromptBuilder<RoleplayPromptStrategy>({
         maxNewTokens: 200,
         strategy: primaryStrategy,
         truncationLength: truncation_length - 150,
       }),
-      new PromptBuilder<AbstractRoleplayStrategy>({
+      new PromptBuilder<RoleplayPromptStrategy>({
         maxNewTokens: 200,
-        strategy: secondaryStrategy,
+        strategy: new RoleplayPromptStrategy(secondary.strategy),
         truncationLength: secondary.truncation_length - 150,
       }),
     ];
@@ -89,7 +88,7 @@ const interactionEffect = async (
     if (!currentCharacterResponse?.emotion && secondary.id !== state.settings.model) {
       const emotionPrompt = secondaryPromptBuilder.buildPrompt(
         { state, currentCharacterId: selectedCharacterId },
-        maxMessages,
+        Math.min(truncation_length / 200, maxMessages),
       );
       const emotionTemplate = emotionPrompt.template.slice(
         0,
@@ -124,22 +123,21 @@ const interactionEffect = async (
 
     const startText =
       currentResponseState?.characters?.find(({ characterId }) => characterId == selectedCharacterId)?.text || '';
-    const completionQuery = responsePromptBuilder.buildPrompt(
-      {
-        state: {
-          ...state,
-          narration: {
-            ...state.narration,
-            responses: {
-              ...state.narration.responses,
-              [state.narration.currentResponseId]: currentResponseState,
-            },
+    const completionState = {
+      state: {
+        ...state,
+        narration: {
+          ...state.narration,
+          responses: {
+            ...state.narration.responses,
+            [state.narration.currentResponseId]: currentResponseState,
           },
         },
-        currentCharacterId: selectedCharacterId,
       },
-      maxMessages,
-    );
+      currentCharacterId: selectedCharacterId,
+    };
+    const completionQuery = responsePromptBuilder.buildPrompt(completionState, maxMessages);
+    const secondaryCompletionQuery = secondaryPromptBuilder.buildPrompt(completionState, maxMessages);
 
     const stream = textCompletion({
       ...completionQuery,
@@ -174,22 +172,7 @@ const interactionEffect = async (
       }),
     );
     secondaryPromptBuilder.setTrucationLength(secondary.truncation_length - 150);
-    let prefixConditionPrompt = secondaryPromptBuilder.buildPrompt(
-      {
-        state: {
-          ...state,
-          narration: {
-            ...state.narration,
-            responses: {
-              ...state.narration.responses,
-              [state.narration.currentResponseId]: currentResponseState,
-            },
-          },
-        },
-        currentCharacterId: selectedCharacterId,
-      },
-      maxMessages,
-    ).template;
+    let prefixConditionPrompt = secondaryCompletionQuery.template;
     finishedCompletionResult.get('text');
     prefixConditionPrompt = prefixConditionPrompt.replace(
       /{{GEN text (.*?)}}/g,
@@ -232,10 +215,10 @@ const interactionEffect = async (
           const conditionResultStream = textCompletion({
             template: fillTextTemplate(
               prefixConditionPrompt +
-                AbstractRoleplayStrategy.getConditionPrompt({
+                RoleplayPromptStrategy.getConditionPrompt({
                   condition,
-                  instructionPrefix: secondaryStrategy.template().instruction,
-                  responsePrefix: secondaryStrategy.template().response,
+                  instructionPrefix: primaryStrategy.template().instruction,
+                  responsePrefix: primaryStrategy.template().response,
                 }),
               {
                 user: state.settings.user.name,
