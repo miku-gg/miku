@@ -80,25 +80,33 @@ const TTSPlayer2: React.FC = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_provider, _voiceId, speakingStyle = 'default'] = voiceId.split('.');
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+
+  const stopAudio = useCallback(() => {
+    audioRef.current?.pause();
+    if (sourceNodeRef.current) {
+      sourceNodeRef.current.stop();
+      sourceNodeRef.current.disconnect();
+      sourceNodeRef.current = null;
+    }
+    if (gainNodeRef.current) {
+      gainNodeRef.current.disconnect();
+      gainNodeRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     if (disabled) {
-      audioRef.current?.pause();
+      stopAudio();
     }
-  }, [disabled]);
-
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
+  }, [disabled, stopAudio]);
 
   const playAudioViaBuffer = async (audioBuffer: ArrayBuffer, playSpeed: Speed) => {
     if (!audioContextRef.current) {
       // eslint-disable-next-line
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-
-    // Stop the previous source if it exists
-    if (sourceNodeRef.current) {
-      sourceNodeRef.current.stop();
     }
 
     const source = audioContextRef.current.createBufferSource();
@@ -110,6 +118,7 @@ const TTSPlayer2: React.FC = () => {
 
       // Create a GainNode for volume control
       const gainNode = audioContextRef.current.createGain();
+      gainNodeRef.current = gainNode;
 
       // Connect the source to the gain node and the gain node to the destination
       source.connect(gainNode);
@@ -130,6 +139,7 @@ const TTSPlayer2: React.FC = () => {
 
   const inferAudio = useCallback(() => {
     const _inferenceSignature = `${lastCharacterText}.${_voiceId}.${speakingStyle}`;
+    stopAudio();
     if (!window.MediaSource || isFirefoxOrSafari()) {
       (async () => {
         // Full audio file fetch and playback
