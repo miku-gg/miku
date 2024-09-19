@@ -1,6 +1,6 @@
 import { Loader, Modal, Tooltip } from '@mikugg/ui-kit';
 import CryptoJS from 'crypto-js';
-import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import React, { useState } from 'react';
 
 import { FaCheck, FaClipboard } from 'react-icons/fa';
@@ -13,6 +13,7 @@ import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { toast } from 'react-toastify';
 import './DeviceExport.scss';
 import { uploadNarration } from '../../libs/platformAPI';
+import { CustomEventType, postMessage } from '../../libs/stateEvents';
 
 function stringToBase64(str: string): string {
   const encoder = new TextEncoder();
@@ -74,7 +75,7 @@ export const DeviceExport = (): React.ReactNode => {
   const state = useAppSelector((state) => state);
   const { isPremium } = useAppSelector((state) => state.settings.user);
   const isModalOpen = useAppSelector((state) => state.settings.modals.deviceExport);
-  const { isProduction, apiEndpoint } = useAppContext();
+  const { isProduction, apiEndpoint, botId } = useAppContext();
 
   const getEncryptedJson = (): {
     encryptionKey: string;
@@ -82,6 +83,7 @@ export const DeviceExport = (): React.ReactNode => {
   } => {
     const clonedState = JSON.parse(JSON.stringify(state));
     clonedState.settings.modals.history = false;
+    clonedState.botId = botId;
     const json = JSON.stringify(clonedState);
     const encryptionKey = randomUUID();
     const encryptedData: string = CryptoJS.AES.encrypt(json, encryptionKey).toString();
@@ -110,7 +112,7 @@ export const DeviceExport = (): React.ReactNode => {
   };
 
   const handleCopyHash = () => {
-    navigator.clipboard.writeText(QR.value || '');
+    postMessage(CustomEventType.COPY_TO_CLIPBOARD, QR.value || '');
     setQR((qr) => ({ ...qr, copied: true }));
     toast.success('Key copied to clipboard');
     setTimeout(() => {
@@ -155,6 +157,8 @@ export const DeviceExport = (): React.ReactNode => {
               <p>Scan the QR code or copy the key to import this narration to another device.</p>
             </div>
             <div className="deviceExport__container__code">
+              {/* eslint-disable-next-line */}
+              {/* @ts-ignore */}
               <QRCodeCanvas
                 size={256}
                 bgColor="transparent"
