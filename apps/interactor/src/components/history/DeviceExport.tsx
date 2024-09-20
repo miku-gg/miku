@@ -200,7 +200,7 @@ export const DeviceExport = (): React.ReactNode => {
               </button>
             </div>
             <div className="deviceExport__container__expiration">
-              {QR.timeLeft !== 0 ? `Expires in ${QR.timeLeft} minutes.` : 'Expirated.'}
+              {QR.timeLeft > 0 ? `Expires in ${QR.timeLeft} minutes.` : 'Expirated.'}
             </div>
           </div>
         )}
