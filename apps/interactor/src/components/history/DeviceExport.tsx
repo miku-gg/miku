@@ -1,7 +1,8 @@
 import { Loader, Modal, Tooltip } from '@mikugg/ui-kit';
 import CryptoJS from 'crypto-js';
 import { QRCodeCanvas } from 'qrcode.react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { IoQrCode } from 'react-icons/io5';
 
 import { FaCheck, FaClipboard } from 'react-icons/fa';
 import { v4 as randomUUID } from 'uuid';
@@ -59,12 +60,14 @@ interface QRProps {
   value: string | null;
   expirationDate: number;
   loading: boolean;
+  timeLeft: number;
   copied: boolean;
 }
 
 const intialQRState: QRProps = {
   value: null,
   expirationDate: Date.now(),
+  timeLeft: 0,
   loading: false,
   copied: false,
 };
@@ -103,6 +106,7 @@ export const DeviceExport = (): React.ReactNode => {
         value: qrValue,
         copied: false,
         expirationDate: uploadResult?.expiration || Date.now(),
+        timeLeft: 0,
       });
     } catch (error) {
       setQR({ ...QR, loading: false });
@@ -126,6 +130,20 @@ export const DeviceExport = (): React.ReactNode => {
     dispatch(setDeviceExportModal(false));
   };
 
+  const getExpirationTime = () => {
+    const expiration = Math.floor((QR.expirationDate - Date.now()) / 1000 / 60);
+    return expiration;
+  };
+
+  useEffect(() => {
+    if (QR.expirationDate) {
+      const interval = setInterval(() => {
+        setQR((qr) => ({ ...qr, timeLeft: getExpirationTime() }));
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [QR.timeLeft, QR.expirationDate]);
+
   if (!isProduction) return null;
   return (
     <>
@@ -133,14 +151,14 @@ export const DeviceExport = (): React.ReactNode => {
         data-tooltip-id="device-export-tooltip"
         data-tooltip-content={
           isPremium
-            ? 'Export this narration to other device'
-            : 'Export to other devices is only available for premium members'
+            ? 'Export this narration to other device.'
+            : 'Export to other devices is only available for premium members.'
         }
         className={`deviceExport__button ${!isPremium ? 'disabled-export' : ''}`}
         onClick={handleExport}
         disabled={!isPremium}
       >
-        Export narration
+        <IoQrCode />
       </button>
       <Tooltip id="device-export-tooltip" place="bottom" />
       <Modal className="deviceExport__modal" opened={isModalOpen} onCloseModal={handleCloseModal}>
@@ -180,6 +198,9 @@ export const DeviceExport = (): React.ReactNode => {
               <button disabled={QR.copied} onClick={handleCopyHash}>
                 {QR.copied ? <FaCheck color="#00ff33" /> : <FaClipboard />}
               </button>
+            </div>
+            <div className="deviceExport__container__expiration">
+              {QR.timeLeft !== 0 ? `Expires in ${QR.timeLeft} minutes.` : 'Expirated.'}
             </div>
           </div>
         )}

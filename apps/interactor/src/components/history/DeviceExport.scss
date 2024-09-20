@@ -2,14 +2,13 @@
 
 .deviceExport {
   &__button {
-    color: $secondary-color;
-    border: 1px solid $secondary-color;
+    color: $color-white;
     padding: 0 4px;
     border-radius: 10px;
     transition: ease-in-out 0.3s;
 
     &:hover {
-      color: white;
+      color: $secondary-color;
     }
   }
 
@@ -77,6 +76,13 @@
         }
       }
     }
+
+    &__expiration {
+      font-size: 0.8rem;
+      margin-top: 4px;
+      color: $color-gray;
+      font-style: italic;
+    }
   }
 
   &__modal {
@@ -85,9 +91,6 @@
 }
 .disabled-export {
   color: $color-gray;
-  border-color: $color-gray;
-
-  background: #4141418a;
   cursor: not-allowed;
   &:hover {
     color: $color-gray;
