@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 
-import { Accordion, AccordionItem, AreYouSure, Button, DragAndDropImages, Dropdown, Input } from '@mikugg/ui-kit';
+import {
+  Accordion,
+  AccordionItem,
+  AreYouSure,
+  Button,
+  CheckBox,
+  DragAndDropImages,
+  Dropdown,
+  Input,
+} from '@mikugg/ui-kit';
 
 import { checkFileType } from '../../libs/utils';
 
@@ -54,6 +63,7 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
       description: '',
       attributes: [],
       template: 'single-emotion',
+      nsfw: 0,
       emotions: [
         {
           id: 'neutral',
@@ -329,6 +339,20 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
               multiple
               accept="image/png, image/gif, video/webm"
               onChange={(event) => handleMultipleImageChange(event, groupIndex)}
+            />
+          </div>
+          <div className="CharacterOutfitsEdit__formGroup">
+            <CheckBox
+              label="Mark as NSFW outfit"
+              value={!!group.nsfw}
+              onChange={(e) => {
+                const newGroups = [...outfits];
+                newGroups[groupIndex] = {
+                  ...newGroups[groupIndex],
+                  nsfw: e.target.checked ? 1 : 0,
+                };
+                dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
+              }}
             />
           </div>
           <div className="CharacterOutfitsEdit__formGroup">
