@@ -77,6 +77,7 @@ export default function SceneSelector(): JSX.Element | null {
                         className="SceneSelector__item-emotion"
                         assetLinkLoader={assetLinkLoader}
                         assetUrl={scene.characterImages[0] || ''}
+                        isSmall
                       />
                     ) : null}
                     <div className="SceneSelector__item-text">{scene.name}</div>

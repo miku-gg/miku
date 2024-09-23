@@ -206,6 +206,7 @@ const CreateScene = () => {
                 >
                   {character?.name ? (
                     <EmotionRenderer
+                      isSmall
                       assetLinkLoader={assetLinkLoader}
                       assetUrl={character?.outfits.find((o) => o?.id === outfit)?.emotions[0].sources.png || ''}
                     />
@@ -664,6 +665,7 @@ const CreateSceneCharacterModal = () => {
                           }}
                         >
                           <EmotionRenderer
+                            isSmall
                             assetLinkLoader={assetLinkLoader}
                             assetUrl={outfit?.emotions[0].sources.png || ''}
                           />
