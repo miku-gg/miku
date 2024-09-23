@@ -12,6 +12,7 @@ import InteractorHeader from './InteractorHeader';
 import Inventory from './Inventory';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import SceneSuggestion from './SceneSuggestion';
 
 const Interactor = () => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
@@ -30,7 +31,7 @@ const Interactor = () => {
       <div className="Interactor">
         <div className="Interactor__content">
           <InteractorHeader />
-          {/* <SceneSuggestion /> */}
+          <SceneSuggestion />
           <div className="Interactor__main-image-container">
             <ProgressiveImage
               src={

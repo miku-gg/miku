@@ -31,7 +31,7 @@ import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false);
-  const { servicesEndpoint, apiEndpoint } = useAppContext();
+  // const { servicesEndpoint, apiEndpoint } = useAppContext();
   const dispatch = useAppDispatch();
   const { suggestedScenes, fetchingSuggestions, shouldSuggestScenes } = useAppSelector(
     (state) => state.narration.responses[state.narration.currentResponseId]!,
@@ -78,30 +78,31 @@ export default function SceneSuggestion() {
               </div>
               <TbPlayerTrackNextFilled />
             </button>
-          ) : !disabled && shouldSuggestScenes ? (
-            <button
-              {...swipeHandlers}
-              className="SceneSuggestion__button"
-              onClick={async () => {
-                dispatch(
-                  setModalOpened({
-                    id: 'scene-suggestions',
-                    opened: true,
-                  }),
-                );
-                if (!fetchingSuggestions && !suggestedScenes.length) {
-                  dispatch(sceneSuggestionsStart({ servicesEndpoint }));
-                  dispatch(userDataFetchStart({ apiEndpoint }));
-                }
-                trackEvent('scene-generate-suggestion-click');
-              }}
-            >
-              <div className="SceneSuggestion__text">
-                <span>Generate next scene</span>
-              </div>
-              <GiFallingStar />
-            </button>
-          ) : null}
+          ) : // !disabled && shouldSuggestScenes ? (
+          // <button
+          //   {...swipeHandlers}
+          //   className="SceneSuggestion__button"
+          //   onClick={async () => {
+          //     dispatch(
+          //       setModalOpened({
+          //         id: 'scene-suggestions',
+          //         opened: true,
+          //       }),
+          //     );
+          //     if (!fetchingSuggestions && !suggestedScenes.length) {
+          //       dispatch(sceneSuggestionsStart({ servicesEndpoint }));
+          //       dispatch(userDataFetchStart({ apiEndpoint }));
+          //     }
+          //     trackEvent('scene-generate-suggestion-click');
+          //   }}
+          // >
+          //   <div className="SceneSuggestion__text">
+          //     <span>Generate next scene</span>
+          //   </div>
+          //   <GiFallingStar />
+          // </button>
+          // ) :
+          null}
         </div>
       </div>
       <SceneSuggestionModal />
