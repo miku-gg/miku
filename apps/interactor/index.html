@@ -5,22 +5,6 @@
     <link rel="icon" type="image/ico" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Interactor | miku.gg</title>
-    <script type="module">
-      // Note that you're importing it via import.meta.env
-      const GTM_ID = import.meta.env.VITE_GTM_ID
-
-      // The rest of your GTM script goes here, with GTM_ID replaced with your actual ID.
-      ;(function (w, d, s, l, i) {
-        w[l] = w[l] || []
-        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != 'dataLayer' ? '&l=' + l : ''
-        j.async = true
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
-        f.parentNode.insertBefore(j, f)
-      })(window, document, 'script', 'dataLayer', GTM_ID)
-    </script>
   </head>
   <body>
     <div id="root"></div>

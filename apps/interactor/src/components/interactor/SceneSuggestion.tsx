@@ -32,7 +32,7 @@ import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false);
   // const { servicesEndpoint, apiEndpoint } = useAppContext();
-
+  const nsfw = useAppSelector((state) => state.settings.user.nsfw);
   const dispatch = useAppDispatch();
   const { shouldSuggestScenes } = useAppSelector(
     (state) => state.narration.responses[state.narration.currentResponseId]!,
@@ -45,7 +45,10 @@ export default function SceneSuggestion() {
     },
   });
 
-  const nextScene = useAppSelector((state) => state.novel.scenes.find((s) => s.id === nextSceneId));
+  let nextScene = useAppSelector((state) => state.novel.scenes.find((s) => s.id === nextSceneId));
+  if (nextScene?.nsfw && !nsfw) {
+    nextScene = undefined;
+  }
 
   useEffect(() => {
     if (shouldSuggestScenes || nextScene) {
@@ -68,7 +71,7 @@ export default function SceneSuggestion() {
                   setModalOpened({
                     id: 'scene-preview',
                     opened: true,
-                    itemId: nextScene.id,
+                    itemId: nextScene?.id,
                   }),
                 );
                 trackEvent('scene-advance-suggestion-click');
@@ -215,7 +218,7 @@ const SceneSuggestionModal = () => {
         background: background?.asset || currentBackground?.source?.jpg || '',
         music: music?.asset || currentScene?.musicId || '',
         name: sceneSuggestion?.actionText || '',
-        prompt: sceneSuggestion?.textPrompt || '',
+        prompt: `*${sceneSuggestion?.textPrompt || ''}*`,
         children: currentScene?.children || [],
       }),
     );

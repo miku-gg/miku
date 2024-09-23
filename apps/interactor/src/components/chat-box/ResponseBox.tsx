@@ -47,7 +47,8 @@ const ResponseBox = (): JSX.Element | null => {
   const swipes = useAppSelector(selectCurrentSwipeResponses);
   const { disabled } = useAppSelector((state) => state.narration.input);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
-  const displayText = useFillTextTemplate(displayCharacter.text);
+  const displayCharacterData = characters.find((c) => c.id === displayCharacter.id);
+  const displayText = useFillTextTemplate(displayCharacter.text, displayCharacterData?.name || '');
   const { isMobileApp } = useAppContext();
 
   const handleRegenerateClick = () => {
@@ -202,13 +203,13 @@ const ResponseBox = (): JSX.Element | null => {
         {!disabled && lastReponse?.parentInteractionId && (swipes?.length || 0) < 8 ? (
           <button className="ResponseBox__regenerate" onClick={handleRegenerateClick}>
             <FaDice />
-            <span>Regenerate</span>
+            <span className="ResponseBox__action-text">Regenerate</span>
           </button>
         ) : null}
         {!disabled && !isInteractionDisabled ? (
           <button className="ResponseBox__edit" onClick={handleEditClick}>
             <FaPencil />
-            <span>Edit</span>
+            <span className="ResponseBox__action-text">Edit</span>
           </button>
         ) : null}
       </div>

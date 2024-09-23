@@ -271,7 +271,7 @@
 }
 
 @media screen and (max-width: 590px) {
-  .ResponseBox__actions span {
+  .ResponseBox__actions .ResponseBox__action-text {
     display: none;
   }
   .ResponseBox__actions {

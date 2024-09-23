@@ -93,14 +93,14 @@ app.get('/text/metadata/:model', async (req, res) => {
     const metadata = models.find((m) => m.id === model);
     const secondaryMetadata = models.find((m) => m.id === metadata?.model_id_for_select) || metadata;
     res.send({
-      strategy: metadata?.strategy || 'alpacarp',
+      strategy: metadata?.strategy || 'llama3',
       tokenizer: metadata?.tokenizer || 'llama',
       truncation_length: metadata?.truncation_length || 4096,
       max_new_tokens: metadata?.new_tokens || 200,
       cost: metadata?.cost || 0,
       secondary: {
         id: secondaryMetadata?.id,
-        strategy: secondaryMetadata?.strategy || 'alpacarp',
+        strategy: secondaryMetadata?.strategy || 'llama3',
         tokenizer: secondaryMetadata?.tokenizer || 'llama',
         truncation_length: secondaryMetadata?.truncation_length || 4096,
         max_new_tokens: secondaryMetadata?.new_tokens || 200,
@@ -108,13 +108,13 @@ app.get('/text/metadata/:model', async (req, res) => {
     });
   } catch (error) {
     res.send({
-      strategy: 'alpacarp',
+      strategy: 'llama3',
       tokenizer: 'llama',
       truncation_length: 4096,
       max_new_tokens: 200,
       cost: 0,
       secondary: {
-        strategy: 'alpacarp',
+        strategy: 'llama3',
         tokenizer: 'llama',
         truncation_length: 4096,
         max_new_tokens: 200,

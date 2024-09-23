@@ -172,11 +172,15 @@ const HistoryModal = (): ReactElement => {
 
       const parentScene = novel.scenes.find((scene) => scene.id === parentSceneId);
 
-      const avatars = response.characters.map(({ characterId }) => {
+      const charactersData = response.characters.map(({ characterId }) => {
         const id =
           parentScene?.characters.find(({ characterId: _characterId }) => _characterId === characterId)?.characterId ||
           '';
-        return novel.characters.find((c) => c.id === id)?.profile_pic || '';
+        const character = novel.characters.find((c) => c.id === id);
+        return {
+          avatar: character?.profile_pic || '',
+          name: character?.name || '',
+        };
       });
 
       const isLastResponse = parentIds[0] === response.id;
@@ -186,7 +190,7 @@ const HistoryModal = (): ReactElement => {
         sourcePosition: Position.Bottom,
         targetPosition: Position.Top,
         data: {
-          avatars,
+          avatars: charactersData.map(({ avatar }) => avatar),
           id: response.id,
           isUser: false,
           isLastResponse,
@@ -194,6 +198,7 @@ const HistoryModal = (): ReactElement => {
           isLeaf: response.childrenInteractions.length === 0,
           highlighted: parentIdsSet.has(response.id),
           text: (response.characters[0]?.text || '').substring(0, 100),
+          charName: charactersData[0]?.name || '',
           isItemAction: false,
         },
         type: 'dialogueNode',
@@ -228,6 +233,7 @@ const HistoryModal = (): ReactElement => {
               isLeaf: interaction.responsesId.length === 0,
               isRoot: false,
               avatars: ['default-profile-pic.png'],
+              charName: charactersData[0]?.name || '',
               isItemAction: !!item,
             },
             position: { x: 0, y: 0 },
