@@ -32,8 +32,9 @@ import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false);
   // const { servicesEndpoint, apiEndpoint } = useAppContext();
+
   const dispatch = useAppDispatch();
-  const { suggestedScenes, fetchingSuggestions, shouldSuggestScenes } = useAppSelector(
+  const { shouldSuggestScenes } = useAppSelector(
     (state) => state.narration.responses[state.narration.currentResponseId]!,
   );
   const { disabled } = useAppSelector((state) => state.narration.input);
