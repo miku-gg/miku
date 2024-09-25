@@ -73,7 +73,7 @@ export default function EmotionRenderer({
     return () => {
       controller.abort(); // Cancel the fetch operation if the component unmounts or the assetUrl changes
     };
-  }, [assetUrl, assetLinkLoader]);
+  }, [assetUrl, assetLinkLoader, isSmall]);
 
   const { url: blobUrl, fileType } = currentAsset;
 
