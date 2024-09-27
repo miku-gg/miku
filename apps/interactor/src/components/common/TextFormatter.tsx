@@ -1,8 +1,11 @@
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '../../state/store';
+import { IoReturnUpBackOutline } from 'react-icons/io5';
+import { setInputDisabled } from '../../state/slices/narrationSlice';
+import { useAppDispatch, useAppSelector } from '../../state/store';
 import { FontSize, Speed } from '../../state/versioning';
 import { ShareConversation } from '../chat-box/ShareConversation';
+
 import './TextFormatter.scss';
 
 interface TextFormatterProps {
@@ -101,6 +104,111 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, childr
       <ShareConversation>
         <>
           {elements}
+          {children}
+        </>
+      </ShareConversation>
+    </div>
+  );
+};
+
+export const VNtextFormatterStatic: React.FC<TextFormatterProps> = ({ text, children }) => {
+  const dispatch = useAppDispatch();
+  const fontSize = useAppSelector((state) => state.settings.text.fontSize);
+  const elements: JSX.Element[] = [];
+  const [currentMessageIndex, setCurrentMessageIndex] = useState<number>(0);
+  let buffer = '';
+  const stack: ('em' | 'q')[] = [];
+
+  const flushBuffer = (endTag?: 'em' | 'q') => {
+    if (buffer) {
+      let element: JSX.Element = <span key={elements.length}>{buffer}</span>;
+
+      if (!stack.length) {
+        // Wrap in <p> if not within em or q
+        element = <p key={elements.length}>{buffer}</p>;
+      }
+
+      while (stack.length) {
+        const tag = stack.pop();
+        if (tag === 'em') {
+          element = <em key={elements.length}>{element}</em>;
+        } else if (tag === 'q') {
+          element = <q key={elements.length}>{element}</q>;
+        }
+        if (tag === endTag) break;
+      }
+
+      elements.push(element);
+      buffer = '';
+    }
+  };
+
+  for (const char of text) {
+    switch (char) {
+      case '*':
+        if (stack[stack.length - 1] === 'em') {
+          flushBuffer('em');
+        } else {
+          flushBuffer();
+          stack.push('em');
+        }
+        break;
+      case '"':
+        if (stack[stack.length - 1] === 'q') {
+          flushBuffer('q');
+        } else {
+          flushBuffer();
+          stack.push('q');
+        }
+        break;
+      case '\n':
+        flushBuffer();
+        break;
+      default:
+        buffer += char;
+    }
+  }
+
+  flushBuffer(); // Flush remaining buffer
+  const filteredElements = elements.filter((element) => element.props.children !== '\r');
+
+  useEffect(() => {
+    if (currentMessageIndex === filteredElements.length - 1) {
+      dispatch(setInputDisabled(false));
+    } else {
+      setTimeout(() => {
+        dispatch(setInputDisabled(true));
+      }, 100);
+    }
+  }, [currentMessageIndex, filteredElements.length, dispatch]);
+
+  return (
+    <div
+      className={classNames({
+        'TextFormatter scrollbar VN-style': true,
+        [`TextFormatter--small`]: FontSize.Small === fontSize,
+        [`TextFormatter--large`]: FontSize.Large === fontSize,
+      })}
+      onClick={() => {
+        if (currentMessageIndex === filteredElements.length - 1) return;
+        setCurrentMessageIndex((currentMessageIndex + 1) % filteredElements.length);
+      }}
+    >
+      <ShareConversation>
+        <>
+          {currentMessageIndex > 0 && (
+            <button
+              className="VN-style__return"
+              disabled={currentMessageIndex === 0}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentMessageIndex(currentMessageIndex - 1);
+              }}
+            >
+              <IoReturnUpBackOutline />
+            </button>
+          )}
+          {filteredElements[currentMessageIndex]}
           {children}
         </>
       </ShareConversation>

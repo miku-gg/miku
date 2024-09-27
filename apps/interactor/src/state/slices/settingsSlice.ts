@@ -18,6 +18,7 @@ export const initialState: SettingsState = {
   },
   chatBox: {
     isDraggable: false,
+    scrollable: true,
   },
   prompt: {
     systemPrompt: '',
@@ -78,6 +79,10 @@ export const settingSlice = createSlice({
     setIsDraggable: (state, action: PayloadAction<boolean>) => {
       state.chatBox.isDraggable = action.payload;
     },
+    setIsScrollable: (state, action: PayloadAction<boolean>) => {
+      state.chatBox.scrollable = action.payload;
+    },
+
     setFontSize: (state, action: PayloadAction<FontSize>) => {
       state.text.fontSize = action.payload;
     },
@@ -164,6 +169,7 @@ export const {
   setModel,
   setName,
   setIsDraggable,
+  setIsScrollable,
   setSystemPrompt,
   setFontSize,
   setSpeed,

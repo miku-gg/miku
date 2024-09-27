@@ -40,7 +40,8 @@ $flex-wrap-gap: 10px;
   &__text-speed,
   &__text-font-size,
   &__voice,
-  &__systemPrompt {
+  &__systemPrompt,
+  &__theme {
     padding: $padding-standard;
     background-color: $primary-background-color;
     border-radius: $border-radius;
@@ -147,5 +148,18 @@ $flex-wrap-gap: 10px;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+  }
+
+  &__theme {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &-toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
   }
 }

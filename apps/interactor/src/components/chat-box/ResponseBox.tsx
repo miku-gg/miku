@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { FaDice, FaForward } from 'react-icons/fa';
 import { FaPencil } from 'react-icons/fa6';
 import { IoIosBookmarks, IoIosMove } from 'react-icons/io';
+
 import {
   selectCharacterOutfits,
   selectCurrentScene,
@@ -14,6 +15,7 @@ import {
   selectLastSelectedCharacter,
 } from '../../state/selectors';
 
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import classNames from 'classnames';
 import { useAppContext } from '../../App.context';
 import { trackEvent } from '../../libs/analytics';
@@ -27,10 +29,9 @@ import {
 } from '../../state/slices/narrationSlice';
 import { setEditModal, setIsDraggable } from '../../state/slices/settingsSlice';
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
-import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter';
+import { TextFormatterStatic, VNtextFormatterStatic } from '../common/TextFormatter';
 import './ResponseBox.scss';
 import TTSPlayer from './TTSPlayer';
-import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch();
@@ -47,6 +48,7 @@ const ResponseBox = (): JSX.Element | null => {
   const swipes = useAppSelector(selectCurrentSwipeResponses);
   const { disabled } = useAppSelector((state) => state.narration.input);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
+  const scrollTheme = useAppSelector((state) => state.settings.chatBox.scrollable);
   const displayCharacterData = characters.find((c) => c.id === displayCharacter.id);
   const displayText = useFillTextTemplate(displayCharacter.text, displayCharacterData?.name || '');
   const { isMobileApp } = useAppContext();
@@ -125,10 +127,25 @@ const ResponseBox = (): JSX.Element | null => {
       ) : null}
 
       <div className={`ResponseBox__text ${isMobile ? 'MobileApp__text' : ''}`} ref={responseDiv}>
+        {/* <VNtextFormatterStatic text={displayText} /> */}
         {isLastResponseFetching ? (
           <TextFormatterStatic text="*Typing...*" />
+        ) : scrollTheme ? (
+          <TextFormatterStatic
+            text={displayText}
+            children={
+              !disabled &&
+              !isInteractionDisabled &&
+              displayCharacter.id === lastCharacters[lastCharacters.length - 1].id ? (
+                <button className="ResponseBox__continue" onClick={handleContinueClick}>
+                  continue
+                  <FaForward />
+                </button>
+              ) : null
+            }
+          />
         ) : (
-          <TextFormatter
+          <VNtextFormatterStatic
             text={displayText}
             children={
               !disabled &&
