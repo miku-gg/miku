@@ -10,9 +10,9 @@ import ModelSelectorModal from './ModelSelectorModal';
 import './Interactor.scss';
 import InteractorHeader from './InteractorHeader';
 import Inventory from './Inventory';
-import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import SceneSuggestion from './SceneSuggestion';
 
 const Interactor = () => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
