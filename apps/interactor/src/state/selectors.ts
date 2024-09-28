@@ -6,6 +6,7 @@ import { NarrationInteraction, NarrationResponse } from './slices/narrationSlice
 import { NovelCharacterOutfit, NovelScene } from './slices/novelSlice';
 import { RootState } from './store';
 import { NovelNSFW } from './versioning';
+import { NarrationSummarySentence } from './versioning/v3.state';
 
 export const selectLastLoadedResponse = (state: RootState): NarrationResponse | undefined => {
   const { currentResponseId } = state.narration;
@@ -31,6 +32,11 @@ export const selectTokensCount = (state: RootState) => {
     truncationLength: 32000,
   });
 
+  const messagesSinceLastSummary = selectMessagesSinceLastSummary(state);
+  const maxMessages = state.settings.summaries?.enabled
+    ? messagesSinceLastSummary
+    : selectAllParentDialogues(state).length;
+
   const tokens = responsePromptBuilder.buildPrompt(
     {
       state: {
@@ -45,7 +51,7 @@ export const selectTokensCount = (state: RootState) => {
       },
       currentCharacterId: currentResponseState.selectedCharacterId || '',
     },
-    selectAllParentDialogues(state).length,
+    maxMessages,
   ).totalTokens;
   return tokens;
 };
@@ -351,14 +357,14 @@ export const selectCurrentMaps = createSelector(
   },
 );
 
-export const selectAllParentDialoguesWhereCharacterIsPresent = createSelector(
+export const selectAllParentDialoguesWhereCharactersArePresent = createSelector(
   [
     selectAllParentDialogues,
     (state: RootState) => state.novel.scenes,
-    (_state: RootState, characterId: string) => characterId,
+    (_state: RootState, characterIds: string[]) => characterIds,
     (state: RootState) => state,
   ],
-  (dialogues, scenes, characterId, state) => {
+  (dialogues, scenes, characterIds, state) => {
     const result = [];
     for (let i = 0; i < dialogues.length; i++) {
       const dialogue = dialogues[i];
@@ -366,7 +372,7 @@ export const selectAllParentDialoguesWhereCharacterIsPresent = createSelector(
         dialogue.type === 'interaction'
           ? scenes.find((scene) => scene.id === dialogue.item.sceneId)
           : selectSceneFromResponse(state, dialogue.item);
-      if (scene && scene.characters.some((c) => c.characterId === characterId)) {
+      if (scene && scene.characters.some((c) => characterIds.includes(c.characterId))) {
         result.push(dialogue);
       }
     }
@@ -398,5 +404,69 @@ export const selectCurrentSceneInteractionCount = createSelector(
   [(state: RootState) => state.narration.interactions, selectCurrentScene],
   (interactions, scene) => {
     return Object.values(interactions).filter((interaction) => interaction?.sceneId === scene?.id).length;
+  },
+);
+
+export const selectMessagesSinceLastSummary = createSelector([selectAllParentDialogues], (dialogues) => {
+  const lastSummaryIndex = dialogues.findIndex((d) => d.type === 'response' && d.item.summary);
+  if (lastSummaryIndex === -1) return dialogues.length;
+  return Math.max(dialogues.slice(0, lastSummaryIndex + 1).length, 2);
+});
+
+export const selectAllSumaries = createSelector(
+  [selectAllParentDialoguesWhereCharactersArePresent, (state: RootState) => state.narration.responses],
+  (dialogues, responses) => {
+    const summaries: {
+      sentences: NarrationSummarySentence[];
+    }[] = [];
+    dialogues.forEach((dialogue) => {
+      const summary = responses[dialogue.item.id]?.summary;
+      if (summary) {
+        summaries.push(summary);
+      }
+    });
+    return summaries;
+  },
+);
+
+export const selectAvailableSummarySentences = createSelector(
+  [selectAllSumaries, (_state: RootState, _characters: string[], maxPromptLength: number) => maxPromptLength],
+  (summaries, maxPromptLength: number) => {
+    const PERCENTAGE_OF_MAX_TOKENS = 0.2;
+    const TOKENS_PER_SENTENCE = 15;
+    const maxSentences = Math.floor((maxPromptLength * PERCENTAGE_OF_MAX_TOKENS) / TOKENS_PER_SENTENCE);
+
+    const allSentences: { sentence: string; importance: number; isLast: boolean }[] = [];
+
+    summaries.forEach((summary, index) => {
+      const isLast = index === summaries.length - 1;
+      summary?.sentences.forEach((s) => allSentences.push({ ...s, isLast }));
+    });
+
+    if (allSentences.length > maxSentences) {
+      const removalOrder = [
+        { importance: 1, isLast: false },
+        { importance: 2, isLast: false },
+        { importance: 3, isLast: false },
+        { importance: 4, isLast: false },
+        { importance: 1, isLast: true },
+        { importance: 5, isLast: false },
+        { importance: 2, isLast: true },
+        { importance: 3, isLast: true },
+        { importance: 4, isLast: true },
+        { importance: 5, isLast: true },
+      ];
+
+      for (const { importance, isLast } of removalOrder) {
+        while (allSentences.length > maxSentences) {
+          const index = allSentences.findIndex((s) => s.importance === importance && s.isLast === isLast);
+          if (index === -1) break;
+          allSentences.splice(index, 1);
+        }
+        if (allSentences.length <= maxSentences) break;
+      }
+    }
+
+    return allSentences.map((s) => s.sentence);
   },
 );

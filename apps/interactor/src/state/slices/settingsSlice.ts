@@ -51,6 +51,9 @@ export const initialState: SettingsState = {
       id: '',
     },
   },
+  summaries: {
+    enabled: false,
+  },
 };
 
 export const settingSlice = createSlice({
@@ -126,6 +129,11 @@ export const settingSlice = createSlice({
     setTestingModal: (state, action: PayloadAction<boolean>) => {
       state.modals.testing = action.payload;
     },
+    setSummariesEnabled: (state, action: PayloadAction<boolean>) => {
+      state.summaries = {
+        enabled: action.payload,
+      };
+    },
     userDataFetchStart: (
       state,
       // eslint-disable-next-line
@@ -182,6 +190,7 @@ export const {
   setEditModal,
   setDebugModal,
   setTestingModal,
+  setSummariesEnabled,
   userDataFetchStart,
   userDataFetchEnd,
 } = settingSlice.actions;

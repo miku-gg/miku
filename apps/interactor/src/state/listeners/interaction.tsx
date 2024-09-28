@@ -12,9 +12,14 @@ import { RootState } from '../store';
 import textCompletion from '../../libs/textCompletion';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
-import { fillTextTemplate } from '../../libs/prompts/strategies';
+import { fillTextTemplate, SummaryPromptStrategy } from '../../libs/prompts/strategies';
 import { RoleplayPromptStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayPromptStrategy';
-import { selectAllParentDialogues, selectCurrentScene, selectCurrentSceneObjectives } from '../selectors';
+import {
+  selectAllParentDialogues,
+  selectCurrentScene,
+  selectCurrentSceneObjectives,
+  selectMessagesSinceLastSummary,
+} from '../selectors';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { unlockAchievement } from '../../libs/platformAPI';
@@ -69,7 +74,10 @@ const interactionEffect = async (
       tokenizer: 'llama',
       truncation_length: 4096,
     };
-    const maxMessages = selectAllParentDialogues(state).length;
+    const messagesSinceLastSummary = selectMessagesSinceLastSummary(state);
+    const maxMessages = state.settings.summaries?.enabled
+      ? messagesSinceLastSummary
+      : selectAllParentDialogues(state).length;
     const primaryStrategy = new RoleplayPromptStrategy(strategy);
 
     const [responsePromptBuilder, secondaryPromptBuilder] = [
@@ -303,7 +311,40 @@ const interactionEffect = async (
         }),
       );
     } catch (error) {
-      dispatch(interactionFailure('Failed to unlock achievement'));
+      dispatch(interactionFailure('Failed to check a condition'));
+    }
+
+    if (secondary.truncation_length > 7900 && messagesSinceLastSummary >= 20) {
+      const summaryPromptBuilder = new PromptBuilder<SummaryPromptStrategy>({
+        maxNewTokens: 200,
+        strategy: new SummaryPromptStrategy(secondary.strategy),
+        truncationLength: secondary.truncation_length,
+      });
+      const prompt = summaryPromptBuilder.buildPrompt(
+        { state, characterIds: [currentCharacterResponse?.characterId || ''] },
+        Math.min(messagesSinceLastSummary, 30),
+      );
+      const stream = textCompletion({
+        serviceBaseUrl: servicesEndpoint,
+        identifier,
+        model: secondary.id,
+        template: prompt.template,
+        variables: prompt.variables,
+      });
+
+      for await (const result of stream) {
+        currentResponseState = summaryPromptBuilder.completeResponse(currentResponseState, result, {
+          state,
+          characterIds: [currentCharacterResponse?.characterId || ''],
+        });
+      }
+
+      dispatch(
+        interactionSuccess({
+          ...currentResponseState,
+          completed: true,
+        }),
+      );
     }
   } catch (error) {
     console.error(error);

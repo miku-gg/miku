@@ -65,3 +65,24 @@ export async function retrieveModelMetadata(servicesEndpoint: string, model: Mod
     };
   }
 }
+
+export function getExistingModelMetadata(model: ModelType): ModelMetadata {
+  const metadata = cacheStrategy.get(model);
+  if (metadata) {
+    return metadata;
+  } else {
+    return {
+      strategy: 'llama3',
+      tokenizer: 'llama',
+      truncation_length: 4096,
+      max_new_tokens: 200,
+      secondary: {
+        id: ModelType.RP,
+        strategy: 'llama3',
+        tokenizer: 'llama',
+        truncation_length: 4096,
+        max_new_tokens: 200,
+      },
+    };
+  }
+}
