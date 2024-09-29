@@ -1,4 +1,4 @@
-import llamaTokenizer, { Tokenizer } from '../_llama-tokenizer';
+import mistralTokenizer, { Tokenizer } from '../_mistral-tokenizer';
 import { getInstructTemplateFromSlug, InstructTemplate, InstructTemplateSlug } from './instructTemplates';
 
 const cache: { [key: string]: number } = {};
@@ -7,7 +7,7 @@ const memoizedTokenize = (line: string): number => {
   if (line in cache) {
     return cache[line];
   }
-  const result = llamaTokenizer.encode(line).length;
+  const result = mistralTokenizer.encode(line).length;
   cache[line] = result;
   return result;
 };
@@ -26,8 +26,8 @@ export abstract class AbstractPromptStrategy<Input, Output> {
   private tokenizer: Tokenizer;
   protected instructTemplate: InstructTemplate;
 
-  constructor(_instructTemplate: InstructTemplateSlug = 'llama3') {
-    this.tokenizer = llamaTokenizer;
+  constructor(_instructTemplate: InstructTemplateSlug = 'chatml') {
+    this.tokenizer = mistralTokenizer;
     this.instructTemplate = getInstructTemplateFromSlug(_instructTemplate);
   }
   public abstract buildGuidancePrompt(
