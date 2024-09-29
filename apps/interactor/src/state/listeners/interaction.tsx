@@ -350,7 +350,7 @@ const interactionEffect = async (
       }
     } catch (error) {
       console.log(error);
-      toast.warn('Failed to generate summary');
+      // toast.warn('Failed to generate summary');
     }
   } catch (error) {
     console.error(error);

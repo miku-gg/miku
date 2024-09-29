@@ -9,7 +9,7 @@ import { setMemoryCapacityModal, setSummariesEnabled } from '../../state/slices/
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './MemoryCapacityView.scss';
 import { useMemo } from 'react';
-import { selectSummaryEnabled, selectTokensCount } from '../../state/selectors';
+import { selectTokensCount } from '../../state/selectors';
 import { trackEvent } from '../../libs/analytics';
 
 const REGULAR_USERS_TOKENS_CAPACITY = 4096;
@@ -209,7 +209,7 @@ const PremiumMemoryModal: React.FC<{
   const dispatch = useAppDispatch();
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const isMemoryModalOpen = useAppSelector((state) => state.settings.modals.memoryCapacity);
-  const usingSummary = useAppSelector(selectSummaryEnabled);
+  const usingSummary = useAppSelector((state) => !!state.settings.summaries?.enabled);
 
   return (
     <Modal
@@ -299,7 +299,7 @@ export default function MemoryCapacityView() {
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const state = useAppSelector((state) => state);
   const inputDisabled = useAppSelector((state) => state.narration.input.disabled);
-  const summaryEnabled = useAppSelector(selectSummaryEnabled);
+  const summaryEnabled = useAppSelector((state) => !!state.settings.summaries?.enabled);
   const currentTokensNoSummary = useMemo(
     () =>
       selectTokensCount({
