@@ -237,7 +237,7 @@ const PremiumMemoryModal: React.FC<{
         />
         <OptionButton
           title="Summary mode"
-          description={['The AI summarizes older messages', 'Remembers the last 900 messages']}
+          description={['The AI summarizes old messages', 'Remembers the last 900 messages']}
           isSelected={usingSummary}
           onClick={() => {
             dispatch(setSummariesEnabled(true));
