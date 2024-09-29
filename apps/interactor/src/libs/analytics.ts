@@ -11,13 +11,16 @@ type TrackableEvent =
   | 'scene-advance-suggestion-click'
   | 'scene-generate-suggestion-click'
   | 'suggestion-click'
-  | 'smart-toggle-click'
+  | 'memory-toggle-click'
   | 'music-toggle-click'
   | 'settings-click'
   | 'voice-gen-click'
   | 'edit-click'
   | 'credits-buy-click'
-  | 'download-history-click';
+  | 'download-history-click'
+  | 'activate-standard-mode'
+  | 'activate-summary-mode'
+  | 'memory-premium-click';
 
 const sessionData: Record<string, string | boolean | number> = {};
 

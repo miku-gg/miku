@@ -9,7 +9,8 @@ import { setMemoryCapacityModal, setSummariesEnabled } from '../../state/slices/
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './MemoryCapacityView.scss';
 import { useMemo } from 'react';
-import { selectTokensCount } from '../../state/selectors';
+import { selectSummaryEnabled, selectTokensCount } from '../../state/selectors';
+import { trackEvent } from '../../libs/analytics';
 
 const REGULAR_USERS_TOKENS_CAPACITY = 4096;
 const PREMIUM_USERS_TOKENS_CAPACITY = 16384;
@@ -190,6 +191,7 @@ function FreeMemoryModal({ currentTokens }: { currentTokens: number }) {
             onClick={() => {
               postMessage(CustomEventType.OPEN_PREMIUM);
               dispatch(setMemoryCapacityModal(false));
+              trackEvent('memory-premium-click');
             }}
           >
             Upgrade to Premium
@@ -207,7 +209,7 @@ const PremiumMemoryModal: React.FC<{
   const dispatch = useAppDispatch();
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const isMemoryModalOpen = useAppSelector((state) => state.settings.modals.memoryCapacity);
-  const usingSummary = useAppSelector((state) => !!state.settings.summaries?.enabled);
+  const usingSummary = useAppSelector(selectSummaryEnabled);
 
   return (
     <Modal
@@ -227,14 +229,20 @@ const PremiumMemoryModal: React.FC<{
           title="Standard mode"
           description={['The AI stores the entire messages', 'Remembers the last 75 messages']}
           isSelected={!usingSummary}
-          onClick={() => dispatch(setSummariesEnabled(false))}
+          onClick={() => {
+            dispatch(setSummariesEnabled(false));
+            trackEvent('activate-standard-mode');
+          }}
           currentTokens={currentTokensNoSummary}
         />
         <OptionButton
           title="Summary mode"
-          description={['The AI summarizes older messages', 'Remembers the last 1000 messages']}
+          description={['The AI summarizes older messages', 'Remembers the last 900 messages']}
           isSelected={usingSummary}
-          onClick={() => dispatch(setSummariesEnabled(true))}
+          onClick={() => {
+            dispatch(setSummariesEnabled(true));
+            trackEvent('activate-summary-mode');
+          }}
           experimental
           currentTokens={currentTokensSummary}
         />
@@ -291,6 +299,7 @@ export default function MemoryCapacityView() {
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const state = useAppSelector((state) => state);
   const inputDisabled = useAppSelector((state) => state.narration.input.disabled);
+  const summaryEnabled = useAppSelector(selectSummaryEnabled);
   const currentTokensNoSummary = useMemo(
     () =>
       selectTokensCount({
@@ -302,7 +311,7 @@ export default function MemoryCapacityView() {
           },
         },
       }),
-    [inputDisabled, state.settings.summaries?.enabled],
+    [inputDisabled, summaryEnabled],
   );
   const currentTokensSummary = useMemo(
     () =>
@@ -315,10 +324,11 @@ export default function MemoryCapacityView() {
           },
         },
       }),
-    [inputDisabled, state.settings.summaries?.enabled],
+    [inputDisabled, summaryEnabled],
   );
   const handleBrainClick = () => {
     dispatch(setMemoryCapacityModal(true));
+    trackEvent('memory-toggle-click');
   };
 
   if (!isProduction) return null;
@@ -326,11 +336,11 @@ export default function MemoryCapacityView() {
     <>
       <FillBrain
         maxCapacity={isPremiumUser ? PREMIUM_USERS_TOKENS_CAPACITY : REGULAR_USERS_TOKENS_CAPACITY}
-        currentTokensCount={state.settings.summaries?.enabled ? currentTokensSummary : currentTokensNoSummary}
+        currentTokensCount={summaryEnabled ? currentTokensSummary : currentTokensNoSummary}
         sizeInPixels={32}
         showFillPercent={false}
         showTooltip={true}
-        fillColor={isPremiumUser ? (state.settings.summaries?.enabled ? '#ffbe33' : 'white') : '#bbc2d8'}
+        fillColor={isPremiumUser ? (summaryEnabled ? '#ffbe33' : 'white') : '#bbc2d8'}
         onClick={handleBrainClick}
       />
       <FreeMemoryModal currentTokens={currentTokensNoSummary} />

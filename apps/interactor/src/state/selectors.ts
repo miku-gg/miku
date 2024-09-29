@@ -7,6 +7,7 @@ import { NovelCharacterOutfit, NovelScene } from './slices/novelSlice';
 import { RootState } from './store';
 import { NovelNSFW } from './versioning';
 import { NarrationSummarySentence } from './versioning/v3.state';
+import { getExistingModelMetadata } from '../libs/retrieveMetadata';
 
 export const selectLastLoadedResponse = (state: RootState): NarrationResponse | undefined => {
   const { currentResponseId } = state.narration;
@@ -470,3 +471,9 @@ export const selectAvailableSummarySentences = createSelector(
     return allSentences.map((s) => s.sentence);
   },
 );
+
+export const selectSummaryEnabled = (state: RootState) => {
+  return (
+    !!state.settings.summaries?.enabled && getExistingModelMetadata(state.settings.model)?.truncation_length > 8000
+  );
+};

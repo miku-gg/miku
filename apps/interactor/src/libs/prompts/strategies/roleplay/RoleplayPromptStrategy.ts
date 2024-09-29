@@ -6,6 +6,7 @@ import {
   selectCurrentCharacterOutfits,
   selectCurrentScene,
   selectLastLoadedCharacters,
+  selectSummaryEnabled,
 } from '../../../../state/selectors';
 import { RootState } from '../../../../state/store';
 import { NarrationInteraction, NarrationResponse } from '../../../../state/versioning';
@@ -73,7 +74,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       ', ',
     )} and {{char}} begins.\n`;
 
-    if (state.settings.summaries?.enabled) {
+    if (selectSummaryEnabled(state)) {
       const setences = selectAvailableSummarySentences(state, [currentCharacterId], maxTokens);
       if (setences.length) {
         template += `STORY EVENTS UNTIL NOW:\n${setences.join('\n')}\n`;

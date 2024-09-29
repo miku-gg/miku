@@ -6,7 +6,6 @@ import { Tooltip } from '@mikugg/ui-kit';
 import { GiBrain } from 'react-icons/gi';
 import { setModel } from '../../state/slices/settingsSlice';
 import './ModelSelector.scss';
-import { trackEvent } from '../../libs/analytics';
 
 const ModelSelector = () => {
   const dispatch = useAppDispatch();
@@ -40,9 +39,6 @@ const ModelSelector = () => {
         className="ModelSelector__icon icon-button"
         onClick={() => {
           dispatch(setModel(isSmart ? ModelType.RP : ModelType.RP_SMART));
-          trackEvent('smart-toggle-click', {
-            modelSet: isSmart ? 'RP' : 'RP_SMART',
-          });
         }}
         data-tooltip-id="smart-tooltip"
         data-tooltip-content={tooltipMessage}

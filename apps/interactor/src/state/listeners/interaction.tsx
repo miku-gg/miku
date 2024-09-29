@@ -19,6 +19,7 @@ import {
   selectCurrentScene,
   selectCurrentSceneObjectives,
   selectMessagesSinceLastSummary,
+  selectSummaryEnabled,
 } from '../selectors';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
@@ -75,8 +76,8 @@ const interactionEffect = async (
       truncation_length: 4096,
     };
     const messagesSinceLastSummary = selectMessagesSinceLastSummary(state);
-    const maxMessages = state.settings.summaries?.enabled
-      ? messagesSinceLastSummary
+    const maxMessages = selectSummaryEnabled(state)
+      ? Math.max(messagesSinceLastSummary, 4)
       : selectAllParentDialogues(state).length;
     const primaryStrategy = new RoleplayPromptStrategy(strategy);
 
@@ -314,37 +315,42 @@ const interactionEffect = async (
       dispatch(interactionFailure('Failed to check a condition'));
     }
 
-    if (secondary.truncation_length > 7900 && messagesSinceLastSummary >= 20) {
-      const summaryPromptBuilder = new PromptBuilder<SummaryPromptStrategy>({
-        maxNewTokens: 200,
-        strategy: new SummaryPromptStrategy(secondary.strategy),
-        truncationLength: secondary.truncation_length,
-      });
-      const prompt = summaryPromptBuilder.buildPrompt(
-        { state, characterIds: [currentCharacterResponse?.characterId || ''] },
-        Math.min(messagesSinceLastSummary, 30),
-      );
-      const stream = textCompletion({
-        serviceBaseUrl: servicesEndpoint,
-        identifier,
-        model: secondary.id,
-        template: prompt.template,
-        variables: prompt.variables,
-      });
-
-      for await (const result of stream) {
-        currentResponseState = summaryPromptBuilder.completeResponse(currentResponseState, result, {
-          state,
-          characterIds: [currentCharacterResponse?.characterId || ''],
+    try {
+      if (secondary.truncation_length > 7900 && messagesSinceLastSummary >= 40) {
+        const summaryPromptBuilder = new PromptBuilder<SummaryPromptStrategy>({
+          maxNewTokens: 200,
+          strategy: new SummaryPromptStrategy(secondary.strategy),
+          truncationLength: secondary.truncation_length,
         });
-      }
+        const prompt = summaryPromptBuilder.buildPrompt(
+          { state, characterIds: [currentCharacterResponse?.characterId || ''] },
+          Math.min(messagesSinceLastSummary, 60),
+        );
+        const stream = textCompletion({
+          serviceBaseUrl: servicesEndpoint,
+          identifier,
+          model: secondary.id,
+          template: prompt.template,
+          variables: prompt.variables,
+        });
 
-      dispatch(
-        interactionSuccess({
-          ...currentResponseState,
-          completed: true,
-        }),
-      );
+        for await (const result of stream) {
+          currentResponseState = summaryPromptBuilder.completeResponse(currentResponseState, result, {
+            state,
+            characterIds: [currentCharacterResponse?.characterId || ''],
+          });
+        }
+
+        dispatch(
+          interactionSuccess({
+            ...currentResponseState,
+            completed: true,
+          }),
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      toast.warn('Failed to generate summary');
     }
   } catch (error) {
     console.error(error);
