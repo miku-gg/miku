@@ -409,7 +409,7 @@ export const selectCurrentSceneInteractionCount = createSelector(
 );
 
 export const selectMessagesSinceLastSummary = createSelector([selectAllParentDialogues], (dialogues) => {
-  const lastSummaryIndex = dialogues.findIndex((d) => d.type === 'response' && d.item.summary);
+  const lastSummaryIndex = dialogues.findIndex((d) => d.type === 'response' && d.item.summary?.sentences.length);
   if (lastSummaryIndex === -1) return dialogues.length;
   return Math.max(dialogues.slice(0, lastSummaryIndex + 1).length, 2);
 });
@@ -422,7 +422,7 @@ export const selectAllSumaries = createSelector(
     }[] = [];
     dialogues.forEach((dialogue) => {
       const summary = responses[dialogue.item.id]?.summary;
-      if (summary) {
+      if (summary?.sentences.length) {
         summaries.push(summary);
       }
     });
