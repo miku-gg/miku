@@ -175,7 +175,11 @@ export default function s3ServerDecorator(app: Express): void {
     if (!req.file) {
       return res.status(400).send('No file uploaded.');
     }
-    const fileName = req.file.originalname;
+    const ext = req.file.mimetype.split('/')[1];
+    if (!ext) {
+      return res.status(400).send('Invalid contentType.');
+    }
+    const fileName = `${Date.now()}_${randomString()}.${ext}`;
     const filePath = path.join(path.join(dataDir, `assets/${fileName}`));
     // @ts-ignore
     fs.writeFile(filePath, req.file.buffer, (err) => {
