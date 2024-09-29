@@ -76,7 +76,7 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
       .map((c) => c.name)
       .join(', ')} and ${input.state.settings.user.name}.`;
     for (let i = 0; i < 10; i++) {
-      template += `\n{{GEN text_${i} max_tokens=${maxNewTokens} stop=[".","\\n"]}} (importance={{GEN importance_${i} max_tokens=1 stop=")"}})`;
+      template += `\n{{GEN text_${i} max_tokens=${maxNewTokens} stop=[".","\\n","("]}} (importance={{GEN importance_${i} max_tokens=1 stop=")"}})`;
     }
 
     template = fillTextTemplate(template, {
@@ -111,7 +111,7 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
       const importance = variables.get(`importance_${i}`);
       if (text) {
         sentences.push({
-          sentence: text,
+          sentence: text.replace('- ', '').replace('-', ''),
           importance: parseInt(importance || '0', 10),
         });
       }
