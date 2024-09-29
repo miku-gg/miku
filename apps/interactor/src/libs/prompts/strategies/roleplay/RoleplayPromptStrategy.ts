@@ -1,10 +1,12 @@
 import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD, TavernCardV2 } from '@mikugg/bot-utils';
 import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..';
 import {
-  selectAllParentDialoguesWhereCharacterIsPresent,
+  selectAllParentDialoguesWhereCharactersArePresent,
+  selectAvailableSummarySentences,
   selectCurrentCharacterOutfits,
   selectCurrentScene,
   selectLastLoadedCharacters,
+  selectSummaryEnabled,
 } from '../../../../state/selectors';
 import { RootState } from '../../../../state/store';
 import { NarrationInteraction, NarrationResponse } from '../../../../state/versioning';
@@ -19,7 +21,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   },
   NarrationResponse
 > {
-  protected getContextPrompt(state: RootState, currentCharacterId: string): string {
+  protected getContextPrompt(state: RootState, currentCharacterId: string, maxTokens: number): string {
     const scene = selectCurrentScene(state);
     const characters = scene?.characters || [];
     const characterTemplates = characters
@@ -70,10 +72,17 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
 
     template += `\nThen the roleplay chat between ${[...characterTemplates, '{{user}}'].join(
       ', ',
-    )} and {{char}} begins.\n\n`;
+    )} and {{char}} begins.\n`;
+
+    if (selectSummaryEnabled(state)) {
+      const setences = selectAvailableSummarySentences(state, [currentCharacterId], maxTokens);
+      if (setences.length) {
+        template += `STORY EVENTS UNTIL NOW:\n${setences.join('\n')}\n`;
+      }
+    }
 
     if (scene?.prompt) {
-      template += `\nSCENE: ${scene.prompt}\n`;
+      template += `CURRENT SCENE: ${scene.prompt}\n`;
     }
 
     scene?.characters.forEach((char) => {
@@ -101,6 +110,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     input: {
       state: RootState;
       currentCharacterId: string;
+      maxTokens: number;
     },
   ): {
     template: string;
@@ -114,7 +124,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const { name } = this.getCharacterSpecs(currentCharacter?.card || EMPTY_MIKU_CARD);
     const emotions = this.getCharacterEmotions(input.state, input.currentCharacterId);
 
-    let template = this.getContextPrompt(input.state, input.currentCharacterId);
+    let template = this.getContextPrompt(input.state, input.currentCharacterId, input.maxTokens);
 
     template += this.getDialogueHistoryPrompt(input.state, memorySize, {
       name: currentCharacter?.name || '',
@@ -190,7 +200,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       id: string;
     },
   ): string {
-    const messages = selectAllParentDialoguesWhereCharacterIsPresent(state, currentCharacter?.id || '');
+    const messages = selectAllParentDialoguesWhereCharactersArePresent(state, [currentCharacter?.id || '']);
     let prompt = '';
     for (const message of [...messages].reverse().slice(-maxLines)) {
       prompt += this.getDialogueLine(message, currentCharacter, prompt);
@@ -391,7 +401,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
           }
         }) || [];
 
-    const lastMessages = selectAllParentDialoguesWhereCharacterIsPresent(state, currentCharacterId)
+    const lastMessages = selectAllParentDialoguesWhereCharactersArePresent(state, [currentCharacterId])
       .slice(1, 4)
       .reverse();
     const lorebooks = [...sceneLorebookIds, ...characterLorebookIds, ...globalLorebookIds]

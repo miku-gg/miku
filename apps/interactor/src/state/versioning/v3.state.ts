@@ -20,6 +20,11 @@ export interface NarrationSceneSuggestion {
   music?: string;
 }
 
+export interface NarrationSummarySentence {
+  sentence: string;
+  importance: number;
+}
+
 export interface NarrationResponse {
   id: string;
   selected: boolean;
@@ -40,6 +45,9 @@ export interface NarrationResponse {
     interactionId: string;
     selected: boolean;
   }[];
+  summary?: {
+    sentences: NarrationSummarySentence[];
+  };
 }
 
 export interface NarrationState {
@@ -147,6 +155,9 @@ export interface SettingsState {
       opened: boolean;
       id: string;
     };
+  };
+  summaries?: {
+    enabled: boolean;
   };
 }
 

@@ -3,7 +3,7 @@ import { v4 as randomUUID } from 'uuid';
 import { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
 import { toast } from 'react-toastify';
 import trim from 'lodash.trim';
-import { NarrationSceneSuggestion } from '../versioning/v3.state';
+import { NarrationSceneSuggestion, NarrationSummarySentence } from '../versioning/v3.state';
 
 export type { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
 
@@ -127,6 +127,9 @@ const narrationSlice = createSlice({
         shouldSuggestScenes?: boolean;
         completed: boolean;
         characters: NarrationResponse['characters'];
+        summary?: {
+          sentences: NarrationSummarySentence[];
+        };
       }>,
     ) {
       const { characters } = action.payload;
@@ -150,6 +153,9 @@ const narrationSlice = createSlice({
 
         if (action.payload.nextScene) {
           response.nextScene = action.payload.nextScene;
+        }
+        if (action.payload.summary) {
+          response.summary = action.payload.summary;
         }
         if (!response.fetching) {
           state.input.text = '';

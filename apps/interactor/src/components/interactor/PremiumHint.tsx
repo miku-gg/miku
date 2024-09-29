@@ -4,7 +4,7 @@ import { selectChatHistory } from '../../state/selectors';
 import { useAppSelector } from '../../state/store';
 import './PremiumHint.scss';
 
-const PREMIUM_HINT = `Characters will forget old messages. Upgrade to premium for longer memory.`;
+const PREMIUM_HINT = `Characters will forget old messages. Upgrade to premium for long term memory.`;
 const DEFAULT_MESSAGES_COUNT = 15;
 
 export default function PremiumHint() {

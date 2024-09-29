@@ -3,19 +3,20 @@ import { Button, Modal, Tooltip } from '@mikugg/ui-kit';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import { GiBrain } from 'react-icons/gi';
 import { useAppContext } from '../../App.context';
-import { trackEvent } from '../../libs/analytics';
+// import { trackEvent } from '../../libs/analytics';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
-// import { selectTokensCount } from '../../state/selectors';
-import { ModelType, setMemoryCapacityModal, setModel } from '../../state/slices/settingsSlice';
+import { setMemoryCapacityModal, setSummariesEnabled } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './MemoryCapacityView.scss';
+import { useMemo } from 'react';
+import { selectSummaryEnabled, selectTokensCount } from '../../state/selectors';
+import { trackEvent } from '../../libs/analytics';
 
 const REGULAR_USERS_TOKENS_CAPACITY = 4096;
 const PREMIUM_USERS_TOKENS_CAPACITY = 16384;
 
 const FillBrain = ({
-  isSmart,
-  isPremium,
+  maxCapacity,
   currentTokensCount,
   sizeInPixels,
   showFillPercent,
@@ -23,8 +24,7 @@ const FillBrain = ({
   showTooltip,
   fillColor = '#fafafa',
 }: {
-  isSmart: boolean;
-  isPremium: boolean;
+  maxCapacity: number;
   currentTokensCount: number;
   sizeInPixels: number;
   onClick?: () => void;
@@ -32,7 +32,6 @@ const FillBrain = ({
   showTooltip?: boolean;
   fillColor?: string;
 }) => {
-  const maxCapacity = isPremium ? PREMIUM_USERS_TOKENS_CAPACITY : REGULAR_USERS_TOKENS_CAPACITY;
   const fillPercentage = Math.min((currentTokensCount / maxCapacity) * 100, 100);
   const realFillPercentage = (fillPercentage + 8) * 0.835;
   const uniqueKeyframeName = `fill-${Math.random().toString(36).slice(2, 9)}`;
@@ -59,11 +58,7 @@ const FillBrain = ({
       <div
         className={`MemoryCapacityView ${onClick ? 'clickable' : ''}`}
         data-tooltip-id={`character-memory-tooltip${showTooltip ? '-yes' : ''}`}
-        data-tooltip-content={
-          !isPremium
-            ? `Smart mode. Only available for premium`
-            : `${!isSmart ? 'Activate smart mode' : 'Deactivate smart mode'}`
-        }
+        data-tooltip-content="Memory Usage"
         style={{ width: sizeInPixels, height: sizeInPixels, minWidth: sizeInPixels, minHeight: sizeInPixels }}
         onClick={onClick}
       >
@@ -119,119 +114,237 @@ const FillBrain = ({
   );
 };
 
-export default function MemoryCapacityView() {
-  const { isProduction, isMobileApp } = useAppContext();
-
+function FreeMemoryModal({ currentTokens }: { currentTokens: number }) {
+  const { isMobileApp } = useAppContext();
   const dispatch = useAppDispatch();
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const isMemoryModalOpen = useAppSelector((state) => state.settings.modals.memoryCapacity);
-  // const state = useAppSelector((state) => state);
-  const isSmart = useAppSelector((state) => state.settings.model === ModelType.RP_SMART);
-
-  // const inputDisabled = useAppSelector((state) => state.narration.input.disabled);
-  // const currentTokens = useMemo(() => selectTokensCount(state), [inputDisabled]);
 
   const isMobileSize = isMobileApp || window.innerWidth < 600;
 
+  return (
+    <Modal
+      opened={isMemoryModalOpen && !isPremiumUser}
+      className={`MemoryCapacityViewModal ${isMobileSize ? 'mobile-view__modal' : ''}`}
+      onCloseModal={() => {
+        dispatch(setMemoryCapacityModal(false));
+      }}
+    >
+      <div className={`MemoryCapacityView__modal ${isMobileSize ? 'mobile-view' : ''}`}>
+        <div className="MemoryCapacityView__modal-header">
+          <h3 className="MemoryCapacityView__modal-header_title">Memory Capacity</h3>
+          <p className="MemoryCapacityView__modal-header__subtitle">
+            Upgrade to premium for long term memory and better responses.
+          </p>
+        </div>
+        <div className="MemoryCapacityView__modal-top">
+          <FillBrain
+            maxCapacity={REGULAR_USERS_TOKENS_CAPACITY}
+            currentTokensCount={currentTokens}
+            sizeInPixels={isMobileSize ? 35 : 70}
+            showFillPercent={true}
+            fillColor="#6f7396"
+          />
+          <div className="MemoryCapacityView__modal-top__text">
+            <h4>Free membership</h4>
+            <div>
+              <FaTimes size={10} color="#9747ff" />
+              <p>Characters remember the last 15 messages</p>
+            </div>
+            <div>
+              <FaTimes size={10} color="#9747ff" />
+              <p>Characters don't remember old messages</p>
+            </div>
+          </div>
+        </div>
+        <div className="MemoryCapacityView__modal-bottom">
+          <FillBrain
+            maxCapacity={PREMIUM_USERS_TOKENS_CAPACITY}
+            currentTokensCount={currentTokens}
+            sizeInPixels={isMobileSize ? 35 : 70}
+            showFillPercent={true}
+            fillColor="white"
+          />
+          <div className="MemoryCapacityView__modal-bottom__text">
+            <h4>Long term memory</h4>
+            <div>
+              <FaCheck size={10} color="#9747ff" />
+              <p>Characters have 5x more memory</p>
+            </div>
+            <div>
+              <FaCheck size={10} color="#9747ff" />
+              <p>Characters remember old messages</p>
+            </div>
+          </div>
+        </div>
+        <div className="MemoryCapacityView__modal-buttons">
+          <Button
+            theme="transparent"
+            onClick={() => {
+              dispatch(setMemoryCapacityModal(false));
+            }}
+          >
+            Continue as Regular
+          </Button>
+          <Button
+            theme="gradient"
+            onClick={() => {
+              postMessage(CustomEventType.OPEN_PREMIUM);
+              dispatch(setMemoryCapacityModal(false));
+              trackEvent('memory-premium-click');
+            }}
+          >
+            Upgrade to Premium
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+const PremiumMemoryModal: React.FC<{
+  currentTokensNoSummary: number;
+  currentTokensSummary: number;
+}> = ({ currentTokensNoSummary, currentTokensSummary }) => {
+  const dispatch = useAppDispatch();
+  const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
+  const isMemoryModalOpen = useAppSelector((state) => state.settings.modals.memoryCapacity);
+  const usingSummary = useAppSelector(selectSummaryEnabled);
+
+  return (
+    <Modal
+      opened={isMemoryModalOpen && isPremiumUser}
+      className={`PremiumMemoryModal`}
+      onCloseModal={() => {
+        dispatch(setMemoryCapacityModal(false));
+      }}
+    >
+      <div className="MemoryCapacityView__modal-header">
+        <h3 className="MemoryCapacityView__modal-header_title">Memory Options</h3>
+        <p className="MemoryCapacityView__modal-header__subtitle">Configure how you want to use long term memory.</p>
+      </div>
+
+      <div className="PremiumMemoryModal__options">
+        <OptionButton
+          title="Standard mode"
+          description={['The AI stores the entire messages', 'Remembers the last 75 messages']}
+          isSelected={!usingSummary}
+          onClick={() => {
+            dispatch(setSummariesEnabled(false));
+            trackEvent('activate-standard-mode');
+          }}
+          currentTokens={currentTokensNoSummary}
+        />
+        <OptionButton
+          title="Summary mode"
+          description={['The AI summarizes older messages', 'Remembers the last 900 messages']}
+          isSelected={usingSummary}
+          onClick={() => {
+            dispatch(setSummariesEnabled(true));
+            trackEvent('activate-summary-mode');
+          }}
+          experimental
+          currentTokens={currentTokensSummary}
+        />
+      </div>
+    </Modal>
+  );
+};
+
+interface OptionButtonProps {
+  title: string;
+  description: [string, string];
+  isSelected: boolean;
+  onClick: () => void;
+  experimental?: boolean;
+  currentTokens: number;
+}
+
+const OptionButton: React.FC<OptionButtonProps> = ({
+  title,
+  description,
+  isSelected,
+  onClick,
+  experimental = false,
+  currentTokens,
+}) => (
+  <button
+    className={`PremiumMemoryModal__option ${isSelected ? 'PremiumMemoryModal__option--selected' : ''}`}
+    onClick={onClick}
+  >
+    <div className="PremiumMemoryModal__option-icon">
+      <FillBrain
+        fillColor={experimental ? '#ffbe33' : 'white'}
+        currentTokensCount={currentTokens}
+        maxCapacity={PREMIUM_USERS_TOKENS_CAPACITY}
+        sizeInPixels={80}
+      />
+    </div>
+    <div className="PremiumMemoryModal__option-content">
+      <h3 className="PremiumMemoryModal__option-title">
+        {title}
+        {experimental && <span className="PremiumMemoryModal__option-badge">Experimental</span>}
+      </h3>
+      <p className="PremiumMemoryModal__option-description">{description[0]}</p>
+      <p className="PremiumMemoryModal__option-description PremiumMemoryModal__option-description--highlighted">
+        {description[1]}
+      </p>
+    </div>
+  </button>
+);
+
+export default function MemoryCapacityView() {
+  const { isProduction } = useAppContext();
+  const dispatch = useAppDispatch();
+  const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
+  const state = useAppSelector((state) => state);
+  const inputDisabled = useAppSelector((state) => state.narration.input.disabled);
+  const summaryEnabled = useAppSelector(selectSummaryEnabled);
+  const currentTokensNoSummary = useMemo(
+    () =>
+      selectTokensCount({
+        ...state,
+        settings: {
+          ...state.settings,
+          summaries: {
+            enabled: false,
+          },
+        },
+      }),
+    [inputDisabled, summaryEnabled],
+  );
+  const currentTokensSummary = useMemo(
+    () =>
+      selectTokensCount({
+        ...state,
+        settings: {
+          ...state.settings,
+          summaries: {
+            enabled: true,
+          },
+        },
+      }),
+    [inputDisabled, summaryEnabled],
+  );
   const handleBrainClick = () => {
-    if (!isPremiumUser) {
-      dispatch(setMemoryCapacityModal(true));
-    } else {
-      dispatch(setModel(isSmart ? ModelType.RP : ModelType.RP_SMART));
-      trackEvent('smart-toggle-click', {
-        modelSet: isSmart ? 'RP' : 'RP_SMART',
-      });
-    }
+    dispatch(setMemoryCapacityModal(true));
+    trackEvent('memory-toggle-click');
   };
 
   if (!isProduction) return null;
   return (
     <>
       <FillBrain
-        isPremium={isPremiumUser}
-        isSmart={isSmart}
-        currentTokensCount={isSmart ? PREMIUM_USERS_TOKENS_CAPACITY : 0}
+        maxCapacity={isPremiumUser ? PREMIUM_USERS_TOKENS_CAPACITY : REGULAR_USERS_TOKENS_CAPACITY}
+        currentTokensCount={summaryEnabled ? currentTokensSummary : currentTokensNoSummary}
         sizeInPixels={32}
         showFillPercent={false}
         showTooltip={true}
+        fillColor={isPremiumUser ? (summaryEnabled ? '#ffbe33' : 'white') : '#bbc2d8'}
         onClick={handleBrainClick}
       />
-      <Modal
-        opened={isMemoryModalOpen && !isPremiumUser}
-        className={`MemoryCapacityViewModal ${isMobileSize ? 'mobile-view__modal' : ''}`}
-        onCloseModal={() => {
-          dispatch(setMemoryCapacityModal(false));
-        }}
-      >
-        <div className={`MemoryCapacityView__modal ${isMobileSize ? 'mobile-view' : ''}`}>
-          <div className="MemoryCapacityView__modal-header">
-            <h3 className="MemoryCapacityView__modal-header_title">Smart Mode</h3>
-            <p className="MemoryCapacityView__modal-header__subtitle">
-              Upgrade to premium for longer memory and better AI responses.
-            </p>
-          </div>
-          <div className="MemoryCapacityView__modal-top">
-            <FillBrain
-              isSmart={false}
-              isPremium={false}
-              currentTokensCount={0}
-              sizeInPixels={isMobileSize ? 35 : 70}
-              showFillPercent={false}
-              fillColor="#6f7396"
-            />
-            <div className="MemoryCapacityView__modal-top__text">
-              <h4>Free membership</h4>
-              <div>
-                <FaTimes size={10} color="#9747ff" />
-                <p>Regular Mode. 8B AI Model with 4k context</p>
-              </div>
-              <div>
-                <FaTimes size={10} color="#9747ff" />
-                <p>Characters remember less details</p>
-              </div>
-            </div>
-          </div>
-          <div className="MemoryCapacityView__modal-bottom">
-            <FillBrain
-              isSmart={false}
-              isPremium={false}
-              currentTokensCount={REGULAR_USERS_TOKENS_CAPACITY}
-              sizeInPixels={isMobileSize ? 35 : 70}
-              showFillPercent={false}
-            />
-            <div className="MemoryCapacityView__modal-bottom__text">
-              <h4>Premium membership</h4>
-              <div>
-                <FaCheck size={10} color="#9747ff" />
-                <p>Smart Mode. 70B AI Model with 8k context</p>
-              </div>
-              <div>
-                <FaCheck size={10} color="#9747ff" />
-                <p>Characters remember more details</p>
-              </div>
-            </div>
-          </div>
-          <div className="MemoryCapacityView__modal-buttons">
-            <Button
-              theme="transparent"
-              onClick={() => {
-                dispatch(setMemoryCapacityModal(false));
-              }}
-            >
-              Continue as Regular
-            </Button>
-            <Button
-              theme="gradient"
-              onClick={() => {
-                postMessage(CustomEventType.OPEN_PREMIUM);
-                dispatch(setMemoryCapacityModal(false));
-              }}
-            >
-              Upgrade to Premium
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      <FreeMemoryModal currentTokens={currentTokensNoSummary} />
+      <PremiumMemoryModal currentTokensNoSummary={currentTokensNoSummary} currentTokensSummary={currentTokensSummary} />
     </>
   );
 }
