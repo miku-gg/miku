@@ -170,4 +170,20 @@ export default function s3ServerDecorator(app: Express): void {
   });
 
   app.post('/asset-upload/complete', uploadAssetHandler);
+
+  app.post('/asset-upload', upload.single('file'), async (req, res) => {
+    if (!req.file) {
+      return res.status(400).send('No file uploaded.');
+    }
+    const fileName = req.file.originalname;
+    const filePath = path.join(path.join(dataDir, `assets/${fileName}`));
+    // @ts-ignore
+    fs.writeFile(filePath, req.file.buffer, (err) => {
+      if (err) {
+        console.error('Error writing file:', err);
+        return res.status(500).send('Error writing file.');
+      }
+      res.status(200).send(fileName);
+    });
+  });
 }
