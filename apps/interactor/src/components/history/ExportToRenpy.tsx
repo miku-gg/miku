@@ -1,10 +1,10 @@
 import { Button, CheckBox, Loader, Modal, Tooltip } from '@mikugg/ui-kit';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useAppContext } from '../../App.context';
 import { downloadRenPyProject, exportToRenPy } from '../../libs/exportToRenpy';
 import { RootState } from '../../state/store';
 import './ExportToRenpy.scss';
-import { useAppContext } from '../../App.context';
 
 interface RenPyExportButtonProps {
   state: RootState;
@@ -14,7 +14,8 @@ export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [linearStory, setLinearStory] = useState<boolean>(false);
-  const { assetLinkLoader } = useAppContext();
+  const premiumMember = state.settings.user.isPremium;
+  const { assetLinkLoader, isMobileApp, isProduction } = useAppContext();
   const handleButtonClick = async () => {
     setIsLoading(true);
     try {
@@ -27,15 +28,21 @@ export const RenPyExportButton = ({ state }: RenPyExportButtonProps) => {
     setIsModalOpen(false);
   };
 
+  if(isMobileApp && !isProduction) return null;
+
   return (
     <>
       <Tooltip id="renpy-export-tooltip" place="bottom" />
       <button
-        className="RenPyExportButton"
+        className={`RenPyExportButton ${!premiumMember ? 'disabled-export-button' : ''}`}
         onClick={() => setIsModalOpen(true)}
         data-tooltip-id="renpy-export-tooltip"
-        data-tooltip-content="Generate a Ren'Py project from the current narration."
-        disabled={isLoading}
+        data-tooltip-content={
+          !premiumMember
+            ? `Export to Ren'Py is only for premium members.`
+            : `Generate a Ren'Py project from the current narration.`
+        }
+        disabled={isLoading || !premiumMember}
       >
         <img src="/images/renpy.png" alt="Ren'Py" height={16} />
         Export as Ren'Py
