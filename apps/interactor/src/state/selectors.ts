@@ -439,7 +439,7 @@ export const selectAvailableSummarySentences = createSelector(
 
     const allSentences: { sentence: string; importance: number; isLast: boolean }[] = [];
 
-    summaries.forEach((summary, index) => {
+    [...summaries].reverse().forEach((summary, index) => {
       const isLast = index === summaries.length - 1;
       summary?.sentences.forEach((s) => allSentences.push({ ...s, isLast }));
     });
