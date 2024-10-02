@@ -141,7 +141,7 @@ app.get('/text/models', async (req, res) => {
 
 app.get('/refresh-settings', async (req, res) => {
   // check header token
-  if (req.headers.Authorization !== process.env.REFRESH_TOKEN) {
+  if (req.headers.Authorization !== `Bearer ${process.env.REFRESH_TOKEN}`) {
     res.status(401).send('Unauthorized');
     return;
   }
