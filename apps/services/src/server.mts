@@ -7,7 +7,7 @@ import textHandler, { tokenizeHandler } from './services/text/index.mjs';
 import { TokenizerType, loadTokenizer } from './services/text/lib/tokenize.mjs';
 import monitor from 'express-status-monitor';
 import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
-import { getModelHealth } from './services/text/lib/healthChecker.mjs';
+import { checkModelsHealth, getModelHealth } from './services/text/lib/healthChecker.mjs';
 const PORT = process.env.SERVICES_PORT || 8484;
 
 const app: express.Application = express();
@@ -137,6 +137,17 @@ app.get('/text/models', async (req, res) => {
       };
     }),
   );
+});
+
+app.get('/refresh-settings', async (req, res) => {
+  // check header token
+  if (req.headers.Authorization !== process.env.REFRESH_TOKEN) {
+    res.status(401).send('Unauthorized');
+    return;
+  }
+  await modelServerSettingsStore.retrieveSettings();
+  await checkModelsHealth();
+  res.send('OK');
 });
 
 console.log('Loading tokenizers...');
