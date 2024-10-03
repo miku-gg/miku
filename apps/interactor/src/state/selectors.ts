@@ -433,9 +433,9 @@ export const selectAllSumaries = createSelector(
 export const selectAvailableSummarySentences = createSelector(
   [selectAllSumaries, (_state: RootState, _characters: string[], maxPromptLength: number) => maxPromptLength],
   (summaries, maxPromptLength: number) => {
-    const PERCENTAGE_OF_MAX_TOKENS = 0.2;
+    const REST_PROMPT_LENGTH = Math.min(4096, maxPromptLength);
     const TOKENS_PER_SENTENCE = 15;
-    const maxSentences = Math.floor((maxPromptLength * PERCENTAGE_OF_MAX_TOKENS) / TOKENS_PER_SENTENCE);
+    const maxSentences = Math.floor((maxPromptLength - REST_PROMPT_LENGTH) / TOKENS_PER_SENTENCE);
 
     const allSentences: { sentence: string; importance: number; isLast: boolean }[] = [];
 
