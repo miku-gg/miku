@@ -7,7 +7,7 @@ import {
   AssetDisplayPrefix,
   uploadAsset,
 } from '@mikugg/bot-utils';
-import { BackgroundResult, listSearch, SearchType, SongResult } from './libs/listSearch';
+import { BackgroundResult, CharacterResult, listSearch, SearchType, SongResult } from './libs/listSearch';
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const VITE_ASSETS_UPLOAD_URL = import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/asset-upload';
@@ -190,12 +190,22 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       previewIframe: 'https://alpha.miku.gg',
       search: {
         characters: async (query) => {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const result = await listSearch<CharacterResult>('https://apidev.miku.gg', SearchType.CHARACTER, {
+            search: query.text,
+            take: query.take,
+            skip: query.skip,
+          });
+          const publicCharacters = result
+            .filter((character) => character.visibility === 'PUBLIC')
+            .map((character) => JSON.parse(character.card) as NovelV3.NovelCharacter);
+          const privateCharacters = result
+            .filter((character) => character.visibility === 'PRIVATE')
+            .map((character) => JSON.parse(character.card) as NovelV3.NovelCharacter);
           return {
             success: true,
             result: {
-              public: [],
-              private: [],
+              public: publicCharacters,
+              private: privateCharacters,
             },
           };
         },
@@ -286,12 +296,22 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       previewIframe: 'https://interactor.miku.gg',
       search: {
         characters: async (query) => {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const result = await listSearch<CharacterResult>('https://api.miku.gg', SearchType.CHARACTER, {
+            search: query.text,
+            take: query.take,
+            skip: query.skip,
+          });
+          const publicCharacters = result
+            .filter((character) => character.visibility === 'PUBLIC')
+            .map((character) => JSON.parse(character.card) as NovelV3.NovelCharacter);
+          const privateCharacters = result
+            .filter((character) => character.visibility === 'PRIVATE')
+            .map((character) => JSON.parse(character.card) as NovelV3.NovelCharacter);
           return {
             success: true,
             result: {
-              public: [],
-              private: [],
+              public: publicCharacters,
+              private: privateCharacters,
             },
           };
         },
