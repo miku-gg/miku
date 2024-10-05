@@ -86,6 +86,13 @@
         color: $color-light-gray;
       }
     }
+
+    &--empty {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100px;
+    }
   }
 
   &__card-characters {
@@ -160,6 +167,12 @@
     &--importance-5 {
       color: #0080ff;
     }
+  }
+
+  &__empty-message {
+    font-size: $font-sm;
+    color: $color-light-gray;
+    font-style: italic;
   }
 
   .CharacterSelector {

@@ -154,25 +154,29 @@ const SummaryView: React.FC = () => {
                 ? 'Memories being used by the AI for this character. Important memories will be prioritized.'
                 : 'All memories available for this character.'}
             </p>
-            {activeTab === 'all' ? (
+            {activeTab === 'all' && (
               <div className="SummaryView__importance-meter">
                 <span className="SummaryView__importance-meter-label">Importance:</span>
                 <div className="SummaryView__importance-meter-gradient"></div>
               </div>
-            ) : (
-              <div></div>
             )}
           </div>
           <div className="SummaryView__cards-container">
             {activeTab === 'used' ? (
-              <div className="SummaryView__card SummaryView__card--available-sentences">
-                {availableSentences.map((sentence, index) => (
-                  <div key={index} className="SummaryView__sentence-container">
-                    <p className="SummaryView__sentence">{sentence}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
+              availableSentences.length > 0 ? (
+                <div className="SummaryView__card SummaryView__card--available-sentences">
+                  {availableSentences.map((sentence, index) => (
+                    <div key={index} className="SummaryView__sentence-container">
+                      <p className="SummaryView__sentence">{sentence}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="SummaryView__card SummaryView__card--empty">
+                  <p className="SummaryView__empty-message">No memories yet</p>
+                </div>
+              )
+            ) : summaries.length > 0 ? (
               summaries.map((summary, index) => {
                 const response = responses[summary.responseId];
                 const characterProfiles =
@@ -216,6 +220,10 @@ const SummaryView: React.FC = () => {
                   </div>
                 );
               })
+            ) : (
+              <div className="SummaryView__card SummaryView__card--empty">
+                <p className="SummaryView__empty-message">No memories yet</p>
+              </div>
             )}
           </div>
         </div>
