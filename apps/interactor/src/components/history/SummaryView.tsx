@@ -44,7 +44,7 @@ const EditSentenceModal: React.FC<{
           ]}
         />
         <div className="EditSentenceModal__characters-container">
-          <span className="EditSentenceModal__characters-label">Characters affected:</span>
+          <span className="EditSentenceModal__characters-label">Characters</span>
           <div className="EditSentenceModal__characters">
             {characters.map((character) => (
               <CharacterAvatar key={character.id} character={character} />
@@ -97,7 +97,7 @@ const SummaryView: React.FC = () => {
   const availableSentences = useAppSelector((state) =>
     selectAvailableSummarySentences(state, [selectedCharacterId], 32000),
   );
-  const [activeTab, setActiveTab] = useState<'current' | 'used'>('used');
+  const [activeTab, setActiveTab] = useState<'used' | 'all'>('used');
   const [editingSentence, setEditingSentence] = useState<{
     sentence: string;
     importance: number;
@@ -132,76 +132,94 @@ const SummaryView: React.FC = () => {
         selectedCharacterId={selectedCharacterId}
         onSelect={setSelectedCharacterId}
       />
-      <div className="SummaryView__tabs">
-        <button
-          className={`SummaryView__tab ${activeTab === 'used' ? 'SummaryView__tab--active' : ''}`}
-          onClick={() => setActiveTab('used')}
-        >
-          Used Memories
-        </button>
-        <button
-          className={`SummaryView__tab ${activeTab === 'current' ? 'SummaryView__tab--active' : ''}`}
-          onClick={() => setActiveTab('current')}
-        >
-          All Memories
-        </button>
-      </div>
-      {activeTab === 'used' ? (
-        <div className="SummaryView__used-summaries scrollbar">
-          {availableSentences.map((sentence, index) => (
-            <div key={index} className="SummaryView__used-sentence">
-              {sentence}
-            </div>
-          ))}
+      <div className="SummaryView__content">
+        <div className="SummaryView__tabs">
+          <button
+            className={`SummaryView__tab ${activeTab === 'used' ? 'SummaryView__tab--active' : ''}`}
+            onClick={() => setActiveTab('used')}
+          >
+            Used Memories
+          </button>
+          <button
+            className={`SummaryView__tab ${activeTab === 'all' ? 'SummaryView__tab--active' : ''}`}
+            onClick={() => setActiveTab('all')}
+          >
+            All Memories
+          </button>
         </div>
-      ) : (
-        <div className="SummaryView__current-summaries">
-          <div className="SummaryView__importance-meter">
-            <span className="SummaryView__importance-meter-label">Importance:</span>
-            <div className="SummaryView__importance-meter-gradient"></div>
+        <div className="SummaryView__tab-content">
+          <div className="SummaryView__tab-content-header">
+            <p className="SummaryView__tab-description">
+              {activeTab === 'used'
+                ? 'Memories being used by the AI for this character. Important memories will be prioritized.'
+                : 'All memories available for this character.'}
+            </p>
+            {activeTab === 'all' ? (
+              <div className="SummaryView__importance-meter">
+                <span className="SummaryView__importance-meter-label">Importance:</span>
+                <div className="SummaryView__importance-meter-gradient"></div>
+              </div>
+            ) : (
+              <div></div>
+            )}
           </div>
           <div className="SummaryView__cards-container">
-            {summaries.map((summary, index) => {
-              const response = responses[summary.responseId];
-              const characterProfiles =
-                response?.characters.map((char) => {
-                  const character = characters.find((c) => c.id === char.characterId);
-                  return character?.profile_pic || '';
-                }) || [];
+            {activeTab === 'used' ? (
+              <div className="SummaryView__card SummaryView__card--available-sentences">
+                {availableSentences.map((sentence, index) => (
+                  <div key={index} className="SummaryView__sentence-container">
+                    <p className="SummaryView__sentence">{sentence}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              summaries.map((summary, index) => {
+                const response = responses[summary.responseId];
+                const characterProfiles =
+                  response?.characters.map((char) => {
+                    const character = characters.find((c) => c.id === char.characterId);
+                    return character?.profile_pic || '';
+                  }) || [];
 
-              return (
-                <div key={index} className="SummaryView__card">
-                  <div className="SummaryView__card-characters">
-                    {characterProfiles.map((profile, i) => (
-                      <img
-                        key={i}
-                        src={assetLinkLoader(profile, AssetDisplayPrefix.CHARACTER_PIC_SMALL)}
-                        alt="Character"
-                        className="SummaryView__card-character-image"
-                      />
+                return (
+                  <div key={index} className="SummaryView__card">
+                    <div className="SummaryView__card-characters">
+                      {characterProfiles.map((profile, i) => (
+                        <img
+                          key={i}
+                          src={assetLinkLoader(profile, AssetDisplayPrefix.CHARACTER_PIC_SMALL)}
+                          alt="Character"
+                          className="SummaryView__card-character-image"
+                        />
+                      ))}
+                    </div>
+                    {summary.sentences.map((sentence, sentenceIndex) => (
+                      <div key={sentenceIndex} className="SummaryView__sentence-container">
+                        <button
+                          className="SummaryView__edit-button"
+                          onClick={() =>
+                            handleEditSentence(
+                              sentence.sentence,
+                              sentence.importance,
+                              summary.responseId,
+                              sentenceIndex,
+                            )
+                          }
+                        >
+                          <FaPencilAlt />
+                        </button>
+                        <p className={`SummaryView__sentence SummaryView__sentence--importance-${sentence.importance}`}>
+                          {sentence.sentence}
+                        </p>
+                      </div>
                     ))}
                   </div>
-                  {summary.sentences.map((sentence, sentenceIndex) => (
-                    <div key={sentenceIndex} className="SummaryView__sentence-container">
-                      <button
-                        className="SummaryView__edit-button"
-                        onClick={() =>
-                          handleEditSentence(sentence.sentence, sentence.importance, summary.responseId, sentenceIndex)
-                        }
-                      >
-                        <FaPencilAlt />
-                      </button>
-                      <p className={`SummaryView__sentence SummaryView__sentence--importance-${sentence.importance}`}>
-                        {sentence.sentence}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
-      )}
+      </div>
       {editingSentence && (
         <EditSentenceModal
           sentence={editingSentence.sentence}

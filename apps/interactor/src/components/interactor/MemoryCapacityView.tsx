@@ -125,7 +125,7 @@ function FreeMemoryModal({ currentTokens }: { currentTokens: number }) {
 
   return (
     <Modal
-      opened={isMemoryModalOpen && isPremiumUser}
+      opened={isMemoryModalOpen && !isPremiumUser}
       className={`MemoryCapacityViewModal ${isMobileSize ? 'mobile-view__modal' : ''}`}
       onCloseModal={() => {
         dispatch(setMemoryCapacityModal(false));
@@ -216,7 +216,7 @@ const PremiumMemoryModal: React.FC<{
   return (
     <>
       <Modal
-        opened={isMemoryModalOpen && !isPremiumUser}
+        opened={isMemoryModalOpen && isPremiumUser}
         className={`PremiumMemoryModal`}
         onCloseModal={() => {
           dispatch(setMemoryCapacityModal(false));
@@ -251,9 +251,13 @@ const PremiumMemoryModal: React.FC<{
           />
         </div>
 
-        <div className="PremiumMemoryModal__summary-button">
-          <Button onClick={() => setShowSummaryModal(true)} theme="secondary">
-            View Summary
+        <div className={`PremiumMemoryModal__advanced-settings ${!usingSummary ? 'disabled' : ''}`}>
+          <div className="PremiumMemoryModal__advanced-settings-info">
+            <h4 className="PremiumMemoryModal__advanced-settings-title">Summary settings</h4>
+            <p className="PremiumMemoryModal__advanced-settings-description">Manage and edit character memories</p>
+          </div>
+          <Button onClick={() => setShowSummaryModal(true)} theme="secondary" disabled={!usingSummary}>
+            Manage Memories
           </Button>
         </div>
       </Modal>
@@ -350,7 +354,7 @@ export default function MemoryCapacityView() {
     trackEvent('memory-toggle-click');
   };
 
-  // if (!isProduction) return null;
+  if (!isProduction) return null;
   return (
     <>
       <FillBrain
