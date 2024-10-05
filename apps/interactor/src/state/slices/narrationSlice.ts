@@ -445,6 +445,19 @@ const narrationSlice = createSlice({
         response.summary = summary;
       }
     },
+    deleteSummarySentence(
+      state,
+      action: PayloadAction<{
+        responseId: string;
+        index: number;
+      }>,
+    ) {
+      const { responseId, index } = action.payload;
+      const response = state.responses[responseId];
+      if (response && response.summary) {
+        response.summary.sentences.splice(index, 1);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -478,6 +491,7 @@ export const {
   setSceneCreationSuggestionToCurrentResponse,
   updateSummarySentence,
   addSummary,
+  deleteSummarySentence,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { selectAllSumaries, selectCurrentScene, selectAvailableSummarySentences } from '../../state/selectors';
 import { Modal, Button, Slider, Input } from '@mikugg/ui-kit';
-import { updateSummarySentence } from '../../state/slices/narrationSlice';
+import { updateSummarySentence, deleteSummarySentence } from '../../state/slices/narrationSlice';
 import { FaPencilAlt } from 'react-icons/fa';
 import './SummaryView.scss';
 import { useAppContext } from '../../App.context';
@@ -14,13 +14,18 @@ const EditSentenceModal: React.FC<{
   importance: number;
   onClose: () => void;
   onSubmit: (sentence: string, importance: number) => void;
+  onDelete: () => void;
   characters: { id: string; name: string; profilePic: string }[];
-}> = ({ sentence, importance, onClose, onSubmit, characters }) => {
+}> = ({ sentence, importance, onClose, onSubmit, onDelete, characters }) => {
   const [editedSentence, setEditedSentence] = useState(sentence);
   const [editedImportance, setEditedImportance] = useState(importance);
 
   const handleSubmit = () => {
-    onSubmit(editedSentence, editedImportance);
+    if (editedSentence.trim() === '') {
+      onDelete();
+    } else {
+      onSubmit(editedSentence, editedImportance);
+    }
   };
 
   return (
@@ -44,7 +49,7 @@ const EditSentenceModal: React.FC<{
           ]}
         />
         <div className="EditSentenceModal__characters-container">
-          <span className="EditSentenceModal__characters-label">Characters</span>
+          <span className="EditSentenceModal__characters-label">Characters affected:</span>
           <div className="EditSentenceModal__characters">
             {characters.map((character) => (
               <CharacterAvatar key={character.id} character={character} />
@@ -56,7 +61,7 @@ const EditSentenceModal: React.FC<{
             Cancel
           </Button>
           <Button theme="secondary" onClick={handleSubmit}>
-            Modify
+            {editedSentence.trim() === '' ? 'Delete' : 'Modify'}
           </Button>
         </div>
       </div>
@@ -113,12 +118,33 @@ const SummaryView: React.FC = () => {
 
   const handleSubmitEdit = (sentence: string, importance: number) => {
     if (editingSentence) {
+      if (sentence.trim() === '') {
+        dispatch(
+          deleteSummarySentence({
+            responseId: editingSentence.responseId,
+            index: editingSentence.index,
+          }),
+        );
+      } else {
+        dispatch(
+          updateSummarySentence({
+            responseId: editingSentence.responseId,
+            index: editingSentence.index,
+            sentence,
+            importance,
+          }),
+        );
+      }
+      setEditingSentence(null);
+    }
+  };
+
+  const handleDeleteSentence = () => {
+    if (editingSentence) {
       dispatch(
-        updateSummarySentence({
+        deleteSummarySentence({
           responseId: editingSentence.responseId,
           index: editingSentence.index,
-          sentence,
-          importance,
         }),
       );
       setEditingSentence(null);
@@ -234,6 +260,7 @@ const SummaryView: React.FC = () => {
           importance={editingSentence.importance}
           onClose={() => setEditingSentence(null)}
           onSubmit={handleSubmitEdit}
+          onDelete={handleDeleteSentence}
           characters={sceneCharacters}
         />
       )}
