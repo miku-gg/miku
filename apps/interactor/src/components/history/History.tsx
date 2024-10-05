@@ -274,6 +274,8 @@ const HistoryModal = (): ReactElement => {
 
   return (
     <div className={`History__modal ${isMobileApp ? 'History__modal--mobile' : ''}`}>
+      {/* eslint-disable-next-line */}
+      {/* @ts-ignore */}
       <ReactFlow
         nodes={nodes}
         edges={edges}
