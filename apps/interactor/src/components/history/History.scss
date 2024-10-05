@@ -206,4 +206,28 @@
   &__edit-modal.Modal {
     overflow: visible;
   }
+
+  &__tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  &__tab {
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+
+    &:hover {
+      color: $secondary-color;
+    }
+
+    &--active {
+      color: $secondary-color;
+      border-bottom: 2px solid $secondary-color;
+    }
+  }
 }

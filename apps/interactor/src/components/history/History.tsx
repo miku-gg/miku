@@ -286,8 +286,6 @@ const HistoryModal = (): ReactElement => {
         }}
         attributionPosition="bottom-left"
         draggable={false}
-        /* eslint-disable-next-line */
-        /* @ts-ignore */
         nodeTypes={nodeTypes}
         onNodeClick={(_event, node) => {
           if (narration.responses[node.id]) {

@@ -1,0 +1,42 @@
+@import '../../variables';
+
+.CharacterAvatar {
+  display: flex;
+  align-items: center;
+  background-color: rgba($secondary-color, 0.1);
+  border-radius: 20px;
+  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  transition: all 0.2s ease-out;
+  user-select: none;
+
+  &__image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+  }
+
+  &__name {
+    font-size: 0.875rem;
+    color: $color-white;
+  }
+
+  &--hoverable {
+    &:hover {
+      background-color: rgba($secondary-color, 0.2);
+      opacity: 1;
+    }
+  }
+
+  &--clickable {
+    cursor: pointer;
+  }
+
+  &--selected {
+    background-color: rgba($secondary-color, 0.6);
+    opacity: 1;
+    &:hover {
+      background-color: rgba($secondary-color, 0.6);
+    }
+  }
+}
