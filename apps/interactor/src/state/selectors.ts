@@ -1,7 +1,7 @@
 import { EmotionTemplateSlug, NovelV3 } from '@mikugg/bot-utils';
 import { createSelector } from '@reduxjs/toolkit';
 import PromptBuilder from '../libs/prompts/PromptBuilder';
-import { RoleplayPromptStrategy } from '../libs/prompts/strategies';
+import { RoleplayPromptStrategy, tokenizeAndSum } from '../libs/prompts/strategies';
 import { NarrationInteraction, NarrationResponse } from './slices/narrationSlice';
 import { NovelCharacterOutfit, NovelScene } from './slices/novelSlice';
 import { RootState } from './store';
@@ -442,8 +442,8 @@ export const selectAvailableSummarySentences = createSelector(
   [selectAllSumaries, (_state: RootState, _characters: string[], maxPromptLength: number) => maxPromptLength],
   (summaries, maxPromptLength: number) => {
     const REST_PROMPT_LENGTH = Math.min(4096, maxPromptLength);
-    const TOKENS_PER_SENTENCE = 15;
-    const maxSentences = Math.floor((maxPromptLength - REST_PROMPT_LENGTH) / TOKENS_PER_SENTENCE);
+    const OFFSET_TOKENS = 30;
+    const maxTokens = maxPromptLength - REST_PROMPT_LENGTH - OFFSET_TOKENS;
 
     const allSentences: { sentence: string; importance: number; isLast: boolean }[] = [];
 
@@ -451,8 +451,9 @@ export const selectAvailableSummarySentences = createSelector(
       const isLast = index === summaries.length - 1;
       summary?.sentences.forEach((s) => allSentences.push({ ...s, isLast }));
     });
+    let summariesTokens = tokenizeAndSum(summaries.map((s) => s.sentences.join('\n')).join('\n'));
 
-    if (allSentences.length > maxSentences) {
+    if (summariesTokens > maxTokens) {
       const removalOrder = [
         { importance: 1, isLast: false },
         { importance: 2, isLast: false },
@@ -467,12 +468,14 @@ export const selectAvailableSummarySentences = createSelector(
       ];
 
       for (const { importance, isLast } of removalOrder) {
-        while (allSentences.length > maxSentences) {
+        summariesTokens = tokenizeAndSum(allSentences.map((s) => s.sentence).join('\n'));
+        while (summariesTokens > maxTokens) {
           const index = allSentences.findIndex((s) => s.importance === importance && s.isLast === isLast);
           if (index === -1) break;
           allSentences.splice(index, 1);
         }
-        if (allSentences.length <= maxSentences) break;
+        summariesTokens = tokenizeAndSum(allSentences.map((s) => s.sentence).join('\n'));
+        if (summariesTokens <= maxTokens) break;
       }
     }
 

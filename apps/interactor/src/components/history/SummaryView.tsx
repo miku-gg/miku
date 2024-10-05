@@ -8,6 +8,7 @@ import './SummaryView.scss';
 import { useAppContext } from '../../App.context';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import CharacterAvatar from './CharacterAvatar';
+import { getExistingModelMetadata } from '../../libs/retrieveMetadata';
 
 const EditSentenceModal: React.FC<{
   sentence: string;
@@ -100,7 +101,11 @@ const SummaryView: React.FC = () => {
   const [selectedCharacterId, setSelectedCharacterId] = useState(sceneCharacters[0]?.id || '');
   const summaries = useAppSelector((state) => selectAllSumaries(state, [selectedCharacterId]));
   const availableSentences = useAppSelector((state) =>
-    selectAvailableSummarySentences(state, [selectedCharacterId], 32000),
+    selectAvailableSummarySentences(
+      state,
+      [selectedCharacterId],
+      getExistingModelMetadata(state.settings.model)?.secondary.truncation_length,
+    ),
   );
   const [activeTab, setActiveTab] = useState<'used' | 'all'>('used');
   const [editingSentence, setEditingSentence] = useState<{

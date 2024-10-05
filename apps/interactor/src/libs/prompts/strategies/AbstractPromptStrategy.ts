@@ -3,7 +3,7 @@ import { getInstructTemplateFromSlug, InstructTemplate, InstructTemplateSlug } f
 
 const cache: { [key: string]: number } = {};
 
-const memoizedTokenize = (line: string): number => {
+export const memoizedTokenize = (line: string): number => {
   if (line in cache) {
     return cache[line];
   }
@@ -13,7 +13,7 @@ const memoizedTokenize = (line: string): number => {
 };
 
 const TOKEN_OFFSET_CONSTANT = 10;
-function tokenizeAndSum(text: string): number {
+export function tokenizeAndSum(text: string): number {
   const lines = text.split('\n');
   const sum = lines.reduce((acc, line) => acc + memoizedTokenize(line), 0);
 
