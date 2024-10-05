@@ -7,6 +7,7 @@ import {
   NarrationResponse,
   continueResponse,
   characterResponseStart,
+  addSummary,
 } from '../slices/narrationSlice';
 import { RootState } from '../store';
 import textCompletion from '../../libs/textCompletion';
@@ -316,16 +317,39 @@ const interactionEffect = async (
     }
 
     try {
-      if (secondary.truncation_length > 7900 && messagesSinceLastSummary >= 40) {
+      const messagesSinceLastSummary = selectMessagesSinceLastSummary(state);
+      const currentInteraction = state.narration.interactions[currentResponseState.parentInteractionId || ''];
+      const previousInteraction = currentInteraction
+        ? state.narration.interactions[
+            state.narration.responses[currentInteraction.parentResponseId || '']?.parentInteractionId || ''
+          ]
+        : null;
+      const sceneChanged = previousInteraction && previousInteraction.sceneId !== currentInteraction?.sceneId;
+
+      if (secondary.truncation_length > 7900 && (messagesSinceLastSummary >= 40 || sceneChanged)) {
         const summaryPromptBuilder = new PromptBuilder<SummaryPromptStrategy>({
           maxNewTokens: 200,
           strategy: new SummaryPromptStrategy(secondary.strategy),
           truncationLength: secondary.truncation_length,
         });
+
+        const messagesToSummarize = Math.min(messagesSinceLastSummary, 60);
+        const sentencesToGenerate = Math.max(1, Math.floor(messagesToSummarize / 4));
+        let previousResponseState = state.narration.responses[currentInteraction?.parentResponseId || ''];
+        if (!previousResponseState || !currentInteraction) {
+          return;
+        }
+
         const prompt = summaryPromptBuilder.buildPrompt(
-          { state, characterIds: [currentCharacterResponse?.characterId || ''] },
-          Math.min(messagesSinceLastSummary, 60),
+          {
+            state,
+            characterIds: [currentCharacterResponse?.characterId || ''],
+            sentencesToGenerate,
+            excludeLastResponse: true,
+          },
+          messagesToSummarize,
         );
+
         const stream = textCompletion({
           serviceBaseUrl: servicesEndpoint,
           identifier,
@@ -335,18 +359,21 @@ const interactionEffect = async (
         });
 
         for await (const result of stream) {
-          currentResponseState = summaryPromptBuilder.completeResponse(currentResponseState, result, {
+          previousResponseState = summaryPromptBuilder.completeResponse(previousResponseState, result, {
             state,
             characterIds: [currentCharacterResponse?.characterId || ''],
+            sentencesToGenerate,
           });
         }
 
-        dispatch(
-          interactionSuccess({
-            ...currentResponseState,
-            completed: true,
-          }),
-        );
+        if (previousResponseState.summary) {
+          dispatch(
+            addSummary({
+              responseId: currentInteraction.parentResponseId || '',
+              summary: previousResponseState.summary,
+            }),
+          );
+        }
       }
     } catch (error) {
       console.log(error);

@@ -274,8 +274,6 @@ const HistoryModal = (): ReactElement => {
 
   return (
     <div className={`History__modal ${isMobileApp ? 'History__modal--mobile' : ''}`}>
-      {/* eslint-disable-next-line */}
-      {/* @ts-ignore */}
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -286,8 +284,6 @@ const HistoryModal = (): ReactElement => {
         }}
         attributionPosition="bottom-left"
         draggable={false}
-        /* eslint-disable-next-line */
-        /* @ts-ignore */
         nodeTypes={nodeTypes}
         onNodeClick={(_event, node) => {
           if (narration.responses[node.id]) {

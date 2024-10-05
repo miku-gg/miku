@@ -8,9 +8,10 @@ import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { setMemoryCapacityModal, setSummariesEnabled } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './MemoryCapacityView.scss';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { selectTokensCount } from '../../state/selectors';
 import { trackEvent } from '../../libs/analytics';
+import SummaryView from '../history/SummaryView';
 
 const REGULAR_USERS_TOKENS_CAPACITY = 4096;
 const PREMIUM_USERS_TOKENS_CAPACITY = 16384;
@@ -124,7 +125,7 @@ function FreeMemoryModal({ currentTokens }: { currentTokens: number }) {
 
   return (
     <Modal
-      opened={isMemoryModalOpen && !isPremiumUser}
+      opened={isMemoryModalOpen && isPremiumUser}
       className={`MemoryCapacityViewModal ${isMobileSize ? 'mobile-view__modal' : ''}`}
       onCloseModal={() => {
         dispatch(setMemoryCapacityModal(false));
@@ -210,44 +211,62 @@ const PremiumMemoryModal: React.FC<{
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const isMemoryModalOpen = useAppSelector((state) => state.settings.modals.memoryCapacity);
   const usingSummary = useAppSelector((state) => !!state.settings.summaries?.enabled);
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
 
   return (
-    <Modal
-      opened={isMemoryModalOpen && isPremiumUser}
-      className={`PremiumMemoryModal`}
-      onCloseModal={() => {
-        dispatch(setMemoryCapacityModal(false));
-      }}
-    >
-      <div className="MemoryCapacityView__modal-header">
-        <h3 className="MemoryCapacityView__modal-header_title">Memory Options</h3>
-        <p className="MemoryCapacityView__modal-header__subtitle">Configure how you want to use long term memory.</p>
-      </div>
+    <>
+      <Modal
+        opened={isMemoryModalOpen && !isPremiumUser}
+        className={`PremiumMemoryModal`}
+        onCloseModal={() => {
+          dispatch(setMemoryCapacityModal(false));
+        }}
+      >
+        <div className="MemoryCapacityView__modal-header">
+          <h3 className="MemoryCapacityView__modal-header_title">Memory Options</h3>
+          <p className="MemoryCapacityView__modal-header__subtitle">Configure how you want to use long term memory.</p>
+        </div>
 
-      <div className="PremiumMemoryModal__options">
-        <OptionButton
-          title="Standard mode"
-          description={['The AI stores the entire messages', 'Remembers the last 75 messages']}
-          isSelected={!usingSummary}
-          onClick={() => {
-            dispatch(setSummariesEnabled(false));
-            trackEvent('activate-standard-mode');
-          }}
-          currentTokens={currentTokensNoSummary}
-        />
-        <OptionButton
-          title="Summary mode"
-          description={['The AI summarizes old messages', 'Remembers the last 900 messages']}
-          isSelected={usingSummary}
-          onClick={() => {
-            dispatch(setSummariesEnabled(true));
-            trackEvent('activate-summary-mode');
-          }}
-          experimental
-          currentTokens={currentTokensSummary}
-        />
-      </div>
-    </Modal>
+        <div className="PremiumMemoryModal__options">
+          <OptionButton
+            title="Standard mode"
+            description={['The AI stores the entire messages', 'Remembers the last 75 messages']}
+            isSelected={!usingSummary}
+            onClick={() => {
+              dispatch(setSummariesEnabled(false));
+              trackEvent('activate-standard-mode');
+            }}
+            currentTokens={currentTokensNoSummary}
+          />
+          <OptionButton
+            title="Summary mode"
+            description={['The AI summarizes old messages', 'Remembers the last 900 messages']}
+            isSelected={usingSummary}
+            onClick={() => {
+              dispatch(setSummariesEnabled(true));
+              trackEvent('activate-summary-mode');
+            }}
+            experimental
+            currentTokens={currentTokensSummary}
+          />
+        </div>
+
+        <div className="PremiumMemoryModal__summary-button">
+          <Button onClick={() => setShowSummaryModal(true)} theme="secondary">
+            View Summary
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        opened={showSummaryModal}
+        onCloseModal={() => setShowSummaryModal(false)}
+        title="Memories"
+        className="SummaryViewModal"
+      >
+        <SummaryView />
+      </Modal>
+    </>
   );
 };
 
@@ -331,7 +350,7 @@ export default function MemoryCapacityView() {
     trackEvent('memory-toggle-click');
   };
 
-  if (!isProduction) return null;
+  // if (!isProduction) return null;
   return (
     <>
       <FillBrain

@@ -14,6 +14,8 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
   {
     state: RootState;
     characterIds: string[];
+    sentencesToGenerate: number;
+    excludeLastResponse?: boolean;
   },
   NarrationResponse
 > {
@@ -54,6 +56,8 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
     input: {
       state: RootState;
       characterIds: string[];
+      sentencesToGenerate: number;
+      excludeLastResponse?: boolean;
     },
   ): {
     template: string;
@@ -72,11 +76,13 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
       });
 
     let template = this.getContextPrompt();
-    template += this.getDialogueHistoryPrompt(input.state, memorySize, currentCharacters);
-    template += `${INPUT_END}${OUTPUT_START}Summary of the story, in chronologial order, in 10 sentences:\nCHARACTERS: ${currentCharacters
-      .map((c) => c.name)
-      .join(', ')} and ${input.state.settings.user.name}.`;
-    for (let i = 0; i < 10; i++) {
+    template += this.getDialogueHistoryPrompt(input.state, memorySize, currentCharacters, input.excludeLastResponse);
+    template += `${INPUT_END}${OUTPUT_START}Summary of the story, in chronological order, in ${
+      input.sentencesToGenerate
+    } sentences:\nCHARACTERS: ${currentCharacters.map((c) => c.name).join(', ')} and ${
+      input.state.settings.user.name
+    }.`;
+    for (let i = 0; i < input.sentencesToGenerate; i++) {
       template += `\n{{GEN text_${i} max_tokens=${maxNewTokens} stop=[".","\\n","("]}} (importance={{GEN importance_${i} max_tokens=1 stop=")"}})`;
     }
 
@@ -102,6 +108,8 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
     _input: {
       state: RootState;
       characterIds: string[];
+      sentencesToGenerate: number;
+      excludeLastResponse?: boolean;
     },
     response: NarrationResponse,
     variables: Map<string, string>,
@@ -132,13 +140,15 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
       name: string;
       id: string;
     }[],
+    excludeLastResponse?: boolean,
   ): string {
     const messages = selectAllParentDialoguesWhereCharactersArePresent(
       state,
       currentCharacters?.map(({ id }) => id) || [],
     );
     let prompt = '';
-    for (const message of [...messages].reverse().slice(-maxLines)) {
+    const messagesToInclude = excludeLastResponse ? messages.slice(0, -1) : messages;
+    for (const message of [...messagesToInclude].reverse().slice(-maxLines)) {
       prompt += this.getDialogueLine(message);
     }
     return prompt;

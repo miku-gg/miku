@@ -415,6 +415,36 @@ const narrationSlice = createSlice({
         state.seenHints = [action.payload];
       }
     },
+    updateSummarySentence(
+      state,
+      action: PayloadAction<{
+        responseId: string;
+        index: number;
+        sentence: string;
+        importance: number;
+      }>,
+    ) {
+      const { responseId, index, sentence, importance } = action.payload;
+      const response = state.responses[responseId];
+      if (response && response.summary) {
+        response.summary.sentences[index] = { sentence, importance };
+      }
+    },
+    addSummary: (
+      state,
+      action: PayloadAction<{
+        responseId: string;
+        summary: {
+          sentences: NarrationSummarySentence[];
+        };
+      }>,
+    ) => {
+      const { responseId, summary } = action.payload;
+      const response = state.responses[responseId];
+      if (response) {
+        response.summary = summary;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -446,6 +476,8 @@ export const {
   setNextSceneToCurrentResponse,
   markHintSeen,
   setSceneCreationSuggestionToCurrentResponse,
+  updateSummarySentence,
+  addSummary,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;

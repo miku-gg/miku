@@ -415,15 +415,23 @@ export const selectMessagesSinceLastSummary = createSelector([selectAllParentDia
 });
 
 export const selectAllSumaries = createSelector(
-  [selectAllParentDialoguesWhereCharactersArePresent, (state: RootState) => state.narration.responses],
+  [
+    selectAllParentDialoguesWhereCharactersArePresent,
+    (state: RootState) => state.narration.responses,
+    (_state: RootState, characterIds: string[]) => characterIds,
+  ],
   (dialogues, responses) => {
     const summaries: {
+      responseId: string;
       sentences: NarrationSummarySentence[];
     }[] = [];
     dialogues.forEach((dialogue) => {
-      const summary = responses[dialogue.item.id]?.summary;
-      if (summary?.sentences.length) {
-        summaries.push(summary);
+      const response = responses[dialogue.item.id];
+      if (response?.summary?.sentences.length) {
+        summaries.push({
+          responseId: dialogue.item.id,
+          sentences: response.summary.sentences,
+        });
       }
     });
     return summaries;
