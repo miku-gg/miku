@@ -15,7 +15,7 @@ interface TextFormatterProps {
 
 interface TextElement {
   text: string;
-  type: 'dialogue' | 'description' | 'newline';
+  type: 'dialogue' | 'description' | 'paragraph' | 'newline';
 }
 
 const parseTextElements = (text: string): TextElement[] => {
@@ -25,9 +25,12 @@ const parseTextElements = (text: string): TextElement[] => {
 
   const flushBuffer = (endTag?: 'em' | 'q') => {
     if (buffer) {
-      let type: 'description' | 'dialogue' = 'description';
+      let type: 'description' | 'dialogue' | 'paragraph' = 'paragraph';
       if (stack.includes('q')) {
         type = 'dialogue';
+      }
+      if (stack.includes('em')) {
+        type = 'description';
       }
       elements.push({ text: buffer, type });
       buffer = '';
@@ -152,6 +155,8 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, childr
         return <em key={index}>{element.text}</em>;
       } else if (element.type === 'newline') {
         return <br key={index} />;
+      } else if (element.type === 'paragraph') {
+        return <p key={index}>{element.text}</p>;
       } else {
         return <span key={index}>{element.text}</span>;
       }
@@ -268,7 +273,13 @@ const VNStyleTextFormatter: React.FC<VNStyleTextFormatterProps> = ({ text, child
       {/* Display current element */}
       {currentElement && (
         <div className="TextFormatter__content">
-          {currentElement.type === 'dialogue' ? <q>{displayedText}</q> : <em>{displayedText}</em>}
+          {currentElement.type === 'dialogue' ? (
+            <q>{displayedText}</q>
+          ) : currentElement.type === 'description' ? (
+            <em>{displayedText}</em>
+          ) : (
+            <p>{displayedText}</p>
+          )}
         </div>
       )}
 
