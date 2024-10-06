@@ -14,6 +14,8 @@ import {
   setVoiceAutoplay,
   setVoiceId,
   setVoiceSpeed,
+  ResponseFormat,
+  setResponseFormat,
 } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './Settings.scss';
@@ -226,6 +228,23 @@ const Settings = (): JSX.Element => {
                       },
                     ]}
                   />
+                </div>
+              </div>
+              <div className="SettingsModal__response-format">
+                <p>Response Format</p>
+                <div className="SettingsModal__response-format-buttons">
+                  <button
+                    className={settings.text.responseFormat === ResponseFormat.FullText ? 'selected' : ''}
+                    onClick={() => dispatch(setResponseFormat(ResponseFormat.FullText))}
+                  >
+                    Full Text
+                  </button>
+                  <button
+                    className={settings.text.responseFormat === ResponseFormat.VNStyle ? 'selected' : ''}
+                    onClick={() => dispatch(setResponseFormat(ResponseFormat.VNStyle))}
+                  >
+                    VN Style
+                  </button>
                 </div>
               </div>
             </>

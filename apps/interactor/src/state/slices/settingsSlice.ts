@@ -5,6 +5,12 @@ export { FontSize, ModelType, Speed, Voices } from '../versioning';
 
 export type { SettingsState } from '../versioning';
 
+// Add the new ResponseFormat enum
+export enum ResponseFormat {
+  FullText = 'FullText',
+  VNStyle = 'VNStyle',
+}
+
 export const initialState: SettingsState = {
   model: ModelType.RP,
   user: {
@@ -26,6 +32,7 @@ export const initialState: SettingsState = {
     speed: Speed.Normal,
     fontSize: FontSize.Medium,
     autoContinue: false,
+    responseFormat: ResponseFormat.FullText, // Added this line
   },
   voice: {
     autoplay: false,
@@ -54,6 +61,7 @@ export const initialState: SettingsState = {
   summaries: {
     enabled: false,
   },
+  displayingLastSentence: false,
 };
 
 export const settingSlice = createSlice({
@@ -156,6 +164,12 @@ export const settingSlice = createSlice({
       state.user.sceneSuggestionsLeft = action.payload.sceneSuggestionsLeft;
       state.user.isTester = action.payload.isTester;
     },
+    setResponseFormat: (state, action: PayloadAction<ResponseFormat>) => {
+      state.text.responseFormat = action.payload;
+    },
+    setDisplayingLastSentence: (state, action: PayloadAction<boolean>) => {
+      state.displayingLastSentence = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -193,6 +207,8 @@ export const {
   setSummariesEnabled,
   userDataFetchStart,
   userDataFetchEnd,
+  setResponseFormat,
+  setDisplayingLastSentence,
 } = settingSlice.actions;
 
 export default settingSlice.reducer;

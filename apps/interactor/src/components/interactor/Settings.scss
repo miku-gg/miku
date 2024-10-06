@@ -148,4 +148,36 @@ $flex-wrap-gap: 10px;
     align-items: center;
     flex-wrap: wrap;
   }
+
+  &__response-format {
+    padding: $padding-standard;
+    background-color: $primary-background-color;
+    border-radius: $border-radius;
+    margin: $margin;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $gap;
+
+    &-buttons {
+      display: flex;
+      gap: $gap;
+
+      button {
+        padding: 0.5rem 1rem;
+        border: none;
+        background-color: $secondary-background-color;
+        color: $font-color-light-gray;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        border-radius: $border-radius;
+
+        &.selected {
+          background-color: $primary-color;
+          color: white;
+        }
+      }
+    }
+  }
 }

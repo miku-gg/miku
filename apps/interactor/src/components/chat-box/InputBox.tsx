@@ -14,6 +14,7 @@ import { ResponseSuggestionPromptStrategy } from '../../libs/prompts/strategies/
 import textCompletion from '../../libs/textCompletion';
 import {
   ModelType,
+  ResponseFormat,
   setDebugModal,
   setModel,
   setModelSelectorModal,
@@ -23,7 +24,7 @@ import { Loader } from '../common/Loader';
 import './InputBox.scss';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
 
-const InputBox = (): JSX.Element | null => {
+const InputBox = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const { servicesEndpoint, isInteractionDisabled, apiEndpoint } = useAppContext();
 
@@ -41,10 +42,9 @@ const InputBox = (): JSX.Element | null => {
   const lastResponse = useAppSelector(selectLastLoadedResponse);
   const suggestions = useAppSelector((state) => state.narration.input.suggestions);
   const [isAutocompleteLoading, setIsAutocompleteLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    dispatch(userDataFetchStart({ apiEndpoint }));
-  }, [apiEndpoint]);
+  const displayingLastSentence = useAppSelector(
+    (state) => state.settings.displayingLastSentence && state.settings.text.responseFormat === ResponseFormat.VNStyle,
+  );
 
   const sendMessage = (text: string) => {
     if (isInteractionDisabled) {
@@ -126,6 +126,7 @@ const InputBox = (): JSX.Element | null => {
       if (first) newSuggestions.push(first);
       dispatch(setSuggestions(newSuggestions));
       dispatch(setInputText(newSuggestions[0]));
+      TextAreaRowCalculator(newSuggestions[0]);
       return;
     }
     setIsAutocompleteLoading(true);
@@ -151,6 +152,7 @@ const InputBox = (): JSX.Element | null => {
       }
       dispatch(setInputText(response[0]));
       dispatch(setSuggestions(response));
+      TextAreaRowCalculator(response[0]);
       setIsAutocompleteLoading(false);
     } catch (err) {
       setIsAutocompleteLoading(false);
@@ -171,15 +173,40 @@ const InputBox = (): JSX.Element | null => {
     TextAreaRowCalculator(value);
   };
 
+  useEffect(() => {
+    dispatch(userDataFetchStart({ apiEndpoint }));
+  }, [apiEndpoint]);
+
+  useEffect(() => {
+    if (!text.length) {
+      TextAreaRowCalculator(text);
+    }
+  }, [text]);
+
   return (
-    <div className={`InputBox ${isMobileApp ? 'IsMobileApp' : ''}`}>
-      <form
-        className={classNames({
-          InputBox__form: true,
-          'InputBox__form--disabled': disabled,
-        })}
-        onSubmit={onSubmit}
-      >
+    <div
+      className={classNames({
+        InputBox: true,
+        'InputBox--disabled': disabled || displayingLastSentence,
+        isMobileApp: isMobileApp,
+      })}
+    >
+      <form className="InputBox__form" onSubmit={onSubmit}>
+        <button
+          className={classNames({
+            'InputBox__suggestion-trigger': true,
+            'InputBox__suggestion-trigger--disabled': disabled || displayingLastSentence,
+            'InputBox__suggestion-trigger--generated': suggestions.length > 0,
+          })}
+          disabled={disabled || displayingLastSentence || isAutocompleteLoading}
+          data-tooltip-id={`suggestion-tooltip`}
+          data-tooltip-html={!suggestions.length ? 'Autocomplete' : ''}
+          data-tooltip-varaint="light"
+          onClick={onAutocomplete}
+        >
+          {isAutocompleteLoading ? <Loader /> : <GiFeather />}
+        </button>
+
         <textarea
           className="InputBox__input scrollbar"
           value={text}
@@ -193,22 +220,10 @@ const InputBox = (): JSX.Element | null => {
           rows={textAreaRows <= 3 ? textAreaRows : 3}
           placeholder="Type a message..."
           ref={textAreaRef}
+          disabled={disabled || displayingLastSentence}
         />
-        <button
-          className={classNames({
-            'InputBox__suggestion-trigger': true,
-            'InputBox__suggestion-trigger--disabled': disabled,
-            'InputBox__suggestion-trigger--generated': suggestions.length > 0,
-          })}
-          disabled={disabled || isAutocompleteLoading}
-          data-tooltip-id={`suggestion-tooltip`}
-          data-tooltip-html={!suggestions.length ? 'Autocomplete' : ''}
-          data-tooltip-varaint="light"
-          onClick={onAutocomplete}
-        >
-          {isAutocompleteLoading ? <Loader /> : <GiFeather />}
-        </button>
-        <button className="InputBox__submit" disabled={disabled}>
+
+        <button className="InputBox__submit" disabled={disabled || displayingLastSentence}>
           <FaPaperPlane />
         </button>
       </form>

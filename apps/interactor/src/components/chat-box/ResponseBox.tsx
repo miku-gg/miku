@@ -25,9 +25,9 @@ import {
   selectCharacterOfResponse,
   swipeResponse,
 } from '../../state/slices/narrationSlice';
-import { setEditModal, setIsDraggable } from '../../state/slices/settingsSlice';
+import { ResponseFormat, setEditModal, setIsDraggable } from '../../state/slices/settingsSlice';
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
-import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter';
+import { TextFormatter, TextFormatterStatic } from '../common/TextFormatter';
 import './ResponseBox.scss';
 import TTSPlayer from './TTSPlayer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
@@ -50,6 +50,7 @@ const ResponseBox = (): JSX.Element | null => {
   const displayCharacterData = characters.find((c) => c.id === displayCharacter.id);
   const displayText = useFillTextTemplate(displayCharacter.text, displayCharacterData?.name || '');
   const { isMobileApp } = useAppContext();
+  const responseFormat = useAppSelector((state) => state.settings.text.responseFormat);
 
   const handleRegenerateClick = () => {
     trackEvent('interaction_regenerate');
@@ -113,8 +114,29 @@ const ResponseBox = (): JSX.Element | null => {
 
   const isMobile = isMobileApp || window.innerWidth < 820;
 
+  const swipeButtons = swipes?.map((swipe) => {
+    if (!swipe?.id) return null;
+    return (
+      <button
+        className={`ResponseBox__swipe ${lastReponse?.id === swipe.id ? 'selected' : ''}`}
+        key={`swipe-${swipe.id}`}
+        onClick={() => dispatch(swipeResponse(swipe.id))}
+        disabled={disabled}
+      >
+        <IoIosBookmarks />
+      </button>
+    );
+  });
+
   return (
-    <div className={`ResponseBox ${isMobile ? 'MobileApp' : ''}`}>
+    <div
+      className={classNames({
+        ResponseBox: true,
+        MobileApp: isMobile,
+        'ResponseBox--has-swipes': (swipes?.length || 0) > 1,
+        'ResponseBox--vn-style': responseFormat === ResponseFormat.VNStyle,
+      })}
+    >
       {!isMobile ? (
         <button
           className={`ResponseBox__move ${isDraggable ? 'dragging' : ''}`}
@@ -143,6 +165,7 @@ const ResponseBox = (): JSX.Element | null => {
           />
         )}
       </div>
+
       {(scene?.characters.length || 0) > 1 ? (
         <div className="ResponseBox__characters">
           {[
@@ -213,23 +236,7 @@ const ResponseBox = (): JSX.Element | null => {
           </button>
         ) : null}
       </div>
-      {!disabled && (swipes?.length || 0) > 1 ? (
-        <div className="ResponseBox__swipes">
-          {swipes?.map((swipe) => {
-            if (!swipe?.id) return null;
-            return (
-              <button
-                className={`ResponseBox__swipe ${lastReponse?.id === swipe.id ? 'selected' : ''}`}
-                key={`swipe-${swipe.id}`}
-                onClick={() => dispatch(swipeResponse(swipe.id))}
-                disabled={disabled}
-              >
-                <IoIosBookmarks />
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
+      {!disabled && (swipes?.length || 0) > 1 ? <div className="ResponseBox__swipes">{swipeButtons}</div> : null}
     </div>
   );
 };

@@ -1,3 +1,15 @@
+$primary-background-color: #ffffff11;
+$secondary-background-color: #ffffff22;
+$primary-color: #9747ff;
+$secondary-color: #5f6388;
+$font-color-light-gray: lightgray;
+$font-size-small: 0.8rem;
+$border-radius: 8px;
+$gap: 10px;
+$margin: 0 0 15px 0;
+$padding-standard: 20px 15px;
+$flex-wrap-gap: 10px;
+
 .TextFormatter {
   text-align: left;
   height: 100%;
@@ -12,5 +24,61 @@
 
   &--large {
     font-size: 1.4rem;
+  }
+
+  &__advance-button,
+  &__back-button {
+    position: absolute;
+    bottom: 1rem;
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 24px;
+      height: 24px;
+      fill: $font-color-light-gray;
+      transition: fill, filter 0.2s ease-in-out;
+    }
+
+    &:hover {
+      svg {
+        fill: $primary-color;
+      }
+    }
+  }
+
+  &__advance-button {
+    right: 1rem;
+    animation: pulse 2s infinite;
+  }
+
+  &__back-button {
+    left: 1rem;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+}
+
+.TextFormatter__back-button {
+  svg {
+    transform: scaleX(-1);
   }
 }

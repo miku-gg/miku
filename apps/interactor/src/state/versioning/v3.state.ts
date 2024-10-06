@@ -131,6 +131,7 @@ export interface SettingsState {
     speed: Speed;
     fontSize: FontSize;
     autoContinue: boolean;
+    responseFormat: string;
   };
   voice: {
     autoplay: boolean;
@@ -159,6 +160,7 @@ export interface SettingsState {
   summaries?: {
     enabled: boolean;
   };
+  displayingLastSentence: boolean;
 }
 
 export const VersionId = 'v3';
