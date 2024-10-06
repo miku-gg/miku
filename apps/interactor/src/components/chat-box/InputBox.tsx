@@ -14,6 +14,7 @@ import { ResponseSuggestionPromptStrategy } from '../../libs/prompts/strategies/
 import textCompletion from '../../libs/textCompletion';
 import {
   ModelType,
+  ResponseFormat,
   setDebugModal,
   setModel,
   setModelSelectorModal,
@@ -41,7 +42,9 @@ const InputBox = (): JSX.Element => {
   const lastResponse = useAppSelector(selectLastLoadedResponse);
   const suggestions = useAppSelector((state) => state.narration.input.suggestions);
   const [isAutocompleteLoading, setIsAutocompleteLoading] = useState<boolean>(false);
-  const displayingLastSentence = useAppSelector((state) => state.settings.displayingLastSentence);
+  const displayingLastSentence = useAppSelector(
+    (state) => state.settings.displayingLastSentence && state.settings.text.responseFormat === ResponseFormat.VNStyle,
+  );
 
   const sendMessage = (text: string) => {
     if (isInteractionDisabled) {

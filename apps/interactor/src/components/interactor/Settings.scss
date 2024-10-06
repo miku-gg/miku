@@ -169,6 +169,7 @@ $flex-wrap-gap: 10px;
         color: $font-color-light-gray;
         cursor: pointer;
         transition: all 0.2s ease-in-out;
+        border-radius: $border-radius;
 
         &.selected {
           background-color: $primary-color;

@@ -99,23 +99,32 @@ const useAnimatedText = (text: string) => {
   const speed = useAppSelector((state) => state.settings.text.speed);
   const [displayedText, setDisplayedText] = useState('');
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const previousTextRef = useRef('');
+
+  useEffect(() => {
+    if (text.startsWith(previousTextRef.current)) {
+      // If the new text is an extension of the previous text,
+      // continue from where we left off
+      setCurrentCharIndex(previousTextRef.current.length);
+      setDisplayedText(previousTextRef.current);
+    } else {
+      // If it's a completely new text, reset animation
+      setDisplayedText('');
+      setCurrentCharIndex(0);
+    }
+    previousTextRef.current = text;
+  }, [text]);
 
   useEffect(() => {
     if (currentCharIndex < text.length) {
       const timer = setTimeout(() => {
-        setDisplayedText((prev) => prev + text[currentCharIndex]);
+        setDisplayedText(() => text.slice(0, currentCharIndex + 1));
         setCurrentCharIndex(currentCharIndex + 1);
       }, SpeedToMs.get(speed) || 20);
 
       return () => clearTimeout(timer);
     }
   }, [currentCharIndex, text, speed]);
-
-  useEffect(() => {
-    // Reset when text changes
-    setDisplayedText('');
-    setCurrentCharIndex(0);
-  }, [text]);
 
   const isAnimationComplete = currentCharIndex >= text.length;
 
