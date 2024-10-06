@@ -209,6 +209,7 @@ export interface NovelState {
   tags: string[];
   logoPic: string;
   author: string;
+  language?: string;
   characters: NovelCharacter[];
   backgrounds: NovelBackground[];
   songs: NovelSong[];

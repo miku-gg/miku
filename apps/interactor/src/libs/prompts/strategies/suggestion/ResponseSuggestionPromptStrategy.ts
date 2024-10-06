@@ -3,6 +3,30 @@ import { selectChatHistory } from '../../../../state/selectors';
 import { RootState } from '../../../../state/store';
 
 export class ResponseSuggestionPromptStrategy extends AbstractPromptStrategy<RootState, string[]> {
+  protected getLabels(): Record<string, string> {
+    const labels: Record<string, Record<string, string>> = {
+      en: {
+        writing_assistant_intro:
+          'You are a writing assistant that will help you write a story. You suggest replies to a conversation.',
+        suggest_replies:
+          'Suggest 3 possible reply Smart/Funny/Flirty dialogs from {{user}} to continue the conversation. They MUST BE ONE SENTENCE EACH.',
+      },
+      es: {
+        // Spanish translations
+      },
+      fr: {
+        // French translations
+      },
+    };
+
+    return labels[this.language] || labels['en'];
+  }
+
+  protected i18n(labelKey: string): string {
+    const labels = this.getLabels();
+    return labels[labelKey] || labelKey;
+  }
+
   public buildGuidancePrompt(
     maxNewTokens: number,
     memorySize: number,

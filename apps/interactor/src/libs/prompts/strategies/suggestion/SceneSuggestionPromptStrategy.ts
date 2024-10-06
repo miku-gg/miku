@@ -12,6 +12,29 @@ export class SceneSuggestionPromptStrategy extends AbstractPromptStrategy<
     sdPrompt: string;
   }[]
 > {
+  protected getLabels(): Record<string, string> {
+    const labels: Record<string, Record<string, string>> = {
+      en: {
+        scene_suggestion_intro: "You're a writing assistant that will suggest possible next scenarios for a story.",
+        scene_suggestion_instructions:
+          'Given an input of the current scene and conversation, you MUST suggest 3 possible next scenes...',
+      },
+      es: {
+        // Spanish translations
+      },
+      fr: {
+        // French translations
+      },
+    };
+
+    return labels[this.language] || labels['en'];
+  }
+
+  protected i18n(labelKey: string): string {
+    const labels = this.getLabels();
+    return labels[labelKey] || labelKey;
+  }
+
   public buildGuidancePrompt(
     maxNewTokens: number,
     memorySize: number,
@@ -29,12 +52,11 @@ export class SceneSuggestionPromptStrategy extends AbstractPromptStrategy<
     const characters = selectCharactersInCurrentScene(state);
     const scene = selectCurrentScene(state);
     const { BOS, SYSTEM_START, SYSTEM_END, INPUT_START, INPUT_END, OUTPUT_START, OUTPUT_END } = this.instructTemplate;
-    let template = `${BOS}${SYSTEM_START}You're a writing assistant that will suggest possible next scenarios for a story.\n`;
+    let template = `${BOS}${SYSTEM_START}${this.i18n('scene_suggestion_intro')}\n`;
+    template += `${this.i18n('scene_suggestion_instructions')}\n`;
     if (singleScenePrompt) {
-      template += `Given an input of the current scene and conversation. You MUST suggest a possible next scene, describe a text explaining what should happen next.\n`;
       template += `The scene MUST indicate a change in the background, so you MUST describe a different environment.\n`;
     } else {
-      template += `Given an input of the current scene and conversation. You MUST suggest 3 possible next scenes, describe a text explaining what should happen next. Also, describe an "action" for a button that the user can click.\n`;
       template += `Each of the 3 scenes MUST indicate a change in the background, so you MUST describe a different environment.\n`;
     }
 

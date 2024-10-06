@@ -25,10 +25,15 @@ export abstract class AbstractPromptStrategy<Input, Output> {
   // @ts-ignore
   private tokenizer: Tokenizer;
   protected instructTemplate: InstructTemplate;
+  protected language: string; // Added language property
 
-  constructor(_instructTemplate: InstructTemplateSlug = 'chatml') {
+  constructor(
+    _instructTemplate: InstructTemplateSlug = 'chatml',
+    language: string = 'en', // Added language parameter with default 'en'
+  ) {
     this.tokenizer = mistralTokenizer;
     this.instructTemplate = getInstructTemplateFromSlug(_instructTemplate);
+    this.language = language;
   }
   public abstract buildGuidancePrompt(
     maxNewTokens: number,
@@ -51,4 +56,8 @@ export abstract class AbstractPromptStrategy<Input, Output> {
     const _template = template.replace(/{{.*?}}/g, '');
     return tokenizeAndSum(_template) + maxTokens;
   }
+
+  protected abstract i18n(labelKey: string, replacements?: string[]): string;
+
+  protected abstract getLabels(): Record<string, string>;
 }
