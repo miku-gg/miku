@@ -2,6 +2,7 @@
 
 .InputBox {
   display: flex;
+  align-items: center;
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-end;
@@ -13,17 +14,17 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    gap: 0.5rem;
     position: relative;
     border: 1px solid transparent;
     outline: none;
     background-color: transparent;
     box-shadow: none;
     border-radius: 0;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
     overflow-x: clip;
     transition: all 0.2s ease-out;
     z-index: 1;
+    align-items: flex-start;
 
     &::placeholder {
       font-style: italic;
@@ -60,11 +61,12 @@
     scrollbar-width: auto;
     font-family: 'Courier New', Courier, monospace;
     color: $text-1;
+    order: 2;
+    flex: 1;
     // font-style: italic;
   }
 
   &__submit,
-  &__inventory,
   &__suggestion-trigger {
     background-color: transparent;
     outline: none;
@@ -76,6 +78,7 @@
     z-index: 1;
     display: inline-flex;
     align-items: center;
+    padding-top: 0.3rem;
 
     &:disabled {
       color: gray;
@@ -96,10 +99,16 @@
     width: 1.6rem;
     display: flex;
     justify-content: center;
+    order: 1;
 
     &--generated {
       color: $color-geen;
     }
+  }
+
+  &__submit {
+    order: 3;
+    margin-left: 0.5rem;
   }
 
   #inventory-tooltip,
@@ -107,6 +116,7 @@
     background-color: $text-3;
   }
 }
+
 .IsMobileApp {
   max-width: 75%;
 }

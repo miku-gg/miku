@@ -27,7 +27,7 @@ import {
 } from '../../state/slices/narrationSlice';
 import { setEditModal, setIsDraggable } from '../../state/slices/settingsSlice';
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
-import TextFormatter, { TextFormatterStatic } from '../common/TextFormatter';
+import { TextFormatter, TextFormatterStatic } from '../common/TextFormatter';
 import './ResponseBox.scss';
 import TTSPlayer from './TTSPlayer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
@@ -140,9 +140,11 @@ const ResponseBox = (): JSX.Element | null => {
                 </button>
               ) : null
             }
+            currentCharacter={displayCharacterData}
           />
         )}
       </div>
+
       {(scene?.characters.length || 0) > 1 ? (
         <div className="ResponseBox__characters">
           {[
