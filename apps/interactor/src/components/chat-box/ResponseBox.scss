@@ -256,6 +256,16 @@
       opacity: 0.9;
     }
   }
+
+  &--vn-style {
+    .ResponseBox__text {
+      // text space between letters
+      // letter-spacing: 0.1rem;
+
+      // background: radial-gradient(circle, rgba(#171717, 0.9) 30%, rgba(#171717, 0) 100%);
+      backdrop-filter: blur(4px);
+    }
+  }
 }
 
 .MobileApp {

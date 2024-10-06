@@ -2,6 +2,7 @@ import React from 'react';
 import { useAppContext } from '../../App.context';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import './CharacterAvatar.scss';
+import classNames from 'classnames';
 
 interface CharacterAvatarProps {
   character: {
@@ -12,16 +13,21 @@ interface CharacterAvatarProps {
   hoverable?: boolean;
   onClick?: () => void;
   selected?: boolean;
+  theme?: 'vn';
 }
 
-const CharacterAvatar: React.FC<CharacterAvatarProps> = ({ character, hoverable, onClick, selected }) => {
+const CharacterAvatar: React.FC<CharacterAvatarProps> = ({ character, hoverable, onClick, selected, theme }) => {
   const { assetLinkLoader } = useAppContext();
 
   return (
     <div
-      className={`CharacterAvatar ${hoverable ? 'CharacterAvatar--hoverable' : ''} ${
-        selected ? 'CharacterAvatar--selected' : ''
-      } ${onClick ? 'CharacterAvatar--clickable' : ''}`}
+      className={classNames({
+        CharacterAvatar: true,
+        'CharacterAvatar--hoverable': hoverable,
+        'CharacterAvatar--selected': selected,
+        'CharacterAvatar--clickable': onClick,
+        'CharacterAvatar--vn-style': theme === 'vn',
+      })}
       onClick={onClick}
     >
       <img

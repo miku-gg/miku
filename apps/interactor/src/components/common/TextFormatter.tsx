@@ -1,9 +1,8 @@
 import classNames from 'classnames';
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { GiFastForwardButton } from 'react-icons/gi';
-import CharacterAvatar from '../history/CharacterAvatar';
 import { useAppDispatch, useAppSelector } from '../../state/store';
-import { FontSize, NovelCharacter, Speed } from '../../state/versioning';
+import { FontSize, Speed } from '../../state/versioning';
 import { ShareConversation } from '../chat-box/ShareConversation';
 import './TextFormatter.scss';
 import { ResponseFormat } from '../../state/slices/settingsSlice';
@@ -11,7 +10,6 @@ import { setDisplayingLastSentence } from '../../state/slices/settingsSlice';
 
 interface TextFormatterProps {
   text: string;
-  currentCharacter?: NovelCharacter;
   children?: React.ReactNode;
 }
 
@@ -188,11 +186,11 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, childr
   );
 };
 
-export const TextFormatter: React.FC<TextFormatterProps> = ({ text, children, currentCharacter }) => {
+export const TextFormatter: React.FC<TextFormatterProps> = ({ text, children }) => {
   const responseFormat = useAppSelector((state) => state.settings.text.responseFormat);
 
   if (responseFormat === ResponseFormat.VNStyle) {
-    return <VNStyleTextFormatter text={text} children={children} currentCharacter={currentCharacter} />;
+    return <VNStyleTextFormatter text={text} children={children} />;
   } else {
     return <TextFormatterStatic text={text} children={children} />;
   }
@@ -201,7 +199,7 @@ interface VNStyleTextFormatterProps extends TextFormatterProps {
   onIsLastElementChanged?: (isLastElement: boolean) => void;
 }
 
-const VNStyleTextFormatter: React.FC<VNStyleTextFormatterProps> = ({ text, children, currentCharacter }) => {
+const VNStyleTextFormatter: React.FC<VNStyleTextFormatterProps> = ({ text, children }) => {
   const fontSize = useAppSelector((state) => state.settings.text.fontSize);
   const dispatch = useAppDispatch();
 
@@ -258,20 +256,6 @@ const VNStyleTextFormatter: React.FC<VNStyleTextFormatterProps> = ({ text, child
         [`TextFormatter--large`]: FontSize.Large === fontSize,
       })}
     >
-      {/* CharacterAvatar at top left */}
-      {currentCharacter && (
-        <div className="TextFormatter__character-avatar">
-          <CharacterAvatar
-            character={{
-              id: currentCharacter.id,
-              name: currentCharacter.name,
-              profilePic: currentCharacter.profile_pic,
-            }}
-            hoverable={false}
-          />
-        </div>
-      )}
-
       {/* Display current element */}
       {currentElement && (
         <div className="TextFormatter__content">

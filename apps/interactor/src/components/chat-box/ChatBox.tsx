@@ -5,6 +5,7 @@ import { useAppSelector } from '../../state/store';
 import './ChatBox.scss';
 import InputBox from './InputBox';
 import ResponseBox from './ResponseBox';
+import { ResponseFormat } from '../../state/slices/settingsSlice';
 
 const ChatBox = (): JSX.Element | null => {
   const { isMobileApp } = useAppContext();
@@ -13,13 +14,18 @@ const ChatBox = (): JSX.Element | null => {
 
   const isDraggable = useAppSelector((state) => state.settings.chatBox.isDraggable);
   const centeredPositionX = (window.innerWidth - window.innerWidth * 0.75) / 2;
+  const isVnStyle = useAppSelector((state) => state.settings.text.responseFormat === ResponseFormat.VNStyle);
 
   const handleTouch = () => {
     const currentTime = new Date().getTime();
     const tapTimeDiff = currentTime - lastTapTime;
 
     if (tapTimeDiff < 300 && tapTimeDiff > 0) {
-      setIsExpanded(!isExpanded);
+      if (isVnStyle) {
+        setIsExpanded(false);
+      } else {
+        setIsExpanded(!isExpanded);
+      }
     }
 
     setLastTapTime(currentTime);
@@ -27,7 +33,7 @@ const ChatBox = (): JSX.Element | null => {
 
   if (isMobileApp || window.innerWidth < 820) {
     return (
-      <div className={`ChatBox ${isExpanded ? 'expanded' : ''}`} onTouchEnd={handleTouch}>
+      <div className={`ChatBox ${isExpanded && !isVnStyle ? 'expanded' : ''}`} onTouchEnd={handleTouch}>
         <ResponseBox />
         <InputBox />
       </div>

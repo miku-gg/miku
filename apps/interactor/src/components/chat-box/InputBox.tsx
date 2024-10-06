@@ -43,10 +43,6 @@ const InputBox = (): JSX.Element => {
   const [isAutocompleteLoading, setIsAutocompleteLoading] = useState<boolean>(false);
   const displayingLastSentence = useAppSelector((state) => state.settings.displayingLastSentence);
 
-  useEffect(() => {
-    dispatch(userDataFetchStart({ apiEndpoint }));
-  }, [apiEndpoint]);
-
   const sendMessage = (text: string) => {
     if (isInteractionDisabled) {
       toast.warn('Please log in to interact.', {
@@ -174,15 +170,25 @@ const InputBox = (): JSX.Element => {
     TextAreaRowCalculator(value);
   };
 
+  useEffect(() => {
+    dispatch(userDataFetchStart({ apiEndpoint }));
+  }, [apiEndpoint]);
+
+  useEffect(() => {
+    if (!text.length) {
+      TextAreaRowCalculator(text);
+    }
+  }, [text]);
+
   return (
-    <div className={`InputBox ${isMobileApp ? 'IsMobileApp' : ''}`}>
-      <form
-        className={classNames({
-          InputBox__form: true,
-          'InputBox__form--disabled': disabled || displayingLastSentence,
-        })}
-        onSubmit={onSubmit}
-      >
+    <div
+      className={classNames({
+        InputBox: true,
+        'InputBox--disabled': disabled || displayingLastSentence,
+        isMobileApp: isMobileApp,
+      })}
+    >
+      <form className="InputBox__form" onSubmit={onSubmit}>
         <button
           className={classNames({
             'InputBox__suggestion-trigger': true,

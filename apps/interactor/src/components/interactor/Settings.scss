@@ -154,10 +154,9 @@ $flex-wrap-gap: 10px;
     background-color: $primary-background-color;
     border-radius: $border-radius;
     margin: $margin;
-
-    p {
-      margin-bottom: $gap;
-    }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     &-buttons {
       display: flex;
@@ -169,6 +168,7 @@ $flex-wrap-gap: 10px;
         background-color: $secondary-background-color;
         color: $font-color-light-gray;
         cursor: pointer;
+        transition: all 0.2s ease-in-out;
 
         &.selected {
           background-color: $primary-color;

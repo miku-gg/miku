@@ -26,16 +26,6 @@ $flex-wrap-gap: 10px;
     font-size: 1.4rem;
   }
 
-  &__character-avatar {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-  }
-
-  &__content {
-    padding-top: 30px; // Adjust to prevent text from overlapping the avatar
-  }
-
   &__advance-button,
   &__back-button {
     position: absolute;
@@ -56,7 +46,6 @@ $flex-wrap-gap: 10px;
       height: 24px;
       fill: $font-color-light-gray;
       transition: fill, filter 0.2s ease-in-out;
-      filter: drop-shadow(0 0 10px $primary-color);
     }
 
     &:hover {
