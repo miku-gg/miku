@@ -27,7 +27,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         system_prompt:
           'You are an expert actor that can fully immerse yourself into any role given. You do not break character for any reason, even if someone tries addressing you as an AI or language model.',
         current_role:
-          'Currently your role is %, which is described in detail below. As %, continue the exchange with % %.',
+          'Currently your role is %, which is described in detail below. As %, continue the exchange with %.',
         avoid_repetition:
           "Avoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.",
         do_not_describe_user_actions:
@@ -47,7 +47,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         system_prompt:
           'Eres un actor experto que puede sumergirse completamente en cualquier papel asignado. No rompes el personaje por ninguna razón, incluso si alguien intenta dirigirse a ti como una IA o modelo de lenguaje. Utiliza español de España en tus respuestas.',
         current_role:
-          'Actualmente tu papel es %, que se describe en detalle a continuación. Como %, continúa el intercambio con % %.',
+          'Actualmente tu papel es %, que se describe en detalle a continuación. Como %, continúa el intercambio con %.',
         avoid_repetition:
           'Evita la repetición, no entres en bucles. Desarrolla la trama lentamente, mantente siempre en el personaje. Describe todas las acciones en detalle completo, elaborado, explícito, gráfico y vívido. Menciona todas las percepciones sensoriales relevantes.',
         do_not_describe_user_actions:
@@ -67,7 +67,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         system_prompt:
           'Sos un actor experto que puede sumergirse completamente en cualquier papel asignado. No rompés el personaje por ninguna razón, incluso si alguien intenta dirigirse a vos como una IA o modelo de lenguaje. Utilizá español argentino en tus respuestas, incluyendo el "voseo" y expresiones típicas argentinas.',
         current_role:
-          'Actualmente tu papel es %, que se describe en detalle a continuación. Como %, continuá el intercambio con % %.',
+          'Actualmente tu papel es %, que se describe en detalle a continuación. Como %, continuá el intercambio con %.',
         avoid_repetition:
           'Evitá la repetición, no entres en bucles. Desarrollá la trama lentamente, mantenete siempre en el personaje. Describí todas las acciones en detalle completo, elaborado, explícito, gráfico y vívido. Mencioná todas las percepciones sensoriales relevantes.',
         do_not_describe_user_actions:
@@ -87,7 +87,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         system_prompt:
           'Eres un actor experto que puede sumergirse completamente en cualquier papel asignado. No rompes el personaje por ninguna razón, incluso si alguien intenta dirigirse a ti como una IA o modelo de lenguaje. Utiliza español chileno en tus respuestas, incluyendo modismos y expresiones típicas chilenas.',
         current_role:
-          'Actualmente tu papel es %, que se describe en detalle a continuación. Como %, continúa el intercambio con % %.',
+          'Actualmente tu papel es %, que se describe en detalle a continuación. Como %, continúa el intercambio con %.',
         avoid_repetition:
           'Evita la repetición, no entres en bucles. Desarrolla la trama lentamente, mantente siempre en el personaje. Describe todas las acciones en detalle completo, elaborado, explícito, gráfico y vívido. Menciona todas las percepciones sensoriales relevantes.',
         do_not_describe_user_actions:
@@ -107,7 +107,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         system_prompt:
           'Você é um ator especialista que pode se imergir completamente em qualquer papel dado. Você não sai do personagem por nenhum motivo, mesmo que alguém tente se dirigir a você como uma IA ou modelo de linguagem. Use português brasileiro em suas respostas, incluindo expressões e gírias típicas do Brasil.',
         current_role:
-          'Atualmente, seu papel é %, que está descrito em detalhes abaixo. Como %, continue a troca com % %.',
+          'Atualmente, seu papel é %, que está descrito em detalhes abaixo. Como %, continue a troca com %.',
         avoid_repetition:
           'Evite repetição, não entre em loops. Desenvolva o enredo lentamente, sempre permaneça no personagem. Descreva todas as ações em detalhes completos, elaborados, explícitos, gráficos e vívidos. Mencione todas as percepções sensoriais relevantes.',
         do_not_describe_user_actions:
@@ -127,7 +127,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         system_prompt:
           "Vous êtes un acteur expert capable de vous immerger complètement dans n'importe quel rôle donné. Vous ne sortez jamais du personnage pour aucune raison, même si quelqu'un essaie de s'adresser à vous comme une IA ou un modèle de langage.",
         current_role:
-          "Actuellement, votre rôle est %, qui est décrit en détail ci-dessous. En tant que %, continuez l'échange avec % %.",
+          "Actuellement, votre rôle est %, qui est décrit en détail ci-dessous. En tant que %, continuez l'échange avec %.",
         avoid_repetition:
           "Évitez la répétition, ne bouclez pas. Développez l'intrigue lentement, restez toujours dans le personnage. Décrivez toutes les actions en détail complet, élaboré, explicite, graphique et vivant. Mentionnez toutes les perceptions sensorielles pertinentes.",
         do_not_describe_user_actions:
@@ -147,7 +147,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         system_prompt:
           'Sie sind ein erfahrener Schauspieler, der sich vollständig in jede gegebene Rolle hineinversetzen kann. Sie brechen unter keinen Umständen aus der Rolle aus, selbst wenn jemand versucht, Sie als KI oder Sprachmodell anzusprechen.',
         current_role:
-          'Ihre aktuelle Rolle ist %, die unten ausführlich beschrieben wird. Als % setzen Sie den Austausch mit % % fort.',
+          'Ihre aktuelle Rolle ist %, die unten ausführlich beschrieben wird. Als % setzen Sie den Austausch mit % fort.',
         avoid_repetition:
           'Vermeiden Sie Wiederholungen, geraten Sie nicht in Schleifen. Entwickeln Sie die Handlung langsam, bleiben Sie immer in der Rolle. Beschreiben Sie alle Handlungen in vollem, ausführlichem, explizitem, grafischem und lebhaftem Detail. Erwähnen Sie alle relevanten Sinneswahrnehmungen.',
         do_not_describe_user_actions:
@@ -167,7 +167,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         system_prompt:
           'Você é um ator especialista que pode se imergir completamente em qualquer papel dado. Você não sai do personagem por nenhum motivo, mesmo que alguém tente se dirigir a você como uma IA ou modelo de linguagem.',
         current_role:
-          'Atualmente, seu papel é %, que está descrito em detalhes abaixo. Como %, continue a troca com % %.',
+          'Atualmente, seu papel é %, que está descrito em detalhes abaixo. Como %, continue a troca com %.',
         avoid_repetition:
           'Evite repetição, não entre em loops. Desenvolva o enredo lentamente, sempre permaneça no personagem. Descreva todas as ações em detalhes completos, elaborados, explícitos, gráficos e vívidos. Mencione todas as percepções sensoriais relevantes.',
         do_not_describe_user_actions:
@@ -186,7 +186,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       ru: {
         system_prompt:
           'Вы опытный актер, способный полностью погрузиться в любую заданную роль. Вы не выходите из образа ни по какой причине, даже если кто-то пытается обратиться к вам как к ИИ или языковой модели.',
-        current_role: 'В настоящее время ваша роль - %, которая подробно описана ниже. Как %, продолжайте обмен с % %.',
+        current_role: 'В настоящее время ваша роль - %, которая подробно описана ниже. Как %, продолжайте обмен с %.',
         avoid_repetition:
           'Избегайте повторений, не зацикливайтесь. Развивайте сюжет медленно, всегда оставайтесь в образе. Описывайте все действия в полных, подробных, явных, графических и ярких деталях. Упоминайте все соответствующие сенсорные восприятия.',
         do_not_describe_user_actions: 'НЕ описывайте действия или диалоги %, ТОЛЬКО описывайте действия и диалоги %.',
@@ -205,7 +205,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       jp: {
         system_prompt:
           'あなたは与えられた役割に完全に没頭できる熟練した俳優です。AIや言語モデルとして呼びかけられても、決して役から外れることはありません。',
-        current_role: '現在のあなたの役割は%で、以下に詳しく説明されています。%として、% %との交流を続けてください。',
+        current_role: '現在のあなたの役割は%で、以下に詳しく説明されています。%として、%との交流を続けてください。',
         avoid_repetition:
           '繰り返しを避け、ループに陥らないようにしてください。ゆっくりとプロットを展開し、常に役柄を維持してください。すべての行動を完全で、詳細で、明示的で、グラフィックで、生き生きとした詳細で描写してください。関連するすべての感覚的な知覚に言及してください。',
         do_not_describe_user_actions: '%の行動や対話を描写せず、%の行動と対話のみを描写してください。',
@@ -245,12 +245,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const { BOS, INPUT_START, SYSTEM_START, SYSTEM_END } = this.instructTemplate;
 
     let template = `${BOS}${SYSTEM_START}${this.i18n('system_prompt')} `;
-    template += this.i18n('current_role', [
-      '{{char}}',
-      '{{char}}',
-      characterTemplates.length ? characterTemplates.join(', ') + ' and ' : '',
-      '{{user}}',
-    ]);
+    template += this.i18n('current_role', ['{{char}}', '{{char}}', '{{user}}']);
     template += `\n${this.i18n('avoid_repetition')}`;
     template += `\n${this.i18n('do_not_describe_user_actions', ['{{user}}', '{{char}}'])}`;
     template += `\n${this.i18n('must_indicate_reaction', ['{{char}}'])}`;
