@@ -57,7 +57,14 @@ export abstract class AbstractPromptStrategy<Input, Output> {
     return tokenizeAndSum(_template) + maxTokens;
   }
 
-  protected abstract i18n(labelKey: string, replacements?: string[]): string;
+  protected abstract getLabels(): Record<string, Record<string, string>>;
 
-  protected abstract getLabels(): Record<string, string>;
+  protected i18n(labelKey: string, replacements: string[] = []): string {
+    const labels = this.getLabels();
+    let text = labels[this.language]?.[labelKey] || labels['en']?.[labelKey] || labelKey;
+    replacements.forEach((replacement) => {
+      text = text.replace('%', replacement);
+    });
+    return text;
+  }
 }

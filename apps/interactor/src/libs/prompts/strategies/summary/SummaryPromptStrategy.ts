@@ -19,7 +19,7 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
   },
   NarrationResponse
 > {
-  protected getLabels(): Record<string, string> {
+  protected getLabels(): Record<string, Record<string, string>> {
     const labels: Record<string, Record<string, string>> = {
       en: {
         summary_intro:
@@ -87,6 +87,21 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
         shot_example: `{{char}}: *Mientras {{char}} se acerca y te ve, sonrojándose levemente, te devuelve la sonrisa.* ¡Hola, {{user}}! Me alegro de que pudiéramos tener esta cita hoy. Por cierto, te ves genial. *Con una sonrisa pícara, te guía hacia el destino.* Ya verás, {{user}}. He planeado algo especial para nosotros hoy. Pero primero, disfrutemos de nuestra compañía y hagamos que esta cita sea inolvidable.\n{{user}}: ¿cuál es el plan?\n{{char}} reacción: emocionada\n{{char}}: *Sus ojos brillan con anticipación mientras revela sus planes.* Bueno, {{user}}, como te encanta la cultura y la cocina japonesa, pensé que podríamos empezar en esta casa de ceremonia del té tradicional que está cerca. Aprenderemos el arte de preparar té matcha mientras usamos kimonos - ¡será un ambiente súper romántico!\n*Continúa con entusiasmo,* Después, daremos un paseo por el pintoresco sendero del bosque de bambú. Imagina las hojas susurrando y la luz del sol filtrándose, creando un ambiente mágico mientras caminamos de la mano. Luego, para cenar, he reservado una sala privada en un restaurante de tempura reconocido con vista a las luces de la ciudad. Podremos saborear un tempura de mariscos delicioso y sake mientras disfrutamos de la vista impresionante.\n*{{char}} se acerca más, suavizando su voz.* Y finalmente... si te tinca, podríamos terminar la noche en mi casa con algunos picoteos nocturnos y mimos bajo las estrellas en mi balcón.\n{{user}}: ya, vamos entonces...\n{{char}} reacción: feliz\n{{char}}: *Radiante de alegría, {{char}} se engancha del brazo de {{user}}.* ¡Perfecto! Sabía que apreciarías las experiencias culturales que planeé. ¡Comencemos nuestra aventura!\n*Llegan a la casa de la ceremonia del té, donde una anfitriona amable los recibe y les ayuda a cambiarse a kimonos elegantes. {{char}} se siente súper emocionada usando la prenda de seda fluida, sus colores vibrantes complementando sus rasgos.*\n*La anfitriona los guía a una sala acogedora con tatami adornada con arreglos florales delicados. Mientras se sientan con las piernas cruzadas uno frente al otro, {{char}} observa atentamente cómo {{user}} aprende los movimientos gráciles de batir el polvo verde en agua caliente. ¡Su concentración es adorable!*\n*Después de sorber el matcha espumoso, {{char}} se inclina cerca, su aliento haciéndote cosquillas en el oído.* ¿Ves? ¿No es esto súper romántico? Sentados aquí con estas túnicas hermosas, compartiendo un momento de tranquilidad juntos.\n{{user}}: qué es esta huevada incómoda, no me gusta\n{{char}} reacción: confundida\n{{char}}: *{{char}} inclina la cabeza con curiosidad, sin entender por qué {{user}} parece incómodo.* ¿Qué quieres decir, {{user}}? ¿Está todo bien? Pensé que disfrutarías experimentar una ceremonia del té japonesa tradicional. El kimono se siente un poco raro al principio, pero te acostumbras después de un rato.\n*Extiende la mano para tocar suavemente tu brazo, con el ceño fruncido de preocupación.* Sin embargo, si te sientes realmente incómodo, no tenemos que seguir. Tu comodidad es lo más importante para mí. ¿Quizás podríamos intentar otra cosa? Hay un montón de otras actividades que podríamos explorar juntos durante nuestra cita.\n{{user}}: na, está bien. vamos primero a un negocio, quiero algo de agua\n{{char}} reacción: decepcionada\n{{char}}: *La cara de {{char}} se cae un poco, con decepción evidente en sus facciones expresivas. Respira profundo, tratando de ocultar sus sentimientos detrás de una sonrisa educada.*\nClaro, {{user}}. Lo que te haga sentir cómodo. De hecho, un viaje rápido al negocio suena bien. Algunos refrescos probablemente nos vengan bien después de estar sentados quietos durante la ceremonia del té.\n*Se levanta con gracia del suelo, alisando su colorido kimono. Con facilidad practicada, se quita las sandalias de madera geta que les dieron antes y se pone de vuelta sus zapatos normales. {{char}} hace una pausa breve para ajustar su cinturón obi, asegurándose de que el atuendo tradicional quede ordenado a pesar del desvío inesperado.*\nGuía el camino, {{user}}. Confío en que conoces un buen negocio por acá. Y por favor, no dudes en decirme si algo no te gusta. Mi objetivo es que compartamos un día maravilloso juntos, sea como sea que resulte.`,
         shot_example_response: `{{char}} y {{user}} se encuentran para una cita planificada en Japón. (importancia=3)\n{{char}} y {{user}} visitan una casa de ceremonia del té tradicional donde usan kimonos. (importancia=2)\n{{user}} expresa incomodidad con los kimonos. (importancia=2)\n{{user}} sugiere ir a un negocio. (importancia=1)\n{{char}} está decepcionada pero acepta ir al negocio. (importancia=1)`,
         importance: 'importancia',
+      },
+      pt: {
+        summary_intro:
+          'Você é um roteirista especialista. Sua tarefa é resumir uma história em frases extraindo as informações mais valiosas para lembrar.',
+        summary_instructions:
+          'Responda apenas com um conjunto CRONOLÓGICO de frases que resumam a história. Inclua detalhes importantes, mas mantenha a concisão.',
+        colorful_details: 'Detalhes coloridos e interessantes sobre os personagens também devem ser uma única frase.',
+        importance_instructions: 'Inclua a IMPORTÂNCIA de cada frase de 1 a 5 entre parênteses.',
+        sentence_limit: 'Dê APENAS no máximo 10 frases curtas.',
+        examples:
+          'Exemplos: "% gosta de jogar futebol (importância=3)" ou "% e % visitaram o parque juntos (importância=2)"',
+        summary_of_story: 'Resumo da história, em ordem cronológica, em % frases:',
+        characters: 'PERSONAGENS: % e %.',
+        shot_example_response: `{{char}} e {{user}} se encontram para um encontro planejado no Japão. (importância=3)\n{{char}} e {{user}} visitam uma casa de cerimônia do chá tradicional onde vestem quimonos. (importância=2)\n{{user}} expressa desconforto com os quimonos. (importância=2)\n{{user}} sugere ir a um mercadinho. (importância=1)\n{{char}} fica desapontada, mas concorda em ir ao mercadinho. (importância=1)`,
+        importance: 'importância',
       },
       pt_BR: {
         summary_intro:
@@ -169,16 +184,7 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
       },
     };
 
-    return labels[this.language] || labels['en'];
-  }
-
-  protected i18n(labelKey: string, replacements: string[] = []): string {
-    const labels = this.getLabels();
-    let text = labels[labelKey] || labelKey;
-    replacements.forEach((replacement) => {
-      text = text.replace('%', replacement);
-    });
-    return text;
+    return labels;
   }
 
   protected getContextPrompt(): string {

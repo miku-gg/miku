@@ -21,7 +21,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   },
   NarrationResponse
 > {
-  protected getLabels(): Record<string, string> {
+  protected getLabels(): Record<string, Record<string, string>> {
     const labels: Record<string, Record<string, string>> = {
       en: {
         system_prompt:
@@ -222,16 +222,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       },
     };
 
-    return labels[this.language] || labels['en'];
-  }
-
-  protected i18n(labelKey: string, replacements: string[] = []): string {
-    const labels = this.getLabels();
-    let text = labels[labelKey] || labelKey;
-    replacements.forEach((replacement) => {
-      text = text.replace('%', replacement);
-    });
-    return text;
+    return labels;
   }
 
   protected getContextPrompt(state: RootState, currentCharacterId: string, maxTokens: number): string {
