@@ -18,6 +18,8 @@ import {
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './Settings.scss';
 import { trackEvent } from '../../libs/analytics';
+import { useEffect } from 'react';
+import { CustomEventType, postMessage } from '../../libs/stateEvents';
 const audio = new Audio();
 
 const Settings = (): JSX.Element => {
@@ -57,6 +59,10 @@ const Settings = (): JSX.Element => {
       value: Voices.Tony,
     },
   ];
+
+  useEffect(() => {
+    postMessage(CustomEventType.SETTINGS_UPDATE, settings);
+  }, [settings]);
 
   return (
     <div className="Settings">
