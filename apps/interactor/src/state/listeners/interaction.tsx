@@ -219,6 +219,7 @@ const interactionEffect = async (
     }
 
     try {
+      const language = state.novel.language || 'en';
       await Promise.all(
         objectives.map(async (objective) => {
           const condition = objective.condition;
@@ -229,6 +230,7 @@ const interactionEffect = async (
                   condition,
                   instructionPrefix: primaryStrategy.template().instruction,
                   responsePrefix: primaryStrategy.template().response,
+                  language,
                 }),
               {
                 user: state.settings.user.name,
@@ -239,14 +241,17 @@ const interactionEffect = async (
             serviceBaseUrl: servicesEndpoint,
             identifier,
             variables: {
-              cond_opt: [' Yes', ' No'],
+              cond_opt: [
+                ` ${RoleplayPromptStrategy.getLabel(language, 'yes')}`,
+                ` ${RoleplayPromptStrategy.getLabel(language, 'no')}`,
+              ],
             },
           });
           let response = '';
           for await (const result of conditionResultStream) {
             response = result.get('cond') || '';
           }
-          if (response === ' Yes') {
+          if (response === ` ${RoleplayPromptStrategy.getLabel(language, 'yes')}`) {
             objective.actions.forEach((action) => {
               const stateAction = novelActionToStateAction(action);
               if (stateAction) {

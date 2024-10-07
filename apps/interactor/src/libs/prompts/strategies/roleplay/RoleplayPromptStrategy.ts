@@ -318,12 +318,16 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     responsePrefix: string;
     language: string;
   }) {
-    const getLabel = (key: string) => labels[language]?.[key] || labels['en']?.[key] || key;
+    const getLabel = (key: string) => RoleplayPromptStrategy.getLabel(language, key);
     return (
       `\n${instructionPrefix}OOC: ${getLabel('has_condition_happened')}: ${condition}` +
       `\n${getLabel('answer_yes_or_no')}` +
       `\n${responsePrefix}${getLabel('based_on_last_two_messages')}{{SEL cond options=cond_opt}}`
     );
+  }
+
+  static getLabel(language: string, key: string) {
+    return labels[language]?.[key] || labels['en']?.[key] || key;
   }
 
   protected getCharacterSpecs(card: TavernCardV2): {
