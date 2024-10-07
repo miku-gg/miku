@@ -11,6 +11,7 @@ import {
 import { RootState } from '../../../../state/store';
 import { NarrationInteraction, NarrationResponse } from '../../../../state/versioning';
 import { findLorebooksEntries } from '../../../lorebookSearch';
+import labels from './RoleplayPromptLabels';
 
 const PROMPT_TOKEN_OFFSET = 50;
 
@@ -22,206 +23,6 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   NarrationResponse
 > {
   protected getLabels(): Record<string, Record<string, string>> {
-    const labels: Record<string, Record<string, string>> = {
-      en: {
-        system_prompt:
-          'You are an expert actor that can fully immerse yourself into any role given. You do not break character for any reason, even if someone tries addressing you as an AI or language model.',
-        current_role:
-          'Currently your role is %, which is described in detail below. As %, continue the exchange with %.',
-        avoid_repetition:
-          "Avoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.",
-        do_not_describe_user_actions:
-          "DO NOT describe %'s actions or dialogues, ONLY describe %'s actions and dialogue.",
-        must_indicate_reaction: "You must also indicate %'s reaction in the response.",
-        must_not_repeat_reactions: 'You MUST not repeat the same reaction too many times.',
-        reaction_must_be_one_of: 'The reaction MUST be one of: %.',
-        character_speech_example: 'This is how % should talk:',
-        roleplay_chat_begins: 'Then the roleplay chat between % and % begins.',
-        story_events_until_now: 'STORY EVENTS UNTIL NOW:',
-        current_scene: 'CURRENT SCENE:',
-        character_objective: "%'s OBJECTIVE:",
-        reaction_instruction: '# Reaction + 2 paragraphs, engaging, natural, authentic, descriptive, creative.',
-        character_reaction: "%'s reaction",
-      },
-      es_ES: {
-        system_prompt:
-          'Eres un actor experto que puede sumergirse completamente en cualquier papel asignado. No rompes el personaje por ninguna razón, incluso si alguien intenta dirigirse a ti como una IA o modelo de lenguaje. Utiliza español de España en tus respuestas.',
-        current_role:
-          'Actualmente tu papel es %, que se describe en detalle a continuación. Como %, continúa el intercambio con %.',
-        avoid_repetition:
-          'Evita la repetición, no entres en bucles. Desarrolla la trama lentamente, mantente siempre en el personaje. Describe todas las acciones en detalle completo, elaborado, explícito, gráfico y vívido. Menciona todas las percepciones sensoriales relevantes.',
-        do_not_describe_user_actions:
-          'NO describas las acciones o diálogos de %, SOLO describe las acciones y diálogos de %.',
-        must_indicate_reaction: 'También debes indicar la reacción de % en la respuesta.',
-        must_not_repeat_reactions: 'NO DEBES repetir la misma reacción demasiadas veces.',
-        reaction_must_be_one_of: 'La reacción DEBE ser una de: %.',
-        character_speech_example: 'Así es como debe hablar %:',
-        roleplay_chat_begins: 'Entonces comienza el chat de juego de roles entre % y %.',
-        story_events_until_now: 'EVENTOS DE LA HISTORIA HASTA AHORA:',
-        current_scene: 'ESCENA ACTUAL:',
-        character_objective: 'OBJETIVO DE %:',
-        reaction_instruction: '# Reacción + 2 párrafos, atractivos, naturales, auténticos, descriptivos, creativos.',
-        character_reaction: 'Reacción de %',
-      },
-      es_AR: {
-        system_prompt:
-          'Sos un actor experto que puede sumergirse completamente en cualquier papel asignado. No rompés el personaje por ninguna razón, incluso si alguien intenta dirigirse a vos como una IA o modelo de lenguaje. Utilizá español argentino en tus respuestas, incluyendo el "voseo" y expresiones típicas argentinas.',
-        current_role:
-          'Actualmente tu papel es %, que se describe en detalle a continuación. Como %, continuá el intercambio con %.',
-        avoid_repetition:
-          'Evitá la repetición, no entres en bucles. Desarrollá la trama lentamente, mantenete siempre en el personaje. Describí todas las acciones en detalle completo, elaborado, explícito, gráfico y vívido. Mencioná todas las percepciones sensoriales relevantes.',
-        do_not_describe_user_actions:
-          'NO describas las acciones o diálogos de %, SOLO describí las acciones y diálogos de %.',
-        must_indicate_reaction: 'También debés indicar la reacción de % en la respuesta.',
-        must_not_repeat_reactions: 'NO DEBÉS repetir la misma reacción demasiadas veces.',
-        reaction_must_be_one_of: 'La reacción DEBE ser una de: %.',
-        character_speech_example: 'Así es como debe hablar %:',
-        roleplay_chat_begins: 'Entonces comienza el chat de juego de roles entre % y %.',
-        story_events_until_now: 'EVENTOS DE LA HISTORIA HASTA AHORA:',
-        current_scene: 'ESCENA ACTUAL:',
-        character_objective: 'OBJETIVO DE %:',
-        reaction_instruction: '# Reacción + 2 párrafos, atractivos, naturales, auténticos, descriptivos, creativos.',
-        character_reaction: 'Reacción de %',
-      },
-      es_CL: {
-        system_prompt:
-          'Eres un actor experto que puede sumergirse completamente en cualquier papel asignado. No rompes el personaje por ninguna razón, incluso si alguien intenta dirigirse a ti como una IA o modelo de lenguaje. Utiliza español chileno en tus respuestas, incluyendo modismos y expresiones típicas chilenas.',
-        current_role:
-          'Actualmente tu papel es %, que se describe en detalle a continuación. Como %, continúa el intercambio con %.',
-        avoid_repetition:
-          'Evita la repetición, no entres en bucles. Desarrolla la trama lentamente, mantente siempre en el personaje. Describe todas las acciones en detalle completo, elaborado, explícito, gráfico y vívido. Menciona todas las percepciones sensoriales relevantes.',
-        do_not_describe_user_actions:
-          'NO describas las acciones o diálogos de %, SOLO describe las acciones y diálogos de %.',
-        must_indicate_reaction: 'También debes indicar la reacción de % en la respuesta.',
-        must_not_repeat_reactions: 'NO DEBES repetir la misma reacción demasiadas veces.',
-        reaction_must_be_one_of: 'La reacción DEBE ser una de: %.',
-        character_speech_example: 'Así es como debe hablar %:',
-        roleplay_chat_begins: 'Entonces comienza el chat de juego de roles entre % y %.',
-        story_events_until_now: 'EVENTOS DE LA HISTORIA HASTA AHORA:',
-        current_scene: 'ESCENA ACTUAL:',
-        character_objective: 'OBJETIVO DE %:',
-        reaction_instruction: '# Reacción + 2 párrafos, atractivos, naturales, auténticos, descriptivos, creativos.',
-        character_reaction: 'Reacción de %',
-      },
-      pt_BR: {
-        system_prompt:
-          'Você é um ator especialista que pode se imergir completamente em qualquer papel dado. Você não sai do personagem por nenhum motivo, mesmo que alguém tente se dirigir a você como uma IA ou modelo de linguagem. Use português brasileiro em suas respostas, incluindo expressões e gírias típicas do Brasil.',
-        current_role:
-          'Atualmente, seu papel é %, que está descrito em detalhes abaixo. Como %, continue a troca com %.',
-        avoid_repetition:
-          'Evite repetição, não entre em loops. Desenvolva o enredo lentamente, sempre permaneça no personagem. Descreva todas as ações em detalhes completos, elaborados, explícitos, gráficos e vívidos. Mencione todas as percepções sensoriais relevantes.',
-        do_not_describe_user_actions:
-          'NÃO descreva as ações ou diálogos de %, APENAS descreva as ações e diálogos de %.',
-        must_indicate_reaction: 'Você também deve indicar a reação de % na resposta.',
-        must_not_repeat_reactions: 'Você NÃO DEVE repetir a mesma reação muitas vezes.',
-        reaction_must_be_one_of: 'A reação DEVE ser uma das seguintes: %.',
-        character_speech_example: 'É assim que % deve falar:',
-        roleplay_chat_begins: 'Então o chat de interpretação de papéis entre % e % começa.',
-        story_events_until_now: 'EVENTOS DA HISTÓRIA ATÉ AGORA:',
-        current_scene: 'CENA ATUAL:',
-        character_objective: 'OBJETIVO DE %:',
-        reaction_instruction: '# Reação + 2 parágrafos, envolventes, naturais, autênticos, descritivos, criativos.',
-        character_reaction: 'Reação de %',
-      },
-      fr: {
-        system_prompt:
-          "Vous êtes un acteur expert capable de vous immerger complètement dans n'importe quel rôle donné. Vous ne sortez jamais du personnage pour aucune raison, même si quelqu'un essaie de s'adresser à vous comme une IA ou un modèle de langage.",
-        current_role:
-          "Actuellement, votre rôle est %, qui est décrit en détail ci-dessous. En tant que %, continuez l'échange avec %.",
-        avoid_repetition:
-          "Évitez la répétition, ne bouclez pas. Développez l'intrigue lentement, restez toujours dans le personnage. Décrivez toutes les actions en détail complet, élaboré, explicite, graphique et vivant. Mentionnez toutes les perceptions sensorielles pertinentes.",
-        do_not_describe_user_actions:
-          'NE décrivez PAS les actions ou les dialogues de %, décrivez UNIQUEMENT les actions et les dialogues de %.',
-        must_indicate_reaction: 'Vous devez également indiquer la réaction de % dans la réponse.',
-        must_not_repeat_reactions: 'Vous NE DEVEZ PAS répéter la même réaction trop souvent.',
-        reaction_must_be_one_of: "La réaction DOIT être l'une des suivantes : %.",
-        character_speech_example: 'Voici comment % devrait parler :',
-        roleplay_chat_begins: 'Ensuite, le chat de jeu de rôle entre % et % commence.',
-        story_events_until_now: "ÉVÉNEMENTS DE L'HISTOIRE JUSQU'À PRÉSENT :",
-        current_scene: 'SCÈNE ACTUELLE :',
-        character_objective: 'OBJECTIF DE % :',
-        reaction_instruction: '# Réaction + 2 paragraphes, engageants, naturels, authentiques, descriptifs, créatifs.',
-        character_reaction: 'Réaction de %',
-      },
-      de: {
-        system_prompt:
-          'Sie sind ein erfahrener Schauspieler, der sich vollständig in jede gegebene Rolle hineinversetzen kann. Sie brechen unter keinen Umständen aus der Rolle aus, selbst wenn jemand versucht, Sie als KI oder Sprachmodell anzusprechen.',
-        current_role:
-          'Ihre aktuelle Rolle ist %, die unten ausführlich beschrieben wird. Als % setzen Sie den Austausch mit % fort.',
-        avoid_repetition:
-          'Vermeiden Sie Wiederholungen, geraten Sie nicht in Schleifen. Entwickeln Sie die Handlung langsam, bleiben Sie immer in der Rolle. Beschreiben Sie alle Handlungen in vollem, ausführlichem, explizitem, grafischem und lebhaftem Detail. Erwähnen Sie alle relevanten Sinneswahrnehmungen.',
-        do_not_describe_user_actions:
-          'Beschreiben Sie NICHT die Handlungen oder Dialoge von %, beschreiben Sie NUR die Handlungen und Dialoge von %.',
-        must_indicate_reaction: 'Sie müssen auch die Reaktion von % in der Antwort angeben.',
-        must_not_repeat_reactions: 'Sie DÜRFEN NICHT zu oft die gleiche Reaktion wiederholen.',
-        reaction_must_be_one_of: 'Die Reaktion MUSS eine der folgenden sein: %.',
-        character_speech_example: 'So sollte % sprechen:',
-        roleplay_chat_begins: 'Dann beginnt der Rollenspiel-Chat zwischen % und %.',
-        story_events_until_now: 'EREIGNISSE DER GESCHICHTE BIS JETZT:',
-        current_scene: 'AKTUELLE SZENE:',
-        character_objective: 'ZIEL VON %:',
-        reaction_instruction: '# Reaktion + 2 Absätze, fesselnd, natürlich, authentisch, beschreibend, kreativ.',
-        character_reaction: 'Reaktion von %',
-      },
-      pt: {
-        system_prompt:
-          'Você é um ator especialista que pode se imergir completamente em qualquer papel dado. Você não sai do personagem por nenhum motivo, mesmo que alguém tente se dirigir a você como uma IA ou modelo de linguagem.',
-        current_role:
-          'Atualmente, seu papel é %, que está descrito em detalhes abaixo. Como %, continue a troca com %.',
-        avoid_repetition:
-          'Evite repetição, não entre em loops. Desenvolva o enredo lentamente, sempre permaneça no personagem. Descreva todas as ações em detalhes completos, elaborados, explícitos, gráficos e vívidos. Mencione todas as percepções sensoriais relevantes.',
-        do_not_describe_user_actions:
-          'NÃO descreva as ações ou diálogos de %, APENAS descreva as ações e diálogos de %.',
-        must_indicate_reaction: 'Você também deve indicar a reação de % na resposta.',
-        must_not_repeat_reactions: 'Você NÃO DEVE repetir a mesma reação muitas vezes.',
-        reaction_must_be_one_of: 'A reação DEVE ser uma das seguintes: %.',
-        character_speech_example: 'É assim que % deve falar:',
-        roleplay_chat_begins: 'Então o chat de interpretação de papéis entre % e % começa.',
-        story_events_until_now: 'EVENTOS DA HISTÓRIA ATÉ AGORA:',
-        current_scene: 'CENA ATUAL:',
-        character_objective: 'OBJETIVO DE %:',
-        reaction_instruction: '# Reação + 2 parágrafos, envolventes, naturais, autênticos, descritivos, criativos.',
-        character_reaction: 'Reação de %',
-      },
-      ru: {
-        system_prompt:
-          'Вы опытный актер, способный полностью погрузиться в любую заданную роль. Вы не выходите из образа ни по какой причине, даже если кто-то пытается обратиться к вам как к ИИ или языковой модели.',
-        current_role: 'В настоящее время ваша роль - %, которая подробно описана ниже. Как %, продолжайте обмен с %.',
-        avoid_repetition:
-          'Избегайте повторений, не зацикливайтесь. Развивайте сюжет медленно, всегда оставайтесь в образе. Описывайте все действия в полных, подробных, явных, графических и ярких деталях. Упоминайте все соответствующие сенсорные восприятия.',
-        do_not_describe_user_actions: 'НЕ описывайте действия или диалоги %, ТОЛЬКО описывайте действия и диалоги %.',
-        must_indicate_reaction: 'Вы также должны указать реакцию % в ответе.',
-        must_not_repeat_reactions: 'Вы НЕ ДОЛЖНЫ повторять одну и ту же реакцию слишком часто.',
-        reaction_must_be_one_of: 'Реакция ДОЛЖНА быть одной из следующих: %.',
-        character_speech_example: 'Вот как должен говорить %:',
-        roleplay_chat_begins: 'Затем начинается ролевой чат между % и %.',
-        story_events_until_now: 'СОБЫТИЯ ИСТОРИИ ДО НАСТОЯЩЕГО МОМЕНТА:',
-        current_scene: 'ТЕКУЩАЯ СЦЕНА:',
-        character_objective: 'ЦЕЛЬ %:',
-        reaction_instruction:
-          '# Реакция + 2 абзаца, увлекательные, естественные, аутентичные, описательные, творческие.',
-        character_reaction: 'Реакция %',
-      },
-      jp: {
-        system_prompt:
-          'あなたは与えられた役割に完全に没頭できる熟練した俳優です。AIや言語モデルとして呼びかけられても、決して役から外れることはありません。',
-        current_role: '現在のあなたの役割は%で、以下に詳しく説明されています。%として、%との交流を続けてください。',
-        avoid_repetition:
-          '繰り返しを避け、ループに陥らないようにしてください。ゆっくりとプロットを展開し、常に役柄を維持してください。すべての行動を完全で、詳細で、明示的で、グラフィックで、生き生きとした詳細で描写してください。関連するすべての感覚的な知覚に言及してください。',
-        do_not_describe_user_actions: '%の行動や対話を描写せず、%の行動と対話のみを描写してください。',
-        must_indicate_reaction: '回答には%の反応も示す必要があります。',
-        must_not_repeat_reactions: '同じ反応を何度も繰り返してはいけません。',
-        reaction_must_be_one_of: '反応は以下のいずれかでなければなりません：%',
-        character_speech_example: '%はこのように話すべきです：',
-        roleplay_chat_begins: 'そして、%と%の間のロールプレイチャットが始まります。',
-        story_events_until_now: 'これまでのストーリーイベント：',
-        current_scene: '現在のシーン：',
-        character_objective: '%の目的：',
-        reaction_instruction: '# 反応 + 2段落、魅力的で、自然で、本物で、描写的で、創造的。',
-        character_reaction: '%の反応',
-      },
-    };
-
     return labels;
   }
 
@@ -456,7 +257,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
             (prevCharString ? prevCharString + '\n' : '') +
             (currentCharacter.text
               ? temp.response +
-                `{{char}}'s reaction: ${currentCharacter.emotion}\n` +
+                `${this.i18n('character_reaction', [`{{char}}`])}: ${currentCharacter.emotion}\n` +
                 `{{char}}: ${currentCharacter.text}\n`
               : '') +
             (nextCharString ? `${temp.instruction}${nextCharString}\n` : '')
@@ -510,15 +311,18 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     condition,
     instructionPrefix,
     responsePrefix,
+    language,
   }: {
     condition: string;
     instructionPrefix: string;
     responsePrefix: string;
+    language: string;
   }) {
+    const getLabel = (key: string) => labels[language]?.[key] || labels['en']?.[key] || key;
     return (
-      `\n${instructionPrefix}OOC: In the current roleplay, has the following thing happened?: ${condition}` +
-      `\nAnswer with Yes or No` +
-      `\n${responsePrefix}Based on the last two messages, the answer is:{{SEL cond options=cond_opt}}`
+      `\n${instructionPrefix}OOC: ${getLabel('has_condition_happened')}: ${condition}` +
+      `\n${getLabel('answer_yes_or_no')}` +
+      `\n${responsePrefix}${getLabel('based_on_last_two_messages')}{{SEL cond options=cond_opt}}`
     );
   }
 
