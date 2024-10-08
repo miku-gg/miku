@@ -80,7 +80,7 @@ const interactionEffect = async (
     const maxMessages = selectSummaryEnabled(state)
       ? Math.max(messagesSinceLastSummary, 4)
       : selectAllParentDialogues(state).length;
-    const primaryStrategy = new RoleplayPromptStrategy(strategy);
+    const primaryStrategy = new RoleplayPromptStrategy(strategy, state.novel.language || 'en');
 
     const [responsePromptBuilder, secondaryPromptBuilder] = [
       new PromptBuilder<RoleplayPromptStrategy>({
@@ -90,7 +90,7 @@ const interactionEffect = async (
       }),
       new PromptBuilder<RoleplayPromptStrategy>({
         maxNewTokens: 200,
-        strategy: new RoleplayPromptStrategy(secondary.strategy),
+        strategy: new RoleplayPromptStrategy(secondary.strategy, state.novel.language || 'en'),
         truncationLength: secondary.truncation_length - 150,
       }),
     ];
@@ -334,7 +334,7 @@ const interactionEffect = async (
       if (secondary.truncation_length > 7900 && (messagesSinceLastSummary >= 40 || sceneChanged)) {
         const summaryPromptBuilder = new PromptBuilder<SummaryPromptStrategy>({
           maxNewTokens: 200,
-          strategy: new SummaryPromptStrategy(secondary.strategy),
+          strategy: new SummaryPromptStrategy(secondary.strategy, state.novel.language || 'en'),
           truncationLength: secondary.truncation_length,
         });
 

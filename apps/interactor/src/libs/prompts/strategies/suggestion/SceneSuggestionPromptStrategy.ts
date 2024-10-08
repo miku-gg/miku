@@ -142,7 +142,7 @@ export class SceneSuggestionPromptStrategy extends AbstractPromptStrategy<
         shot_2_scene_3_description:
           'Mientras exploran el bosque durante su lección, Roxy y {{user}} se encuentran con una misteriosa criatura mágica.',
       },
-      es_ES: {
+      es_es: {
         scene_suggestion_intro:
           'Eres un asistente de escritura que sugerirá posibles escenarios siguientes para una historia.',
         scene_suggestion_instructions:
@@ -206,7 +206,7 @@ export class SceneSuggestionPromptStrategy extends AbstractPromptStrategy<
         shot_2_scene_3_description:
           'Mientras exploran el bosque durante su lección, Roxy y {{user}} se encuentran con una misteriosa criatura mágica.',
       },
-      es_AR: {
+      es_ar: {
         scene_suggestion_intro:
           'Sos un asistente de escritura que va a sugerir posibles escenarios siguientes para una historia.',
         scene_suggestion_instructions:
@@ -269,7 +269,7 @@ export class SceneSuggestionPromptStrategy extends AbstractPromptStrategy<
         shot_2_scene_3_description:
           'Mientras exploran el bosque durante su lección, Roxy y {{user}} se encuentran con una criatura mágica re misteriosa.',
       },
-      es_CL: {
+      es_cl: {
         scene_suggestion_intro:
           'Eres un asistente de escritura que sugerirá posibles escenarios siguientes para una historia.',
         scene_suggestion_instructions:
@@ -396,7 +396,7 @@ export class SceneSuggestionPromptStrategy extends AbstractPromptStrategy<
         shot_2_scene_3_description:
           'Enquanto exploram a floresta durante a sua lição, Roxy e {{user}} encontram uma misteriosa criatura mágica.',
       },
-      pt_BR: {
+      pt_br: {
         scene_suggestion_intro:
           'Você é um assistente de escrita que irá sugerir possíveis cenários seguintes para uma história.',
         scene_suggestion_instructions:

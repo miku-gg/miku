@@ -25,7 +25,7 @@ export class ResponseSuggestionPromptStrategy extends AbstractPromptStrategy<Roo
         funny_reply: 'Respuesta Divertida: %: "%"',
         flirty_reply: 'Respuesta Coqueta: %: "%"',
       },
-      es_ES: {
+      es_es: {
         writing_assistant_intro:
           'Eres un asistente de escritura que ayudará a escribir una historia. Sugieres respuestas a una conversación.',
         conversation: 'Conversación:',
@@ -35,7 +35,7 @@ export class ResponseSuggestionPromptStrategy extends AbstractPromptStrategy<Roo
         funny_reply: 'Respuesta Divertida: %: "%"',
         flirty_reply: 'Respuesta Coqueta: %: "%"',
       },
-      es_AR: {
+      es_ar: {
         writing_assistant_intro:
           'Sos un asistente de escritura que va a ayudar a escribir una historia. Sugerís respuestas a una conversación.',
         conversation: 'Conversación:',
@@ -45,7 +45,7 @@ export class ResponseSuggestionPromptStrategy extends AbstractPromptStrategy<Roo
         funny_reply: 'Respuesta Divertida: %: "%"',
         flirty_reply: 'Respuesta Coqueta: %: "%"',
       },
-      es_CL: {
+      es_cl: {
         writing_assistant_intro:
           'Eres un asistente de escritura que ayudará a escribir una historia. Sugieres respuestas a una conversación.',
         conversation: 'Conversación:',
@@ -65,7 +65,7 @@ export class ResponseSuggestionPromptStrategy extends AbstractPromptStrategy<Roo
         funny_reply: 'Resposta Engraçada: %: "%"',
         flirty_reply: 'Resposta Flertante: %: "%"',
       },
-      pt_BR: {
+      pt_br: {
         writing_assistant_intro:
           'Você é um assistente de escrita que ajudará a escrever uma história. Você sugere respostas para uma conversa.',
         conversation: 'Conversa:',

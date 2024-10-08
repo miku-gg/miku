@@ -66,7 +66,7 @@ const labels: Record<string, Record<string, string>> = {
     answer_yes_or_no: 'Answer with Yes or No',
     based_on_last_two_messages: 'Based on the last two messages, the answer is:',
   },
-  es_ES: {
+  es: {
     system_prompt:
       'Eres un actor experto que puede sumergirse completamente en cualquier papel asignado. No rompes el personaje por ninguna razón, incluso si alguien intenta dirigirse a ti como una IA o modelo de lenguaje. Utiliza español de España en tus respuestas.',
     current_role:
@@ -135,7 +135,7 @@ const labels: Record<string, Record<string, string>> = {
     answer_yes_or_no: 'Responde con Sí o No',
     based_on_last_two_messages: 'Basado en los dos últimos mensajes, la respuesta es:',
   },
-  es_AR: {
+  es_ar: {
     system_prompt:
       'Sos un actor experto que puede sumergirse completamente en cualquier papel asignado. No rompés el personaje por ninguna razón, incluso si alguien intenta dirigirse a vos como una IA o modelo de lenguaje. Utilizá español argentino en tus respuestas, incluyendo el "voseo" y expresiones típicas argentinas.',
     current_role:
@@ -204,7 +204,7 @@ const labels: Record<string, Record<string, string>> = {
     answer_yes_or_no: 'Respondé con Sí o No',
     based_on_last_two_messages: 'Basado en los dos últimos mensajes, la respuesta es:',
   },
-  es_CL: {
+  es_cl: {
     system_prompt:
       'Eres un actor experto que puede sumergirse completamente en cualquier papel asignado. No rompes el personaje por ninguna razón, incluso si alguien intenta dirigirse a ti como una IA o modelo de lenguaje. Utiliza español chileno en tus respuestas, incluyendo modismos y expresiones típicas chilenas.',
     current_role:
@@ -273,7 +273,7 @@ const labels: Record<string, Record<string, string>> = {
     answer_yes_or_no: 'Responde con Sí o No',
     based_on_last_two_messages: 'Basado en los dos últimos mensajes, la respuesta es:',
   },
-  pt_BR: {
+  pt_br: {
     system_prompt:
       'Você é um ator especialista que pode se imergir completamente em qualquer papel dado. Você não sai do personagem por nenhum motivo, mesmo que alguém tente se dirigir a você como uma IA ou modelo de linguagem. Use português brasileiro em suas respostas, incluindo expressões e gírias típicas do Brasil.',
     current_role: 'Atualmente, seu papel é %, que está descrito em detalhes abaixo. Como %, continue a troca com %.',

@@ -38,7 +38,7 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
         importance: 'importance',
         conversation_2: 'CONVERSATION #2:',
       },
-      es_ES: {
+      es_es: {
         summary_intro:
           'Eres un guionista experto. Tu tarea es resumir una historia en frases extrayendo la información más valiosa para recordar.',
         summary_instructions:
@@ -56,7 +56,7 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
         importance: 'importancia',
         conversation_2: 'CONVERSACIÓN #2:',
       },
-      es_AR: {
+      es_ar: {
         summary_intro:
           'Sos un guionista experto. Tu tarea es resumir una historia en frases extrayendo la información más valiosa para recordar.',
         summary_instructions:
@@ -74,7 +74,7 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
         importance: 'importancia',
         conversation_2: 'CONVERSACIÓN #2:',
       },
-      es_CL: {
+      es_cl: {
         summary_intro:
           'Eres un guionista experto. Tu tarea es resumir una historia en frases extrayendo la información más valiosa para recordar.',
         summary_instructions:
@@ -109,7 +109,7 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
         importance: 'importância',
         conversation_2: 'CONVERSA #2:',
       },
-      pt_BR: {
+      pt_br: {
         summary_intro:
           'Você é um roteirista especialista. Sua tarefa é resumir uma história em frases extraindo as informações mais valiosas para lembrar.',
         summary_instructions:

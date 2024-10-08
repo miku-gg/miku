@@ -61,7 +61,7 @@ export abstract class AbstractPromptStrategy<Input, Output> {
 
   protected i18n(labelKey: string, replacements: string[] = []): string {
     const labels = this.getLabels();
-    let text = labels[this.language]?.[labelKey] || labels['en']?.[labelKey] || labelKey;
+    let text = labels[this.language?.toLowerCase()]?.[labelKey] || labels['en']?.[labelKey] || labelKey;
     replacements.forEach((replacement) => {
       text = text.replace('%', replacement);
     });
