@@ -76,7 +76,7 @@ export class SummaryPromptStrategy extends AbstractPromptStrategy<
 
     let template = this.getContextPrompt();
     template += this.getDialogueHistoryPrompt(input.state, memorySize, currentCharacters, input.excludeLastResponse);
-    template += `${INPUT_END}${OUTPUT_START}Here is the summary of "CONVERSATION #2", in chronologial order, in ${
+    template += `${INPUT_END}${OUTPUT_START}Here is the summary for "CONVERSATION #2", in chronologial order, in ${
       input.sentencesToGenerate
     } sentences:\nCHARACTERS: ${currentCharacters.map((c) => c.name).join(', ')} and ${
       input.state.settings.user.name
