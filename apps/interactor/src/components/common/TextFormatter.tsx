@@ -215,6 +215,7 @@ interface VNStyleTextFormatterProps extends TextFormatterProps {
 
 const VNStyleTextFormatter: React.FC<VNStyleTextFormatterProps> = ({ text, children }) => {
   const fontSize = useAppSelector((state) => state.settings.text.fontSize);
+  const isInputDisabled = useAppSelector((state) => state.narration.input.disabled);
   const dispatch = useAppDispatch();
 
   const elements = useMemo(() => {
@@ -282,6 +283,7 @@ const VNStyleTextFormatter: React.FC<VNStyleTextFormatterProps> = ({ text, child
           )}
         </div>
       )}
+      {isInputDisabled && isLastElement ? <em className="elipsisLoading"></em> : null}
 
       {/* Show 'Back' button if not first element */}
       {!isFirstElement && (
