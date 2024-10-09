@@ -58,6 +58,18 @@ export interface NovelCharacterOutfit {
   }[];
 }
 
+export interface CutScene {
+  id: boolean;
+  name: string;
+  parts: {
+    text: string;
+    type: 'dialogue' | 'description';
+    background: string;
+    music: string;
+    characters: { id: string; outfitId: string; emotion: string }[];
+  }[];
+}
+
 export interface NovelCharacter {
   id: string;
   name: string;
@@ -214,6 +226,7 @@ export interface NovelState {
   songs: NovelSong[];
   maps: NovelMap[];
   scenes: NovelScene[];
+  cutscenes?: CutScene[];
   starts: NovelStart[];
   objectives?: NovelObjective[];
   lorebooks?: NovelLorebook[];
