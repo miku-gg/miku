@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Rnd } from 'react-rnd';
 import { useAppContext } from '../../App.context';
 import { useAppSelector } from '../../state/store';
+import { useI18n } from '../../libs/i18n';
 import './ChatBox.scss';
 import InputBox from './InputBox';
 import ResponseBox from './ResponseBox';
@@ -30,6 +31,8 @@ const ChatBox = (): JSX.Element | null => {
 
     setLastTapTime(currentTime);
   };
+
+  const { i18n } = useI18n();
 
   if (isMobileApp || window.innerWidth < 820) {
     return (
