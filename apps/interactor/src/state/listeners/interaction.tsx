@@ -248,7 +248,7 @@ const interactionEffect = async (
           for await (const result of conditionResultStream) {
             response = result.get('cond') || '';
           }
-          if (response === ` ${RoleplayPromptStrategy.getLabel(language, 'yes')}`) {
+          if (response === ` Yes`) {
             objective.actions.forEach((action) => {
               const stateAction = novelActionToStateAction(action);
               if (stateAction) {
