@@ -321,7 +321,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const getLabel = (key: string) => RoleplayPromptStrategy.getLabel(language, key);
     return (
       `\n${instructionPrefix}OOC: ${getLabel('has_condition_happened')}: ${condition}` +
-      `\n${getLabel('answer_yes_or_no')}` +
+      `\nAnswer with Yes or No` +
       `\n${responsePrefix}${getLabel('based_on_last_two_messages')}{{SEL cond options=cond_opt}}`
     );
   }

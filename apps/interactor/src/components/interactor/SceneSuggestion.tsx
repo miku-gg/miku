@@ -272,7 +272,7 @@ const SceneSuggestionModal = () => {
           {!isPremium ? (
             <div className="SceneSuggestionModal__countdown">
               <div className="SceneSuggestionModal__countdown-amount">
-                {i18n('scene_generations_left', [sceneSuggestionsLeft.toString()])}
+                {i18n('scene_generations_left', [(sceneSuggestionsLeft || 0).toString()])}
               </div>
               <div className="SceneSuggestionModal__countdown-upgrade">
                 <Button

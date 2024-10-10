@@ -241,10 +241,7 @@ const interactionEffect = async (
             serviceBaseUrl: servicesEndpoint,
             identifier,
             variables: {
-              cond_opt: [
-                ` ${RoleplayPromptStrategy.getLabel(language, 'yes')}`,
-                ` ${RoleplayPromptStrategy.getLabel(language, 'no')}`,
-              ],
+              cond_opt: [` Yes`, ` No`],
             },
           });
           let response = '';
