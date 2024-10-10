@@ -10,6 +10,7 @@ export enum CustomEventType {
   SHARE_CONVERSATION = 'SHARE_CONVERSATION',
   ACHIEVEMENT_UNLOCKED = 'ACHIEVEMENT_UNLOCKED',
   NOVEL_PROFILE_CLICK = 'NOVEL_PROFILE_CLICK',
+  SETTINGS_UPDATE = 'SETTINGS_UPDATE',
 }
 
 export const postMessage = (type: StateEventType | CustomEventType, payload?: unknown) => {
