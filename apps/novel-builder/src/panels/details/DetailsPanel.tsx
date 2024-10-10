@@ -13,7 +13,7 @@ import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 const languageOptions = [
   { code: 'en', name: 'English', flag: 'GB' },
   { code: 'es', name: 'Español', flag: 'ES' },
-  { code: 'es_la', name: 'Español (Latin America)', flag: 'MX' },
+  // { code: 'es_es', name: 'Español (España)', flag: 'ES' },
   { code: 'es_ar', name: 'Español (Argentina)', flag: 'AR' },
   { code: 'es_cl', name: 'Español (Chile)', flag: 'CL' },
   { code: 'fr', name: 'Français', flag: 'FR' },

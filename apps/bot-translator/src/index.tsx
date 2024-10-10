@@ -12,7 +12,7 @@ type NovelState = NovelV3.NovelState;
 const languageCodeToName = new Map([
   ['es', 'Spanish'],
   ['es_ar', 'Spanish (Argentina)'],
-  ['es_la', 'Spanish (Latin America)'],
+  ['es_es', 'Spanish (España)'],
   ['es_cl', 'Spanish (Chile)'],
   ['pt', 'Portuguese'],
   ['pt_br', 'Portuguese (Brazil)'],
@@ -25,7 +25,7 @@ const languageCodeToName = new Map([
 const languageCodeToExtraPrompt = new Map([
   ['es', 'Use typical Spanish expressions and vocabulary.'],
   ['es_ar', 'Use typical Argentinean Spanish expressions and vocabulary.'],
-  ['es_la', 'Use typical Latin American Spanish expressions and vocabulary.'],
+  ['es_es', 'Use typical Spanish from Spain expressions and vocabulary.'],
   ['es_cl', 'Use typical Chilean Spanish expressions and vocabulary.'],
   ['pt', 'Use typical Portuguese expressions and vocabulary.'],
   ['pt_br', 'Use typical Brazilian Portuguese expressions and vocabulary.'],
