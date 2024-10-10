@@ -1,9 +1,7 @@
 import { Button, Modal, Tooltip } from '@mikugg/ui-kit';
-// import { useMemo } from 'react';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import { GiBrain } from 'react-icons/gi';
 import { useAppContext } from '../../App.context';
-// import { trackEvent } from '../../libs/analytics';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { setMemoryCapacityModal, setSummariesEnabled } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
@@ -12,6 +10,7 @@ import { useMemo, useState } from 'react';
 import { selectTokensCount } from '../../state/selectors';
 import { trackEvent } from '../../libs/analytics';
 import SummaryView from '../history/SummaryView';
+import { useI18n } from '../../libs/i18n';
 
 const REGULAR_USERS_TOKENS_CAPACITY = 4096;
 const PREMIUM_USERS_TOKENS_CAPACITY = 16384;
@@ -120,6 +119,7 @@ function FreeMemoryModal({ currentTokens }: { currentTokens: number }) {
   const dispatch = useAppDispatch();
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const isMemoryModalOpen = useAppSelector((state) => state.settings.modals.memoryCapacity);
+  const { i18n } = useI18n();
 
   const isMobileSize = isMobileApp || window.innerWidth < 600;
 
@@ -133,9 +133,9 @@ function FreeMemoryModal({ currentTokens }: { currentTokens: number }) {
     >
       <div className={`MemoryCapacityView__modal ${isMobileSize ? 'mobile-view' : ''}`}>
         <div className="MemoryCapacityView__modal-header">
-          <h3 className="MemoryCapacityView__modal-header_title">Memory Capacity</h3>
+          <h3 className="MemoryCapacityView__modal-header_title">{i18n('memory_capacity')}</h3>
           <p className="MemoryCapacityView__modal-header__subtitle">
-            Upgrade to premium for long term memory and better responses.
+            {i18n('upgrade_to_premium_for_long_term_memory')}
           </p>
         </div>
         <div className="MemoryCapacityView__modal-top">
@@ -147,14 +147,14 @@ function FreeMemoryModal({ currentTokens }: { currentTokens: number }) {
             fillColor="#6f7396"
           />
           <div className="MemoryCapacityView__modal-top__text">
-            <h4>Free membership</h4>
+            <h4>{i18n('free_membership')}</h4>
             <div>
               <FaTimes size={10} color="#9747ff" />
-              <p>Characters remember the last 15 messages</p>
+              <p>{i18n('characters_remember_last_15_messages')}</p>
             </div>
             <div>
               <FaTimes size={10} color="#9747ff" />
-              <p>Characters don't remember old messages</p>
+              <p>{i18n('characters_dont_remember_old_messages')}</p>
             </div>
           </div>
         </div>
@@ -167,14 +167,14 @@ function FreeMemoryModal({ currentTokens }: { currentTokens: number }) {
             fillColor="white"
           />
           <div className="MemoryCapacityView__modal-bottom__text">
-            <h4>Long term memory</h4>
+            <h4>{i18n('long_term_memory')}</h4>
             <div>
               <FaCheck size={10} color="#9747ff" />
-              <p>Characters have 5x more memory</p>
+              <p>{i18n('characters_have_5x_more_memory')}</p>
             </div>
             <div>
               <FaCheck size={10} color="#9747ff" />
-              <p>Characters remember old messages</p>
+              <p>{i18n('characters_remember_old_messages')}</p>
             </div>
           </div>
         </div>
@@ -185,7 +185,7 @@ function FreeMemoryModal({ currentTokens }: { currentTokens: number }) {
               dispatch(setMemoryCapacityModal(false));
             }}
           >
-            Continue as Regular
+            {i18n('continue_as_regular')}
           </Button>
           <Button
             theme="gradient"
@@ -195,7 +195,7 @@ function FreeMemoryModal({ currentTokens }: { currentTokens: number }) {
               trackEvent('memory-premium-click');
             }}
           >
-            Upgrade to Premium
+            {i18n('upgrade_to_premium')}
           </Button>
         </div>
       </div>
@@ -212,6 +212,7 @@ const PremiumMemoryModal: React.FC<{
   const isMemoryModalOpen = useAppSelector((state) => state.settings.modals.memoryCapacity);
   const usingSummary = useAppSelector((state) => !!state.settings.summaries?.enabled);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const { i18n } = useI18n();
 
   return (
     <>
@@ -223,14 +224,14 @@ const PremiumMemoryModal: React.FC<{
         }}
       >
         <div className="MemoryCapacityView__modal-header">
-          <h3 className="MemoryCapacityView__modal-header_title">Memory Options</h3>
-          <p className="MemoryCapacityView__modal-header__subtitle">Configure how you want to use long term memory.</p>
+          <h3 className="MemoryCapacityView__modal-header_title">{i18n('memory_options')}</h3>
+          <p className="MemoryCapacityView__modal-header__subtitle">{i18n('configure_long_term_memory')}</p>
         </div>
 
         <div className="PremiumMemoryModal__options">
           <OptionButton
-            title="Standard mode"
-            description={['The AI stores the entire messages', 'Remembers the last 75 messages']}
+            title={i18n('standard_mode')}
+            description={[i18n('ai_stores_entire_messages'), i18n('remembers_last_75_messages')]}
             isSelected={!usingSummary}
             onClick={() => {
               dispatch(setSummariesEnabled(false));
@@ -239,8 +240,8 @@ const PremiumMemoryModal: React.FC<{
             currentTokens={currentTokensNoSummary}
           />
           <OptionButton
-            title="Summary mode"
-            description={['The AI summarizes old messages', 'Remembers the last 900 messages']}
+            title={i18n('summary_mode')}
+            description={[i18n('ai_summarizes_old_messages'), i18n('remembers_last_900_messages')]}
             isSelected={usingSummary}
             onClick={() => {
               dispatch(setSummariesEnabled(true));
@@ -253,11 +254,13 @@ const PremiumMemoryModal: React.FC<{
 
         <div className={`PremiumMemoryModal__advanced-settings ${!usingSummary ? 'disabled' : ''}`}>
           <div className="PremiumMemoryModal__advanced-settings-info">
-            <h4 className="PremiumMemoryModal__advanced-settings-title">Summary settings</h4>
-            <p className="PremiumMemoryModal__advanced-settings-description">Manage and edit character memories</p>
+            <h4 className="PremiumMemoryModal__advanced-settings-title">{i18n('summary_settings')}</h4>
+            <p className="PremiumMemoryModal__advanced-settings-description">
+              {i18n('manage_edit_character_memories')}
+            </p>
           </div>
           <Button onClick={() => setShowSummaryModal(true)} theme="secondary" disabled={!usingSummary}>
-            Manage Memories
+            {i18n('manage_memories')}
           </Button>
         </div>
       </Modal>
@@ -265,7 +268,7 @@ const PremiumMemoryModal: React.FC<{
       <Modal
         opened={showSummaryModal}
         onCloseModal={() => setShowSummaryModal(false)}
-        title="Memories"
+        title={i18n('memories')}
         className="SummaryViewModal"
       >
         <SummaryView />

@@ -23,6 +23,7 @@ import {
 import { Loader } from '../common/Loader';
 import './InputBox.scss';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
+import { useI18n } from '../../libs/i18n';
 
 const InputBox = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -45,6 +46,7 @@ const InputBox = (): JSX.Element => {
   const displayingLastSentence = useAppSelector(
     (state) => state.settings.displayingLastSentence && state.settings.text.responseFormat === ResponseFormat.VNStyle,
   );
+  const { i18n } = useI18n();
 
   const sendMessage = (text: string) => {
     if (isInteractionDisabled) {
@@ -218,7 +220,7 @@ const InputBox = (): JSX.Element => {
           }}
           autoComplete="off"
           rows={textAreaRows <= 3 ? textAreaRows : 3}
-          placeholder="Type a message..."
+          placeholder={i18n('type_a_message')}
           ref={textAreaRef}
           disabled={disabled || displayingLastSentence}
         />

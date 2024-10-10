@@ -192,8 +192,8 @@ const ResponseBox = (): JSX.Element | null => {
                   key={`response-character-${characterId}`}
                   data-tooltip-id={`ResponseBox__character-tooltip`}
                   data-tooltip-content={character?.name || ''}
-                  data-tooltip-varaint="dark"
-                  data-tooltip-events="hover"
+                  data-tooltip-variant="dark"
+                  data-tooltip-events={['hover']}
                 >
                   <button
                     className="ResponseBox__character-button"

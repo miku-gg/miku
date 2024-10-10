@@ -29,6 +29,7 @@ import { VersionId as V2VersionId } from '../../state/versioning/v2.state';
 import { VersionId as V3VersionId } from '../../state/versioning/v3.state';
 import { RenPyExportButton } from './ExportToRenpy';
 import './History.scss';
+import { useI18n } from '../../libs/i18n';
 
 const HistoryActions = () => {
   const dispatch = useAppDispatch();
@@ -36,6 +37,7 @@ const HistoryActions = () => {
   const hasInteractions = useAppSelector((state) => Object.keys(state.narration.interactions).length > 0);
 
   const { isMobileApp } = useAppContext();
+  const { i18n } = useI18n();
 
   const handleSave = () => {
     const clonedState = JSON.parse(JSON.stringify(state));
@@ -107,7 +109,7 @@ const HistoryActions = () => {
         <label
           className="icon-button"
           data-tooltip-id="history-actions-tooltip"
-          data-tooltip-content="Load narration history"
+          data-tooltip-content={i18n('load_narration_history')}
         >
           <input
             id="load-history-input"
@@ -122,7 +124,7 @@ const HistoryActions = () => {
       <button
         className="icon-button"
         data-tooltip-id="history-actions-tooltip"
-        data-tooltip-content="Download narration history"
+        data-tooltip-content={i18n('download_narration_history')}
         onClick={handleSave}
       >
         <BiCloudDownload />
@@ -303,6 +305,7 @@ const History = (): JSX.Element => {
   const historyOpened = useAppSelector((state) => state.settings.modals.history);
   const { opened: editOpened, id: editId } = useAppSelector((state) => state.settings.modals.edit);
   const { disabled: inputDisabled } = useAppSelector((state) => state.narration.input);
+  const { i18n } = useI18n();
 
   return (
     <div className="History">
@@ -318,7 +321,7 @@ const History = (): JSX.Element => {
       </button>
       <Modal
         opened={historyOpened}
-        title="History"
+        title={i18n('history')}
         onCloseModal={() => dispatch(setHistoryModal(false))}
         shouldCloseOnOverlayClick
         overlayClassName="History__modal-overlay"
@@ -329,7 +332,7 @@ const History = (): JSX.Element => {
       </Modal>
       <Modal
         opened={editOpened}
-        title="Edit"
+        title={i18n('edit')}
         className="History__edit-modal"
         shouldCloseOnOverlayClick
         onCloseModal={() => dispatch(setEditModal({ opened: false, id: '' }))}

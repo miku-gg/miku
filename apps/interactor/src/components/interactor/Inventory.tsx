@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import './Inventory.scss';
 import classNames from 'classnames';
 import { GiLockedChest } from 'react-icons/gi';
+import { useI18n } from '../../libs/i18n';
 
 export default function Inventory() {
   const dispatch = useAppDispatch();
@@ -21,11 +22,12 @@ export default function Inventory() {
   const { servicesEndpoint, isInteractionDisabled, apiEndpoint, assetLinkLoader } = useAppContext();
   const scene = useAppSelector(selectCurrentScene);
   const lastResponse = useAppSelector(selectLastLoadedResponse);
+  const { i18n } = useI18n();
 
   return (
     <div className={`Inventory ${showInventory}`}>
       <div className="Inventory__header">
-        <div>Inventory</div>
+        <div>{i18n('inventory')}</div>
 
         <button
           onClick={() => {
@@ -71,7 +73,7 @@ export default function Inventory() {
                 }}
                 data-tooltip-id={disabled ? 'premium-item-inventory' : undefined}
                 data-tooltip-varaint="light"
-                data-tooltip-content={disabled && item.isPremium ? 'This is a premium-only item' : undefined}
+                data-tooltip-content={disabled && item.isPremium ? i18n('this_is_a_premium_only_item') : undefined}
               >
                 <img
                   className="Inventory__item-image"
@@ -102,7 +104,7 @@ export default function Inventory() {
             dispatch(setInventoryVisibility('closed'));
 
             if (isInteractionDisabled) {
-              toast.warn('Please log in to interact.', {
+              toast.warn(i18n('please_log_in_to_interact'), {
                 position: 'top-center',
                 style: {
                   top: 10,

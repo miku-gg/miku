@@ -1,6 +1,16 @@
 import { AbstractPromptStrategy } from '../strategies';
 
 class TestStrategy extends AbstractPromptStrategy<boolean, boolean> {
+  protected getLabels(): Record<string, Record<string, string>> {
+    return {
+      en: {
+        roleplay: 'Roleplay',
+      },
+    };
+  }
+  protected i18n(labelKey: string): string {
+    return labelKey;
+  }
   public buildGuidancePrompt(): {
     template: string;
     variables: Record<string, string | string[]>;

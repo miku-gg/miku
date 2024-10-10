@@ -58,7 +58,7 @@ const Dropdown = ({
       >
         {selectedItem ? (
           <>
-            <div className="dropdown__selected-name">{selectedItem.name}</div>
+            <div className="dropdown__selected-name">{selectedItem.content || selectedItem.name}</div>
             {selectedItem.description && (
               <div className="dropdown__selected-description">{selectedItem.description}</div>
             )}
@@ -78,7 +78,7 @@ const Dropdown = ({
               role="option"
               aria-selected={index === selectedIndex}
             >
-              <div className="dropdown__list-item-name">{item.name}</div>
+              <div className="dropdown__list-item-name">{item.content || item.name}</div>
               {item.description && <div className="dropdown__list-item-description">{item.description}</div>}
             </div>
           ))}

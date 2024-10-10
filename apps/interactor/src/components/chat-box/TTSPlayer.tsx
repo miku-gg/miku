@@ -9,6 +9,7 @@ import { Speed } from '../../state/versioning';
 import { useAppContext } from '../../App.context';
 import { trackEvent } from '../../libs/analytics';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { useI18n } from '../../libs/i18n';
 
 function isFirefoxOrSafari(): boolean {
   const userAgent = navigator.userAgent.toLowerCase();
@@ -83,6 +84,7 @@ const TTSPlayer2: React.FC = () => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
+  const { i18n } = useI18n();
 
   const stopAudio = useCallback(() => {
     audioRef.current?.pause();
@@ -318,14 +320,14 @@ const TTSPlayer2: React.FC = () => {
         data-tooltip-id="smart-tooltip"
         data-tooltip-content={
           !isPremium && !freeTTS && !isFirstMessage
-            ? 'This is a premium feature'
+            ? i18n('this_is_a_premium_feature')
             : !isPremium && freeTTS
-            ? 'Free for a limited time'
+            ? i18n('free_for_a_limited_time')
             : ''
         }
       >
         {inferencing ? <Loader /> : <MdRecordVoiceOver />}
-        <span className="ResponseBox__action-text">Listen</span>
+        <span className="ResponseBox__action-text">{i18n('listen')}</span>
       </button>
       <Tooltip id="audio-tooltip" place="top" />
     </>
