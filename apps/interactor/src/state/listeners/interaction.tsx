@@ -80,7 +80,7 @@ const interactionEffect = async (
     const maxMessages = selectSummaryEnabled(state)
       ? Math.max(messagesSinceLastSummary, 4)
       : selectAllParentDialogues(state).length;
-    const primaryStrategy = new RoleplayPromptStrategy(strategy);
+    const primaryStrategy = new RoleplayPromptStrategy(strategy, state.novel.language || 'en');
 
     const [responsePromptBuilder, secondaryPromptBuilder] = [
       new PromptBuilder<RoleplayPromptStrategy>({
@@ -90,7 +90,7 @@ const interactionEffect = async (
       }),
       new PromptBuilder<RoleplayPromptStrategy>({
         maxNewTokens: 200,
-        strategy: new RoleplayPromptStrategy(secondary.strategy),
+        strategy: new RoleplayPromptStrategy(secondary.strategy, state.novel.language || 'en'),
         truncationLength: secondary.truncation_length - 150,
       }),
     ];
@@ -219,6 +219,7 @@ const interactionEffect = async (
     }
 
     try {
+      const language = state.novel.language || 'en';
       await Promise.all(
         objectives.map(async (objective) => {
           const condition = objective.condition;
@@ -229,6 +230,7 @@ const interactionEffect = async (
                   condition,
                   instructionPrefix: primaryStrategy.template().instruction,
                   responsePrefix: primaryStrategy.template().response,
+                  language,
                 }),
               {
                 user: state.settings.user.name,
@@ -239,14 +241,14 @@ const interactionEffect = async (
             serviceBaseUrl: servicesEndpoint,
             identifier,
             variables: {
-              cond_opt: [' Yes', ' No'],
+              cond_opt: [` Yes`, ` No`],
             },
           });
           let response = '';
           for await (const result of conditionResultStream) {
             response = result.get('cond') || '';
           }
-          if (response === ' Yes') {
+          if (response === ` Yes`) {
             objective.actions.forEach((action) => {
               const stateAction = novelActionToStateAction(action);
               if (stateAction) {
@@ -329,7 +331,7 @@ const interactionEffect = async (
       if (secondary.truncation_length > 7900 && (messagesSinceLastSummary >= 40 || sceneChanged)) {
         const summaryPromptBuilder = new PromptBuilder<SummaryPromptStrategy>({
           maxNewTokens: 200,
-          strategy: new SummaryPromptStrategy(secondary.strategy),
+          strategy: new SummaryPromptStrategy(secondary.strategy, state.novel.language || 'en'),
           truncationLength: secondary.truncation_length,
         });
 

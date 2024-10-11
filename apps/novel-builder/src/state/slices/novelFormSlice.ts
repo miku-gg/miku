@@ -17,6 +17,7 @@ const initialState: NovelV3.NovelState = {
   starts: [],
   lorebooks: [],
   inventory: [],
+  language: 'en',
 };
 
 const novelFormSlice = createSlice({
@@ -397,7 +398,7 @@ const novelFormSlice = createSlice({
     updateDetails: (
       state,
       action: PayloadAction<{
-        name: 'title' | 'description' | 'author' | 'logoPic';
+        name: 'title' | 'description' | 'author' | 'logoPic' | 'language';
         value: string;
       }>,
     ) => {

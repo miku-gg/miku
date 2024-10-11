@@ -401,6 +401,9 @@ importers:
       react:
         specifier: ^18.2.0
         version: 18.2.0
+      react-country-flag:
+        specifier: ^3.1.0
+        version: 3.1.0(react@18.2.0)
       react-icons:
         specifier: ^4.12.0
         version: 4.12.0(react@18.2.0)
@@ -572,8 +575,8 @@ importers:
   docs:
     devDependencies:
       retypeapp:
-        specifier: ^3.5.0
-        version: 3.5.0
+        specifier: ^3.6.0
+        version: 3.6.0
 
   packages/bot-utils:
     dependencies:
@@ -1982,7 +1985,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.23.6
-      '@babel/helper-plugin-utils': 7.22.5
+      '@babel/helper-plugin-utils': 7.21.5
     dev: true
 
   /@babel/plugin-syntax-logical-assignment-operators@7.10.4(@babel/core@7.21.3):
@@ -14348,6 +14351,15 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
+  /react-country-flag@3.1.0(react@18.2.0):
+    resolution: {integrity: sha512-JWQFw1efdv9sTC+TGQvTKXQg1NKbDU2mBiAiRWcKM9F1sK+/zjhP2yGmm8YDddWyZdXVkR8Md47rPMJmo4YO5g==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /react-dom@18.2.0(react@18.2.0):
     resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
     peerDependencies:
@@ -14808,8 +14820,8 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
-  /retypeapp@3.5.0:
-    resolution: {integrity: sha512-YhHilXfKLXU2BCZ0lfj4tUVMrk8nUjkSCAoV52xIPfRfSKQQah9D5vn2Eiu+FUmeGGEB9gykr8UVi7CvjmiqbQ==}
+  /retypeapp@3.6.0:
+    resolution: {integrity: sha512-lDswiUZAVlLVfKo78tb5u4uc4FLN16pPyammOZ/MKBtyQzba+14nza5X4ndMrJMCr4UJuMAuru/515PdGff87A==}
     hasBin: true
     dev: true
 
