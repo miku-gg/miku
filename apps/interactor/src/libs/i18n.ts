@@ -106,6 +106,7 @@ const labels: Record<string, Record<string, string>> = {
     free_for_a_limited_time: 'Free for a limited time',
     select: 'Select',
     type_a_message: 'Type a message...',
+    hint: 'Hint:',
   },
   es: {
     loading_novel: 'Cargando Novela',
@@ -214,6 +215,7 @@ const labels: Record<string, Record<string, string>> = {
     free_for_a_limited_time: 'Gratis por tiempo limitado',
     select: 'Seleccionar',
     type_a_message: 'Escribe un mensaje...',
+    hint: 'Pista:',
   },
   pt: {
     loading_novel: 'Carregando Romance',
@@ -321,6 +323,7 @@ const labels: Record<string, Record<string, string>> = {
     free_for_a_limited_time: 'Grátis por tempo limitado',
     select: 'Selecionar',
     type_a_message: 'Digite uma mensagem...',
+    hint: 'Dica:',
   },
   de: {
     loading_novel: 'Roman wird geladen',
@@ -429,6 +432,7 @@ const labels: Record<string, Record<string, string>> = {
     free_for_a_limited_time: 'Für begrenzte Zeit kostenlos',
     select: 'Auswählen',
     type_a_message: 'Schreibe eine Nachricht...',
+    hint: 'Tipp:',
   },
   fr: {
     loading_novel: 'Chargement du Roman',
@@ -536,6 +540,7 @@ const labels: Record<string, Record<string, string>> = {
     free_for_a_limited_time: 'Gratuit pour une durée limitée',
     select: 'Sélectionner',
     type_a_message: 'Tapez un message...',
+    hint: 'Indice :',
   },
   ru: {
     loading_novel: 'Загрузка романа',
@@ -644,6 +649,7 @@ const labels: Record<string, Record<string, string>> = {
     free_for_a_limited_time: 'Бесплатно на ограниченное время',
     select: 'Выбрать',
     type_a_message: 'Введите сообщение...',
+    hint: 'Подсказка:',
   },
   jp: {
     loading_novel: '小説を読み込み中',
@@ -750,6 +756,7 @@ const labels: Record<string, Record<string, string>> = {
     free_for_a_limited_time: '期間限定で無料',
     select: '選択',
     type_a_message: 'メッセージを入力...',
+    hint: 'ヒント：',
   },
 };
 

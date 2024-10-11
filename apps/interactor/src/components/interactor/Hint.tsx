@@ -8,6 +8,7 @@ import {
   selectCurrentSceneObjectives,
 } from '../../state/selectors';
 import { markHintSeen } from '../../state/slices/narrationSlice';
+import { useI18n } from '../../libs/i18n';
 
 export default function Hint() {
   const [hidden, setHidden] = useState(false);
@@ -18,6 +19,7 @@ export default function Hint() {
   const objectives =
     useAppSelector(selectCurrentSceneObjectives).filter((o) => !seenHints?.includes(o.id) && o.hint) || [];
   let hintToShow = [...objectives, seenHints.includes(scene?.id || '') ? null : scene][0];
+  const { i18n } = useI18n();
 
   if (count < 2) {
     hintToShow = undefined;
@@ -46,7 +48,7 @@ export default function Hint() {
         </div>
         <div className="Hint__text">
           <span className="Hint__text-span">
-            <span className="Hint__text-label">Hint:</span>
+            <span className="Hint__text-label">{i18n('hint')}</span>
             <span>{hintToShow.hint}</span>
           </span>
         </div>
