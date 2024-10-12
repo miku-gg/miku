@@ -87,14 +87,30 @@ const BotTranslator = () => {
         const totalTexts = textsToTranslate.length;
         let translatedCount = 0;
 
-        const translatedTexts = await Promise.all(
-          textsToTranslate.map(async ({ path, text }) => {
-            const translatedText = await translateText(text, languageCode, openAIKey);
-            translatedCount++;
-            setProgress((translatedCount / totalTexts) * 100);
-            return { path, translatedText };
-          }),
-        );
+        // New code: Process translations in batches
+        const batchSize = 50;
+        const translatedTexts: {
+          path: string;
+          translatedText: string;
+        }[] = [];
+
+        for (let i = 0; i < textsToTranslate.length; i += batchSize) {
+          const batch = textsToTranslate.slice(i, i + batchSize);
+          const batchTranslations = await Promise.all(
+            batch.map(async ({ path, text }) => {
+              const translatedText = await translateText(text, languageCode, openAIKey);
+              translatedCount++;
+              setProgress((translatedCount / totalTexts) * 100);
+              return { path, translatedText };
+            }),
+          );
+          translatedTexts.push(...batchTranslations);
+
+          // Add a 2-second delay between batches
+          if (i + batchSize < textsToTranslate.length) {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }
+        }
 
         // Apply the translations back to the novel data
         const translatedNovelData = applyTranslations(novelData, translatedTexts);
