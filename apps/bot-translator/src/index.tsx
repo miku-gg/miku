@@ -20,6 +20,7 @@ const languageCodeToName = new Map([
   ['de', 'German'],
   ['ru', 'Russian'],
   ['jp', 'Japanese'],
+  ['pl', 'Polish'],
 ]);
 
 const languageCodeToExtraPrompt = new Map([
@@ -33,6 +34,7 @@ const languageCodeToExtraPrompt = new Map([
   ['de', 'Use typical German expressions and vocabulary.'],
   ['ru', 'Use typical Russian expressions and vocabulary.'],
   ['jp', 'Use typical Japanese expressions and vocabulary.'],
+  ['pl', 'Use typical Polish expressions and vocabulary.'],
 ]);
 
 const BotTranslator = () => {
@@ -41,7 +43,9 @@ const BotTranslator = () => {
   const [language, setLanguage] = useState(0);
   const [expandedLanguage, setExpandedLanguage] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [novelName, setNovelName] = useState<string>('');
 
   const languageOptions = Array.from(languageCodeToName.keys()).map((code) => ({
     name: languageCodeToName.get(code) || '',
@@ -73,6 +77,7 @@ const BotTranslator = () => {
       return;
     }
 
+    setIsLoading(true);
     // Read the JSON file
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -101,9 +106,13 @@ const BotTranslator = () => {
         });
         const url = URL.createObjectURL(blob);
         setDownloadUrl(url);
+        const titleFileNameSave = translatedNovelData.title.replace(/[^a-zA-Z0-9]/g, '_');
+        setNovelName(titleFileNameSave);
+        setIsLoading(false);
 
         toast.success('Translation completed', { autoClose: 5000 });
       } catch (error) {
+        setIsLoading(false);
         console.error(error);
         toast.error('Error translating file', { autoClose: 5000 });
       }
@@ -244,7 +253,7 @@ const BotTranslator = () => {
     if (downloadUrl) {
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.download = `translated_novel_${languageCode}.json`;
+      link.download = `${novelName || 'novel'}_${languageCode}.json`;
       link.click();
       // Revoke the object URL after downloading
       setTimeout(() => {
@@ -255,21 +264,25 @@ const BotTranslator = () => {
   };
 
   return (
-    <div>
-      <label>
-        Novel JSON File:
+    <div className="Main">
+      <div className="Header">
+        <img src="/logo.png" />
+        <span>miku.gg | Novel Translator</span>
+      </div>
+      <label className="JsonFile">
+        Novel JSON File
         <input
           type="file"
           accept=".json"
           onChange={(e) => (e.target.files?.[0] ? handleFileChange(e.target.files?.[0]) : null)}
         />
       </label>
-      <label>
-        OpenAI API Key:
-        <Input value={openAIKey} onChange={handleKeyChange} placeHolder="OpenAI API Key" />
+      <label className="OpenAIKey">
+        OpenAI API Key
+        <Input isTextArea value={openAIKey} onChange={handleKeyChange} placeHolder="OpenAI API Key" />
       </label>
-      <label>
-        Language to translate to:
+      <label className="Language">
+        Language to translate to
         <Dropdown
           items={languageOptions}
           selectedIndex={language}
@@ -278,7 +291,7 @@ const BotTranslator = () => {
           expanded={expandedLanguage}
         />
       </label>
-      <Button theme="primary" type="submit" disabled={!file || !openAIKey} onClick={handleSubmit}>
+      <Button theme="primary" type="submit" disabled={!file || !openAIKey || isLoading} onClick={handleSubmit}>
         Translate
       </Button>
       {progress > 0 && progress < 100 && (
