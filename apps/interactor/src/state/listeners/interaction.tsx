@@ -78,7 +78,7 @@ const interactionEffect = async (
     };
     const messagesSinceLastSummary = selectMessagesSinceLastSummary(state);
     const maxMessages = selectSummaryEnabled(state)
-      ? Math.max(messagesSinceLastSummary, 4)
+      ? Math.max(messagesSinceLastSummary, 16)
       : selectAllParentDialogues(state).length;
     const primaryStrategy = new RoleplayPromptStrategy(strategy, state.novel.language || 'en');
 
