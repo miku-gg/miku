@@ -39,6 +39,10 @@ export interface NovelScene {
   parentMapIds?: string[] | null;
   nsfw: NovelNSFW;
   lorebookIds?: string[];
+  cutScene?: {
+    id: boolean;
+    triggerOnlyOnce: boolean;
+  };
 }
 
 export interface NovelCharacterOutfit {
@@ -58,16 +62,19 @@ export interface NovelCharacterOutfit {
   }[];
 }
 
+export interface CutScenePart {
+  id: string;
+  text: string;
+  type: 'dialogue' | 'description';
+  background: string;
+  music: string;
+  characters: { id: string; outfitId: string; emotionId: string }[];
+}
+
 export interface CutScene {
-  id: boolean;
+  id: string;
   name: string;
-  parts: {
-    text: string;
-    type: 'dialogue' | 'description';
-    background: string;
-    music: string;
-    characters: { id: string; outfitId: string; emotion: string }[];
-  }[];
+  parts: CutScenePart[];
 }
 
 export interface NovelCharacter {
