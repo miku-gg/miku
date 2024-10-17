@@ -12,8 +12,6 @@ type NovelState = NovelV3.NovelState;
 const languageCodeToName = new Map([
   ['es', 'Spanish'],
   ['es_ar', 'Spanish (Argentina)'],
-  ['es_es', 'Spanish (España)'],
-  ['es_cl', 'Spanish (Chile)'],
   ['pt', 'Portuguese'],
   ['pt_br', 'Portuguese (Brazil)'],
   ['fr', 'French'],
@@ -26,8 +24,6 @@ const languageCodeToName = new Map([
 const languageCodeToExtraPrompt = new Map([
   ['es', 'Use typical Spanish expressions and vocabulary.'],
   ['es_ar', 'Use typical Argentinean Spanish expressions and vocabulary.'],
-  ['es_es', 'Use typical Spanish from Spain expressions and vocabulary.'],
-  ['es_cl', 'Use typical Chilean Spanish expressions and vocabulary.'],
   ['pt', 'Use typical Portuguese expressions and vocabulary.'],
   ['pt_br', 'Use typical Brazilian Portuguese expressions and vocabulary.'],
   ['fr', 'Use typical French expressions and vocabulary.'],
@@ -106,9 +102,9 @@ const BotTranslator = () => {
           );
           translatedTexts.push(...batchTranslations);
 
-          // Add a 2-second delay between batches
+          // Add a 10-second delay between batches
           if (i + batchSize < textsToTranslate.length) {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await new Promise((resolve) => setTimeout(resolve, 10000));
           }
         }
 
