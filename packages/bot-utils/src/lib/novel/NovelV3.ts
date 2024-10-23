@@ -40,7 +40,7 @@ export interface NovelScene {
   nsfw: NovelNSFW;
   lorebookIds?: string[];
   cutScene?: {
-    id: boolean;
+    id: string;
     triggerOnlyOnce: boolean;
   };
 }

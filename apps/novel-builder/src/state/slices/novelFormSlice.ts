@@ -426,33 +426,40 @@ const novelFormSlice = createSlice({
     },
     clearNovelState: () => initialState,
 
-    createCutscenePart: (state, action: PayloadAction<{ cutsceneId: string, partId: string }>) => {
-      const cutscene = state.cutscenes?.find(cutscene => cutscene.id === action.payload.cutsceneId);
+    createCutscenePart: (state, action: PayloadAction<{ cutsceneId: string; partId: string }>) => {
+      const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
+      const character = state.characters[0];
       if (!cutscene) return;
       const newPart: NovelV3.CutScenePart = {
         id: action.payload.partId,
-        text: '',
+        text: 'Description or dialogue text',
         type: 'dialogue',
         background: state.backgrounds[0]?.id || '',
         music: state.songs[0]?.id || '',
-        characters: [],
+        characters: [
+          {
+            id: character.id,
+            emotionId: character.card.data.extensions.mikugg_v2.outfits[0].emotions[0].id,
+            outfitId: character.card.data.extensions.mikugg_v2.outfits[0].id,
+          },
+        ],
       };
       cutscene.parts.push(newPart);
     },
 
     updateCutscenePart: (state, action: PayloadAction<{ cutsceneId: string; part: NovelV3.CutScenePart }>) => {
-      const cutscene = state.cutscenes?.find(cutscene => cutscene.id === action.payload.cutsceneId);
+      const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
       if (!cutscene) return;
-      const index = cutscene.parts.findIndex(part => part.id === action.payload.part.id);
+      const index = cutscene.parts.findIndex((part) => part.id === action.payload.part.id);
       if (index !== -1) {
         cutscene.parts[index] = action.payload.part;
       }
     },
 
     deleteCutscenePart: (state, action: PayloadAction<{ cutsceneId: string; partId: string }>) => {
-      const cutscene = state.cutscenes?.find(cutscene => cutscene.id === action.payload.cutsceneId);
+      const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
       if (!cutscene) return;
-      cutscene.parts = cutscene.parts.filter(part => part.id !== action.payload.partId);
+      cutscene.parts = cutscene.parts.filter((part) => part.id !== action.payload.partId);
     },
   },
 });

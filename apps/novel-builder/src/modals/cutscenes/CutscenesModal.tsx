@@ -1,20 +1,19 @@
 import { Button, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
 import { v4 as randomUUID } from 'uuid';
-import { createCutscene, createCutscenePart, deleteCutscene, updateCutscene } from '../../state/slices/novelFormSlice';
+import { createCutscene, deleteCutscene, updateCutscene } from '../../state/slices/novelFormSlice';
 import { closeModal, openModal } from '../../state/slices/inputSlice';
-import { selectEditingCutscene, selectEditingScene } from '../../state/selectors';
+import { selectEditingCutscene } from '../../state/selectors';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { FaTrashAlt } from 'react-icons/fa';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import './CutsceneModal.scss';
-import ButtonGroup from '../../components/ButtonGroup';
+import { CutScenePartsRender } from './CutscenesPartsRender';
 
 export const CutscenesModal = () => {
   const dispatch = useAppDispatch();
   const cutsceneModal = useAppSelector((state: RootState) => state.input.modals.cutscenes);
   const currentCutscene = useAppSelector(selectEditingCutscene);
-  const cutsceneParts = currentCutscene?.parts || [];
 
   const handleCreateCutscene = () => {
     const id = randomUUID();
@@ -34,7 +33,7 @@ export const CutscenesModal = () => {
 
   return (
     <>
-      <Button theme="primary" onClick={handleCreateCutscene}>
+      <Button theme="gradient" onClick={handleCreateCutscene}>
         Add Cutscene
       </Button>
       {currentCutscene && (
@@ -60,9 +59,13 @@ export const CutscenesModal = () => {
             <h1>Add Cutscene</h1>
             <div>
               <Input
+                label="Name"
                 value={currentCutscene.name}
                 onChange={(e) => handleEditCutscene({ ...currentCutscene, name: e.target.value })}
               />
+            </div>
+            <div>
+              <CutScenePartsRender onDeletePart={() => {}} />
             </div>
           </div>
         </Modal>
