@@ -3,7 +3,7 @@ import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
 import { v4 as randomUUID } from 'uuid';
 import { createCutscene, deleteCutscene, updateCutscene } from '../../state/slices/novelFormSlice';
 import { closeModal, openModal } from '../../state/slices/inputSlice';
-import { selectEditingCutscene } from '../../state/selectors';
+import { selectEditingCutscene, selectEditingScene } from '../../state/selectors';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { FaTrashAlt } from 'react-icons/fa';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
@@ -14,10 +14,17 @@ export const CutscenesModal = () => {
   const dispatch = useAppDispatch();
   const cutsceneModal = useAppSelector((state: RootState) => state.input.modals.cutscenes);
   const currentCutscene = useAppSelector(selectEditingCutscene);
+  const currentScene = useAppSelector(selectEditingScene);
+  const currentCutsceneByScene = currentScene?.cutScene;
 
   const handleCreateCutscene = () => {
+    if (!currentScene) return;
+    if (currentCutsceneByScene) {
+      dispatch(openModal({ modalType: 'cutscenes', editId: currentCutsceneByScene.id }));
+      return;
+    }
     const id = randomUUID();
-    dispatch(createCutscene(id));
+    dispatch(createCutscene({ cutsceneId: id, sceneId: currentScene.id }));
     dispatch(openModal({ modalType: 'cutscenes', editId: id }));
   };
 
@@ -26,15 +33,15 @@ export const CutscenesModal = () => {
   };
 
   const handleDeleteCutscene = () => {
-    if (!currentCutscene) return;
-    dispatch(deleteCutscene(currentCutscene.id));
+    if (!currentCutscene || !currentScene) return;
+    dispatch(deleteCutscene({ cutsceneId: currentCutscene.id, sceneId: currentScene.id }));
     dispatch(closeModal({ modalType: 'cutscenes' }));
   };
 
   return (
     <>
       <Button theme="gradient" onClick={handleCreateCutscene}>
-        Add Cutscene
+        {currentCutsceneByScene ? 'Edit Cutscene' : 'Add Cutscene'}
       </Button>
       {currentCutscene && (
         <Modal opened={cutsceneModal.opened} onCloseModal={() => dispatch(closeModal({ modalType: 'cutscenes' }))}>
@@ -56,7 +63,7 @@ export const CutscenesModal = () => {
               />
               <Tooltip id="delete-cutscene-tooltip" place="bottom" />
             </div>
-            <h1>Add Cutscene</h1>
+            <h2>Add Cutscene</h2>
             <div>
               <Input
                 label="Name"
@@ -65,7 +72,7 @@ export const CutscenesModal = () => {
               />
             </div>
             <div>
-              <CutScenePartsRender onDeletePart={() => {}} />
+              <CutScenePartsRender />
             </div>
           </div>
         </Modal>

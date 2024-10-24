@@ -392,12 +392,19 @@ const novelFormSlice = createSlice({
       if (!state.objectives) return;
       state.objectives = state.objectives.filter((objective) => objective.id !== action.payload.id);
     },
-    createCutscene: (state, action: PayloadAction<string>) => {
+    createCutscene: (state, action: PayloadAction<{ cutsceneId: string; sceneId: string }>) => {
       const newCutscene: NovelV3.CutScene = {
-        id: action.payload,
+        id: action.payload.cutsceneId,
         name: 'New Cutscene',
         parts: [],
       };
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene) {
+        scene.cutScene = {
+          id: action.payload.cutsceneId,
+          triggerOnlyOnce: false,
+        };
+      }
       state.cutscenes ? state.cutscenes.push(newCutscene) : (state.cutscenes = [newCutscene]);
     },
     updateCutscene: (state, action: PayloadAction<NovelV3.CutScene>) => {
@@ -407,9 +414,13 @@ const novelFormSlice = createSlice({
         state.cutscenes[index] = action.payload;
       }
     },
-    deleteCutscene: (state, action: PayloadAction<string>) => {
+    deleteCutscene: (state, action: PayloadAction<{ cutsceneId: string; sceneId: string }>) => {
       if (!state.cutscenes) return;
-      state.cutscenes = state.cutscenes.filter((cutscene) => cutscene.id !== action.payload);
+      state.cutscenes = state.cutscenes.filter((cutscene) => cutscene.id !== action.payload.cutsceneId);
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene) {
+        scene.cutScene = undefined;
+      }
     },
 
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
