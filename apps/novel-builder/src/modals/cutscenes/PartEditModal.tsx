@@ -1,4 +1,4 @@
-import { Button, Carousel, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import { AreYouSure, Button, Carousel, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { selectEditingCutscene, selectEditingCutscenePart, selectEditingScene } from '../../state/selectors';
 import { closeModal } from '../../state/slices/inputSlice';
@@ -8,7 +8,7 @@ import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { FaTrashAlt, FaUser } from 'react-icons/fa';
 import './PartEditModal.scss';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Songs from '../../panels/assets/songs/Songs';
 import Backgrounds from '../../panels/assets/backgrounds/Backgrounds';
 import config from '../../config';
@@ -19,6 +19,8 @@ import './PartEditModal.scss';
 
 export const PartEditModal = () => {
   const dispatch = useAppDispatch();
+  const { openModal } = AreYouSure.useAreYouSure();
+
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
   const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] = useState(false);
   const [selectCharacterModal, setSelectCharacterModal] = useState({
@@ -47,8 +49,15 @@ export const PartEditModal = () => {
 
   const deletePart = () => {
     if (!currentCutscene || !part) return;
-    dispatch(deleteCutscenePart({ cutsceneId: currentCutscene.id, partId: part.id }));
     handleClose();
+    dispatch(closeModal({ modalType: 'cutscenes' }));
+    openModal({
+      title: 'Are you sure?',
+      description: 'This action cannot be undone',
+      onYes: () => {
+        dispatch(deleteCutscenePart({ cutsceneId: currentCutscene.id, partId: part.id }));
+      },
+    });
   };
 
   const handleCloseAllModals = () => {
