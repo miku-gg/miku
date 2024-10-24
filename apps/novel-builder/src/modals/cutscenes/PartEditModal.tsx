@@ -8,7 +8,7 @@ import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { FaTrashAlt, FaUser } from 'react-icons/fa';
 import './PartEditModal.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Songs from '../../panels/assets/songs/Songs';
 import Backgrounds from '../../panels/assets/backgrounds/Backgrounds';
 import config from '../../config';
@@ -20,6 +20,12 @@ import './PartEditModal.scss';
 export const PartEditModal = () => {
   const dispatch = useAppDispatch();
   const { openModal } = AreYouSure.useAreYouSure();
+  const part = useAppSelector(selectEditingCutscenePart);
+  const opened = useAppSelector((state) => state.input.modals.cutscenePartEdit.opened);
+  const currentCutscene = useAppSelector(selectEditingCutscene);
+  const selectedMusic = useAppSelector((state) => state.novel.songs.find((s) => s.id === part?.music));
+  const selectedBackground = useAppSelector((state) => state.novel.backgrounds.find((b) => b.id === part?.background));
+  const characters = useAppSelector(selectEditingScene)?.characters || [];
 
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
   const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] = useState(false);
@@ -28,15 +34,8 @@ export const PartEditModal = () => {
     characterIndex: 0,
   });
 
-  const [showingEmotionChar1, setShowingEmotionChar1] = useState('neutral');
-  const [showingEmotionChar2, setShowingEmotionChar2] = useState('neutral');
-
-  const part = useAppSelector(selectEditingCutscenePart);
-  const opened = useAppSelector((state) => state.input.modals.cutscenePartEdit.opened);
-  const currentCutscene = useAppSelector(selectEditingCutscene);
-  const selectedMusic = useAppSelector((state) => state.novel.songs.find((s) => s.id === part?.music));
-  const selectedBackground = useAppSelector((state) => state.novel.backgrounds.find((b) => b.id === part?.background));
-  const characters = useAppSelector(selectEditingScene)?.characters || [];
+  const [showingEmotionChar1, setShowingEmotionChar1] = useState<string | undefined>(undefined);
+  const [showingEmotionChar2, setShowingEmotionChar2] = useState<string | undefined>(undefined);
 
   const handleClose = () => {
     dispatch(closeModal({ modalType: 'cutscenePartEdit' }));
@@ -75,6 +74,11 @@ export const PartEditModal = () => {
         break;
     }
   };
+
+  useEffect(() => {
+    setShowingEmotionChar1(part?.characters[0]?.emotionId || 'neutral');
+    setShowingEmotionChar2(part?.characters[1]?.emotionId || 'neutral');
+  }, [part]);
 
   if (!part) return null;
 
