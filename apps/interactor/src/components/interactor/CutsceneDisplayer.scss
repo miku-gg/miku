@@ -1,0 +1,125 @@
+// Define base styles for the component
+.CutsceneDisplayer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.75rem; // This is equivalent to 'rounded-xl' in Tailwind
+  box-shadow: 0px 0px 20px 0px rgb(205 95 234);
+
+  &__content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__main-image-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 0.75rem; // Equivalent to 'rounded-xl' in Tailwind
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0) 10%);
+    }
+  }
+
+  &__background-image,
+  &__background-video,
+  &__background-mobileVideo {
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+    border-radius: 0.75rem; // Equivalent to 'rounded-xl' in Tailwind
+    object-fit: cover;
+    transition: all 0.2s ease-in;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  &__mobileVideo {
+    object-fit: none;
+  }
+
+  &__characters {
+    position: absolute;
+    bottom: 0;
+    height: 90%;
+    object-fit: cover;
+    transition: all 0.2s ease-in;
+    pointer-events: none;
+    user-select: none;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__emotion-renderer {
+    opacity: 0;
+    z-index: 0;
+    object-fit: contain;
+    height: 100%;
+    transition: all 0.2s ease-out;
+    animation: up-and-down 3s ease-in-out infinite;
+  }
+
+  &__characters--multiple {
+    opacity: 1;
+    z-index: 1;
+    display: initial;
+    justify-content: initial;
+
+    .Interactor__emotion-renderer {
+      position: absolute;
+      width: 100%;
+      filter: brightness(0.6);
+      animation: none;
+
+      &.selected {
+        animation: up-and-down 3s ease-in-out infinite, brightnessfade 0.5s ease-in-out forwards;
+        z-index: 1;
+      }
+
+      &:first-child {
+        left: -25%;
+      }
+
+      &:last-child {
+        right: -25%;
+      }
+    }
+  }
+}
+
+@keyframes brightnessfade {
+  0% {
+    filter: brightness(0.6);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+@keyframes up-and-down {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+}

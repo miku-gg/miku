@@ -13,10 +13,12 @@ import Inventory from './Inventory';
 import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { CutsceneDisplayer } from './CutsceneDisplayer';
 
 const Interactor = () => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
   const scene = useAppSelector(selectCurrentScene);
+  const hasCutscene = scene?.cutScene !== null;
   const lastCharacters = useAppSelector(selectLastLoadedCharacters);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
@@ -26,87 +28,96 @@ const Interactor = () => {
   }
 
   const background = backgrounds.find((b) => b.id === scene.backgroundId);
+
   return (
     <AreYouSure.AreYouSureProvider>
       <div className="Interactor">
         <div className="Interactor__content">
-          <InteractorHeader />
-          <SceneSuggestion />
-          <div className="Interactor__main-image-container">
-            <ProgressiveImage
-              src={
-                background
-                  ? assetLinkLoader(
-                      (isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile
-                        ? background.source.mp4Mobile
-                        : background.source.mp4 || background.source.jpg,
-                      (isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile
-                        ? AssetDisplayPrefix.BACKGROUND_VIDEO
-                        : background.source.mp4
-                        ? AssetDisplayPrefix.BACKGROUND_VIDEO
-                        : AssetDisplayPrefix.BACKGROUND_IMAGE,
+          {hasCutscene ? (
+            <CutsceneDisplayer />
+          ) : (
+            <>
+              <InteractorHeader />
+              <SceneSuggestion />
+              <div className="Interactor__main-image-container">
+                <ProgressiveImage
+                  src={
+                    background
+                      ? assetLinkLoader(
+                          (isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile
+                            ? background.source.mp4Mobile
+                            : background.source.mp4 || background.source.jpg,
+                          (isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile
+                            ? AssetDisplayPrefix.BACKGROUND_VIDEO
+                            : background.source.mp4
+                            ? AssetDisplayPrefix.BACKGROUND_VIDEO
+                            : AssetDisplayPrefix.BACKGROUND_IMAGE,
+                        )
+                      : ''
+                  }
+                  placeholder={
+                    background ? assetLinkLoader(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL) : ''
+                  }
+                >
+                  {(src) =>
+                    (isMobileApp || window.innerWidth < 600) && background?.source.mp4Mobile ? (
+                      <video className="Interactor__background-mobileVideo" loop autoPlay muted>
+                        <source
+                          src={assetLinkLoader(background.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_IMAGE)}
+                        ></source>
+                      </video>
+                    ) : background?.source.mp4 ? (
+                      <video className="Interactor__background-video" loop autoPlay muted>
+                        <source
+                          src={assetLinkLoader(background.source.mp4, AssetDisplayPrefix.BACKGROUND_VIDEO)}
+                        ></source>
+                      </video>
+                    ) : (
+                      <img
+                        className="Interactor__background-image"
+                        src={`${src}`}
+                        alt="background"
+                        onError={({ currentTarget }) => {
+                          if (currentTarget.src !== '/images/default_background.png') {
+                            currentTarget.onerror = null;
+                            currentTarget.src = '/images/default_background.png';
+                          }
+                        }}
+                      />
                     )
-                  : ''
-              }
-              placeholder={
-                background ? assetLinkLoader(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL) : ''
-              }
-            >
-              {(src) =>
-                (isMobileApp || window.innerWidth < 600) && background?.source.mp4Mobile ? (
-                  <video className="Interactor__background-mobileVideo" loop autoPlay muted>
-                    <source
-                      src={assetLinkLoader(background.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_IMAGE)}
-                    ></source>
-                  </video>
-                ) : background?.source.mp4 ? (
-                  <video className="Interactor__background-video" loop autoPlay muted>
-                    <source src={assetLinkLoader(background.source.mp4, AssetDisplayPrefix.BACKGROUND_VIDEO)}></source>
-                  </video>
-                ) : (
-                  <img
-                    className="Interactor__background-image"
-                    src={`${src}`}
-                    alt="background"
-                    onError={({ currentTarget }) => {
-                      if (currentTarget.src !== '/images/default_background.png') {
-                        currentTarget.onerror = null;
-                        currentTarget.src = '/images/default_background.png';
-                      }
-                    }}
-                  />
-                )
-              }
-            </ProgressiveImage>
-            <div
-              className={classNames({
-                Interactor__characters: true,
-                'Interactor__characters--multiple': lastCharacters.length > 1,
-              })}
-            >
-              {lastCharacters.map(({ id, image }) => {
-                if (!image) {
-                  return null;
-                }
-                return (
-                  <EmotionRenderer
-                    key={`character-emotion-render-${id}`}
-                    assetLinkLoader={assetLinkLoader}
-                    assetUrl={image}
-                    upDownAnimation
-                    className={classNames({
-                      'Interactor__emotion-renderer': true,
-                      selected: displayCharacter?.id === id,
-                    })}
-                  />
-                );
-              })}
-            </div>
-          </div>
-          <ChatBox />
-          <Inventory />
-          <DebugModal />
-          <ModelSelectorModal />
+                  }
+                </ProgressiveImage>
+                <div
+                  className={classNames({
+                    Interactor__characters: true,
+                    'Interactor__characters--multiple': lastCharacters.length > 1,
+                  })}
+                >
+                  {lastCharacters.map(({ id, image }) => {
+                    if (!image) {
+                      return null;
+                    }
+                    return (
+                      <EmotionRenderer
+                        key={`character-emotion-render-${id}`}
+                        assetLinkLoader={assetLinkLoader}
+                        assetUrl={image}
+                        upDownAnimation
+                        className={classNames({
+                          'Interactor__emotion-renderer': true,
+                          selected: displayCharacter?.id === id,
+                        })}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+              <ChatBox />
+              <Inventory />
+              <DebugModal />
+              <ModelSelectorModal />
+            </>
+          )}
         </div>
       </div>
     </AreYouSure.AreYouSureProvider>

@@ -14,6 +14,7 @@ const initialState: NovelState = {
   backgrounds: [],
   logoPic: '',
   maps: [],
+  cutscenes: [],
   songs: [],
   tags: [],
 };
@@ -98,6 +99,12 @@ const novelSlice = createSlice({
             parent.children.push(childId);
           }
         });
+      }
+    },
+    updateCutsceneTriggerOnlyOnce: (state, action: PayloadAction<{ sceneId: string; triggerOnlyOnce: boolean }>) => {
+      const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
+      if (scene && scene.cutScene) {
+        scene.cutScene.triggerOnlyOnce = action.payload.triggerOnlyOnce;
       }
     },
   },
