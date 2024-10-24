@@ -382,6 +382,7 @@ const novelFormSlice = createSlice({
         actions: [],
       });
     },
+
     updateObjective: (state, action: PayloadAction<{ id: string; objective: NovelV3.NovelObjective }>) => {
       if (!state.objectives) return;
       const index = state.objectives?.findIndex((objective) => objective.id === action.payload.id);
@@ -391,6 +392,12 @@ const novelFormSlice = createSlice({
     deleteObjective: (state, action: PayloadAction<{ id: string }>) => {
       if (!state.objectives) return;
       state.objectives = state.objectives.filter((objective) => objective.id !== action.payload.id);
+    },
+    updateTriggerOnlyOnce: (state, action: PayloadAction<{ sceneId: string; triggerOnlyOnce: boolean }>) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene && scene.cutScene) {
+        scene.cutScene.triggerOnlyOnce = action.payload.triggerOnlyOnce;
+      }
     },
     createCutscene: (state, action: PayloadAction<{ cutsceneId: string; sceneId: string }>) => {
       const newCutscene: NovelV3.CutScene = {
@@ -513,6 +520,7 @@ export const {
   createObjective,
   updateObjective,
   deleteObjective,
+  updateTriggerOnlyOnce,
   createCutscene,
   updateCutscene,
   deleteCutscene,
