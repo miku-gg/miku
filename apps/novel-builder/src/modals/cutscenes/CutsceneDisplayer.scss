@@ -21,4 +21,27 @@
       }
     }
   }
+
+  &__info {
+    border: 1px solid $node-conector-color;
+    border-radius: 0.5rem;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+
+    &__title {
+      gap: 1rem;
+
+      & h3 {
+        margin: 0;
+      }
+
+      & p {
+        margin: 0;
+        font-size: 0.9rem;
+      }
+    }
+  }
 }

@@ -40,7 +40,7 @@ export const CutscenesModal = () => {
 
   return (
     <>
-      <Button theme="gradient" onClick={handleCreateCutscene}>
+      <Button theme={currentCutsceneByScene ? 'primary' : 'gradient'} onClick={handleCreateCutscene}>
         {currentCutsceneByScene ? 'Edit Cutscene' : 'Add Cutscene'}
       </Button>
       {currentCutscene && (
@@ -67,6 +67,7 @@ export const CutscenesModal = () => {
             <div>
               <Input
                 label="Name"
+                maxLength={50}
                 value={currentCutscene.name}
                 onChange={(e) => handleEditCutscene({ ...currentCutscene, name: e.target.value })}
               />
