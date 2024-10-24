@@ -1,4 +1,4 @@
-import { Button, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import { AreYouSure, Button, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
 import { v4 as randomUUID } from 'uuid';
 import { createCutscene, deleteCutscene, updateCutscene } from '../../state/slices/novelFormSlice';
@@ -14,6 +14,7 @@ export const CutscenesModal = () => {
   const dispatch = useAppDispatch();
   const cutsceneModal = useAppSelector((state: RootState) => state.input.modals.cutscenes);
   const currentCutscene = useAppSelector(selectEditingCutscene);
+  const confirmationModal = AreYouSure.useAreYouSure();
   const currentScene = useAppSelector(selectEditingScene);
   const currentCutsceneByScene = currentScene?.cutScene;
 
@@ -34,8 +35,17 @@ export const CutscenesModal = () => {
 
   const handleDeleteCutscene = () => {
     if (!currentCutscene || !currentScene) return;
-    dispatch(deleteCutscene({ cutsceneId: currentCutscene.id, sceneId: currentScene.id }));
     dispatch(closeModal({ modalType: 'cutscenes' }));
+    confirmationModal.openModal({
+      title: 'Are you sure?',
+      description: 'This action cannot be undone',
+      onYes: () => {
+        dispatch(deleteCutscene({ cutsceneId: currentCutscene.id, sceneId: currentScene.id }));
+      },
+      onNo: () => {
+        dispatch(openModal({ modalType: 'cutscenes', editId: currentCutscene.id }));
+      },
+    });
   };
 
   return (
