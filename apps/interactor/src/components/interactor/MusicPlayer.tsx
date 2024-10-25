@@ -28,7 +28,7 @@ export const MusicNegated = () => {
   );
 };
 
-const MusicPlayer: React.FC = () => {
+const MusicPlayer: React.FC<{ source?: string }> = ({ source }) => {
   const dispatch = useAppDispatch();
   const { assetLinkLoader } = useAppContext();
   const volume = useAppSelector((state) => state.settings.music.volume);
@@ -37,7 +37,12 @@ const MusicPlayer: React.FC = () => {
   const songs = useAppSelector((state) => state.novel.songs);
   const scene = useAppSelector(selectCurrentScene);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const _src = songs.find((s) => s.id === scene?.musicId)?.source || scene?.musicId;
+
+  let _src = songs.find((s) => s.id === scene?.musicId)?.source || scene?.musicId;
+  if (source) {
+    _src = source;
+  }
+
   const src = _src ? assetLinkLoader(_src, AssetDisplayPrefix.MUSIC) : '';
 
   const togglePlay = () => {

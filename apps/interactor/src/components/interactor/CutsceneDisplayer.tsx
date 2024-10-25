@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
 import { FaArrowCircleLeft, FaArrowCircleRight } from 'react-icons/fa';
 import { IoIosArrowForward } from 'react-icons/io';
+import MusicPlayer from './MusicPlayer';
 
 const PartRenderer = ({
   part,
@@ -24,9 +25,11 @@ const PartRenderer = ({
 }) => {
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
+  const songs = useAppSelector((state) => state.novel.songs);
 
   const background = backgrounds.find((b) => b.id === part.background);
   const currentCharacters = part.characters;
+  const songSource = songs.find((s) => s.id === part.music)?.source;
 
   return (
     <div className="CutsceneDisplayer__main-image-container">
@@ -97,6 +100,9 @@ const PartRenderer = ({
           );
         })}
       </div>
+      <div className="CutsceneDisplayer__music-player">
+        <MusicPlayer source={songSource} />
+      </div>
     </div>
   );
 };
@@ -123,6 +129,13 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
       setCurrentPartIndex(currentPartIndex - 1);
     }
   };
+
+  const getText = (index: number) => {
+    if (parts[index].type === 'description') {
+      return parts[index].text;
+    }
+    return `"${parts[index].text}"`;
+  };
   return (
     <>
       <PartRenderer
@@ -133,13 +146,13 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         onPreviousClick={handlePreviousClick}
       />
       <div
-        className="CutsceneDisplayer__text"
+        className={`CutsceneDisplayer__text ${parts[currentPartIndex].type}`}
         onClick={(e) => {
           e.stopPropagation();
           handleContinueClick();
         }}
       >
-        <TextFormatterStatic text={parts[currentPartIndex].text} />
+        <TextFormatterStatic text={getText(currentPartIndex)} />
         <div className="CutsceneDisplayer__text-button">
           {currentPartIndex > 0 && (
             <FaArrowCircleLeft
@@ -161,16 +174,20 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
               />
             </>
           ) : (
-            <button
-              className="CutsceneDisplayer__continue-button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEndDisplay();
-              }}
-            >
-              Continue to scene
-              <IoIosArrowForward />
-            </button>
+            <>
+              {currentPartIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
+
+              <button
+                className="CutsceneDisplayer__continue-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEndDisplay();
+                }}
+              >
+                Continue to scene
+                <IoIosArrowForward />
+              </button>
+            </>
           )}
         </div>
       </div>
