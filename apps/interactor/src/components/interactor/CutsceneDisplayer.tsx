@@ -8,22 +8,26 @@ import classNames from 'classnames';
 import './CutsceneDisplayer.scss';
 import { useState } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
+import { FaArrowCircleLeft, FaArrowCircleRight } from 'react-icons/fa';
+import { IoIosArrowForward } from 'react-icons/io';
 
 const PartRenderer = ({
   part,
   assetLinkLoader,
   isMobileApp,
-  onContinueClick,
 }: {
   part: NovelV3.CutScenePart;
   assetLinkLoader: (src: string, type: AssetDisplayPrefix) => string;
   isMobileApp: boolean;
   onContinueClick: () => void;
+  onPreviousClick: () => void;
 }) => {
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
+  const characters = useAppSelector((state) => state.novel.characters);
 
   const background = backgrounds.find((b) => b.id === part.background);
   const currentCharacters = part.characters;
+
   return (
     <div className="CutsceneDisplayer__main-image-container">
       <ProgressiveImage
@@ -75,32 +79,29 @@ const PartRenderer = ({
           'CutsceneDisplayer__characters--multiple': currentCharacters.length > 1,
         })}
       >
-        {currentCharacters.map(({ id, emotionId }) => {
-          if (!emotionId) {
+        {currentCharacters.map(({ id, outfitId, emotionId }) => {
+          const character = characters.find((c) => c.id === id);
+          const outfit = character?.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === outfitId);
+          const emotion = outfit?.emotions.find((e) => e.id === emotionId);
+          if (!outfitId || !emotion) {
+            console.log('xd');
             return null;
           }
           return (
             <EmotionRenderer
               key={`character-emotion-render-${id}`}
               assetLinkLoader={assetLinkLoader}
-              assetUrl={emotionId}
+              assetUrl={emotion.sources.png}
               upDownAnimation
-              className={classNames({
-                'CutsceneDisplayer__emotion-renderer': true,
-                selected: currentCharacters[0]?.id === id,
-              })}
             />
           );
         })}
-      </div>
-      <div onClick={onContinueClick}>
-        <TextFormatterStatic text={part.text} />
       </div>
     </div>
   );
 };
 
-export const CutsceneDisplayer = () => {
+export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }) => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
   const scene = useAppSelector(selectCurrentScene);
   const cutscenes = useAppSelector((state) => state.novel.cutscenes);
@@ -117,12 +118,62 @@ export const CutsceneDisplayer = () => {
       setCurrentPartIndex(currentPartIndex + 1);
     }
   };
+  const handlePreviousClick = () => {
+    if (currentPartIndex > 0) {
+      setCurrentPartIndex(currentPartIndex - 1);
+    }
+  };
   return (
-    <PartRenderer
-      part={parts[currentPartIndex]}
-      assetLinkLoader={assetLinkLoader}
-      isMobileApp={isMobileApp}
-      onContinueClick={handleContinueClick}
-    />
+    <>
+      <PartRenderer
+        part={parts[currentPartIndex]}
+        assetLinkLoader={assetLinkLoader}
+        isMobileApp={isMobileApp}
+        onContinueClick={handleContinueClick}
+        onPreviousClick={handlePreviousClick}
+      />
+      <div
+        className="CutsceneDisplayer__text"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleContinueClick();
+        }}
+      >
+        <TextFormatterStatic text={parts[currentPartIndex].text} />
+        <div className="CutsceneDisplayer__text-button">
+          {currentPartIndex > 0 && (
+            <FaArrowCircleLeft
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePreviousClick();
+              }}
+            />
+          )}
+          {currentPartIndex < parts.length - 1 ? (
+            <>
+              {currentPartIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
+              <FaArrowCircleRight
+                className="CutsceneDisplayer__continue-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleContinueClick();
+                }}
+              />
+            </>
+          ) : (
+            <button
+              className="CutsceneDisplayer__continue-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEndDisplay();
+              }}
+            >
+              Continue to scene
+              <IoIosArrowForward />
+            </button>
+          )}
+        </div>
+      </div>
+    </>
   );
 };

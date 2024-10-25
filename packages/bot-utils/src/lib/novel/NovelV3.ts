@@ -42,6 +42,7 @@ export interface NovelScene {
   cutScene?: {
     id: string;
     triggerOnlyOnce: boolean;
+    triggered?: boolean;
   };
 }
 

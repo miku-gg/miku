@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import ProgressiveImage from 'react-progressive-graceful-image';
 import { useAppContext } from '../../App.context';
 import { selectCurrentScene, selectLastLoadedCharacters, selectLastSelectedCharacter } from '../../state/selectors';
-import { useAppSelector } from '../../state/store';
+import { useAppDispatch, useAppSelector } from '../../state/store';
 import ChatBox from '../chat-box/ChatBox';
 import DebugModal from './DebugModal';
 import ModelSelectorModal from './ModelSelectorModal';
@@ -14,14 +14,19 @@ import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
+import { setCutsceneTriggered } from '../../state/slices/novelSlice';
+import { useState } from 'react';
 
 const Interactor = () => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
+  const [isCutsceneDisplayed, setIsCutsceneDisplayed] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
   const scene = useAppSelector(selectCurrentScene);
   const hasCutscene = scene?.cutScene !== null;
   const lastCharacters = useAppSelector(selectLastLoadedCharacters);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
+  const isAlreadyTriggered = scene?.cutScene?.triggered && scene?.cutScene?.triggerOnlyOnce;
 
   if (!scene) {
     return null;
@@ -33,8 +38,13 @@ const Interactor = () => {
     <AreYouSure.AreYouSureProvider>
       <div className="Interactor">
         <div className="Interactor__content">
-          {hasCutscene ? (
-            <CutsceneDisplayer />
+          {!isCutsceneDisplayed && hasCutscene && !isAlreadyTriggered ? (
+            <CutsceneDisplayer
+              onEndDisplay={() => {
+                dispatch(setCutsceneTriggered({ sceneId: scene.id, triggered: true }));
+                setIsCutsceneDisplayed(true);
+              }}
+            />
           ) : (
             <>
               <InteractorHeader />

@@ -1,4 +1,6 @@
 // Define base styles for the component
+@import '../../variables';
+
 .CutsceneDisplayer {
   width: 100%;
   height: 100%;
@@ -101,6 +103,57 @@
       &:last-child {
         right: -25%;
       }
+    }
+  }
+
+  &__text {
+    cursor: pointer;
+    position: absolute;
+    bottom: 35px;
+    z-index: 1;
+    background: linear-gradient(to top, rgba(#171717, 0.9), rgba(#171717, 0.6));
+
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+    width: 75%;
+    min-width: 700px;
+    height: 200px;
+    overflow: scroll;
+    border: 1px solid red;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    &-button {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+
+      & svg {
+        transition: all 0.2s ease-in;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        color: #fff;
+
+        &:hover {
+          color: $secondary-color;
+        }
+      }
+    }
+  }
+  &__continue-button {
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.2s ease-in;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      color: $secondary-color;
     }
   }
 }
