@@ -88,10 +88,11 @@ export default function HomePanel() {
             </div>
             <input
               type="file"
-              accept=".json,.png,.miku,.miku-temp.json,.miku.json,.miku.card.png"
+              accept="application/json,.json,image/png,.png,.miku,.miku-temp.json,.miku.json,.miku.card.png"
               style={{ display: 'none' }}
               ref={fileInputRef}
               onChange={handleFileLoad}
+              multiple
             />
           </div>
         </div>
