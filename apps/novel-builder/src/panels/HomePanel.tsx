@@ -88,7 +88,7 @@ export default function HomePanel() {
             </div>
             <input
               type="file"
-              accept="application/json, image/png, .miku"
+              accept=".json,.png,.miku,.miku-temp.json,.miku.json,.miku.card.png"
               style={{ display: 'none' }}
               ref={fileInputRef}
               onChange={handleFileLoad}
