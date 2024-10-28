@@ -11,12 +11,12 @@ import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { setMapModal } from '../../state/slices/settingsSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
-export const SceneChangeModal = () => {
+export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) => {
   const { assetLinkLoader, isInteractionDisabled, servicesEndpoint, apiEndpoint } = useAppContext();
   const dispatch = useAppDispatch();
   const userName = useAppSelector((state) => state.settings.user.name);
   const { opened, sceneId } = useAppSelector((state) => state.creation.scene.scenePreview);
-  const scene = useAppSelector(selectScenes).find((s) => s.id === sceneId);
+  const scene = useAppSelector(selectScenes).find((s) => s.id === (customSceneId || sceneId));
   const currentCharacterName = useAppSelector(
     (state) => state.novel.characters.find((c) => c.id === scene?.characters[0].characterId)?.name,
   );

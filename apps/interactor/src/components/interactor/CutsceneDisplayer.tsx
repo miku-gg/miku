@@ -9,7 +9,7 @@ import './CutsceneDisplayer.scss';
 import { useState } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
 import { FaArrowCircleLeft, FaArrowCircleRight } from 'react-icons/fa';
-import { IoIosArrowForward } from 'react-icons/io';
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import MusicPlayer from './MusicPlayer';
 
 const PartRenderer = ({
@@ -153,43 +153,46 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         }}
       >
         <TextFormatterStatic text={getText(currentPartIndex)} />
-        <div className="CutsceneDisplayer__text-button">
-          {currentPartIndex > 0 && (
-            <FaArrowCircleLeft
+      </div>
+      <div className="CutsceneDisplayer__buttons">
+        {currentPartIndex > 0 && (
+          <IoIosArrowBack
+            className="CutsceneDisplayer__buttons-left"
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePreviousClick();
+            }}
+          />
+        )}
+        {currentPartIndex < parts.length - 1 ? (
+          <>
+            {currentPartIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
+            <IoIosArrowForward
+              className="CutsceneDisplayer__buttons-right"
               onClick={(e) => {
                 e.stopPropagation();
-                handlePreviousClick();
+                handleContinueClick();
               }}
             />
-          )}
-          {currentPartIndex < parts.length - 1 ? (
-            <>
-              {currentPartIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
-              <FaArrowCircleRight
-                className="CutsceneDisplayer__continue-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleContinueClick();
-                }}
-              />
-            </>
-          ) : (
-            <>
-              {currentPartIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
+          </>
+        ) : (
+          <>
+            {currentPartIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
 
-              <button
-                className="CutsceneDisplayer__continue-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEndDisplay();
-                }}
-              >
-                Continue to scene
+            <button
+              className="CutsceneDisplayer__buttons-right"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEndDisplay();
+              }}
+            >
+              <p className="CutsceneDisplayer__buttons-right__text">
+                Go to scene
                 <IoIosArrowForward />
-              </button>
-            </>
-          )}
-        </div>
+              </p>
+            </button>
+          </>
+        )}
       </div>
     </>
   );

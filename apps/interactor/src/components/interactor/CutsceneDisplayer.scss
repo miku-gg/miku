@@ -111,14 +111,14 @@
     position: absolute;
     bottom: 35px;
     z-index: 1;
-    background: linear-gradient(to top, rgba(#171717, 0.9), rgba(#171717, 0.6));
+    // background: linear-gradient(to top, rgba(#171717, 0.9), rgba(#171717, 0.6));
     text-shadow: 1.41px 1.41px black, 2px 0 black, 1.41px -1.41px black, 0 -2px black, -1.41px -1.41px black,
       -2px 0 black, -1.41px 1.41px black, 0 2px black;
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
-    width: 75%;
-    min-width: 700px;
+    z-index: 2;
+    width: 700px;
     height: 200px;
     overflow: scroll;
     padding: 16px;
@@ -126,23 +126,10 @@
     flex-direction: column;
     justify-content: space-between;
 
-    &-button {
+    & div {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      margin-top: 10px;
-
-      & svg {
-        transition: all 0.2s ease-in;
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        color: #fff;
-
-        &:hover {
-          color: $secondary-color;
-        }
-      }
     }
 
     &.description {
@@ -158,11 +145,46 @@
     }
   }
 
+  &__buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    color: $color-gray;
+
+    &-right,
+    &-left {
+      height: 100%;
+      width: 20%;
+      opacity: 0.3;
+      transition: all 0.2s ease-in-out;
+
+      &__text {
+        font-size: 1.2rem;
+        color: $color-white;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        justify-content: center;
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.237);
+        cursor: pointer;
+        opacity: 1;
+        color: $color-light-gray;
+      }
+    }
+  }
+
   &__music-player {
     position: absolute;
     top: 10px;
     right: 10px;
-    z-index: 2;
+    z-index: 3;
   }
 
   &__continue-button {

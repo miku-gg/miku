@@ -22,7 +22,7 @@ const Interactor = () => {
   const [isCutsceneDisplayed, setIsCutsceneDisplayed] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const scene = useAppSelector(selectCurrentScene);
-  const hasCutscene = scene?.cutScene !== null;
+  const hasCutscene = scene?.cutScene !== undefined;
   const lastCharacters = useAppSelector(selectLastLoadedCharacters);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
@@ -31,14 +31,13 @@ const Interactor = () => {
   if (!scene) {
     return null;
   }
-
   const background = backgrounds.find((b) => b.id === scene.backgroundId);
 
   return (
     <AreYouSure.AreYouSureProvider>
       <div className="Interactor">
         <div className="Interactor__content">
-          {!isCutsceneDisplayed && hasCutscene && !isAlreadyTriggered ? (
+          {hasCutscene && !isCutsceneDisplayed && !isAlreadyTriggered ? (
             <CutsceneDisplayer
               onEndDisplay={() => {
                 dispatch(setCutsceneTriggered({ sceneId: scene.id, triggered: true }));
