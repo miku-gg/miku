@@ -1,18 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { translateCard, initOpenAI, languageCodeToName } from './translateBot';
-import { Button, Input, Dropdown, DragAndDropImages } from '@mikugg/ui-kit';
-import { TavernCardV2, extractCardData } from '@mikugg/bot-utils';
+import { Button, Input, Dropdown } from '@mikugg/ui-kit';
+import { NovelV3 } from '@mikugg/bot-utils';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.scss';
-import { BUILDING_STEPS, downloadPng } from './encodePNG';
+
+type NovelState = NovelV3.NovelState;
+
+// Define the list of languages to translate to
+const languageCodeToName = new Map([
+  ['es', 'Spanish'],
+  ['es_ar', 'Spanish (Argentina)'],
+  ['pt', 'Portuguese'],
+  ['pt_br', 'Portuguese (Brazil)'],
+  ['fr', 'French'],
+  ['de', 'German'],
+  ['ru', 'Russian'],
+  ['jp', 'Japanese'],
+  ['pl', 'Polish'],
+]);
+
+const languageCodeToExtraPrompt = new Map([
+  ['es', 'Use typical Spanish expressions and vocabulary.'],
+  ['es_ar', 'Use typical Argentinean Spanish expressions and vocabulary.'],
+  ['pt', 'Use typical Portuguese expressions and vocabulary.'],
+  ['pt_br', 'Use typical Brazilian Portuguese expressions and vocabulary.'],
+  ['fr', 'Use typical French expressions and vocabulary.'],
+  ['de', 'Use typical German expressions and vocabulary.'],
+  ['ru', 'Use typical Russian expressions and vocabulary.'],
+  ['jp', 'Use typical Japanese expressions and vocabulary.'],
+  ['pl', 'Use typical Polish expressions and vocabulary.'],
+]);
 
 const BotTranslator = () => {
   const [file, setFile] = useState<File | null>(null);
   const [openAIKey, setOpenAIKey] = useState(localStorage.getItem('openAIKey') || '');
   const [language, setLanguage] = useState(0);
   const [expandedLanguage, setExpandedLanguage] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [novelName, setNovelName] = useState<string>('');
+
+  const languageOptions = Array.from(languageCodeToName.keys()).map((code) => ({
+    name: languageCodeToName.get(code) || '',
+    content: languageCodeToName.get(code),
+  }));
   const languageCode = Array.from(languageCodeToName.keys())[language];
 
   useEffect(() => {
@@ -23,103 +57,244 @@ const BotTranslator = () => {
     setFile(file);
   };
 
-  const handleKeyChange = (event) => {
+  const handleKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setOpenAIKey(event.target.value);
   };
 
-  const handleSubmit = async (event) => {
-    let toastid = toast.loading(`Reading card...`);
-    // const id = toast.loading();
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    initOpenAI(openAIKey);
     if (!file) {
-      toast.update(toastid, { render: 'No file selected', type: 'error', isLoading: false });
-      return;
-    }
-    const card = await extractCardData(file);
-    if (card['spec'] !== 'chara_card_v2') {
-      toast.update(toastid, { render: 'png is not chara_card_v2', type: 'error', isLoading: false });
+      toast.error('No file selected', { autoClose: 5000 });
       return;
     }
 
-    let translatedCard: TavernCardV2 | null = null;
-    toast.update(toastid, {
-      render: `Translating to ${languageCodeToName.get(languageCode)}...`,
-      type: 'default',
-      isLoading: true,
-    });
-    for await (const progress of translateCard(card as TavernCardV2, languageCode)) {
-      if (progress['completed'] && progress['total']) {
-        // eslint-disable-next-line
-        // @ts-ignore
-        toast.update(toastid, {
-          render: `Translation progress: ${progress.completed}/${progress.total}`,
-          type: 'default',
-          isLoading: true,
-        });
-      } else {
-        translatedCard = progress as TavernCardV2;
-      }
+    if (!openAIKey) {
+      toast.error('OpenAI API key is required', { autoClose: 5000 });
+      return;
     }
-    toast.update(toastid, { render: `Translation completed`, type: 'success', isLoading: false, closeButton: true });
 
-    toastid = toast.loading(`Building card...`);
-    await downloadPng(
-      JSON.stringify(translatedCard),
-      URL.createObjectURL(file),
-      `${card['data'].name}_${languageCode}`,
-      (step) => {
-        switch (step) {
-          case BUILDING_STEPS.STEP_2_GENERATING_CHUNKS:
-            toast.update(toastid, { render: `Generating chunks...`, type: 'default', isLoading: true });
-            break;
-          case BUILDING_STEPS.STEP_3_ENCODING_CHUNKS:
-            toast.update(toastid, { render: `Encoding chunks...`, type: 'default', isLoading: true });
-            break;
-          case BUILDING_STEPS.STEP_4_BUILDING_DOWNLOAD_FILE:
-            toast.update(toastid, { render: `Building download file...`, type: 'default', isLoading: true });
-            break;
-          case BUILDING_STEPS.STEP_5_DONE:
-            toast.update(toastid, { render: `Download ready`, type: 'success', isLoading: false, closeButton: true });
-            break;
+    setIsLoading(true);
+    // Read the JSON file
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const { novel: novelData } = JSON.parse(e.target?.result as string);
+        const textsToTranslate = extractTexts(novelData);
+        const totalTexts = textsToTranslate.length;
+        let translatedCount = 0;
+
+        // New code: Process translations in batches
+        const batchSize = 50;
+        const translatedTexts: {
+          path: string;
+          translatedText: string;
+        }[] = [];
+
+        for (let i = 0; i < textsToTranslate.length; i += batchSize) {
+          const batch = textsToTranslate.slice(i, i + batchSize);
+          const batchTranslations = await Promise.all(
+            batch.map(async ({ path, text }) => {
+              const translatedText = await translateText(text, languageCode, openAIKey);
+              translatedCount++;
+              setProgress((translatedCount / totalTexts) * 100);
+              return { path, translatedText };
+            }),
+          );
+          translatedTexts.push(...batchTranslations);
+
+          // Add a 10-second delay between batches
+          if (i + batchSize < textsToTranslate.length) {
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+          }
         }
-      },
-    ).catch((error) => {
-      toast.update(toastid, {
-        render: `Error building card: ${error}`,
-        type: 'error',
-        isLoading: false,
-        closeButton: true,
-      });
-    });
+
+        // Apply the translations back to the novel data
+        const translatedNovelData = applyTranslations(novelData, translatedTexts);
+        translatedNovelData.language = languageCode;
+
+        // Create a downloadable JSON
+        const blob = new Blob([JSON.stringify({ novel: translatedNovelData, version: 'v3' }, null, 2)], {
+          type: 'application/json',
+        });
+        const url = URL.createObjectURL(blob);
+        setDownloadUrl(url);
+        const titleFileNameSave = translatedNovelData.title.replace(/[^a-zA-Z0-9]/g, '_');
+        setNovelName(titleFileNameSave);
+        setIsLoading(false);
+
+        toast.success('Translation completed', { autoClose: 5000 });
+      } catch (error) {
+        setIsLoading(false);
+        console.error(error);
+        toast.error('Error translating file', { autoClose: 5000 });
+      }
+    };
+
+    reader.readAsText(file);
   };
 
-  const languageOptions = Array.from(languageCodeToName.keys()).map((code, index) => ({
-    name: languageCodeToName.get(code) || '',
-    content: languageCodeToName.get(code),
-    // description: languageCodeToName.get(code),
-  }));
+  const extractTexts = (novel: NovelState) => {
+    const texts: { path: string; text: string }[] = [];
+
+    // Helper function to push text to the array
+    const pushText = (path: string, text: string | undefined) => {
+      if (text) {
+        texts.push({ path, text });
+      }
+    };
+
+    // Collect texts from novel
+    pushText('title', novel.title);
+    pushText('description', novel.description);
+    novel.tags?.forEach((tag, index) => {
+      pushText(`tags[${index}]`, tag);
+    });
+    // Collect texts from characters
+    novel.characters?.forEach((character, charIndex) => {
+      pushText(`characters[${charIndex}].name`, character.name);
+      pushText(`characters[${charIndex}].short_description`, character.short_description);
+      character.tags?.forEach((tag, tagIndex) => {
+        pushText(`characters[${charIndex}].tags[${tagIndex}]`, tag);
+      });
+      const card = character.card;
+      if (card?.data) {
+        pushText(`characters[${charIndex}].card.data.name`, card.data.name);
+        pushText(`characters[${charIndex}].card.data.description`, card.data.description);
+        pushText(`characters[${charIndex}].card.data.personality`, card.data.personality);
+        pushText(`characters[${charIndex}].card.data.scenario`, card.data.scenario);
+        pushText(`characters[${charIndex}].card.data.first_mes`, card.data.first_mes);
+        pushText(`characters[${charIndex}].card.data.mes_example`, card.data.mes_example);
+        pushText(`characters[${charIndex}].card.data.creator_notes`, card.data.creator_notes);
+        pushText(`characters[${charIndex}].card.data.system_prompt`, card.data.system_prompt);
+        pushText(`characters[${charIndex}].card.data.post_history_instructions`, card.data.post_history_instructions);
+        card.data.tags?.forEach((tag, tagIndex) => {
+          pushText(`characters[${charIndex}].card.data.tags[${tagIndex}]`, tag);
+        });
+        card.data.alternate_greetings?.forEach((greeting, greetIndex) => {
+          pushText(`characters[${charIndex}].card.data.alternate_greetings[${greetIndex}]`, greeting);
+        });
+      }
+    });
+    // Collect texts from backgrounds
+    novel.backgrounds?.forEach((background, bgIndex) => {
+      pushText(`backgrounds[${bgIndex}].name`, background.name);
+      pushText(`backgrounds[${bgIndex}].description`, background.description);
+    });
+    // Collect texts from songs
+    novel.songs?.forEach((song, songIndex) => {
+      pushText(`songs[${songIndex}].name`, song.name);
+      pushText(`songs[${songIndex}].description`, song.description);
+      song.tags?.forEach((tag, tagIndex) => {
+        pushText(`songs[${songIndex}].tags[${tagIndex}]`, tag);
+      });
+    });
+    // Collect texts from scenes
+    novel.scenes?.forEach((scene, sceneIndex) => {
+      pushText(`scenes[${sceneIndex}].name`, scene.name);
+      pushText(`scenes[${sceneIndex}].description`, scene.description);
+      pushText(`scenes[${sceneIndex}].prompt`, scene.prompt);
+      pushText(`scenes[${sceneIndex}].actionText`, scene.actionText);
+      pushText(`scenes[${sceneIndex}].hint`, scene.hint);
+    });
+    // Collect texts from starts
+    novel.starts?.forEach((start, startIndex) => {
+      pushText(`starts[${startIndex}].title`, start.title);
+      pushText(`starts[${startIndex}].description`, start.description);
+      start.characters?.forEach((character, charIndex) => {
+        pushText(`starts[${startIndex}].characters[${charIndex}].text`, character.text);
+      });
+    });
+    // Collect texts from objectives
+    novel.objectives?.forEach((objective, objIndex) => {
+      pushText(`objectives[${objIndex}].name`, objective.name);
+      pushText(`objectives[${objIndex}].description`, objective.description);
+      pushText(`objectives[${objIndex}].hint`, objective.hint);
+    });
+    // Collect texts from inventory
+    novel.inventory?.forEach((item, itemIndex) => {
+      pushText(`inventory[${itemIndex}].name`, item.name);
+      pushText(`inventory[${itemIndex}].description`, item.description);
+      item.actions?.forEach((action, actionIndex) => {
+        pushText(`inventory[${itemIndex}].actions[${actionIndex}].name`, action.name);
+        pushText(`inventory[${itemIndex}].actions[${actionIndex}].prompt`, action.prompt);
+      });
+    });
+
+    return texts;
+  };
+
+  const applyTranslations = (novel: NovelState, translations: { path: string; translatedText: string }[]) => {
+    const translatedNovel = JSON.parse(JSON.stringify(novel)); // Deep copy
+    translations.forEach(({ path, translatedText }) => {
+      const pathParts = path.split(/[\.\[\]]/).filter((part) => part !== '');
+      let obj: any = translatedNovel;
+      for (let i = 0; i < pathParts.length - 1; i++) {
+        obj = obj[pathParts[i]];
+      }
+      obj[pathParts[pathParts.length - 1]] = translatedText;
+    });
+    return translatedNovel;
+  };
+
+  const translateText = async (text: string, languageKey: string, apiKey: string): Promise<string> => {
+    const targetLanguage = languageCodeToName.get(languageKey);
+    const extraPrompt = languageCodeToExtraPrompt.get(languageKey);
+    const prompt = `Translate the following text to ${targetLanguage}. This text for a visual novel narration. ${extraPrompt}, but do NOT translate content inside curly braces {} or angle brackets <>. Respond only with the translated text.\n\n${text}`;
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const translatedText = data.choices[0].message.content.trim();
+    return translatedText;
+  };
+
+  const handleDownload = () => {
+    if (downloadUrl) {
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `${novelName || 'novel'}_${languageCode}.json`;
+      link.click();
+      // Revoke the object URL after downloading
+      setTimeout(() => {
+        URL.revokeObjectURL(downloadUrl);
+        setDownloadUrl(null);
+      }, 100);
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Bot PNG File (with spec in English):
-        <DragAndDropImages
-          size="lg"
-          className="step1Description__dragAndDropImages"
-          handleChange={handleFileChange}
-          previewImage={file ? URL.createObjectURL(file) : undefined}
-          placeHolder="Drag and drop a bot PNG file here."
-          onFileValidate={(file) => file.type === 'image/png'}
-          errorMessage="Please upload a chara_spec_v2 compatible PNG card."
+    <div className="Main">
+      <div className="Header">
+        <img src="/logo.png" />
+        <span>miku.gg | Novel Translator</span>
+      </div>
+      <label className="JsonFile">
+        Novel JSON File
+        <input
+          type="file"
+          accept=".json"
+          onChange={(e) => (e.target.files?.[0] ? handleFileChange(e.target.files?.[0]) : null)}
         />
       </label>
-      <label>
-        OpenAI Key:
-        <Input value={openAIKey} onChange={handleKeyChange} placeHolder="OpenAI Key" />
+      <label className="OpenAIKey">
+        OpenAI API Key
+        <Input isTextArea value={openAIKey} onChange={handleKeyChange} placeHolder="OpenAI API Key" />
       </label>
-      <label>
-        Language to translate to:
+      <label className="Language">
+        Language to translate to
         <Dropdown
           items={languageOptions}
           selectedIndex={language}
@@ -128,9 +303,21 @@ const BotTranslator = () => {
           expanded={expandedLanguage}
         />
       </label>
-      <Button theme="primary" type="submit" disabled={!file || !openAIKey || !languageCode}>
+      <Button theme="primary" type="submit" disabled={!file || !openAIKey || isLoading} onClick={handleSubmit}>
         Translate
       </Button>
+      {progress > 0 && progress < 100 && (
+        <div>
+          <p>Translation progress: {Math.round(progress)}%</p>
+        </div>
+      )}
+      {progress === 100 && downloadUrl && (
+        <div>
+          <Button onClick={handleDownload} theme="secondary">
+            Download Translated Novel
+          </Button>
+        </div>
+      )}
       <ToastContainer
         position="top-left"
         autoClose={5000}
@@ -143,7 +330,7 @@ const BotTranslator = () => {
         pauseOnHover
         theme="dark"
       />
-    </form>
+    </div>
   );
 };
 

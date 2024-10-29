@@ -57,7 +57,7 @@ class ModelServerSettingsStore {
     return this.settings?.rp_models || [];
   }
 
-  private async retrieveSettings(): Promise<void> {
+  public async retrieveSettings(): Promise<void> {
     try {
       const result = await axios.get<ModelServerSettings>(
         process.env.MODEL_SERVER_SETTINGS_URL || 'http://localhost:8080/settings/models',

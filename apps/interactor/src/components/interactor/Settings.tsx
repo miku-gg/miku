@@ -14,10 +14,15 @@ import {
   setVoiceAutoplay,
   setVoiceId,
   setVoiceSpeed,
+  ResponseFormat,
+  setResponseFormat,
 } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './Settings.scss';
 import { trackEvent } from '../../libs/analytics';
+import { useI18n } from '../../libs/i18n';
+import { useEffect } from 'react';
+import { CustomEventType, postMessage } from '../../libs/stateEvents';
 const audio = new Audio();
 
 const Settings = (): JSX.Element => {
@@ -26,37 +31,21 @@ const Settings = (): JSX.Element => {
   const settingsTab = useAppSelector((state) => state.settings.modals.settingsTab);
   const currentSystemPromptLenght = useAppSelector((state) => state.settings.prompt.systemPrompt.length);
   const systemPromptMaxLenght = 800;
+  const { i18n } = useI18n();
 
   const voiceItems = [
-    {
-      name: 'Sara',
-      value: Voices.Sara,
-    },
-    {
-      name: 'Sara - Whispering',
-      value: Voices.SaraWhispering,
-    },
-    {
-      name: 'Sonia',
-      value: Voices.Sonia,
-    },
-    {
-      name: 'Jane',
-      value: Voices.Jane,
-    },
-    {
-      name: 'Maisie',
-      value: Voices.Maisie,
-    },
-    {
-      name: 'Davis',
-      value: Voices.Davis,
-    },
-    {
-      name: 'Tony',
-      value: Voices.Tony,
-    },
+    { name: 'Sara', value: Voices.Sara },
+    { name: 'Sara - Whispering', value: Voices.SaraWhispering },
+    { name: 'Sonia', value: Voices.Sonia },
+    { name: 'Jane', value: Voices.Jane },
+    { name: 'Maisie', value: Voices.Maisie },
+    { name: 'Davis', value: Voices.Davis },
+    { name: 'Tony', value: Voices.Tony },
   ];
+
+  useEffect(() => {
+    postMessage(CustomEventType.SETTINGS_UPDATE, settings);
+  }, [settings]);
 
   return (
     <div className="Settings">
@@ -75,19 +64,19 @@ const Settings = (): JSX.Element => {
         shouldCloseOnOverlayClick
       >
         <div className="SettingsModal__header">
-          <div className="SettingsModal__title">Settings</div>
+          <div className="SettingsModal__title">{i18n('settings')}</div>
           <div className="SettingsModal__navigation">
             <button
               className={`SettingsModal__navigation__button ${settingsTab === 'general' ? 'selected' : ''}`}
               onClick={() => dispatch(setSettingsTab('general'))}
             >
-              General Settings
+              {i18n('general_settings')}
             </button>
             <button
               className={`SettingsModal__navigation__button ${settingsTab === 'prompt' ? 'selected' : ''}`}
               onClick={() => dispatch(setSettingsTab('prompt'))}
             >
-              Prompt Settings
+              {i18n('prompt_settings')}
             </button>
           </div>
         </div>
@@ -96,7 +85,7 @@ const Settings = (): JSX.Element => {
             <>
               <div className="SettingsModal__name">
                 <Input
-                  label="Your name"
+                  label={i18n('your_name')}
                   value={settings.user.name}
                   onChange={(event) => dispatch(setName(event.target.value))}
                 />
@@ -106,8 +95,8 @@ const Settings = (): JSX.Element => {
                   className="SettingsModal__systemPrompt__input"
                   isTextArea
                   maxLength={systemPromptMaxLenght}
-                  label="Custom system prompt"
-                  placeHolder={`Add information to always be remembered. For Example: Anon is Miku's student.`}
+                  label={i18n('custom_system_prompt')}
+                  placeHolder={i18n('custom_system_prompt_placeholder')}
                   value={settings.prompt.systemPrompt}
                   onChange={(event) => dispatch(setSystemPrompt(event.target.value))}
                 />
@@ -120,70 +109,46 @@ const Settings = (): JSX.Element => {
           {settingsTab === 'general' && (
             <>
               <div className="SettingsModal__text-speed">
-                <p>Text Animation Speed</p>
+                <p>{i18n('text_animation_speed')}</p>
                 <Slider
                   value={settings.text.speed}
                   onChange={(value) => dispatch(setSpeed(value as Speed))}
                   steps={[
-                    {
-                      label: 'Slow',
-                      value: Speed.Slow,
-                    },
-                    {
-                      label: 'Normal',
-                      value: Speed.Normal,
-                    },
-                    {
-                      label: 'Fast',
-                      value: Speed.Fast,
-                    },
-                    {
-                      label: 'Presto',
-                      value: Speed.Presto,
-                    },
+                    { label: i18n('slow'), value: Speed.Slow },
+                    { label: i18n('normal'), value: Speed.Normal },
+                    { label: i18n('fast'), value: Speed.Fast },
+                    { label: i18n('presto'), value: Speed.Presto },
                   ]}
                 />
               </div>
               <div className="SettingsModal__text-font-size">
-                <p>Text Font Size</p>
+                <p>{i18n('text_font_size')}</p>
                 <Slider
                   value={settings.text.fontSize}
                   onChange={(value) => dispatch(setFontSize(value as FontSize))}
                   steps={[
-                    {
-                      label: 'Small',
-                      value: FontSize.Small,
-                    },
-                    {
-                      label: 'Normal',
-                      value: FontSize.Medium,
-                    },
-                    {
-                      label: 'Large',
-                      value: FontSize.Large,
-                    },
+                    { label: i18n('small'), value: FontSize.Small },
+                    { label: i18n('medium'), value: FontSize.Medium },
+                    { label: i18n('large'), value: FontSize.Large },
                   ]}
                 />
               </div>
               <div className="SettingsModal__voice">
                 <div className="SettingsModal__voice-header">
                   <div className="SettingsModal__voice-header-title">
-                    <div className="SettingsModal__voice-title">Narration Voice</div>
-                    <div className="SettingsModal__voice-description">
-                      Enhances the experience by adding a narration voice audio to every response. This feature is only
-                      avalable for premium users.
-                    </div>
+                    <div className="SettingsModal__voice-title">{i18n('narration_voice')}</div>
+                    <div className="SettingsModal__voice-description">{i18n('narration_voice_description')}</div>
                   </div>
                   <div className="SettingsModal__voice-enabled">
                     <CheckBox
-                      label="Autoplay"
+                      label={i18n('autoplay')}
                       value={settings.voice.autoplay}
                       onChange={(event) => dispatch(setVoiceAutoplay(event.target.checked))}
                     />
                   </div>
                 </div>
                 <div className="SettingsModal__voice-id">
-                  <p>Voice ID</p>
+                  <p>{i18n('voice_id')}</p>
                   <div className="SettingsModal__voice-id-input">
                     <div
                       className="SettingsModal__voice-id-listen"
@@ -203,29 +168,34 @@ const Settings = (): JSX.Element => {
                   </div>
                 </div>
                 <div className="SettingsModal__voice-speed">
-                  <p>Reading speed</p>
+                  <p>{i18n('reading_speed')}</p>
                   <Slider
                     value={settings.voice.speed}
                     onChange={(value) => dispatch(setVoiceSpeed(value as Speed))}
                     steps={[
-                      {
-                        label: 'Slow',
-                        value: Speed.Slow,
-                      },
-                      {
-                        label: 'Normal',
-                        value: Speed.Normal,
-                      },
-                      {
-                        label: 'Fast',
-                        value: Speed.Fast,
-                      },
-                      {
-                        label: 'Presto',
-                        value: Speed.Presto,
-                      },
+                      { label: i18n('slow'), value: Speed.Slow },
+                      { label: i18n('normal'), value: Speed.Normal },
+                      { label: i18n('fast'), value: Speed.Fast },
+                      { label: i18n('presto'), value: Speed.Presto },
                     ]}
                   />
+                </div>
+              </div>
+              <div className="SettingsModal__response-format">
+                <p>{i18n('response_format')}</p>
+                <div className="SettingsModal__response-format-buttons">
+                  <button
+                    className={settings.text.responseFormat === ResponseFormat.FullText ? 'selected' : ''}
+                    onClick={() => dispatch(setResponseFormat(ResponseFormat.FullText))}
+                  >
+                    {i18n('full_text')}
+                  </button>
+                  <button
+                    className={settings.text.responseFormat === ResponseFormat.VNStyle ? 'selected' : ''}
+                    onClick={() => dispatch(setResponseFormat(ResponseFormat.VNStyle))}
+                  >
+                    {i18n('vn_style')}
+                  </button>
                 </div>
               </div>
             </>

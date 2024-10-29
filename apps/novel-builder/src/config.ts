@@ -7,9 +7,10 @@ import {
   AssetDisplayPrefix,
   uploadAsset,
 } from '@mikugg/bot-utils';
-import { BackgroundResult, listSearch, SearchType, SongResult } from './libs/listSearch';
+import { BackgroundResult, CharacterResult, listSearch, SearchType, SongResult } from './libs/listSearch';
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const VITE_ASSETS_UPLOAD_URL = import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/asset-upload';
 
 interface BuilderConfig {
   assetsEndpoint: string;
@@ -69,15 +70,15 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
         if (typeof file === 'string') {
           file = await dataURLtoFile(file, 'asset');
         }
+        if (file.type.startsWith('image')) {
+          file = new File([await convertToWebP(file)], 'asset.webp', { type: 'image/webp' });
+        }
 
-        const result = await fetch('http://localhost:8585/asset-upload', {
-          method: 'POST',
-          body: file,
-        }).then((res) => res.json());
+        const result = await uploadAsset(VITE_ASSETS_UPLOAD_URL, file, type);
 
         return {
-          success: !!result.fileName,
-          assetId: result.fileName,
+          success: result.status === 200 || result.status === 201,
+          assetId: result.data,
         };
       },
       previewIframe: 'http://localhost:5173',
@@ -179,7 +180,7 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
           file = new File([await convertToWebP(file)], 'asset.webp', { type: 'image/webp' });
         }
 
-        const result = await uploadAsset(import.meta.env.VITE_ASSETS_UPLOAD_URL, file, type);
+        const result = await uploadAsset(VITE_ASSETS_UPLOAD_URL, file, type);
 
         return {
           success: result.status === 200 || result.status === 201,
@@ -189,12 +190,22 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       previewIframe: 'https://alpha.miku.gg',
       search: {
         characters: async (query) => {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const result = await listSearch<CharacterResult>('https://apidev.miku.gg', SearchType.CHARACTER, {
+            search: query.text,
+            take: query.take,
+            skip: query.skip,
+          });
+          const publicCharacters = result
+            .filter((character) => character.visibility === 'PUBLIC')
+            .map((character) => JSON.parse(character.card) as NovelV3.NovelCharacter);
+          const privateCharacters = result
+            .filter((character) => character.visibility === 'PRIVATE')
+            .map((character) => JSON.parse(character.card) as NovelV3.NovelCharacter);
           return {
             success: true,
             result: {
-              public: [],
-              private: [],
+              public: publicCharacters,
+              private: privateCharacters,
             },
           };
         },
@@ -275,7 +286,7 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
           file = new File([await convertToWebP(file)], 'asset.webp', { type: 'image/webp' });
         }
 
-        const result = await uploadAsset(import.meta.env.VITE_ASSETS_UPLOAD_URL, file, type);
+        const result = await uploadAsset(VITE_ASSETS_UPLOAD_URL, file, type);
 
         return {
           success: result.status === 200 || result.status === 201,
@@ -285,12 +296,22 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       previewIframe: 'https://interactor.miku.gg',
       search: {
         characters: async (query) => {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const result = await listSearch<CharacterResult>('https://api.miku.gg', SearchType.CHARACTER, {
+            search: query.text,
+            take: query.take,
+            skip: query.skip,
+          });
+          const publicCharacters = result
+            .filter((character) => character.visibility === 'PUBLIC')
+            .map((character) => JSON.parse(character.card) as NovelV3.NovelCharacter);
+          const privateCharacters = result
+            .filter((character) => character.visibility === 'PRIVATE')
+            .map((character) => JSON.parse(character.card) as NovelV3.NovelCharacter);
           return {
             success: true,
             result: {
-              public: [],
-              private: [],
+              public: publicCharacters,
+              private: privateCharacters,
             },
           };
         },

@@ -44,7 +44,7 @@ export default function EmotionRenderer({
         const contentType = response.headers.get('Content-Type');
         const data = await response.blob();
         const newBlobUrl = URL.createObjectURL(data);
-        assets.set(url, {
+        assets.set(url + (isSmall ? '_small' : ''), {
           fileType: contentType,
           url: newBlobUrl,
         });
@@ -62,18 +62,18 @@ export default function EmotionRenderer({
     }
 
     // Fetch assets only if they haven't been fetched before or if assetUrl changes.
-    if (!assets.has(assetUrl)) {
+    if (!assets.has(assetUrl + (isSmall ? '_small' : ''))) {
       fetchAssets();
     } else {
       // If we already have the asset, use it and don't show the loading state.
-      setCurrentAsset(assets.get(assetUrl) || { url: '', fileType: null });
+      setCurrentAsset(assets.get(assetUrl + (isSmall ? '_small' : '')) || { url: '', fileType: null });
       setLoading(false);
     }
 
     return () => {
       controller.abort(); // Cancel the fetch operation if the component unmounts or the assetUrl changes
     };
-  }, [assetUrl, assetLinkLoader]);
+  }, [assetUrl, assetLinkLoader, isSmall]);
 
   const { url: blobUrl, fileType } = currentAsset;
 

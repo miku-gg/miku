@@ -1,5 +1,11 @@
 @import '../../variables';
 
+@keyframes ellipsis-dot {
+  to {
+    width: 20px;
+  }
+}
+
 .ResponseBox {
   width: 100%;
   height: 100%;
@@ -49,6 +55,7 @@
     p,
     q {
       display: inline;
+      padding: 0 0.2rem;
     }
 
     p {
@@ -57,6 +64,47 @@
 
     q {
       color: rgba(225, 138, 36, 1);
+
+      &::before,
+      &::after {
+        content: ' ';
+      }
+
+      &:first-child::before {
+        content: open-quote !important;
+      }
+
+      &:last-child::after {
+        content: close-quote !important;
+      }
+    }
+    br + q::before,
+    em + q::before,
+    p + q::before {
+      content: open-quote !important;
+    }
+
+    q:has(+ br),
+    q:has(+ p),
+    q:has(+ em),
+    q:has(+ button) {
+      &::after {
+        content: close-quote !important;
+      }
+    }
+
+    .elipsisLoading {
+      &:after {
+        overflow: hidden;
+        display: inline-block;
+        vertical-align: bottom;
+        -webkit-animation: ellipsis-dot steps(4, end) 900ms infinite;
+        animation: ellipsis-dot steps(4, end) 900ms infinite;
+        content: '\2026';
+        font-size: 1.6rem;
+        /* ascii code for the ellipsis character */
+        width: 0px;
+      }
     }
   }
 
@@ -254,6 +302,16 @@
 
     &:hover {
       opacity: 0.9;
+    }
+  }
+
+  &--vn-style {
+    .ResponseBox__text {
+      // text space between letters
+      // letter-spacing: 0.1rem;
+
+      // background: radial-gradient(circle, rgba(#171717, 0.9) 30%, rgba(#171717, 0) 100%);
+      backdrop-filter: blur(4px);
     }
   }
 }

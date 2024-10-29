@@ -3,7 +3,7 @@ import { v4 as randomUUID } from 'uuid';
 import { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
 import { toast } from 'react-toastify';
 import trim from 'lodash.trim';
-import { NarrationSceneSuggestion } from '../versioning/v3.state';
+import { NarrationSceneSuggestion, NarrationSummarySentence } from '../versioning/v3.state';
 
 export type { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
 
@@ -127,6 +127,9 @@ const narrationSlice = createSlice({
         shouldSuggestScenes?: boolean;
         completed: boolean;
         characters: NarrationResponse['characters'];
+        summary?: {
+          sentences: NarrationSummarySentence[];
+        };
       }>,
     ) {
       const { characters } = action.payload;
@@ -150,6 +153,9 @@ const narrationSlice = createSlice({
 
         if (action.payload.nextScene) {
           response.nextScene = action.payload.nextScene;
+        }
+        if (action.payload.summary) {
+          response.summary = action.payload.summary;
         }
         if (!response.fetching) {
           state.input.text = '';
@@ -409,6 +415,49 @@ const narrationSlice = createSlice({
         state.seenHints = [action.payload];
       }
     },
+    updateSummarySentence(
+      state,
+      action: PayloadAction<{
+        responseId: string;
+        index: number;
+        sentence: string;
+        importance: number;
+      }>,
+    ) {
+      const { responseId, index, sentence, importance } = action.payload;
+      const response = state.responses[responseId];
+      if (response && response.summary) {
+        response.summary.sentences[index] = { sentence, importance };
+      }
+    },
+    addSummary: (
+      state,
+      action: PayloadAction<{
+        responseId: string;
+        summary: {
+          sentences: NarrationSummarySentence[];
+        };
+      }>,
+    ) => {
+      const { responseId, summary } = action.payload;
+      const response = state.responses[responseId];
+      if (response) {
+        response.summary = summary;
+      }
+    },
+    deleteSummarySentence(
+      state,
+      action: PayloadAction<{
+        responseId: string;
+        index: number;
+      }>,
+    ) {
+      const { responseId, index } = action.payload;
+      const response = state.responses[responseId];
+      if (response && response.summary) {
+        response.summary.sentences.splice(index, 1);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -440,6 +489,9 @@ export const {
   setNextSceneToCurrentResponse,
   markHintSeen,
   setSceneCreationSuggestionToCurrentResponse,
+  updateSummarySentence,
+  addSummary,
+  deleteSummarySentence,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;

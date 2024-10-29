@@ -1,11 +1,13 @@
 import { EmotionTemplateSlug, NovelV3 } from '@mikugg/bot-utils';
 import { createSelector } from '@reduxjs/toolkit';
 import PromptBuilder from '../libs/prompts/PromptBuilder';
-import { RoleplayPromptStrategy } from '../libs/prompts/strategies';
+import { RoleplayPromptStrategy, tokenizeAndSum } from '../libs/prompts/strategies';
 import { NarrationInteraction, NarrationResponse } from './slices/narrationSlice';
 import { NovelCharacterOutfit, NovelScene } from './slices/novelSlice';
 import { RootState } from './store';
 import { NovelNSFW } from './versioning';
+import { NarrationSummarySentence } from './versioning/v3.state';
+import { getExistingModelMetadata } from '../libs/retrieveMetadata';
 
 export const selectLastLoadedResponse = (state: RootState): NarrationResponse | undefined => {
   const { currentResponseId } = state.narration;
@@ -31,6 +33,11 @@ export const selectTokensCount = (state: RootState) => {
     truncationLength: 32000,
   });
 
+  const messagesSinceLastSummary = selectMessagesSinceLastSummary(state);
+  const maxMessages = state.settings.summaries?.enabled
+    ? messagesSinceLastSummary
+    : selectAllParentDialogues(state).length;
+
   const tokens = responsePromptBuilder.buildPrompt(
     {
       state: {
@@ -45,7 +52,7 @@ export const selectTokensCount = (state: RootState) => {
       },
       currentCharacterId: currentResponseState.selectedCharacterId || '',
     },
-    selectAllParentDialogues(state).length,
+    maxMessages,
   ).totalTokens;
   return tokens;
 };
@@ -351,14 +358,14 @@ export const selectCurrentMaps = createSelector(
   },
 );
 
-export const selectAllParentDialoguesWhereCharacterIsPresent = createSelector(
+export const selectAllParentDialoguesWhereCharactersArePresent = createSelector(
   [
     selectAllParentDialogues,
     (state: RootState) => state.novel.scenes,
-    (_state: RootState, characterId: string) => characterId,
+    (_state: RootState, characterIds: string[]) => characterIds,
     (state: RootState) => state,
   ],
-  (dialogues, scenes, characterId, state) => {
+  (dialogues, scenes, characterIds, state) => {
     const result = [];
     for (let i = 0; i < dialogues.length; i++) {
       const dialogue = dialogues[i];
@@ -366,7 +373,7 @@ export const selectAllParentDialoguesWhereCharacterIsPresent = createSelector(
         dialogue.type === 'interaction'
           ? scenes.find((scene) => scene.id === dialogue.item.sceneId)
           : selectSceneFromResponse(state, dialogue.item);
-      if (scene && scene.characters.some((c) => c.characterId === characterId)) {
+      if (scene && scene.characters.some((c) => characterIds.includes(c.characterId))) {
         result.push(dialogue);
       }
     }
@@ -400,3 +407,84 @@ export const selectCurrentSceneInteractionCount = createSelector(
     return Object.values(interactions).filter((interaction) => interaction?.sceneId === scene?.id).length;
   },
 );
+
+export const selectMessagesSinceLastSummary = createSelector([selectAllParentDialogues], (dialogues) => {
+  const lastSummaryIndex = dialogues.findIndex((d) => d.type === 'response' && d.item.summary?.sentences.length);
+  if (lastSummaryIndex === -1) return dialogues.length;
+  return Math.max(dialogues.slice(0, lastSummaryIndex + 1).length, 2);
+});
+
+export const selectAllSumaries = createSelector(
+  [
+    selectAllParentDialoguesWhereCharactersArePresent,
+    (state: RootState) => state.narration.responses,
+    (_state: RootState, characterIds: string[]) => characterIds,
+  ],
+  (dialogues, responses) => {
+    const summaries: {
+      responseId: string;
+      sentences: NarrationSummarySentence[];
+    }[] = [];
+    dialogues.forEach((dialogue) => {
+      const response = responses[dialogue.item.id];
+      if (response?.summary?.sentences.length) {
+        summaries.push({
+          responseId: dialogue.item.id,
+          sentences: response.summary.sentences,
+        });
+      }
+    });
+    return summaries;
+  },
+);
+
+export const selectAvailableSummarySentences = createSelector(
+  [selectAllSumaries, (_state: RootState, _characters: string[], maxPromptLength: number) => maxPromptLength],
+  (summaries, maxPromptLength: number) => {
+    const REST_PROMPT_LENGTH = Math.min(4096, maxPromptLength);
+    const OFFSET_TOKENS = 30;
+    const maxTokens = maxPromptLength - REST_PROMPT_LENGTH - OFFSET_TOKENS;
+
+    const allSentences: { sentence: string; importance: number; isLast: boolean }[] = [];
+
+    [...summaries].reverse().forEach((summary, index) => {
+      const isLast = index === summaries.length - 1;
+      summary?.sentences.forEach((s) => allSentences.push({ ...s, isLast }));
+    });
+    let summariesTokens = tokenizeAndSum(summaries.map((s) => s.sentences.join('\n')).join('\n'));
+
+    if (summariesTokens > maxTokens) {
+      const removalOrder = [
+        { importance: 1, isLast: false },
+        { importance: 2, isLast: false },
+        { importance: 3, isLast: false },
+        { importance: 4, isLast: false },
+        { importance: 1, isLast: true },
+        { importance: 5, isLast: false },
+        { importance: 2, isLast: true },
+        { importance: 3, isLast: true },
+        { importance: 4, isLast: true },
+        { importance: 5, isLast: true },
+      ];
+
+      for (const { importance, isLast } of removalOrder) {
+        summariesTokens = tokenizeAndSum(allSentences.map((s) => s.sentence).join('\n'));
+        while (summariesTokens > maxTokens) {
+          const index = allSentences.findIndex((s) => s.importance === importance && s.isLast === isLast);
+          if (index === -1) break;
+          allSentences.splice(index, 1);
+        }
+        summariesTokens = tokenizeAndSum(allSentences.map((s) => s.sentence).join('\n'));
+        if (summariesTokens <= maxTokens) break;
+      }
+    }
+
+    return allSentences.map((s) => s.sentence);
+  },
+);
+
+export const selectSummaryEnabled = (state: RootState) => {
+  return (
+    !!state.settings.summaries?.enabled && getExistingModelMetadata(state.settings.model)?.truncation_length > 8000
+  );
+};

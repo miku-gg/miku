@@ -1,44 +1,45 @@
 import classNames from 'classnames';
-import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '../../state/store';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { GiFastForwardButton } from 'react-icons/gi';
+import { useAppDispatch, useAppSelector } from '../../state/store';
 import { FontSize, Speed } from '../../state/versioning';
 import { ShareConversation } from '../chat-box/ShareConversation';
 import './TextFormatter.scss';
+import { ResponseFormat } from '../../state/slices/settingsSlice';
+import { setDisplayingLastSentence } from '../../state/slices/settingsSlice';
 
 interface TextFormatterProps {
   text: string;
   children?: React.ReactNode;
 }
 
-export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, children }) => {
-  const fontSize = useAppSelector((state) => state.settings.text.fontSize);
-  const textFormatterDiv = React.useRef<HTMLDivElement>(null);
-  const [userScrolled, setUserScrolled] = useState(false);
-  const elements: JSX.Element[] = [];
+interface TextElement {
+  text: string;
+  type: 'dialogue' | 'description' | 'paragraph' | 'newline';
+}
+
+const parseTextElements = (text: string): TextElement[] => {
+  const elements: TextElement[] = [];
   let buffer = '';
   const stack: ('em' | 'q')[] = [];
 
   const flushBuffer = (endTag?: 'em' | 'q') => {
     if (buffer) {
-      let element: JSX.Element = <span key={elements.length}>{buffer}</span>;
-
-      if (!stack.length) {
-        // Wrap in <p> if not within em or q
-        element = <p key={elements.length}>{buffer}</p>;
+      let type: 'description' | 'dialogue' | 'paragraph' = 'paragraph';
+      if (stack.includes('q')) {
+        type = 'dialogue';
       }
-
-      while (stack.length) {
-        const tag = stack.pop();
-        if (tag === 'em') {
-          element = <em key={elements.length}>{element}</em>;
-        } else if (tag === 'q') {
-          element = <q key={elements.length}>{element}</q>;
-        }
-        if (tag === endTag) break;
+      if (stack.includes('em')) {
+        type = 'description';
       }
-
-      elements.push(element);
+      elements.push({ text: buffer, type });
       buffer = '';
+    }
+    if (endTag) {
+      const index = stack.lastIndexOf(endTag);
+      if (index !== -1) {
+        stack.splice(index, 1);
+      }
     }
   };
 
@@ -62,7 +63,7 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, childr
         break;
       case '\n':
         flushBuffer();
-        elements.push(<br key={elements.length} />);
+        elements.push({ text: '\n', type: 'newline' });
         break;
       default:
         buffer += char;
@@ -70,6 +71,97 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, childr
   }
 
   flushBuffer(); // Flush remaining buffer
+
+  // After parsing the elements, further split them into sentences
+  const sentenceElements: TextElement[] = [];
+  elements.forEach((element) => {
+    if (element.type !== 'newline') {
+      // Split text into sentences
+      const sentences = element.text.match(/[^.!?]+[.!?]*/g) || [element.text];
+      sentences.forEach((sentence) => {
+        sentenceElements.push({ text: sentence.trim(), type: element.type });
+      });
+    } else {
+      sentenceElements.push(element);
+    }
+  });
+
+  return sentenceElements;
+};
+
+// Existing SpeedToMs Map
+const SpeedToMs = new Map<Speed, number>([
+  [Speed.Presto, 2],
+  [Speed.Fast, 10],
+  [Speed.Normal, 20],
+  [Speed.Slow, 30],
+]);
+
+// Custom hook to animate text
+const useAnimatedText = (text: string) => {
+  const speed = useAppSelector((state) => state.settings.text.speed);
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const previousTextRef = useRef('');
+
+  useEffect(() => {
+    if (text.startsWith(previousTextRef.current)) {
+      // If the new text is an extension of the previous text,
+      // continue from where we left off
+      setCurrentCharIndex(previousTextRef.current.length);
+      setDisplayedText(previousTextRef.current);
+    } else {
+      // If it's a completely new text, reset animation
+      setDisplayedText('');
+      setCurrentCharIndex(0);
+    }
+    previousTextRef.current = text;
+  }, [text]);
+
+  useEffect(() => {
+    if (currentCharIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayedText(() => text.slice(0, currentCharIndex + 1));
+        setCurrentCharIndex(currentCharIndex + 1);
+      }, SpeedToMs.get(speed) || 20);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentCharIndex, text, speed]);
+
+  const isAnimationComplete = currentCharIndex >= text.length;
+
+  const skipAnimation = () => {
+    setDisplayedText(text);
+    setCurrentCharIndex(text.length);
+  };
+
+  return { displayedText, isAnimationComplete, skipAnimation };
+};
+
+export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, children }) => {
+  const fontSize = useAppSelector((state) => state.settings.text.fontSize);
+  const textFormatterDiv = useRef<HTMLDivElement>(null);
+  const [userScrolled, setUserScrolled] = useState(false);
+
+  const { displayedText, isAnimationComplete } = useAnimatedText(text);
+
+  const elements = useMemo(() => {
+    const parsedElements = parseTextElements(displayedText);
+    return parsedElements.map((element, index) => {
+      if (element.type === 'dialogue') {
+        return <q key={index}>{element.text}</q>;
+      } else if (element.type === 'description') {
+        return <em key={index}>{element.text}</em>;
+      } else if (element.type === 'newline') {
+        return <br key={index} />;
+      } else if (element.type === 'paragraph') {
+        return <p key={index}>{element.text}</p>;
+      } else {
+        return <span key={index}>{element.text}</span>;
+      }
+    });
+  }, [displayedText]);
 
   useEffect(() => {
     if (textFormatterDiv.current) {
@@ -79,7 +171,7 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, childr
         textFormatterDiv.current.scrollTop = textFormatterDiv.current.scrollHeight;
       }
     }
-  }, [text, userScrolled]);
+  }, [displayedText, userScrolled]);
 
   return (
     <div
@@ -101,49 +193,116 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, childr
       <ShareConversation>
         <>
           {elements}
-          {children}
+          {isAnimationComplete && children}
         </>
       </ShareConversation>
     </div>
   );
 };
 
-const SpeedToMs = new Map<Speed, number>([
-  [Speed.Presto, 2],
-  [Speed.Fast, 10],
-  [Speed.Normal, 20],
-  [Speed.Slow, 30],
-]);
+export const TextFormatter: React.FC<TextFormatterProps> = ({ text, children }) => {
+  const responseFormat = useAppSelector((state) => state.settings.text.responseFormat);
 
-const TextFormatter: React.FC<TextFormatterProps> = ({ text, children }) => {
-  const [displayedText, setDisplayedText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const speed = useAppSelector((state) => state.settings.text.speed);
+  if (responseFormat === ResponseFormat.VNStyle) {
+    return <VNStyleTextFormatter text={text} children={children} />;
+  } else {
+    return <TextFormatterStatic text={text} children={children} />;
+  }
+};
+interface VNStyleTextFormatterProps extends TextFormatterProps {
+  onIsLastElementChanged?: (isLastElement: boolean) => void;
+}
+
+const VNStyleTextFormatter: React.FC<VNStyleTextFormatterProps> = ({ text, children }) => {
+  const fontSize = useAppSelector((state) => state.settings.text.fontSize);
+  const isInputDisabled = useAppSelector((state) => state.narration.input.disabled);
+  const dispatch = useAppDispatch();
+
+  const elements = useMemo(() => {
+    // Parse and filter out newline and empty elements
+    return parseTextElements(text).filter((element) => element.type !== 'newline' && element.text.trim() !== '');
+  }, [text]);
+
+  const [currentElementIndex, setCurrentElementIndex] = useState(0);
+  const currentElement = elements[currentElementIndex];
+
+  const { displayedText, isAnimationComplete, skipAnimation } = useAnimatedText(currentElement?.text || '');
+
+  const previousTextRef = useRef<string>('');
 
   useEffect(() => {
-    if (!text.startsWith(displayedText)) {
-      if (displayedText.startsWith(text)) {
-        setDisplayedText(text);
-        setCurrentIndex(text.length);
-      } else {
-        setDisplayedText('');
-        setCurrentIndex(0);
+    if (!text.startsWith(previousTextRef.current)) {
+      // Reset to first element
+      setCurrentElementIndex(0);
+    }
+    previousTextRef.current = text;
+  }, [text]);
+
+  const handleAdvanceClick = () => {
+    if (isAnimationComplete) {
+      if (currentElementIndex < elements.length - 1) {
+        setCurrentElementIndex(currentElementIndex + 1);
       }
+    } else {
+      // Skip animation
+      skipAnimation();
     }
-  }, [text, displayedText]);
+  };
+
+  const handleBackClick = () => {
+    if (currentElementIndex > 0) {
+      setCurrentElementIndex(currentElementIndex - 1);
+    }
+  };
+
+  const isFirstElement = currentElementIndex === 0;
+  const isLastElement = currentElementIndex === elements.length - 1;
 
   useEffect(() => {
-    if (currentIndex < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayedText((prevText) => prevText + text[currentIndex]);
-        setCurrentIndex(currentIndex + 1);
-      }, SpeedToMs.get(speed)); // Set typing speed here
+    // Update to use the new state name
+    dispatch(setDisplayingLastSentence(!isLastElement || !isAnimationComplete));
+  }, [isLastElement, isAnimationComplete, dispatch]);
 
-      return () => clearTimeout(timer);
-    }
-  }, [currentIndex, text, speed]);
+  return (
+    <div
+      className={classNames({
+        'TextFormatter scrollbar': true,
+        [`TextFormatter--small`]: FontSize.Small === fontSize,
+        [`TextFormatter--large`]: FontSize.Large === fontSize,
+      })}
+    >
+      {/* Display current element */}
+      {currentElement && (
+        <div className="TextFormatter__content">
+          {currentElement.type === 'dialogue' ? (
+            <q>{displayedText}</q>
+          ) : currentElement.type === 'description' ? (
+            <em>{displayedText}</em>
+          ) : (
+            <p>{displayedText}</p>
+          )}
+        </div>
+      )}
+      {isInputDisabled && isLastElement ? <em className="elipsisLoading"></em> : null}
 
-  return <TextFormatterStatic text={displayedText} children={displayedText === text ? children : null} />;
+      {/* Show 'Back' button if not first element */}
+      {!isFirstElement && (
+        <button className="TextFormatter__back-button" onClick={handleBackClick}>
+          <GiFastForwardButton />
+        </button>
+      )}
+
+      {/* Show 'Advance' button unless on the last element and animation is complete */}
+      {!(isLastElement && isAnimationComplete) && (
+        <button className="TextFormatter__advance-button" onClick={handleAdvanceClick}>
+          <GiFastForwardButton />
+        </button>
+      )}
+
+      {/* Show children after last element and animation complete */}
+      {isAnimationComplete && isLastElement && children}
+    </div>
+  );
 };
 
 export default TextFormatter;

@@ -7,14 +7,21 @@ import {
   NarrationResponse,
   continueResponse,
   characterResponseStart,
+  addSummary,
 } from '../slices/narrationSlice';
 import { RootState } from '../store';
 import textCompletion from '../../libs/textCompletion';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
-import { fillTextTemplate } from '../../libs/prompts/strategies';
+import { fillTextTemplate, SummaryPromptStrategy } from '../../libs/prompts/strategies';
 import { RoleplayPromptStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayPromptStrategy';
-import { selectAllParentDialogues, selectCurrentScene, selectCurrentSceneObjectives } from '../selectors';
+import {
+  selectAllParentDialogues,
+  selectCurrentScene,
+  selectCurrentSceneObjectives,
+  selectMessagesSinceLastSummary,
+  selectSummaryEnabled,
+} from '../selectors';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { unlockAchievement } from '../../libs/platformAPI';
@@ -69,8 +76,11 @@ const interactionEffect = async (
       tokenizer: 'llama',
       truncation_length: 4096,
     };
-    const maxMessages = selectAllParentDialogues(state).length;
-    const primaryStrategy = new RoleplayPromptStrategy(strategy);
+    const messagesSinceLastSummary = selectMessagesSinceLastSummary(state);
+    const maxMessages = selectSummaryEnabled(state)
+      ? Math.max(messagesSinceLastSummary, 16)
+      : selectAllParentDialogues(state).length;
+    const primaryStrategy = new RoleplayPromptStrategy(strategy, state.novel.language || 'en');
 
     const [responsePromptBuilder, secondaryPromptBuilder] = [
       new PromptBuilder<RoleplayPromptStrategy>({
@@ -80,7 +90,7 @@ const interactionEffect = async (
       }),
       new PromptBuilder<RoleplayPromptStrategy>({
         maxNewTokens: 200,
-        strategy: new RoleplayPromptStrategy(secondary.strategy),
+        strategy: new RoleplayPromptStrategy(secondary.strategy, state.novel.language || 'en'),
         truncationLength: secondary.truncation_length - 150,
       }),
     ];
@@ -209,6 +219,7 @@ const interactionEffect = async (
     }
 
     try {
+      const language = state.novel.language || 'en';
       await Promise.all(
         objectives.map(async (objective) => {
           const condition = objective.condition;
@@ -219,6 +230,7 @@ const interactionEffect = async (
                   condition,
                   instructionPrefix: primaryStrategy.template().instruction,
                   responsePrefix: primaryStrategy.template().response,
+                  language,
                 }),
               {
                 user: state.settings.user.name,
@@ -229,14 +241,14 @@ const interactionEffect = async (
             serviceBaseUrl: servicesEndpoint,
             identifier,
             variables: {
-              cond_opt: [' Yes', ' No'],
+              cond_opt: [` Yes`, ` No`],
             },
           });
           let response = '';
           for await (const result of conditionResultStream) {
             response = result.get('cond') || '';
           }
-          if (response === ' Yes') {
+          if (response === ` Yes`) {
             objective.actions.forEach((action) => {
               const stateAction = novelActionToStateAction(action);
               if (stateAction) {
@@ -303,7 +315,71 @@ const interactionEffect = async (
         }),
       );
     } catch (error) {
-      dispatch(interactionFailure('Failed to unlock achievement'));
+      dispatch(interactionFailure('Failed to check a condition'));
+    }
+
+    try {
+      const messagesSinceLastSummary = selectMessagesSinceLastSummary(state);
+      const currentInteraction = state.narration.interactions[currentResponseState.parentInteractionId || ''];
+      const previousInteraction = currentInteraction
+        ? state.narration.interactions[
+            state.narration.responses[currentInteraction.parentResponseId || '']?.parentInteractionId || ''
+          ]
+        : null;
+      const sceneChanged = previousInteraction && previousInteraction.sceneId !== currentInteraction?.sceneId;
+
+      if (secondary.truncation_length > 7900 && (messagesSinceLastSummary >= 40 || sceneChanged)) {
+        const summaryPromptBuilder = new PromptBuilder<SummaryPromptStrategy>({
+          maxNewTokens: 200,
+          strategy: new SummaryPromptStrategy(secondary.strategy, state.novel.language || 'en'),
+          truncationLength: secondary.truncation_length,
+        });
+
+        const messagesToSummarize = Math.min(messagesSinceLastSummary, 60);
+        const sentencesToGenerate = Math.max(1, Math.floor(messagesToSummarize / 4));
+        let previousResponseState = state.narration.responses[currentInteraction?.parentResponseId || ''];
+        if (!previousResponseState || !currentInteraction) {
+          return;
+        }
+
+        const prompt = summaryPromptBuilder.buildPrompt(
+          {
+            state,
+            characterIds: [currentCharacterResponse?.characterId || ''],
+            sentencesToGenerate,
+            excludeLastResponse: true,
+          },
+          messagesToSummarize,
+        );
+
+        const stream = textCompletion({
+          serviceBaseUrl: servicesEndpoint,
+          identifier,
+          model: secondary.id,
+          template: prompt.template,
+          variables: prompt.variables,
+        });
+
+        for await (const result of stream) {
+          previousResponseState = summaryPromptBuilder.completeResponse(previousResponseState, result, {
+            state,
+            characterIds: [currentCharacterResponse?.characterId || ''],
+            sentencesToGenerate,
+          });
+        }
+
+        if (previousResponseState.summary) {
+          dispatch(
+            addSummary({
+              responseId: currentInteraction.parentResponseId || '',
+              summary: previousResponseState.summary,
+            }),
+          );
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      // toast.warn('Failed to generate summary');
     }
   } catch (error) {
     console.error(error);

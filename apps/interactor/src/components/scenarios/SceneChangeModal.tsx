@@ -89,6 +89,7 @@ export const SceneChangeModal = () => {
                 className="SceneChangeModal__character-emotion"
                 assetLinkLoader={assetLinkLoader}
                 assetUrl={image}
+                isSmall
               />
             );
           })}

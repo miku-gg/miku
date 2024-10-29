@@ -1,19 +1,19 @@
-import llamaTokenizer, { Tokenizer } from '../_llama-tokenizer';
+import mistralTokenizer, { Tokenizer } from '../_mistral-tokenizer';
 import { getInstructTemplateFromSlug, InstructTemplate, InstructTemplateSlug } from './instructTemplates';
 
 const cache: { [key: string]: number } = {};
 
-const memoizedTokenize = (line: string): number => {
+export const memoizedTokenize = (line: string): number => {
   if (line in cache) {
     return cache[line];
   }
-  const result = llamaTokenizer.encode(line).length;
+  const result = mistralTokenizer.encode(line).length;
   cache[line] = result;
   return result;
 };
 
 const TOKEN_OFFSET_CONSTANT = 10;
-function tokenizeAndSum(text: string): number {
+export function tokenizeAndSum(text: string): number {
   const lines = text.split('\n');
   const sum = lines.reduce((acc, line) => acc + memoizedTokenize(line), 0);
 
@@ -25,10 +25,15 @@ export abstract class AbstractPromptStrategy<Input, Output> {
   // @ts-ignore
   private tokenizer: Tokenizer;
   protected instructTemplate: InstructTemplate;
+  protected language: string; // Added language property
 
-  constructor(_instructTemplate: InstructTemplateSlug = 'llama3') {
-    this.tokenizer = llamaTokenizer;
+  constructor(
+    _instructTemplate: InstructTemplateSlug = 'chatml',
+    language: string = 'en', // Added language parameter with default 'en'
+  ) {
+    this.tokenizer = mistralTokenizer;
     this.instructTemplate = getInstructTemplateFromSlug(_instructTemplate);
+    this.language = language;
   }
   public abstract buildGuidancePrompt(
     maxNewTokens: number,
@@ -50,5 +55,16 @@ export abstract class AbstractPromptStrategy<Input, Output> {
     });
     const _template = template.replace(/{{.*?}}/g, '');
     return tokenizeAndSum(_template) + maxTokens;
+  }
+
+  protected abstract getLabels(): Record<string, Record<string, string>>;
+
+  protected i18n(labelKey: string, replacements: string[] = []): string {
+    const labels = this.getLabels();
+    let text = labels[this.language?.toLowerCase()]?.[labelKey] || labels['en']?.[labelKey] || labelKey;
+    replacements.forEach((replacement) => {
+      text = text.replace('%', replacement);
+    });
+    return text;
   }
 }

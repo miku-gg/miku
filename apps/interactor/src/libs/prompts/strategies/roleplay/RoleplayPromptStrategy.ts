@@ -1,14 +1,17 @@
 import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD, TavernCardV2 } from '@mikugg/bot-utils';
 import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..';
 import {
-  selectAllParentDialoguesWhereCharacterIsPresent,
+  selectAllParentDialoguesWhereCharactersArePresent,
+  selectAvailableSummarySentences,
   selectCurrentCharacterOutfits,
   selectCurrentScene,
   selectLastLoadedCharacters,
+  selectSummaryEnabled,
 } from '../../../../state/selectors';
 import { RootState } from '../../../../state/store';
 import { NarrationInteraction, NarrationResponse } from '../../../../state/versioning';
 import { findLorebooksEntries } from '../../../lorebookSearch';
+import labels from './RoleplayPromptLabels';
 
 const PROMPT_TOKEN_OFFSET = 50;
 
@@ -19,7 +22,11 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   },
   NarrationResponse
 > {
-  protected getContextPrompt(state: RootState, currentCharacterId: string): string {
+  protected getLabels(): Record<string, Record<string, string>> {
+    return labels;
+  }
+
+  protected getContextPrompt(state: RootState, currentCharacterId: string, maxTokens: number): string {
     const scene = selectCurrentScene(state);
     const characters = scene?.characters || [];
     const characterTemplates = characters
@@ -38,16 +45,14 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
 
     const { BOS, INPUT_START, SYSTEM_START, SYSTEM_END } = this.instructTemplate;
 
-    let template =
-      `${BOS}${SYSTEM_START}You are an expert actor that can fully immerse yourself into any role given. You do not break character for any reason, even if someone tries addressing you as an AI or language model.` +
-      ` Currently your role is {{char}}, which is described in detail below. As {{char}}, continue the exchange with ${
-        characterTemplates.length ? characterTemplates.join(', ') + ' and ' : ''
-      }{{user}}.`;
-    template += `\nAvoid repetition, don't loop. Develop the plot slowly, always stay in character. Describe all actions in full, elaborate, explicit, graphic, and vivid detail. Mention all relevant sensory perceptions.`;
-    template += `\nDO NOT describe {{user}}'s actions or dialogues, ONLY describe {{char}}'s actions and dialogue.`;
-    template += `\nYou must also indicate {{char}}'s reaction in the response.`;
-    template += `\nYou MUST not repeat the same reaction too many times.`;
-    template += `\nThe reaction MUST be one of: ${emotionStrings}.`;
+    let template = `${BOS}${SYSTEM_START}${this.i18n('system_prompt')} `;
+    template += this.i18n('current_role', ['{{char}}', '{{char}}', '{{user}}']);
+    template += `\n${this.i18n('avoid_repetition')}`;
+    template += `\n${this.i18n('do_not_describe_user_actions', ['{{user}}', '{{char}}'])}`;
+    template += `\n${this.i18n('must_indicate_reaction', ['{{char}}'])}`;
+    template += `\n${this.i18n('must_not_repeat_reactions')}`;
+    template += `\n${this.i18n('reaction_must_be_one_of', [emotionStrings])}`;
+
     if (persona || formattedAttributes) {
       template += `${SYSTEM_END}${INPUT_START}${persona}\n${formattedAttributes}\n`;
     }
@@ -59,7 +64,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const lorebook = this.getContextForLorebookEntry(state, currentCharacterId);
 
     if (sampleChat.length || lorebook) {
-      template += `\nThis is how {{char}} should talk:\n`;
+      template += `\n${this.i18n('character_speech_example', ['{{char}}'])}\n`;
       for (const example of sampleChat) {
         template += example + '\n';
       }
@@ -68,17 +73,25 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       }
     }
 
-    template += `\nThen the roleplay chat between ${[...characterTemplates, '{{user}}'].join(
-      ', ',
-    )} and {{char}} begins.\n\n`;
+    template += `\n${this.i18n('roleplay_chat_begins', [
+      [...characterTemplates, '{{user}}'].join(', '),
+      '{{char}}',
+    ])}\n`;
+
+    if (selectSummaryEnabled(state)) {
+      const sentences = selectAvailableSummarySentences(state, [currentCharacterId], maxTokens);
+      if (sentences.length) {
+        template += `${this.i18n('story_events_until_now')}\n${sentences.join('\n')}\n`;
+      }
+    }
 
     if (scene?.prompt) {
-      template += `\nSCENE: ${scene.prompt}\n`;
+      template += `${this.i18n('current_scene')} ${scene.prompt}\n`;
     }
 
     scene?.characters.forEach((char) => {
       if (char.objective) {
-        template += `\n{{${char.characterId}}}'s OBJECTIVE: ${char.objective}\n`;
+        template += `\n${this.i18n('character_objective', [`{{${char.characterId}}}`])} ${char.objective}\n`;
       }
     });
 
@@ -88,7 +101,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   public template() {
     const { INPUT_START, INPUT_END, OUTPUT_START, OUTPUT_END, STOPS } = this.instructTemplate;
     return {
-      askLine: `${INPUT_END}${OUTPUT_START}# Reaction + 2 paragraphs, engaging, natural, authentic, descriptive, creative.\n`,
+      askLine: `${INPUT_END}${OUTPUT_START}`,
       instruction: `${OUTPUT_END}${INPUT_START}`,
       response: `${INPUT_END}${OUTPUT_START}`,
       stops: STOPS,
@@ -101,6 +114,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     input: {
       state: RootState;
       currentCharacterId: string;
+      maxTokens: number;
     },
   ): {
     template: string;
@@ -114,7 +128,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const { name } = this.getCharacterSpecs(currentCharacter?.card || EMPTY_MIKU_CARD);
     const emotions = this.getCharacterEmotions(input.state, input.currentCharacterId);
 
-    let template = this.getContextPrompt(input.state, input.currentCharacterId);
+    let template = this.getContextPrompt(input.state, input.currentCharacterId, input.maxTokens);
 
     template += this.getDialogueHistoryPrompt(input.state, memorySize, {
       name: currentCharacter?.name || '',
@@ -190,7 +204,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       id: string;
     },
   ): string {
-    const messages = selectAllParentDialoguesWhereCharacterIsPresent(state, currentCharacter?.id || '');
+    const messages = selectAllParentDialoguesWhereCharactersArePresent(state, [currentCharacter?.id || '']);
     let prompt = '';
     for (const message of [...messages].reverse().slice(-maxLines)) {
       prompt += this.getDialogueLine(message, currentCharacter, prompt);
@@ -243,7 +257,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
             (prevCharString ? prevCharString + '\n' : '') +
             (currentCharacter.text
               ? temp.response +
-                `{{char}}'s reaction: ${currentCharacter.emotion}\n` +
+                `${this.i18n('character_reaction', [`{{char}}`])}: ${currentCharacter.emotion}\n` +
                 `{{char}}: ${currentCharacter.text}\n`
               : '') +
             (nextCharString ? `${temp.instruction}${nextCharString}\n` : '')
@@ -269,9 +283,6 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const currentCharacterResponse = currentResponse?.characters.find((char) => char.characterId === characterId);
     const scene = selectCurrentScene(state);
 
-    // const background = state.novel.backgrounds.find(
-    //   (bg) => bg.id === scene?.backgroundId
-    // )
     const existingEmotion = currentCharacterResponse?.emotion || '';
     const existingText = currentCharacterResponse?.text || '';
     const charStops = scene?.characters
@@ -288,7 +299,10 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
 
     return (
       temp.askLine +
-      `{{char}}'s reaction:${existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'}\n` +
+      `${this.i18n('reaction_instruction')}\n` +
+      `${this.i18n('character_reaction', ['{{char}}'])}:${
+        existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'
+      }\n` +
       `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`
     );
   }
@@ -297,16 +311,23 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     condition,
     instructionPrefix,
     responsePrefix,
+    language,
   }: {
     condition: string;
     instructionPrefix: string;
     responsePrefix: string;
+    language: string;
   }) {
+    const getLabel = (key: string) => RoleplayPromptStrategy.getLabel(language, key);
     return (
-      `\n${instructionPrefix}OOC: In the current roleplay, has the following thing happened?: ${condition}` +
+      `\n${instructionPrefix}OOC: ${getLabel('has_condition_happened')}: ${condition}` +
       `\nAnswer with Yes or No` +
-      `\n${responsePrefix}Based on the last two messages, the answer is:{{SEL cond options=cond_opt}}`
+      `\n${responsePrefix}${getLabel('based_on_last_two_messages')}{{SEL cond options=cond_opt}}`
     );
+  }
+
+  static getLabel(language: string, key: string) {
+    return labels[language]?.[key] || labels['en']?.[key] || key;
   }
 
   protected getCharacterSpecs(card: TavernCardV2): {
@@ -391,7 +412,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
           }
         }) || [];
 
-    const lastMessages = selectAllParentDialoguesWhereCharacterIsPresent(state, currentCharacterId)
+    const lastMessages = selectAllParentDialoguesWhereCharactersArePresent(state, [currentCharacterId])
       .slice(1, 4)
       .reverse();
     const lorebooks = [...sceneLorebookIds, ...characterLorebookIds, ...globalLorebookIds]

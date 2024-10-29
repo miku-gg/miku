@@ -5,6 +5,16 @@ import _nalaRPMock, { expectedResult as _nalaRPMock_expected } from './__mocks__
 import _nalaRPLongMock from './__mocks__/nala_roleplay_long.mock';
 
 class TestStrategy extends AbstractPromptStrategy<boolean, boolean> {
+  protected getLabels(): Record<string, Record<string, string>> {
+    return {
+      en: {
+        roleplay: 'Roleplay',
+      },
+    };
+  }
+  protected i18n(labelKey: string): string {
+    return labelKey;
+  }
   public buildGuidancePrompt(): {
     template: string;
     variables: Record<string, string | string[]>;

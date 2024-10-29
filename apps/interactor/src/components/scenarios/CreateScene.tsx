@@ -37,6 +37,7 @@ import { Loader } from '../common/Loader';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import './CreateScene.scss';
 import CreditsDisplayer from './CreditsDisplayer';
+import { useI18n } from '../../libs/i18n';
 
 const selectSelectableCharacters = createSelector(
   [(state: RootState) => state.novel.characters, (state: RootState) => state.creation.importedCharacters],
@@ -90,6 +91,8 @@ const CreateScene = () => {
   const title = useAppSelector((state) => state.creation.scene.title);
   const submitting = useAppSelector((state) => state.creation.scene.submitting);
   const importedCharacters = useAppSelector((state) => state.creation.importedCharacters);
+
+  const { i18n } = useI18n();
 
   const submitScene = async () => {
     const sceneId = randomUUID();
@@ -172,7 +175,7 @@ const CreateScene = () => {
     <div className="CreateScene">
       <div className="CreateScene__form">
         <div className="CreateScene__background">
-          <div className="CreateScene__background__title">Background</div>
+          <div className="CreateScene__background__title">{i18n('background')}</div>
           <button
             className="CreateScene__background__button"
             style={{
@@ -190,11 +193,11 @@ const CreateScene = () => {
               )
             }
           >
-            {!backgroundSelected ? 'Select background' : null}
+            {!backgroundSelected ? i18n('select_background') : null}
           </button>
         </div>
         <div className="CreateScene__characters">
-          <div className="CreateScene__characters__title">Characters</div>
+          <div className="CreateScene__characters__title">{i18n('characters')}</div>
           <div className="CreateScene__characters__list scrollbar">
             {charactersSelected.map(({ id, outfit }, index) => {
               const character = characters.find((c) => c?.id === id);
@@ -206,6 +209,7 @@ const CreateScene = () => {
                 >
                   {character?.name ? (
                     <EmotionRenderer
+                      isSmall
                       assetLinkLoader={assetLinkLoader}
                       assetUrl={character?.outfits.find((o) => o?.id === outfit)?.emotions[0].sources.png || ''}
                     />
@@ -218,7 +222,7 @@ const CreateScene = () => {
           </div>
         </div>
         <div className="CreateScene__music">
-          <div className="CreateScene__music__title">Music</div>
+          <div className="CreateScene__music__title">{i18n('music')}</div>
           <MusicSelector
             musicList={musicList.map((m) => ({
               name: m.name,
@@ -242,7 +246,7 @@ const CreateScene = () => {
           />
         </div>
         <div className="CreateScene__prompt">
-          <div className="CreateScene__prompt__title">Scene prompt</div>
+          <div className="CreateScene__prompt__title">{i18n('scene_prompt')}</div>
           <Input
             placeHolder="*{{user}} and Hina head to the swimming pool to have fun. It's a hot summer day but there's no people there.*"
             isTextArea
@@ -251,12 +255,12 @@ const CreateScene = () => {
           />
         </div>
         <div className="CreateScene__prompt">
-          <div className="CreateScene__prompt__title">Scene title</div>
+          <div className="CreateScene__prompt__title">{i18n('scene_title')}</div>
           <Input placeHolder="Go to the pool" value={title} onChange={(e) => dispatch(setTitleValue(e.target.value))} />
         </div>
         <div className="CreateScene__actions">
           <Button theme="transparent" onClick={() => dispatch(setModalOpened({ id: 'scene', opened: false }))}>
-            Cancel
+            {i18n('cancel')}
           </Button>
           <Button
             className={submitting ? 'Loader__container' : ''}
@@ -264,7 +268,7 @@ const CreateScene = () => {
             onClick={submitScene}
             disabled={submitting}
           >
-            {submitting ? <Loader /> : 'Start scene'}
+            {submitting ? <Loader /> : i18n('start_scene')}
           </Button>
         </div>
       </div>
@@ -664,6 +668,7 @@ const CreateSceneCharacterModal = () => {
                           }}
                         >
                           <EmotionRenderer
+                            isSmall
                             assetLinkLoader={assetLinkLoader}
                             assetUrl={outfit?.emotions[0].sources.png || ''}
                           />
@@ -686,6 +691,8 @@ const GenerateBackgroundModal = () => {
   const { apiEndpoint, servicesEndpoint } = useAppContext();
   const opened = useAppSelector((state) => state.creation.scene.background.gen.opened);
   const { credits } = useAppSelector((state) => state.settings.user);
+
+  const { i18n } = useI18n();
 
   useEffect(() => {
     if (opened) {
@@ -711,12 +718,12 @@ const GenerateBackgroundModal = () => {
     >
       <div className="CreateScene__generator">
         <div className="CreateScene__generator__header">
-          <div className="CreateScene__generator__title">Generate a background</div>
+          <div className="CreateScene__generator__title">{i18n('generate_a_background')}</div>
           <CreditsDisplayer />
         </div>
         <div className="CreateScene__generator__text-area">
           <Input
-            placeHolder="Write a prompt..."
+            placeHolder={i18n('write_a_prompt')}
             isTextArea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -743,7 +750,7 @@ const GenerateBackgroundModal = () => {
               );
             }}
           >
-            Generate Background{' '}
+            {i18n('generate_background')}{' '}
             <span>
               {GEN_BACKGROUND_COST} <FaCoins />
             </span>

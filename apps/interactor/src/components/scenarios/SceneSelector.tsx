@@ -12,6 +12,7 @@ import CreateScene from './CreateScene';
 import './SceneSelector.scss';
 import SlidePanel from './SlidePanel';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { useI18n } from '../../libs/i18n';
 
 export default function SceneSelector(): JSX.Element | null {
   const dispatch = useAppDispatch();
@@ -21,6 +22,7 @@ export default function SceneSelector(): JSX.Element | null {
   const slidePanelOpened = useAppSelector((state) => state.creation.scene.slidePanelOpened);
   const createSceneOpened = useAppSelector((state) => state.creation.scene.sceneOpened);
   const { disabled: inputDisabled } = useAppSelector((state) => state.narration.input);
+  const { i18n } = useI18n();
 
   return (
     <div className={`SceneSelector ${slidePanelOpened ? 'SceneSelector--expanded' : ''}`}>
@@ -42,7 +44,7 @@ export default function SceneSelector(): JSX.Element | null {
         }}
       >
         <div className="SceneSelector__list-container">
-          <h2>{createSceneOpened ? 'Create Scene' : 'Change Scene'}</h2>
+          <h2>{createSceneOpened ? i18n('create_scene') : i18n('change_scene')}</h2>
           {createSceneOpened ? (
             <CreateScene />
           ) : (
@@ -77,6 +79,7 @@ export default function SceneSelector(): JSX.Element | null {
                         className="SceneSelector__item-emotion"
                         assetLinkLoader={assetLinkLoader}
                         assetUrl={scene.characterImages[0] || ''}
+                        isSmall
                       />
                     ) : null}
                     <div className="SceneSelector__item-text">{scene.name}</div>
@@ -87,7 +90,7 @@ export default function SceneSelector(): JSX.Element | null {
                 className="SceneSelector__item"
                 onClick={() => {
                   if (isInteractionDisabled) {
-                    toast.warn('Please log in to interact.', {
+                    toast.warn(i18n('please_log_in_to_interact'), {
                       position: 'top-center',
                       style: {
                         top: 10,
@@ -105,14 +108,14 @@ export default function SceneSelector(): JSX.Element | null {
                 }}
               >
                 <div className="SceneSelector__item-background" style={{ backgroundColor: 'gray' }} />
-                <div className="SceneSelector__item-text">Create new scene</div>
+                <div className="SceneSelector__item-text">{i18n('create_new_scene')}</div>
               </button>
 
               <button
                 className="SceneSelector__item"
                 onClick={() => {
                   if (isInteractionDisabled) {
-                    toast.warn('Please log in to interact.', {
+                    toast.warn(i18n('please_log_in_to_interact'), {
                       position: 'top-center',
                       style: {
                         top: 10,
@@ -138,7 +141,7 @@ export default function SceneSelector(): JSX.Element | null {
                   <StarsEffect />
                 </div>
                 <div className="SceneSelector__item-text">
-                  Generate Scene <BsStars />
+                  {i18n('generate_scene')} <BsStars />
                 </div>
               </button>
             </div>

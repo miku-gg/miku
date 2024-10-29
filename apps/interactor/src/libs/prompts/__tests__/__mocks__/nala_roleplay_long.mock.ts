@@ -39,6 +39,7 @@ export default {
   },
   settings: {
     model: 'RP',
+    displayingLastSentence: false,
     user: {
       id: '',
       name: 'Anon',
@@ -49,7 +50,7 @@ export default {
       sceneSuggestionsLeft: 0,
     },
     prompt: { systemPrompt: '' },
-    text: { speed: 1, fontSize: 1, autoContinue: false },
+    text: { speed: 1, fontSize: 1, autoContinue: false, responseFormat: 'FullText' },
     voice: {
       autoplay: false,
       speed: 1,

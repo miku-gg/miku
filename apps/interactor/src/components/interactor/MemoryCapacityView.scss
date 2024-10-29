@@ -44,7 +44,7 @@
 
     &-header {
       &__subtitle {
-        margin-top: 4px;
+        margin-top: 8px;
         font-size: 0.85rem;
         font-style: italic;
         color: $color-gray;
@@ -146,4 +146,157 @@
   .MemoryCapacityView__percentage {
     font-size: 0.5rem;
   }
+}
+
+.PremiumMemoryModal {
+  background-color: #1f2937;
+  color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  max-width: 56rem;
+  margin: 0 auto;
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  &__subtitle {
+    color: #9ca3af;
+    margin-bottom: 1.5rem;
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 30px;
+
+    @media (min-width: 640px) {
+      flex-direction: row;
+    }
+  }
+
+  &__option {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    background-color: $background-color-dark;
+    border: 1px solid $background-color-light;
+    cursor: pointer;
+    color: white;
+    opacity: 0.8;
+
+    &:hover {
+      background-color: $background-color-light;
+      box-shadow: 0 0px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      opacity: 1;
+    }
+
+    &--selected {
+      opacity: 1;
+      // background-color: $secondary-color;
+      box-shadow: 0 0px 15px -3px rgba(124, 58, 237, 0.5), 0 4px 6px -2px rgba(124, 58, 237, 0.25);
+      border: 1px solid $secondary-color;
+      background-color: $background-color-light;
+      &:hover {
+        box-shadow: 0 0px 15px -3px rgba(124, 58, 237, 0.5), 0 4px 6px -2px rgba(124, 58, 237, 0.25);
+        // background-color: $secondary-color;
+      }
+    }
+  }
+
+  &__option-icon {
+    margin-bottom: 1rem;
+  }
+
+  &__option-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  &__option-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+
+  &__option-badge {
+    margin-left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #fbbf24;
+    color: #92400e;
+    border-radius: 9999px;
+  }
+
+  &__option-description {
+    font-size: 0.875rem;
+    color: #d1d5db;
+
+    &--highlighted {
+      color: $text-1;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+  }
+
+  &__summary-button {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__advanced-settings {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    margin-top: 1rem;
+    background-color: $background-color-dark;
+    border-radius: 0.5rem;
+    transition: opacity 0.3s ease;
+
+    &.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+
+  &__advanced-settings-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__advanced-settings-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  &__advanced-settings-description {
+    font-size: 0.875rem;
+    color: $color-light-gray;
+  }
+}
+
+.SummaryViewModal {
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
 }

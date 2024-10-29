@@ -20,6 +20,11 @@ export interface NarrationSceneSuggestion {
   music?: string;
 }
 
+export interface NarrationSummarySentence {
+  sentence: string;
+  importance: number;
+}
+
 export interface NarrationResponse {
   id: string;
   selected: boolean;
@@ -40,6 +45,9 @@ export interface NarrationResponse {
     interactionId: string;
     selected: boolean;
   }[];
+  summary?: {
+    sentences: NarrationSummarySentence[];
+  };
 }
 
 export interface NarrationState {
@@ -123,6 +131,7 @@ export interface SettingsState {
     speed: Speed;
     fontSize: FontSize;
     autoContinue: boolean;
+    responseFormat: string;
   };
   voice: {
     autoplay: boolean;
@@ -149,6 +158,10 @@ export interface SettingsState {
       id: string;
     };
   };
+  summaries?: {
+    enabled: boolean;
+  };
+  displayingLastSentence: boolean;
 }
 
 export const VersionId = 'v3';

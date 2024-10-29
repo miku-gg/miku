@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { RPModelSettings } from '../data/rpModelTypes.mjs';
 
-// Every 5 minutes
-const CHECK_INTERVAL = 5 * 60 * 1000;
+// Every 2 minutes
+const CHECK_INTERVAL = 2 * 60 * 1000;
 
 const modelHealth: Map<
   string,
@@ -31,24 +31,28 @@ export const setModelHealthChecker = (modelSettings: RPModelSettings) => {
   });
 };
 
+export const checkModelsHealth = async (): Promise<void> => {
+  for (const [modelId, model] of modelHealth) {
+    try {
+      const healthUrl = model.endpoint.url.replace('/v1', '/health');
+      const result = await axios.get(healthUrl, {});
+      if (result.status !== 200) {
+        model.status = false;
+      } else {
+        model.status = true;
+      }
+    } catch (error) {
+      model.status = false;
+    }
+    model.lastCheck = new Date();
+  }
+};
+
 // Health check
 (async () => {
   const checkHealthObj = {
     fn: async () => {
-      for (const [modelId, model] of modelHealth) {
-        try {
-          const healthUrl = model.endpoint.url.replace('/v1', '/health');
-          const result = await axios.get(healthUrl, {});
-          if (result.status !== 200) {
-            model.status = false;
-          } else {
-            model.status = true;
-          }
-        } catch (error) {
-          model.status = false;
-        }
-        model.lastCheck = new Date();
-      }
+      await checkModelsHealth();
       setTimeout(checkHealthObj['fn'], CHECK_INTERVAL);
     },
   };

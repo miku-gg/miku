@@ -218,6 +218,16 @@ export interface OpenAIAphroditeConfig {
    * Number of log probabilities to return per output token.
    */
   logit_bias?: Record<string, number>;
+
+  /**
+   * XTC Exclude top choices threshold
+   */
+  xtc_threshold?: number;
+
+  /**
+   * XTC Exclude top choices probability
+   */
+  xtc_probability?: number;
 }
 
 export interface OpenAIAphroditeCompletionParams extends OpenAIAphroditeConfig {

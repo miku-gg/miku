@@ -5,9 +5,9 @@ import monitor from 'express-status-monitor';
 import jwtPermissionMiddleware from './lib/verifyJWT.mjs';
 import audioHandler from './services/audio/index.mjs';
 import textHandler, { tokenizeHandler } from './services/text/index.mjs';
-import { getModelHealth } from './services/text/lib/healthChecker.mjs';
-import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
 import { TokenizerType, loadTokenizer } from './services/text/lib/tokenize.mjs';
+import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
+import { checkModelsHealth, getModelHealth } from './services/text/lib/healthChecker.mjs';
 const PORT = process.env.SERVICES_PORT || 8484;
 
 const app: express.Application = express();
@@ -137,6 +137,17 @@ app.get('/text/models', async (req, res) => {
       };
     }),
   );
+});
+
+app.get('/refresh-settings', async (req, res) => {
+  // check header token
+  if (req.headers.Authorization !== `Bearer ${process.env.REFRESH_TOKEN}`) {
+    res.status(401).send('Unauthorized');
+    return;
+  }
+  await modelServerSettingsStore.retrieveSettings();
+  await checkModelsHealth();
+  res.send('OK');
 });
 
 console.log('Loading tokenizers...');
