@@ -119,12 +119,12 @@ export const uploadNarration = async (
   ecryptedJSON: string,
 ): Promise<{
   filename: string;
-  expiration: number;
+  expiration: string;
 } | null> => {
   try {
     const response = await axios.post<{
       filename: string;
-      expiration: number;
+      expiration: string;
     }>(
       `${apiEndpoint}/bot/save-history`,
       {

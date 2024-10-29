@@ -24,14 +24,12 @@ interface QRProps {
   value: string | null;
   expirationDate: number;
   loading: boolean;
-  timeLeft: number;
   copied: boolean;
 }
 
 const intialQRState: QRProps = {
   value: null,
   expirationDate: Date.now(),
-  timeLeft: 0,
   loading: false,
   copied: false,
 };
@@ -43,6 +41,7 @@ export const DeviceExport = (): React.ReactNode => {
   const { isPremium } = useAppSelector((state) => state.settings.user);
   const isModalOpen = useAppSelector((state) => state.settings.modals.deviceExport);
   const { isProduction, apiEndpoint, botId } = useAppContext();
+  const [_, forceUpdate] = useState(0);
 
   const getEncryptedJson = (): {
     encryptionKey: string;
@@ -65,12 +64,13 @@ export const DeviceExport = (): React.ReactNode => {
       const { encryptedData, encryptionKey } = getEncryptedJson();
       const uploadResult = await uploadNarration(apiEndpoint, encryptedData);
       const qrValue = uploadResult?.filename ? stringToBase64(`${uploadResult.filename}#${encryptionKey}`) : null;
+      console.log('uploadResult?.expiration', uploadResult?.expiration);
+      console.log('Date.now()', Date.now());
       setQR({
         loading: false,
         value: qrValue,
         copied: false,
-        expirationDate: uploadResult?.expiration || Date.now(),
-        timeLeft: 0,
+        expirationDate: uploadResult?.expiration ? new Date(uploadResult.expiration).getTime() : Date.now(),
       });
     } catch (error) {
       setQR({ ...QR, loading: false });
@@ -93,20 +93,13 @@ export const DeviceExport = (): React.ReactNode => {
     setQR(intialQRState);
     dispatch(setDeviceExportModal(false));
   };
-
-  const getExpirationTime = () => {
-    const expiration = Math.floor((QR.expirationDate - Date.now()) / 1000 / 60);
-    return expiration;
-  };
+  const timeLeft = Math.floor((QR.expirationDate - Date.now()) / 1000 / 60);
 
   useEffect(() => {
-    if (QR.expirationDate) {
-      const interval = setInterval(() => {
-        setQR((qr) => ({ ...qr, timeLeft: getExpirationTime() }));
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [QR.timeLeft, QR.expirationDate]);
+    setInterval(() => {
+      forceUpdate((prev) => prev + 1);
+    }, 60000);
+  }, []);
 
   if (!isProduction) return null;
   return (
@@ -164,7 +157,7 @@ export const DeviceExport = (): React.ReactNode => {
               </button>
             </div>
             <div className="deviceExport__container__expiration">
-              {QR.timeLeft > 0 ? `Expires in ${QR.timeLeft} minutes.` : 'Expirated.'}
+              {timeLeft > 0 ? `Expires in ${timeLeft} minutes` : 'Expired'}
             </div>
           </div>
         )}
