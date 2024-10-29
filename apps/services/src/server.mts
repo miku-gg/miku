@@ -1,11 +1,11 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
+import monitor from 'express-status-monitor';
 import jwtPermissionMiddleware from './lib/verifyJWT.mjs';
 import audioHandler from './services/audio/index.mjs';
 import textHandler, { tokenizeHandler } from './services/text/index.mjs';
 import { TokenizerType, loadTokenizer } from './services/text/lib/tokenize.mjs';
-import monitor from 'express-status-monitor';
 import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
 import { checkModelsHealth, getModelHealth } from './services/text/lib/healthChecker.mjs';
 const PORT = process.env.SERVICES_PORT || 8484;

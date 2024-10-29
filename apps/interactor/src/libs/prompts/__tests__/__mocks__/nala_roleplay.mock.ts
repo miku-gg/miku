@@ -41,6 +41,7 @@ export default {
     model: 'RP',
     displayingLastSentence: false,
     user: {
+      id: '',
       name: 'Anon',
       isPremium: false,
       nsfw: 0,
@@ -67,6 +68,7 @@ export default {
       edit: { opened: false, id: '' },
       modelSelector: false,
       memoryCapacity: false,
+      deviceExport: false,
     },
     chatBox: {
       isDraggable: false,

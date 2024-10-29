@@ -15,6 +15,7 @@ import './App.scss';
 
 function App(props: AppProps) {
   const contextValue = {
+    botId: props.botId,
     isProduction: props.isProduction,
     freeSmart: props.freeSmart,
     freeTTS: props.freeTTS,
