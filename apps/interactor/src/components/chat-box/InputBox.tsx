@@ -201,8 +201,8 @@ const InputBox = (): JSX.Element => {
             'InputBox__suggestion-trigger--generated': suggestions.length > 0,
           })}
           disabled={disabled || displayingLastSentence || isAutocompleteLoading}
-          data-tooltip-id={`suggestion-tooltip`}
-          data-tooltip-html={!suggestions.length ? 'Autocomplete' : ''}
+          data-tooltip-id={isMobileApp ? '' : `suggestion-tooltip`}
+          data-tooltip-html={!suggestions.length && !isMobileApp ? 'Autocomplete' : ''}
           data-tooltip-varaint="light"
           onClick={onAutocomplete}
         >
