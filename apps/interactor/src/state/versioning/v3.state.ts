@@ -151,6 +151,7 @@ export interface SettingsState {
     debug: boolean;
     testing: boolean;
     modelSelector: boolean;
+    deviceExport: boolean;
     memoryCapacity: boolean;
     edit: {
       opened: boolean;

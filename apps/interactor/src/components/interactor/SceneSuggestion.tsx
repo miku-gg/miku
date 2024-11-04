@@ -28,6 +28,7 @@ import { BsStars } from 'react-icons/bs';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { spendSceneSuggestion } from '../../libs/platformAPI';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { useI18n } from '../../libs/i18n';
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false);
@@ -58,6 +59,8 @@ export default function SceneSuggestion() {
     }
   }, [shouldSuggestScenes, nextScene]);
 
+  const { i18n } = useI18n();
+
   return (
     <>
       <div className={classNames('SceneSuggestion', !buttonOpened ? 'SceneSuggestion--button-hidden' : '')}>
@@ -78,7 +81,7 @@ export default function SceneSuggestion() {
               }}
             >
               <div className="SceneSuggestion__text">
-                <span>Go to next scene</span>
+                <span>{i18n('go_to_next_scene')}</span>
               </div>
               <TbPlayerTrackNextFilled />
             </button>
@@ -101,7 +104,7 @@ export default function SceneSuggestion() {
               }}
             >
               <div className="SceneSuggestion__text">
-                <span>Generate next scene</span>
+                <span>{i18n('generate_next_scene')}</span>
               </div>
               <GiFallingStar />
             </button>
@@ -135,6 +138,8 @@ const SceneSuggestionModal = () => {
   );
   const { isPremium, sceneSuggestionsLeft } = useAppSelector((state) => state.settings.user);
   const [loadingEditIndex, setLoadingEditIndex] = useState<number>(-1);
+
+  const { i18n } = useI18n();
 
   const loadSceneData = async (
     sceneSuggestion: NarrationSceneSuggestion,
@@ -263,20 +268,20 @@ const SceneSuggestionModal = () => {
     >
       <div className="SceneSuggestionModal">
         <div className="SceneSuggestionModal__header">
-          <h2>Scene suggestions</h2>
+          <h2>{i18n('scene_suggestions')}</h2>
           {!isPremium ? (
             <div className="SceneSuggestionModal__countdown">
               <div className="SceneSuggestionModal__countdown-amount">
-                {sceneSuggestionsLeft} scene generations left today.
+                {i18n('scene_generations_left', [(sceneSuggestionsLeft || 0).toString()])}
               </div>
               <div className="SceneSuggestionModal__countdown-upgrade">
                 <Button
                   theme="transparent"
                   data-tooltip-id="upgrade-tooltip"
-                  data-tooltip-content="Get premium for unlimited scene generations."
+                  data-tooltip-content={i18n('get_premium_for_unlimited')}
                   onClick={() => postMessage(CustomEventType.OPEN_PREMIUM, null)}
                 >
-                  Upgrade
+                  {i18n('upgrade')}
                 </Button>
                 <Tooltip id="upgrade-tooltip" place="bottom" />
               </div>
@@ -294,13 +299,11 @@ const SceneSuggestionModal = () => {
                     dispatch(userDataFetchStart({ apiEndpoint }));
                   }}
                 >
-                  Suggest 3 scenes
+                  {i18n('suggest_3_scenes')}
                 </Button>
               </div>
               <div className="SceneSuggestionModal__single-suggest">
-                <div className="SceneSuggestionModal__single-suggest-text">
-                  or describe the new scene in your own words
-                </div>
+                <div className="SceneSuggestionModal__single-suggest-text">{i18n('describe_new_scene')}</div>
                 <div className="SceneSuggestionModal__single-suggest-field">
                   <Input value={promptForSuggestion} onChange={(e) => setPromptForSuggestion(e.target.value)} />
                   <Button
@@ -318,7 +321,7 @@ const SceneSuggestionModal = () => {
                   >
                     <BsStars />
                     {''}
-                    Generate
+                    {i18n('generate')}
                   </Button>
                 </div>
               </div>
@@ -326,12 +329,12 @@ const SceneSuggestionModal = () => {
           ) : fetchingScene ? (
             <div className="SceneSuggestionModal__loading">
               <Loader />
-              Generating scene...
+              {i18n('generating_scene')}
             </div>
           ) : fetchingSuggestions && !suggestedScenes.length ? (
             <div className="SceneSuggestionModal__loading">
               <Loader />
-              Fetching suggestions...
+              {i18n('fetching_suggestions')}
             </div>
           ) : (
             <div className="SceneSuggestionModal__suggestions">
@@ -356,7 +359,7 @@ const SceneSuggestionModal = () => {
                           theme="transparent"
                           disabled={loadingEditIndex === index}
                         >
-                          {loadingEditIndex === index ? <Loader /> : 'Edit'}
+                          {loadingEditIndex === index ? <Loader /> : i18n('edit')}
                         </Button>
                       ) : null}
                       <Button
@@ -364,7 +367,7 @@ const SceneSuggestionModal = () => {
                         disabled={loading || (!sceneSuggestionsLeft && !isPremium)}
                         onClick={() => (sceneSuggestionsLeft || isPremium) && generateScene(suggestion)}
                       >
-                        {loading ? <Loader /> : 'Go to scene'}
+                        {loading ? <Loader /> : i18n('go_to_scene')}
                       </Button>
                     </div>
                   </div>

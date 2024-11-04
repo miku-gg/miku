@@ -6,6 +6,7 @@ import { PersonaResult } from './libs/listSearch';
 import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 export interface AppProps {
+  botId: string;
   isProduction: boolean;
   isInteractionDisabled: boolean;
   apiEndpoint: string;
@@ -27,6 +28,7 @@ export interface AppProps {
 }
 
 const AppContext = createContext<AppProps>({
+  botId: '',
   isProduction: false,
   isInteractionDisabled: false,
   apiEndpoint: '',

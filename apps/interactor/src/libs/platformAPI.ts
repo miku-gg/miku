@@ -113,3 +113,30 @@ export const getUnlockedItems = async (apiEndpoint: string): Promise<NovelV3.Inv
     return [];
   }
 };
+
+export const uploadNarration = async (
+  apiEndpoint: string,
+  ecryptedJSON: string,
+): Promise<{
+  filename: string;
+  expiration: string;
+} | null> => {
+  try {
+    const response = await axios.post<{
+      filename: string;
+      expiration: string;
+    }>(
+      `${apiEndpoint}/bot/save-history`,
+      {
+        data: ecryptedJSON,
+      },
+      {
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.warn(error);
+    return null;
+  }
+};

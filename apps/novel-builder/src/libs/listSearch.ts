@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+export type Language = 'EN' | 'DE' | 'ES' | 'FR' | 'IT' | 'JP' | 'KO' | 'PL' | 'PT' | 'RU' | 'ZH' | 'CN';
 export interface BackgroundResult {
   id: string;
   description: string;
@@ -22,8 +23,9 @@ export interface CharacterResult {
   description: string;
   card: string;
   profilePic: string;
-  language: string;
+  language: Language;
   nsfw: boolean;
+  completelyNSFW?: boolean;
   author: {
     id: string;
     username: string;
@@ -31,6 +33,8 @@ export interface CharacterResult {
   };
   createdAt: Date;
   updatedAt: Date;
+  visibility: 'PUBLIC' | 'PRIVATE' | 'UNLISTED' | 'REVIEW';
+  unlistedMessage?: string;
   tags: string[];
 }
 

@@ -261,6 +261,7 @@ export const loadNarration = async (): Promise<RootState> => {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App
+      botId={params.botId}
       isProduction={params.production}
       isInteractionDisabled={params.disabled}
       servicesEndpoint={params.servicesEndpoint}

@@ -53,6 +53,7 @@ export const initialState: SettingsState = {
     testing: false,
     modelSelector: false,
     memoryCapacity: false,
+    deviceExport: false,
     edit: {
       opened: false,
       id: '',
@@ -137,6 +138,9 @@ export const settingSlice = createSlice({
     setTestingModal: (state, action: PayloadAction<boolean>) => {
       state.modals.testing = action.payload;
     },
+    setDeviceExportModal: (state, action: PayloadAction<boolean>) => {
+      state.modals.deviceExport = action.payload;
+    },
     setSummariesEnabled: (state, action: PayloadAction<boolean>) => {
       state.summaries = {
         enabled: action.payload,
@@ -201,6 +205,7 @@ export const {
   setAboutModal,
   setHistoryModal,
   setMapModal,
+  setDeviceExportModal,
   setEditModal,
   setDebugModal,
   setTestingModal,

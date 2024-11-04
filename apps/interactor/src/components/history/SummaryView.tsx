@@ -9,6 +9,7 @@ import { useAppContext } from '../../App.context';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import CharacterAvatar from './CharacterAvatar';
 import { getExistingModelMetadata } from '../../libs/retrieveMetadata';
+import { useI18n } from '../../libs/i18n';
 
 const EditSentenceModal: React.FC<{
   sentence: string;
@@ -20,6 +21,7 @@ const EditSentenceModal: React.FC<{
 }> = ({ sentence, importance, onClose, onSubmit, onDelete, characters }) => {
   const [editedSentence, setEditedSentence] = useState(sentence);
   const [editedImportance, setEditedImportance] = useState(importance);
+  const { i18n } = useI18n();
 
   const handleSubmit = () => {
     if (editedSentence.trim() === '') {
@@ -30,7 +32,7 @@ const EditSentenceModal: React.FC<{
   };
 
   return (
-    <Modal opened={true} onCloseModal={onClose} title="Edit Memory">
+    <Modal opened={true} onCloseModal={onClose} title={i18n('edit_memory')}>
       <div className="EditSentenceModal">
         <Input
           value={editedSentence}
@@ -42,15 +44,15 @@ const EditSentenceModal: React.FC<{
           value={editedImportance}
           onChange={(value) => setEditedImportance(value as number)}
           steps={[
-            { label: 'Not important', value: 1 },
+            { label: i18n('not_important'), value: 1 },
             { label: '', value: 2 },
             { label: '', value: 3 },
             { label: '', value: 4 },
-            { label: 'Very important', value: 5 },
+            { label: i18n('very_important'), value: 5 },
           ]}
         />
         <div className="EditSentenceModal__characters-container">
-          <span className="EditSentenceModal__characters-label">Characters affected:</span>
+          <span className="EditSentenceModal__characters-label">{i18n('characters_affected')}:</span>
           <div className="EditSentenceModal__characters">
             {characters.map((character) => (
               <CharacterAvatar key={character.id} character={character} />
@@ -59,10 +61,10 @@ const EditSentenceModal: React.FC<{
         </div>
         <div className="EditSentenceModal__actions">
           <Button theme="transparent" onClick={onClose}>
-            Cancel
+            {i18n('cancel')}
           </Button>
           <Button theme="secondary" onClick={handleSubmit}>
-            {editedSentence.trim() === '' ? 'Delete' : 'Modify'}
+            {editedSentence.trim() === '' ? i18n('delete') : i18n('modify')}
           </Button>
         </div>
       </div>
@@ -91,6 +93,7 @@ const CharacterSelector: React.FC<{
 const SummaryView: React.FC = () => {
   const dispatch = useAppDispatch();
   const { assetLinkLoader } = useAppContext();
+  const { i18n } = useI18n();
   const currentScene = useAppSelector(selectCurrentScene);
   const characters = useAppSelector((state) => state.novel.characters);
   const sceneCharacters =
@@ -169,25 +172,23 @@ const SummaryView: React.FC = () => {
             className={`SummaryView__tab ${activeTab === 'used' ? 'SummaryView__tab--active' : ''}`}
             onClick={() => setActiveTab('used')}
           >
-            Used Memories
+            {i18n('used_memories')}
           </button>
           <button
             className={`SummaryView__tab ${activeTab === 'all' ? 'SummaryView__tab--active' : ''}`}
             onClick={() => setActiveTab('all')}
           >
-            All Memories
+            {i18n('all_memories')}
           </button>
         </div>
         <div className="SummaryView__tab-content">
           <div className="SummaryView__tab-content-header">
             <p className="SummaryView__tab-description">
-              {activeTab === 'used'
-                ? 'Memories being used by the AI for this character. Important memories will be prioritized.'
-                : 'All memories available for this character.'}
+              {activeTab === 'used' ? i18n('memories_used_by_ai') : i18n('all_memories_available')}
             </p>
             {activeTab === 'all' && (
               <div className="SummaryView__importance-meter">
-                <span className="SummaryView__importance-meter-label">Importance:</span>
+                <span className="SummaryView__importance-meter-label">{i18n('importance')}:</span>
                 <div className="SummaryView__importance-meter-gradient"></div>
               </div>
             )}
@@ -204,7 +205,7 @@ const SummaryView: React.FC = () => {
                 </div>
               ) : (
                 <div className="SummaryView__card SummaryView__card--empty">
-                  <p className="SummaryView__empty-message">No memories yet</p>
+                  <p className="SummaryView__empty-message">{i18n('no_memories_yet')}</p>
                 </div>
               )
             ) : summaries.length > 0 ? (
@@ -253,7 +254,7 @@ const SummaryView: React.FC = () => {
               })
             ) : (
               <div className="SummaryView__card SummaryView__card--empty">
-                <p className="SummaryView__empty-message">No memories yet</p>
+                <p className="SummaryView__empty-message">{i18n('no_memories_yet')}</p>
               </div>
             )}
           </div>
