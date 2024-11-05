@@ -92,7 +92,7 @@ export const CutScenePartsRender = () => {
             </div>
             <div className="CutScenePartsRender__part__music">
               <h3>Music</h3>
-              <audio src={getMusicAssetSRC(part.music)} controls />
+              {part.music && <audio src={getMusicAssetSRC(part.music)} controls />}
             </div>
           </div>
         ))}

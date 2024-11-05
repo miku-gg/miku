@@ -68,7 +68,7 @@ export interface CutScenePart {
   text: string;
   type: 'dialogue' | 'description';
   background: string;
-  music: string;
+  music?: string;
   characters: { id: string; outfitId: string; emotionId: string }[];
 }
 

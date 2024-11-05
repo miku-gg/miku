@@ -449,20 +449,20 @@ const novelFormSlice = createSlice({
 
     createCutscenePart: (state, action: PayloadAction<{ cutsceneId: string; partId: string }>) => {
       const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
-      const character = state.characters[0];
+      // const character = state.characters[0];
       if (!cutscene) return;
       const newPart: NovelV3.CutScenePart = {
         id: action.payload.partId,
         text: 'Description or dialogue text',
         type: 'dialogue',
         background: state.backgrounds[0]?.id || '',
-        music: state.songs[0]?.id || '',
+        // music: state.songs[0]?.id || '',
         characters: [
-          {
-            id: character.id,
-            emotionId: character.card.data.extensions.mikugg_v2.outfits[0].emotions[0].id,
-            outfitId: character.card.data.extensions.mikugg_v2.outfits[0].id,
-          },
+          // {
+          //   id: character.id,
+          //   emotionId: character.card.data.extensions.mikugg_v2.outfits[0].emotions[0].id,
+          //   outfitId: character.card.data.extensions.mikugg_v2.outfits[0].id,
+          // },
         ],
       };
       cutscene.parts.push(newPart);

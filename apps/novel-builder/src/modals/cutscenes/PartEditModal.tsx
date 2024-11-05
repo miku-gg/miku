@@ -26,10 +26,14 @@ export const PartEditModal = () => {
   const selectedMusic = useAppSelector((state) => state.novel.songs.find((s) => s.id === part?.music));
   const selectedBackground = useAppSelector((state) => state.novel.backgrounds.find((b) => b.id === part?.background));
   const characters = useAppSelector(selectEditingScene)?.characters || [];
+  const partCharacters = part?.characters || [];
 
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
   const [selectBackgroundModalOpened, setSelectBackgroundModalOpened] = useState(false);
-  const [selectCharacterModal, setSelectCharacterModal] = useState({
+  const [selectCharacterModal, setSelectCharacterModal] = useState<{
+    opened: boolean;
+    characterIndex: number;
+  }>({
     opened: false,
     characterIndex: 0,
   });
@@ -106,13 +110,13 @@ export const PartEditModal = () => {
           <Tooltip id="delete-cutscene-part-tooltip" place="bottom" />
         </div>
 
-        <div className="SceneEditModal__background-container">
+        <div className="PartEditModal__background-container">
           <img
-            className="SceneEditModal__background"
+            className="PartEditModal__background"
             src={config.genAssetLink(selectedBackground?.source.jpg || '', AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL)}
           />
           <div
-            className="SceneEditModal__background-edit-btn"
+            className="PartEditModal__background-edit-btn"
             onClick={() => setSelectBackgroundModalOpened(true)}
             tabIndex={0}
             role="button"
@@ -120,7 +124,7 @@ export const PartEditModal = () => {
             <AiOutlinePicture />
           </div>
           <div
-            className="SceneEditModal__character-select1-btn"
+            className="PartEditModal__character-select1-btn"
             onClick={() =>
               setSelectCharacterModal({
                 opened: true,
@@ -134,8 +138,8 @@ export const PartEditModal = () => {
           </div>
           <div
             className={classNames({
-              'SceneEditModal__character-select2-btn': true,
-              'SceneEditModal__character-select2-btn--disabled': part.characters.length < 2,
+              'PartEditModal__character-select2-btn': true,
+              'PartEditModal__character-select2-btn--disabled': part.characters.length < 2,
             })}
             onClick={() =>
               setSelectCharacterModal({
@@ -148,82 +152,82 @@ export const PartEditModal = () => {
           >
             <FaUser /> 2
           </div>
-          <div className="SceneEditModal__characters">
-            {characters.map((character, characterIndex) => {
-              const outfits = character.card?.data.extensions.mikugg_v2.outfits || [];
-              const selectedOutfitIndex = Math.max(
-                outfits.findIndex((outfit) => outfit.id === character.outfit),
-                0,
-              );
-              const selectedEmotion = outfits[selectedOutfitIndex].emotions.find(
-                (emotion) => emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
-              ) ||
-                outfits[selectedOutfitIndex].emotions[0] || {
-                  id: 'neutral',
-                  sources: {
-                    png: '',
-                  },
-                };
-              return (
-                <div key={character.id} className="SceneEditModal__character">
-                  <ImageSlider
-                    images={outfits.map((outfit) => ({
-                      source: config.genAssetLink(selectedEmotion.sources.png, AssetDisplayPrefix.EMOTION_IMAGE),
-                      label: outfit.name,
-                    }))}
-                    backgroundImageSource=""
-                    selectedIndex={selectedOutfitIndex}
-                    onChange={(delta) => {
-                      let newOutfitIndex = selectedOutfitIndex + delta;
-                      if (newOutfitIndex < 0) {
-                        newOutfitIndex = outfits.length - 1;
-                      } else if (newOutfitIndex >= outfits.length) {
-                        newOutfitIndex = 0;
-                      }
-                      updatePart({
-                        ...part,
-                        characters: part.characters.map((character) => ({
-                          ...character,
-                          outfitId: outfits[newOutfitIndex].id,
-                        })),
-                      });
-                    }}
-                  />
-                  <Carousel
-                    items={outfits[selectedOutfitIndex].emotions.map((emotion) => ({
-                      title: emotion.id,
-                    }))}
-                    selectedIndex={
-                      outfits[selectedOutfitIndex].emotions.findIndex((emotion) => emotion.id === selectedEmotion.id) ||
-                      0
-                    }
-                    onClick={(index) => {
-                      if (characterIndex === 0) {
-                        setShowingEmotionChar1(outfits[selectedOutfitIndex].emotions[index]?.id || '');
+          <div className="PartEditModal__characters">
+            {partCharacters.length > 0 &&
+              characters.map((character, characterIndex) => {
+                const outfits = character.card?.data.extensions.mikugg_v2.outfits || [];
+                const selectedOutfitIndex = Math.max(
+                  outfits.findIndex((outfit) => outfit.id === character.outfit),
+                  0,
+                );
+                const selectedEmotion = outfits[selectedOutfitIndex].emotions.find(
+                  (emotion) => emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
+                ) ||
+                  outfits[selectedOutfitIndex].emotions[0] || {
+                    id: 'neutral',
+                    sources: {
+                      png: '',
+                    },
+                  };
+                return (
+                  <div key={character.id} className="PartEditModal__character">
+                    <ImageSlider
+                      images={outfits.map((outfit) => ({
+                        source: config.genAssetLink(selectedEmotion.sources.png, AssetDisplayPrefix.EMOTION_IMAGE),
+                        label: outfit.name,
+                      }))}
+                      backgroundImageSource=""
+                      selectedIndex={selectedOutfitIndex}
+                      onChange={(delta) => {
+                        let newOutfitIndex = selectedOutfitIndex + delta;
+                        if (newOutfitIndex < 0) {
+                          newOutfitIndex = outfits.length - 1;
+                        } else if (newOutfitIndex >= outfits.length) {
+                          newOutfitIndex = 0;
+                        }
                         updatePart({
                           ...part,
-                          characters: part.characters.map((char, idx) =>
-                            idx === 0
-                              ? { ...char, emotionId: outfits[selectedOutfitIndex].emotions[index]?.id || '' }
-                              : char,
-                          ),
+                          characters: part.characters.map((character) => ({
+                            ...character,
+                            outfitId: outfits[newOutfitIndex].id,
+                          })),
                         });
-                      } else {
-                        setShowingEmotionChar2(outfits[selectedOutfitIndex].emotions[index]?.id || '');
-                        updatePart({
-                          ...part,
-                          characters: part.characters.map((char, idx) =>
-                            idx === 1
-                              ? { ...char, emotionId: outfits[selectedOutfitIndex].emotions[index]?.id || '' }
-                              : char,
-                          ),
-                        });
-                      }
-                    }}
-                  />
-                </div>
-              );
-            })}
+                      }}
+                    />
+                    <Carousel
+                      items={outfits[selectedOutfitIndex].emotions.map((emotion) => ({
+                        title: emotion.id,
+                      }))}
+                      selectedIndex={outfits[selectedOutfitIndex].emotions.findIndex(
+                        (emotion) => emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
+                      )}
+                      onClick={(index) => {
+                        if (characterIndex === 0) {
+                          setShowingEmotionChar1(outfits[selectedOutfitIndex].emotions[index]?.id || '');
+                          updatePart({
+                            ...part,
+                            characters: part.characters.map((char, idx) =>
+                              idx === 0
+                                ? { ...char, emotionId: outfits[selectedOutfitIndex].emotions[index]?.id || '' }
+                                : char,
+                            ),
+                          });
+                        } else {
+                          setShowingEmotionChar2(outfits[selectedOutfitIndex].emotions[index]?.id || '');
+                          updatePart({
+                            ...part,
+                            characters: part.characters.map((char, idx) =>
+                              idx === 1
+                                ? { ...char, emotionId: outfits[selectedOutfitIndex].emotions[index]?.id || '' }
+                                : char,
+                            ),
+                          });
+                        }
+                      }}
+                    />
+                  </div>
+                );
+              })}
           </div>
         </div>
 
@@ -255,7 +259,7 @@ export const PartEditModal = () => {
           <Modal
             opened={selectCharacterModal.opened || selectBackgroundModalOpened || selectSongModalOpened}
             onCloseModal={handleCloseAllModals}
-            className="SceneEditModal__select-character-modal"
+            className="PartEditModal__select-character-modal"
           >
             {selectCharacterModal.opened && (
               <Characters
@@ -268,8 +272,8 @@ export const PartEditModal = () => {
                     ? [characters[0]?.id]
                     : []
                 }
-                showNone={selectCharacterModal.characterIndex === 1}
-                selected={characters[selectCharacterModal.characterIndex]?.id}
+                showNone
+                selected={partCharacters.length > 0 ? partCharacters[selectCharacterModal.characterIndex]?.id : ''}
                 onSelect={(characterId) => {
                   if (characters) {
                     const newCharacters = characters.map((character) => ({
