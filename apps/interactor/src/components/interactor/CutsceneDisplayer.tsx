@@ -8,7 +8,6 @@ import classNames from 'classnames';
 import './CutsceneDisplayer.scss';
 import { useState } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
-import { FaArrowCircleLeft, FaArrowCircleRight } from 'react-icons/fa';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import MusicPlayer from './MusicPlayer';
 
@@ -76,33 +75,36 @@ const PartRenderer = ({
           )
         }
       </ProgressiveImage>
-      <div
-        className={classNames({
-          CutsceneDisplayer__characters: true,
-          'CutsceneDisplayer__characters--multiple': currentCharacters.length > 1,
-        })}
-      >
-        {currentCharacters.map(({ id, outfitId, emotionId }) => {
-          const character = characters.find((c) => c.id === id);
-          const outfit = character?.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === outfitId);
-          const emotion = outfit?.emotions.find((e) => e.id === emotionId);
-          if (!outfitId || !emotion) {
-            console.log('xd');
-            return null;
-          }
-          return (
-            <EmotionRenderer
-              key={`character-emotion-render-${id}`}
-              assetLinkLoader={assetLinkLoader}
-              assetUrl={emotion.sources.png}
-              upDownAnimation
-            />
-          );
-        })}
-      </div>
-      <div className="CutsceneDisplayer__music-player">
-        <MusicPlayer source={songSource} />
-      </div>
+      {currentCharacters.length > 0 && (
+        <div
+          className={classNames({
+            CutsceneDisplayer__characters: true,
+            'CutsceneDisplayer__characters--multiple': currentCharacters.length > 1,
+          })}
+        >
+          {currentCharacters.map(({ id, outfitId, emotionId }) => {
+            const character = characters.find((c) => c.id === id);
+            const outfit = character?.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === outfitId);
+            const emotion = outfit?.emotions.find((e) => e.id === emotionId);
+            if (!outfitId || !emotion) {
+              return null;
+            }
+            return (
+              <EmotionRenderer
+                key={`character-emotion-render-${id}`}
+                assetLinkLoader={assetLinkLoader}
+                assetUrl={emotion.sources.png}
+                upDownAnimation
+              />
+            );
+          })}
+        </div>
+      )}
+      {part.music && (
+        <div className="CutsceneDisplayer__music-player">
+          <MusicPlayer source={songSource} />
+        </div>
+      )}
     </div>
   );
 };
