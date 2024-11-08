@@ -18,7 +18,7 @@ const initialState: NovelV3.NovelState = {
   lorebooks: [],
   inventory: [],
   cutscenes: [],
-  // language: 'en',
+  language: 'en',
 };
 
 const novelFormSlice = createSlice({
