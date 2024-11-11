@@ -1,6 +1,6 @@
 import { AreYouSure, Button, Carousel, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import { useAppDispatch, useAppSelector } from '../../state/store';
-import { selectEditingCutscene, selectEditingCutscenePart, selectEditingScene } from '../../state/selectors';
+import { selectEditingCutscenePart, selectEditingScene } from '../../state/selectors';
 import { closeModal } from '../../state/slices/inputSlice';
 import ButtonGroup from '../../components/ButtonGroup';
 import { deleteCutscenePart, updateCutscenePart } from '../../state/slices/novelFormSlice';
@@ -22,10 +22,11 @@ export const PartEditModal = () => {
   const { openModal } = AreYouSure.useAreYouSure();
   const part = useAppSelector(selectEditingCutscenePart);
   const opened = useAppSelector((state) => state.input.modals.cutscenePartEdit.opened);
-  const currentCutscene = useAppSelector(selectEditingCutscene);
+  const scene = useAppSelector(selectEditingScene);
+  const currentCutscene = useAppSelector((state) => state.novel.cutscenes?.find((c) => c.id === scene?.cutScene?.id));
   const selectedMusic = useAppSelector((state) => state.novel.songs.find((s) => s.id === part?.music));
   const selectedBackground = useAppSelector((state) => state.novel.backgrounds.find((b) => b.id === part?.background));
-  const characters = useAppSelector(selectEditingScene)?.characters || [];
+  const characters = scene?.characters || [];
   const partCharacters = part?.characters || [];
 
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
