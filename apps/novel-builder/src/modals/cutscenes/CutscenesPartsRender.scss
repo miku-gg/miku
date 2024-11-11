@@ -1,20 +1,30 @@
 @import '../../styles/variables.scss';
 
 .CutScenePartsRender {
-  margin-top: 16px;
-
   &__header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin-bottom: 1rem;
-
-    border: 1px solid $node-conector-color;
-    padding: 0.5rem;
-    border-radius: 10px;
+    align-items: center;
 
     & h2 {
       margin: 0;
+    }
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &__infoIcon {
+        font-size: 1.25rem;
+        color: $text-2;
+      }
+    }
+
+    &__controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
   }
 

@@ -67,16 +67,16 @@ export const CutScenePartsRender = () => {
   return (
     <div className="CutScenePartsRender">
       <div className="CutScenePartsRender__header">
-        <div className="CutsceneDisplayer__header__title">
+        <div className="CutScenePartsRender__header__title">
           <h2>Cutscene</h2>
           <IoInformationCircleOutline
             data-tooltip-id="Info-cutscene"
-            className="CutsceneDisplayer__header__title__infoIcon"
+            className="CutScenePartsRender__header__title__infoIcon"
             data-tooltip-content="[Optional] The cutscene will be triggered before the scene starts, only once or every time the scene is loaded"
           />
           <Tooltip id="Info-cutscene" place="top" />
         </div>
-        <div>
+        <div className="CutScenePartsRender__header__controls">
           <CheckBox
             value={scene?.cutScene?.triggerOnlyOnce}
             onChange={(e) => {
