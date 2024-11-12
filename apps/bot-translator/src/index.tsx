@@ -158,7 +158,6 @@ const BotTranslator = () => {
       });
       const card = character.card;
       if (card?.data) {
-        pushText(`characters[${charIndex}].card.data.name`, card.data.name);
         pushText(`characters[${charIndex}].card.data.description`, card.data.description);
         pushText(`characters[${charIndex}].card.data.personality`, card.data.personality);
         pushText(`characters[${charIndex}].card.data.scenario`, card.data.scenario);
@@ -177,7 +176,6 @@ const BotTranslator = () => {
     });
     // Collect texts from backgrounds
     novel.backgrounds?.forEach((background, bgIndex) => {
-      pushText(`backgrounds[${bgIndex}].name`, background.name);
       pushText(`backgrounds[${bgIndex}].description`, background.description);
     });
     // Collect texts from songs
@@ -195,6 +193,7 @@ const BotTranslator = () => {
       pushText(`scenes[${sceneIndex}].prompt`, scene.prompt);
       pushText(`scenes[${sceneIndex}].actionText`, scene.actionText);
       pushText(`scenes[${sceneIndex}].hint`, scene.hint);
+      // if (scene.condition) pushText(`scenes[${sceneIndex}].condition`, scene.condition);
     });
     // Collect texts from starts
     novel.starts?.forEach((start, startIndex) => {
@@ -209,6 +208,7 @@ const BotTranslator = () => {
       pushText(`objectives[${objIndex}].name`, objective.name);
       pushText(`objectives[${objIndex}].description`, objective.description);
       pushText(`objectives[${objIndex}].hint`, objective.hint);
+      // pushText(`objectives[${objIndex}].condition`, objective.condition);
     });
     // Collect texts from inventory
     novel.inventory?.forEach((item, itemIndex) => {
@@ -217,6 +217,25 @@ const BotTranslator = () => {
       item.actions?.forEach((action, actionIndex) => {
         pushText(`inventory[${itemIndex}].actions[${actionIndex}].name`, action.name);
         pushText(`inventory[${itemIndex}].actions[${actionIndex}].prompt`, action.prompt);
+      });
+    });
+    novel.maps?.forEach((map, mapIndex) => {
+      pushText(`maps[${mapIndex}].name`, map.name);
+      pushText(`maps[${mapIndex}].description`, map.description);
+      map.places?.forEach((place, placeIndex) => {
+        pushText(`maps[${mapIndex}].places[${placeIndex}].name`, place.name);
+        pushText(`maps[${mapIndex}].places[${placeIndex}].description`, place.description);
+      });
+    });
+    novel.lorebooks?.forEach((lorebook, lorebookIndex) => {
+      pushText(`lorebooks[${lorebookIndex}].name`, lorebook.name);
+      if (lorebook.description) pushText(`lorebooks[${lorebookIndex}].description`, lorebook.description);
+      lorebook.entries?.forEach((entry, entryIndex) => {
+        pushText(`lorebooks[${lorebookIndex}].entries[${entryIndex}].content`, entry.content);
+        // check entry.keys
+        entry.keys.forEach((key, keyIndex) => {
+          pushText(`lorebooks[${lorebookIndex}].entries[${entryIndex}].keys[${keyIndex}]`, key);
+        });
       });
     });
 
