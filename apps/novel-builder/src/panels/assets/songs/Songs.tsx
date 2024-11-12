@@ -11,7 +11,15 @@ import { addSong } from '../../../state/slices/novelFormSlice';
 import { MdSearch } from 'react-icons/md';
 import { AssetType } from '@mikugg/bot-utils';
 
-export default function Songs({ selected, onSelect }: { selected?: string; onSelect?: (id: string) => void }) {
+export default function Songs({
+  selected,
+  onSelect,
+  displayNoneButton = true,
+}: {
+  selected?: string | undefined;
+  displayNoneButton?: boolean;
+  onSelect?: (id: string | undefined) => void;
+}) {
   const songs = useAppSelector((state) => state.novel.songs);
   const dispatch = useAppDispatch();
   const [songUploading, setSongUploading] = useState<boolean>(false);
@@ -42,49 +50,65 @@ export default function Songs({ selected, onSelect }: { selected?: string; onSel
     dispatch(openModal({ modalType: 'song', editId: id }));
   };
 
+  const getBlockItems = () => {
+    let items = [];
+    if (displayNoneButton && displayNoneButton !== undefined) {
+      items.push({
+        id: 'none',
+        highlighted: selected === undefined,
+        content: {
+          text: 'None',
+        },
+        onClick: () => onSelect?.(undefined),
+      });
+    }
+    items = [
+      ...items,
+      ...songs.map((song) => ({
+        id: `songs-${song.id}`,
+        tooltip: song.name,
+        highlighted: selected === song.id,
+        content: {
+          text: song.name,
+        },
+        onEditClick: () =>
+          dispatch(
+            openModal({
+              modalType: 'song',
+              editId: song.id,
+            }),
+          ),
+        editIcon: <FaPencil />,
+        onClick: () => onSelect?.(song.id),
+      })),
+      {
+        id: 'upload',
+        content: {
+          icon: <FaUpload />,
+          text: 'Upload',
+        },
+        onClick: () => uploadSong?.current?.click(),
+        loading: songUploading,
+        disabled: songUploading,
+      },
+      {
+        id: 'search',
+        content: {
+          icon: <MdSearch />,
+          text: 'Search',
+        },
+        onClick: () => dispatch(openModal({ modalType: 'songSearch' })),
+      },
+    ];
+
+    return items;
+  };
+
   return (
     <div className="Songs group">
       <div className="title-small">Music</div>
       <div className="Songs__list">
-        <Blocks
-          tooltipId="songs"
-          items={[
-            ...songs.map((song) => ({
-              id: `songs-${song.id}`,
-              tooltip: song.name,
-              content: {
-                text: song.name,
-              },
-              onEditClick: () =>
-                dispatch(
-                  openModal({
-                    modalType: 'song',
-                    editId: song.id,
-                  }),
-                ),
-              editIcon: <FaPencil />,
-              onClick: () => onSelect?.(song.id),
-            })),
-            {
-              id: 'upload',
-              content: {
-                icon: <FaUpload />,
-                text: 'Upload',
-              },
-              onClick: () => uploadSong?.current?.click(),
-              loading: songUploading,
-              disabled: songUploading,
-            },
-            {
-              id: 'search',
-              content: {
-                icon: <MdSearch />,
-                text: 'Search',
-              },
-              onClick: () => dispatch(openModal({ modalType: 'songSearch' })),
-            },
-          ]}
-        />
+        <Blocks tooltipId="songs" items={getBlockItems()} />
         <input type="file" onChange={handleUploadSong} ref={uploadSong} accept="audio/*" hidden />
       </div>
     </div>

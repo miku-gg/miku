@@ -1,0 +1,213 @@
+@import '../../styles//variables';
+
+.PartEditor {
+  position: relative;
+  border: 1px solid $node-conector-color;
+  border-radius: 10px;
+
+  &__buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+
+    &__removePlace {
+      color: $text-1;
+      width: 1.3rem;
+      height: 1.3rem;
+      cursor: pointer;
+
+      &:hover {
+        color: $secondary-color;
+      }
+    }
+
+    &__closeModal {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  &__removePlace {
+    color: #bababa;
+    width: 1.3rem;
+    height: 1.3rem;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    cursor: pointer;
+
+    &:hover {
+      color: $secondary-color;
+    }
+  }
+
+  &__text {
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0;
+
+      & p {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  &__background-container {
+    height: 200px;
+    width: 300px;
+    border-radius: 10px;
+    position: relative;
+
+    .ImageSlider__selectedImage {
+      transition: all 0.2s ease-out;
+    }
+
+    &:has(.SceneEditModal__background-edit-btn:hover) {
+      .SceneEditModal__background {
+        opacity: 0.3;
+      }
+    }
+
+    &:has(.SceneEditModal__character-select1-btn:hover) {
+      .SceneEditModal__character:first-child {
+        .ImageSlider__selectedImage {
+          filter: blur(5px);
+          margin-bottom: -1rem;
+        }
+      }
+    }
+
+    &:has(.SceneEditModal__character-select2-btn:hover) {
+      .SceneEditModal__character:last-child {
+        .ImageSlider__selectedImage {
+          filter: blur(5px);
+          margin-bottom: -1rem;
+        }
+      }
+    }
+
+    &__controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+  }
+
+  &__background {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem;
+    transition: all 0.2s ease-out;
+    z-index: -1;
+  }
+
+  &__background-edit-btn,
+  &__character-select1-btn,
+  &__character-select2-btn,
+  &__music-select-btn,
+  &__text-input-btn {
+    color: black;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    padding: 5px;
+    display: flex;
+    transition: all 0.2s ease-out;
+    outline: none;
+    width: 36px;
+    display: flex;
+    justify-content: center;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  &__character-select1-btn,
+  &__character-select2-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &__character-select2-btn {
+    &--disabled {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &__music-select-btn,
+  &__text-input-btn {
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &__characters {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+
+    .ImageSlider__backgroundImage {
+      overflow: hidden;
+    }
+
+    .Carousel {
+      position: absolute;
+      bottom: -40px;
+    }
+  }
+
+  &__selected-characters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  &__modal {
+    top: 50px !important;
+    h2 {
+      display: none !important;
+    }
+
+    &__characters {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    &__done-btn {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}
