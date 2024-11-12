@@ -225,6 +225,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     let nextCharString = '';
     let currentCharacterIndex;
     let currentCharacter;
+    let linePrefix = '';
     switch (dialog.type) {
       case 'response':
         currentCharacterIndex = dialog.item.characters.findIndex(({ characterId }) => {
@@ -271,9 +272,10 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
           );
         }
       case 'interaction':
+        linePrefix = dialog.item.query.startsWith('OOC:') ? '' : '{{user}}: ';
         if ((currentText?.lastIndexOf(temp.instruction) || 0) < (currentText?.lastIndexOf(temp.response) || 1))
-          return `${temp.instruction}{{user}}: ${dialog.item.query}\n`;
-        else return `{{user}}: ${dialog.item.query}\n`;
+          return `${temp.instruction}${linePrefix}${dialog.item.query}\n`;
+        else return `${linePrefix}${dialog.item.query}\n`;
     }
   }
 

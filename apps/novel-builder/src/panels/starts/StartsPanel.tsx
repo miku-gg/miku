@@ -9,6 +9,7 @@ import classNames from 'classnames';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
 import SceneSelector, { SceneSelectorModal } from '../../modals/scene/SceneSelector';
+import { EMOTION_GROUP_TEMPLATES } from '@mikugg/bot-utils';
 
 export default function StartsPanel() {
   const dispatch = useAppDispatch();
@@ -88,10 +89,17 @@ export default function StartsPanel() {
                   const outfit = character?.card.data.extensions.mikugg_v2.outfits.find(
                     (outfit) => outfit.id === characterSceneOutfit,
                   );
+
+                  const emotionsToUse =
+                    outfit?.template === 'single-emotion'
+                      ? EMOTION_GROUP_TEMPLATES['base-emotions'].emotionIds
+                      : outfit?.emotions.map((emotion) => emotion.id) || [];
+
                   const selectedEmotionIndex = Math.max(
-                    outfit?.emotions.findIndex((emotion) => emotion.id === _character.emotion) || 0,
+                    emotionsToUse.findIndex((emotionId) => emotionId === _character.emotion) || 0,
                     0,
                   );
+
                   return (
                     <div
                       className="StartsPanel__item-prompt-character"
@@ -102,12 +110,10 @@ export default function StartsPanel() {
                         <div className="StartsPanel__item-prompt-character-title-right">
                           <div className="StartsPanel__item-prompt-character-emotion">
                             <Dropdown
-                              items={
-                                outfit?.emotions.map((emotion) => ({
-                                  name: emotion.id,
-                                  value: emotion.id,
-                                })) || []
-                              }
+                              items={emotionsToUse.map((emotionId) => ({
+                                name: emotionId,
+                                value: emotionId,
+                              }))}
                               selectedIndex={selectedEmotionIndex}
                               onChange={(indexEmotion) => {
                                 dispatch(
@@ -117,7 +123,7 @@ export default function StartsPanel() {
                                       i === index
                                         ? {
                                             ...char,
-                                            emotion: outfit?.emotions[indexEmotion]?.id || '',
+                                            emotion: emotionsToUse[indexEmotion] || '',
                                           }
                                         : char,
                                     ),

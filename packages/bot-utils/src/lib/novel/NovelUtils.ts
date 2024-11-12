@@ -654,12 +654,12 @@ export function validateNovelState(novel: NovelV3.NovelState): NovelValidation[]
               message: `A character in start "${start.title || start.id}" not found in scene ${start.sceneId}`,
             });
           } else {
-            const { outfit: outfitSlig } = startScene.characters.find(
+            const { outfit: outfitSlug } = startScene.characters.find(
               (sceneCharacter) => sceneCharacter.characterId === character.characterId,
             ) || { outfit: '' };
             const characterEntity = novel.characters.find((c) => c.id === character.characterId);
             // check if outfit is valid
-            const outfit = characterEntity?.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === outfitSlig);
+            const outfit = characterEntity?.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === outfitSlug);
             if (!outfit) {
               errors.push({
                 targetType: NovelValidationTargetType.START,
@@ -668,14 +668,21 @@ export function validateNovelState(novel: NovelV3.NovelState): NovelValidation[]
                 message: `Outfit ${outfit} not found for character ${character.characterId}`,
               });
             }
-            // check if emotion is valid for outfit
-            if (outfit && !outfit.emotions.some((e) => e.id === character.emotion)) {
-              errors.push({
-                targetType: NovelValidationTargetType.START,
-                severity: 'error',
-                targetId: start.id,
-                message: `Emotion ${character.emotion} not found for outfit ${outfit.name} in character ${characterEntity?.name}`,
-              });
+            // check if emotion is valid for outfit, using base-emotions for single-emotion outfits
+            if (outfit) {
+              const validEmotions =
+                outfit.template === 'single-emotion'
+                  ? EMOTION_GROUP_TEMPLATES['base-emotions'].emotionIds
+                  : outfit.emotions.map((e) => e.id);
+
+              if (!validEmotions.includes(character.emotion)) {
+                errors.push({
+                  targetType: NovelValidationTargetType.START,
+                  severity: 'error',
+                  targetId: start.id,
+                  message: `Emotion ${character.emotion} not found for outfit ${outfit.name} in character ${characterEntity?.name}`,
+                });
+              }
             }
 
             // check if text is not empty
