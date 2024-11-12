@@ -14,7 +14,7 @@ import { AssetType } from '@mikugg/bot-utils';
 export default function Songs({
   selected,
   onSelect,
-  displayNoneButton = true,
+  displayNoneButton,
 }: {
   selected?: string | undefined;
   displayNoneButton?: boolean;
