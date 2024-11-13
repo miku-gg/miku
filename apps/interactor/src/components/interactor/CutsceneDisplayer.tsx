@@ -168,7 +168,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         {(currentPartIndex > 0 || currentTextIndex > 0) && (
           <IoIosArrowBack
             className="CutsceneDisplayer__buttons-left"
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent) => {
               e.stopPropagation();
               handlePreviousClick();
             }}
@@ -179,7 +179,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
             {currentPartIndex === 0 && currentTextIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
             <IoIosArrowForward
               className="CutsceneDisplayer__buttons-right"
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 handleContinueClick();
               }}
