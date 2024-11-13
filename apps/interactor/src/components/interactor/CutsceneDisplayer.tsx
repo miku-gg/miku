@@ -115,6 +115,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const cutscenes = useAppSelector((state) => state.novel.cutscenes);
   const currentCutscene = cutscenes?.find((c) => c.id === scene?.cutScene?.id);
   const [currentPartIndex, setCurrentPartIndex] = useState<number>(0);
+  const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
 
   if (!currentCutscene || !scene) {
     return null;
@@ -122,22 +123,29 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const parts = currentCutscene.parts;
 
   const handleContinueClick = () => {
-    if (currentPartIndex < parts.length - 1) {
+    const currentPart = parts[currentPartIndex];
+    if (currentTextIndex < currentPart.text.length - 1) {
+      setCurrentTextIndex(currentTextIndex + 1);
+    } else if (currentPartIndex < parts.length - 1) {
       setCurrentPartIndex(currentPartIndex + 1);
-    }
-  };
-  const handlePreviousClick = () => {
-    if (currentPartIndex > 0) {
-      setCurrentPartIndex(currentPartIndex - 1);
+      setCurrentTextIndex(0);
     }
   };
 
-  const getText = (index: number) => {
-    if (parts[index].type === 'description') {
-      return parts[index].text;
+  const handlePreviousClick = () => {
+    if (currentTextIndex > 0) {
+      setCurrentTextIndex(currentTextIndex - 1);
+    } else if (currentPartIndex > 0) {
+      setCurrentPartIndex(currentPartIndex - 1);
+      setCurrentTextIndex(parts[currentPartIndex - 1].text.length - 1);
     }
-    return `"${parts[index].text}"`;
   };
+
+  const getText = (partIndex: number, textIndex: number) => {
+    const text = parts[partIndex].text[textIndex];
+    return text.type === 'description' ? text.content : `"${text.content}"`;
+  };
+
   return (
     <>
       <PartRenderer
@@ -148,16 +156,16 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         onPreviousClick={handlePreviousClick}
       />
       <div
-        className={`CutsceneDisplayer__text ${parts[currentPartIndex].type}`}
+        className={`CutsceneDisplayer__text ${parts[currentPartIndex].text[currentTextIndex].type}`}
         onClick={(e) => {
           e.stopPropagation();
           handleContinueClick();
         }}
       >
-        <TextFormatterStatic text={getText(currentPartIndex)} />
+        <TextFormatterStatic text={getText(currentPartIndex, currentTextIndex)} />
       </div>
       <div className="CutsceneDisplayer__buttons">
-        {currentPartIndex > 0 && (
+        {(currentPartIndex > 0 || currentTextIndex > 0) && (
           <IoIosArrowBack
             className="CutsceneDisplayer__buttons-left"
             onClick={(e) => {
@@ -166,9 +174,9 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
             }}
           />
         )}
-        {currentPartIndex < parts.length - 1 ? (
+        {currentPartIndex < parts.length - 1 || currentTextIndex < parts[currentPartIndex].text.length - 1 ? (
           <>
-            {currentPartIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
+            {currentPartIndex === 0 && currentTextIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
             <IoIosArrowForward
               className="CutsceneDisplayer__buttons-right"
               onClick={(e) => {
@@ -179,7 +187,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
           </>
         ) : (
           <>
-            {currentPartIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
+            {currentPartIndex === 0 && currentTextIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
 
             <button
               className="CutsceneDisplayer__buttons-right"
