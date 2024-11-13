@@ -1,12 +1,18 @@
 import { v4 as randomUUID } from 'uuid';
 import { Button, CheckBox, Tooltip } from '@mikugg/ui-kit';
 import { selectEditingScene } from '../../state/selectors';
-import { createCutscene, createCutscenePart, updateTriggerOnlyOnce } from '../../state/slices/novelFormSlice';
+import {
+  createCutscene,
+  createCutscenePart,
+  deleteCutscene,
+  updateTriggerOnlyOnce,
+} from '../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { openModal } from '../../state/slices/inputSlice';
 import './CutscenesPartsRender.scss';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { PartEditor } from './PartEditor';
+import { useEffect } from 'react';
 
 export const CutScenePartsRender = () => {
   const dispatch = useAppDispatch();
@@ -32,6 +38,18 @@ export const CutScenePartsRender = () => {
     dispatch(openModal({ modalType: 'cutscenePartEdit', editId: partId }));
   };
 
+  const handleDeleteCutscene = () => {
+    if (!currentCutscene) return;
+    dispatch(deleteCutscene({ cutsceneId: currentCutscene.id, sceneId: scene!.id }));
+  };
+
+  useEffect(() => {
+    if (!currentCutscene) return;
+    if (parts.length === 0) {
+      handleDeleteCutscene();
+    }
+  }, [parts]);
+
   return (
     <div className="CutScenePartsRender">
       <div className="CutScenePartsRender__header">
@@ -45,14 +63,16 @@ export const CutScenePartsRender = () => {
           <Tooltip id="Info-cutscene" place="top" />
         </div>
         <div className="CutScenePartsRender__header__controls">
-          <CheckBox
-            value={scene?.cutScene?.triggerOnlyOnce}
-            onChange={(e) => {
-              if (!scene) return;
-              dispatch(updateTriggerOnlyOnce({ sceneId: scene.id, triggerOnlyOnce: e.target.checked }));
-            }}
-            label="Trigger only once"
-          />
+          {scene?.cutScene && (
+            <CheckBox
+              value={scene?.cutScene?.triggerOnlyOnce}
+              onChange={(e) => {
+                if (!scene) return;
+                dispatch(updateTriggerOnlyOnce({ sceneId: scene.id, triggerOnlyOnce: e.target.checked }));
+              }}
+              label="Trigger only once"
+            />
+          )}
           <Button theme="primary" onClick={handleCreatePart}>
             Create
           </Button>

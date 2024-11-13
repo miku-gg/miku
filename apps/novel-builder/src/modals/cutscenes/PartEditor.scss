@@ -209,5 +209,44 @@
       display: flex;
       justify-content: flex-end;
     }
+
+    &__text {
+      &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+
+        & h3 {
+          margin: 0;
+        }
+      }
+
+      &__parts {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 450px;
+        overflow-y: auto;
+        padding-right: 10px;
+      }
+
+      &__part {
+        padding: 6px;
+        border: 1px solid $node-conector-color;
+        border-radius: 10px;
+
+        &__header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 8px;
+        }
+      }
+
+      .last {
+        border-bottom: none;
+      }
+    }
   }
 }

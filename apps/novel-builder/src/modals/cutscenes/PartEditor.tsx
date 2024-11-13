@@ -1,11 +1,9 @@
 import { AreYouSure, Button, Carousel, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import { useAppDispatch, useAppSelector } from '../../state/store';
-import { selectEditingCutscenePart, selectEditingScene } from '../../state/selectors';
+import { selectEditingScene } from '../../state/selectors';
 import { closeModal } from '../../state/slices/inputSlice';
-import ButtonGroup from '../../components/ButtonGroup';
 import { deleteCutscenePart, updateCutscenePart } from '../../state/slices/novelFormSlice';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
-import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { FaMusic, FaTrashAlt, FaUser } from 'react-icons/fa';
 import './PartEditor.scss';
 import { useEffect, useState } from 'react';
@@ -18,6 +16,7 @@ import Characters from '../../panels/assets/characters/Characters';
 import './PartEditor.scss';
 import { CutScenePart } from '@mikugg/bot-utils/dist/lib/novel/NovelV3';
 import { BsChatLeftText } from 'react-icons/bs';
+import ButtonGroup from '../../components/ButtonGroup';
 
 export const PartEditor = ({ part }: { part: CutScenePart }) => {
   const dispatch = useAppDispatch();
@@ -86,9 +85,51 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
       case selectSongModalOpened:
         setSelectSongModalOpened(false);
         break;
+      case selectTextModalOpened:
+        setSelectTextModalOpened(false);
+        break;
       default:
         break;
     }
+  };
+
+  const handleInputChange = (index: number, value: string) => {
+    if (!part?.text || index < 0 || index >= part.text.length) return;
+
+    const newText = [...part.text];
+    newText[index] = {
+      ...newText[index],
+      content: value,
+    };
+
+    updatePart({ ...part, text: newText });
+  };
+
+  const createTextPart = () => {
+    const newText = [...part.text];
+    newText.push({ type: 'description', content: '' });
+    updatePart({ ...part, text: newText });
+  };
+
+  const handleTextTypeChange = (index: number, type: 'description' | 'dialogue') => {
+    if (!part?.text || index < 0 || index >= part.text.length) return;
+
+    const newText = [...part.text];
+    newText[index] = {
+      ...newText[index],
+      type: type as 'description' | 'dialogue',
+    };
+
+    updatePart({ ...part, text: newText });
+  };
+
+  const handleDeleteTextPart = (index: number) => {
+    if (!part?.text || index < 0 || index >= part.text.length) return;
+
+    const newText = [...part.text];
+    newText.splice(index, 1);
+
+    updatePart({ ...part, text: newText });
   };
 
   useEffect(() => {
@@ -338,7 +379,42 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
               }}
             />
           )}
-          {selectTextModalOpened && <div>Text</div>}
+          {selectTextModalOpened && (
+            <div className="PartEditor__modal__text">
+              <div className="PartEditor__modal__text__header">
+                <h3>Text Parts</h3>
+                <Button theme="secondary" onClick={createTextPart}>
+                  Create
+                </Button>
+              </div>
+              {part.text.length > 0 && (
+                <div className="PartEditor__modal__text__parts scrollbar">
+                  {part.text.map((text, index) => (
+                    <div key={`${text.type}-${index}`} className="PartEditor__modal__text__part">
+                      <div className="PartEditor__modal__text__part__header">
+                        <ButtonGroup
+                          buttons={[
+                            { content: 'Description', value: 'description' },
+                            { content: 'Dialogue', value: 'dialogue' },
+                          ]}
+                          selected={text.type}
+                          onButtonClick={(type) => handleTextTypeChange(index, type)}
+                        />
+                        <Button theme="primary" onClick={() => handleDeleteTextPart(index)}>
+                          Delete
+                        </Button>
+                      </div>
+                      <Input
+                        isTextArea
+                        value={text.content}
+                        onChange={(e) => handleInputChange(index, e.target.value)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </Modal>
       </div>
     </div>

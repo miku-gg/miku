@@ -65,8 +65,10 @@ export interface NovelCharacterOutfit {
 
 export interface CutScenePart {
   id: string;
-  text: string;
-  type: 'dialogue' | 'description';
+  text: {
+    type: 'dialogue' | 'description';
+    content: string;
+  }[];
   background: string;
   music?: string;
   characters: { id: string; outfitId: string; emotionId: string }[];

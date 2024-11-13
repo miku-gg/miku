@@ -437,8 +437,8 @@ const novelFormSlice = createSlice({
     updateDetails: (
       state,
       action: PayloadAction<{
-        // name: 'title' | 'description' | 'author' | 'logoPic' | 'language';
-        name: 'title' | 'description' | 'author' | 'logoPic';
+        name: 'title' | 'description' | 'author' | 'logoPic' | 'language';
+        // name: 'title' | 'description' | 'author' | 'logoPic';
 
         value: string;
       }>,
@@ -453,17 +453,14 @@ const novelFormSlice = createSlice({
       if (!cutscene) return;
       const newPart: NovelV3.CutScenePart = {
         id: action.payload.partId,
-        text: 'Description or dialogue text',
-        type: 'dialogue',
-        background: state.backgrounds[0]?.id || '',
-        // music: state.songs[0]?.id || '',
-        characters: [
-          // {
-          //   id: character.id,
-          //   emotionId: character.card.data.extensions.mikugg_v2.outfits[0].emotions[0].id,
-          //   outfitId: character.card.data.extensions.mikugg_v2.outfits[0].id,
-          // },
+        text: [
+          {
+            content: 'Description or dialogue text',
+            type: 'dialogue',
+          },
         ],
+        background: state.backgrounds[0]?.id || '',
+        characters: [],
       };
       cutscene.parts.push(newPart);
     },
