@@ -73,16 +73,18 @@ export const CutScenePartsRender = () => {
               label="Trigger only once"
             />
           )}
-          <Button theme="primary" onClick={handleCreatePart}>
-            Create
+          <Button theme="gradient" onClick={handleCreatePart}>
+            Add Part
           </Button>
         </div>
       </div>
-      <div className="CutScenePartsRender__container">
-        {parts.map((part) => (
-          <PartEditor key={part.id} part={part} />
-        ))}
-      </div>
+      {parts.length > 0 && (
+        <div className="CutScenePartsRender__container">
+          {parts.map((part) => (
+            <PartEditor key={part.id} part={part} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

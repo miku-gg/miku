@@ -449,13 +449,13 @@ const novelFormSlice = createSlice({
 
     createCutscenePart: (state, action: PayloadAction<{ cutsceneId: string; partId: string }>) => {
       const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
-      // const character = state.characters[0];
+
       if (!cutscene) return;
       const newPart: NovelV3.CutScenePart = {
         id: action.payload.partId,
         text: [
           {
-            content: 'Description or dialogue text',
+            content: '',
             type: 'dialogue',
           },
         ],

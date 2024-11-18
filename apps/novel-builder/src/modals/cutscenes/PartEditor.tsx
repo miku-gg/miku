@@ -157,7 +157,10 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
         <Tooltip id="delete-cutscene-part-tooltip" place="bottom" />
         <div className="PartEditor__background-container__controls">
           <div
-            className="PartEditor__background-edit-btn"
+            className={classNames({
+              'PartEditor__background-edit-btn': true,
+              'PartEditor__background-edit-btn--selected': part.background,
+            })}
             onClick={() => setSelectBackgroundModalOpened(true)}
             tabIndex={0}
             role="button"
@@ -181,10 +184,11 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
           >
             <FaUser /> 1
           </div>
-          <div
+          <button
             className={classNames({
               'PartEditor__character-select2-btn': true,
               'PartEditor__character-select2-btn--disabled': part.characters.length < 2,
+              'PartEditor__character-select2-btn--selected': part.characters.length === 2,
             })}
             onClick={() =>
               setSelectCharacterModal({
@@ -193,16 +197,17 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
               })
             }
             tabIndex={0}
+            disabled={part.characters.length < 2}
             role="button"
             data-tooltip-id="cutscene-part-data"
             data-tooltip-content={part.characters.length > 1 ? 'Edit character 2' : 'Add character 2'}
           >
             <FaUser /> 2
-          </div>
+          </button>
           <div
             className={classNames({
               'PartEditor__music-select-btn': true,
-              'PartEditor__music-select-btn--disabled': false,
+              'PartEditor__music-select-btn--selected': part.music,
             })}
             onClick={() => setSelectSongModalOpened(true)}
             tabIndex={0}
@@ -215,7 +220,7 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
           <div
             className={classNames({
               'PartEditor__text-input-btn': true,
-              'PartEditor__text-input-btn--disabled': false,
+              'PartEditor__text-input-btn--selected': part.text.length > 0,
             })}
             onClick={() => setSelectTextModalOpened(true)}
             tabIndex={0}
@@ -400,9 +405,11 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
                           selected={text.type}
                           onButtonClick={(type) => handleTextTypeChange(index, type)}
                         />
-                        <Button theme="primary" onClick={() => handleDeleteTextPart(index)}>
-                          Delete
-                        </Button>
+                        {part.text.length > 1 && (
+                          <Button theme="primary" onClick={() => handleDeleteTextPart(index)}>
+                            Delete
+                          </Button>
+                        )}
                       </div>
                       <Input
                         isTextArea
