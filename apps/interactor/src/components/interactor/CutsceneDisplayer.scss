@@ -71,37 +71,36 @@
   }
 
   &__emotion-renderer {
-    opacity: 0;
     z-index: 0;
     object-fit: contain;
+    position: absolute;
+    object-fit: cover;
     height: 100%;
     transition: all 0.2s ease-out;
     animation: up-and-down 3s ease-in-out infinite;
+    right: 0;
   }
 
   &__characters--multiple {
     opacity: 1;
     z-index: 1;
-    display: initial;
-    justify-content: initial;
+    display: flex;
+    width: 60%;
+    justify-content: flex-end;
+    position: absolute;
+    right: 0;
 
-    .Interactor__emotion-renderer {
-      position: absolute;
-      width: 100%;
-      filter: brightness(0.6);
-      animation: none;
-
-      &.selected {
-        animation: up-and-down 3s ease-in-out infinite, brightnessfade 0.5s ease-in-out forwards;
-        z-index: 1;
-      }
+    .CutsceneDisplayer__emotion-renderer {
+      opacity: 1;
+      width: 50%;
+      object-fit: cover;
 
       &:first-child {
-        left: -25%;
+        left: 0;
       }
 
       &:last-child {
-        right: -25%;
+        right: 0;
       }
     }
   }

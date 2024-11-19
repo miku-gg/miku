@@ -94,6 +94,7 @@ const PartRenderer = ({
                 key={`character-emotion-render-${id}`}
                 assetLinkLoader={assetLinkLoader}
                 assetUrl={emotion.sources.png}
+                className="CutsceneDisplayer__emotion-renderer"
                 upDownAnimation
               />
             );
