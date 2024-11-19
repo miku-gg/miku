@@ -105,22 +105,34 @@
     }
   }
 
+  &__text-container {
+    position: absolute;
+    border: 1px solid red;
+    top: 0px;
+    left: 0px;
+    z-index: 2;
+    width: 40%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   &__text {
     cursor: pointer;
-    position: absolute;
+    // position: absolute;
+    border: 1px solid blue;
     bottom: 35px;
     z-index: 1;
-    // background: linear-gradient(to top, rgba(#171717, 0.9), rgba(#171717, 0.6));
     text-shadow: 1.41px 1.41px black, 2px 0 black, 1.41px -1.41px black, 0 -2px black, -1.41px -1.41px black,
       -2px 0 black, -1.41px 1.41px black, 0 2px black;
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
     z-index: 2;
-    width: 700px;
-    height: 200px;
+    width: fit-content;
+    max-width: 100%;
     overflow: scroll;
-    padding: 16px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -128,7 +140,6 @@
     & div {
       display: flex;
       flex-direction: column;
-      align-items: center;
     }
 
     &.description {

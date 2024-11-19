@@ -117,6 +117,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const currentCutscene = cutscenes?.find((c) => c.id === scene?.cutScene?.id);
   const [currentPartIndex, setCurrentPartIndex] = useState<number>(0);
   const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
+  const [displayedTextIndices, setDisplayedTextIndices] = useState<number[]>([0]);
 
   if (!currentCutscene || !scene) {
     return null;
@@ -127,9 +128,11 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
     const currentPart = parts[currentPartIndex];
     if (currentTextIndex < currentPart.text.length - 1) {
       setCurrentTextIndex(currentTextIndex + 1);
+      setDisplayedTextIndices([...displayedTextIndices, currentTextIndex + 1]);
     } else if (currentPartIndex < parts.length - 1) {
       setCurrentPartIndex(currentPartIndex + 1);
       setCurrentTextIndex(0);
+      setDisplayedTextIndices([0]);
     }
   };
 
@@ -156,14 +159,19 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         onContinueClick={handleContinueClick}
         onPreviousClick={handlePreviousClick}
       />
-      <div
-        className={`CutsceneDisplayer__text ${parts[currentPartIndex].text[currentTextIndex].type}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleContinueClick();
-        }}
-      >
-        <TextFormatterStatic text={getText(currentPartIndex, currentTextIndex)} />
+      <div className="CutsceneDisplayer__text-container">
+        {displayedTextIndices.map((textIndex) => (
+          <div
+            key={`text-${currentPartIndex}-${textIndex}`}
+            className={`CutsceneDisplayer__text ${parts[currentPartIndex].text[textIndex].type}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleContinueClick();
+            }}
+          >
+            <TextFormatterStatic text={getText(currentPartIndex, textIndex)} />
+          </div>
+        ))}
       </div>
       <div className="CutsceneDisplayer__buttons">
         {(currentPartIndex > 0 || currentTextIndex > 0) && (
