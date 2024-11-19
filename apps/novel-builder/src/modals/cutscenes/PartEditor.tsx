@@ -25,7 +25,7 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
   const currentCutscene = useAppSelector((state) => state.novel.cutscenes?.find((c) => c.id === scene?.cutScene?.id));
   const selectedMusic = useAppSelector((state) => state.novel.songs.find((s) => s.id === part?.music));
   const selectedBackground = useAppSelector((state) => state.novel.backgrounds.find((b) => b.id === part?.background));
-  const characters = scene?.characters || [];
+  const characters = useAppSelector((state) => state.novel.characters);
   const partCharacters = part?.characters || [];
 
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
@@ -169,8 +169,11 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
           >
             <AiOutlinePicture />
           </div>
-          <div
-            className="PartEditor__character-select1-btn"
+          <button
+            className={classNames({
+              'PartEditor__character-select1-btn': true,
+              'PartEditor__character-select1-btn--selected': part.characters.length > 0,
+            })}
             onClick={() =>
               setSelectCharacterModal({
                 opened: true,
@@ -183,11 +186,11 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
             data-tooltip-content={part.characters.length > 0 ? 'Edit character 1' : 'Add character 1'}
           >
             <FaUser /> 1
-          </div>
+          </button>
           <button
             className={classNames({
               'PartEditor__character-select2-btn': true,
-              'PartEditor__character-select2-btn--disabled': part.characters.length < 2,
+              'PartEditor__character-select2-btn--disabled': characters.length < 2,
               'PartEditor__character-select2-btn--selected': part.characters.length === 2,
             })}
             onClick={() =>
@@ -197,7 +200,7 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
               })
             }
             tabIndex={0}
-            disabled={part.characters.length < 2}
+            disabled={characters.length < 2}
             role="button"
             data-tooltip-id="cutscene-part-data"
             data-tooltip-content={part.characters.length > 1 ? 'Edit character 2' : 'Add character 2'}
@@ -263,17 +266,13 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
                 selected={partCharacters.length > 0 ? partCharacters[selectCharacterModal.characterIndex]?.id : ''}
                 onSelect={(characterId) => {
                   if (characters) {
-                    const newCharacters = characters.map((character) => ({
-                      id: character.id || '',
-                      outfitId: character.outfit || '',
-                      emotionId: character.card?.data.extensions.mikugg_v2.outfits[0].emotions[0].id || '',
-                    }));
+                    const newCharacters = [...part.characters];
                     const newCharacter = characters.find((character) => character.id === characterId);
                     if (newCharacter) {
-                      newCharacters[selectCharacterModal.characterIndex || 0] = {
-                        id: newCharacter?.id || '',
-                        outfitId: newCharacter?.card?.data.extensions.mikugg_v2.outfits[0].id || '',
-                        emotionId: newCharacter?.card?.data.extensions.mikugg_v2.outfits[0].emotions[0].id || '',
+                      newCharacters[selectCharacterModal.characterIndex] = {
+                        id: newCharacter.id || '',
+                        outfitId: newCharacter.card?.data.extensions.mikugg_v2.outfits[0].id || '',
+                        emotionId: newCharacter.card?.data.extensions.mikugg_v2.outfits[0].emotions[0].id || '',
                       };
                     } else {
                       newCharacters.splice(selectCharacterModal.characterIndex, 1);
@@ -282,82 +281,89 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
                   }
                 }}
               />
-              {partCharacters.length > 0 &&
-                characters.map((character, characterIndex) => {
-                  const outfits = character.card?.data.extensions.mikugg_v2.outfits || [];
-                  const selectedOutfitIndex = Math.max(
-                    outfits.findIndex((outfit) => outfit.id === character.outfit),
-                    0,
-                  );
-                  const selectedEmotion = outfits[selectedOutfitIndex].emotions.find(
-                    (emotion) => emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
-                  ) ||
-                    outfits[selectedOutfitIndex].emotions[0] || {
-                      id: 'neutral',
-                      sources: {
-                        png: '',
-                      },
-                    };
-                  return (
-                    <div key={character.id} className="PartEditor__character">
-                      <ImageSlider
-                        images={outfits.map((outfit) => ({
-                          source: config.genAssetLink(selectedEmotion.sources.png, AssetDisplayPrefix.EMOTION_IMAGE),
-                          label: outfit.name,
-                        }))}
-                        backgroundImageSource=""
-                        selectedIndex={selectedOutfitIndex}
-                        onChange={(delta) => {
-                          let newOutfitIndex = selectedOutfitIndex + delta;
-                          if (newOutfitIndex < 0) {
-                            newOutfitIndex = outfits.length - 1;
-                          } else if (newOutfitIndex >= outfits.length) {
-                            newOutfitIndex = 0;
-                          }
-                          updatePart({
-                            ...part,
-                            characters: part.characters.map((character) => ({
-                              ...character,
-                              outfitId: outfits[newOutfitIndex].id,
-                            })),
-                          });
-                        }}
-                      />
-                      <Carousel
-                        items={outfits[selectedOutfitIndex].emotions.map((emotion) => ({
-                          title: emotion.id,
-                        }))}
-                        selectedIndex={outfits[selectedOutfitIndex].emotions.findIndex(
-                          (emotion) =>
-                            emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
-                        )}
-                        onClick={(index) => {
-                          if (characterIndex === 0) {
-                            setShowingEmotionChar1(outfits[selectedOutfitIndex].emotions[index]?.id || '');
+              {partCharacters.length > 0 && (
+                <div className="PartEditor__character">
+                  {partCharacters.map((character, characterIndex) => {
+                    if (characterIndex !== selectCharacterModal.characterIndex) return null;
+                    const characterData = characters.find((c) => c.id === character.id);
+                    if (!characterData) return null;
+
+                    const outfits = characterData.card?.data.extensions.mikugg_v2.outfits || [];
+                    const selectedOutfitIndex = Math.max(
+                      outfits.findIndex((outfit) => outfit.id === character.outfitId),
+                      0,
+                    );
+                    const selectedEmotion = outfits[selectedOutfitIndex].emotions.find(
+                      (emotion) => emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
+                    ) ||
+                      outfits[selectedOutfitIndex].emotions[0] || {
+                        id: 'neutral',
+                        sources: {
+                          png: '',
+                        },
+                      };
+
+                    return (
+                      <div key={character.id}>
+                        <ImageSlider
+                          images={outfits.map((outfit) => ({
+                            source: config.genAssetLink(selectedEmotion.sources.png, AssetDisplayPrefix.EMOTION_IMAGE),
+                            label: outfit.name,
+                          }))}
+                          backgroundImageSource=""
+                          selectedIndex={selectedOutfitIndex}
+                          onChange={(delta) => {
+                            let newOutfitIndex = selectedOutfitIndex + delta;
+                            if (newOutfitIndex < 0) {
+                              newOutfitIndex = outfits.length - 1;
+                            } else if (newOutfitIndex >= outfits.length) {
+                              newOutfitIndex = 0;
+                            }
                             updatePart({
                               ...part,
                               characters: part.characters.map((char, idx) =>
-                                idx === 0
-                                  ? { ...char, emotionId: outfits[selectedOutfitIndex].emotions[index]?.id || '' }
-                                  : char,
+                                idx === characterIndex ? { ...char, outfitId: outfits[newOutfitIndex].id } : char,
                               ),
                             });
-                          } else {
-                            setShowingEmotionChar2(outfits[selectedOutfitIndex].emotions[index]?.id || '');
-                            updatePart({
-                              ...part,
-                              characters: part.characters.map((char, idx) =>
-                                idx === 1
-                                  ? { ...char, emotionId: outfits[selectedOutfitIndex].emotions[index]?.id || '' }
-                                  : char,
-                              ),
-                            });
-                          }
-                        }}
-                      />
-                    </div>
-                  );
-                })}
+                          }}
+                        />
+                        <Carousel
+                          items={outfits[selectedOutfitIndex].emotions.map((emotion) => ({
+                            title: emotion.id,
+                          }))}
+                          selectedIndex={outfits[selectedOutfitIndex].emotions.findIndex(
+                            (emotion) =>
+                              emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
+                          )}
+                          onClick={(index) => {
+                            if (characterIndex === 0) {
+                              setShowingEmotionChar1(outfits[selectedOutfitIndex].emotions[index]?.id || '');
+                              updatePart({
+                                ...part,
+                                characters: part.characters.map((char, idx) =>
+                                  idx === 0
+                                    ? { ...char, emotionId: outfits[selectedOutfitIndex].emotions[index]?.id || '' }
+                                    : char,
+                                ),
+                              });
+                            } else {
+                              setShowingEmotionChar2(outfits[selectedOutfitIndex].emotions[index]?.id || '');
+                              updatePart({
+                                ...part,
+                                characters: part.characters.map((char, idx) =>
+                                  idx === 1
+                                    ? { ...char, emotionId: outfits[selectedOutfitIndex].emotions[index]?.id || '' }
+                                    : char,
+                                ),
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               <div className="PartEditor__modal__done-btn">
                 <Button theme="gradient" onClick={() => setSelectCharacterModal({ opened: false, characterIndex: 0 })}>
                   Done
@@ -413,6 +419,10 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
                       </div>
                       <Input
                         isTextArea
+                        className={classNames({
+                          'PartEditor__modal__text__input': true,
+                          'PartEditor__modal__text__input--dialogue': text.type === 'dialogue',
+                        })}
                         value={text.content}
                         onChange={(e) => handleInputChange(index, e.target.value)}
                       />

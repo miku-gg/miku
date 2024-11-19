@@ -199,6 +199,12 @@
     position: absolute;
     top: 0;
     left: 0;
+
+    img {
+      width: 50%;
+      height: auto;
+      object-fit: contain;
+    }
   }
 
   &__modal {
@@ -237,6 +243,14 @@
         max-height: 450px;
         overflow-y: auto;
         padding-right: 10px;
+      }
+
+      &__input {
+        &--dialogue {
+          & textarea {
+            color: rgba(225, 138, 36, 1);
+          }
+        }
       }
 
       &__part {
