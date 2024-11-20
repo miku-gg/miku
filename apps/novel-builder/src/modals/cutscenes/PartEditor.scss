@@ -209,6 +209,7 @@
 
   &__modal {
     top: 50px !important;
+    min-height: 450px;
     h2 {
       display: none !important;
     }
@@ -225,6 +226,7 @@
     }
 
     &__text {
+      height: 100%;
       &__header {
         display: flex;
         align-items: center;
@@ -240,7 +242,7 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        max-height: 450px;
+        height: 450px;
         overflow-y: auto;
         padding-right: 10px;
       }
@@ -253,16 +255,24 @@
         }
       }
 
+      &__dropdown {
+        width: fit-content;
+        min-width: 115px;
+        margin: 0;
+      }
+
       &__part {
         padding: 6px;
         border: 1px solid $node-conector-color;
         border-radius: 10px;
+        gap: 8px;
 
-        &__header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .Input {
+          width: 100%;
         }
       }
 

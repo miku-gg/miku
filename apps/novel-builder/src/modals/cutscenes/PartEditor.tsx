@@ -1,4 +1,4 @@
-import { AreYouSure, Button, Carousel, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import { AreYouSure, Button, Carousel, Dropdown, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { selectEditingScene } from '../../state/selectors';
 import { closeModal } from '../../state/slices/inputSlice';
@@ -16,7 +16,6 @@ import Characters from '../../panels/assets/characters/Characters';
 import './PartEditor.scss';
 import { CutScenePart } from '@mikugg/bot-utils/dist/lib/novel/NovelV3';
 import { BsChatLeftText } from 'react-icons/bs';
-import ButtonGroup from '../../components/ButtonGroup';
 
 export const PartEditor = ({ part }: { part: CutScenePart }) => {
   const dispatch = useAppDispatch();
@@ -131,6 +130,11 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
 
     updatePart({ ...part, text: newText });
   };
+
+  const dropdownItems = [
+    { name: 'Description', value: 'description' },
+    { name: 'Dialogue', value: 'dialogue' },
+  ];
 
   useEffect(() => {
     setShowingEmotionChar1(part?.characters[0]?.emotionId || 'neutral');
@@ -402,30 +406,29 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
                 <div className="PartEditor__modal__text__parts scrollbar">
                   {part.text.map((text, index) => (
                     <div key={`${text.type}-${index}`} className="PartEditor__modal__text__part">
-                      <div className="PartEditor__modal__text__part__header">
-                        <ButtonGroup
-                          buttons={[
-                            { content: 'Description', value: 'description' },
-                            { content: 'Dialogue', value: 'dialogue' },
-                          ]}
-                          selected={text.type}
-                          onButtonClick={(type) => handleTextTypeChange(index, type)}
-                        />
-                        {part.text.length > 1 && (
-                          <Button theme="primary" onClick={() => handleDeleteTextPart(index)}>
-                            Delete
-                          </Button>
-                        )}
-                      </div>
                       <Input
-                        isTextArea
                         className={classNames({
-                          'PartEditor__modal__text__input': true,
+                          PartEditor__modal__text__input: true,
                           'PartEditor__modal__text__input--dialogue': text.type === 'dialogue',
                         })}
                         value={text.content}
+                        maxLength={100}
                         onChange={(e) => handleInputChange(index, e.target.value)}
                       />
+
+                      <Dropdown
+                        className="PartEditor__modal__text__dropdown"
+                        items={dropdownItems}
+                        selectedIndex={dropdownItems.findIndex((item) => item.value === text.type)}
+                        onChange={(selectedIndex) =>
+                          handleTextTypeChange(index, dropdownItems[selectedIndex].value as 'description' | 'dialogue')
+                        }
+                      />
+                      {part.text.length > 1 && (
+                        <Button theme="primary" onClick={() => handleDeleteTextPart(index)}>
+                          Delete
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>
