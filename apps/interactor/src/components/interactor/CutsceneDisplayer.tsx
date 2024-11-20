@@ -119,11 +119,6 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
   const [displayedTextIndices, setDisplayedTextIndices] = useState<number[]>([0]);
 
-  if (!currentCutscene || !scene) {
-    return null;
-  }
-  const parts = currentCutscene.parts;
-
   const handleContinueClick = () => {
     const currentPart = parts[currentPartIndex];
     if (currentTextIndex < currentPart.text.length - 1) {
@@ -145,10 +140,11 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
     }
   };
 
-  const getText = (partIndex: number, textIndex: number) => {
-    const text = parts[partIndex].text[textIndex];
-    return text.type === 'description' ? text.content : `"${text.content}"`;
-  };
+  if (!currentCutscene || !scene) {
+    return null;
+  }
+
+  const parts = currentCutscene.parts;
 
   return (
     <>
@@ -160,18 +156,22 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         onPreviousClick={handlePreviousClick}
       />
       <div className="CutsceneDisplayer__text-container">
-        {displayedTextIndices.map((textIndex) => (
-          <div
-            key={`text-${currentPartIndex}-${textIndex}`}
-            className={`CutsceneDisplayer__text ${parts[currentPartIndex].text[textIndex].type}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleContinueClick();
-            }}
-          >
-            <TextFormatterStatic text={getText(currentPartIndex, textIndex)} />
-          </div>
-        ))}
+        {displayedTextIndices.map((textIndex) => {
+          const text = parts[currentPartIndex].text[textIndex].content;
+          const type = parts[currentPartIndex].text[textIndex].type;
+          return (
+            <div
+              key={`text-${currentPartIndex}-${textIndex}`}
+              className={`CutsceneDisplayer__text ${type}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleContinueClick();
+              }}
+            >
+              <TextFormatterStatic text={type === 'description' ? text : `"${text}"`} />
+            </div>
+          );
+        })}
       </div>
       <div className="CutsceneDisplayer__buttons">
         {(currentPartIndex > 0 || currentTextIndex > 0) && (
