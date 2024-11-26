@@ -56,7 +56,7 @@ export default function Characters({
         tooltip: character.name,
         highlighted: selected === character.id,
         content: {
-          image: config.genAssetLink(character.profile_pic, AssetDisplayPrefix.PROFILE_PIC_SMALL),
+          image: config.genAssetLink(character.profile_pic, AssetDisplayPrefix.PROFILE_PIC),
         },
         onEditClick: () =>
           dispatch(

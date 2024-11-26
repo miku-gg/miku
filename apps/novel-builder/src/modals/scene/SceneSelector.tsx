@@ -64,7 +64,7 @@ export const SceneSelectorModal = ({
                   {scene.characters.map((character, index) => (
                     <img
                       key={index}
-                      src={config.genAssetLink(character.profile_pic || '', AssetDisplayPrefix.PROFILE_PIC_SMALL)}
+                      src={config.genAssetLink(character.profile_pic || '', AssetDisplayPrefix.PROFILE_PIC)}
                       alt={`Character ${index}`}
                       className="SceneNode__character"
                     />
@@ -147,7 +147,7 @@ export default function SceneSelector({
                 {scene.characters.map((character, index) => (
                   <img
                     key={index}
-                    src={config.genAssetLink(character.profile_pic || '', AssetDisplayPrefix.PROFILE_PIC_SMALL)}
+                    src={config.genAssetLink(character.profile_pic || '', AssetDisplayPrefix.PROFILE_PIC)}
                     alt={`Character ${index}`}
                     className="SceneNode__character"
                   />

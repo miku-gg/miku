@@ -22,7 +22,7 @@ export default function CharacterSearchModal() {
             id: item.id,
             description: item.short_description,
             name: item.name,
-            previewAssetUrl: config.genAssetLink(item.profile_pic, AssetDisplayPrefix.PROFILE_PIC_SMALL),
+            previewAssetUrl: config.genAssetLink(item.profile_pic, AssetDisplayPrefix.PROFILE_PIC),
             tags: item.tags,
             value: item,
           };
