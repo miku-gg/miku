@@ -78,6 +78,7 @@ export const listSearch = async <T extends BackgroundResult | CharacterResult | 
     search: string;
     take: number;
     skip: number;
+    languages?: string[];
   },
 ): Promise<T[]> => {
   const response = await axios.get<T[]>(apiEndpont + searchType, {
