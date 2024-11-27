@@ -119,6 +119,8 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
   const [displayedTextIndices, setDisplayedTextIndices] = useState<number[]>([0]);
 
+  const isMobileDisplay = isMobileApp || window.innerWidth < 600;
+
   const handleContinueClick = () => {
     const currentPart = parts[currentPartIndex];
     if (currentTextIndex < currentPart.text.length - 1) {
@@ -134,9 +136,14 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const handlePreviousClick = () => {
     if (currentTextIndex > 0) {
       setCurrentTextIndex(currentTextIndex - 1);
+      setDisplayedTextIndices(displayedTextIndices.slice(0, -1));
     } else if (currentPartIndex > 0) {
       setCurrentPartIndex(currentPartIndex - 1);
-      setCurrentTextIndex(parts[currentPartIndex - 1].text.length - 1);
+      const previousPart = parts[currentPartIndex - 1];
+      const lastTextIndex = previousPart.text.length - 1;
+      setCurrentTextIndex(lastTextIndex);
+      const allIndices = Array.from({ length: previousPart.text.length }, (_, i) => i);
+      setDisplayedTextIndices(allIndices);
     }
   };
 
@@ -145,6 +152,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   }
 
   const parts = currentCutscene.parts;
+  const lastPart = parts[parts.length - 1];
 
   return (
     <>
@@ -155,13 +163,13 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         onContinueClick={handleContinueClick}
         onPreviousClick={handlePreviousClick}
       />
-      <div className="CutsceneDisplayer__text-container">
+      <div className="CutsceneDisplayer__text-container scrollbar">
         {displayedTextIndices.map((textIndex) => {
           const text = parts[currentPartIndex].text[textIndex].content;
           const type = parts[currentPartIndex].text[textIndex].type;
           return (
             <div
-              key={`text-${currentPartIndex}-${textIndex}`}
+              key={text}
               className={`CutsceneDisplayer__text ${type}`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -174,44 +182,32 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         })}
       </div>
       <div className="CutsceneDisplayer__buttons">
-        {(currentPartIndex > 0 || currentTextIndex > 0) && (
-          <IoIosArrowBack
-            className="CutsceneDisplayer__buttons-left"
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              handlePreviousClick();
-            }}
-          />
-        )}
-        {currentPartIndex < parts.length - 1 || currentTextIndex < parts[currentPartIndex].text.length - 1 ? (
-          <>
-            {currentPartIndex === 0 && currentTextIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
-            <IoIosArrowForward
-              className="CutsceneDisplayer__buttons-right"
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                handleContinueClick();
-              }}
-            />
-          </>
-        ) : (
-          <>
-            {currentPartIndex === 0 && currentTextIndex === 0 && <div>{/* {"empty div for center"} */}</div>}
-
-            <button
-              className="CutsceneDisplayer__buttons-right"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEndDisplay();
-              }}
-            >
-              <p className="CutsceneDisplayer__buttons-right__text">
-                Go to scene
-                <IoIosArrowForward />
-              </p>
-            </button>
-          </>
-        )}
+        <button
+          className="CutsceneDisplayer__buttons-left"
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            handlePreviousClick();
+          }}
+        >
+          <IoIosArrowBack />
+        </button>
+        <button
+          className="CutsceneDisplayer__buttons-right"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (currentPartIndex < parts.length - 1 || currentTextIndex < parts[currentPartIndex].text.length - 1) {
+              handleContinueClick();
+            } else {
+              onEndDisplay();
+            }
+          }}
+        >
+          {lastPart.id === parts[currentPartIndex].id &&
+          currentTextIndex === parts[currentPartIndex].text.length - 1 ? (
+            <p className="CutsceneDisplayer__buttons-right__text">Go to scene</p>
+          ) : null}
+          <IoIosArrowForward />
+        </button>
       </div>
     </>
   );
