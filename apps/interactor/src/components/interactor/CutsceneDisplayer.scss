@@ -61,13 +61,14 @@
     position: absolute;
     bottom: 0;
     height: 90%;
-    object-fit: cover;
     transition: all 0.2s ease-in;
     pointer-events: none;
     user-select: none;
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
+    align-items: flex-end;
+    right: 0;
   }
 
   &__emotion-renderer {
@@ -84,40 +85,53 @@
   &__characters--multiple {
     opacity: 1;
     z-index: 1;
+    width: 70%;
     display: flex;
-    width: 60%;
     justify-content: flex-end;
-    position: absolute;
-    right: 0;
+    align-items: flex-end;
 
     .CutsceneDisplayer__emotion-renderer {
-      opacity: 1;
       width: 50%;
       object-fit: cover;
+      position: relative;
+      overflow: visible;
+      height: 80%;
 
       &:first-child {
-        left: 0;
+        margin-right: -20%;
+        z-index: 4;
       }
 
       &:last-child {
-        right: 0;
+        z-index: 3;
+        filter: grayscale(20%);
       }
     }
   }
 
+  &__body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
   &__text-container {
-    position: absolute;
-    top: 0;
-    left: 0;
     padding: 20px;
-    z-index: 2;
     width: 70%;
     height: 100%;
-    max-height: 450px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    z-index: 2;
+    -ms-overflow-style: none; /* Para Internet Explorer y Edge */
+    scrollbar-width: none; /* Para Firefox */
+
+    &::-webkit-scrollbar {
+      /* Para Chrome, Safari y Opera */
+      display: none;
+    }
   }
 
   &__text {
@@ -130,9 +144,7 @@
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
     z-index: 2;
-    width: fit-content;
-
-    max-width: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -164,17 +176,13 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    z-index: 3;
-    position: absolute;
-    // background-color: rgba(0, 0, 0, 0.237);
-    bottom: 0;
 
     &-right,
     &-left {
-      // background-color: rgba(0, 0, 0, 0.237);
-      opacity: 0.9;
+      opacity: 0.8;
       color: $color-white;
       display: flex;
+      z-index: 3;
       align-items: center;
       justify-content: flex-end;
       cursor: pointer;
@@ -213,6 +221,38 @@
 
     &:hover {
       color: $secondary-color;
+    }
+  }
+}
+
+.MobileDisplay {
+  width: 100%;
+
+  .CutsceneDisplayer__emotion-renderer {
+    position: relative;
+  }
+  .CutsceneDisplayer__characters {
+    justify-content: center;
+    right: unset;
+    align-items: flex-end;
+  }
+  .CutsceneDisplayer__characters--multiple {
+    justify-content: center;
+    width: 100%;
+    padding: 0;
+
+    .CutsceneDisplayer__emotion-renderer {
+      height: 70%;
+      object-fit: cover;
+      overflow: visible;
+      &:first-child {
+        // z-index: 4;
+        margin-right: 5%;
+      }
+
+      &:last-child {
+        margin-right: -10%;
+      }
     }
   }
 }

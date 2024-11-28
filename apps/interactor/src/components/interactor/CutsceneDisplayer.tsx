@@ -6,7 +6,7 @@ import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import classNames from 'classnames';
 import './CutsceneDisplayer.scss';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import MusicPlayer from './MusicPlayer';
@@ -31,7 +31,7 @@ const PartRenderer = ({
   const songSource = songs.find((s) => s.id === part.music)?.source;
 
   return (
-    <div className="CutsceneDisplayer__main-image-container">
+    <div className={`CutsceneDisplayer__main-image-container ${isMobileApp ? 'MobileDisplay' : ''}`}>
       <ProgressiveImage
         src={
           background
@@ -117,35 +117,60 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const currentCutscene = cutscenes?.find((c) => c.id === scene?.cutScene?.id);
   const [currentPartIndex, setCurrentPartIndex] = useState<number>(0);
   const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
-  const [displayedTextIndices, setDisplayedTextIndices] = useState<number[]>([0]);
+  const [currentGroupIndex, setCurrentGroupIndex] = useState<number>(0);
 
   const isMobileDisplay = isMobileApp || window.innerWidth < 600;
+  const TEXTS_PER_GROUP = 3;
+
+  const getTextGroups = (texts: NovelV3.CutScenePart['text']) => {
+    if (!isMobileDisplay) return [texts];
+    return texts.reduce((acc: NovelV3.CutScenePart['text'][], curr, i) => {
+      const groupIndex = Math.floor(i / TEXTS_PER_GROUP);
+      if (!acc[groupIndex]) acc[groupIndex] = [];
+      acc[groupIndex].push(curr);
+      return acc;
+    }, []);
+  };
 
   const handleContinueClick = () => {
     const currentPart = parts[currentPartIndex];
-    if (currentTextIndex < currentPart.text.length - 1) {
+    const textGroups = getTextGroups(currentPart.text);
+    const currentGroup = textGroups[currentGroupIndex];
+
+    if (currentTextIndex < currentGroup.length - 1) {
       setCurrentTextIndex(currentTextIndex + 1);
-      setDisplayedTextIndices([...displayedTextIndices, currentTextIndex + 1]);
+    } else if (currentGroupIndex < textGroups.length - 1) {
+      setCurrentGroupIndex(currentGroupIndex + 1);
+      setCurrentTextIndex(0);
     } else if (currentPartIndex < parts.length - 1) {
       setCurrentPartIndex(currentPartIndex + 1);
+      setCurrentGroupIndex(0);
       setCurrentTextIndex(0);
-      setDisplayedTextIndices([0]);
     }
   };
 
   const handlePreviousClick = () => {
     if (currentTextIndex > 0) {
       setCurrentTextIndex(currentTextIndex - 1);
-      setDisplayedTextIndices(displayedTextIndices.slice(0, -1));
+    } else if (currentGroupIndex > 0) {
+      setCurrentGroupIndex(currentGroupIndex - 1);
+      const previousGroup = getTextGroups(parts[currentPartIndex].text)[currentGroupIndex - 1];
+      setCurrentTextIndex(previousGroup.length - 1);
     } else if (currentPartIndex > 0) {
       setCurrentPartIndex(currentPartIndex - 1);
-      const previousPart = parts[currentPartIndex - 1];
-      const lastTextIndex = previousPart.text.length - 1;
-      setCurrentTextIndex(lastTextIndex);
-      const allIndices = Array.from({ length: previousPart.text.length }, (_, i) => i);
-      setDisplayedTextIndices(allIndices);
+      const previousPartGroups = getTextGroups(parts[currentPartIndex - 1].text);
+      setCurrentGroupIndex(previousPartGroups.length - 1);
+      setCurrentTextIndex(previousPartGroups[previousPartGroups.length - 1].length - 1);
     }
   };
+
+  const textContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (textContainerRef.current) {
+      textContainerRef.current.scrollTop = textContainerRef.current.scrollHeight;
+    }
+  }, [currentTextIndex]);
 
   if (!currentCutscene || !scene) {
     return null;
@@ -159,55 +184,64 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
       <PartRenderer
         part={parts[currentPartIndex]}
         assetLinkLoader={assetLinkLoader}
-        isMobileApp={isMobileApp}
+        isMobileApp={isMobileDisplay}
         onContinueClick={handleContinueClick}
         onPreviousClick={handlePreviousClick}
       />
-      <div className="CutsceneDisplayer__text-container scrollbar">
-        {displayedTextIndices.map((textIndex) => {
-          const text = parts[currentPartIndex].text[textIndex].content;
-          const type = parts[currentPartIndex].text[textIndex].type;
-          return (
-            <div
-              key={text}
-              className={`CutsceneDisplayer__text ${type}`}
-              onClick={(e) => {
-                e.stopPropagation();
+      <div className="CutsceneDisplayer__body">
+        <div
+          ref={textContainerRef}
+          className={`CutsceneDisplayer__text-container ${isMobileDisplay ? 'MobileDisplay' : ''}`}
+        >
+          {(() => {
+            const currentPart = parts[currentPartIndex];
+            const textGroups = getTextGroups(currentPart.text);
+            const currentGroup = textGroups[currentGroupIndex];
+
+            return currentGroup.slice(0, currentTextIndex + 1).map((textItem, index) => (
+              <div
+                key={`${textItem.content}-${index}`}
+                className={`CutsceneDisplayer__text ${textItem.type}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleContinueClick();
+                }}
+              >
+                <TextFormatterStatic
+                  text={textItem.type === 'description' ? textItem.content : `"${textItem.content}"`}
+                />
+              </div>
+            ));
+          })()}
+        </div>
+        <div className="CutsceneDisplayer__buttons">
+          <button
+            className="CutsceneDisplayer__buttons-left"
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              handlePreviousClick();
+            }}
+          >
+            <IoIosArrowBack />
+          </button>
+          <button
+            className="CutsceneDisplayer__buttons-right"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (currentPartIndex < parts.length - 1 || currentTextIndex < parts[currentPartIndex].text.length - 1) {
                 handleContinueClick();
-              }}
-            >
-              <TextFormatterStatic text={type === 'description' ? text : `"${text}"`} />
-            </div>
-          );
-        })}
-      </div>
-      <div className="CutsceneDisplayer__buttons">
-        <button
-          className="CutsceneDisplayer__buttons-left"
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            handlePreviousClick();
-          }}
-        >
-          <IoIosArrowBack />
-        </button>
-        <button
-          className="CutsceneDisplayer__buttons-right"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (currentPartIndex < parts.length - 1 || currentTextIndex < parts[currentPartIndex].text.length - 1) {
-              handleContinueClick();
-            } else {
-              onEndDisplay();
-            }
-          }}
-        >
-          {lastPart.id === parts[currentPartIndex].id &&
-          currentTextIndex === parts[currentPartIndex].text.length - 1 ? (
-            <p className="CutsceneDisplayer__buttons-right__text">Go to scene</p>
-          ) : null}
-          <IoIosArrowForward />
-        </button>
+              } else {
+                onEndDisplay();
+              }
+            }}
+          >
+            {lastPart.id === parts[currentPartIndex].id &&
+            currentTextIndex === parts[currentPartIndex].text.length - 1 ? (
+              <p className="CutsceneDisplayer__buttons-right__text">Go to scene</p>
+            ) : null}
+            <IoIosArrowForward />
+          </button>
+        </div>
       </div>
     </>
   );
