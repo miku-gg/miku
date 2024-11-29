@@ -202,7 +202,7 @@ const InputBox = (): JSX.Element => {
           })}
           disabled={disabled || displayingLastSentence || isAutocompleteLoading}
           data-tooltip-id={`suggestion-tooltip`}
-          data-tooltip-html={!suggestions.length ? 'Autocomplete' : ''}
+          data-tooltip-html={!suggestions.length && !isMobileApp ? 'Autocomplete' : ''}
           data-tooltip-varaint="light"
           onClick={onAutocomplete}
         >

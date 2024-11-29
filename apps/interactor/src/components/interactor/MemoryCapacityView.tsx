@@ -35,6 +35,7 @@ const FillBrain = ({
   const fillPercentage = Math.min((currentTokensCount / maxCapacity) * 100, 100);
   const realFillPercentage = (fillPercentage + 8) * 0.835;
   const uniqueKeyframeName = `fill-${Math.random().toString(36).slice(2, 9)}`;
+  const { isMobileApp } = useAppContext();
 
   const keyframes = [
     `@keyframes ${uniqueKeyframeName}wave1 {
@@ -58,7 +59,7 @@ const FillBrain = ({
       <div
         className={`MemoryCapacityView ${onClick ? 'clickable' : ''}`}
         data-tooltip-id={`character-memory-tooltip${showTooltip ? '-yes' : ''}`}
-        data-tooltip-content="Memory Usage"
+        data-tooltip-content={!isMobileApp ? 'Memory Usage' : ''}
         style={{ width: sizeInPixels, height: sizeInPixels, minWidth: sizeInPixels, minHeight: sizeInPixels }}
         onClick={onClick}
       >
