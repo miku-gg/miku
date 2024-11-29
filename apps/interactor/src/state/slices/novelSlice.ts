@@ -101,12 +101,6 @@ const novelSlice = createSlice({
         });
       }
     },
-    updateCutsceneTriggerOnlyOnce: (state, action: PayloadAction<{ sceneId: string; triggerOnlyOnce: boolean }>) => {
-      const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
-      if (scene && scene.cutScene) {
-        scene.cutScene.triggerOnlyOnce = action.payload.triggerOnlyOnce;
-      }
-    },
     setCutsceneTriggered: (state, action: PayloadAction<{ sceneId: string; triggered: boolean }>) => {
       const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
       if (scene && scene.cutScene) {
@@ -123,7 +117,6 @@ const novelSlice = createSlice({
   },
 });
 
-export const { setNovel, addScene, addChildrenScenes, updateCutsceneTriggerOnlyOnce, setCutsceneTriggered } =
-  novelSlice.actions;
+export const { setNovel, addScene, addChildrenScenes, setCutsceneTriggered } = novelSlice.actions;
 
 export default novelSlice.reducer;
