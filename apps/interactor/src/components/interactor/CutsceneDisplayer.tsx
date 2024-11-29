@@ -10,6 +10,7 @@ import { useState, useRef, useEffect } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import MusicPlayer from './MusicPlayer';
+import { useI18n } from '../../libs/i18n';
 
 const PartRenderer = ({
   part,
@@ -112,6 +113,7 @@ const PartRenderer = ({
 
 export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }) => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
+  const { i18n } = useI18n();
   const scene = useAppSelector(selectCurrentScene);
   const cutscenes = useAppSelector((state) => state.novel.cutscenes);
   const currentCutscene = cutscenes?.find((c) => c.id === scene?.cutScene?.id);
@@ -237,7 +239,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
           >
             {lastPart.id === parts[currentPartIndex].id &&
             currentTextIndex === parts[currentPartIndex].text.length - 1 ? (
-              <p className="CutsceneDisplayer__buttons-right__text">Go to scene</p>
+              <p className="CutsceneDisplayer__buttons-right__text">{i18n('go_to_scene')}</p>
             ) : null}
             <IoIosArrowForward />
           </button>

@@ -10,9 +10,11 @@ import { interactionStart } from '../../state/slices/narrationSlice';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { setMapModal } from '../../state/slices/settingsSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { useI18n } from '../../libs/i18n';
 
 export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) => {
   const { assetLinkLoader, isInteractionDisabled, servicesEndpoint, apiEndpoint } = useAppContext();
+  const { i18n } = useI18n();
   const dispatch = useAppDispatch();
   const userName = useAppSelector((state) => state.settings.user.name);
   const { opened, sceneId } = useAppSelector((state) => state.creation.scene.scenePreview);
@@ -100,10 +102,10 @@ export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) 
         </div>
         <div className="SceneChangeModal__buttons">
           <Button theme="secondary" onClick={() => handleCloseModal()}>
-            Cancel
+            {i18n('cancel')}
           </Button>
           <Button theme="gradient" onClick={() => handleConfirm()}>
-            Go to Scene
+            {i18n('go_to_scene')}
           </Button>
         </div>
       </div>
