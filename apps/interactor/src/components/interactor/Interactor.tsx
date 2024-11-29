@@ -22,7 +22,7 @@ const Interactor = () => {
   const [isCutsceneDisplayed, setIsCutsceneDisplayed] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const scene = useAppSelector(selectCurrentScene);
-  const hasCutscene = scene?.cutScene !== undefined;
+  const hasCutscene = !!scene?.cutScene
   const lastCharacters = useAppSelector(selectLastLoadedCharacters);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
