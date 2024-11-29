@@ -58,6 +58,7 @@ export interface NarrationState {
     text: string;
     suggestions: string[];
     disabled: boolean;
+    seenCutscene?: boolean;
   };
   interactions: {
     [id: string]: NarrationInteraction | undefined;

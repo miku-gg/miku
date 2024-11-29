@@ -162,6 +162,7 @@ const CreateScene = () => {
         apiEndpoint,
         text: prompt,
         sceneId,
+        isNewScene: true,
         characters: characters.map(({ id }) => id),
         selectedCharacterId: characters[0].id,
       }),

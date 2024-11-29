@@ -101,12 +101,6 @@ const novelSlice = createSlice({
         });
       }
     },
-    setCutsceneTriggered: (state, action: PayloadAction<{ sceneId: string; triggered: boolean }>) => {
-      const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
-      if (scene && scene.cutScene) {
-        scene.cutScene.triggered = action.payload.triggered;
-      }
-    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -117,6 +111,6 @@ const novelSlice = createSlice({
   },
 });
 
-export const { setNovel, addScene, addChildrenScenes, setCutsceneTriggered } = novelSlice.actions;
+export const { setNovel, addScene, addChildrenScenes } = novelSlice.actions;
 
 export default novelSlice.reducer;

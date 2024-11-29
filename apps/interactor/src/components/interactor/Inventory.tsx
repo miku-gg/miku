@@ -117,6 +117,7 @@ export default function Inventory() {
                 interactionStart({
                   text: action.prompt,
                   sceneId: scene?.id || '',
+                  isNewScene: false,
                   characters: scene?.characters.map((r) => r.characterId) || [],
                   apiEndpoint,
                   servicesEndpoint,

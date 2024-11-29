@@ -230,6 +230,7 @@ const SceneSuggestionModal = () => {
     dispatch(
       interactionStart({
         sceneId: sceneSuggestion.sceneId,
+        isNewScene: true,
         text: `OOC: Describe the following scene and add dialogue: ${sceneSuggestion?.textPrompt || ''}`,
         characters: sceneSuggestion?.characters.map((r) => r.characterId) || [],
         servicesEndpoint,

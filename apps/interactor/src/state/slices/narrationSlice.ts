@@ -15,6 +15,7 @@ const initialState: NarrationState = {
     text: '',
     suggestions: [],
     disabled: false,
+    seenCutscene: false,
   },
   interactions: {},
   responses: {},
@@ -41,12 +42,13 @@ const narrationSlice = createSlice({
         apiEndpoint: string;
         text: string;
         sceneId: string;
+        isNewScene: boolean;
         characters: string[];
         selectedCharacterId: string;
         emotion?: string;
       }>,
     ) {
-      const { text, sceneId } = action.payload;
+      const { text, sceneId, isNewScene } = action.payload;
       const newInteractionId = randomUUID();
       const response: NarrationResponse = {
         id: randomUUID(),
@@ -85,9 +87,11 @@ const narrationSlice = createSlice({
       state.currentResponseId = response.id;
       state.input.disabled = true;
       state.input.suggestions = [];
+      state.input.seenCutscene = isNewScene ? false : state.input.seenCutscene;
     },
     interactionFailure(state, action: PayloadAction<string | undefined>) {
       state.input.disabled = false;
+      state.input.seenCutscene = true;
       const response = state.responses[state.currentResponseId];
       if (!response?.fetching) return state;
       toast.error(action.payload || 'Error querying the AI');
@@ -458,6 +462,9 @@ const narrationSlice = createSlice({
         response.summary.sentences.splice(index, 1);
       }
     },
+    markCurrentCutsceneAsSeen(state) {
+      state.input.seenCutscene = true;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -492,6 +499,7 @@ export const {
   updateSummarySentence,
   addSummary,
   deleteSummarySentence,
+  markCurrentCutsceneAsSeen,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;

@@ -48,6 +48,7 @@ export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) 
     dispatch(
       interactionStart({
         sceneId,
+        isNewScene: true,
         text: scene.prompt || '',
         characters: scene.characters.map((r) => r.characterId) || [],
         servicesEndpoint,

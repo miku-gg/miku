@@ -206,7 +206,29 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   ): string {
     const messages = selectAllParentDialoguesWhereCharactersArePresent(state, [currentCharacter?.id || '']);
     let prompt = '';
+    let sceneId = '';
+    const temp = this.template();
     for (const message of [...messages].reverse().slice(-maxLines)) {
+      const messageSceneId =
+        (message.type === 'interaction'
+          ? message.item.sceneId
+          : state.novel.starts.find((start) => start.id === message.item.id)?.sceneId) || sceneId;
+      if (messageSceneId !== sceneId) {
+        const scene = state.novel.scenes.find((scene) => scene.id === messageSceneId);
+        const cutscene = state.novel.cutscenes?.find((cutscene) => cutscene.id === scene?.cutScene?.id);
+        if (cutscene?.parts.length) {
+          prompt += `${temp.response}${cutscene.parts
+            .map((part) =>
+              part.text
+                .map((textPart) =>
+                  textPart.type === 'description' ? `*${textPart.content}*` : `"${textPart.content}"`,
+                )
+                .join('\n'),
+            )
+            .join('\n')}\n`;
+        }
+        sceneId = messageSceneId;
+      }
       prompt += this.getDialogueLine(message, currentCharacter, prompt);
     }
     return prompt;

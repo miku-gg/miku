@@ -62,6 +62,7 @@ const InputBox = (): JSX.Element => {
       interactionStart({
         text,
         sceneId: scene?.id || '',
+        isNewScene: false,
         characters: scene?.characters.map((r) => r.characterId) || [],
         servicesEndpoint,
         apiEndpoint,

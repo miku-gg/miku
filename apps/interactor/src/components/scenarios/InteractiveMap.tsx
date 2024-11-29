@@ -260,6 +260,7 @@ const InteractiveMapModal = ({
       dispatch(
         interactionStart({
           sceneId: scene.id,
+          isNewScene: true,
           text: scene.prompt,
           apiEndpoint,
           characters: scene?.characters.map((r) => r.characterId) || [],

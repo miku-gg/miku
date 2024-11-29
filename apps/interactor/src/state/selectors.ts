@@ -488,3 +488,57 @@ export const selectSummaryEnabled = (state: RootState) => {
     !!state.settings.summaries?.enabled && getExistingModelMetadata(state.settings.model)?.truncation_length > 8000
   );
 };
+
+export const selectAllParentScenesIds = createSelector(
+  [
+    (state: RootState) => state.narration.interactions,
+    (state: RootState) => state.narration.responses,
+    (state: RootState) => state.narration.currentResponseId,
+    (state: RootState) => state.novel.starts,
+  ],
+  (interactions, responses, currentResponseId, starts) => {
+    const parentSceneIds: string[] = [];
+    let responseIdPointer = currentResponseId;
+
+    while (responseIdPointer) {
+      const response = responses[responseIdPointer];
+      if (!response) break;
+
+      let sceneId: string | undefined;
+
+      if (response.parentInteractionId) {
+        // If response has a parent interaction, get scene from there
+        const interaction = interactions[response.parentInteractionId];
+        sceneId = interaction?.sceneId;
+      } else {
+        // If no parent interaction, check starts (it's an initial response)
+        const start = starts.find((start) => start.id === response.id);
+        sceneId = start?.sceneId;
+      }
+
+      if (sceneId) {
+        parentSceneIds.push(sceneId);
+      }
+
+      // Move up to parent response
+      const interaction = interactions[response.parentInteractionId || ''];
+      responseIdPointer = interaction?.parentResponseId || '';
+    }
+
+    // Remove adjacent duplicates
+    const filteredSceneIds = parentSceneIds.reverse().filter((id, index, arr) => {
+      return index === 0 || id !== arr[index - 1];
+    });
+
+    return filteredSceneIds;
+  },
+);
+
+export const selectDisplayingCutScene = createSelector(
+  [selectCurrentScene, selectAllParentScenesIds, (state: RootState) => state.narration.input.seenCutscene],
+  (scene, parentSceneIds, isCurrentCutsceneSeen) => {
+    const hasCutscene = !!scene?.cutScene;
+    const isAlreadyTriggered = parentSceneIds.slice(1).includes(scene?.id || '') && scene?.cutScene?.triggerOnlyOnce;
+    return hasCutscene && !isAlreadyTriggered && !isCurrentCutsceneSeen;
+  },
+);

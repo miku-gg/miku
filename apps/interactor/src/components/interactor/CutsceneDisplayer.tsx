@@ -174,6 +174,12 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
     }
   }, [currentTextIndex]);
 
+  useEffect(() => {
+    setCurrentPartIndex(0);
+    setCurrentTextIndex(0);
+    setCurrentGroupIndex(0);
+  }, [currentCutscene?.id]);
+
   if (!currentCutscene || !scene) {
     return null;
   }

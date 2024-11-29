@@ -9,6 +9,7 @@ import {
   selectCharacterOutfits,
   selectCurrentScene,
   selectCurrentSwipeResponses,
+  selectDisplayingCutScene,
   selectLastLoadedCharacters,
   selectLastLoadedResponse,
   selectLastSelectedCharacter,
@@ -48,7 +49,11 @@ const ResponseBox = (): JSX.Element | null => {
   const { disabled } = useAppSelector((state) => state.narration.input);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
   const displayCharacterData = characters.find((c) => c.id === displayCharacter.id);
-  const displayText = useFillTextTemplate(displayCharacter.text, displayCharacterData?.name || '');
+  const displayingCutScene = useAppSelector(selectDisplayingCutScene);
+  const displayText = useFillTextTemplate(
+    !displayingCutScene ? displayCharacter.text : '',
+    displayCharacterData?.name || '',
+  );
   const { isMobileApp } = useAppContext();
   const responseFormat = useAppSelector((state) => state.settings.text.responseFormat);
 
