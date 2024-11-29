@@ -157,6 +157,13 @@
     }
   }
 
+  &__scene-cutscene {
+    margin-top: 1rem;
+    background-color: $background-1;
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+
   &__scene-music {
     margin-top: 1rem;
     background-color: $background-1;

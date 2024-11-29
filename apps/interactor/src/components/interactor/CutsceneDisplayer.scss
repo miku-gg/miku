@@ -1,0 +1,277 @@
+// Define base styles for the component
+@import '../../variables';
+
+.CutsceneDisplayer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.75rem; // This is equivalent to 'rounded-xl' in Tailwind
+  box-shadow: 0px 0px 20px 0px rgb(205 95 234);
+
+  &__content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__main-image-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 0.75rem; // Equivalent to 'rounded-xl' in Tailwind
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0) 10%);
+    }
+  }
+
+  &__background-image,
+  &__background-video,
+  &__background-mobileVideo {
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+    border-radius: 0.75rem; // Equivalent to 'rounded-xl' in Tailwind
+    object-fit: cover;
+    transition: all 0.2s ease-in;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  &__mobileVideo {
+    object-fit: none;
+  }
+
+  &__characters {
+    position: absolute;
+    bottom: 0;
+    height: 90%;
+    transition: all 0.2s ease-in;
+    pointer-events: none;
+    user-select: none;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    right: 0;
+  }
+
+  &__emotion-renderer {
+    z-index: 0;
+    object-fit: contain;
+    position: absolute;
+    object-fit: cover;
+    height: 100%;
+    transition: all 0.2s ease-out;
+    animation: up-and-down 3s ease-in-out infinite;
+    right: 0;
+  }
+
+  &__characters--multiple {
+    opacity: 1;
+    z-index: 1;
+    width: 70%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+
+    .CutsceneDisplayer__emotion-renderer {
+      width: 50%;
+      object-fit: cover;
+      position: relative;
+      overflow: visible;
+      height: 80%;
+
+      &:first-child {
+        margin-right: -20%;
+        z-index: 4;
+      }
+
+      &:last-child {
+        z-index: 3;
+        filter: grayscale(20%);
+      }
+    }
+  }
+
+  &__body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__text-container {
+    padding: 20px;
+    width: 70%;
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 2;
+    -ms-overflow-style: none; /* Para Internet Explorer y Edge */
+    scrollbar-width: none; /* Para Firefox */
+
+    &::-webkit-scrollbar {
+      /* Para Chrome, Safari y Opera */
+      display: none;
+    }
+  }
+
+  &__text {
+    cursor: pointer;
+    bottom: 35px;
+    z-index: 1;
+    text-shadow: 1.41px 1.41px black, 2px 0 black, 1.41px -1.41px black, 0 -2px black, -1.41px -1.41px black,
+      -2px 0 black, -1.41px 1.41px black, 0 2px black;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .TextFormatter {
+      overflow: unset;
+    }
+
+    & div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &.description {
+      & p {
+        color: #fff;
+        font-style: italic;
+      }
+    }
+    &.dialogue {
+      & q {
+        color: rgb(225, 138, 36);
+      }
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    &-right,
+    &-left {
+      opacity: 0.8;
+      color: $color-white;
+      display: flex;
+      z-index: 3;
+      align-items: center;
+      justify-content: flex-end;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      width: 100px;
+      height: 100px;
+
+      & svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      &:hover {
+        opacity: 1;
+        color: $secondary-color;
+        & svg {
+          color: $secondary-color;
+        }
+      }
+    }
+  }
+
+  &__music-player {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+  }
+
+  &__continue-button {
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.2s ease-in;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      color: $secondary-color;
+    }
+  }
+}
+
+.MobileDisplay {
+  width: 100%;
+
+  .CutsceneDisplayer__emotion-renderer {
+    position: relative;
+  }
+  .CutsceneDisplayer__characters {
+    justify-content: center;
+    right: unset;
+    align-items: flex-end;
+  }
+  .CutsceneDisplayer__characters--multiple {
+    justify-content: center;
+    width: 100%;
+    padding: 0;
+
+    .CutsceneDisplayer__emotion-renderer {
+      height: 70%;
+      object-fit: cover;
+      overflow: visible;
+      &:first-child {
+        // z-index: 4;
+        margin-right: 5%;
+      }
+
+      &:last-child {
+        margin-right: -10%;
+      }
+    }
+  }
+}
+
+@keyframes brightnessfade {
+  0% {
+    filter: brightness(0.6);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+@keyframes up-and-down {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+}

@@ -586,6 +586,7 @@ export enum NovelValidationTargetType {
   MAP,
   INVENTORY,
   OBJETIVES,
+  CUTSCENE,
 }
 export interface NovelValidation {
   targetType: NovelValidationTargetType;
@@ -1342,6 +1343,100 @@ export function validateNovelState(novel: NovelV3.NovelState): NovelValidation[]
         targetId: 'starts',
         severity: 'error',
         message: `Novel has no starts`,
+      });
+    }
+
+    if (novel.cutscenes?.length) {
+      novel.cutscenes.forEach((cutscene) => {
+        if (!cutscene.name) {
+          errors.push({
+            targetType: NovelValidationTargetType.CUTSCENE,
+            targetId: cutscene.id,
+            severity: 'error',
+            message: `Cutscene ${cutscene.id} has no name`,
+          });
+        }
+
+        if (!cutscene.parts.length) {
+          errors.push({
+            targetType: NovelValidationTargetType.CUTSCENE,
+            targetId: cutscene.id,
+            severity: 'error',
+            message: `Cutscene "${cutscene.name || cutscene.id}" has no parts`,
+          });
+        }
+
+        cutscene.parts.forEach((part) => {
+          if (!part.text.length) {
+            errors.push({
+              targetType: NovelValidationTargetType.CUTSCENE,
+              targetId: cutscene.id,
+              severity: 'error',
+              message: `Part ${part.id} in cutscene "${cutscene.name}" has no text`,
+            });
+          }
+
+          part.text.forEach((text, index) => {
+            if (!text.content) {
+              errors.push({
+                targetType: NovelValidationTargetType.CUTSCENE,
+                targetId: cutscene.id,
+                severity: 'error',
+                message: `Text ${index + 1} in part ${part.id} of cutscene "${cutscene.name}" is empty`,
+              });
+            }
+          });
+
+          // Validar background
+          if (!part.background) {
+            errors.push({
+              targetType: NovelValidationTargetType.CUTSCENE,
+              targetId: cutscene.id,
+              severity: 'error',
+              message: `Part ${part.id} in cutscene "${cutscene.name}" has no background`,
+            });
+          } else if (!novel.backgrounds.some((bg) => bg.id === part.background)) {
+            errors.push({
+              targetType: NovelValidationTargetType.CUTSCENE,
+              targetId: cutscene.id,
+              severity: 'error',
+              message: `Background ${part.background} not found for part ${part.id} in cutscene "${cutscene.name}"`,
+            });
+          }
+
+          part.characters.forEach((character) => {
+            const characterObj = novel.characters.find((c) => c.id === character.id);
+            if (!characterObj) {
+              errors.push({
+                targetType: NovelValidationTargetType.CUTSCENE,
+                targetId: cutscene.id,
+                severity: 'error',
+                message: `Character ${character.id} not found in part ${part.id} of cutscene "${cutscene.name}"`,
+              });
+              return;
+            }
+
+            const outfit = characterObj.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === character.outfitId);
+            if (!outfit) {
+              errors.push({
+                targetType: NovelValidationTargetType.CUTSCENE,
+                targetId: cutscene.id,
+                severity: 'error',
+                message: `Outfit ${character.outfitId} not found for character ${characterObj.name} in part ${part.id} of cutscene "${cutscene.name}"`,
+              });
+              return;
+            }
+
+            if (!outfit.emotions.some((e) => e.id === character.emotionId)) {
+              errors.push({
+                targetType: NovelValidationTargetType.CUTSCENE,
+                targetId: cutscene.id,
+                severity: 'error',
+                message: `Emotion ${character.emotionId} not found in outfit ${outfit.name} for character ${characterObj.name} in part ${part.id} of cutscene "${cutscene.name}"`,
+              });
+            }
+          });
+        });
       });
     }
   } catch (e) {

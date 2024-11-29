@@ -17,6 +17,8 @@ export type ModalType =
   | 'editInventoryItem'
   | 'actionEdit'
   | 'errors'
+  | 'cutscenes'
+  | 'cutscenePartEdit'
   | 'scene';
 
 export type PanelType = 'details' | 'assets' | 'maps' | 'scenes' | 'starts' | 'preview';
@@ -77,6 +79,12 @@ const initialState: InputState = {
       opened: false,
     },
     character: {
+      opened: false,
+    },
+    cutscenes: {
+      opened: false,
+    },
+    cutscenePartEdit: {
       opened: false,
     },
     characterGeneration: {

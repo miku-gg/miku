@@ -17,6 +17,7 @@ const initialState: NovelV3.NovelState = {
   starts: [],
   lorebooks: [],
   inventory: [],
+  cutscenes: [],
   language: 'en',
 };
 
@@ -382,6 +383,7 @@ const novelFormSlice = createSlice({
         actions: [],
       });
     },
+
     updateObjective: (state, action: PayloadAction<{ id: string; objective: NovelV3.NovelObjective }>) => {
       if (!state.objectives) return;
       const index = state.objectives?.findIndex((objective) => objective.id === action.payload.id);
@@ -392,6 +394,43 @@ const novelFormSlice = createSlice({
       if (!state.objectives) return;
       state.objectives = state.objectives.filter((objective) => objective.id !== action.payload.id);
     },
+    updateTriggerOnlyOnce: (state, action: PayloadAction<{ sceneId: string; triggerOnlyOnce: boolean }>) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene && scene.cutScene) {
+        scene.cutScene.triggerOnlyOnce = action.payload.triggerOnlyOnce;
+      }
+    },
+    createCutscene: (state, action: PayloadAction<{ cutsceneId: string; sceneId: string }>) => {
+      const newCutscene: NovelV3.CutScene = {
+        id: action.payload.cutsceneId,
+        name: 'New Cutscene',
+        parts: [],
+      };
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene) {
+        scene.cutScene = {
+          id: action.payload.cutsceneId,
+          triggerOnlyOnce: false,
+        };
+      }
+      state.cutscenes ? state.cutscenes.push(newCutscene) : (state.cutscenes = [newCutscene]);
+    },
+    updateCutscene: (state, action: PayloadAction<NovelV3.CutScene>) => {
+      if (!state.cutscenes) return;
+      const index = state.cutscenes.findIndex((cutscene) => cutscene.id === action.payload.id);
+      if (index !== -1) {
+        state.cutscenes[index] = action.payload;
+      }
+    },
+    deleteCutscene: (state, action: PayloadAction<{ cutsceneId: string; sceneId: string }>) => {
+      if (!state.cutscenes) return;
+      state.cutscenes = state.cutscenes.filter((cutscene) => cutscene.id !== action.payload.cutsceneId);
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene) {
+        scene.cutScene = undefined;
+      }
+    },
+
     loadCompleteState: (state, action: PayloadAction<NovelV3.NovelState>) => {
       return action.payload;
     },
@@ -399,12 +438,47 @@ const novelFormSlice = createSlice({
       state,
       action: PayloadAction<{
         name: 'title' | 'description' | 'author' | 'logoPic' | 'language';
+        // name: 'title' | 'description' | 'author' | 'logoPic';
+
         value: string;
       }>,
     ) => {
       state[action.payload.name] = action.payload.value;
     },
     clearNovelState: () => initialState,
+
+    createCutscenePart: (state, action: PayloadAction<{ cutsceneId: string; partId: string }>) => {
+      const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
+
+      if (!cutscene) return;
+      const newPart: NovelV3.CutScenePart = {
+        id: action.payload.partId,
+        text: [
+          {
+            content: '',
+            type: 'dialogue',
+          },
+        ],
+        background: state.backgrounds[0]?.id || '',
+        characters: [],
+      };
+      cutscene.parts.push(newPart);
+    },
+
+    updateCutscenePart: (state, action: PayloadAction<{ cutsceneId: string; part: NovelV3.CutScenePart }>) => {
+      const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
+      if (!cutscene) return;
+      const index = cutscene.parts.findIndex((part) => part.id === action.payload.part.id);
+      if (index !== -1) {
+        cutscene.parts[index] = action.payload.part;
+      }
+    },
+
+    deleteCutscenePart: (state, action: PayloadAction<{ cutsceneId: string; partId: string }>) => {
+      const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
+      if (!cutscene) return;
+      cutscene.parts = cutscene.parts.filter((part) => part.id !== action.payload.partId);
+    },
   },
 });
 
@@ -446,9 +520,16 @@ export const {
   createObjective,
   updateObjective,
   deleteObjective,
+  updateTriggerOnlyOnce,
+  createCutscene,
+  updateCutscene,
+  deleteCutscene,
   loadCompleteState,
   updateDetails,
   clearNovelState,
+  createCutscenePart,
+  updateCutscenePart,
+  deleteCutscenePart,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

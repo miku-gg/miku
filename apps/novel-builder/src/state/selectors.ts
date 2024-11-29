@@ -169,3 +169,15 @@ export const selectTotalTokenCount = createSelector([(state: RootState) => state
 
   return Math.max(0, ...scenesTokens);
 });
+
+export const selectCutscenes = (state: RootState) => state.novel.cutscenes;
+
+export const selectEditingCutscenePart = createSelector(
+  [(state: RootState) => state.input.modals.cutscenePartEdit, selectCutscenes, selectEditingScene],
+  (modal, cutscenes, editingScene) => {
+    if (!modal.opened || !editingScene) return undefined;
+    return cutscenes
+      ?.find((cutscene) => cutscene.id === editingScene.cutScene?.id)
+      ?.parts.find((part) => part.id === modal.editId);
+  },
+);

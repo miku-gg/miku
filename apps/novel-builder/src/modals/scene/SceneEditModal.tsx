@@ -19,6 +19,8 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelObjectives } from './NovelObjectives';
 import './SceneEditModal.scss';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { CutsceneDisplayer } from '../cutscenes/CutsceneDisplayer';
+import { CutScenePartsRender } from '../cutscenes/CutscenesPartsRender';
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -475,6 +477,9 @@ export default function SceneEditModal() {
                 })}
               </div>
             </div>
+            <div className="SceneEditModal__scene-cutscene">
+              <CutScenePartsRender />
+            </div>
             <div className="SceneEditModal__scene-maps">
               {maps ? (
                 <MapList
@@ -486,7 +491,6 @@ export default function SceneEditModal() {
                 />
               ) : null}
             </div>
-
             <div className="SceneEditModal__scene-lorebooks">
               <LorebookList
                 selectedLorebookId={scene?.lorebookIds || []}
