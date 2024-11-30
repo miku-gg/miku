@@ -77,7 +77,7 @@ const MusicPlayer: React.FC<{ source?: string }> = ({ source }) => {
 
   return (
     <div className="MusicPlayer">
-      <audio ref={audioRef} src={src} autoPlay loop />
+      <audio ref={audioRef} src={src} autoPlay={enabled} loop />
       <button onClick={togglePlay} className="MusicPlayer__icon icon-button">
         {enabled ? <Music /> : <MusicNegated />}
       </button>
