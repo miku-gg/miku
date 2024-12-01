@@ -32,7 +32,7 @@ export const initialState: SettingsState = {
     speed: Speed.Normal,
     fontSize: FontSize.Medium,
     autoContinue: false,
-    responseFormat: ResponseFormat.FullText, // Added this line
+    responseFormat: ResponseFormat.VNStyle,
   },
   voice: {
     autoplay: false,
