@@ -78,7 +78,14 @@ export default {
     fetching: false,
     currentResponseId: 'NfZCeiXDzqR2nVS3WcHuRF648jxe6fiH',
     id: '0b747c39-3d7e-415e-9638-eee5eb3adb32',
-    input: { text: '', suggestions: [], disabled: false },
+    input: {
+      text: '',
+      suggestions: [],
+      disabled: false,
+      cutscenePartIndex: 0,
+      cutsceneGroupIndex: 0,
+      cutsceneTextIndex: 0,
+    },
     interactions: {
       '86644173-ac0f-4904-8484-18ea4d1642bb': {
         id: '86644173-ac0f-4904-8484-18ea4d1642bb',

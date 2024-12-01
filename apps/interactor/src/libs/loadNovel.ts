@@ -100,6 +100,10 @@ export async function loadNovelFromSingleCard({
         text: '',
         suggestions: [],
         disabled: false,
+        cutscenePartIndex: 0,
+        cutsceneGroupIndex: 0,
+        cutsceneTextIndex: 0,
+        seenCutscene: false,
       },
       interactions: {},
       responses: novel.starts.reduce((acc, start) => {
