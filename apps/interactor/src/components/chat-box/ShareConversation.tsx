@@ -11,6 +11,7 @@ import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { selectCurrentScene, selectLastSelectedCharacter } from '../../state/selectors';
 import { useAppSelector } from '../../state/store';
 import './ShareConversation.scss';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 interface ImageData {
   background: string;
@@ -19,7 +20,10 @@ interface ImageData {
   marks: string;
 }
 
-const generateImage = async (data: ImageData, assetLinkLoader: (url: string) => string): Promise<string> => {
+const generateImage = async (
+  data: ImageData,
+  assetLinkLoader: (url: string, assetPrefix: AssetDisplayPrefix) => string,
+): Promise<string> => {
   return new Promise<string>((resolve, reject) => {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
@@ -33,13 +37,13 @@ const generateImage = async (data: ImageData, assetLinkLoader: (url: string) => 
 
     const background = new Image();
     background.crossOrigin = 'anonymous';
-    background.src = assetLinkLoader(data.background);
+    background.src = assetLinkLoader(data.background, AssetDisplayPrefix.BACKGROUND);
     background.onload = () => {
       ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
       const character = new Image();
       character.crossOrigin = 'anonymous';
-      character.src = assetLinkLoader(data.character);
+      character.src = assetLinkLoader(data.character, AssetDisplayPrefix.EMOTION_IMAGE);
       character.onload = () => {
         const characterHeight = character.naturalHeight;
         const characterWidth = character.naturalWidth;
