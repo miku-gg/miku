@@ -59,6 +59,9 @@ export interface NarrationState {
     suggestions: string[];
     disabled: boolean;
     seenCutscene?: boolean;
+    cutscenePartIndex: number;
+    cutsceneTextIndex: number;
+    cutsceneGroupIndex: number;
   };
   interactions: {
     [id: string]: NarrationInteraction | undefined;

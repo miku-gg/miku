@@ -1,16 +1,16 @@
 import ProgressiveImage from 'react-progressive-graceful-image';
 import { useAppContext } from '../../App.context';
 import { selectCurrentScene } from '../../state/selectors';
-import { useAppSelector } from '../../state/store';
+import { useAppSelector, useAppDispatch } from '../../state/store';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import classNames from 'classnames';
 import './CutsceneDisplayer.scss';
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
-import MusicPlayer from './MusicPlayer';
 import { useI18n } from '../../libs/i18n';
+import { setCutsceneTextIndex, setCutsceneGroupIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
 
 const PartRenderer = ({
   part,
@@ -25,11 +25,9 @@ const PartRenderer = ({
 }) => {
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
-  const songs = useAppSelector((state) => state.novel.songs);
 
   const background = backgrounds.find((b) => b.id === part.background);
   const currentCharacters = part.characters;
-  const songSource = songs.find((s) => s.id === part.music)?.source;
 
   return (
     <div className={`CutsceneDisplayer__main-image-container ${isMobileApp ? 'MobileDisplay' : ''}`}>
@@ -102,11 +100,6 @@ const PartRenderer = ({
           })}
         </div>
       )}
-      {part.music && (
-        <div className="CutsceneDisplayer__music-player">
-          <MusicPlayer source={songSource} />
-        </div>
-      )}
     </div>
   );
 };
@@ -114,12 +107,13 @@ const PartRenderer = ({
 export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }) => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
   const { i18n } = useI18n();
+  const dispatch = useAppDispatch();
   const scene = useAppSelector(selectCurrentScene);
-  const cutscenes = useAppSelector((state) => state.novel.cutscenes);
-  const currentCutscene = cutscenes?.find((c) => c.id === scene?.cutScene?.id);
-  const [currentPartIndex, setCurrentPartIndex] = useState<number>(0);
-  const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
-  const [currentGroupIndex, setCurrentGroupIndex] = useState<number>(0);
+  const currentCutscene = useAppSelector((state) => state.novel.cutscenes?.find((c) => c.id === scene?.cutScene?.id));
+
+  const currentPartIndex = useAppSelector((state) => state.narration.input.cutscenePartIndex || 0);
+  const currentTextIndex = useAppSelector((state) => state.narration.input.cutsceneTextIndex || 0);
+  const currentGroupIndex = useAppSelector((state) => state.narration.input.cutsceneGroupIndex || 0);
 
   const isMobileDisplay = isMobileApp || window.innerWidth < 600;
   const TEXTS_PER_GROUP = 3;
@@ -140,29 +134,29 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
     const currentGroup = textGroups[currentGroupIndex];
 
     if (currentTextIndex < currentGroup.length - 1) {
-      setCurrentTextIndex(currentTextIndex + 1);
+      dispatch(setCutsceneTextIndex(currentTextIndex + 1));
     } else if (currentGroupIndex < textGroups.length - 1) {
-      setCurrentGroupIndex(currentGroupIndex + 1);
-      setCurrentTextIndex(0);
+      dispatch(setCutsceneGroupIndex(currentGroupIndex + 1));
+      dispatch(setCutsceneTextIndex(0));
     } else if (currentPartIndex < parts.length - 1) {
-      setCurrentPartIndex(currentPartIndex + 1);
-      setCurrentGroupIndex(0);
-      setCurrentTextIndex(0);
+      dispatch(setCutscenePartIndex(currentPartIndex + 1));
+      dispatch(setCutsceneGroupIndex(0));
+      dispatch(setCutsceneTextIndex(0));
     }
   };
 
   const handlePreviousClick = () => {
     if (currentTextIndex > 0) {
-      setCurrentTextIndex(currentTextIndex - 1);
+      dispatch(setCutsceneTextIndex(currentTextIndex - 1));
     } else if (currentGroupIndex > 0) {
-      setCurrentGroupIndex(currentGroupIndex - 1);
+      dispatch(setCutsceneGroupIndex(currentGroupIndex - 1));
       const previousGroup = getTextGroups(parts[currentPartIndex].text)[currentGroupIndex - 1];
-      setCurrentTextIndex(previousGroup.length - 1);
+      dispatch(setCutsceneTextIndex(previousGroup.length - 1));
     } else if (currentPartIndex > 0) {
-      setCurrentPartIndex(currentPartIndex - 1);
+      dispatch(setCutscenePartIndex(currentPartIndex - 1));
       const previousPartGroups = getTextGroups(parts[currentPartIndex - 1].text);
-      setCurrentGroupIndex(previousPartGroups.length - 1);
-      setCurrentTextIndex(previousPartGroups[previousPartGroups.length - 1].length - 1);
+      dispatch(setCutsceneGroupIndex(previousPartGroups.length - 1));
+      dispatch(setCutsceneTextIndex(previousPartGroups[previousPartGroups.length - 1].length - 1));
     }
   };
 
@@ -173,12 +167,6 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
       textContainerRef.current.scrollTop = textContainerRef.current.scrollHeight;
     }
   }, [currentTextIndex]);
-
-  useEffect(() => {
-    setCurrentPartIndex(0);
-    setCurrentTextIndex(0);
-    setCurrentGroupIndex(0);
-  }, [currentCutscene?.id]);
 
   if (!currentCutscene || !scene) {
     return null;

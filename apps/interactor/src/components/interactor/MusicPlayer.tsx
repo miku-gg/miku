@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import './MusicPlayer.scss';
 import { useAppContext } from '../../App.context';
 import { useAppDispatch, useAppSelector } from '../../state/store';
-import { selectCurrentScene } from '../../state/selectors';
+import { selectCurrentScene, selectDisplayingCutScene, selectCurrentCutScenePart } from '../../state/selectors';
 import { setMusicEnabled, setMusicVolume } from '../../state/slices/settingsSlice';
 import { trackEvent } from '../../libs/analytics';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
@@ -28,7 +28,7 @@ export const MusicNegated = () => {
   );
 };
 
-const MusicPlayer: React.FC<{ source?: string }> = ({ source }) => {
+const MusicPlayer: React.FC = () => {
   const dispatch = useAppDispatch();
   const { assetLinkLoader } = useAppContext();
   const volume = useAppSelector((state) => state.settings.music.volume);
@@ -36,11 +36,16 @@ const MusicPlayer: React.FC<{ source?: string }> = ({ source }) => {
   const novelFetching = useAppSelector((state) => !state.novel.starts.length);
   const songs = useAppSelector((state) => state.novel.songs);
   const scene = useAppSelector(selectCurrentScene);
+  const displayingCutscene = useAppSelector(selectDisplayingCutScene);
+  const currentCutScenePart = useAppSelector(selectCurrentCutScenePart);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  let _src = songs.find((s) => s.id === scene?.musicId)?.source || scene?.musicId;
-  if (source) {
-    _src = source;
+  let _src = '';
+
+  if (displayingCutscene && currentCutScenePart?.music) {
+    _src = songs.find((s) => s.id === currentCutScenePart.music)?.source || currentCutScenePart.music;
+  } else if (scene?.musicId) {
+    _src = songs.find((s) => s.id === scene?.musicId)?.source || scene?.musicId;
   }
 
   const src = _src ? assetLinkLoader(_src, AssetDisplayPrefix.MUSIC) : '';

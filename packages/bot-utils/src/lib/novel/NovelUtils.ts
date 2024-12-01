@@ -1348,16 +1348,7 @@ export function validateNovelState(novel: NovelV3.NovelState): NovelValidation[]
 
     if (novel.cutscenes?.length) {
       novel.cutscenes.forEach((cutscene) => {
-        if (!cutscene.name) {
-          errors.push({
-            targetType: NovelValidationTargetType.CUTSCENE,
-            targetId: cutscene.id,
-            severity: 'error',
-            message: `Cutscene ${cutscene.id} has no name`,
-          });
-        }
-
-        if (!cutscene.parts.length) {
+        if (!cutscene.parts?.length) {
           errors.push({
             targetType: NovelValidationTargetType.CUTSCENE,
             targetId: cutscene.id,
@@ -1366,8 +1357,8 @@ export function validateNovelState(novel: NovelV3.NovelState): NovelValidation[]
           });
         }
 
-        cutscene.parts.forEach((part) => {
-          if (!part.text.length) {
+        cutscene.parts?.forEach((part) => {
+          if (!part.text?.length) {
             errors.push({
               targetType: NovelValidationTargetType.CUTSCENE,
               targetId: cutscene.id,
@@ -1376,7 +1367,7 @@ export function validateNovelState(novel: NovelV3.NovelState): NovelValidation[]
             });
           }
 
-          part.text.forEach((text, index) => {
+          part.text?.forEach((text, index) => {
             if (!text.content) {
               errors.push({
                 targetType: NovelValidationTargetType.CUTSCENE,
@@ -1404,7 +1395,7 @@ export function validateNovelState(novel: NovelV3.NovelState): NovelValidation[]
             });
           }
 
-          part.characters.forEach((character) => {
+          part.characters?.forEach((character) => {
             const characterObj = novel.characters.find((c) => c.id === character.id);
             if (!characterObj) {
               errors.push({

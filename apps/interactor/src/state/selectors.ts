@@ -542,3 +542,16 @@ export const selectDisplayingCutScene = createSelector(
     return hasCutscene && !isAlreadyTriggered && !isCurrentCutsceneSeen;
   },
 );
+
+export const selectCurrentCutScenePart = createSelector(
+  [
+    (state: RootState) => state.narration.input.cutscenePartIndex || 0,
+    selectCurrentScene,
+    (state: RootState) => state.novel.cutscenes,
+  ],
+  (currentPartIndex, scene, cutscenes) => {
+    if (!scene || !scene.cutScene) return null;
+    const currentCutscene = cutscenes?.find((c) => c.id === scene.cutScene?.id);
+    return currentCutscene?.parts[currentPartIndex] || null;
+  },
+);

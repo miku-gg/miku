@@ -16,6 +16,9 @@ const initialState: NarrationState = {
     suggestions: [],
     disabled: false,
     seenCutscene: false,
+    cutscenePartIndex: 0,
+    cutsceneTextIndex: 0,
+    cutsceneGroupIndex: 0,
   },
   interactions: {},
   responses: {},
@@ -88,6 +91,12 @@ const narrationSlice = createSlice({
       state.input.disabled = true;
       state.input.suggestions = [];
       state.input.seenCutscene = isNewScene ? false : state.input.seenCutscene;
+      if (isNewScene) {
+        state.input.seenCutscene = false;
+        state.input.cutscenePartIndex = 0;
+        state.input.cutsceneTextIndex = 0;
+        state.input.cutsceneGroupIndex = 0;
+      }
     },
     interactionFailure(state, action: PayloadAction<string | undefined>) {
       state.input.disabled = false;
@@ -465,6 +474,20 @@ const narrationSlice = createSlice({
     markCurrentCutsceneAsSeen(state) {
       state.input.seenCutscene = true;
     },
+    resetCutsceneIndices(state) {
+      state.input.cutscenePartIndex = 0;
+      state.input.cutsceneTextIndex = 0;
+      state.input.cutsceneGroupIndex = 0;
+    },
+    setCutscenePartIndex(state, action: PayloadAction<number>) {
+      state.input.cutscenePartIndex = action.payload;
+    },
+    setCutsceneTextIndex(state, action: PayloadAction<number>) {
+      state.input.cutsceneTextIndex = action.payload;
+    },
+    setCutsceneGroupIndex(state, action: PayloadAction<number>) {
+      state.input.cutsceneGroupIndex = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -500,6 +523,10 @@ export const {
   addSummary,
   deleteSummarySentence,
   markCurrentCutsceneAsSeen,
+  resetCutsceneIndices,
+  setCutscenePartIndex,
+  setCutsceneTextIndex,
+  setCutsceneGroupIndex,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;
