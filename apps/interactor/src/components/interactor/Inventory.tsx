@@ -127,8 +127,8 @@ export default function Inventory() {
             }
             if (action.usageActions) {
               action.usageActions.forEach((novelAction) => {
-                const action = novelActionToStateAction(novelAction);
-                if (action) dispatch(action);
+                const actions = novelActionToStateAction(novelAction);
+                actions.forEach((action) => dispatch(action));
               });
             }
           }}

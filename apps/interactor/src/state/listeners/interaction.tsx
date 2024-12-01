@@ -250,8 +250,8 @@ const interactionEffect = async (
           }
           if (response === ` Yes`) {
             objective.actions.forEach((action) => {
-              const stateAction = novelActionToStateAction(action);
-              if (stateAction) {
+              const stateActions = novelActionToStateAction(action);
+              for (const stateAction of stateActions) {
                 dispatch(stateAction);
               }
               let item: NovelV3.InventoryItem | undefined = undefined;
