@@ -401,7 +401,7 @@ const SearchBackgroundModal = () => {
 
 const SearchCharacterModal = () => {
   const dispatch = useAppDispatch();
-  const { assetLinkLoader, apiEndpoint, cardEndpoint } = useAppContext();
+  const { assetLinkLoader, apiEndpoint, cardEndpoint, isMobileApp } = useAppContext();
   const language = useAppSelector((state) => state.novel.language?.toUpperCase() || 'EN');
   const charactersSelected = useAppSelector((state) => state.creation.scene.characters.selected);
   const characters = useAppSelector(selectSelectableCharacters);
@@ -410,9 +410,11 @@ const SearchCharacterModal = () => {
     <SearchModal<CharacterResult>
       modalId="characters"
       searcher={(params) =>
-        listSearch<CharacterResult>(apiEndpoint, SearchType.CHARACTER, { ...params, languages: [language] }).then((r) =>
-          r.filter((c) => characters.find((c2) => c2?.id === c.card) === undefined),
-        )
+        listSearch<CharacterResult>(apiEndpoint, SearchType.CHARACTER, {
+          ...params,
+          languages: [language],
+          isApprovedForMobile: isMobileApp || undefined,
+        }).then((r) => r.filter((c) => characters.find((c2) => c2?.id === c.card) === undefined))
       }
       renderResult={(result: CharacterResult, index) => {
         return (

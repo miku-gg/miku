@@ -49,4 +49,4 @@ const AppContext = createContext<AppProps>({
 
 export const AppProvider = AppContext.Provider;
 
-export const useAppContext = () => useContext(AppContext);
+export const useAppContext = () => useContext<AppProps>(AppContext);
