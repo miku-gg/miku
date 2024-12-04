@@ -479,6 +479,17 @@ const novelFormSlice = createSlice({
       if (!cutscene) return;
       cutscene.parts = cutscene.parts.filter((part) => part.id !== action.payload.partId);
     },
+    reorderStart: (state, action: PayloadAction<{ startId: string; direction: 'up' | 'down' }>) => {
+      const { startId, direction } = action.payload;
+      const currentIndex = state.starts.findIndex((start) => start.id === startId);
+      if (currentIndex === -1) return;
+
+      const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+      if (newIndex < 0 || newIndex >= state.starts.length) return;
+
+      // Swap elements
+      [state.starts[currentIndex], state.starts[newIndex]] = [state.starts[newIndex], state.starts[currentIndex]];
+    },
   },
 });
 
@@ -530,6 +541,7 @@ export const {
   createCutscenePart,
   updateCutscenePart,
   deleteCutscenePart,
+  reorderStart,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

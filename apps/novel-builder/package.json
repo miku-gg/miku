@@ -63,6 +63,7 @@
     "buffer": "^6.0.3",
     "classnames": "^2.3.2",
     "digest": "link:multiformats/hashes/digest",
+    "framer-motion": "^11.13.1",
     "ipfs-only-hash": "^4.0.0",
     "ipld-dag-pb": "^0.22.3",
     "lodash.clonedeep": "^4.5.0",
