@@ -15,6 +15,8 @@ import labels from './RoleplayPromptLabels';
 
 const PROMPT_TOKEN_OFFSET = 50;
 
+export const metricVarName = (metricName: string) => metricName.replace(/\W+/g, '_').toLowerCase();
+
 export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   {
     state: RootState;
@@ -95,6 +97,19 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       }
     });
 
+    if (scene?.metrics) {
+      template += `\n${this.i18n('current_metrics')}`;
+      scene.metrics.forEach((metric) => {
+        template += `\n${metric.name}: ${metric.description} ${
+          metric.type === 'percentage'
+            ? `${metric.name} MUST be a percentage between 0 and 100.`
+            : metric.type === 'amount'
+            ? `${metric.name} MUST be an amount between ${metric.min} and ${metric.max}.`
+            : `${metric.name} MUST be one of the following: ${metric.values?.join(', ')}.`
+        }`;
+      });
+    }
+
     return template;
   }
 
@@ -150,15 +165,26 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const parentEmotion =
       selectLastLoadedCharacters(input.state).find(({ id }) => id === input.currentCharacterId)?.emotion || '';
 
+    const scene = selectCurrentScene(input.state);
+    const variables: Record<string, string | string[]> = {
+      scene_opt: [' Yes', ' No'],
+      cond_opt: Array.from({ length: 10 }, (_, i) => ' ' + i.toString()),
+      emotions: emotions
+        .filter((emotion) => (emotions.length > 1 ? emotion !== parentEmotion : true))
+        .map((emotion) => ' ' + emotion),
+    };
+
+    if (scene?.metrics) {
+      scene.metrics.forEach((metric) => {
+        if (metric.type === 'discrete') {
+          variables[`${metricVarName(metric.name)}_options`] = metric.values?.map((value) => ` ${value}`) || [];
+        }
+      });
+    }
+
     return {
       template,
-      variables: {
-        scene_opt: [' Yes', ' No'],
-        cond_opt: Array.from({ length: 10 }, (_, i) => ' ' + i.toString()),
-        emotions: emotions
-          .filter((emotion) => (emotions.length > 1 ? emotion !== parentEmotion : true))
-          .map((emotion) => ' ' + emotion),
-      },
+      variables,
       totalTokens,
     };
   }
@@ -187,12 +213,23 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
 
     const index = response.characters.findIndex(({ characterId }) => characterId === input.currentCharacterId);
 
+    const sceneId = input.state.narration.interactions[response?.parentInteractionId || '']?.sceneId;
+    const scene = input.state.novel.scenes.find((scene) => scene.id === sceneId);
+    const metrics = scene?.metrics || [];
+
+    const updatedMetrics = metrics.map((metric) => {
+      const value =
+        variables.get(metricVarName(metric.name))?.trim() || response.metrics?.find((m) => m.id === metric.id)?.value;
+      return { id: metric.id, name: metric.name, value: value || '' };
+    });
+
     return {
       ...response,
       characters: [
         ...response.characters.slice(0, index !== -1 ? index : response.characters.length),
         characterResponse,
       ],
+      metrics: updatedMetrics,
     };
   }
 
@@ -307,6 +344,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const currentCharacterResponse = currentResponse?.characters.find((char) => char.characterId === characterId);
     const scene = selectCurrentScene(state);
 
+    const existingMetrics = currentResponse?.metrics || [];
     const existingEmotion = currentCharacterResponse?.emotion || '';
     const existingText = currentCharacterResponse?.text || '';
     const charStops = scene?.characters
@@ -321,14 +359,31 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
 
     const userSanitized = state.settings.user.name.replace(/"/g, '\\"');
 
-    return (
-      temp.askLine +
-      `${this.i18n('reaction_instruction')}\n` +
-      `${this.i18n('character_reaction', ['{{char}}'])}:${
-        existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'
-      }\n` +
-      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`
-    );
+    let response = temp.askLine;
+    response += `${this.i18n('reaction_instruction')}\n`;
+
+    if (scene?.metrics) {
+      scene.metrics.forEach((metric) => {
+        const existingMetric = existingMetrics.find((m) => m.id === metric.id);
+        if (existingMetric) {
+          response += `${metric.name}: ${existingMetric.value}${metric.type === 'percentage' ? '%' : ''}\n`;
+        } else {
+          if (metric.inferred && (metric.type === 'percentage' || metric.type === 'amount')) {
+            response += `${metric.name}: {{GEN ${metricVarName(metric.name)} max_tokens=3 stop=["%"]}}\n`;
+          } else if (metric.type === 'discrete') {
+            response += `${metric.name}: {{SEL ${metricVarName(metric.name)} options=${metricVarName(
+              metric.name,
+            )}_options}}\n`;
+          }
+        }
+      });
+    }
+
+    response += `${this.i18n('character_reaction', ['{{char}}'])}:${
+      existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'
+    }\n`;
+    response += `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`;
+    return response;
   }
 
   static getConditionPrompt({

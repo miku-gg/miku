@@ -555,3 +555,21 @@ export const selectCurrentCutScenePart = createSelector(
     return currentCutscene?.parts[currentPartIndex] || null;
   },
 );
+
+export const selectCurrentMetrics = (state: RootState) => {
+  const scene = selectCurrentScene(state);
+  const currentResponseId = state.narration.currentResponseId;
+  const metrics = scene?.metrics || [];
+  const updatedMetrics = state.narration.responses[currentResponseId]?.metrics || [];
+  return metrics.map((metric) => {
+    const updatedMetric = updatedMetrics.find((m) => m.id === metric.id);
+    return { ...metric, currentValue: updatedMetric?.value || metric.initialValue };
+  });
+};
+
+export const selectCurrentInteraction = (state: RootState) => {
+  const currentResponse = state.narration.responses[state.narration.currentResponseId];
+  return currentResponse?.parentInteractionId
+    ? state.narration.interactions[currentResponse.parentInteractionId]
+    : null;
+};

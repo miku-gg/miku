@@ -490,6 +490,33 @@ const novelFormSlice = createSlice({
       // Swap elements
       [state.starts[currentIndex], state.starts[newIndex]] = [state.starts[newIndex], state.starts[currentIndex]];
     },
+    addMetricToScene: (state, action: PayloadAction<{ sceneId: string; metric: NovelV3.NovelMetric }>) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene) {
+        if (!scene.metrics) {
+          scene.metrics = [];
+        }
+        scene.metrics.push(action.payload.metric);
+      }
+    },
+    updateMetricInScene: (
+      state,
+      action: PayloadAction<{ sceneId: string; metricId: string; metric: NovelV3.NovelMetric }>,
+    ) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene && scene.metrics) {
+        const index = scene.metrics.findIndex((metric) => metric.id === action.payload.metricId);
+        if (index !== -1) {
+          scene.metrics[index] = action.payload.metric;
+        }
+      }
+    },
+    deleteMetricFromScene: (state, action: PayloadAction<{ sceneId: string; metricId: string }>) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene && scene.metrics) {
+        scene.metrics = scene.metrics.filter((metric) => metric.id !== action.payload.metricId);
+      }
+    },
   },
 });
 
@@ -542,6 +569,9 @@ export const {
   updateCutscenePart,
   deleteCutscenePart,
   reorderStart,
+  addMetricToScene,
+  updateMetricInScene,
+  deleteMetricFromScene,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

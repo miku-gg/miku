@@ -44,6 +44,7 @@ export interface NovelScene {
     triggerOnlyOnce: boolean;
     triggered?: boolean;
   };
+  metrics?: NovelMetric[];
 }
 
 export interface NovelCharacterOutfit {
@@ -242,4 +243,20 @@ export interface NovelState {
   objectives?: NovelObjective[];
   lorebooks?: NovelLorebook[];
   inventory?: InventoryItem[];
+}
+
+export interface NovelMetric {
+  id: string;
+  name: string;
+  description: string;
+  type: 'percentage' | 'amount' | 'discrete';
+  values?: string[];
+  initialValue: string;
+  inferred: boolean;
+  step?: number;
+  min?: number;
+  max?: number;
+  hidden?: boolean;
+  editable?: boolean;
+  color?: string;
 }

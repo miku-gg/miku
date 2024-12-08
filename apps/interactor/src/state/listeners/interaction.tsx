@@ -17,6 +17,7 @@ import { fillTextTemplate, SummaryPromptStrategy } from '../../libs/prompts/stra
 import { RoleplayPromptStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayPromptStrategy';
 import {
   selectAllParentDialogues,
+  selectCurrentInteraction,
   selectCurrentScene,
   selectCurrentSceneObjectives,
   selectMessagesSinceLastSummary,
@@ -68,6 +69,7 @@ const interactionEffect = async (
     const currentCharacter = state.novel.characters.find((character) => character.id === selectedCharacterId);
     const identifier = simpleHash(state.settings.user.name + '_' + state.narration.id);
     const currentScene = selectCurrentScene(state);
+    const currentInteraction = selectCurrentInteraction(state);
     const { secondary, strategy, truncation_length } = (await retrieveModelMetadata(
       servicesEndpoint,
       state.settings.model,
@@ -94,6 +96,55 @@ const interactionEffect = async (
         truncationLength: secondary.truncation_length - 150,
       }),
     ];
+
+    // Metrics stuff
+    // ----------------------------
+    const metrics = [...(currentResponseState.metrics || [])];
+    // prefill metrics
+    if (state.narration.input.prefillMetrics?.length) {
+      state.narration.input.prefillMetrics.forEach((metric) => {
+        metrics.push(metric);
+      });
+    }
+    // check non-inferred metrics
+    currentScene?.metrics?.forEach((metric) => {
+      if (!metric.inferred && metric.type !== 'discrete' && !metrics.find((m) => m.id === metric.id)) {
+        const valueString = getPreviousMetricValueString(
+          state,
+          metric.id,
+          currentInteraction?.parentResponseId || null,
+          currentScene?.id,
+        );
+        let value = valueString ? Number(valueString) + Number(metric.step || 0) : Number(metric.initialValue);
+        value = Math.min(value, metric.max || 100);
+        value = Math.max(value, metric.min || 0);
+        metrics.push({
+          ...metric,
+          value: value.toString(),
+        });
+      }
+    });
+
+    // check discrete metrics
+    currentScene?.metrics?.forEach((metric) => {
+      if (metric.type === 'discrete' && !currentResponseState.metrics?.find((m) => m.id === metric.id)) {
+        const previousValue = getPreviousMetricValueString(
+          state,
+          metric.id,
+          currentInteraction?.parentResponseId || null,
+          currentScene?.id,
+        );
+        metrics.push({
+          ...metric,
+          value: previousValue?.toString() || metric.initialValue,
+        });
+      }
+    });
+
+    currentResponseState = {
+      ...currentResponseState,
+      metrics,
+    };
 
     if (!currentCharacterResponse?.emotion && secondary.id !== state.settings.model) {
       const emotionPrompt = secondaryPromptBuilder.buildPrompt(
@@ -164,6 +215,7 @@ const interactionEffect = async (
         state,
         currentCharacterId: selectedCharacterId,
       });
+
       dispatch(
         interactionSuccess({
           ...currentResponseState,
@@ -385,6 +437,31 @@ const interactionEffect = async (
     console.error(error);
     dispatch(interactionFailure());
   }
+};
+
+const getPreviousMetricValueString = (
+  state: RootState,
+  metricId: string,
+  parentResponseId: string | null,
+  currentSceneId: string,
+): string | null => {
+  let responseId = parentResponseId;
+  if (responseId) {
+    const response = state.narration.responses[responseId];
+    if (response && response.metrics) {
+      const metric = response.metrics.find((m) => m.id === metricId);
+      if (metric) {
+        return metric.value;
+      }
+    }
+    const parentInteraction = state.narration.interactions[response?.parentInteractionId || ''];
+    if (parentInteraction?.sceneId !== currentSceneId) {
+      return null;
+    } else {
+      responseId = parentInteraction?.parentResponseId || null;
+    }
+  }
+  return null;
 };
 
 export const interactionListenerMiddleware = createListenerMiddleware();

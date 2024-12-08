@@ -1,4 +1,15 @@
-import { AreYouSure, Button, Carousel, CheckBox, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import {
+  AreYouSure,
+  Button,
+  Carousel,
+  CheckBox,
+  ImageSlider,
+  Input,
+  Modal,
+  Tooltip,
+  Dropdown,
+  TagAutocomplete,
+} from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import { useState } from 'react';
 import { AiOutlinePicture } from 'react-icons/ai';
@@ -19,8 +30,11 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelObjectives } from './NovelObjectives';
 import './SceneEditModal.scss';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
-import { CutsceneDisplayer } from '../cutscenes/CutsceneDisplayer';
 import { CutScenePartsRender } from '../cutscenes/CutscenesPartsRender';
+import { v4 as uuidv4 } from 'uuid';
+import { NovelV3 } from '@mikugg/bot-utils';
+import { addMetricToScene, updateMetricInScene, deleteMetricFromScene } from '../../state/slices/novelFormSlice';
+import { SketchPicker } from 'react-color';
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -29,6 +43,7 @@ export default function SceneEditModal() {
   const maps = useAppSelector((state) => state.novel.maps);
   const backgrounds = useAppSelector(selectBackgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
+  const metrics = scene?.metrics || [];
 
   const objectives = useAppSelector((state) => state.novel.objectives);
   const objectiveLockedsByScenes = objectives?.filter((obj) => {
@@ -85,6 +100,47 @@ export default function SceneEditModal() {
           : [id],
       }),
     );
+  };
+
+  const handleAddMetric = () => {
+    const newMetric: NovelV3.NovelMetric = {
+      id: uuidv4(),
+      name: '',
+      description: '',
+      type: 'percentage', // default type
+      values: [],
+      initialValue: '',
+      inferred: false,
+      step: 0,
+      min: 0,
+      max: 100,
+      hidden: false,
+      editable: false,
+      color: '#4caf50',
+    };
+    dispatch(addMetricToScene({ sceneId: scene?.id || '', metric: newMetric }));
+  };
+
+  const handleUpdateMetric = (metric: NovelV3.NovelMetric) => {
+    const index = metrics.findIndex((m) => m.id === metric.id);
+    if (index !== -1) {
+      dispatch(updateMetricInScene({ sceneId: scene?.id || '', metricId: metric.id, metric }));
+    }
+  };
+
+  const handleDeleteMetric = (metricId: string) => {
+    dispatch(deleteMetricFromScene({ sceneId: scene?.id || '', metricId }));
+  };
+
+  const saveMetrics = () => {
+    if (scene?._source) {
+      dispatch(
+        updateScene({
+          ...scene._source,
+          metrics: metrics,
+        }),
+      );
+    }
   };
 
   return (
@@ -503,6 +559,23 @@ export default function SceneEditModal() {
                 Delete Scene
               </Button>
             </div>
+            <div className="SceneEditModal__metrics">
+              <h3>Metrics</h3>
+              {metrics.map((metric) => (
+                <MetricEditor
+                  key={metric.id}
+                  metric={metric}
+                  onUpdate={(updatedMetric) => handleUpdateMetric(updatedMetric)}
+                  onDelete={() => handleDeleteMetric(metric.id)}
+                />
+              ))}
+              <Button theme="primary" onClick={handleAddMetric}>
+                Add Metric
+              </Button>
+              <Button theme="secondary" onClick={saveMetrics}>
+                Save Metrics
+              </Button>
+            </div>
           </div>
         ) : null}
       </Modal>
@@ -580,7 +653,7 @@ export default function SceneEditModal() {
         <Songs
           selected={scene?.musicId}
           onSelect={(musicId) => {
-            if (scene?._source) {
+            if (scene?._source && musicId) {
               dispatch(
                 updateScene({
                   ...scene._source,
@@ -593,5 +666,94 @@ export default function SceneEditModal() {
         />
       </Modal>
     </>
+  );
+}
+
+function MetricEditor({
+  metric,
+  onUpdate,
+  onDelete,
+}: {
+  metric: NovelV3.NovelMetric;
+  onUpdate: (metric: NovelV3.NovelMetric) => void;
+  onDelete: () => void;
+}) {
+  const handleInputChange = (e: { target: { name: string; value: string } }) => {
+    const { name, value } = e.target;
+    onUpdate({
+      ...metric,
+      [name]: value,
+    });
+  };
+
+  const handleTypeChange = (selectedIndex: number) => {
+    const selectedType = ['percentage', 'amount', 'discrete'][selectedIndex];
+    onUpdate({
+      ...metric,
+      type: selectedType as 'percentage' | 'amount' | 'discrete',
+      inferred: selectedType === 'discrete' ? false : metric.inferred,
+    });
+  };
+
+  const handleValuesChange = (e: { target: { value: string[] } }) => {
+    onUpdate({
+      ...metric,
+      values: e.target.value,
+    });
+  };
+
+  return (
+    <div className="MetricEditor">
+      <Input label="Name" name="name" value={metric.name} onChange={handleInputChange} maxLength={50} />
+      <Input
+        label="Description"
+        name="description"
+        value={metric.description}
+        onChange={handleInputChange}
+        isTextArea
+      />
+      <Dropdown
+        items={[{ name: 'Percentage' }, { name: 'Amount' }, { name: 'Discrete' }]}
+        selectedIndex={metric.type === 'percentage' ? 0 : metric.type === 'amount' ? 1 : 2}
+        onChange={handleTypeChange}
+      />
+      <div className="MetricEditor__initial-value">
+        <Input label="Initial Value" name="initialValue" value={metric.initialValue} onChange={handleInputChange} />
+      </div>
+      {(metric.type === 'percentage' || metric.type === 'amount') && (
+        <CheckBox
+          label="Inferred"
+          value={metric.inferred}
+          onChange={(e) => onUpdate({ ...metric, inferred: e.target.checked })}
+        />
+      )}
+      {!metric.inferred && (metric.type === 'percentage' || metric.type === 'amount') && (
+        <>
+          <Input label="Step" name="step" value={metric.step?.toString() || '0'} onChange={handleInputChange} />
+          <Input label="Min" name="min" value={metric.min?.toString() || '0'} onChange={handleInputChange} />
+          <Input label="Max" name="max" value={metric.max?.toString() || '100'} onChange={handleInputChange} />
+        </>
+      )}
+      <CheckBox
+        label="Editable"
+        value={metric.editable || false}
+        onChange={(e) => onUpdate({ ...metric, editable: e.target.checked })}
+      />
+      <CheckBox
+        label="Hidden"
+        value={metric.hidden || false}
+        onChange={(e) => onUpdate({ ...metric, hidden: e.target.checked })}
+      />
+      <div className="MetricEditor__color-picker">
+        <label>Color</label>
+        <SketchPicker
+          color={metric.color || '#4caf50'}
+          onChangeComplete={(color) => onUpdate({ ...metric, color: color.hex })}
+        />
+      </div>
+      <Button theme="secondary" onClick={onDelete}>
+        Delete
+      </Button>
+    </div>
   );
 }

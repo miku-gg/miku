@@ -45,6 +45,8 @@ export default function StartsPanel() {
         List all possible starting points for your novel. For each, indicate the start scene and character's message.
       </div>
       <div className="StartsPanel__list">
+        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+        {/* @ts-ignore */}
         <AnimatePresence>
           {starts.map((start, index) => {
             const scene = scenes.find((scene) => scene.id === start.sceneId);
