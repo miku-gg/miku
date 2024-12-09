@@ -19,7 +19,6 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelObjectives } from './NovelObjectives';
 import './SceneEditModal.scss';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
-import { CutsceneDisplayer } from '../cutscenes/CutsceneDisplayer';
 import { CutScenePartsRender } from '../cutscenes/CutscenesPartsRender';
 
 export default function SceneEditModal() {

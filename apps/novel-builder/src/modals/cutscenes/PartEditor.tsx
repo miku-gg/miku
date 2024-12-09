@@ -25,7 +25,7 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
   const selectedMusic = useAppSelector((state) => state.novel.songs.find((s) => s.id === part?.music));
   const selectedBackground = useAppSelector((state) => state.novel.backgrounds.find((b) => b.id === part?.background));
   const characters = useAppSelector((state) => state.novel.characters);
-  const partCharacters = part?.characters || [];
+  const partCharacters = part?.characters.filter((c) => c) || [];
 
   const [selectSongModalOpened, setSelectSongModalOpened] = useState(false);
   const [selectTextModalOpened, setSelectTextModalOpened] = useState(false);
@@ -281,7 +281,7 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
                     } else {
                       newCharacters.splice(selectCharacterModal.characterIndex, 1);
                     }
-                    updatePart({ ...part, characters: newCharacters });
+                    updatePart({ ...part, characters: newCharacters.filter((c) => c) });
                   }
                 }}
               />

@@ -27,7 +27,7 @@ const PartRenderer = ({
   const characters = useAppSelector((state) => state.novel.characters);
 
   const background = backgrounds.find((b) => b.id === part.background);
-  const currentCharacters = part.characters;
+  const currentCharacters = part.characters.filter((c) => characters?.find((ch) => ch?.id === c?.id));
 
   return (
     <div className={`CutsceneDisplayer__main-image-container ${isMobileApp ? 'MobileDisplay' : ''}`}>

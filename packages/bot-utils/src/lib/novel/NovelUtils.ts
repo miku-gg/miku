@@ -1396,6 +1396,15 @@ export function validateNovelState(novel: NovelV3.NovelState): NovelValidation[]
           }
 
           part.characters?.forEach((character) => {
+            if (!character) {
+              errors.push({
+                targetType: NovelValidationTargetType.CUTSCENE,
+                targetId: cutscene.id,
+                severity: 'error',
+                message: `A part of cutscene "${cutscene.name}" has an null character`,
+              });
+              return;
+            }
             const characterObj = novel.characters.find((c) => c.id === character.id);
             if (!characterObj) {
               errors.push({
