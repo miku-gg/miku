@@ -257,6 +257,10 @@
   }
 }
 
+.CutsceneDisplayer__text-container.MobileDisplay {
+  padding-top: 50px;
+}
+
 @keyframes brightnessfade {
   0% {
     filter: brightness(0.6);
