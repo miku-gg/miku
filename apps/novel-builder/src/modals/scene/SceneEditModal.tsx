@@ -583,7 +583,7 @@ export default function SceneEditModal() {
               dispatch(
                 updateScene({
                   ...scene._source,
-                  musicId,
+                  musicId: musicId || '',
                 }),
               );
               setSelectSongModalOpened(false);

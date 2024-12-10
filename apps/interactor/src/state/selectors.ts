@@ -538,7 +538,8 @@ export const selectDisplayingCutScene = createSelector(
   [selectCurrentScene, selectAllParentScenesIds, (state: RootState) => state.narration.input.seenCutscene],
   (scene, parentSceneIds, isCurrentCutsceneSeen) => {
     const hasCutscene = !!scene?.cutScene;
-    const isAlreadyTriggered = parentSceneIds.slice(1).includes(scene?.id || '') && scene?.cutScene?.triggerOnlyOnce;
+    const isAlreadyTriggered =
+      parentSceneIds.slice(0, parentSceneIds.length - 1).includes(scene?.id || '') && scene?.cutScene?.triggerOnlyOnce;
     return hasCutscene && !isAlreadyTriggered && !isCurrentCutsceneSeen;
   },
 );
