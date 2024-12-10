@@ -20,6 +20,7 @@ interface DropdownProps {
   onToggle?: (expanded: boolean) => void;
   placeholder?: string;
   selectedIndex: number;
+  disabled?: boolean;
 }
 
 const Dropdown = ({
@@ -31,17 +32,20 @@ const Dropdown = ({
   onToggle,
   placeholder = 'Select an item...',
   selectedIndex = -1,
+  disabled = false,
 }: DropdownProps) => {
   const [_expanded, setExpanded] = useState<boolean>(false);
   const isExpanded = expanded === undefined ? _expanded : expanded;
 
   const handleItemClick = (newSelectedIndex: number) => {
+    if (disabled) return;
     onChange && onChange(newSelectedIndex);
     onToggle && onToggle(false);
     setExpanded(false);
   };
 
   const handleToggleClick = () => {
+    if (disabled) return;
     onToggle && onToggle(!isExpanded);
     setExpanded(!isExpanded);
   };
@@ -49,7 +53,10 @@ const Dropdown = ({
   const selectedItem = items[selectedIndex];
 
   return (
-    <div tabIndex={0} className={`dropdown flavor-${flavor} ${className}`}>
+    <div 
+      tabIndex={disabled ? -1 : 0} 
+      className={`dropdown flavor-${flavor} ${className} ${disabled ? 'disabled' : ''}`}
+    >
       <div
         className="dropdown__selected"
         onClick={handleToggleClick}
@@ -68,7 +75,7 @@ const Dropdown = ({
         )}
         <DownArrow />
       </div>
-      {isExpanded && (
+      {isExpanded && !disabled && (
         <div className="dropdown__list scrollbar" role="listbox">
           {items.map((item, index) => (
             <div

@@ -219,6 +219,27 @@
     border-radius: 1rem;
   }
 
+  &__scene-metrics {
+    margin-top: 1rem;
+
+    &-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      &-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        h2 {
+          margin: 0;
+        }
+      }
+    }
+  }
+
   &__scene-items {
     margin-top: 1rem;
   }

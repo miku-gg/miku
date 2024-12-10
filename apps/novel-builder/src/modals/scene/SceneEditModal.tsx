@@ -35,6 +35,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { addMetricToScene, updateMetricInScene, deleteMetricFromScene } from '../../state/slices/novelFormSlice';
 import { SketchPicker } from 'react-color';
+import { MetricEditor } from './MetricEditor';
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -554,13 +555,21 @@ export default function SceneEditModal() {
                 onSelectLorebook={(id) => handleLorebookSelect(id)}
               />
             </div>
-            <div className="SceneEditModal__scene-actions">
-              <Button theme="primary" onClick={handleDeleteScene}>
-                Delete Scene
-              </Button>
-            </div>
-            <div className="SceneEditModal__metrics">
-              <h3>Metrics</h3>
+            <div className="SceneEditModal__scene-metrics">
+              <div className="SceneEditModal__scene-metrics-header">
+                <div className="SceneEditModal__scene-metrics-header-title">
+                  <h2>Metrics</h2>
+                  <IoInformationCircleOutline
+                    data-tooltip-id="Info-metrics"
+                    className="SceneEditModal__scene-metrics-header-title-infoIcon"
+                    data-tooltip-content="[Optional] Define optional values that will be tracked in the scene. They will be considered by the AI."
+                  />
+                  <Tooltip id="Info-metrics" place="top" />
+                </div>
+                <Button theme="gradient" onClick={handleAddMetric}>
+                  Add Metric
+                </Button>
+              </div>
               {metrics.map((metric) => (
                 <MetricEditor
                   key={metric.id}
@@ -569,11 +578,10 @@ export default function SceneEditModal() {
                   onDelete={() => handleDeleteMetric(metric.id)}
                 />
               ))}
-              <Button theme="primary" onClick={handleAddMetric}>
-                Add Metric
-              </Button>
-              <Button theme="secondary" onClick={saveMetrics}>
-                Save Metrics
+            </div>
+            <div className="SceneEditModal__scene-actions">
+              <Button theme="primary" onClick={handleDeleteScene}>
+                Delete Scene
               </Button>
             </div>
           </div>
@@ -666,94 +674,5 @@ export default function SceneEditModal() {
         />
       </Modal>
     </>
-  );
-}
-
-function MetricEditor({
-  metric,
-  onUpdate,
-  onDelete,
-}: {
-  metric: NovelV3.NovelMetric;
-  onUpdate: (metric: NovelV3.NovelMetric) => void;
-  onDelete: () => void;
-}) {
-  const handleInputChange = (e: { target: { name: string; value: string } }) => {
-    const { name, value } = e.target;
-    onUpdate({
-      ...metric,
-      [name]: value,
-    });
-  };
-
-  const handleTypeChange = (selectedIndex: number) => {
-    const selectedType = ['percentage', 'amount', 'discrete'][selectedIndex];
-    onUpdate({
-      ...metric,
-      type: selectedType as 'percentage' | 'amount' | 'discrete',
-      inferred: selectedType === 'discrete' ? false : metric.inferred,
-    });
-  };
-
-  const handleValuesChange = (e: { target: { value: string[] } }) => {
-    onUpdate({
-      ...metric,
-      values: e.target.value,
-    });
-  };
-
-  return (
-    <div className="MetricEditor">
-      <Input label="Name" name="name" value={metric.name} onChange={handleInputChange} maxLength={50} />
-      <Input
-        label="Description"
-        name="description"
-        value={metric.description}
-        onChange={handleInputChange}
-        isTextArea
-      />
-      <Dropdown
-        items={[{ name: 'Percentage' }, { name: 'Amount' }, { name: 'Discrete' }]}
-        selectedIndex={metric.type === 'percentage' ? 0 : metric.type === 'amount' ? 1 : 2}
-        onChange={handleTypeChange}
-      />
-      <div className="MetricEditor__initial-value">
-        <Input label="Initial Value" name="initialValue" value={metric.initialValue} onChange={handleInputChange} />
-      </div>
-      {(metric.type === 'percentage' || metric.type === 'amount') && (
-        <CheckBox
-          label="Inferred"
-          value={metric.inferred}
-          onChange={(e) => onUpdate({ ...metric, inferred: e.target.checked })}
-        />
-      )}
-      {!metric.inferred && (metric.type === 'percentage' || metric.type === 'amount') && (
-        <>
-          <Input label="Step" name="step" value={metric.step?.toString() || '0'} onChange={handleInputChange} />
-          <Input label="Min" name="min" value={metric.min?.toString() || '0'} onChange={handleInputChange} />
-          <Input label="Max" name="max" value={metric.max?.toString() || '100'} onChange={handleInputChange} />
-        </>
-      )}
-      <CheckBox
-        label="Editable"
-        value={metric.editable || false}
-        onChange={(e) => onUpdate({ ...metric, editable: e.target.checked })}
-      />
-      <CheckBox
-        label="Hidden"
-        value={metric.hidden || false}
-        onChange={(e) => onUpdate({ ...metric, hidden: e.target.checked })}
-      />
-      <div className="MetricEditor__color-picker">
-        <label>Color</label>
-        <SketchPicker
-          color={metric.color || '#4caf50'}
-          onChangeComplete={(color) => onUpdate({ ...metric, color: color.hex })}
-        />
-      </div>
-      <Button theme="secondary" onClick={onDelete}>
-        Delete
-      </Button>
-    </div>
   );
 }

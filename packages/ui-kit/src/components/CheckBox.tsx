@@ -8,11 +8,12 @@ interface CheckBoxProps {
   name?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value?: boolean;
+  disabled?: boolean;
 }
 
-const CheckBox = ({ id, label, name, onChange, value }: CheckBoxProps) => {
+const CheckBox = ({ id, label, name, onChange, value, disabled }: CheckBoxProps) => {
   return (
-    <label htmlFor={id} className="CheckBox__container">
+    <label htmlFor={id} className={`CheckBox__container ${disabled ? 'disabled' : ''}`}>
       <input
         type="checkbox"
         className="CheckBox__field"
@@ -21,6 +22,7 @@ const CheckBox = ({ id, label, name, onChange, value }: CheckBoxProps) => {
         value={value ? 'checked' : ''}
         name={name}
         id={id}
+        disabled={disabled}
       />
       <div className="CheckBox">{value ? <SquareCheckFilled /> : <SquareCheckEmpty />}</div>
       <span className="CheckBox__label">{label}</span>
