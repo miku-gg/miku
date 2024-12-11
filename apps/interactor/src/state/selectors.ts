@@ -556,16 +556,21 @@ export const selectCurrentCutScenePart = createSelector(
   },
 );
 
-export const selectCurrentMetrics = (state: RootState) => {
-  const scene = selectCurrentScene(state);
-  const currentResponseId = state.narration.currentResponseId;
-  const metrics = scene?.metrics || [];
-  const updatedMetrics = state.narration.responses[currentResponseId]?.metrics || [];
-  return metrics.map((metric) => {
-    const updatedMetric = updatedMetrics.find((m) => m.id === metric.id);
-    return { ...metric, currentValue: updatedMetric?.value || metric.initialValue };
-  });
-};
+export const selectCurrentMetrics = createSelector(
+  [
+    selectCurrentScene,
+    (state: RootState) => state.narration.currentResponseId,
+    (state: RootState) => state.narration.responses,
+  ],
+  (scene, currentResponseId, responses) => {
+    const metrics = scene?.metrics || [];
+    const updatedMetrics = responses[currentResponseId]?.metrics || [];
+    return metrics.map((metric) => {
+      const updatedMetric = updatedMetrics.find((m) => m.id === metric.id);
+      return { ...metric, currentValue: updatedMetric?.value || metric.initialValue };
+    });
+  },
+);
 
 export const selectCurrentInteraction = (state: RootState) => {
   const currentResponse = state.narration.responses[state.narration.currentResponseId];

@@ -68,7 +68,7 @@ export interface NarrationState {
     cutsceneGroupIndex: number;
     prefillMetrics?: {
       id: string;
-      value: string;
+      value: string | number;
     }[];
   };
   interactions: {

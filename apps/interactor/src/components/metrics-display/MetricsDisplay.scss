@@ -1,79 +1,181 @@
+@import '../../variables';
+
 .MetricsDisplay {
   position: absolute;
   top: 60px;
-  right: 20px;
-  width: 200px;
-  z-index: 10;
+  right: -250px;
+  width: 250px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 0 0 0 8px;
+  padding: 15px;
+  transition: right 0.3s ease-in-out;
+  z-index: 2;
+  background: linear-gradient(#0c0a1d 0%, #1e1a41 100%);
+  background: $background-1;
 
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  &.open {
+    right: 0;
 
-  .MetricsDisplay__metric {
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 10px;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 14px;
-    position: relative;
-    overflow: hidden;
+    .MetricsDisplay__toggle {
+      background: $background-1;
+      svg {
+        color: white;
+      }
+    }
+  }
+
+  &__toggle {
+    position: absolute;
+    top: 0px;
+    left: -40px;
+    z-index: 101;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px 0 0 8px;
+    background-color: rgba($background-1, 0.6);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 24px;
+      height: 24px;
+      color: rgba(255, 255, 255, 0.6);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    &:hover {
+      background-color: $background-1;
+      svg {
+        color: white;
+      }
+    }
+  }
+
+  &__metric {
+    margin-bottom: 12px;
 
     &.metric-change {
       animation: flash 1s;
     }
 
-    .MetricsDisplay__metric-name {
-      font-weight: bold;
-      margin-bottom: 5px;
+    &-header {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
     }
 
-    .MetricsDisplay__metric-bar {
-      background-color: #444;
-      height: 10px;
-      border-radius: 5px;
+    &-name {
+      font-size: 10px;
+      color: #fff;
+      font-weight: 500;
+      padding: 4px 0;
+    }
+
+    &-edit {
+      background: none;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      color: #666;
+      transition: color 0.2s ease;
+
+      outline: none;
+
+      &:focus {
+        outline: none;
+      }
+
+      &:hover {
+        color: #fff;
+        svg {
+          color: #fff;
+        }
+      }
+
+      svg {
+        width: 11px;
+        height: 11px;
+        color: #666;
+        transition: color 0.2s ease-out;
+      }
+    }
+
+    &-bar {
+      background-color: rgba(255, 255, 255, 0.1);
+      height: 6px;
+      border-radius: 3px;
       overflow: hidden;
       position: relative;
+      width: 100%;
 
-      .MetricsDisplay__metric-bar-fill {
+      &-fill {
         height: 100%;
         width: 0%;
         transition: width 0.5s ease-in-out;
       }
     }
 
-    .MetricsDisplay__metric-value {
-      font-size: 18px;
-      font-weight: bold;
+    &-value {
+      position: absolute;
+      left: 4px;
+      // top: -14px;
+      font-size: 10px;
+      color: #fff;
+    }
+
+    &-discrete {
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+    }
+
+    &-value-container.prefilled {
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 4px;
+
+      .MetricsDisplay__metric-prefill-indicator {
+        // dot
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: $color-gold;
+      }
+    }
+  }
+
+  &__edit-modal {
+    width: 300px;
+    padding: 20px;
+    overflow: visible !important;
+
+    &-actions {
+      margin-top: 50px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
     }
   }
 
   @keyframes flash {
     0% {
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: transparent;
     }
     50% {
-      background-color: rgba(255, 255, 0, 0.8);
+      background-color: rgba(255, 255, 0, 0.3);
     }
     100% {
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: transparent;
     }
   }
 
   @media (max-width: 768px) {
-    width: 150px;
     top: 50px;
-    right: 10px;
-
-    .MetricsDisplay__metric {
-      font-size: 12px;
-
-      .MetricsDisplay__metric-name {
-        font-size: 12px;
-      }
-
-      .MetricsDisplay__metric-value {
-        font-size: 14px;
-      }
-    }
   }
 }

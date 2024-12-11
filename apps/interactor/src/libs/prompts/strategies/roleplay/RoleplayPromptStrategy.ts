@@ -1,4 +1,4 @@
-import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD, TavernCardV2 } from '@mikugg/bot-utils';
+import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD, TavernCardV2, NovelV3 } from '@mikugg/bot-utils';
 import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..';
 import {
   selectAllParentDialoguesWhereCharactersArePresent,
@@ -244,6 +244,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const messages = selectAllParentDialoguesWhereCharactersArePresent(state, [currentCharacter?.id || '']);
     let prompt = '';
     let sceneId = '';
+    let scene: NovelV3.NovelScene | undefined = undefined;
     const temp = this.template();
     for (const message of [...messages].reverse().slice(-maxLines)) {
       const messageSceneId =
@@ -251,7 +252,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
           ? message.item.sceneId
           : state.novel.starts.find((start) => start.id === message.item.id)?.sceneId) || sceneId;
       if (messageSceneId !== sceneId) {
-        const scene = state.novel.scenes.find((scene) => scene.id === messageSceneId);
+        scene = state.novel.scenes.find((scene) => scene.id === messageSceneId);
         const cutscene = state.novel.cutscenes?.find((cutscene) => cutscene.id === scene?.cutScene?.id);
         if (cutscene?.parts.length) {
           prompt += `${temp.response}${cutscene.parts
@@ -266,7 +267,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         }
         sceneId = messageSceneId;
       }
-      prompt += this.getDialogueLine(message, currentCharacter, prompt);
+      prompt += this.getDialogueLine(message, currentCharacter, prompt, scene?.metrics);
     }
     return prompt;
   }
@@ -278,6 +279,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       id: string;
     },
     currentText?: string,
+    metricsFromScene?: NovelV3.NovelMetric[],
   ): string {
     const temp = this.template();
     let prevCharString = '';
@@ -285,8 +287,20 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     let currentCharacterIndex;
     let currentCharacter;
     let linePrefix = '';
+    let metricsString = '';
     switch (dialog.type) {
       case 'response':
+        metricsString =
+          dialog.item.metrics?.reduce((prev, metric) => {
+            const metricFromScene = metricsFromScene?.find((m) => m.id === metric.id);
+            if (!metricFromScene) {
+              return prev;
+            } else {
+              return (
+                prev + `${metricFromScene?.name}: ${metric.value}${metricFromScene.type === 'percentage' ? '%' : ''}\n`
+              );
+            }
+          }, '') || '';
         currentCharacterIndex = dialog.item.characters.findIndex(({ characterId }) => {
           return character?.id === characterId;
         });
@@ -317,6 +331,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
             (prevCharString ? prevCharString + '\n' : '') +
             (currentCharacter.text
               ? temp.response +
+                (metricsString ? metricsString + '\n' : '') +
                 `${this.i18n('character_reaction', [`{{char}}`])}: ${currentCharacter.emotion}\n` +
                 `{{char}}: ${currentCharacter.text}\n`
               : '') +
@@ -325,7 +340,9 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         } else {
           return (
             (prevCharString ? `${temp.instruction}${prevCharString}\n` : '') +
-            (currentCharacter.text ? temp.response + `{{char}}: ${currentCharacter.text}\n` : '') +
+            (currentCharacter.text
+              ? temp.response + (metricsString ? metricsString + '\n' : '') + `{{char}}: ${currentCharacter.text}\n`
+              : '') +
             '\n' +
             (nextCharString ? `${temp.instruction}${nextCharString}\n` : '')
           );

@@ -496,7 +496,7 @@ const narrationSlice = createSlice({
     setCutsceneGroupIndex(state, action: PayloadAction<number>) {
       state.input.cutsceneGroupIndex = action.payload;
     },
-    setPrefillMetrics(state, action: PayloadAction<{ id: string; value: string }[]>) {
+    setPrefillMetrics(state, action: PayloadAction<{ id: string; value: string | number }[]>) {
       state.input.prefillMetrics = action.payload;
     },
     clearPrefillMetrics(state) {
