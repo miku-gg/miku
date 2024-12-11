@@ -490,31 +490,31 @@ const novelFormSlice = createSlice({
       // Swap elements
       [state.starts[currentIndex], state.starts[newIndex]] = [state.starts[newIndex], state.starts[currentIndex]];
     },
-    addMetricToScene: (state, action: PayloadAction<{ sceneId: string; metric: NovelV3.NovelMetric }>) => {
+    addIndicatorToScene: (state, action: PayloadAction<{ sceneId: string; indicator: NovelV3.NovelIndicator }>) => {
       const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
       if (scene) {
-        if (!scene.metrics) {
-          scene.metrics = [];
+        if (!scene.indicators) {
+          scene.indicators = [];
         }
-        scene.metrics.push(action.payload.metric);
+        scene.indicators.push(action.payload.indicator);
       }
     },
-    updateMetricInScene: (
+    updateIndicatorInScene: (
       state,
-      action: PayloadAction<{ sceneId: string; metricId: string; metric: NovelV3.NovelMetric }>,
+      action: PayloadAction<{ sceneId: string; indicatorId: string; indicator: NovelV3.NovelIndicator }>,
     ) => {
       const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
-      if (scene && scene.metrics) {
-        const index = scene.metrics.findIndex((metric) => metric.id === action.payload.metricId);
+      if (scene && scene.indicators) {
+        const index = scene.indicators.findIndex((indicator) => indicator.id === action.payload.indicatorId);
         if (index !== -1) {
-          scene.metrics[index] = action.payload.metric;
+          scene.indicators[index] = action.payload.indicator;
         }
       }
     },
-    deleteMetricFromScene: (state, action: PayloadAction<{ sceneId: string; metricId: string }>) => {
+    deleteIndicatorFromScene: (state, action: PayloadAction<{ sceneId: string; indicatorId: string }>) => {
       const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
-      if (scene && scene.metrics) {
-        scene.metrics = scene.metrics.filter((metric) => metric.id !== action.payload.metricId);
+      if (scene && scene.indicators) {
+        scene.indicators = scene.indicators.filter((indicator) => indicator.id !== action.payload.indicatorId);
       }
     },
   },
@@ -569,9 +569,9 @@ export const {
   updateCutscenePart,
   deleteCutscenePart,
   reorderStart,
-  addMetricToScene,
-  updateMetricInScene,
-  deleteMetricFromScene,
+  addIndicatorToScene,
+  updateIndicatorInScene,
+  deleteIndicatorFromScene,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

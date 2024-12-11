@@ -1,15 +1,4 @@
-import {
-  AreYouSure,
-  Button,
-  Carousel,
-  CheckBox,
-  ImageSlider,
-  Input,
-  Modal,
-  Tooltip,
-  Dropdown,
-  TagAutocomplete,
-} from '@mikugg/ui-kit';
+import { AreYouSure, Button, Carousel, CheckBox, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import { useState } from 'react';
 import { AiOutlinePicture } from 'react-icons/ai';
@@ -33,9 +22,12 @@ import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutScenePartsRender } from '../cutscenes/CutscenesPartsRender';
 import { v4 as uuidv4 } from 'uuid';
 import { NovelV3 } from '@mikugg/bot-utils';
-import { addMetricToScene, updateMetricInScene, deleteMetricFromScene } from '../../state/slices/novelFormSlice';
-import { SketchPicker } from 'react-color';
-import { MetricEditor } from './MetricEditor';
+import {
+  addIndicatorToScene,
+  updateIndicatorInScene,
+  deleteIndicatorFromScene,
+} from '../../state/slices/novelFormSlice';
+import { IndicatorEditor } from './IndicatorEditor';
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -44,7 +36,7 @@ export default function SceneEditModal() {
   const maps = useAppSelector((state) => state.novel.maps);
   const backgrounds = useAppSelector(selectBackgrounds);
   const characters = useAppSelector((state) => state.novel.characters);
-  const metrics = scene?.metrics || [];
+  const indicators = scene?.indicators || [];
 
   const objectives = useAppSelector((state) => state.novel.objectives);
   const objectiveLockedsByScenes = objectives?.filter((obj) => {
@@ -103,8 +95,8 @@ export default function SceneEditModal() {
     );
   };
 
-  const handleAddMetric = () => {
-    const newMetric: NovelV3.NovelMetric = {
+  const handleAddIndicator = () => {
+    const newIndicator: NovelV3.NovelIndicator = {
       id: uuidv4(),
       name: '',
       description: '',
@@ -119,29 +111,18 @@ export default function SceneEditModal() {
       editable: false,
       color: '#4caf50',
     };
-    dispatch(addMetricToScene({ sceneId: scene?.id || '', metric: newMetric }));
+    dispatch(addIndicatorToScene({ sceneId: scene?.id || '', indicator: newIndicator }));
   };
 
-  const handleUpdateMetric = (metric: NovelV3.NovelMetric) => {
-    const index = metrics.findIndex((m) => m.id === metric.id);
+  const handleUpdateIndicator = (indicator: NovelV3.NovelIndicator) => {
+    const index = indicators.findIndex((m) => m.id === indicator.id);
     if (index !== -1) {
-      dispatch(updateMetricInScene({ sceneId: scene?.id || '', metricId: metric.id, metric }));
+      dispatch(updateIndicatorInScene({ sceneId: scene?.id || '', indicatorId: indicator.id, indicator }));
     }
   };
 
-  const handleDeleteMetric = (metricId: string) => {
-    dispatch(deleteMetricFromScene({ sceneId: scene?.id || '', metricId }));
-  };
-
-  const saveMetrics = () => {
-    if (scene?._source) {
-      dispatch(
-        updateScene({
-          ...scene._source,
-          metrics: metrics,
-        }),
-      );
-    }
+  const handleDeleteIndicator = (indicatorId: string) => {
+    dispatch(deleteIndicatorFromScene({ sceneId: scene?.id || '', indicatorId }));
   };
 
   return (
@@ -555,27 +536,27 @@ export default function SceneEditModal() {
                 onSelectLorebook={(id) => handleLorebookSelect(id)}
               />
             </div>
-            <div className="SceneEditModal__scene-metrics">
-              <div className="SceneEditModal__scene-metrics-header">
-                <div className="SceneEditModal__scene-metrics-header-title">
-                  <h2>Metrics</h2>
+            <div className="SceneEditModal__scene-indicators">
+              <div className="SceneEditModal__scene-indicators-header">
+                <div className="SceneEditModal__scene-indicators-header-title">
+                  <h2>Indicators</h2>
                   <IoInformationCircleOutline
-                    data-tooltip-id="Info-metrics"
-                    className="SceneEditModal__scene-metrics-header-title-infoIcon"
+                    data-tooltip-id="Info-indicators"
+                    className="SceneEditModal__scene-indicators-header-title-infoIcon"
                     data-tooltip-content="[Optional] Define optional values that will be tracked in the scene. They will be considered by the AI."
                   />
-                  <Tooltip id="Info-metrics" place="top" />
+                  <Tooltip id="Info-indicators" place="top" />
                 </div>
-                <Button theme="gradient" onClick={handleAddMetric}>
-                  Add Metric
+                <Button theme="gradient" onClick={handleAddIndicator}>
+                  Add Indicator
                 </Button>
               </div>
-              {metrics.map((metric) => (
-                <MetricEditor
-                  key={metric.id}
-                  metric={metric}
-                  onUpdate={(updatedMetric) => handleUpdateMetric(updatedMetric)}
-                  onDelete={() => handleDeleteMetric(metric.id)}
+              {indicators.map((indicator) => (
+                <IndicatorEditor
+                  key={indicator.id}
+                  indicator={indicator}
+                  onUpdate={(updatedIndicator) => handleUpdateIndicator(updatedIndicator)}
+                  onDelete={() => handleDeleteIndicator(indicator.id)}
                 />
               ))}
             </div>

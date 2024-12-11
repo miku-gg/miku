@@ -44,7 +44,7 @@ export interface NovelScene {
     triggerOnlyOnce: boolean;
     triggered?: boolean;
   };
-  metrics?: NovelMetric[];
+  indicators?: NovelIndicator[];
 }
 
 export interface NovelCharacterOutfit {
@@ -245,7 +245,7 @@ export interface NovelState {
   inventory?: InventoryItem[];
 }
 
-export interface NovelMetric {
+export interface NovelIndicator {
   id: string;
   name: string;
   description: string;

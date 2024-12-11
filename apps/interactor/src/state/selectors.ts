@@ -556,18 +556,18 @@ export const selectCurrentCutScenePart = createSelector(
   },
 );
 
-export const selectCurrentMetrics = createSelector(
+export const selectCurrentIndicators = createSelector(
   [
     selectCurrentScene,
     (state: RootState) => state.narration.currentResponseId,
     (state: RootState) => state.narration.responses,
   ],
   (scene, currentResponseId, responses) => {
-    const metrics = scene?.metrics || [];
-    const updatedMetrics = responses[currentResponseId]?.metrics || [];
-    return metrics.map((metric) => {
-      const updatedMetric = updatedMetrics.find((m) => m.id === metric.id);
-      return { ...metric, currentValue: updatedMetric?.value || metric.initialValue };
+    const indicators = scene?.indicators || [];
+    const updatedIndicators = responses[currentResponseId]?.indicators || [];
+    return indicators.map((indicator) => {
+      const updatedIndicator = updatedIndicators.find((i) => i.id === indicator.id);
+      return { ...indicator, currentValue: updatedIndicator?.value || indicator.initialValue };
     });
   },
 );

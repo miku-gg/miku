@@ -97,53 +97,53 @@ const interactionEffect = async (
       }),
     ];
 
-    // Metrics stuff
+    // Indicators stuff
     // ----------------------------
-    const metrics = [...(currentResponseState.metrics || [])];
-    // prefill metrics
-    if (state.narration.input.prefillMetrics?.length) {
-      state.narration.input.prefillMetrics.forEach((metric) => {
-        metrics.push(metric);
+    const indicators = [...(currentResponseState.indicators || [])];
+    // prefill indicators
+    if (state.narration.input.prefillIndicators?.length) {
+      state.narration.input.prefillIndicators.forEach((indicator) => {
+        indicators.push(indicator);
       });
     }
-    // check non-inferred metrics
-    currentScene?.metrics?.forEach((metric) => {
-      if (!metric.inferred && metric.type !== 'discrete' && !metrics.find((m) => m.id === metric.id)) {
-        const valueString = getPreviousMetricValueString(
+    // check non-inferred indicators
+    currentScene?.indicators?.forEach((indicator) => {
+      if (!indicator.inferred && indicator.type !== 'discrete' && !indicators.find((m) => m.id === indicator.id)) {
+        const valueString = getPreviousIndicatorValueString(
           state,
-          metric.id,
+          indicator.id,
           currentInteraction?.parentResponseId || null,
           currentScene?.id,
         );
-        let value = valueString ? Number(valueString) + Number(metric.step || 0) : Number(metric.initialValue);
-        value = Math.min(value, metric.max || 100);
-        value = Math.max(value, metric.min || 0);
-        metrics.push({
-          ...metric,
+        let value = valueString ? Number(valueString) + Number(indicator.step || 0) : Number(indicator.initialValue);
+        value = Math.min(value, indicator.max || 100);
+        value = Math.max(value, indicator.min || 0);
+        indicators.push({
+          ...indicator,
           value: value.toString(),
         });
       }
     });
 
-    // check discrete metrics
-    currentScene?.metrics?.forEach((metric) => {
-      if (metric.type === 'discrete' && !currentResponseState.metrics?.find((m) => m.id === metric.id)) {
-        const previousValue = getPreviousMetricValueString(
+    // check discrete indicators
+    currentScene?.indicators?.forEach((indicator) => {
+      if (indicator.type === 'discrete' && !currentResponseState.indicators?.find((m) => m.id === indicator.id)) {
+        const previousValue = getPreviousIndicatorValueString(
           state,
-          metric.id,
+          indicator.id,
           currentInteraction?.parentResponseId || null,
           currentScene?.id,
         );
-        metrics.push({
-          ...metric,
-          value: previousValue?.toString() || metric.initialValue,
+        indicators.push({
+          ...indicator,
+          value: previousValue?.toString() || indicator.initialValue,
         });
       }
     });
 
     currentResponseState = {
       ...currentResponseState,
-      metrics,
+      indicators,
     };
 
     if (!currentCharacterResponse?.emotion && secondary.id !== state.settings.model) {
@@ -439,19 +439,19 @@ const interactionEffect = async (
   }
 };
 
-const getPreviousMetricValueString = (
+const getPreviousIndicatorValueString = (
   state: RootState,
-  metricId: string,
+  indicatorId: string,
   parentResponseId: string | null,
   currentSceneId: string,
 ): string | null => {
   let responseId = parentResponseId;
   if (responseId) {
     const response = state.narration.responses[responseId];
-    if (response && response.metrics) {
-      const metric = response.metrics.find((m) => m.id === metricId);
-      if (metric) {
-        return metric.value;
+    if (response && response.indicators) {
+      const indicator = response.indicators.find((m) => m.id === indicatorId);
+      if (indicator) {
+        return indicator.value;
       }
     }
     const parentInteraction = state.narration.interactions[response?.parentInteractionId || ''];

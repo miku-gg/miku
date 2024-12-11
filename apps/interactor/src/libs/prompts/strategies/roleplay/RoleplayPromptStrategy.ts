@@ -15,7 +15,7 @@ import labels from './RoleplayPromptLabels';
 
 const PROMPT_TOKEN_OFFSET = 50;
 
-export const metricVarName = (metricName: string) => metricName.replace(/\W+/g, '_').toLowerCase();
+export const indicatorVarName = (indicatorName: string) => indicatorName.replace(/\W+/g, '_').toLowerCase();
 
 export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   {
@@ -97,15 +97,15 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       }
     });
 
-    if (scene?.metrics) {
-      template += `\n${this.i18n('current_metrics')}`;
-      scene.metrics.forEach((metric) => {
-        template += `\n${metric.name}: ${metric.description} ${
-          metric.type === 'percentage'
-            ? `${metric.name} MUST be a percentage between 0 and 100.`
-            : metric.type === 'amount'
-            ? `${metric.name} MUST be an amount between ${metric.min} and ${metric.max}.`
-            : `${metric.name} MUST be one of the following: ${metric.values?.join(', ')}.`
+    if (scene?.indicators) {
+      template += `\n${this.i18n('current_indicators')}`;
+      scene.indicators.forEach((indicator) => {
+        template += `\n${indicator.name}: ${indicator.description} ${
+          indicator.type === 'percentage'
+            ? `${indicator.name} MUST be a percentage between 0 and 100.`
+            : indicator.type === 'amount'
+            ? `${indicator.name} MUST be an amount between ${indicator.min} and ${indicator.max}.`
+            : `${indicator.name} MUST be one of the following: ${indicator.values?.join(', ')}.`
         }`;
       });
     }
@@ -174,10 +174,11 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         .map((emotion) => ' ' + emotion),
     };
 
-    if (scene?.metrics) {
-      scene.metrics.forEach((metric) => {
-        if (metric.type === 'discrete') {
-          variables[`${metricVarName(metric.name)}_options`] = metric.values?.map((value) => ` ${value}`) || [];
+    if (scene?.indicators) {
+      scene.indicators.forEach((indicator) => {
+        if (indicator.type === 'discrete') {
+          variables[`${indicatorVarName(indicator.name)}_options`] =
+            indicator.values?.map((value) => ` ${value}`) || [];
         }
       });
     }
@@ -215,12 +216,13 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
 
     const sceneId = input.state.narration.interactions[response?.parentInteractionId || '']?.sceneId;
     const scene = input.state.novel.scenes.find((scene) => scene.id === sceneId);
-    const metrics = scene?.metrics || [];
+    const indicators = scene?.indicators || [];
 
-    const updatedMetrics = metrics.map((metric) => {
+    const updatedIndicators = indicators.map((indicator) => {
       const value =
-        variables.get(metricVarName(metric.name))?.trim() || response.metrics?.find((m) => m.id === metric.id)?.value;
-      return { id: metric.id, name: metric.name, value: value || '' };
+        variables.get(indicatorVarName(indicator.name))?.trim() ||
+        response.indicators?.find((m) => m.id === indicator.id)?.value;
+      return { id: indicator.id, name: indicator.name, value: value || '' };
     });
 
     return {
@@ -229,7 +231,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         ...response.characters.slice(0, index !== -1 ? index : response.characters.length),
         characterResponse,
       ],
-      metrics: updatedMetrics,
+      indicators: updatedIndicators,
     };
   }
 
@@ -267,7 +269,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         }
         sceneId = messageSceneId;
       }
-      prompt += this.getDialogueLine(message, currentCharacter, prompt, scene?.metrics);
+      prompt += this.getDialogueLine(message, currentCharacter, prompt, scene?.indicators);
     }
     return prompt;
   }
@@ -279,7 +281,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       id: string;
     },
     currentText?: string,
-    metricsFromScene?: NovelV3.NovelMetric[],
+    indicatorsFromScene?: NovelV3.NovelIndicator[],
   ): string {
     const temp = this.template();
     let prevCharString = '';
@@ -287,17 +289,20 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     let currentCharacterIndex;
     let currentCharacter;
     let linePrefix = '';
-    let metricsString = '';
+    let indicatorsString = '';
     switch (dialog.type) {
       case 'response':
-        metricsString =
-          dialog.item.metrics?.reduce((prev, metric) => {
-            const metricFromScene = metricsFromScene?.find((m) => m.id === metric.id);
-            if (!metricFromScene) {
+        indicatorsString =
+          dialog.item.indicators?.reduce((prev, indicator) => {
+            const indicatorFromScene = indicatorsFromScene?.find((m) => m.id === indicator.id);
+            if (!indicatorFromScene) {
               return prev;
             } else {
               return (
-                prev + `${metricFromScene?.name}: ${metric.value}${metricFromScene.type === 'percentage' ? '%' : ''}\n`
+                prev +
+                `${indicatorFromScene?.name}: ${indicator.value}${
+                  indicatorFromScene.type === 'percentage' ? '%' : ''
+                }\n`
               );
             }
           }, '') || '';
@@ -331,7 +336,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
             (prevCharString ? prevCharString + '\n' : '') +
             (currentCharacter.text
               ? temp.response +
-                (metricsString ? metricsString + '\n' : '') +
+                (indicatorsString ? indicatorsString + '\n' : '') +
                 `${this.i18n('character_reaction', [`{{char}}`])}: ${currentCharacter.emotion}\n` +
                 `{{char}}: ${currentCharacter.text}\n`
               : '') +
@@ -341,7 +346,9 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
           return (
             (prevCharString ? `${temp.instruction}${prevCharString}\n` : '') +
             (currentCharacter.text
-              ? temp.response + (metricsString ? metricsString + '\n' : '') + `{{char}}: ${currentCharacter.text}\n`
+              ? temp.response +
+                (indicatorsString ? indicatorsString + '\n' : '') +
+                `{{char}}: ${currentCharacter.text}\n`
               : '') +
             '\n' +
             (nextCharString ? `${temp.instruction}${nextCharString}\n` : '')
@@ -361,7 +368,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const currentCharacterResponse = currentResponse?.characters.find((char) => char.characterId === characterId);
     const scene = selectCurrentScene(state);
 
-    const existingMetrics = currentResponse?.metrics || [];
+    const existingIndicators = currentResponse?.indicators || [];
     const existingEmotion = currentCharacterResponse?.emotion || '';
     const existingText = currentCharacterResponse?.text || '';
     const charStops = scene?.characters
@@ -379,17 +386,17 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     let response = temp.askLine;
     response += `${this.i18n('reaction_instruction')}\n`;
 
-    if (scene?.metrics) {
-      scene.metrics.forEach((metric) => {
-        const existingMetric = existingMetrics.find((m) => m.id === metric.id);
-        if (existingMetric) {
-          response += `${metric.name}: ${existingMetric.value}${metric.type === 'percentage' ? '%' : ''}\n`;
+    if (scene?.indicators) {
+      scene.indicators.forEach((indicator) => {
+        const existingIndicator = existingIndicators.find((m) => m.id === indicator.id);
+        if (existingIndicator) {
+          response += `${indicator.name}: ${existingIndicator.value}${indicator.type === 'percentage' ? '%' : ''}\n`;
         } else {
-          if (metric.inferred && (metric.type === 'percentage' || metric.type === 'amount')) {
-            response += `${metric.name}: {{GEN ${metricVarName(metric.name)} max_tokens=3 stop=["%"]}}\n`;
-          } else if (metric.type === 'discrete') {
-            response += `${metric.name}: {{SEL ${metricVarName(metric.name)} options=${metricVarName(
-              metric.name,
+          if (indicator.inferred && (indicator.type === 'percentage' || indicator.type === 'amount')) {
+            response += `${indicator.name}: {{GEN ${indicatorVarName(indicator.name)} max_tokens=3 stop=["%"]}}\n`;
+          } else if (indicator.type === 'discrete') {
+            response += `${indicator.name}: {{SEL ${indicatorVarName(indicator.name)} options=${indicatorVarName(
+              indicator.name,
             )}_options}}\n`;
           }
         }

@@ -48,7 +48,7 @@ export interface NarrationResponse {
   summary?: {
     sentences: NarrationSummarySentence[];
   };
-  metrics?: {
+  indicators?: {
     id: string;
     value: string;
   }[];
@@ -66,7 +66,7 @@ export interface NarrationState {
     cutscenePartIndex: number;
     cutsceneTextIndex: number;
     cutsceneGroupIndex: number;
-    prefillMetrics?: {
+    prefillIndicators?: {
       id: string;
       value: string | number;
     }[];

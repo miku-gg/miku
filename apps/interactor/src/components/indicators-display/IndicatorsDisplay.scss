@@ -1,6 +1,6 @@
 @import '../../variables';
 
-.MetricsDisplay {
+.IndicatorsDisplay {
   position: absolute;
   top: 60px;
   right: -250px;
@@ -16,7 +16,7 @@
   &.open {
     right: 0;
 
-    .MetricsDisplay__toggle {
+    .IndicatorsDisplay__toggle {
       background: $background-1;
       svg {
         color: white;
@@ -54,10 +54,10 @@
     }
   }
 
-  &__metric {
+  &__indicator {
     margin-bottom: 12px;
 
-    &.metric-change {
+    &.indicator-change {
       animation: flash 1s;
     }
 
@@ -139,7 +139,7 @@
       justify-content: flex-start;
       gap: 4px;
 
-      .MetricsDisplay__metric-prefill-indicator {
+      .IndicatorsDisplay__indicator-prefill-indicator {
         // dot
         width: 4px;
         height: 4px;

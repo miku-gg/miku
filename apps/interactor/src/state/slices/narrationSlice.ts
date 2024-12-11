@@ -19,7 +19,7 @@ const initialState: NarrationState = {
     cutscenePartIndex: 0,
     cutsceneTextIndex: 0,
     cutsceneGroupIndex: 0,
-    prefillMetrics: [],
+    prefillIndicators: [],
   },
   interactions: {},
   responses: {},
@@ -70,7 +70,7 @@ const narrationSlice = createSlice({
         parentInteractionId: newInteractionId,
         selected: true,
         suggestedScenes: [],
-        metrics: [],
+        indicators: [],
       };
       const interaction: NarrationInteraction = {
         id: newInteractionId,
@@ -145,10 +145,10 @@ const narrationSlice = createSlice({
         summary?: {
           sentences: NarrationSummarySentence[];
         };
-        metrics?: NarrationResponse['metrics'];
+        indicators?: NarrationResponse['indicators'];
       }>,
     ) {
-      const { characters, metrics } = action.payload;
+      const { characters, indicators } = action.payload;
       const response = state.responses[state.currentResponseId];
       const interaction = state.interactions[response?.parentInteractionId || ''];
       const currentScene = interaction?.sceneId;
@@ -176,14 +176,14 @@ const narrationSlice = createSlice({
         if (!response.fetching) {
           state.input.text = '';
         }
-        if (metrics) {
-          response.metrics = metrics;
+        if (indicators) {
+          response.indicators = indicators;
         }
       }
       if (action.payload.completed) {
         state.input.disabled = false;
         state.input.text = '';
-        state.input.prefillMetrics = [];
+        state.input.prefillIndicators = [];
       }
     },
     regenerationStart(
@@ -214,7 +214,7 @@ const narrationSlice = createSlice({
         parentInteractionId: currentInteraction.id,
         selected: true,
         suggestedScenes: [],
-        metrics: [],
+        indicators: [],
       };
       currentInteraction.responsesId.forEach((responseId) => {
         const response = state.responses[responseId];
@@ -496,11 +496,11 @@ const narrationSlice = createSlice({
     setCutsceneGroupIndex(state, action: PayloadAction<number>) {
       state.input.cutsceneGroupIndex = action.payload;
     },
-    setPrefillMetrics(state, action: PayloadAction<{ id: string; value: string | number }[]>) {
-      state.input.prefillMetrics = action.payload;
+    setPrefillIndicators(state, action: PayloadAction<{ id: string; value: string | number }[]>) {
+      state.input.prefillIndicators = action.payload;
     },
-    clearPrefillMetrics(state) {
-      state.input.prefillMetrics = [];
+    clearPrefillIndicators(state) {
+      state.input.prefillIndicators = [];
     },
   },
   extraReducers: (builder) => {
@@ -541,8 +541,8 @@ export const {
   setCutscenePartIndex,
   setCutsceneTextIndex,
   setCutsceneGroupIndex,
-  setPrefillMetrics,
-  clearPrefillMetrics,
+  setPrefillIndicators,
+  clearPrefillIndicators,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;
