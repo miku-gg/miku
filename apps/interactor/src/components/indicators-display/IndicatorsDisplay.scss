@@ -156,6 +156,10 @@
     padding: 20px;
     overflow: visible !important;
 
+    &-content {
+      margin-top: 20px;
+    }
+
     &-actions {
       margin-top: 50px;
       display: flex;

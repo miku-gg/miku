@@ -2,7 +2,7 @@
 
 .IndicatorEditor {
   margin-top: 20px;
-  
+
   &__header {
     display: flex;
     justify-content: space-between;
@@ -23,7 +23,8 @@
   &__row {
     display: flex;
     gap: 1rem;
-    align-items: baseline;
+    align-items: end;
+    flex-wrap: wrap;
 
     & > * {
       flex: 1;

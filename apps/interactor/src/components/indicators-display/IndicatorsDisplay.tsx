@@ -200,44 +200,46 @@ const IndicatorsDisplay = () => {
         className="IndicatorsDisplay__edit-modal"
         hideCloseButton={false}
       >
-        {editingIndicator?.type === 'discrete' ? (
-          <Dropdown
-            items={editingIndicator.values?.map((value) => ({ name: fillText(value), value: value })) || []}
-            selectedIndex={editingIndicator.values?.indexOf(editingIndicator.currentValue.toString()) || 0}
-            onChange={(index) =>
-              handleIndicatorValueChange(editingIndicator.id, editingIndicator.values?.[index] || '')
-            }
-          />
-        ) : (
-          <Slider
-            continuous
-            min={editingIndicator?.min || 0}
-            max={editingIndicator?.max || 100}
-            step={1}
-            value={Number(editingIndicator?.currentValue) || 0}
-            onChange={(value) => handleIndicatorValueChange(editingIndicator?.id || '', Number(value))}
-          />
-        )}
-        <div className="IndicatorsDisplay__edit-modal-actions">
-          <Button
-            theme="secondary"
-            onClick={() => {
-              setEditingIndicator(null);
-              dispatch(setPrefillIndicators(prefillIndicators.filter((m) => m.id !== editingIndicator?.id)));
-            }}
-            disabled={!prefillIndicators.find((m) => m.id === editingIndicator?.id)}
-          >
-            Discard Changes
-          </Button>
-          <Button
-            className="IndicatorsDisplay__edit-modal-actions-save"
-            theme="transparent"
-            onClick={() => {
-              setEditingIndicator(null);
-            }}
-          >
-            Save
-          </Button>
+        <div className="IndicatorsDisplay__edit-modal-content">
+          {editingIndicator?.type === 'discrete' ? (
+            <Dropdown
+              items={editingIndicator.values?.map((value) => ({ name: fillText(value), value: value })) || []}
+              selectedIndex={editingIndicator.values?.indexOf(editingIndicator.currentValue.toString()) || 0}
+              onChange={(index) =>
+                handleIndicatorValueChange(editingIndicator.id, editingIndicator.values?.[index] || '')
+              }
+            />
+          ) : (
+            <Slider
+              continuous
+              min={editingIndicator?.min || 0}
+              max={editingIndicator?.max || 100}
+              step={1}
+              value={Number(editingIndicator?.currentValue) || 0}
+              onChange={(value) => handleIndicatorValueChange(editingIndicator?.id || '', Number(value))}
+            />
+          )}
+          <div className="IndicatorsDisplay__edit-modal-actions">
+            <Button
+              theme="secondary"
+              onClick={() => {
+                setEditingIndicator(null);
+                dispatch(setPrefillIndicators(prefillIndicators.filter((m) => m.id !== editingIndicator?.id)));
+              }}
+              disabled={!prefillIndicators.find((m) => m.id === editingIndicator?.id)}
+            >
+              Discard Changes
+            </Button>
+            <Button
+              className="IndicatorsDisplay__edit-modal-actions-save"
+              theme="transparent"
+              onClick={() => {
+                setEditingIndicator(null);
+              }}
+            >
+              Save
+            </Button>
+          </div>
         </div>
       </Modal>
 
