@@ -110,7 +110,7 @@ const IndicatorsDisplay = () => {
 
   return (
     <>
-      <div className={`IndicatorsDisplay ${isOpen ? 'open' : ''}`}>
+      <div className={`IndicatorsDisplay ${isOpen ? 'open' : ''} ${isMobileApp ? 'mobile' : ''}`}>
         <button className="IndicatorsDisplay__toggle" onClick={() => setIsOpen(!isOpen)} title="Toggle Indicators">
           <GiHeartBeats className={isOpen ? 'open' : ''} />
         </button>
