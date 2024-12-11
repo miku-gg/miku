@@ -243,7 +243,7 @@ export function IndicatorEditor({ indicator, onUpdate, onDelete }: IndicatorEdit
                     name="step"
                     value={indicator.step?.toString() || '1'}
                     onChange={handleInputChange}
-                    description="The amount to increase/decrease per step"
+                    description="The amount to increase/decrease per response"
                   />
                 </div>
               )}
