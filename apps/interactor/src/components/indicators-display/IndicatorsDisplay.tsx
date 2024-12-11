@@ -17,6 +17,7 @@ import { setModalOpened, updateIndicator, addCreatedIndicatorId } from '../../st
 import { AreYouSure } from '@mikugg/ui-kit';
 import { removeIndicatorFromScene } from '../../state/slices/novelSlice';
 import { removeCreatedIndicatorId } from '../../state/slices/creationSlice';
+import { useAppContext } from '../../App.context';
 
 const IndicatorsDisplay = () => {
   const dispatch = useAppDispatch();
@@ -28,6 +29,7 @@ const IndicatorsDisplay = () => {
   const indicatorToCreate = useAppSelector((state) => state.creation.scene.indicator.item);
   const { i18n } = useI18n();
   const fillText = useFillTextTemplateFunction();
+  const { isMobileApp } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
   const [editingIndicator, setEditingIndicator] = useState<{
     id: string;

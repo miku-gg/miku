@@ -13,6 +13,10 @@
   background: linear-gradient(#0c0a1d 0%, #1e1a41 100%);
   background: $background-1;
 
+  &.mobile {
+    top: 70px;
+  }
+
   &.open {
     right: 0;
 
@@ -224,9 +228,5 @@
       color: #666;
       transition: color 0.2s ease-out;
     }
-  }
-
-  @media (max-width: 768px) {
-    top: 50px;
   }
 }
