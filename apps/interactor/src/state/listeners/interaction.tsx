@@ -14,7 +14,10 @@ import textCompletion from '../../libs/textCompletion';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
 import { fillTextTemplate, SummaryPromptStrategy } from '../../libs/prompts/strategies';
-import { RoleplayPromptStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayPromptStrategy';
+import {
+  indicatorVarName,
+  RoleplayPromptStrategy,
+} from '../../libs/prompts/strategies/roleplay/RoleplayPromptStrategy';
 import {
   selectAllParentDialogues,
   selectCurrentInteraction,
@@ -244,6 +247,15 @@ const interactionEffect = async (
       '{{SEL emotion options=emotions}}',
       finishedCompletionResult.get('emotion') || '',
     );
+    for (const indicator of currentResponseState.indicators || []) {
+      const indicatorFromScene = currentScene?.indicators?.find((m) => m.id === indicator.id);
+      if (indicatorFromScene) {
+        prefixConditionPrompt = prefixConditionPrompt.replace(
+          `{{GEN ${indicatorVarName(indicatorFromScene?.name || '')} max_tokens=3 stop=["%"]}}`,
+          indicator.value.toString(),
+        );
+      }
+    }
     const objectives = [...selectCurrentSceneObjectives(state)];
     if (
       !objectives.some((objective) =>
