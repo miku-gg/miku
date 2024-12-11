@@ -106,7 +106,10 @@ const interactionEffect = async (
     // prefill indicators
     if (state.narration.input.prefillIndicators?.length) {
       state.narration.input.prefillIndicators.forEach((indicator) => {
-        indicators.push(indicator);
+        indicators.push({
+          ...indicator,
+          value: indicator.value.toString(),
+        });
       });
     }
     // check non-inferred indicators
