@@ -34,6 +34,11 @@ export default {
       music: { opened: false, selected: '', source: '' },
       sceneSugestions: { opened: false, inferencing: false },
       scenePreview: { opened: false, sceneId: '' },
+      indicator: {
+        opened: false,
+        item: null,
+        createdIds: [],
+      },
     },
     inference: { fetching: false, backgrounds: [] },
   },

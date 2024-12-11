@@ -14,9 +14,13 @@ import textCompletion from '../../libs/textCompletion';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
 import { fillTextTemplate, SummaryPromptStrategy } from '../../libs/prompts/strategies';
-import { RoleplayPromptStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayPromptStrategy';
+import {
+  indicatorVarName,
+  RoleplayPromptStrategy,
+} from '../../libs/prompts/strategies/roleplay/RoleplayPromptStrategy';
 import {
   selectAllParentDialogues,
+  selectCurrentInteraction,
   selectCurrentScene,
   selectCurrentSceneObjectives,
   selectMessagesSinceLastSummary,
@@ -68,6 +72,7 @@ const interactionEffect = async (
     const currentCharacter = state.novel.characters.find((character) => character.id === selectedCharacterId);
     const identifier = simpleHash(state.settings.user.name + '_' + state.narration.id);
     const currentScene = selectCurrentScene(state);
+    const currentInteraction = selectCurrentInteraction(state);
     const { secondary, strategy, truncation_length } = (await retrieveModelMetadata(
       servicesEndpoint,
       state.settings.model,
@@ -94,6 +99,58 @@ const interactionEffect = async (
         truncationLength: secondary.truncation_length - 150,
       }),
     ];
+
+    // Indicators stuff
+    // ----------------------------
+    const indicators = [...(currentResponseState.indicators || [])];
+    // prefill indicators
+    if (state.narration.input.prefillIndicators?.length) {
+      state.narration.input.prefillIndicators.forEach((indicator) => {
+        indicators.push({
+          ...indicator,
+          value: indicator.value.toString(),
+        });
+      });
+    }
+    // check non-inferred indicators
+    currentScene?.indicators?.forEach((indicator) => {
+      if (!indicator.inferred && indicator.type !== 'discrete' && !indicators.find((m) => m.id === indicator.id)) {
+        const valueString = getPreviousIndicatorValueString(
+          state,
+          indicator.id,
+          currentInteraction?.parentResponseId || null,
+          currentScene?.id,
+        );
+        let value = valueString ? Number(valueString) + Number(indicator.step || 0) : Number(indicator.initialValue);
+        value = Math.min(value, indicator.max || 100);
+        value = Math.max(value, indicator.min || 0);
+        indicators.push({
+          ...indicator,
+          value: value.toString(),
+        });
+      }
+    });
+
+    // check discrete indicators
+    currentScene?.indicators?.forEach((indicator) => {
+      if (indicator.type === 'discrete' && !currentResponseState.indicators?.find((m) => m.id === indicator.id)) {
+        const previousValue = getPreviousIndicatorValueString(
+          state,
+          indicator.id,
+          currentInteraction?.parentResponseId || null,
+          currentScene?.id,
+        );
+        indicators.push({
+          ...indicator,
+          value: previousValue?.toString() || indicator.initialValue,
+        });
+      }
+    });
+
+    currentResponseState = {
+      ...currentResponseState,
+      indicators,
+    };
 
     if (!currentCharacterResponse?.emotion && secondary.id !== state.settings.model) {
       const emotionPrompt = secondaryPromptBuilder.buildPrompt(
@@ -164,6 +221,7 @@ const interactionEffect = async (
         state,
         currentCharacterId: selectedCharacterId,
       });
+
       dispatch(
         interactionSuccess({
           ...currentResponseState,
@@ -192,6 +250,15 @@ const interactionEffect = async (
       '{{SEL emotion options=emotions}}',
       finishedCompletionResult.get('emotion') || '',
     );
+    for (const indicator of currentResponseState.indicators || []) {
+      const indicatorFromScene = currentScene?.indicators?.find((m) => m.id === indicator.id);
+      if (indicatorFromScene) {
+        prefixConditionPrompt = prefixConditionPrompt.replace(
+          `{{GEN ${indicatorVarName(indicatorFromScene?.name || '')} max_tokens=3 stop=["%"]}}`,
+          indicator.value.toString(),
+        );
+      }
+    }
     const objectives = [...selectCurrentSceneObjectives(state)];
     if (
       !objectives.some((objective) =>
@@ -385,6 +452,31 @@ const interactionEffect = async (
     console.error(error);
     dispatch(interactionFailure());
   }
+};
+
+const getPreviousIndicatorValueString = (
+  state: RootState,
+  indicatorId: string,
+  parentResponseId: string | null,
+  currentSceneId: string,
+): string | null => {
+  let responseId = parentResponseId;
+  if (responseId) {
+    const response = state.narration.responses[responseId];
+    if (response && response.indicators) {
+      const indicator = response.indicators.find((m) => m.id === indicatorId);
+      if (indicator) {
+        return indicator.value;
+      }
+    }
+    const parentInteraction = state.narration.interactions[response?.parentInteractionId || ''];
+    if (parentInteraction?.sceneId !== currentSceneId) {
+      return null;
+    } else {
+      responseId = parentInteraction?.parentResponseId || null;
+    }
+  }
+  return null;
 };
 
 export const interactionListenerMiddleware = createListenerMiddleware();

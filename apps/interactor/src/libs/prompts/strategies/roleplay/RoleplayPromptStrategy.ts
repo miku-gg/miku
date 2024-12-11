@@ -1,4 +1,4 @@
-import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD, TavernCardV2 } from '@mikugg/bot-utils';
+import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD, TavernCardV2, NovelV3 } from '@mikugg/bot-utils';
 import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..';
 import {
   selectAllParentDialoguesWhereCharactersArePresent,
@@ -14,6 +14,8 @@ import { findLorebooksEntries } from '../../../lorebookSearch';
 import labels from './RoleplayPromptLabels';
 
 const PROMPT_TOKEN_OFFSET = 50;
+
+export const indicatorVarName = (indicatorName: string) => indicatorName.replace(/\W+/g, '_').toLowerCase();
 
 export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   {
@@ -95,6 +97,19 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       }
     });
 
+    if (scene?.indicators) {
+      template += `\n${this.i18n('current_indicators')}`;
+      scene.indicators.forEach((indicator) => {
+        template += `\n${indicator.name}: ${indicator.description} ${
+          indicator.type === 'percentage'
+            ? `${indicator.name} MUST be a percentage between 0 and 100.`
+            : indicator.type === 'amount'
+            ? `${indicator.name} MUST be an amount between ${indicator.min} and ${indicator.max}.`
+            : `${indicator.name} MUST be one of the following: ${indicator.values?.join(', ')}.`
+        }`;
+      });
+    }
+
     return template;
   }
 
@@ -150,15 +165,27 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const parentEmotion =
       selectLastLoadedCharacters(input.state).find(({ id }) => id === input.currentCharacterId)?.emotion || '';
 
+    const scene = selectCurrentScene(input.state);
+    const variables: Record<string, string | string[]> = {
+      scene_opt: [' Yes', ' No'],
+      cond_opt: Array.from({ length: 10 }, (_, i) => ' ' + i.toString()),
+      emotions: emotions
+        .filter((emotion) => (emotions.length > 1 ? emotion !== parentEmotion : true))
+        .map((emotion) => ' ' + emotion),
+    };
+
+    if (scene?.indicators) {
+      scene.indicators.forEach((indicator) => {
+        if (indicator.type === 'discrete') {
+          variables[`${indicatorVarName(indicator.name)}_options`] =
+            indicator.values?.map((value) => ` ${value}`) || [];
+        }
+      });
+    }
+
     return {
       template,
-      variables: {
-        scene_opt: [' Yes', ' No'],
-        cond_opt: Array.from({ length: 10 }, (_, i) => ' ' + i.toString()),
-        emotions: emotions
-          .filter((emotion) => (emotions.length > 1 ? emotion !== parentEmotion : true))
-          .map((emotion) => ' ' + emotion),
-      },
+      variables,
       totalTokens,
     };
   }
@@ -187,12 +214,24 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
 
     const index = response.characters.findIndex(({ characterId }) => characterId === input.currentCharacterId);
 
+    const sceneId = input.state.narration.interactions[response?.parentInteractionId || '']?.sceneId;
+    const scene = input.state.novel.scenes.find((scene) => scene.id === sceneId);
+    const indicators = scene?.indicators || [];
+
+    const updatedIndicators = indicators.map((indicator) => {
+      const value =
+        variables.get(indicatorVarName(indicator.name))?.trim() ||
+        response.indicators?.find((m) => m.id === indicator.id)?.value;
+      return { id: indicator.id, name: indicator.name, value: value || '' };
+    });
+
     return {
       ...response,
       characters: [
         ...response.characters.slice(0, index !== -1 ? index : response.characters.length),
         characterResponse,
       ],
+      indicators: updatedIndicators,
     };
   }
 
@@ -207,6 +246,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const messages = selectAllParentDialoguesWhereCharactersArePresent(state, [currentCharacter?.id || '']);
     let prompt = '';
     let sceneId = '';
+    let scene: NovelV3.NovelScene | undefined = undefined;
     const temp = this.template();
     for (const message of [...messages].reverse().slice(-maxLines)) {
       const messageSceneId =
@@ -214,7 +254,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
           ? message.item.sceneId
           : state.novel.starts.find((start) => start.id === message.item.id)?.sceneId) || sceneId;
       if (messageSceneId !== sceneId) {
-        const scene = state.novel.scenes.find((scene) => scene.id === messageSceneId);
+        scene = state.novel.scenes.find((scene) => scene.id === messageSceneId);
         const cutscene = state.novel.cutscenes?.find((cutscene) => cutscene.id === scene?.cutScene?.id);
         if (cutscene?.parts.length) {
           prompt += `${temp.response}${cutscene.parts
@@ -229,7 +269,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         }
         sceneId = messageSceneId;
       }
-      prompt += this.getDialogueLine(message, currentCharacter, prompt);
+      prompt += this.getDialogueLine(message, currentCharacter, prompt, scene?.indicators);
     }
     return prompt;
   }
@@ -241,6 +281,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       id: string;
     },
     currentText?: string,
+    indicatorsFromScene?: NovelV3.NovelIndicator[],
   ): string {
     const temp = this.template();
     let prevCharString = '';
@@ -248,8 +289,23 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     let currentCharacterIndex;
     let currentCharacter;
     let linePrefix = '';
+    let indicatorsString = '';
     switch (dialog.type) {
       case 'response':
+        indicatorsString =
+          dialog.item.indicators?.reduce((prev, indicator) => {
+            const indicatorFromScene = indicatorsFromScene?.find((m) => m.id === indicator.id);
+            if (!indicatorFromScene) {
+              return prev;
+            } else {
+              return (
+                prev +
+                `${indicatorFromScene?.name}: ${indicator.value}${
+                  indicatorFromScene.type === 'percentage' ? '%' : ''
+                }\n`
+              );
+            }
+          }, '') || '';
         currentCharacterIndex = dialog.item.characters.findIndex(({ characterId }) => {
           return character?.id === characterId;
         });
@@ -280,6 +336,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
             (prevCharString ? prevCharString + '\n' : '') +
             (currentCharacter.text
               ? temp.response +
+                (indicatorsString ? indicatorsString + '\n' : '') +
                 `${this.i18n('character_reaction', [`{{char}}`])}: ${currentCharacter.emotion}\n` +
                 `{{char}}: ${currentCharacter.text}\n`
               : '') +
@@ -288,7 +345,11 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         } else {
           return (
             (prevCharString ? `${temp.instruction}${prevCharString}\n` : '') +
-            (currentCharacter.text ? temp.response + `{{char}}: ${currentCharacter.text}\n` : '') +
+            (currentCharacter.text
+              ? temp.response +
+                (indicatorsString ? indicatorsString + '\n' : '') +
+                `{{char}}: ${currentCharacter.text}\n`
+              : '') +
             '\n' +
             (nextCharString ? `${temp.instruction}${nextCharString}\n` : '')
           );
@@ -307,6 +368,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const currentCharacterResponse = currentResponse?.characters.find((char) => char.characterId === characterId);
     const scene = selectCurrentScene(state);
 
+    const existingIndicators = currentResponse?.indicators || [];
     const existingEmotion = currentCharacterResponse?.emotion || '';
     const existingText = currentCharacterResponse?.text || '';
     const charStops = scene?.characters
@@ -321,14 +383,31 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
 
     const userSanitized = state.settings.user.name.replace(/"/g, '\\"');
 
-    return (
-      temp.askLine +
-      `${this.i18n('reaction_instruction')}\n` +
-      `${this.i18n('character_reaction', ['{{char}}'])}:${
-        existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'
-      }\n` +
-      `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`
-    );
+    let response = temp.askLine;
+    response += `${this.i18n('reaction_instruction')}\n`;
+
+    if (scene?.indicators) {
+      scene.indicators.forEach((indicator) => {
+        const existingIndicator = existingIndicators.find((m) => m.id === indicator.id);
+        if (existingIndicator) {
+          response += `${indicator.name}: ${existingIndicator.value}${indicator.type === 'percentage' ? '%' : ''}\n`;
+        } else {
+          if (indicator.inferred && (indicator.type === 'percentage' || indicator.type === 'amount')) {
+            response += `${indicator.name}: {{GEN ${indicatorVarName(indicator.name)} max_tokens=3 stop=["%"]}}\n`;
+          } else if (indicator.type === 'discrete') {
+            response += `${indicator.name}: {{SEL ${indicatorVarName(indicator.name)} options=${indicatorVarName(
+              indicator.name,
+            )}_options}}\n`;
+          }
+        }
+      });
+    }
+
+    response += `${this.i18n('character_reaction', ['{{char}}'])}:${
+      existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'
+    }\n`;
+    response += `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`;
+    return response;
   }
 
   static getConditionPrompt({

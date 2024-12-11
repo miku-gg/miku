@@ -15,3 +15,19 @@ export const useFillTextTemplate = (text: string, characterName: string) => {
     }, {} as Record<string, string>),
   });
 };
+
+export const useFillTextTemplateFunction = () => {
+  const characters = useAppSelector((state) => state.novel.characters);
+  const userName = useAppSelector((state) => state.settings.user.name);
+  const scene = useAppSelector(selectCurrentScene);
+  return (text: string, characterId?: string) => {
+    return fillTextTemplate(text, {
+      user: userName,
+      bot: characterId ? characters.find(({ id }) => id === characterId)?.name || '' : characters[0]?.name || '',
+      characters: scene?.characters.reduce((prev, { characterId }) => {
+        prev[characterId] = characters.find(({ id }) => id === characterId)?.name || '';
+        return prev;
+      }, {} as Record<string, string>),
+    });
+  };
+};

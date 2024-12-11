@@ -1,3 +1,19 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "apps/bot-directory/public/tailwind.js": true,
+    "apps/bot-directory/public/tailwind.css": true,
+    "apps/bot-directory/public/semantic.min.css": true,
+    "apps/bot-directory/public/semantic.min.js": true,
+    "apps/bot-directory/public/form.min.js": true,
+    "apps/bot-directory/public/form.min.css": true,
+    "docs/retype.manifest.json": true,
+    "**/node_modules/!(@mikugg)/**": true
+  }
 }

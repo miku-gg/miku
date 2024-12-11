@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { NovelCharacter, NovelBackground } from '../versioning';
+import { NovelCharacter, NovelBackground, NovelIndicator } from '../versioning';
 
 interface CreationState {
   importedBackgrounds: NovelBackground[];
@@ -45,6 +45,11 @@ interface CreationState {
     scenePreview: {
       opened: boolean;
       sceneId: string;
+    };
+    indicator: {
+      opened: boolean;
+      item?: NovelIndicator | null;
+      createdIds: string[];
     };
   };
   inference: {
@@ -109,6 +114,11 @@ export const initialState: CreationState = {
       opened: false,
       sceneId: '',
     },
+    indicator: {
+      opened: false,
+      item: null,
+      createdIds: [],
+    },
   },
   inference: {
     fetching: false,
@@ -132,7 +142,8 @@ export const creationSlice = createSlice({
           | 'characters-search'
           | 'background-gen'
           | 'scene-suggestions'
-          | 'scene-preview';
+          | 'scene-preview'
+          | 'indicator';
         opened: boolean;
         itemId?: string;
       }>,
@@ -152,6 +163,25 @@ export const creationSlice = createSlice({
       } else if (action.payload.id === 'scene-preview') {
         state.scene.scenePreview.opened = action.payload.opened;
         state.scene.scenePreview.sceneId = action.payload.itemId || state.scene.scenePreview.sceneId;
+      } else if (action.payload.id === 'indicator') {
+        state.scene.indicator.opened = action.payload.opened;
+        state.scene.indicator.item = action.payload.opened
+          ? {
+              id: '',
+              name: '',
+              description: '',
+              type: 'percentage',
+              values: [],
+              initialValue: '0',
+              min: 0,
+              max: 100,
+              step: 1,
+              inferred: false,
+              editable: true,
+              hidden: false,
+              color: '#4CAF50',
+            }
+          : state.scene.indicator.item;
       } else {
         state.scene[action.payload.id].opened = action.payload.opened;
       }
@@ -288,6 +318,15 @@ export const creationSlice = createSlice({
     endInferencingScene: (state) => {
       state.scene.sceneSugestions.inferencing = false;
     },
+    updateIndicator: (state, action: PayloadAction<NovelIndicator>) => {
+      state.scene.indicator.item = action.payload;
+    },
+    addCreatedIndicatorId: (state, action: PayloadAction<string>) => {
+      state.scene.indicator.createdIds.push(action.payload);
+    },
+    removeCreatedIndicatorId: (state, action: PayloadAction<string>) => {
+      state.scene.indicator.createdIds = state.scene.indicator.createdIds.filter((id) => id !== action.payload);
+    },
   },
 });
 
@@ -310,6 +349,9 @@ export const {
   backgroundInferenceFailure,
   startInferencingScene,
   endInferencingScene,
+  updateIndicator,
+  addCreatedIndicatorId,
+  removeCreatedIndicatorId,
 } = creationSlice.actions;
 
 export default creationSlice.reducer;

@@ -556,3 +556,26 @@ export const selectCurrentCutScenePart = createSelector(
     return currentCutscene?.parts[currentPartIndex] || null;
   },
 );
+
+export const selectCurrentIndicators = createSelector(
+  [
+    selectCurrentScene,
+    (state: RootState) => state.narration.currentResponseId,
+    (state: RootState) => state.narration.responses,
+  ],
+  (scene, currentResponseId, responses) => {
+    const indicators = scene?.indicators || [];
+    const updatedIndicators = responses[currentResponseId]?.indicators || [];
+    return indicators.map((indicator) => {
+      const updatedIndicator = updatedIndicators.find((i) => i.id === indicator.id);
+      return { ...indicator, currentValue: updatedIndicator?.value || indicator.initialValue };
+    });
+  },
+);
+
+export const selectCurrentInteraction = (state: RootState) => {
+  const currentResponse = state.narration.responses[state.narration.currentResponseId];
+  return currentResponse?.parentInteractionId
+    ? state.narration.interactions[currentResponse.parentInteractionId]
+    : null;
+};

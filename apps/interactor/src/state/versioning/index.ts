@@ -14,4 +14,5 @@ export type {
   NovelMap,
   NovelSong,
   NovelStart,
+  NovelIndicator,
 } from './v3.state';

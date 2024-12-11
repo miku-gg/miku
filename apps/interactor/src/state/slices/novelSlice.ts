@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { NovelCharacter, NovelState, NovelNSFW } from '../versioning';
+import { NovelCharacter, NovelState, NovelNSFW, NovelIndicator } from '../versioning';
 import { v4 as randomUUID } from 'uuid';
 
 export type { NovelScene, NovelCharacter, NovelCharacterOutfit, NovelState } from '../versioning';
@@ -101,6 +101,21 @@ const novelSlice = createSlice({
         });
       }
     },
+    addIndicatorToScene: (state, action: PayloadAction<{ sceneId: string; indicator: NovelIndicator }>) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene) {
+        if (!scene.indicators) {
+          scene.indicators = [];
+        }
+        scene.indicators.push(action.payload.indicator);
+      }
+    },
+    removeIndicatorFromScene: (state, action: PayloadAction<{ sceneId: string; indicatorId: string }>) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene && scene.indicators) {
+        scene.indicators = scene.indicators.filter((indicator) => indicator.id !== action.payload.indicatorId);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -111,6 +126,7 @@ const novelSlice = createSlice({
   },
 });
 
-export const { setNovel, addScene, addChildrenScenes } = novelSlice.actions;
+export const { setNovel, addScene, addChildrenScenes, addIndicatorToScene, removeIndicatorFromScene } =
+  novelSlice.actions;
 
 export default novelSlice.reducer;

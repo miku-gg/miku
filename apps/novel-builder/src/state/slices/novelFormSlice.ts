@@ -490,6 +490,33 @@ const novelFormSlice = createSlice({
       // Swap elements
       [state.starts[currentIndex], state.starts[newIndex]] = [state.starts[newIndex], state.starts[currentIndex]];
     },
+    addIndicatorToScene: (state, action: PayloadAction<{ sceneId: string; indicator: NovelV3.NovelIndicator }>) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene) {
+        if (!scene.indicators) {
+          scene.indicators = [];
+        }
+        scene.indicators.push(action.payload.indicator);
+      }
+    },
+    updateIndicatorInScene: (
+      state,
+      action: PayloadAction<{ sceneId: string; indicatorId: string; indicator: NovelV3.NovelIndicator }>,
+    ) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene && scene.indicators) {
+        const index = scene.indicators.findIndex((indicator) => indicator.id === action.payload.indicatorId);
+        if (index !== -1) {
+          scene.indicators[index] = action.payload.indicator;
+        }
+      }
+    },
+    deleteIndicatorFromScene: (state, action: PayloadAction<{ sceneId: string; indicatorId: string }>) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene && scene.indicators) {
+        scene.indicators = scene.indicators.filter((indicator) => indicator.id !== action.payload.indicatorId);
+      }
+    },
   },
 });
 
@@ -542,6 +569,9 @@ export const {
   updateCutscenePart,
   deleteCutscenePart,
   reorderStart,
+  addIndicatorToScene,
+  updateIndicatorInScene,
+  deleteIndicatorFromScene,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

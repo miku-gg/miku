@@ -48,6 +48,10 @@ export interface NarrationResponse {
   summary?: {
     sentences: NarrationSummarySentence[];
   };
+  indicators?: {
+    id: string;
+    value: string;
+  }[];
 }
 
 export interface NarrationState {
@@ -62,6 +66,10 @@ export interface NarrationState {
     cutscenePartIndex: number;
     cutsceneTextIndex: number;
     cutsceneGroupIndex: number;
+    prefillIndicators?: {
+      id: string;
+      value: string | number;
+    }[];
   };
   interactions: {
     [id: string]: NarrationInteraction | undefined;
@@ -80,6 +88,7 @@ export interface NovelBackground extends NovelV3.NovelBackground {}
 export interface NovelMap extends NovelV3.NovelMap {}
 export interface NovelSong extends NovelV3.NovelSong {}
 export interface NovelStart extends NovelV3.NovelStart {}
+export interface NovelIndicator extends NovelV3.NovelIndicator {}
 
 export enum NovelNSFW {
   NONE = NovelV3.NovelNSFW.NONE,

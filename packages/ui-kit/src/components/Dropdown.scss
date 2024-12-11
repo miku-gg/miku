@@ -94,7 +94,7 @@
 
       &-description {
         font-size: 12px;
-        color: #b9b7b7;
+        color: white;
       }
 
       &-selected {
@@ -159,6 +159,15 @@
           color: #0026ff;
         }
       }
+    }
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    .dropdown__selected {
+      pointer-events: none;
     }
   }
 }

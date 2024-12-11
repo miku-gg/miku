@@ -20,6 +20,7 @@ import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
 import { markCurrentCutsceneAsSeen } from '../../state/slices/narrationSlice';
+import IndicatorsDisplay from '../indicators-display/IndicatorsDisplay';
 
 const Interactor = () => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
@@ -49,6 +50,7 @@ const Interactor = () => {
         ) : null}
         <div className="Interactor__content">
           <InteractorHeader />
+          <IndicatorsDisplay />
           <SceneSuggestion />
           <div className="Interactor__main-image-container">
             <ProgressiveImage
