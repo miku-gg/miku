@@ -7,7 +7,7 @@
   width: 250px;
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: 0 0 0 8px;
-  padding: 15px;
+  padding: 10px;
   transition: right 0.3s ease-in-out;
   z-index: 2;
   background: linear-gradient(#0c0a1d 0%, #1e1a41 100%);
@@ -54,12 +54,14 @@
     }
   }
 
+  &__no-indicators {
+    color: $text-3;
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+
   &__indicator {
     margin-bottom: 12px;
-
-    &.indicator-change {
-      animation: flash 1s;
-    }
 
     &-header {
       display: flex;
@@ -163,15 +165,60 @@
     }
   }
 
-  @keyframes flash {
-    0% {
-      background-color: transparent;
+  &__create-indicator {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__create-indicator-button {
+    background-color: #9747ff;
+    color: white;
+    padding: 0.4rem 0.6rem;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.1333333333);
+    color: lightgray;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 8px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    &:hover {
+      background-color: #9747ff;
+      color: white;
     }
-    50% {
-      background-color: rgba(255, 255, 0, 0.3);
+  }
+
+  &__indicator-delete {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s ease;
+    margin-right: 4px;
+
+    outline: none;
+
+    &:focus {
+      outline: none;
     }
-    100% {
-      background-color: transparent;
+
+    &:hover {
+      color: #ff4444;
+      svg {
+        color: #ff4444;
+      }
+    }
+
+    svg {
+      width: 11px;
+      height: 11px;
+      color: #666;
+      transition: color 0.2s ease-out;
     }
   }
 

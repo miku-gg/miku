@@ -4,19 +4,20 @@ import { useState } from 'react';
 import './IndicatorEditor.scss';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { TagAutocomplete } from '@mikugg/ui-kit';
+import { v4 as uuidv4 } from 'uuid';
 
 const TYPE_OPTIONS = [
   {
     name: 'Percentage',
-    description: 'A value that represents a percentage (0-100%)',
+    description: 'A percentage (0-100%)',
   },
   {
     name: 'Amount',
-    description: 'A numeric value within a custom range',
+    description: 'A numeric value',
   },
   {
     name: 'Discrete',
-    description: 'A value from a predefined set of options',
+    description: 'A value from a predefined list',
   },
 ];
 
@@ -36,7 +37,8 @@ const PREDEFINED_COLORS = [
 interface IndicatorEditorProps {
   indicator: NovelV3.NovelIndicator;
   onUpdate: (indicator: NovelV3.NovelIndicator) => void;
-  onDelete: () => void;
+  onSave: (indicator: NovelV3.NovelIndicator) => void;
+  onCancel: () => void;
 }
 
 function CheckBoxWithInfo({
@@ -61,7 +63,7 @@ function CheckBoxWithInfo({
   );
 }
 
-export function IndicatorEditor({ indicator, onUpdate, onDelete }: IndicatorEditorProps) {
+export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel }: IndicatorEditorProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   const handleInputChange = (e: { target: { name: string; value: string } }) => {
@@ -144,13 +146,6 @@ export function IndicatorEditor({ indicator, onUpdate, onDelete }: IndicatorEdit
 
   return (
     <div className="IndicatorEditor">
-      <div className="IndicatorEditor__header">
-        <h3>{indicator.name || 'Indicator'}</h3>
-        <Button theme="transparent" onClick={onDelete}>
-          Remove Indicator
-        </Button>
-      </div>
-
       <div className="IndicatorEditor__content">
         <div className="IndicatorEditor__row">
           <div className="IndicatorEditor__name-field">
@@ -283,16 +278,17 @@ export function IndicatorEditor({ indicator, onUpdate, onDelete }: IndicatorEdit
             label="Editable"
             value={indicator.editable || false}
             onChange={(e) => onUpdate({ ...indicator, editable: e.target.checked })}
-            disabled={indicator.type === 'discrete'} // Disable for discrete type
+            disabled
             description="Whether users can modify this value"
           />
-          <CheckBoxWithInfo
-            label="Hidden"
-            value={indicator.hidden || false}
-            onChange={(e) => onUpdate({ ...indicator, hidden: e.target.checked })}
-            disabled={indicator.type === 'discrete'} // Disable for discrete type
-            description="Whether this indicator is visible to users"
-          />
+        </div>
+        <div className="IndicatorEditor__row">
+          <Button theme="transparent" onClick={() => onCancel()}>
+            Cancel
+          </Button>
+          <Button theme="secondary" onClick={() => onSave({ ...indicator, id: uuidv4() })}>
+            Save
+          </Button>
         </div>
       </div>
     </div>

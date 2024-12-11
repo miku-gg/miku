@@ -5,19 +5,30 @@ import './IndicatorsDisplay.scss';
 import { Button, Dropdown, Modal, Slider } from '@mikugg/ui-kit';
 import { GiHeartBeats } from 'react-icons/gi';
 import { setPrefillIndicators } from '../../state/slices/narrationSlice';
-import { FaPencil } from 'react-icons/fa6';
+import { FaPencil, FaPlus, FaTrash } from 'react-icons/fa6';
 import { useI18n } from '../../libs/i18n';
 import classNames from 'classnames';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
+import IndicatorEditor from './IndicatorEditor';
+import { addIndicatorToScene } from '../../state/slices/novelSlice';
+import { selectCurrentScene } from '../../state/selectors';
+import { NovelIndicator } from '../../state/versioning';
+import { setModalOpened, updateIndicator, addCreatedIndicatorId } from '../../state/slices/creationSlice';
+import { AreYouSure } from '@mikugg/ui-kit';
+import { removeIndicatorFromScene } from '../../state/slices/novelSlice';
+import { removeCreatedIndicatorId } from '../../state/slices/creationSlice';
 
 const IndicatorsDisplay = () => {
   const dispatch = useAppDispatch();
   const indicators = useAppSelector(selectCurrentIndicators);
   const disabled = useAppSelector((state) => state.narration.input.disabled);
   const prefillIndicators = useAppSelector((state) => state.narration.input.prefillIndicators || []);
+  const currentScene = useAppSelector(selectCurrentScene);
+  const openIndicatorModal = useAppSelector((state) => state.creation.scene.indicator.opened);
+  const indicatorToCreate = useAppSelector((state) => state.creation.scene.indicator.item);
   const { i18n } = useI18n();
   const fillText = useFillTextTemplateFunction();
-  const [isOpen, setIsOpen] = useState(window.innerWidth > 768);
+  const [isOpen, setIsOpen] = useState(false);
   const [editingIndicator, setEditingIndicator] = useState<{
     id: string;
     type: 'discrete' | 'percentage' | 'amount';
@@ -27,6 +38,8 @@ const IndicatorsDisplay = () => {
     max?: number;
     currentValue: string | number;
   } | null>(null);
+  const { openModal } = AreYouSure.useAreYouSure();
+  const createdIndicatorIds = useAppSelector((state) => state.creation.scene.indicator.createdIds);
 
   // Filter out hidden indicators
   const visibleIndicators = indicators.filter((indicator) => !indicator.hidden);
@@ -74,7 +87,24 @@ const IndicatorsDisplay = () => {
     });
   };
 
-  if (!visibleIndicators.length) return null;
+  const handleDeleteIndicator = (indicatorId: string) => {
+    if (!currentScene) return;
+
+    openModal({
+      title: 'Delete Indicator',
+      description: 'Are you sure you want to delete this indicator?',
+      yesLabel: 'Delete',
+      onYes: () => {
+        dispatch(
+          removeIndicatorFromScene({
+            sceneId: currentScene.id,
+            indicatorId: indicatorId,
+          }),
+        );
+        dispatch(removeCreatedIndicatorId(indicatorId));
+      },
+    });
+  };
 
   return (
     <>
@@ -109,6 +139,15 @@ const IndicatorsDisplay = () => {
                     <FaPencil />
                   </button>
                 )}
+                {createdIndicatorIds.includes(indicator.id) && (
+                  <button
+                    className="IndicatorsDisplay__indicator-delete"
+                    disabled={disabled}
+                    onClick={() => handleDeleteIndicator(indicator.id)}
+                  >
+                    <FaTrash />
+                  </button>
+                )}
               </div>
               <div
                 className={classNames('IndicatorsDisplay__indicator-value-container', { prefilled: !!prefillValue })}
@@ -139,6 +178,19 @@ const IndicatorsDisplay = () => {
             </div>
           );
         })}
+
+        {visibleIndicators.length === 0 && <div className="IndicatorsDisplay__no-indicators">No indicators found</div>}
+
+        {/* Add the "Create Indicator" button at the end */}
+        <div className="IndicatorsDisplay__create-indicator">
+          <button
+            className="IndicatorsDisplay__create-indicator-button"
+            disabled={disabled}
+            onClick={() => dispatch(setModalOpened({ id: 'indicator', opened: true }))}
+          >
+            <FaPlus />
+          </button>
+        </div>
       </div>
 
       <Modal
@@ -187,6 +239,48 @@ const IndicatorsDisplay = () => {
             Save
           </Button>
         </div>
+      </Modal>
+
+      {/* Add the modal for creating a new indicator */}
+      <Modal
+        opened={openIndicatorModal}
+        onCloseModal={() => dispatch(setModalOpened({ id: 'indicator', opened: false }))}
+        title="Create Indicator"
+        className="IndicatorsDisplay__edit-modal"
+        hideCloseButton={false}
+      >
+        {currentScene && (
+          <IndicatorEditor
+            onUpdate={(newIndicator: NovelIndicator) => {
+              dispatch(updateIndicator(newIndicator));
+            }}
+            indicator={
+              indicatorToCreate || {
+                id: '',
+                name: '',
+                description: '',
+                type: 'percentage',
+                color: '#4caf50',
+                initialValue: '',
+                inferred: false,
+                min: 0,
+                max: 100,
+              }
+            }
+            onSave={(newIndicator: NovelIndicator) => {
+              // Dispatch action to add the indicator to the current scene
+              dispatch(
+                addIndicatorToScene({
+                  sceneId: currentScene.id,
+                  indicator: newIndicator,
+                }),
+              );
+              dispatch(addCreatedIndicatorId(newIndicator.id));
+              dispatch(setModalOpened({ id: 'indicator', opened: false }));
+            }}
+            onCancel={() => dispatch(setModalOpened({ id: 'indicator', opened: false }))}
+          />
+        )}
       </Modal>
     </>
   );

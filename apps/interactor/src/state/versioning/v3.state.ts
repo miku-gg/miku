@@ -88,6 +88,7 @@ export interface NovelBackground extends NovelV3.NovelBackground {}
 export interface NovelMap extends NovelV3.NovelMap {}
 export interface NovelSong extends NovelV3.NovelSong {}
 export interface NovelStart extends NovelV3.NovelStart {}
+export interface NovelIndicator extends NovelV3.NovelIndicator {}
 
 export enum NovelNSFW {
   NONE = NovelV3.NovelNSFW.NONE,
