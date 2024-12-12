@@ -33,6 +33,7 @@
 
   &__name-field {
     flex: 2;
+    min-width: 203px;
   }
 
   &__type-color {
@@ -44,6 +45,7 @@
 
   &__type-dropdown {
     flex: 3;
+    min-width: 297px;
   }
 
   &__color,
@@ -83,8 +85,8 @@
   &__color-picker-popover {
     position: absolute;
     z-index: 2;
-    top: 27px;
-    left: 37px;
+    left: -184px;
+    top: 100%;
     background-color: $background-2;
     padding: 0.75rem;
     border-radius: 0.5rem;

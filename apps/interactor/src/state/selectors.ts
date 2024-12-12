@@ -382,14 +382,21 @@ export const selectAllParentDialoguesWhereCharactersArePresent = createSelector(
 );
 
 export const selectCurrentSceneObjectives = createSelector(
-  [(state: RootState) => state.objectives, selectCurrentScene],
-  (objectives, scene) => {
-    return objectives.filter(
-      (objective) =>
-        objective.stateCondition?.type === 'IN_SCENE' &&
-        (objective.stateCondition?.config?.sceneIds?.includes(scene?.id || '') ||
-          !objective.stateCondition?.config?.sceneIds?.length),
-    );
+  [
+    (state: RootState) => state.objectives,
+    selectCurrentScene,
+    (state: RootState) => state.novel.scenes,
+    (state: RootState) => state.settings.user.nsfw,
+  ],
+  (objectives, scene, scenes, nsfw) => {
+    return objectives.filter((objective) => {
+      const sceneIds = objective.stateCondition?.config?.sceneIds || [];
+      const scenesFromObjectives = scenes.filter((scene) => sceneIds.includes(scene.id));
+      if (nsfw === NovelNSFW.NONE && scenesFromObjectives.some((scene) => scene.nsfw > NovelNSFW.NONE)) {
+        return false;
+      }
+      return objective.stateCondition?.type === 'IN_SCENE' && (sceneIds.includes(scene?.id || '') || !sceneIds.length);
+    });
   },
 );
 
