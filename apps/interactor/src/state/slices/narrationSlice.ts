@@ -18,7 +18,6 @@ const initialState: NarrationState = {
     seenCutscene: false,
     cutscenePartIndex: 0,
     cutsceneTextIndex: 0,
-    cutsceneGroupIndex: 0,
     prefillIndicators: [],
   },
   interactions: {},
@@ -97,7 +96,6 @@ const narrationSlice = createSlice({
         state.input.seenCutscene = false;
         state.input.cutscenePartIndex = 0;
         state.input.cutsceneTextIndex = 0;
-        state.input.cutsceneGroupIndex = 0;
       }
     },
     interactionFailure(state, action: PayloadAction<string | undefined>) {
@@ -485,16 +483,12 @@ const narrationSlice = createSlice({
     resetCutsceneIndices(state) {
       state.input.cutscenePartIndex = 0;
       state.input.cutsceneTextIndex = 0;
-      state.input.cutsceneGroupIndex = 0;
     },
     setCutscenePartIndex(state, action: PayloadAction<number>) {
       state.input.cutscenePartIndex = action.payload;
     },
     setCutsceneTextIndex(state, action: PayloadAction<number>) {
       state.input.cutsceneTextIndex = action.payload;
-    },
-    setCutsceneGroupIndex(state, action: PayloadAction<number>) {
-      state.input.cutsceneGroupIndex = action.payload;
     },
     setPrefillIndicators(state, action: PayloadAction<{ id: string; value: string | number }[]>) {
       state.input.prefillIndicators = action.payload;
@@ -540,7 +534,6 @@ export const {
   resetCutsceneIndices,
   setCutscenePartIndex,
   setCutsceneTextIndex,
-  setCutsceneGroupIndex,
   setPrefillIndicators,
   clearPrefillIndicators,
 } = narrationSlice.actions;
