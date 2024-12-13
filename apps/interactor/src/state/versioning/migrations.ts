@@ -124,7 +124,6 @@ export const migrateV2toV3 = (v2: {
         ...v2.narration.input,
         cutscenePartIndex: 0,
         cutsceneTextIndex: 0,
-        cutsceneGroupIndex: 0,
       },
     },
     novel,
