@@ -147,7 +147,6 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
     return isLastPart && currentTextIndex === currentPart.text.length - 1;
   };
 
-  // Para el renderizado de textos
   const getCurrentTextsToShow = () => {
     const currentPart = parts[currentPartIndex];
     if (!isMobileDisplay) {
@@ -171,7 +170,6 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   }
 
   const parts = currentCutscene.parts;
-  const lastPart = parts[parts.length - 1];
 
   return (
     <>
