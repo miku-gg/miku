@@ -10,7 +10,7 @@ import { useRef, useEffect } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { useI18n } from '../../libs/i18n';
-import { setCutsceneTextIndex, setCutsceneGroupIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
+import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
 
 const PartRenderer = ({
   part,
@@ -113,34 +113,17 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
 
   const currentPartIndex = useAppSelector((state) => state.narration.input.cutscenePartIndex || 0);
   const currentTextIndex = useAppSelector((state) => state.narration.input.cutsceneTextIndex || 0);
-  const currentGroupIndex = useAppSelector((state) => state.narration.input.cutsceneGroupIndex || 0);
-
+  
   const isMobileDisplay = isMobileApp || window.innerWidth < 600;
   const TEXTS_PER_GROUP = 3;
 
-  const getTextGroups = (texts: NovelV3.CutScenePart['text']) => {
-    if (!isMobileDisplay) return [texts];
-    return texts.reduce((acc: NovelV3.CutScenePart['text'][], curr, i) => {
-      const groupIndex = Math.floor(i / TEXTS_PER_GROUP);
-      if (!acc[groupIndex]) acc[groupIndex] = [];
-      acc[groupIndex].push(curr);
-      return acc;
-    }, []);
-  };
-
   const handleContinueClick = () => {
     const currentPart = parts[currentPartIndex];
-    const textGroups = getTextGroups(currentPart.text);
-    const currentGroup = textGroups[currentGroupIndex];
-
-    if (currentTextIndex < currentGroup.length - 1) {
+    
+    if (currentTextIndex < currentPart.text.length - 1) {
       dispatch(setCutsceneTextIndex(currentTextIndex + 1));
-    } else if (currentGroupIndex < textGroups.length - 1) {
-      dispatch(setCutsceneGroupIndex(currentGroupIndex + 1));
-      dispatch(setCutsceneTextIndex(0));
     } else if (currentPartIndex < parts.length - 1) {
       dispatch(setCutscenePartIndex(currentPartIndex + 1));
-      dispatch(setCutsceneGroupIndex(0));
       dispatch(setCutsceneTextIndex(0));
     }
   };
@@ -148,16 +131,30 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const handlePreviousClick = () => {
     if (currentTextIndex > 0) {
       dispatch(setCutsceneTextIndex(currentTextIndex - 1));
-    } else if (currentGroupIndex > 0) {
-      dispatch(setCutsceneGroupIndex(currentGroupIndex - 1));
-      const previousGroup = getTextGroups(parts[currentPartIndex].text)[currentGroupIndex - 1];
-      dispatch(setCutsceneTextIndex(previousGroup.length - 1));
     } else if (currentPartIndex > 0) {
+      const previousPart = parts[currentPartIndex - 1];
       dispatch(setCutscenePartIndex(currentPartIndex - 1));
-      const previousPartGroups = getTextGroups(parts[currentPartIndex - 1].text);
-      dispatch(setCutsceneGroupIndex(previousPartGroups.length - 1));
-      dispatch(setCutsceneTextIndex(previousPartGroups[previousPartGroups.length - 1].length - 1));
+      dispatch(setCutsceneTextIndex(previousPart.text.length - 1));
     }
+  };
+
+  const isAtEnd = () => {
+    if (!parts[currentPartIndex]) return false;
+    
+    const currentPart = parts[currentPartIndex];
+    const isLastPart = currentPartIndex === parts.length - 1;
+    
+    return isLastPart && currentTextIndex === currentPart.text.length - 1;
+  };
+
+  const getCurrentTextsToShow = () => {
+    const currentPart = parts[currentPartIndex];
+    if (!isMobileDisplay) {
+      return currentPart.text.slice(0, currentTextIndex + 1);
+    }
+    
+    const startIndex = Math.floor(currentTextIndex / TEXTS_PER_GROUP) * TEXTS_PER_GROUP;
+    return currentPart.text.slice(startIndex, currentTextIndex + 1);
   };
 
   const textContainerRef = useRef<HTMLDivElement>(null);
@@ -173,7 +170,6 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   }
 
   const parts = currentCutscene.parts;
-  const lastPart = parts[parts.length - 1];
 
   return (
     <>
@@ -189,26 +185,20 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
           ref={textContainerRef}
           className={`CutsceneDisplayer__text-container ${isMobileDisplay ? 'MobileDisplay' : ''}`}
         >
-          {(() => {
-            const currentPart = parts[currentPartIndex];
-            const textGroups = getTextGroups(currentPart.text);
-            const currentGroup = textGroups[currentGroupIndex];
-
-            return currentGroup.slice(0, currentTextIndex + 1).map((textItem, index) => (
-              <div
-                key={`${textItem.content}-${index}`}
-                className={`CutsceneDisplayer__text ${textItem.type}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleContinueClick();
-                }}
-              >
-                <TextFormatterStatic
-                  text={textItem.type === 'description' ? textItem.content : `"${textItem.content}"`}
-                />
-              </div>
-            ));
-          })()}
+          {getCurrentTextsToShow().map((textItem, index) => (
+            <div
+              key={`${textItem.content}-${index}`}
+              className={`CutsceneDisplayer__text ${textItem.type}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleContinueClick();
+              }}
+            >
+              <TextFormatterStatic
+                text={textItem.type === 'description' ? textItem.content : `"${textItem.content}"`}
+              />
+            </div>
+          ))}
         </div>
         <div className="CutsceneDisplayer__buttons">
           <button
@@ -224,15 +214,14 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
             className="CutsceneDisplayer__buttons-right"
             onClick={(e) => {
               e.stopPropagation();
-              if (currentPartIndex < parts.length - 1 || currentTextIndex < parts[currentPartIndex].text.length - 1) {
-                handleContinueClick();
-              } else {
+              if (isAtEnd()) {
                 onEndDisplay();
+              } else {
+                handleContinueClick();
               }
             }}
           >
-            {lastPart.id === parts[currentPartIndex].id &&
-            currentTextIndex === parts[currentPartIndex].text.length - 1 ? (
+            {isAtEnd() ? (
               <p className="CutsceneDisplayer__buttons-right__text">{i18n('go_to_scene')}</p>
             ) : null}
             <IoIosArrowForward />

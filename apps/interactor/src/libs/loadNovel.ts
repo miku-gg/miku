@@ -101,7 +101,6 @@ export async function loadNovelFromSingleCard({
         suggestions: [],
         disabled: false,
         cutscenePartIndex: 0,
-        cutsceneGroupIndex: 0,
         cutsceneTextIndex: 0,
         seenCutscene: false,
       },

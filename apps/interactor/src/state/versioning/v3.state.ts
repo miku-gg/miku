@@ -65,7 +65,6 @@ export interface NarrationState {
     seenCutscene?: boolean;
     cutscenePartIndex: number;
     cutsceneTextIndex: number;
-    cutsceneGroupIndex: number;
     prefillIndicators?: {
       id: string;
       value: string | number;
