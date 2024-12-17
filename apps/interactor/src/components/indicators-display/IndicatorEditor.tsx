@@ -69,13 +69,19 @@ function CheckBoxWithInfo({
 export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel }: IndicatorEditorProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
+  const [animationKey, setAnimationKey] = useState(0);
 
   const handleBack = () => {
+    setDirection('backward');
     setCurrentStep((prev) => Math.max(1, prev - 1));
+    setAnimationKey((prev) => prev + 1);
   };
 
   const handleNext = () => {
+    setDirection('forward');
     setCurrentStep((prev) => Math.min(4, prev + 1));
+    setAnimationKey((prev) => prev + 1);
   };
 
   const handleTypeSelect = (type: 'numeric' | 'discrete') => {
@@ -128,6 +134,36 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel 
       ...indicator,
       [name]: value,
     });
+  };
+
+  const isStepValid = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        return true;
+      case 2:
+        return !!indicator.name.trim() && !!indicator.description.trim() && !!indicator.color;
+      case 3:
+        if (indicator.type === 'discrete') {
+          return (indicator.values?.length || 0) >= 1;
+        } else {
+          const min = Number(indicator.min);
+          const max = Number(indicator.max);
+          const step = Number(indicator.step);
+          return !isNaN(min) && !isNaN(max) && (!indicator.inferred ? !isNaN(step) && step > 0 : true) && max > min;
+        }
+      case 4:
+        if (indicator.type === 'discrete') {
+          // Check if initialValue exists and is in the values array
+          return !!indicator.initialValue && (indicator.values?.includes(indicator.initialValue) || false);
+        } else {
+          const initialValue = Number(indicator.initialValue);
+          const min = Number(indicator.min);
+          const max = Number(indicator.max);
+          return !isNaN(initialValue) && initialValue >= min && initialValue <= max;
+        }
+      default:
+        return false;
+    }
   };
 
   const steps = {
@@ -226,7 +262,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel 
             </div>
           )}
           <div className="IndicatorEditor__actions">
-            <Button theme="secondary" onClick={handleNext}>
+            <Button theme="secondary" onClick={handleNext} disabled={!isStepValid(2)}>
               Continue
             </Button>
           </div>
@@ -253,7 +289,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel 
               />
             </div>
             <div className="IndicatorEditor__actions">
-              <Button theme="secondary" onClick={handleNext}>
+              <Button theme="secondary" onClick={handleNext} disabled={!isStepValid(3)}>
                 Continue
               </Button>
             </div>
@@ -292,7 +328,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel 
               )}
             </div>
             <div className="IndicatorEditor__actions">
-              <Button theme="secondary" onClick={handleNext}>
+              <Button theme="secondary" onClick={handleNext} disabled={!isStepValid(3)}>
                 Continue
               </Button>
             </div>
@@ -353,7 +389,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel 
             <Button theme="transparent" onClick={() => onCancel()}>
               Cancel
             </Button>
-            <Button theme="secondary" onClick={() => onSave({ ...indicator, id: uuidv4() })}>
+            <Button theme="secondary" onClick={() => onSave({ ...indicator, id: uuidv4() })} disabled={!isStepValid(4)}>
               Create Indicator
             </Button>
           </div>
@@ -370,7 +406,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel 
         subtitle={steps[currentStep as keyof typeof steps].subtitle}
         onBack={handleBack}
       />
-      <div className={`IndicatorEditor__step IndicatorEditor__step-${currentStep}`}>
+      <div key={animationKey} className={`IndicatorEditor__step IndicatorEditor__step--${direction}`}>
         {steps[currentStep as keyof typeof steps].content}
       </div>
     </div>

@@ -181,7 +181,13 @@
   }
 
   &__step {
-    animation: slideIn 0.3s ease-out;
+    &--forward {
+      animation: slideInFromRight 0.3s ease-out;
+    }
+
+    &--backward {
+      animation: slideInFromLeft 0.3s ease-out;
+    }
   }
 
   &__type-selection {
@@ -210,10 +216,21 @@
   }
 }
 
-@keyframes slideIn {
+@keyframes slideInFromRight {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
   }
   to {
     opacity: 1;
