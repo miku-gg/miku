@@ -122,8 +122,8 @@ const IndicatorsDisplay = () => {
     if (!currentScene) return;
 
     openModal({
-      title: 'Delete Indicator',
-      description: 'Are you sure you want to delete this indicator?',
+      title: i18n('delete_indicator'),
+      description: i18n('delete_indicator_confirm'),
       yesLabel: 'Delete',
       onYes: () => {
         dispatch(
@@ -151,7 +151,11 @@ const IndicatorsDisplay = () => {
   return (
     <>
       <div ref={containerRef} className={`IndicatorsDisplay ${isOpen ? 'open' : ''} ${isMobileApp ? 'mobile' : ''}`}>
-        <button className="IndicatorsDisplay__toggle" onClick={() => setIsOpen(!isOpen)} title="Toggle Indicators">
+        <button
+          className="IndicatorsDisplay__toggle"
+          onClick={() => setIsOpen(!isOpen)}
+          title={i18n('toggle_indicators')}
+        >
           <GiHeartBeats className={`${isOpen ? 'open' : ''} ${visibleIndicators.length > 0 ? 'has-indicators' : ''}`} />
         </button>
         {visibleIndicators.map((indicator) => {
@@ -221,7 +225,9 @@ const IndicatorsDisplay = () => {
           );
         })}
 
-        {visibleIndicators.length === 0 && <div className="IndicatorsDisplay__no-indicators">No indicators found</div>}
+        {visibleIndicators.length === 0 && (
+          <div className="IndicatorsDisplay__no-indicators">{i18n('no_indicators_found')}</div>
+        )}
 
         {/* Add the "Create Indicator" button at the end */}
         <div className="IndicatorsDisplay__create-indicator">
@@ -273,7 +279,7 @@ const IndicatorsDisplay = () => {
               }}
               disabled={!isIndicatorPrefilled}
             >
-              Discard Changes
+              {i18n('cancel')}
             </Button>
             <Button
               className="IndicatorsDisplay__edit-modal-actions-save"
@@ -282,7 +288,7 @@ const IndicatorsDisplay = () => {
                 setEditingIndicator(null);
               }}
             >
-              Save
+              {i18n('save')}
             </Button>
           </div>
 
@@ -299,7 +305,7 @@ const IndicatorsDisplay = () => {
                   }
                 }}
               >
-                Indicator Settings
+                {i18n('indicator_settings')}
               </Button>
             </div>
           )}

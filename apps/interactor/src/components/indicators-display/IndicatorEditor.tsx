@@ -10,8 +10,7 @@ import { OptionButton } from '../common/OptionButton';
 import { BsThermometerSnow } from 'react-icons/bs';
 //import { LuIdCard } from "react-icons/lu";
 import { GiSkills } from 'react-icons/gi';
-
-// import { GiMedicalThermometer } from 'react-icons/gi';
+import { useI18n } from '../../libs/i18n';
 
 const NUMERIC_TYPE_OPTIONS = [
   {
@@ -72,6 +71,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
   const [animationKey, setAnimationKey] = useState(0);
+  const { i18n } = useI18n();
 
   const handleBack = () => {
     setDirection('backward');
@@ -168,21 +168,20 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
 
   const steps = {
     1: {
-      title: 'Create Indicator',
-      subtitle:
-        'Indicators are used to represent a value in current scene. They help the AI understand make better responses.',
+      title: i18n('create_indicator'),
+      subtitle: i18n('create_indicator_subtitle'),
       content: (
         <div className="IndicatorEditor__type-selection">
           <OptionButton
-            title="Numeric Bar"
-            description="A value that can be represented in a progress bar."
+            title={i18n('numeric_bar')}
+            description={i18n('numeric_bar_description')}
             icon={<BsThermometerSnow />}
             isSelected={false}
             onClick={() => handleTypeSelect('numeric')}
           />
           <OptionButton
-            title="Text Indicator"
-            description="A text that represents a discrete state."
+            title={i18n('text_indicator')}
+            description={i18n('text_indicator_description')}
             icon={<GiSkills />}
             isSelected={false}
             onClick={() => handleTypeSelect('discrete')}
@@ -191,26 +190,26 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
       ),
     },
     2: {
-      title: 'Basic Information',
-      subtitle: 'Set the name and appearance of your indicator',
+      title: i18n('basic_information'),
+      subtitle: i18n('basic_information_subtitle'),
       content: (
         <div className="IndicatorEditor__basic-info">
           <div className="IndicatorEditor__name-row">
             <Input
               className="IndicatorEditor__name-field"
-              label="Name"
+              label={i18n('name')}
               name="name"
               placeHolder={indicator.type === 'discrete' ? "Eg: Elina's teaching style" : "Eg: Elina's drunk level"}
               value={indicator.name}
               onChange={handleInputChange}
               maxLength={50}
-              description="The name of the indicator that will be displayed. Used in the AI prompt."
+              description={i18n('name_description')}
             />
             <div className="IndicatorEditor__color">
               <label>
-                Color
+                {i18n('color')}
                 <IoInformationCircleOutline data-tooltip-id="color-info" className="IndicatorEditor__info-icon" />
-                <Tooltip id="color-info" content="The color used to represent this indicator in the UI" />
+                <Tooltip id="color-info" content={i18n('color_tooltip')} />
               </label>
               <div className="IndicatorEditor__color-controls">
                 <div
@@ -239,7 +238,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
             </div>
           </div>
           <Input
-            label="Description"
+            label={i18n('description')}
             name="description"
             placeHolder={
               indicator.type === 'discrete'
@@ -249,11 +248,11 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
             value={indicator.description}
             onChange={handleInputChange}
             isTextArea
-            description="Explain the AI what this indicator represents."
+            description={i18n('description_description')}
           />
           {indicator.type !== 'discrete' && (
             <div className="IndicatorEditor__type-dropdown">
-              <label>Type</label>
+              <label>{i18n('type')}</label>
               <Dropdown
                 items={NUMERIC_TYPE_OPTIONS}
                 selectedIndex={indicator.type === 'percentage' ? 0 : 1}
@@ -263,23 +262,23 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
           )}
           <div className="IndicatorEditor__actions">
             <Button theme="secondary" onClick={handleNext} disabled={!isStepValid(2)}>
-              Continue
+              {i18n('continue')}
             </Button>
           </div>
         </div>
       ),
     },
     3: {
-      title: 'Configure Values',
-      subtitle: indicator.type === 'discrete' ? 'Define the possible values' : 'Set the range and step size',
+      title: i18n('configure_values'),
+      subtitle: indicator.type === 'discrete' ? i18n('configure_values_discrete') : i18n('configure_values_numeric'),
       content:
         indicator.type === 'discrete' ? (
           <div className="IndicatorEditor__discrete-config">
             <div className="IndicatorEditor__discrete-values">
               <label>
-                Possible Values
+                {i18n('possible_values')}
                 <IoInformationCircleOutline data-tooltip-id="values-info" className="IndicatorEditor__info-icon" />
-                <Tooltip id="values-info" content="The list of possible values this indicator can take" />
+                <Tooltip id="values-info" content={i18n('possible_values_tooltip')} />
               </label>
               <TagAutocomplete
                 tags={[]}
@@ -290,7 +289,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
             </div>
             <div className="IndicatorEditor__actions">
               <Button theme="secondary" onClick={handleNext} disabled={!isStepValid(3)}>
-                Continue
+                {i18n('continue')}
               </Button>
             </div>
           </div>
@@ -299,45 +298,45 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
             <div className="IndicatorEditor__row">
               <div className="IndicatorEditor__number-field">
                 <Input
-                  label="Minimum Value"
+                  label={i18n('minimum_value')}
                   name="min"
                   value={indicator.min?.toString() || '0'}
                   onChange={handleInputChange}
-                  description="The minimum value this indicator can have"
+                  description={i18n('minimum_value_description')}
                 />
               </div>
               <div className="IndicatorEditor__number-field">
                 <Input
-                  label="Maximum Value"
+                  label={i18n('maximum_value')}
                   name="max"
                   value={indicator.max?.toString() || (indicator.type === 'percentage' ? '100' : '1000')}
                   onChange={handleInputChange}
-                  description="The maximum value this indicator can have"
+                  description={i18n('maximum_value_description')}
                 />
               </div>
               {!indicator.inferred && (
                 <div className="IndicatorEditor__number-field">
                   <Input
-                    label="Step"
+                    label={i18n('step')}
                     name="step"
                     value={indicator.step?.toString() || '1'}
                     onChange={handleInputChange}
-                    description="The amount to increase/decrease per response"
+                    description={i18n('step_description')}
                   />
                 </div>
               )}
             </div>
             <div className="IndicatorEditor__actions">
               <Button theme="secondary" onClick={handleNext} disabled={!isStepValid(3)}>
-                Continue
+                {i18n('continue')}
               </Button>
             </div>
           </div>
         ),
     },
     4: {
-      title: 'Final Settings',
-      subtitle: 'Set the initial value and behavior',
+      title: i18n('final_settings'),
+      subtitle: i18n('final_settings_subtitle'),
       content: (
         <div className="IndicatorEditor__final-settings">
           {indicator.type === 'discrete' ? (
@@ -364,7 +363,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
                   data-tooltip-id="initial-value-info"
                   className="IndicatorEditor__info-icon"
                 />
-                <Tooltip id="initial-value-info" content="The starting value for this indicator" />
+                <Tooltip id="initial-value-info" content={i18n('initial_value_tooltip')} />
               </label>
               <Slider
                 continuous
@@ -378,29 +377,29 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
           )}
           <div className="IndicatorEditor__row">
             <CheckBoxWithInfo
-              label="Inferred"
+              label={i18n('inferred')}
               value={indicator.inferred}
               onChange={(e) => onUpdate({ ...indicator, inferred: e.target.checked })}
               disabled={indicator.type === 'discrete'}
-              description="Whether the value is determined by the AI"
+              description={i18n('inferred_description')}
             />
             <CheckBoxWithInfo
-              label="Persistent"
+              label={i18n('persistent')}
               value={indicator.persistent}
               onChange={(e) => onUpdate({ ...indicator, persistent: e.target.checked })}
-              description="Carry this indicator to the next scene"
+              description={i18n('persistent_description')}
             />
           </div>
           <div className="IndicatorEditor__actions">
             <Button theme="transparent" onClick={() => onCancel()}>
-              Cancel
+              {i18n('discard_changes')}
             </Button>
             <Button
               theme="secondary"
               onClick={() => onSave(isEditing ? indicator : { ...indicator, id: uuidv4() })}
               disabled={!isStepValid(4)}
             >
-              {isEditing ? 'Save Changes' : 'Create Indicator'}
+              {isEditing ? i18n('save_changes') : i18n('create_indicator_button')}
             </Button>
           </div>
         </div>
