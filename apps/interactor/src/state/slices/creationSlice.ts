@@ -49,7 +49,6 @@ interface CreationState {
     indicator: {
       opened: boolean;
       item?: NovelIndicator | null;
-      createdIds: string[];
     };
   };
   inference: {
@@ -117,7 +116,6 @@ export const initialState: CreationState = {
     indicator: {
       opened: false,
       item: null,
-      createdIds: [],
     },
   },
   inference: {
@@ -321,12 +319,6 @@ export const creationSlice = createSlice({
     updateIndicator: (state, action: PayloadAction<NovelIndicator>) => {
       state.scene.indicator.item = action.payload;
     },
-    addCreatedIndicatorId: (state, action: PayloadAction<string>) => {
-      state.scene.indicator.createdIds.push(action.payload);
-    },
-    removeCreatedIndicatorId: (state, action: PayloadAction<string>) => {
-      state.scene.indicator.createdIds = state.scene.indicator.createdIds.filter((id) => id !== action.payload);
-    },
   },
 });
 
@@ -350,8 +342,6 @@ export const {
   startInferencingScene,
   endInferencingScene,
   updateIndicator,
-  addCreatedIndicatorId,
-  removeCreatedIndicatorId,
 } = creationSlice.actions;
 
 export default creationSlice.reducer;

@@ -4,7 +4,11 @@ import { selectCurrentIndicators } from '../../state/selectors';
 import './IndicatorsDisplay.scss';
 import { Button, Dropdown, Modal, Slider, Tooltip } from '@mikugg/ui-kit';
 import { GiHeartBeats } from 'react-icons/gi';
-import { setPrefillIndicators } from '../../state/slices/narrationSlice';
+import {
+  setPrefillIndicators,
+  addCreatedIndicatorId,
+  removeCreatedIndicatorId,
+} from '../../state/slices/narrationSlice';
 import { FaPencil, FaPlus, FaTrash } from 'react-icons/fa6';
 import { useI18n } from '../../libs/i18n';
 import classNames from 'classnames';
@@ -13,10 +17,9 @@ import IndicatorEditor from './IndicatorEditor';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { selectCurrentScene } from '../../state/selectors';
 import { NovelIndicator } from '../../state/versioning';
-import { setModalOpened, updateIndicator, addCreatedIndicatorId } from '../../state/slices/creationSlice';
+import { setModalOpened, updateIndicator } from '../../state/slices/creationSlice';
 import { AreYouSure } from '@mikugg/ui-kit';
 import { removeIndicatorFromScene } from '../../state/slices/novelSlice';
-import { removeCreatedIndicatorId } from '../../state/slices/creationSlice';
 import { useAppContext } from '../../App.context';
 
 const IndicatorsDisplay = () => {
@@ -41,13 +44,14 @@ const IndicatorsDisplay = () => {
     currentValue: string | number;
   } | null>(null);
   const { openModal } = AreYouSure.useAreYouSure();
-  const createdIndicatorIds = useAppSelector((state) => state.creation.scene.indicator.createdIds);
+  const createdIndicatorIds = useAppSelector((state) => state.narration.createdIndicatorIds);
 
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const visibleIndicators = indicators.filter((indicator) => !indicator.hidden);
-  const hasReachedLimit = isPremiumUser ? visibleIndicators.length >= 10 : visibleIndicators.length >= 1;
+  const createdIndicatorsCount = createdIndicatorIds?.length || 0;
+  const hasReachedLimit = isPremiumUser ? createdIndicatorsCount >= 10 : createdIndicatorsCount >= 1;
   const limitTooltipText = isPremiumUser
-    ? 'Max number of indicators is 10.'
+    ? 'Max number of custom indicators is 10.'
     : 'Upgrade to premium to add more indicators.';
 
   const [prevIndicators, setPrevIndicators] = useState<Record<string, number | string>>({});
@@ -145,7 +149,7 @@ const IndicatorsDisplay = () => {
                     <FaPencil />
                   </button>
                 )}
-                {createdIndicatorIds.includes(indicator.id) && (
+                {createdIndicatorIds?.includes(indicator.id) && (
                   <button
                     className="IndicatorsDisplay__indicator-delete"
                     disabled={disabled}
@@ -198,7 +202,7 @@ const IndicatorsDisplay = () => {
           >
             <FaPlus />
           </button>
-          {hasReachedLimit && <Tooltip id="indicator-limit-tooltip" place="left" />}
+          {hasReachedLimit && <Tooltip id="indicator-limit-tooltip" place="bottom" />}
         </div>
       </div>
 

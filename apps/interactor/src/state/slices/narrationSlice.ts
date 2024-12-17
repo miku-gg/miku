@@ -23,6 +23,7 @@ const initialState: NarrationState = {
   interactions: {},
   responses: {},
   seenHints: [],
+  createdIndicatorIds: [],
 };
 
 const narrationSlice = createSlice({
@@ -496,6 +497,18 @@ const narrationSlice = createSlice({
     clearPrefillIndicators(state) {
       state.input.prefillIndicators = [];
     },
+    addCreatedIndicatorId: (state, action: PayloadAction<string>) => {
+      if (state.createdIndicatorIds) {
+        state.createdIndicatorIds.push(action.payload);
+      } else {
+        state.createdIndicatorIds = [action.payload];
+      }
+    },
+    removeCreatedIndicatorId: (state, action: PayloadAction<string>) => {
+      if (state.createdIndicatorIds) {
+        state.createdIndicatorIds = state.createdIndicatorIds.filter((id) => id !== action.payload);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -536,6 +549,8 @@ export const {
   setCutsceneTextIndex,
   setPrefillIndicators,
   clearPrefillIndicators,
+  addCreatedIndicatorId,
+  removeCreatedIndicatorId,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;
