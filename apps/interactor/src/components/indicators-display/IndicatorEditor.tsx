@@ -199,7 +199,9 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
               className="IndicatorEditor__name-field"
               label={i18n('name')}
               name="name"
-              placeHolder={indicator.type === 'discrete' ? "Eg: Elina's teaching style" : "Eg: Elina's drunk level"}
+              placeHolder={
+                indicator.type === 'discrete' ? i18n('discrete_name_placeholder') : i18n('numeric_name_placeholder')
+              }
               value={indicator.name}
               onChange={handleInputChange}
               maxLength={50}
@@ -242,8 +244,8 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
             name="description"
             placeHolder={
               indicator.type === 'discrete'
-                ? 'Eg: Indicates the way Elina teaches {{user}}'
-                : 'Eg: Indicates the amount of alcohol Elina has drunk'
+                ? i18n('discrete_description_placeholder')
+                : i18n('numeric_description_placeholder')
             }
             value={indicator.description}
             onChange={handleInputChange}
@@ -341,7 +343,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
         <div className="IndicatorEditor__final-settings">
           {indicator.type === 'discrete' ? (
             <div className="IndicatorEditor__initial-value">
-              <label>Initial Value</label>
+              <label>{i18n('initial_value_label')}</label>
               <Dropdown
                 items={indicator.values?.map((value) => ({ name: value })) || []}
                 selectedIndex={indicator.values ? indicator.values.indexOf(indicator.initialValue) : -1}
@@ -351,14 +353,14 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
                     initialValue: indicator.values?.[index] || '',
                   })
                 }
-                placeholder="Select initial value..."
+                placeholder={i18n('select_initial_value')}
                 disabled={!indicator.values?.length}
               />
             </div>
           ) : (
             <div className="IndicatorEditor__slider-group">
               <label>
-                Initial Value
+                {i18n('initial_value_label')}
                 <IoInformationCircleOutline
                   data-tooltip-id="initial-value-info"
                   className="IndicatorEditor__info-icon"
