@@ -37,6 +37,7 @@ const novelSlice = createSlice({
         characters: { id: string; outfit: string }[];
         music: string;
         children?: string[];
+        indicators?: NovelIndicator[];
       }>,
     ) => {
       if (action.payload.newChars) {
@@ -89,6 +90,7 @@ const novelSlice = createSlice({
         condition: '',
         nsfw: NovelNSFW.NONE,
         parentMapIds: null,
+        indicators: action.payload.indicators || [],
       });
     },
     addChildrenScenes: (state, action: PayloadAction<{ parentId: string; childIds: string[] }>) => {

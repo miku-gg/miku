@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../state/store';
-import { selectCurrentMaps, selectCurrentScene } from '../../state/selectors';
+import { selectCurrentIndicators, selectCurrentMaps, selectCurrentScene } from '../../state/selectors';
 import { GiPathDistance } from 'react-icons/gi';
 import './InteractiveMap.scss';
 import { Button, Modal } from '@mikugg/ui-kit';
@@ -10,6 +10,7 @@ import { interactionStart } from '../../state/slices/narrationSlice';
 import { useAppContext } from '../../App.context';
 import { setModalOpened } from '../../state/slices/creationSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { addIndicatorToScene } from '../../state/slices/novelSlice';
 
 const isTouchScreen = window.navigator.maxTouchPoints > 0;
 
@@ -90,6 +91,7 @@ const InteractiveMapModal = ({
   const dispatch = useAppDispatch();
   const { servicesEndpoint, apiEndpoint, assetLinkLoader } = useAppContext();
   const currentScene = useAppSelector(selectCurrentScene);
+  const currentIndicators = useAppSelector(selectCurrentIndicators);
   const mapBackgroundRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const offScreenCanvasRef = useRef(document.createElement('canvas'));
@@ -257,6 +259,19 @@ const InteractiveMapModal = ({
   const handleGoToScene = () => {
     if (highlightedPlace && scene && highlightedPlace.sceneId !== currentScene?.id) {
       dispatch(setMapModal(false));
+      currentIndicators
+        ?.filter((i) => i.persistent)
+        .forEach((i) => {
+          dispatch(
+            addIndicatorToScene({
+              sceneId: scene.id,
+              indicator: {
+                ...i,
+                initialValue: i.currentValue,
+              },
+            }),
+          );
+        });
       dispatch(
         interactionStart({
           sceneId: scene.id,

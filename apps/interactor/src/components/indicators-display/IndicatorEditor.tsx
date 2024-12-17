@@ -384,6 +384,12 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel 
               disabled={indicator.type === 'discrete'}
               description="Whether the value is determined by the AI"
             />
+            <CheckBoxWithInfo
+              label="Persistent"
+              value={indicator.persistent}
+              onChange={(e) => onUpdate({ ...indicator, persistent: e.target.checked })}
+              description="Carry this indicator to the next scene"
+            />
           </div>
           <div className="IndicatorEditor__actions">
             <Button theme="transparent" onClick={() => onCancel()}>

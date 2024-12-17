@@ -259,4 +259,5 @@ export interface NovelIndicator {
   hidden?: boolean;
   editable?: boolean;
   color?: string;
+  persistent?: boolean;
 }

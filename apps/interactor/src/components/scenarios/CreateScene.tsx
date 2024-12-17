@@ -13,7 +13,7 @@ import { useAppContext } from '../../App.context';
 import { trackEvent } from '../../libs/analytics';
 import { BackgroundResult, CharacterResult, listSearch, SearchType } from '../../libs/listSearch';
 import { loadNovelFromSingleCard } from '../../libs/loadNovel';
-import { selectCurrentScene } from '../../state/selectors';
+import { selectCurrentIndicators, selectCurrentScene } from '../../state/selectors';
 import {
   addImportedBackground,
   addImportedCharacter,
@@ -59,6 +59,7 @@ const CreateScene = () => {
   const songs = useAppSelector((state) =>
     state.novel.songs.filter((song) => state.novel.scenes.find((scene) => scene.musicId === song.id)),
   );
+  const currentIndicators = useAppSelector(selectCurrentIndicators);
 
   const musicList: { name: string; source: string }[] = [
     ...songs.map((song) => ({
@@ -154,6 +155,8 @@ const CreateScene = () => {
         prompt,
         music: _music,
         children: currentScene?.children || [],
+        indicators:
+          currentIndicators?.filter((i) => i.persistent).map((i) => ({ ...i, initialValue: i.currentValue })) || [],
       }),
     );
     dispatch(
