@@ -42,6 +42,7 @@ interface IndicatorEditorProps {
   onUpdate: (indicator: NovelV3.NovelIndicator) => void;
   onSave: (indicator: NovelV3.NovelIndicator) => void;
   onCancel: () => void;
+  isEditing?: boolean;
 }
 
 function CheckBoxWithInfo({
@@ -66,8 +67,8 @@ function CheckBoxWithInfo({
   );
 }
 
-export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel }: IndicatorEditorProps) {
-  const [currentStep, setCurrentStep] = useState(1);
+export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel, isEditing }: IndicatorEditorProps) {
+  const [currentStep, setCurrentStep] = useState(isEditing ? 2 : 1);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
   const [animationKey, setAnimationKey] = useState(0);
@@ -114,9 +115,8 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel 
       max: selectedType === 'discrete' ? undefined : indicator.max,
       // Reset initial value when changing types
       initialValue: '',
-      // Force editable true and hidden false for discrete type
-      editable: selectedType === 'discrete' ? true : indicator.editable,
-      hidden: selectedType === 'discrete' ? false : indicator.hidden,
+      editable: true,
+      hidden: false,
     });
   };
 
@@ -395,8 +395,12 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel 
             <Button theme="transparent" onClick={() => onCancel()}>
               Cancel
             </Button>
-            <Button theme="secondary" onClick={() => onSave({ ...indicator, id: uuidv4() })} disabled={!isStepValid(4)}>
-              Create Indicator
+            <Button
+              theme="secondary"
+              onClick={() => onSave(isEditing ? indicator : { ...indicator, id: uuidv4() })}
+              disabled={!isStepValid(4)}
+            >
+              {isEditing ? 'Save Changes' : 'Create Indicator'}
             </Button>
           </div>
         </div>
@@ -410,7 +414,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel 
         currentStep={currentStep}
         title={steps[currentStep as keyof typeof steps].title}
         subtitle={steps[currentStep as keyof typeof steps].subtitle}
-        onBack={handleBack}
+        onBack={!isEditing ? handleBack : undefined}
       />
       <div key={animationKey} className={`IndicatorEditor__step IndicatorEditor__step--${direction}`}>
         {steps[currentStep as keyof typeof steps].content}

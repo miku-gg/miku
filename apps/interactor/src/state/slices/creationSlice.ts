@@ -1,6 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NovelCharacter, NovelBackground, NovelIndicator } from '../versioning';
 
+export const getEmptyIndicator = (): NovelIndicator => {
+  return {
+    id: '',
+    name: '',
+    description: '',
+    type: 'percentage',
+    color: '#4caf50',
+    initialValue: '',
+    inferred: false,
+    editable: true,
+    hidden: false,
+    persistent: false,
+    min: 0,
+    max: 100,
+  };
+};
+
 interface CreationState {
   importedBackgrounds: NovelBackground[];
   importedCharacters: NovelCharacter[];
@@ -144,6 +161,7 @@ export const creationSlice = createSlice({
           | 'indicator';
         opened: boolean;
         itemId?: string;
+        item?: NovelIndicator;
       }>,
     ) => {
       if (action.payload.id === 'scene') {
@@ -163,23 +181,7 @@ export const creationSlice = createSlice({
         state.scene.scenePreview.sceneId = action.payload.itemId || state.scene.scenePreview.sceneId;
       } else if (action.payload.id === 'indicator') {
         state.scene.indicator.opened = action.payload.opened;
-        state.scene.indicator.item = action.payload.opened
-          ? {
-              id: '',
-              name: '',
-              description: '',
-              type: 'percentage',
-              values: [],
-              initialValue: '0',
-              min: 0,
-              max: 100,
-              step: 1,
-              inferred: false,
-              editable: true,
-              hidden: false,
-              color: '#4CAF50',
-            }
-          : state.scene.indicator.item;
+        state.scene.indicator.item = action.payload.opened ? action.payload.item : getEmptyIndicator();
       } else {
         state.scene[action.payload.id].opened = action.payload.opened;
       }

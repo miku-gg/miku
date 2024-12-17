@@ -4,23 +4,18 @@ import { selectCurrentIndicators } from '../../state/selectors';
 import './IndicatorsDisplay.scss';
 import { Button, Dropdown, Modal, Slider, Tooltip } from '@mikugg/ui-kit';
 import { GiHeartBeats } from 'react-icons/gi';
-import {
-  setPrefillIndicators,
-  addCreatedIndicatorId,
-  removeCreatedIndicatorId,
-} from '../../state/slices/narrationSlice';
+import { setPrefillIndicators, removeCreatedIndicatorId } from '../../state/slices/narrationSlice';
 import { FaPencil, FaPlus, FaTrash } from 'react-icons/fa6';
 import { useI18n } from '../../libs/i18n';
 import classNames from 'classnames';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
-import IndicatorEditor from './IndicatorEditor';
-import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { selectCurrentScene } from '../../state/selectors';
-import { NovelIndicator } from '../../state/versioning';
-import { setModalOpened, updateIndicator } from '../../state/slices/creationSlice';
+import { setModalOpened } from '../../state/slices/creationSlice';
 import { AreYouSure } from '@mikugg/ui-kit';
+import { NovelV3 } from '@mikugg/bot-utils';
 import { removeIndicatorFromScene } from '../../state/slices/novelSlice';
 import { useAppContext } from '../../App.context';
+import CreateIndicator from './CreateIndicator';
 
 const IndicatorsDisplay = () => {
   const dispatch = useAppDispatch();
@@ -29,7 +24,6 @@ const IndicatorsDisplay = () => {
   const prefillIndicators = useAppSelector((state) => state.narration.input.prefillIndicators || []);
   const currentScene = useAppSelector(selectCurrentScene);
   const openIndicatorModal = useAppSelector((state) => state.creation.scene.indicator.opened);
-  const indicatorToCreate = useAppSelector((state) => state.creation.scene.indicator.item);
   const { i18n } = useI18n();
   const fillText = useFillTextTemplateFunction();
   const { isMobileApp } = useAppContext();
@@ -58,6 +52,7 @@ const IndicatorsDisplay = () => {
   const [prevIndicators, setPrevIndicators] = useState<Record<string, number | string>>({});
   const containerRef = useRef<HTMLDivElement>(null);
   const isEditingOrModalOpen = !!editingIndicator || openIndicatorModal;
+  const isIndicatorPrefilled = prefillIndicators.find((m) => m.id === editingIndicator?.id);
 
   useEffect(() => {
     if (disabled) return;
@@ -140,6 +135,17 @@ const IndicatorsDisplay = () => {
         dispatch(removeCreatedIndicatorId(indicatorId));
       },
     });
+  };
+
+  const handleEditIndicatorSchema = (indicator: NovelV3.NovelIndicator) => {
+    dispatch(
+      setModalOpened({
+        id: 'indicator',
+        opened: true,
+        item: indicator,
+      }),
+    );
+    setEditingIndicator(null);
   };
 
   return (
@@ -260,18 +266,18 @@ const IndicatorsDisplay = () => {
           )}
           <div className="IndicatorsDisplay__edit-modal-actions">
             <Button
-              theme="secondary"
+              theme="transparent"
               onClick={() => {
                 setEditingIndicator(null);
                 dispatch(setPrefillIndicators(prefillIndicators.filter((m) => m.id !== editingIndicator?.id)));
               }}
-              disabled={!prefillIndicators.find((m) => m.id === editingIndicator?.id)}
+              disabled={!isIndicatorPrefilled}
             >
               Discard Changes
             </Button>
             <Button
               className="IndicatorsDisplay__edit-modal-actions-save"
-              theme="transparent"
+              theme={isIndicatorPrefilled ? 'secondary' : 'transparent'}
               onClick={() => {
                 setEditingIndicator(null);
               }}
@@ -279,48 +285,29 @@ const IndicatorsDisplay = () => {
               Save
             </Button>
           </div>
+
+          {/* Add edit schema button for custom indicators */}
+          {editingIndicator && createdIndicatorIds?.includes(editingIndicator.id) && (
+            <div className="IndicatorsDisplay__edit-modal-schema">
+              <Button
+                theme="transparent"
+                onClick={() => {
+                  const indicator = indicators.find((i) => i.id === editingIndicator.id);
+                  if (indicator) {
+                    console.log('indicator', indicator);
+                    handleEditIndicatorSchema(indicator);
+                  }
+                }}
+              >
+                Indicator Settings
+              </Button>
+            </div>
+          )}
         </div>
       </Modal>
 
       {/* Add the modal for creating a new indicator */}
-      <Modal
-        opened={openIndicatorModal}
-        onCloseModal={() => dispatch(setModalOpened({ id: 'indicator', opened: false }))}
-        className="IndicatorsDisplay__edit-modal"
-        hideCloseButton={false}
-      >
-        {currentScene && (
-          <IndicatorEditor
-            onUpdate={(newIndicator: NovelIndicator) => {
-              dispatch(updateIndicator(newIndicator));
-            }}
-            indicator={
-              indicatorToCreate || {
-                id: '',
-                name: '',
-                description: '',
-                type: 'percentage',
-                color: '#4caf50',
-                initialValue: '',
-                inferred: false,
-                min: 0,
-                max: 100,
-              }
-            }
-            onSave={(newIndicator: NovelIndicator) => {
-              dispatch(
-                addIndicatorToScene({
-                  sceneId: currentScene.id,
-                  indicator: newIndicator,
-                }),
-              );
-              dispatch(addCreatedIndicatorId(newIndicator.id));
-              dispatch(setModalOpened({ id: 'indicator', opened: false }));
-            }}
-            onCancel={() => dispatch(setModalOpened({ id: 'indicator', opened: false }))}
-          />
-        )}
-      </Modal>
+      <CreateIndicator />
     </>
   );
 };

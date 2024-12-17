@@ -175,6 +175,17 @@
       flex-wrap: wrap;
       gap: 10px;
     }
+
+    &-schema {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: center;
+      .Button {
+        width: 100%;
+      }
+    }
   }
 
   &__create-indicator {
