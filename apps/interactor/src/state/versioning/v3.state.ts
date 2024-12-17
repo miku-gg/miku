@@ -77,6 +77,7 @@ export interface NarrationState {
     [id: string]: NarrationResponse | undefined;
   };
   seenHints?: string[];
+  createdIndicatorIds?: string[];
 }
 
 export interface NovelScene extends NovelV3.NovelScene {}

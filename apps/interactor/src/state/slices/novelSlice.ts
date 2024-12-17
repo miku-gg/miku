@@ -37,6 +37,7 @@ const novelSlice = createSlice({
         characters: { id: string; outfit: string }[];
         music: string;
         children?: string[];
+        indicators?: NovelIndicator[];
       }>,
     ) => {
       if (action.payload.newChars) {
@@ -89,6 +90,7 @@ const novelSlice = createSlice({
         condition: '',
         nsfw: NovelNSFW.NONE,
         parentMapIds: null,
+        indicators: action.payload.indicators || [],
       });
     },
     addChildrenScenes: (state, action: PayloadAction<{ parentId: string; childIds: string[] }>) => {
@@ -116,6 +118,15 @@ const novelSlice = createSlice({
         scene.indicators = scene.indicators.filter((indicator) => indicator.id !== action.payload.indicatorId);
       }
     },
+    updateIndicatorInScene: (state, action: PayloadAction<{ sceneId: string; indicator: NovelIndicator }>) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene && scene.indicators) {
+        const index = scene.indicators.findIndex((ind) => ind.id === action.payload.indicator.id);
+        if (index !== -1) {
+          scene.indicators[index] = action.payload.indicator;
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -126,7 +137,13 @@ const novelSlice = createSlice({
   },
 });
 
-export const { setNovel, addScene, addChildrenScenes, addIndicatorToScene, removeIndicatorFromScene } =
-  novelSlice.actions;
+export const {
+  setNovel,
+  addScene,
+  addChildrenScenes,
+  addIndicatorToScene,
+  removeIndicatorFromScene,
+  updateIndicatorInScene,
+} = novelSlice.actions;
 
 export default novelSlice.reducer;

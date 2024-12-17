@@ -96,6 +96,8 @@ export default function SceneEditModal() {
   };
 
   const handleAddIndicator = () => {
+    if (indicators.length >= 6) return;
+
     const newIndicator: NovelV3.NovelIndicator = {
       id: uuidv4(),
       name: '',
@@ -109,6 +111,7 @@ export default function SceneEditModal() {
       max: 100,
       hidden: false,
       editable: false,
+      persistent: false,
       color: '#4caf50',
     };
     dispatch(addIndicatorToScene({ sceneId: scene?.id || '', indicator: newIndicator }));
@@ -547,9 +550,16 @@ export default function SceneEditModal() {
                   />
                   <Tooltip id="Info-indicators" place="top" />
                 </div>
-                <Button theme="gradient" onClick={handleAddIndicator}>
+                <Button
+                  theme="gradient"
+                  onClick={handleAddIndicator}
+                  disabled={indicators.length >= 6}
+                  data-tooltip-id="add-indicator-tooltip"
+                  data-tooltip-content={indicators.length >= 6 ? 'Maximum of 6 indicators reached' : undefined}
+                >
                   Add Indicator
                 </Button>
+                <Tooltip id="add-indicator-tooltip" place="bottom" />
               </div>
               {indicators.map((indicator) => (
                 <IndicatorEditor
