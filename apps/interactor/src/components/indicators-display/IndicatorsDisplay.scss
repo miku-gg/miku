@@ -48,6 +48,10 @@
       height: 24px;
       color: rgba(255, 255, 255, 0.6);
       transition: transform 0.3s ease-in-out;
+
+      &.has-indicators {
+        animation: heartPulse 2s ease-in-out infinite;
+      }
     }
 
     &:hover {
@@ -234,5 +238,17 @@
       color: #666;
       transition: color 0.2s ease-out;
     }
+  }
+}
+
+@keyframes heartPulse {
+  0% {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  50% {
+    color: #d54155;
+  }
+  100% {
+    color: rgba(255, 255, 255, 0.8);
   }
 }

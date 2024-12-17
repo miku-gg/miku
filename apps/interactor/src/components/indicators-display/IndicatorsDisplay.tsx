@@ -121,7 +121,7 @@ const IndicatorsDisplay = () => {
     <>
       <div className={`IndicatorsDisplay ${isOpen ? 'open' : ''} ${isMobileApp ? 'mobile' : ''}`}>
         <button className="IndicatorsDisplay__toggle" onClick={() => setIsOpen(!isOpen)} title="Toggle Indicators">
-          <GiHeartBeats className={isOpen ? 'open' : ''} />
+          <GiHeartBeats className={`${isOpen ? 'open' : ''} ${visibleIndicators.length > 0 ? 'has-indicators' : ''}`} />
         </button>
         {visibleIndicators.map((indicator) => {
           const prefillValue = prefillIndicators.find((m) => m.id === indicator.id)?.value;
