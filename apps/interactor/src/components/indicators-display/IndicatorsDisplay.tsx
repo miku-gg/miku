@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { selectCurrentIndicators } from '../../state/selectors';
 import './IndicatorsDisplay.scss';
@@ -56,6 +56,8 @@ const IndicatorsDisplay = () => {
     : 'Upgrade to premium to add more indicators.';
 
   const [prevIndicators, setPrevIndicators] = useState<Record<string, number | string>>({});
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isEditingOrModalOpen = !!editingIndicator || openIndicatorModal;
 
   useEffect(() => {
     if (disabled) return;
@@ -80,6 +82,29 @@ const IndicatorsDisplay = () => {
     });
     setPrevIndicators(indicatorValues);
   }, [indicators, disabled]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!containerRef.current) return;
+
+      // Don't close if editing or modal is open
+      if (isEditingOrModalOpen) return;
+
+      // Check if click is outside the container
+      const isOutside = !containerRef.current.contains(event.target as Node);
+
+      // Only close if we're clicking outside and the panel is open
+      if (isOutside && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, isEditingOrModalOpen]);
 
   const handleIndicatorValueChange = (indicatorId: string, value: string | number) => {
     if (!editingIndicator) return;
@@ -119,7 +144,7 @@ const IndicatorsDisplay = () => {
 
   return (
     <>
-      <div className={`IndicatorsDisplay ${isOpen ? 'open' : ''} ${isMobileApp ? 'mobile' : ''}`}>
+      <div ref={containerRef} className={`IndicatorsDisplay ${isOpen ? 'open' : ''} ${isMobileApp ? 'mobile' : ''}`}>
         <button className="IndicatorsDisplay__toggle" onClick={() => setIsOpen(!isOpen)} title="Toggle Indicators">
           <GiHeartBeats className={`${isOpen ? 'open' : ''} ${visibleIndicators.length > 0 ? 'has-indicators' : ''}`} />
         </button>
