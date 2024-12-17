@@ -31,6 +31,18 @@
     }
   }
 
+  &__name-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    .IndicatorEditor__name-field {
+      flex: 10;
+    }
+    .IndicatorEditor__color {
+      flex: 2;
+    }
+  }
+
   &__name-field {
     flex: 2;
     min-width: 203px;
@@ -166,5 +178,45 @@
     input {
       text-align: right;
     }
+  }
+
+  &__step {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  &__type-selection {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    .OptionButton {
+      flex: 1;
+    }
+  }
+
+  &__basic-info,
+  &__discrete-config,
+  &__numeric-config,
+  &__final-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

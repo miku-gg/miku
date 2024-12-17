@@ -249,7 +249,6 @@ const IndicatorsDisplay = () => {
       <Modal
         opened={openIndicatorModal}
         onCloseModal={() => dispatch(setModalOpened({ id: 'indicator', opened: false }))}
-        title="Create Indicator"
         className="IndicatorsDisplay__edit-modal"
         hideCloseButton={false}
       >
@@ -272,7 +271,6 @@ const IndicatorsDisplay = () => {
               }
             }
             onSave={(newIndicator: NovelIndicator) => {
-              // Dispatch action to add the indicator to the current scene
               dispatch(
                 addIndicatorToScene({
                   sceneId: currentScene.id,

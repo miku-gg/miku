@@ -1,0 +1,52 @@
+@import '../../variables';
+
+.OptionButton {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+  border: 1px solid $background-color-light;
+  border-radius: 0.5rem;
+  background-color: $background-color-dark;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+  color: white;
+  height: 200px;
+
+  &--selected {
+    background-color: $secondary-color;
+    border-color: $secondary-color;
+    color: white;
+  }
+
+  &:hover {
+    opacity: 1;
+    box-shadow: 0 0 15px -3px #7c3aed80, 0 4px 6px -2px #7c3aed40;
+    border: 1px solid #9747ff;
+    background-color: #25284b;
+  }
+
+  &__icon {
+    margin-right: 1rem;
+    font-size: 4rem;
+    color: $text-2;
+  }
+
+  &__content {
+    text-align: left;
+
+    .OptionButton__title {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    .OptionButton__description {
+      font-size: 0.9rem;
+      color: #d1d5db;
+      margin: 0.5rem 0 0;
+    }
+  }
+}

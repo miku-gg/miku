@@ -1,0 +1,48 @@
+@import '../../variables';
+
+.StepNavigation {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  &__back {
+    background: none;
+    border: none;
+    color: $text-2;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba($text-2, 0.1);
+      color: $text-1;
+    }
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  &__content {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: $text-1;
+  }
+
+  &__subtitle {
+    font-size: 0.9rem;
+    color: $text-2;
+    margin: 0.5rem 0 0;
+  }
+}
