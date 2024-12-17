@@ -48,7 +48,8 @@ const IndicatorsDisplay = () => {
 
   const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const visibleIndicators = indicators.filter((indicator) => !indicator.hidden);
-  const createdIndicatorsCount = createdIndicatorIds?.length || 0;
+  const createdIndicatorsCount =
+    createdIndicatorIds?.filter((id) => indicators.some((indicator) => indicator.id === id)).length || 0;
   const hasReachedLimit = isPremiumUser ? createdIndicatorsCount >= 10 : createdIndicatorsCount >= 1;
   const limitTooltipText = isPremiumUser
     ? 'Max number of custom indicators is 10.'
