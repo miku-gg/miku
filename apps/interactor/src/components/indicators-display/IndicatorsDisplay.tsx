@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { selectCurrentIndicators } from '../../state/selectors';
 import './IndicatorsDisplay.scss';
-import { Button, Dropdown, Modal, Slider } from '@mikugg/ui-kit';
+import { Button, Dropdown, Modal, Slider, Tooltip } from '@mikugg/ui-kit';
 import { GiHeartBeats } from 'react-icons/gi';
 import { setPrefillIndicators } from '../../state/slices/narrationSlice';
 import { FaPencil, FaPlus, FaTrash } from 'react-icons/fa6';
@@ -43,8 +43,12 @@ const IndicatorsDisplay = () => {
   const { openModal } = AreYouSure.useAreYouSure();
   const createdIndicatorIds = useAppSelector((state) => state.creation.scene.indicator.createdIds);
 
-  // Filter out hidden indicators
+  const isPremiumUser = useAppSelector((state) => state.settings.user.isPremium);
   const visibleIndicators = indicators.filter((indicator) => !indicator.hidden);
+  const hasReachedLimit = isPremiumUser ? visibleIndicators.length >= 10 : visibleIndicators.length >= 1;
+  const limitTooltipText = isPremiumUser
+    ? 'Max number of indicators is 10.'
+    : 'Upgrade to premium to add more indicators.';
 
   const [prevIndicators, setPrevIndicators] = useState<Record<string, number | string>>({});
 
@@ -187,11 +191,14 @@ const IndicatorsDisplay = () => {
         <div className="IndicatorsDisplay__create-indicator">
           <button
             className="IndicatorsDisplay__create-indicator-button"
-            disabled={disabled}
+            disabled={disabled || hasReachedLimit}
             onClick={() => dispatch(setModalOpened({ id: 'indicator', opened: true }))}
+            data-tooltip-id="indicator-limit-tooltip"
+            data-tooltip-content={hasReachedLimit ? limitTooltipText : undefined}
           >
             <FaPlus />
           </button>
+          {hasReachedLimit && <Tooltip id="indicator-limit-tooltip" place="left" />}
         </div>
       </div>
 

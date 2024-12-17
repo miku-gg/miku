@@ -198,6 +198,12 @@
       background-color: #9747ff;
       color: white;
     }
+
+    &:disabled {
+      background-color: rgba(255, 255, 255, 0.1333333333);
+      color: white;
+      opacity: 0.5;
+    }
   }
 
   &__indicator-delete {
