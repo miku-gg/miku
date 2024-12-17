@@ -1,4 +1,5 @@
 import { CharacterBook, EmotionTemplateSlug, MikuCardV2 } from '../MikuCardValidator';
+import { NovelRPG } from './NovelRPG';
 
 export enum NovelNSFW {
   NONE = 0,
@@ -243,6 +244,7 @@ export interface NovelState {
   objectives?: NovelObjective[];
   lorebooks?: NovelLorebook[];
   inventory?: InventoryItem[];
+  rpg: NovelRPG;
 }
 
 export interface NovelIndicator {
