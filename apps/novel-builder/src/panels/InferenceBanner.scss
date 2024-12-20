@@ -39,3 +39,16 @@
     justify-content: flex-end;
   }
 }
+//add media query for width 540px
+@media (max-width: 540px) {
+  .InferenceBanner {
+    &__content {
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+
+    img {
+      width: 100%;
+    }
+  }
+}

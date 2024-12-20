@@ -153,3 +153,23 @@
     }
   }
 }
+
+@media (max-width: 525px) {
+  .StartsPanel {
+    &__item {
+      padding: 6px;
+
+      &-spec {
+        padding: 0;
+      }
+
+      &-docs {
+        padding: 0;
+      }
+    }
+    &__item-prompt-character-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}

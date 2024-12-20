@@ -40,6 +40,19 @@
 
     &__description {
       font-style: italic;
+      text-align: center;
+    }
+  }
+}
+//add media query for witdh 540px
+@media (max-width: 540px) {
+  .HomePanel {
+    &__options {
+      flex-direction: column;
+    }
+
+    &__option {
+      padding: 1rem;
     }
   }
 }

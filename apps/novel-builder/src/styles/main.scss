@@ -69,3 +69,11 @@ a {
   z-index: 999999;
   position: relative;
 }
+
+@media (max-width: 400px) {
+  .app__header {
+    flex-direction: column;
+    font-size: 1.8rem;
+    gap: 10px;
+  }
+}

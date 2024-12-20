@@ -1,4 +1,4 @@
-import { AreYouSure, DragAndDropImages, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import { AreYouSure, Button, DragAndDropImages, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import { HiOutlinePlus } from 'react-icons/hi';
 
 import { FaTrashAlt } from 'react-icons/fa';
@@ -158,7 +158,18 @@ export default function MapEditModal() {
             </div>
           </div>
           <div className="MapEdit__createPlace">
-            <label>Places</label>
+            <div className="MapEdit__createPlace__header">
+              <label>Places</label>
+              <Button
+                onClick={() => {
+                  dispatch(createPlace({ mapId: map.id }));
+                }}
+                theme="gradient"
+                className="MapEdit__createPlace__button"
+              >
+                Add place
+              </Button>
+            </div>
 
             {map?.places.length > 0 && (
               <div className="MapEdit__placesContainer scrollbar">

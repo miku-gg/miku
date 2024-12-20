@@ -133,15 +133,9 @@ export default function BackgroundEditModal() {
             />
           </div>
           {background.source.jpg.length > 0 && selectedTab === 'image' ? (
-            <div
-              className="BackgroundEditModal__background"
-              style={{
-                backgroundImage: `url(${config.genAssetLink(
-                  background.source.jpg,
-                  AssetDisplayPrefix.BACKGROUND_IMAGE,
-                )})`,
-              }}
-            />
+            <div className="BackgroundEditModal__background">
+              <img src={config.genAssetLink(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE)} />
+            </div>
           ) : null}
           {background.source.mp4 && selectedTab === 'video' ? (
             <div className="BackgroundEditModal__video">

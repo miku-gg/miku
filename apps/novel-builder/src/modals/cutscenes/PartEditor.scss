@@ -282,3 +282,11 @@
     }
   }
 }
+//add media query for width 480px
+@media (max-width: 480px) {
+  .PartEditor {
+    &__modal {
+      padding: 8px !important;
+    }
+  }
+}

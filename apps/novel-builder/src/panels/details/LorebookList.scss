@@ -113,3 +113,32 @@
     }
   }
 }
+
+@media (max-width: 582px) {
+  .lorebookList {
+    padding: 8px;
+    &__container {
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .lorebookList {
+    min-width: 0;
+
+    &__container {
+      gap: 6px;
+    }
+    &__box {
+      padding: 0;
+      width: 100%;
+      min-width: 0;
+    }
+
+    &__lorebook {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+}

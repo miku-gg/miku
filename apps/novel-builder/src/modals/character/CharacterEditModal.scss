@@ -8,3 +8,9 @@
     justify-content: space-between;
   }
 }
+// add media query for 580px
+@media (max-width: 981px) {
+  .CharacterEditModal {
+    padding: 8px !important;
+  }
+}

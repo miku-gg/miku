@@ -27,6 +27,7 @@
     display: flex;
     gap: 1rem;
     align-items: baseline;
+    flex-wrap: wrap;
 
     & > * {
       flex: 1;
@@ -35,6 +36,8 @@
 
   &__name-field {
     flex: 2;
+    display: flex;
+    gap: 1rem;
   }
 
   &__type-color {
@@ -165,6 +168,32 @@
 
     input {
       text-align: right;
+    }
+  }
+}
+
+@media (max-width: 825px) {
+  .IndicatorEditor {
+    &__row {
+      flex-direction: column;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    &__type-dropdown {
+      width: 100%;
+    }
+
+    &__name-field {
+      width: 100%;
+
+      .Input {
+        width: 100%;
+      }
+    }
+
+    &__number-field {
+      width: 100%;
     }
   }
 }

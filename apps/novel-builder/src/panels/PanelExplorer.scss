@@ -23,8 +23,57 @@
       gap: 10px;
       margin-bottom: 10px;
 
+      &__tokens {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
       > .ButtonGroup {
         padding: 0;
+      }
+    }
+  }
+}
+//add media query for width 1110px
+@media (max-width: 1110px) {
+  .PanelExplorer {
+    &__header {
+      flex-direction: column-reverse;
+      justify-content: center;
+    }
+    .ButtonGroup {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+}
+//add media query for width 890px
+@media (max-width: 890px) {
+  .PanelExplorer {
+    &__header-left {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  .ButtonGroup {
+    gap: 6px;
+  }
+}
+
+//add media query for width 480px
+@media (max-width: 480px) {
+  .PanelExplorer {
+    &__header-left {
+      .ButtonGroup {
+        & span {
+          display: none;
+        }
+
+        & svg {
+          width: 1.4rem;
+          height: 1.4rem;
+        }
       }
     }
   }

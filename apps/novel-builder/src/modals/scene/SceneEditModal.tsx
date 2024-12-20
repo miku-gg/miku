@@ -342,7 +342,7 @@ export default function SceneEditModal() {
                 </div>
               </div>
               <div className="SceneEditModal__scene-details-row">
-                <div>
+                <div className="SceneEditModal__scene-details-row__prompt">
                   <div className="SceneEditModal__scene-details-row__label">
                     <label className="Input__label">
                       Prompt <IoInformationCircleOutline data-tooltip-id="scene-prompt-tooltip" />

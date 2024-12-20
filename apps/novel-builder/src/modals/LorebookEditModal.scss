@@ -99,3 +99,20 @@
     }
   }
 }
+//add media query for width 580px
+@media (max-width: 580px) {
+  .CharacterLorebooks {
+    &__form-top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    &__entries {
+      &__form {
+        flex-direction: column;
+      }
+    }
+  }
+  .LorebookEditModal {
+    padding: 8px !important;
+  }
+}
