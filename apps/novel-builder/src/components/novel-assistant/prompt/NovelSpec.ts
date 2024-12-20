@@ -1,5 +1,4 @@
 import { NovelV3, validateNovelState } from '@mikugg/bot-utils';
-import { NovelActionType } from '@mikugg/bot-utils/dist/lib/novel/NovelV3';
 
 export interface LoreBookEntry {
   id: string;
@@ -999,23 +998,23 @@ export class NovelManager {
             switch (usageAction.actionType) {
               case 'attach_parent_scene_to_child':
                 return {
-                  type: NovelActionType.ADD_CHILD_SCENES,
+                  type: NovelV3.NovelActionType.ADD_CHILD_SCENES,
                   params: { sceneId: usageAction.parentSceneId || '', children: [usageAction.childSceneId || ''] },
                 };
               case 'suggest_advance_to_scene':
                 return {
-                  type: NovelActionType.SUGGEST_ADVANCE_SCENE,
+                  type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
                   params: { sceneId: usageAction.suggestSceneId || '' },
                 };
               case 'display_item':
                 return {
-                  type: NovelActionType.SHOW_ITEM,
+                  type: NovelV3.NovelActionType.SHOW_ITEM,
                   params: { itemId: usageAction.itemId || '' },
                 };
               case 'hide_item':
               default:
                 return {
-                  type: NovelActionType.HIDE_ITEM,
+                  type: NovelV3.NovelActionType.HIDE_ITEM,
                   params: { itemId: usageAction.itemId || '' },
                 };
             }
@@ -1077,23 +1076,23 @@ export class NovelManager {
               switch (usageAction.actionType) {
                 case 'attach_parent_scene_to_child':
                   return {
-                    type: NovelActionType.ADD_CHILD_SCENES,
+                    type: NovelV3.NovelActionType.ADD_CHILD_SCENES,
                     params: { sceneId: usageAction.parentSceneId || '', children: [usageAction.childSceneId || ''] },
                   };
                 case 'suggest_advance_to_scene':
                   return {
-                    type: NovelActionType.SUGGEST_ADVANCE_SCENE,
+                    type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
                     params: { sceneId: usageAction.suggestSceneId || '' },
                   };
                 case 'display_item':
                   return {
-                    type: NovelActionType.SHOW_ITEM,
+                    type: NovelV3.NovelActionType.SHOW_ITEM,
                     params: { itemId: usageAction.itemId || '' },
                   };
                 case 'hide_item':
                 default:
                   return {
-                    type: NovelActionType.HIDE_ITEM,
+                    type: NovelV3.NovelActionType.HIDE_ITEM,
                     params: { itemId: usageAction.itemId || '' },
                   };
               }
