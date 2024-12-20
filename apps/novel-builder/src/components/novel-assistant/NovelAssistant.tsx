@@ -1,91 +1,145 @@
-import ChatBot, { Params } from 'react-chatbotify';
-import { FaEye } from 'react-icons/fa';
-import OpenAI from 'openai';
-import { ChatCompletionMessageParam } from 'openai/src/resources/index.js';
+import ChatBot, { Button, Params } from 'react-chatbotify';
+import { ChatCompletion, ChatCompletionMessageParam } from 'openai/src/resources/index.js';
+import axios from 'axios';
 
 import './NovelAssistant.scss';
-import systemPrompt from './prompt/systemPrompt';
-import { FunctionRegistry } from './prompt/FunctionDefinitions';
+import { FunctionAction, FunctionRegistry } from './prompt/FunctionDefinitions';
 import { NovelManager } from './prompt/NovelSpec';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { loadCompleteState } from '../../state/slices/novelFormSlice';
 import { useEffect } from 'react';
+import { APIPromise } from 'openai/src/core.js';
+const SERVICES_ENDPOINT = import.meta.env.VITE_SERVICES_ENDPOINT || 'http://localhost:8484';
 
-function AssistantActivityLog(props: { verb: string; subject: string; onNavigate: () => void }): React.ReactNode {
+function getFunctionActionColor(action: FunctionAction): string {
+  switch (action) {
+    case 'created':
+      return 'green';
+    case 'updated':
+      return 'blue';
+    case 'removed':
+      return 'red';
+    case 'connected':
+      return 'yellow';
+    case 'deleted':
+      return 'red';
+  }
+}
+
+function AssistantActivityLog(props: {
+  verb: FunctionAction;
+  subject: string;
+  onNavigate?: () => void;
+  onClick: () => void;
+}): React.ReactNode {
   return (
-    <div className="AssistantActivityLog">
-      Miku <span className="AssistantActivityLog__verb">{props.verb}</span>{' '}
+    <div className="AssistantActivityLog" onClick={props.onClick}>
+      Miku{' '}
+      <span className="AssistantActivityLog__verb" style={{ color: getFunctionActionColor(props.verb) }}>
+        {props.verb}
+      </span>{' '}
       <span className="AssistantActivityLog__subject">{props.subject}</span>
-      <button className="AssistantActivityLog__button" onClick={props.onNavigate}>
+      {/* <button className="AssistantActivityLog__button" onClick={props.onNavigate}>
         <FaEye size={12} />
-      </button>
+      </button> */}
     </div>
   );
 }
-
-// Configure OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
-});
-const model = 'gpt-4o-mini';
 const novelManager = new NovelManager();
 const functionRegistry = new FunctionRegistry(novelManager);
 const functions = functionRegistry.getFunctionDefinitions();
 
 // Load existing history if it exists
-const conversationHistory: ChatCompletionMessageParam[] = [
-  {
-    role: 'system',
-    content: systemPrompt,
-  },
-];
+const conversationHistory: ChatCompletionMessageParam[] = [];
 
 // Load
+
+const callChatCompletion = async (
+  messages: ChatCompletionMessageParam[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tools: any[],
+  parallel_tool_calls: boolean,
+  tool_choice: 'none' | 'auto',
+): Promise<ChatCompletion> => {
+  const response = await axios.post(
+    SERVICES_ENDPOINT + '/openai/chat/completions',
+    {
+      messages,
+      tools,
+      parallel_tool_calls,
+      tool_choice,
+    },
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+
+  if (response.status !== 200) {
+    throw new Error('Failed to get completion from proxy');
+  }
+
+  return response.data;
+};
 
 const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelState) => void) => {
   try {
     conversationHistory.push({ role: 'user', content: params.userInput });
+    console.log(conversationHistory);
 
-    const firstResponse = await openai.chat.completions.create({
-      model: model,
-      messages: conversationHistory,
-      tools: functions.map((fn) => ({ type: 'function', function: fn })),
-      tool_choice: 'auto',
-    });
+    let amountOfCalls = 0;
+    const askResponse = (): Promise<ChatCompletion> =>
+      callChatCompletion(
+        conversationHistory,
+        functions.map((fn) => ({ type: 'function', function: fn })),
+        true,
+        amountOfCalls++ > 15 ? 'none' : 'auto',
+      );
 
-    const firstMessage = firstResponse.choices[0].message;
-    conversationHistory.push(firstMessage);
+    let response;
+    for (response = await askResponse(); response?.choices[0].message?.tool_calls; response = await askResponse()) {
+      const message = response.choices[0].message;
+      conversationHistory.push(message);
+      if (message?.tool_calls) {
+        for (const toolCall of message.tool_calls) {
+          const fnName = toolCall.function.name;
+          const fnArgs = JSON.parse(toolCall.function.arguments || '{}');
 
-    if (firstMessage?.tool_calls) {
-      for (const toolCall of firstMessage.tool_calls) {
-        const fnName = toolCall.function.name;
-        const fnArgs = JSON.parse(toolCall.function.arguments || '{}');
+          const functionResponse = await functionRegistry.executeFunction(fnName, fnArgs);
+          // Add this line to save the novel state after each function execution
+          replaceState(novelManager.getNovelState());
 
-        const functionResponse = await functionRegistry.executeFunction(fnName, fnArgs);
-
-        // Add this line to save the novel state after each function execution
-        replaceState(novelManager.getNovelState());
-
-        conversationHistory.push({
-          role: 'tool',
-          tool_call_id: toolCall.id,
-          content: functionResponse,
-        });
+          conversationHistory.push({
+            role: 'tool',
+            tool_call_id: toolCall.id,
+            content: functionResponse,
+          });
+          const displayData = functionRegistry.getFunctionDisplayData(fnName);
+          if (!functionResponse.toLowerCase().startsWith('error:') && displayData?.isSetter) {
+            const toastData: { id: string | null } = { id: null };
+            toastData.id = await params.showToast(
+              <AssistantActivityLog
+                onClick={() => toastData.id && params.dismissToast(toastData.id)}
+                verb={displayData.action}
+                subject={displayData.subject}
+                onNavigate={() => {}}
+              />,
+              5000,
+            );
+          }
+        }
       }
-
-      const secondResponse = await openai.chat.completions.create({
-        model: model,
-        messages: conversationHistory,
-      });
-
-      const secondMessage = secondResponse.choices[0].message;
-      conversationHistory.push(secondMessage);
-      console.log(secondMessage?.content);
-      await params.injectMessage(secondMessage?.content || '');
-    } else {
-      await params.injectMessage(firstMessage?.content || '');
+      if (message.content) {
+        await params.injectMessage(String(message?.content) || '');
+      }
+    }
+    conversationHistory.push(response.choices[0].message);
+    console.log(conversationHistory);
+    if (response.choices[0].message.content) {
+      await params.injectMessage(String(response.choices[0].message?.content) || '');
     }
   } catch (error) {
     await params.injectMessage('Error: ' + error);
@@ -131,6 +185,13 @@ export default function NovelAssistant() {
         chatInputContainerStyle: {
           backgroundColor: '#1b2142',
         },
+        toastPromptContainerStyle: {
+          backgroundColor: 'transparent',
+          color: 'white',
+          bottom: '73px',
+          opacity: 0.8,
+          textAlign: 'center',
+        },
       }}
       settings={{
         footer: {
@@ -138,9 +199,10 @@ export default function NovelAssistant() {
           text: 'This AI assistant uses GPT-4o to help you create your novel.',
         },
         header: {
-          title: 'Miku Assistant',
+          title: 'MikuGG Assistant',
           avatar: 'https://assets.miku.gg/miku_profile_pic.png',
           showAvatar: true,
+          buttons: [Button.CLOSE_CHAT_BUTTON],
         },
         general: {
           primaryColor: '#ff4e67',
@@ -150,7 +212,7 @@ export default function NovelAssistant() {
           showFooter: false,
         },
         audio: {
-          disabled: false,
+          disabled: true,
         },
         chatHistory: {
           disabled: true,
@@ -161,9 +223,15 @@ export default function NovelAssistant() {
         botBubble: {
           avatar: 'https://assets.miku.gg/miku_profile_pic.png',
           showAvatar: true,
+          simStream: true,
+          animate: true,
         },
         chatButton: {
           icon: 'https://assets.miku.gg/miku_profile_pic.png',
+        },
+        toast: {
+          dismissOnClick: true,
+          maxCount: 6,
         },
       }}
     />

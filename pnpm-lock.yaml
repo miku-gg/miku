@@ -582,6 +582,9 @@ importers:
       multer:
         specifier: 1.4.5-lts.1
         version: 1.4.5-lts.1
+      openai:
+        specifier: ^4.77.0
+        version: 4.77.0
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1
@@ -5145,10 +5148,11 @@ packages:
     resolution: {integrity: sha512-337mDDPdsMfKRLBJkOtb85uukIk95qOXzCnSbus+tYu3bhUq4Xk7d6sSw02xGD4H1Zh71vRnNi3sq/aAMsn70Q==}
     dependencies:
       gpt-tokenizer: 2.1.2
-      openai: 4.19.0
+      openai: 4.77.0
     transitivePeerDependencies:
       - encoding
       - supports-color
+      - zod
     dev: false
 
   /@multiformats/base-x@4.0.1:

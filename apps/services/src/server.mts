@@ -8,6 +8,7 @@ import textHandler, { tokenizeHandler } from './services/text/index.mjs';
 import { TokenizerType, loadTokenizer } from './services/text/lib/tokenize.mjs';
 import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
 import { checkModelsHealth, getModelHealth } from './services/text/lib/healthChecker.mjs';
+import assistantHandler from './services/assistant/index.mjs';
 const PORT = process.env.SERVICES_PORT || 8484;
 
 const app: express.Application = express();
@@ -60,6 +61,8 @@ app.post('/text/tokenize', async (req: Request<string>, res: Response) => {
     }
   }
 });
+
+app.post('/openai/chat/completions', assistantHandler);
 
 app.post('/audio', async (req: Request<string>, res: Response) => {
   try {

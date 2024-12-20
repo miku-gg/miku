@@ -1,4 +1,4 @@
-import { NovelV3 } from '@mikugg/bot-utils';
+import { NovelV3, validateNovelState } from '@mikugg/bot-utils';
 
 export interface LoreBookEntry {
   id: string;
@@ -107,6 +107,22 @@ export class NovelManager {
     return JSON.parse(JSON.stringify(this.novel));
   }
 
+  async getNovelStats(): Promise<string> {
+    const warns = validateNovelState(this.novel);
+    return JSON.stringify({
+      warnings: warns,
+      scenes: this.novel.scenes?.length,
+      characters: this.novel.characters?.length,
+      backgrounds: this.novel.backgrounds?.length,
+      songs: this.novel.songs?.length,
+      maps: this.novel.maps?.length,
+      starts: this.novel.starts?.length,
+      lorebooks: this.novel.lorebooks?.length,
+      inventory: this.novel.inventory?.length,
+      cutscenes: this.novel.cutscenes?.length,
+    });
+  }
+
   async getTitle(): Promise<string> {
     return this.novel.title || 'empty value';
   }
@@ -151,7 +167,7 @@ export class NovelManager {
     } else {
       // Create new lorebook
       if (!name || isGlobal === undefined) {
-        return 'Missing required parameters for new lorebook';
+        return 'Error: missing required parameters for new lorebook';
       }
 
       const newLorebook: NovelV3.NovelLorebook = {
@@ -222,7 +238,7 @@ export class NovelManager {
     } else {
       // Create new entry
       if (!name || !keywords) {
-        return 'Missing required parameters for new entry';
+        return 'Error: missing required parameters for new entry';
       }
 
       const id = Number(getId('entry'));
@@ -354,6 +370,11 @@ export class NovelManager {
       short_description: char.short_description,
       description: char.card.data.description,
       conversation_examples: char.card.data.mes_example,
+      outfits: char.card.data.extensions.mikugg_v2.outfits.map((outfit) => ({
+        id: outfit.id,
+        name: outfit.name,
+        description: outfit.description,
+      })),
       lorebookIds: char.lorebookIds || [],
     }));
 
@@ -451,7 +472,7 @@ export class NovelManager {
 
   async modifyMusicDescription(musicId: string, description: string): Promise<string> {
     const music = this.novel.songs?.find((s) => s.id === musicId);
-    if (!music) return 'Music not found';
+    if (!music) return 'Error: Music not found';
 
     music.description = description;
     return 'Music description updated successfully';
@@ -486,8 +507,8 @@ export class NovelManager {
       emotionId: CharacterEmotion;
       objective?: string;
     }[];
-    background?: string;
-    music?: string;
+    backgroundId?: string;
+    musicId?: string;
     cutscene?: {
       triggerOnlyOnce: boolean;
       parts: {
@@ -495,7 +516,7 @@ export class NovelManager {
           type: 'dialogue' | 'description';
           content: string;
         }[];
-        background: string;
+        backgroundId: string;
         music?: string;
         characters: {
           id: string;
@@ -511,72 +532,67 @@ export class NovelManager {
     const { sceneId, ...sceneData } = params;
 
     if (!sceneId) {
-      // Creating new scene - validate all required fields
-      if (
-        !sceneData.name ||
-        !sceneData.short_description ||
-        !sceneData.prompt ||
-        !sceneData.characters ||
-        !sceneData.background ||
-        !sceneData.music
-      ) {
-        return 'Missing required fields for new scene';
-      }
+      if (!sceneData.name) return 'Error: missing scene name';
+      if (!sceneData.short_description) return 'Error: missing scene short description';
+      if (!sceneData.prompt) return 'Error: missing scene prompt';
+      if (!sceneData.characters) return 'Error: missing scene characters';
+      if (!sceneData.backgroundId) return 'Error: missing scene background';
+      if (!sceneData.musicId) return 'Error: missing scene music';
 
       // Validate characters length
       if (sceneData.characters.length === 0 || sceneData.characters.length > 2) {
-        return 'Scene must have 1 or 2 characters';
+        return 'Error: Scene must have 1 or 2 characters';
       }
 
       // Validate characters exist and their outfits
       for (const char of sceneData.characters) {
         const character = this.novel.characters.find((c) => c.id === char.id);
-        if (!character) return `Character with ID ${char.id} not found`;
+        if (!character) return `Error: Character with ID ${char.id} not found`;
 
         const outfit = character.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === char.outfitId);
         if (!outfit) {
-          return `Outfit with ID ${char.outfitId} not found for character ${char.id}`;
+          return `Error: Outfit with ID ${char.outfitId} not found for character ${char.id}`;
         }
       }
 
       // Validate background exists
-      const bgExists = this.novel.backgrounds.find((bg) => bg.id === sceneData.background);
-      if (!bgExists) return 'Background not found';
+      const bgExists = this.novel.backgrounds.find((bg) => bg.id === sceneData.backgroundId);
+      if (!bgExists) return `Error: Background with ID ${sceneData.backgroundId} not found`;
 
       // Validate music exists
-      const musicExists = this.novel.songs.find((s) => s.id === sceneData.music);
-      if (!musicExists) return 'Music not found';
+      const musicExists = this.novel.songs.find((s) => s.id === sceneData.musicId);
+      if (!musicExists) return `Error: Music with ID ${sceneData.musicId} not found`;
     } else {
       // Updating existing scene - only validate what's being updated
       const existingScene = this.novel.scenes.find((s) => s.id === sceneId);
-      if (!existingScene) return 'Scene not found';
+      if (!existingScene) return `Error: Scene with ID ${sceneId} not found`;
 
       if (sceneData.characters) {
         // Validate characters length
         if (sceneData.characters.length === 0 || sceneData.characters.length > 2) {
-          return 'Scene must have 1 or 2 characters';
+          return 'Error: Scene must have 1 or 2 characters';
         }
 
         // Validate characters and outfits
         for (const char of sceneData.characters) {
           const character = this.novel.characters.find((c) => c.id === char.id);
-          if (!character) return `Character with ID ${char.id} not found`;
+          if (!character) return `Error: Character with ID ${char.id} not found`;
 
           const outfit = character.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === char.outfitId);
           if (!outfit) {
-            return `Outfit with ID ${char.outfitId} not found for character ${char.id}`;
+            return `Error: Outfit with ID ${char.outfitId} not found for character ${char.id}`;
           }
         }
       }
 
-      if (sceneData.background) {
-        const bgExists = this.novel.backgrounds.find((bg) => bg.id === sceneData.background);
-        if (!bgExists) return 'Background not found';
+      if (sceneData.backgroundId) {
+        const bgExists = this.novel.backgrounds.find((bg) => bg.id === sceneData.backgroundId);
+        if (!bgExists) return `Error: Background with ID ${sceneData.backgroundId} not found`;
       }
 
-      if (sceneData.music) {
-        const musicExists = this.novel.songs.find((s) => s.id === sceneData.music);
-        if (!musicExists) return 'Music not found';
+      if (sceneData.musicId) {
+        const musicExists = this.novel.songs.find((s) => s.id === sceneData.musicId);
+        if (!musicExists) return `Error: Music with ID ${sceneData.musicId} not found`;
       }
     }
 
@@ -592,7 +608,7 @@ export class NovelManager {
         parts: sceneData.cutscene.parts.map((part) => ({
           id: getId('cutscene'),
           text: part.text,
-          background: part.background,
+          background: part.backgroundId,
           music: part.music,
           characters: part.characters,
         })),
@@ -614,7 +630,7 @@ export class NovelManager {
     if (sceneId) {
       // Update existing scene - only update provided fields
       const sceneIndex = this.novel.scenes.findIndex((s) => s.id === sceneId);
-      if (sceneIndex === -1) return 'Scene not found';
+      if (sceneIndex === -1) return 'Error: Scene not found';
 
       const existingScene = this.novel.scenes[sceneIndex];
 
@@ -629,11 +645,11 @@ export class NovelManager {
           objective: char.objective,
         }));
       }
-      if (sceneData.background) existingScene.backgroundId = sceneData.background;
-      if (sceneData.music) existingScene.musicId = sceneData.music;
-      if (sceneData.cutscene) {
+      if (sceneData.backgroundId) existingScene.backgroundId = sceneData.backgroundId;
+      if (sceneData.musicId) existingScene.musicId = sceneData.musicId;
+      if (sceneData.cutscene && cutSceneId) {
         existingScene.cutScene = {
-          id: cutSceneId!,
+          id: cutSceneId,
           triggerOnlyOnce: sceneData.cutscene.triggerOnlyOnce,
           triggered: false,
         };
@@ -655,8 +671,8 @@ export class NovelManager {
           outfit: char.outfitId,
           objective: char.objective,
         })),
-        backgroundId: sceneData.background!,
-        musicId: sceneData.music!,
+        backgroundId: sceneData.backgroundId!,
+        musicId: sceneData.musicId!,
         cutScene: cutSceneId
           ? {
               id: cutSceneId,
@@ -693,10 +709,10 @@ export class NovelManager {
 
   async connectScenes(sceneId: string, childSceneId: string): Promise<string> {
     const parentScene = this.novel.scenes.find((s) => s.id === sceneId);
-    if (!parentScene) return 'Parent scene not found';
+    if (!parentScene) return 'Error: Parent scene not found';
 
     const childScene = this.novel.scenes.find((s) => s.id === childSceneId);
-    if (!childScene) return 'Child scene not found';
+    if (!childScene) return 'Error: Child scene not found';
 
     if (!parentScene.children) {
       parentScene.children = [];
@@ -714,7 +730,7 @@ export class NovelManager {
     if (!parentScene) return 'Parent scene not found';
 
     if (!parentScene.children?.includes(childSceneId)) {
-      return 'Scenes are not connected';
+      return 'Error: Scenes are not connected';
     }
 
     parentScene.children = parentScene.children.filter((id) => id !== childSceneId);
@@ -735,13 +751,13 @@ export class NovelManager {
 
     // Validate scene exists
     const scene = this.novel.scenes.find((s) => s.id === sceneId);
-    if (!scene) return 'Scene not found';
+    if (!scene) return 'Error: Scene not found';
 
     // Validate characters exist and emotions
     for (const msg of firstMessages) {
       const character = this.novel.characters.find((c) => c.id === msg.characterId);
       if (!character) {
-        return `Character with ID ${msg.characterId} not found`;
+        return `Error: Character with ID ${msg.characterId} not found`;
       }
     }
 
@@ -768,11 +784,11 @@ export class NovelManager {
 
   async removeStart(startId: string): Promise<string> {
     const initialLength = this.novel.starts?.length || 0;
-    if (!this.novel.starts) return 'Start not found';
+    if (!this.novel.starts) return 'Error: Start not found';
 
     this.novel.starts = this.novel.starts.filter((s) => s.id !== startId);
 
-    return initialLength !== this.novel.starts.length ? 'Start removed successfully' : 'Start not found';
+    return initialLength !== this.novel.starts.length ? 'Start removed successfully' : 'Error: Start not found';
   }
 
   async moveStartAsFirstOption(startId: string): Promise<string> {
@@ -781,8 +797,8 @@ export class NovelManager {
     }
 
     const startIndex = this.novel.starts.findIndex((s) => s.id === startId);
-    if (startIndex === -1) return 'Start not found';
-    if (startIndex === 0) return 'Start is already the first option';
+    if (startIndex === -1) return 'Error: Start not found';
+    if (startIndex === 0) return 'Error: Start is already the first option';
 
     // Remove the start from its current position and insert it at the beginning
     const [start] = this.novel.starts.splice(startIndex, 1);
@@ -791,16 +807,40 @@ export class NovelManager {
     return 'Start moved to first position successfully';
   }
 
-  async updateSceneCutscene(sceneId: string, cutscene: any): Promise<string> {
+  async updateSceneCutscene(
+    sceneId: string,
+    cutscene: {
+      triggerOnlyOnce: boolean;
+      parts: {
+        text: {
+          type: 'dialogue' | 'description';
+          content: string;
+        }[];
+        backgroundId: string;
+        musicId: string;
+        characters: {
+          id: string;
+          outfitId: string;
+          emotionId: CharacterEmotion;
+        }[];
+      }[];
+    },
+  ): Promise<string> {
     const scene = this.novel.scenes.find((s) => s.id === sceneId);
-    if (!scene) return 'Scene not found';
+    if (!scene) return 'Error: Scene not found';
 
     const cutSceneId = scene.cutScene?.id || getId('cutscene');
 
     const cutsceneData = {
       id: cutSceneId,
       name: 'cutscene',
-      parts: cutscene.parts,
+      parts: cutscene.parts.map((part) => ({
+        id: getId('cutscene'),
+        text: part.text,
+        background: part.backgroundId,
+        music: part.musicId,
+        characters: part.characters,
+      })),
     };
 
     if (scene.cutScene) {
@@ -826,7 +866,7 @@ export class NovelManager {
 
   async updateSceneHint(sceneId: string, hint: string): Promise<string> {
     const scene = this.novel.scenes.find((s) => s.id === sceneId);
-    if (!scene) return 'Scene not found';
+    if (!scene) return 'Error: Scene not found';
 
     scene.hint = hint;
     return 'Scene hint updated successfully';
@@ -834,7 +874,7 @@ export class NovelManager {
 
   async updateSceneCondition(sceneId: string, condition: string): Promise<string> {
     const scene = this.novel.scenes.find((s) => s.id === sceneId);
-    if (!scene) return 'Scene not found';
+    if (!scene) return 'Error: Scene not found';
 
     scene.condition = condition;
     return 'Scene condition updated successfully';
@@ -852,11 +892,11 @@ export class NovelManager {
     // Validate characters and outfits
     for (const char of characters) {
       const character = this.novel.characters.find((c) => c.id === char.id);
-      if (!character) return `Character with ID ${char.id} not found`;
+      if (!character) return `Error: Character with ID ${char.id} not found`;
 
       const outfit = character.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === char.outfitId);
       if (!outfit) {
-        return `Outfit with ID ${char.outfitId} not found for character ${char.id}`;
+        return `Error: Outfit with ID ${char.outfitId} not found for character ${char.id}`;
       }
     }
 
@@ -871,10 +911,10 @@ export class NovelManager {
 
   async updateSceneBackground(sceneId: string, backgroundId: string): Promise<string> {
     const scene = this.novel.scenes.find((s) => s.id === sceneId);
-    if (!scene) return 'Scene not found';
+    if (!scene) return 'Error: Scene not found';
 
     const background = this.novel.backgrounds.find((bg) => bg.id === backgroundId);
-    if (!background) return 'Background not found';
+    if (!background) return 'Error: Background not found';
 
     scene.backgroundId = backgroundId;
     return 'Scene background updated successfully';
@@ -882,10 +922,10 @@ export class NovelManager {
 
   async updateSceneMusic(sceneId: string, musicId: string): Promise<string> {
     const scene = this.novel.scenes.find((s) => s.id === sceneId);
-    if (!scene) return 'Scene not found';
+    if (!scene) return 'Error: Scene not found';
 
     const music = this.novel.songs.find((s) => s.id === musicId);
-    if (!music) return 'Music not found';
+    if (!music) return 'Error: Music not found';
 
     scene.musicId = musicId;
     return 'Scene music updated successfully';
@@ -893,7 +933,7 @@ export class NovelManager {
 
   async updateCharacterName(characterId: string, name: string): Promise<string> {
     const character = this.novel.characters.find((c) => c.id === characterId);
-    if (!character) return 'Character not found';
+    if (!character) return 'Error: Character not found';
 
     character.name = name;
     character.card.data.name = name;
@@ -911,10 +951,210 @@ export class NovelManager {
 
   async updateCharacterTags(characterId: string, tags: string[]): Promise<string> {
     const character = this.novel.characters.find((c) => c.id === characterId);
-    if (!character) return 'Character not found';
+    if (!character) return 'Error: Character not found';
 
     character.tags = tags;
     character.card.data.tags = tags;
     return 'Character tags updated successfully';
+  }
+
+  async getScenes(): Promise<string> {
+    return JSON.stringify({
+      amount_of_scenes: this.novel.scenes.length,
+      scenes: this.novel.scenes,
+    });
+  }
+
+  async createItem(args: {
+    name: string;
+    description: string;
+    hidden?: boolean;
+    isPremium?: boolean;
+    isNovelOnly?: boolean;
+  }): Promise<string> {
+    if (!this.novel.inventory) {
+      this.novel.inventory = [];
+    }
+    const itemId = getId('item');
+    this.novel.inventory.push({
+      id: itemId,
+      name: args.name,
+      description: args.description,
+      icon: '',
+      hidden: args.hidden ?? false,
+      isPremium: args.isPremium ?? false,
+      isNovelOnly: args.isNovelOnly ?? true,
+      actions: [
+        {
+          id: getId('itemaction'),
+          name: 'Default Action',
+          prompt: '',
+          usageActions: [],
+        },
+      ],
+    });
+    return `Item created with ID: ${itemId}`;
+  }
+
+  async updateItem(args: {
+    itemId: string;
+    name?: string;
+    description?: string;
+    hidden?: boolean;
+    isPremium?: boolean;
+    isNovelOnly?: boolean;
+  }): Promise<string> {
+    if (!this.novel.inventory) return 'Error: No items in the inventory';
+    const item = this.novel.inventory.find((itm) => itm.id === args.itemId);
+    if (!item) return 'Error: Item not found';
+
+    if (args.name !== undefined) item.name = args.name;
+    if (args.description !== undefined) item.description = args.description;
+    if (args.hidden !== undefined) item.hidden = args.hidden;
+    if (args.isPremium !== undefined) item.isPremium = args.isPremium;
+    if (args.isNovelOnly !== undefined) item.isNovelOnly = args.isNovelOnly;
+
+    return 'Item updated successfully';
+  }
+
+  async removeItem(itemId: string): Promise<string> {
+    if (!this.novel.inventory) return 'Error: No items in the inventory';
+    const initialLength = this.novel.inventory.length;
+    this.novel.inventory = this.novel.inventory.filter((itm) => itm.id !== itemId);
+    return initialLength !== this.novel.inventory.length ? 'Item removed successfully' : 'Error: Item not found';
+  }
+
+  //
+  // OBJECTIVES
+  //
+  async createObjective(args: {
+    name: string;
+    description?: string;
+    hint?: string;
+    condition?: string;
+  }): Promise<string> {
+    if (!this.novel.objectives) {
+      (this.novel as any).objectives = []; // Casting to any to allow new field; or define it in the interface
+    }
+    const newId = getId('objective');
+    (this.novel as any).objectives.push({
+      id: newId,
+      name: args.name,
+      description: args.description || '',
+      hint: args.hint || '',
+      condition: args.condition || '',
+      actions: [],
+      singleUse: true,
+      stateCondition: {
+        type: 'IN_SCENE',
+        config: { sceneIds: [] },
+      },
+    });
+    return `Objective created with ID: ${newId}`;
+  }
+
+  async updateObjective(args: {
+    objectiveId: string;
+    name?: string;
+    description?: string;
+    hint?: string;
+    condition?: string;
+  }): Promise<string> {
+    if (!this.novel.objectives) return 'Error: No objectives in the novel';
+    const objective = (this.novel as any).objectives.find((obj: any) => obj.id === args.objectiveId);
+    if (!objective) return 'Error: Objective not found';
+
+    if (args.name !== undefined) objective.name = args.name;
+    if (args.description !== undefined) objective.description = args.description;
+    if (args.hint !== undefined) objective.hint = args.hint;
+    if (args.condition !== undefined) objective.condition = args.condition;
+
+    return 'Objective updated successfully';
+  }
+
+  async removeObjective(objectiveId: string): Promise<string> {
+    if (!this.novel.objectives) return 'Error: No objectives in the novel';
+    const initialLength = (this.novel as any).objectives.length;
+    (this.novel as any).objectives = (this.novel as any).objectives.filter((obj: any) => obj.id !== objectiveId);
+    return initialLength !== (this.novel as any).objectives.length
+      ? 'Objective removed successfully'
+      : 'Error: Objective not found';
+  }
+
+  //
+  // MAPS
+  //
+  async createMap(args: { name: string; description?: string }): Promise<string> {
+    if (!this.novel.maps) {
+      this.novel.maps = [];
+    }
+    const newId = getId('map');
+    this.novel.maps.push({
+      id: newId,
+      name: args.name,
+      description: args.description || '',
+      source: { png: '' },
+      places: [],
+    });
+    return `Map created with ID: ${newId}`;
+  }
+
+  async updateMap(args: { mapId: string; name?: string; description?: string }): Promise<string> {
+    const map = this.novel.maps?.find((m) => m.id === args.mapId);
+    if (!map) return 'Error: Map not found';
+
+    if (args.name !== undefined) map.name = args.name;
+    if (args.description !== undefined) map.description = args.description;
+
+    return 'Map updated successfully';
+  }
+
+  async removeMap(mapId: string): Promise<string> {
+    const initialLength = this.novel.maps?.length || 0;
+    this.novel.maps = this.novel.maps?.filter((m) => m.id !== mapId);
+    return initialLength !== (this.novel.maps?.length || 0) ? 'Map removed successfully' : 'Error: Map not found';
+  }
+
+  async createMapPlace(args: { mapId: string; name: string; sceneId?: string; description?: string }): Promise<string> {
+    const map = this.novel.maps?.find((m) => m.id === args.mapId);
+    if (!map) return 'Error: Map not found';
+    const newPlaceId = getId('place');
+
+    map.places.push({
+      id: newPlaceId,
+      sceneId: args.sceneId || '',
+      name: args.name,
+      description: args.description || '',
+      previewSource: '',
+      maskSource: '',
+    });
+    return `New place created with ID: ${newPlaceId} in map ${args.mapId}`;
+  }
+
+  async updateMapPlace(args: {
+    mapId: string;
+    placeId: string;
+    name?: string;
+    sceneId?: string;
+    description?: string;
+  }): Promise<string> {
+    const map = this.novel.maps?.find((m) => m.id === args.mapId);
+    if (!map) return 'Error: Map not found';
+    const place = map.places.find((p) => p.id === args.placeId);
+    if (!place) return 'Error: Place not found';
+
+    if (args.name !== undefined) place.name = args.name;
+    if (args.sceneId !== undefined) place.sceneId = args.sceneId;
+    if (args.description !== undefined) place.description = args.description;
+
+    return 'Map place updated successfully';
+  }
+
+  async removeMapPlace(mapId: string, placeId: string): Promise<string> {
+    const map = this.novel.maps?.find((m) => m.id === mapId);
+    if (!map) return 'Error: Map not found';
+    const initialLength = map.places.length;
+    map.places = map.places.filter((p) => p.id !== placeId);
+    return initialLength !== map.places.length ? 'Place removed successfully' : 'Error: Place not found';
   }
 }

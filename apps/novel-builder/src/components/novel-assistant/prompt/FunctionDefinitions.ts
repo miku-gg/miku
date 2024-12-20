@@ -2,6 +2,8 @@ import { CharacterEmotion, NovelManager } from './NovelSpec';
 
 export type FunctionHandler = (...args: any[]) => Promise<string>;
 
+export type FunctionAction = 'created' | 'updated' | 'removed' | 'connected' | 'deleted';
+
 export interface FunctionDefinition {
   name: string;
   description: string;
@@ -11,6 +13,13 @@ export interface FunctionDefinition {
     required?: string[];
   };
   handler: FunctionHandler;
+  displayData:
+    | { isSetter: false }
+    | {
+        isSetter: true;
+        action: FunctionAction;
+        subject: string;
+      };
 }
 
 export class FunctionRegistry {
@@ -30,16 +39,31 @@ export class FunctionRegistry {
   private createFunctionDefinitions(novelManager: NovelManager): FunctionDefinition[] {
     return [
       {
+        name: 'get_novel_validation_state',
+        description: 'Gives information about the current state of the novel and indicates warnings and missing parts',
+        parameters: { type: 'object', properties: {} },
+        handler: () => novelManager.getNovelStats(),
+        displayData: {
+          isSetter: false,
+        },
+      },
+      {
         name: 'get_title',
         description: 'Retrieve the current title of the visual novel',
         parameters: { type: 'object', properties: {} },
         handler: () => novelManager.getTitle(),
+        displayData: {
+          isSetter: false,
+        },
       },
       {
         name: 'get_description',
         description: 'Retrieve the current description of the visual novel.',
         parameters: { type: 'object', properties: {} },
         handler: () => novelManager.getDescription(),
+        displayData: {
+          isSetter: false,
+        },
       },
       {
         name: 'set_title',
@@ -55,6 +79,11 @@ export class FunctionRegistry {
           required: ['title'],
         },
         handler: (args: { title: string }) => novelManager.setTitle(args.title),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'the novel title',
+        },
       },
       {
         name: 'set_description',
@@ -70,12 +99,20 @@ export class FunctionRegistry {
           required: ['description'],
         },
         handler: (args: { description: string }) => novelManager.setDescription(args.description),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'the novel description',
+        },
       },
       {
         name: 'get_lorebooks',
         description: 'Retrieve all lorebooks in the visual novel',
         parameters: { type: 'object', properties: {} },
         handler: () => novelManager.getLoreBooks(),
+        displayData: {
+          isSetter: false,
+        },
       },
       {
         name: 'set_lorebook_details',
@@ -102,6 +139,11 @@ export class FunctionRegistry {
           },
         },
         handler: (args) => novelManager.setLoreBookDetails(args),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'the lorebook details',
+        },
       },
       {
         name: 'add_lorebook_to_scene',
@@ -122,6 +164,11 @@ export class FunctionRegistry {
         },
         handler: (args: { lorebookId: string; sceneId: string }) =>
           novelManager.addLorebookToScene(args.lorebookId, args.sceneId),
+        displayData: {
+          isSetter: true,
+          action: 'connected',
+          subject: 'a lorebook with a scene',
+        },
       },
       {
         name: 'remove_lorebook_from_scene',
@@ -142,6 +189,11 @@ export class FunctionRegistry {
         },
         handler: (args: { lorebookId: string; sceneId: string }) =>
           novelManager.removeLorebookFromScene(args.lorebookId, args.sceneId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a lorebook from a scene',
+        },
       },
       {
         name: 'remove_entry_from_lorebook',
@@ -162,6 +214,11 @@ export class FunctionRegistry {
         },
         handler: (args: { lorebookId: string; entryId: number }) =>
           novelManager.removeEntryFromLorebook(args.lorebookId, args.entryId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'an entry from a lorebook',
+        },
       },
       {
         name: 'set_entry_to_lorebook',
@@ -195,6 +252,11 @@ export class FunctionRegistry {
           required: ['lorebookId'],
         },
         handler: (args) => novelManager.setEntryToLorebook(args),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'an entry in a lorebook',
+        },
       },
       {
         name: 'add_character_basics',
@@ -223,6 +285,11 @@ export class FunctionRegistry {
           required: ['name', 'short_description', 'tags'],
         },
         handler: (args) => novelManager.addCharacterBasics(args),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a character',
+        },
       },
       {
         name: 'set_character_prompts',
@@ -246,6 +313,11 @@ export class FunctionRegistry {
           required: ['characterId', 'description', 'conversation_examples'],
         },
         handler: (args) => novelManager.setCharacterPrompts(args),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a character',
+        },
       },
       {
         name: 'delete_character',
@@ -261,12 +333,20 @@ export class FunctionRegistry {
           required: ['characterId'],
         },
         handler: (args: { characterId: string }) => novelManager.deleteCharacter(args.characterId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a character',
+        },
       },
       {
-        name: 'get_characters',
+        name: 'get_all_characters_in_novel',
         description: 'Retrieve all characters in the visual novel',
         parameters: { type: 'object', properties: {} },
         handler: () => novelManager.getCharacters(),
+        displayData: {
+          isSetter: false,
+        },
       },
       {
         name: 'attach_lorebook_to_character',
@@ -287,6 +367,11 @@ export class FunctionRegistry {
         },
         handler: (args: { characterId: string; lorebookId: string }) =>
           novelManager.attachLorebookToCharacter(args.characterId, args.lorebookId),
+        displayData: {
+          isSetter: true,
+          action: 'connected',
+          subject: 'a lorebook with a character',
+        },
       },
       {
         name: 'detach_lorebook_from_character',
@@ -307,6 +392,11 @@ export class FunctionRegistry {
         },
         handler: (args: { characterId: string; lorebookId: string }) =>
           novelManager.detachLorebookFromCharacter(args.characterId, args.lorebookId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a lorebook from a character',
+        },
       },
       {
         name: 'add_background_from_database',
@@ -322,6 +412,11 @@ export class FunctionRegistry {
           required: ['prompt'],
         },
         handler: (args: { prompt: string }) => novelManager.addBackgroundFromDatabase(args.prompt),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'a background',
+        },
       },
       {
         name: 'modify_background_description',
@@ -342,6 +437,11 @@ export class FunctionRegistry {
         },
         handler: (args: { backgroundId: string; description: string }) =>
           novelManager.modifyBackgroundDescription(args.backgroundId, args.description),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a background description',
+        },
       },
       {
         name: 'remove_background',
@@ -357,12 +457,20 @@ export class FunctionRegistry {
           required: ['backgroundId'],
         },
         handler: (args: { backgroundId: string }) => novelManager.removeBackground(args.backgroundId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a background',
+        },
       },
       {
-        name: 'get_backgrounds',
+        name: 'get_all_backgrounds_in_novel',
         description: 'Retrieve all backgrounds in the visual novel',
         parameters: { type: 'object', properties: {} },
         handler: () => novelManager.getBackgrounds(),
+        displayData: {
+          isSetter: false,
+        },
       },
       {
         name: 'add_music_from_database',
@@ -378,9 +486,14 @@ export class FunctionRegistry {
           required: ['prompt'],
         },
         handler: (args: { prompt: string }) => novelManager.addMusicFromDatabase(args.prompt),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'a music track',
+        },
       },
       {
-        name: 'modify_music_description',
+        name: 'set_music_description',
         description: 'Update the description of an existing music track',
         parameters: {
           type: 'object',
@@ -398,9 +511,14 @@ export class FunctionRegistry {
         },
         handler: (args: { musicId: string; description: string }) =>
           novelManager.modifyMusicDescription(args.musicId, args.description),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a music track description',
+        },
       },
       {
-        name: 'remove_music',
+        name: 'remove_music_from_novel',
         description: 'Remove a music track from the novel',
         parameters: {
           type: 'object',
@@ -413,23 +531,36 @@ export class FunctionRegistry {
           required: ['musicId'],
         },
         handler: (args: { musicId: string }) => novelManager.removeMusic(args.musicId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a music track',
+        },
       },
       {
-        name: 'get_music',
+        name: 'get_all_music_in_novel',
         description: 'Retrieve all music tracks in the visual novel',
         parameters: { type: 'object', properties: {} },
         handler: () => novelManager.getMusic(),
+        displayData: {
+          isSetter: false,
+        },
       },
       {
-        name: 'set_scene_details',
-        description: 'Create a new scene or update an existing one in the visual novel',
+        name: 'get_all_scenes_in_novel',
+        description: 'Retrieve all scenes in the visual novel',
+        parameters: { type: 'object', properties: {} },
+        handler: () => novelManager.getScenes(),
+        displayData: {
+          isSetter: false,
+        },
+      },
+      {
+        name: 'create_scene',
+        description: 'Create a new scene in the visual novel. It requires a background and music already created.',
         parameters: {
           type: 'object',
           properties: {
-            sceneId: {
-              type: 'string',
-              description: 'ID of the scene to update (omit for creating new scene)',
-            },
             name: {
               type: 'string',
               description: 'Name of the scene',
@@ -464,11 +595,11 @@ export class FunctionRegistry {
               },
               description: 'Array of characters in the scene (1-2 characters)',
             },
-            background: {
+            backgroundId: {
               type: 'string',
               description: 'ID of the background to use',
             },
-            music: {
+            musicId: {
               type: 'string',
               description: 'ID of the music track to play',
             },
@@ -498,8 +629,8 @@ export class FunctionRegistry {
                           required: ['type', 'content'],
                         },
                       },
-                      background: { type: 'string' },
-                      music: { type: 'string' },
+                      backgroundId: { type: 'string' },
+                      musicId: { type: 'string' },
                       characters: {
                         type: 'array',
                         items: {
@@ -546,7 +677,7 @@ export class FunctionRegistry {
                         },
                       },
                     },
-                    required: ['text', 'background', 'characters'],
+                    required: ['text', 'backgroundId', 'characters'],
                   },
                 },
               },
@@ -566,9 +697,14 @@ export class FunctionRegistry {
               description: 'Optional button text to trigger the scene',
             },
           },
-          required: ['name', 'short_description', 'prompt', 'characters', 'background', 'music'],
+          required: ['name', 'short_description', 'prompt', 'characters', 'backgroundId', 'musicId'],
         },
         handler: (args) => novelManager.setSceneDetails(args),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'a scene',
+        },
       },
       {
         name: 'remove_scene',
@@ -584,6 +720,11 @@ export class FunctionRegistry {
           required: ['sceneId'],
         },
         handler: (args: { sceneId: string }) => novelManager.removeScene(args.sceneId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a scene',
+        },
       },
       {
         name: 'connect_scenes',
@@ -604,6 +745,11 @@ export class FunctionRegistry {
         },
         handler: (args: { sceneId: string; childSceneId: string }) =>
           novelManager.connectScenes(args.sceneId, args.childSceneId),
+        displayData: {
+          isSetter: true,
+          action: 'connected',
+          subject: 'two scenes',
+        },
       },
       {
         name: 'disconnect_scenes',
@@ -624,6 +770,11 @@ export class FunctionRegistry {
         },
         handler: (args: { sceneId: string; childSceneId: string }) =>
           novelManager.disconnectScenes(args.sceneId, args.childSceneId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a scene connection',
+        },
       },
       {
         name: 'add_start',
@@ -700,6 +851,11 @@ export class FunctionRegistry {
           required: ['sceneId', 'name', 'short_description', 'firstMessages'],
         },
         handler: (args) => novelManager.addStart(args),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'a start point',
+        },
       },
       {
         name: 'remove_start',
@@ -715,6 +871,11 @@ export class FunctionRegistry {
           required: ['startId'],
         },
         handler: (args: { startId: string }) => novelManager.removeStart(args.startId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a start point',
+        },
       },
       {
         name: 'move_start_as_first_option',
@@ -730,10 +891,15 @@ export class FunctionRegistry {
           required: ['startId'],
         },
         handler: (args: { startId: string }) => novelManager.moveStartAsFirstOption(args.startId),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'start point order',
+        },
       },
       {
-        name: 'update_scene_cutscene',
-        description: 'Update only the cutscene of an existing scene',
+        name: 'set_scene_cutscene',
+        description: 'Update the cutscene of an existing scene',
         parameters: {
           type: 'object',
           properties: {
@@ -767,8 +933,8 @@ export class FunctionRegistry {
                           required: ['type', 'content'],
                         },
                       },
-                      background: { type: 'string' },
-                      music: { type: 'string' },
+                      backgroundId: { type: 'string' },
+                      musicId: { type: 'string' },
                       characters: {
                         type: 'array',
                         items: {
@@ -785,7 +951,7 @@ export class FunctionRegistry {
                         },
                       },
                     },
-                    required: ['text', 'background', 'characters'],
+                    required: ['text', 'backgroundId', 'characters'],
                   },
                 },
               },
@@ -795,10 +961,15 @@ export class FunctionRegistry {
           required: ['sceneId', 'cutscene'],
         },
         handler: (args) => novelManager.updateSceneCutscene(args.sceneId, args.cutscene),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a scene cutscene',
+        },
       },
       {
-        name: 'update_scene_hint',
-        description: 'Update only the hint of an existing scene',
+        name: 'set_scene_hint',
+        description: 'Update the hint of an existing scene',
         parameters: {
           type: 'object',
           properties: {
@@ -814,10 +985,15 @@ export class FunctionRegistry {
           required: ['sceneId', 'hint'],
         },
         handler: (args) => novelManager.updateSceneHint(args.sceneId, args.hint),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a scene hint',
+        },
       },
       {
-        name: 'update_scene_condition',
-        description: 'Update only the condition of an existing scene',
+        name: 'set_scene_condition',
+        description: 'Update the condition of an existing scene',
         parameters: {
           type: 'object',
           properties: {
@@ -833,10 +1009,15 @@ export class FunctionRegistry {
           required: ['sceneId', 'condition'],
         },
         handler: (args) => novelManager.updateSceneCondition(args.sceneId, args.condition),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a scene condition',
+        },
       },
       {
-        name: 'update_scene_characters',
-        description: 'Update only the characters in an existing scene',
+        name: 'set_scene_characters',
+        description: 'Update the characters in an existing scene',
         parameters: {
           type: 'object',
           properties: {
@@ -870,10 +1051,15 @@ export class FunctionRegistry {
           required: ['sceneId', 'characters'],
         },
         handler: (args) => novelManager.updateSceneCharacters(args.sceneId, args.characters),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'scene characters',
+        },
       },
       {
-        name: 'update_scene_background',
-        description: 'Update only the background of an existing scene',
+        name: 'set_scene_background',
+        description: 'Update the background of an existing scene',
         parameters: {
           type: 'object',
           properties: {
@@ -889,10 +1075,15 @@ export class FunctionRegistry {
           required: ['sceneId', 'backgroundId'],
         },
         handler: (args) => novelManager.updateSceneBackground(args.sceneId, args.backgroundId),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a scene background',
+        },
       },
       {
-        name: 'update_scene_music',
-        description: 'Update only the music of an existing scene',
+        name: 'set_scene_music',
+        description: 'Update the music of an existing scene',
         parameters: {
           type: 'object',
           properties: {
@@ -908,6 +1099,11 @@ export class FunctionRegistry {
           required: ['sceneId', 'musicId'],
         },
         handler: (args) => novelManager.updateSceneMusic(args.sceneId, args.musicId),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a scene music',
+        },
       },
       {
         name: 'update_character_name',
@@ -927,6 +1123,11 @@ export class FunctionRegistry {
           required: ['characterId', 'name'],
         },
         handler: (args) => novelManager.updateCharacterName(args.characterId, args.name),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a character name',
+        },
       },
       {
         name: 'update_character_short_description',
@@ -946,6 +1147,11 @@ export class FunctionRegistry {
           required: ['characterId', 'shortDescription'],
         },
         handler: (args) => novelManager.updateCharacterShortDescription(args.characterId, args.shortDescription),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a character description',
+        },
       },
       {
         name: 'update_character_tags',
@@ -966,12 +1172,259 @@ export class FunctionRegistry {
           required: ['characterId', 'tags'],
         },
         handler: (args) => novelManager.updateCharacterTags(args.characterId, args.tags),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'character tags',
+        },
+      },
+      {
+        name: 'create_item',
+        description: 'Create a new item in the novel inventory.',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Name of the item' },
+            description: { type: 'string', description: 'Description of the item' },
+            hidden: { type: 'boolean', description: 'Whether the item is hidden from the player by default' },
+            isPremium: { type: 'boolean', description: 'Whether the item is considered premium' },
+            isNovelOnly: { type: 'boolean', description: 'Whether the item is only usable in the current novel' },
+          },
+          required: ['name', 'description'],
+        },
+        handler: (args) => novelManager.createItem(args),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'an item',
+        },
+      },
+      {
+        name: 'update_item',
+        description: 'Update an existing item in the novel inventory.',
+        parameters: {
+          type: 'object',
+          properties: {
+            itemId: { type: 'string', description: 'ID of the item to update' },
+            name: { type: 'string', description: 'New name for the item' },
+            description: { type: 'string', description: 'Updated description' },
+            hidden: { type: 'boolean', description: 'Whether the item is hidden from the player' },
+            isPremium: { type: 'boolean', description: 'Whether the item is considered premium' },
+            isNovelOnly: { type: 'boolean', description: 'Whether the item is only usable in the current novel' },
+          },
+          required: ['itemId'],
+        },
+        handler: (args) => novelManager.updateItem(args),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'an item',
+        },
+      },
+      {
+        name: 'remove_item',
+        description: 'Remove an item from the novel inventory.',
+        parameters: {
+          type: 'object',
+          properties: {
+            itemId: { type: 'string', description: 'ID of the item to remove' },
+          },
+          required: ['itemId'],
+        },
+        handler: (args) => novelManager.removeItem(args.itemId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'an item',
+        },
+      },
+      {
+        name: 'create_objective',
+        description: 'Create a new objective for the novel.',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Name of the objective' },
+            description: { type: 'string', description: 'Short description of the objective' },
+            hint: { type: 'string', description: 'Hint for the player about this objective' },
+            condition: { type: 'string', description: 'Condition prompt that triggers the objective' },
+          },
+          required: ['name'],
+        },
+        handler: (args) => novelManager.createObjective(args),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'an objective',
+        },
+      },
+      {
+        name: 'update_objective',
+        description: 'Update an existing objective in the novel.',
+        parameters: {
+          type: 'object',
+          properties: {
+            objectiveId: { type: 'string', description: 'ID of the objective to update' },
+            name: { type: 'string', description: 'Name of the objective' },
+            description: { type: 'string', description: 'Short description' },
+            hint: { type: 'string', description: 'Hint for the player' },
+            condition: { type: 'string', description: 'Condition prompt that triggers the objective' },
+          },
+          required: ['objectiveId'],
+        },
+        handler: (args) => novelManager.updateObjective(args),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'an objective',
+        },
+      },
+      {
+        name: 'remove_objective',
+        description: 'Remove an objective from the novel.',
+        parameters: {
+          type: 'object',
+          properties: {
+            objectiveId: { type: 'string', description: 'ID of the objective to remove' },
+          },
+          required: ['objectiveId'],
+        },
+        handler: (args) => novelManager.removeObjective(args.objectiveId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'an objective',
+        },
+      },
+      {
+        name: 'create_map',
+        description: 'Create a new map for the novel.',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Name of the map' },
+            description: { type: 'string', description: 'Short description of the map' },
+          },
+          required: ['name'],
+        },
+        handler: (args) => novelManager.createMap(args),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'a map',
+        },
+      },
+      {
+        name: 'update_map',
+        description: 'Update an existing map in the novel.',
+        parameters: {
+          type: 'object',
+          properties: {
+            mapId: { type: 'string', description: 'ID of the map to update' },
+            name: { type: 'string', description: 'New name for the map' },
+            description: { type: 'string', description: 'Updated description' },
+          },
+          required: ['mapId'],
+        },
+        handler: (args) => novelManager.updateMap(args),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a map',
+        },
+      },
+      {
+        name: 'remove_map',
+        description: 'Remove a map from the novel.',
+        parameters: {
+          type: 'object',
+          properties: {
+            mapId: { type: 'string', description: 'ID of the map to remove' },
+          },
+          required: ['mapId'],
+        },
+        handler: (args) => novelManager.removeMap(args.mapId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a map',
+        },
+      },
+      {
+        name: 'create_map_place',
+        description: 'Create a new place in an existing map.',
+        parameters: {
+          type: 'object',
+          properties: {
+            mapId: { type: 'string', description: 'ID of the map to create the place in' },
+            name: { type: 'string', description: 'Name of the place' },
+            sceneId: { type: 'string', description: 'If associated with a scene, specify its ID' },
+            description: { type: 'string', description: 'Short description of the place' },
+          },
+          required: ['mapId', 'name'],
+        },
+        handler: (args) => novelManager.createMapPlace(args),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'a map place',
+        },
+      },
+      {
+        name: 'update_map_place',
+        description: 'Update a place in an existing map.',
+        parameters: {
+          type: 'object',
+          properties: {
+            mapId: { type: 'string', description: 'ID of the map containing the place' },
+            placeId: { type: 'string', description: 'ID of the place to update' },
+            name: { type: 'string', description: 'New name for the place' },
+            sceneId: { type: 'string', description: 'Associated scene ID if any' },
+            description: { type: 'string', description: 'Updated place description' },
+          },
+          required: ['mapId', 'placeId'],
+        },
+        handler: (args) => novelManager.updateMapPlace(args),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a map place',
+        },
+      },
+      {
+        name: 'remove_map_place',
+        description: 'Remove a place from an existing map.',
+        parameters: {
+          type: 'object',
+          properties: {
+            mapId: { type: 'string', description: 'ID of the map containing the place' },
+            placeId: { type: 'string', description: 'ID of the place to remove' },
+          },
+          required: ['mapId', 'placeId'],
+        },
+        handler: (args) => novelManager.removeMapPlace(args.mapId, args.placeId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a place from a map',
+        },
       },
     ];
   }
 
   getFunctionDefinitions(): FunctionDefinition[] {
     return this.functionDefinitions;
+  }
+
+  getFunctionDisplayData(name: string):
+    | { isSetter: false }
+    | {
+        isSetter: true;
+        action: FunctionAction;
+        subject: string;
+      }
+    | null {
+    return this.functionDefinitions.find((fn) => fn.name === name)?.displayData || null;
   }
 
   async executeFunction(name: string, args: any): Promise<string> {
