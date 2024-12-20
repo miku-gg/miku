@@ -1,0 +1,14 @@
+@import '../../styles/variables';
+
+.AssistantActivityLog {
+  font-style: italic;
+  padding: 1rem;
+
+  &__verb {
+    color: $secondary-color;
+  }
+
+  &__button {
+    color: $text-1;
+  }
+}
