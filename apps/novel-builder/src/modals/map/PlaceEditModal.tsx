@@ -269,6 +269,7 @@ export default function PlaceEditModal() {
             />
             <DragAndDropImages
               placeHolder="Add a Preview Image"
+              size="md"
               previewImage={
                 place.previewSource
                   ? config.genAssetLink(
