@@ -56,6 +56,9 @@
       align-items: center;
     }
   }
+  .ButtonGroup {
+    gap: 6px;
+  }
 }
 
 //add media query for width 480px
@@ -63,7 +66,6 @@
   .PanelExplorer {
     &__header-left {
       .ButtonGroup {
-        gap: 8px;
         & span {
           display: none;
         }

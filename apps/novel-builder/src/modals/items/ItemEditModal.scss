@@ -178,3 +178,22 @@
     }
   }
 }
+@media (max-width: 540px) {
+  .ItemEdit {
+    &__actionList {
+      flex-direction: column;
+
+      &__action {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 440px) {
+  .ItemEdit {
+    &__form {
+      flex-direction: column;
+    }
+  }
+}
