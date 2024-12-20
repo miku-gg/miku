@@ -101,3 +101,18 @@
     }
   }
 }
+// add media query for width 480px
+@media (max-width: 480px) {
+  .NovelObjectives {
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    &__container {
+      flex-wrap: wrap;
+      &__box {
+        min-width: 100%;
+      }
+    }
+  }
+}

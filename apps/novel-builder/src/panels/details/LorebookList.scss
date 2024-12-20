@@ -114,27 +114,21 @@
   }
 }
 
-//add media query for width 582px
 @media (max-width: 582px) {
   .lorebookList {
-    padding: 4px;
+    padding: 8px;
     &__container {
       justify-content: center;
     }
   }
 }
 
-//add media query for width 480px
 @media (max-width: 400px) {
   .lorebookList {
     min-width: 0;
 
-    &__header {
-      flex-direction: column;
-      align-items: center;
-    }
     &__container {
-      gap: 4px;
+      gap: 6px;
     }
     &__box {
       padding: 0;
