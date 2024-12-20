@@ -1187,8 +1187,45 @@ export class FunctionRegistry {
             name: { type: 'string', description: 'Name of the item' },
             description: { type: 'string', description: 'Description of the item' },
             hidden: { type: 'boolean', description: 'Whether the item is hidden from the player by default' },
-            isPremium: { type: 'boolean', description: 'Whether the item is considered premium' },
-            isNovelOnly: { type: 'boolean', description: 'Whether the item is only usable in the current novel' },
+            scenes: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'List of scenes where the item can be used. Empty for every scene.',
+            },
+            actions: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string', description: 'Name of the action' },
+                  prompt: { type: 'string', description: 'Prompt for the action' },
+                  usageActions: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        actionType: {
+                          type: 'string',
+                          enum: [
+                            'attach_parent_scene_to_child',
+                            'suggest_advance_to_scene',
+                            'display_item',
+                            'hide_item',
+                          ],
+                          description: 'Type of the action',
+                        },
+                        suggestSceneId: { type: 'string', description: 'ID of the scene to suggest to the player' },
+                        itemId: { type: 'string', description: 'ID of the item to add' },
+                        parentSceneId: { type: 'string', description: 'ID of the parent scene' },
+                        childSceneId: { type: 'string', description: 'ID of the child scene' },
+                      },
+                      required: ['actionType'],
+                    },
+                    description: 'List of actions that can be used to trigger this item. Optional.',
+                  },
+                },
+              },
+            },
           },
           required: ['name', 'description'],
         },
@@ -1209,8 +1246,45 @@ export class FunctionRegistry {
             name: { type: 'string', description: 'New name for the item' },
             description: { type: 'string', description: 'Updated description' },
             hidden: { type: 'boolean', description: 'Whether the item is hidden from the player' },
-            isPremium: { type: 'boolean', description: 'Whether the item is considered premium' },
-            isNovelOnly: { type: 'boolean', description: 'Whether the item is only usable in the current novel' },
+            scenes: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'List of scenes where the item can be used. Empty for every scene.',
+            },
+            actions: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string', description: 'Name of the action' },
+                  prompt: { type: 'string', description: 'Prompt for the action' },
+                  usageActions: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        actionType: {
+                          type: 'string',
+                          enum: [
+                            'attach_parent_scene_to_child',
+                            'suggest_advance_to_scene',
+                            'display_item',
+                            'hide_item',
+                          ],
+                          description: 'Type of the action',
+                        },
+                        suggestSceneId: { type: 'string', description: 'ID of the scene to suggest to the player' },
+                        itemId: { type: 'string', description: 'ID of the item to add' },
+                        parentSceneId: { type: 'string', description: 'ID of the parent scene' },
+                        childSceneId: { type: 'string', description: 'ID of the child scene' },
+                      },
+                      required: ['actionType'],
+                    },
+                    description: 'List of actions that can be used to trigger this item. Optional.',
+                  },
+                },
+              },
+            },
           },
           required: ['itemId'],
         },
@@ -1407,6 +1481,257 @@ export class FunctionRegistry {
           isSetter: true,
           action: 'removed',
           subject: 'a place from a map',
+        },
+      },
+      {
+        name: 'create_scene_indicator',
+        description: 'Attach a new indicator to a scene',
+        parameters: {
+          type: 'object',
+          properties: {
+            sceneId: { type: 'string', description: 'ID of the scene to receive the indicator' },
+            name: { type: 'string', description: 'Indicator name' },
+            description: { type: 'string', description: 'Indicator purpose or context' },
+            type: {
+              type: 'string',
+              description: 'Indicator type: percentage, amount or discrete',
+              enum: ['percentage', 'amount', 'discrete'],
+            },
+            values: {
+              type: 'array',
+              description: 'Valid only for discrete indicators. List of possible states',
+              items: { type: 'string' },
+            },
+            initialValue: {
+              type: 'string',
+              description: 'Default or starting value of the indicator',
+            },
+            inferred: {
+              type: 'boolean',
+              description: 'If true, the system will set the indicator value automatically',
+            },
+            step: {
+              type: 'number',
+              description: 'Step used to increment or decrement the indicator if not inferred',
+            },
+            min: {
+              type: 'number',
+              description: 'Minimum range for amounts or percentages',
+            },
+            max: {
+              type: 'number',
+              description: 'Maximum range for amounts or percentages',
+            },
+            hidden: {
+              type: 'boolean',
+              description: 'Whether the indicator is hidden from the player',
+            },
+            editable: {
+              type: 'boolean',
+              description: 'Whether the player can change this indicator in-game',
+            },
+            color: {
+              type: 'string',
+              description: 'Color for the indicator, e.g. #4CAF50',
+            },
+          },
+          required: ['sceneId', 'name', 'type', 'initialValue'],
+        },
+        handler: (args) => novelManager.addIndicatorToScene(args),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'a scene indicator',
+        },
+      },
+      {
+        name: 'update_scene_indicator',
+        description: 'Update an existing indicator in a scene',
+        parameters: {
+          type: 'object',
+          properties: {
+            sceneId: { type: 'string', description: 'ID of the scene containing the indicator' },
+            indicatorId: { type: 'string', description: 'ID of the indicator to update' },
+            name: { type: 'string', description: 'Updated indicator name' },
+            description: { type: 'string', description: 'Updated indicator purpose or context' },
+            type: {
+              type: 'string',
+              description: 'Indicator type: percentage, amount or discrete',
+              enum: ['percentage', 'amount', 'discrete'],
+            },
+            values: {
+              type: 'array',
+              description: 'Valid only for discrete indicators. List of possible states',
+              items: { type: 'string' },
+            },
+            initialValue: { type: 'string', description: 'Updated default or current value' },
+            inferred: { type: 'boolean', description: 'If true, the system sets the value automatically' },
+            step: { type: 'number', description: 'Step for increment/decrement' },
+            min: { type: 'number', description: 'Minimum range' },
+            max: { type: 'number', description: 'Maximum range' },
+            hidden: { type: 'boolean', description: 'Whether the indicator is hidden' },
+            editable: { type: 'boolean', description: 'Whether the player can change this indicator' },
+            color: { type: 'string', description: 'Color (hex) for the indicator' },
+          },
+          required: ['sceneId', 'indicatorId'],
+        },
+        handler: (args) => novelManager.updateIndicatorInScene(args),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'a scene indicator',
+        },
+      },
+      {
+        name: 'remove_scene_indicator',
+        description: 'Remove an indicator from a scene',
+        parameters: {
+          type: 'object',
+          properties: {
+            sceneId: { type: 'string', description: 'ID of the scene containing the indicator' },
+            indicatorId: { type: 'string', description: 'ID of the indicator to remove' },
+          },
+          required: ['sceneId', 'indicatorId'],
+        },
+        handler: (args) => novelManager.removeIndicatorFromScene(args.sceneId, args.indicatorId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'a scene indicator',
+        },
+      },
+      {
+        name: 'get_objectives_in_scene',
+        description: 'Retrieve all objectives in a specific scene',
+        parameters: {
+          type: 'object',
+          properties: {
+            sceneId: { type: 'string', description: 'ID of the scene to list objectives from' },
+          },
+          required: ['sceneId'],
+        },
+        handler: (args) => novelManager.getObjectivesInScene(args.sceneId),
+        displayData: {
+          isSetter: false,
+        },
+      },
+      {
+        name: 'get_items',
+        description: 'Retrieve all items in the novel inventory',
+        parameters: { type: 'object', properties: {} },
+        handler: () => novelManager.getItems(),
+        displayData: {
+          isSetter: false,
+        },
+      },
+      {
+        name: 'get_indicators_in_scene',
+        description: 'Retrieve the indicators associated with a particular scene',
+        parameters: {
+          type: 'object',
+          properties: {
+            sceneId: { type: 'string', description: 'ID of the scene' },
+          },
+          required: ['sceneId'],
+        },
+        handler: (args) => novelManager.getIndicatorsInScene(args.sceneId),
+        displayData: {
+          isSetter: false,
+        },
+      },
+      {
+        name: 'create_objective',
+        description: 'Create a new objective and attach it to a given scene.',
+        parameters: {
+          type: 'object',
+          properties: {
+            sceneId: { type: 'string', description: 'ID of the scene to attach this objective' },
+            name: { type: 'string', description: 'Name of the objective' },
+            description: { type: 'string', description: 'Short description of the objective' },
+            hint: { type: 'string', description: 'Hint for the player about this objective' },
+            condition: { type: 'string', description: 'Condition prompt that triggers the objective' },
+          },
+          required: ['sceneId', 'name'],
+        },
+        handler: (args) => novelManager.createObjective(args),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'an objective',
+        },
+      },
+      {
+        name: 'update_objective',
+        description: 'Update an existing objective in a specific scene.',
+        parameters: {
+          type: 'object',
+          properties: {
+            sceneId: { type: 'string', description: 'ID of the scene containing the objective' },
+            objectiveId: { type: 'string', description: 'ID of the objective to update' },
+            name: { type: 'string', description: 'Name of the objective' },
+            description: { type: 'string', description: 'Short description' },
+            hint: { type: 'string', description: 'Hint for the player' },
+            condition: { type: 'string', description: 'Condition prompt that triggers the objective' },
+          },
+          required: ['sceneId', 'objectiveId'],
+        },
+        handler: (args) => novelManager.updateObjective(args),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'an objective',
+        },
+      },
+      {
+        name: 'remove_objective',
+        description: 'Remove an objective from a specific scene.',
+        parameters: {
+          type: 'object',
+          properties: {
+            sceneId: { type: 'string', description: 'ID of the scene that has the objective' },
+            objectiveId: { type: 'string', description: 'ID of the objective to remove' },
+          },
+          required: ['sceneId', 'objectiveId'],
+        },
+        handler: (args) => novelManager.removeObjective(args.objectiveId),
+        displayData: {
+          isSetter: true,
+          action: 'removed',
+          subject: 'an objective',
+        },
+      },
+      {
+        name: 'get_maps',
+        description: 'Retrieve all maps in the novel',
+        parameters: {
+          type: 'object',
+          properties: {},
+        },
+        handler: () => novelManager.getMaps(),
+        displayData: {
+          isSetter: false,
+        },
+      },
+      {
+        name: 'set_map_scenes',
+        description: 'Define a list of scene IDs where the map is accessible or visible',
+        parameters: {
+          type: 'object',
+          properties: {
+            mapId: { type: 'string', description: 'ID of the map to attach to scenes' },
+            sceneIds: {
+              type: 'array',
+              description: 'List of scene IDs where the map is visible',
+              items: { type: 'string' },
+            },
+          },
+          required: ['mapId', 'sceneIds'],
+        },
+        handler: (args) => novelManager.setMapScenes(args.mapId, args.sceneIds),
+        displayData: {
+          isSetter: true,
+          action: 'updated',
+          subject: 'the scenes that have a map',
         },
       },
     ];

@@ -1,4 +1,5 @@
 import { NovelV3, validateNovelState } from '@mikugg/bot-utils';
+import { NovelActionType } from '@mikugg/bot-utils/dist/lib/novel/NovelV3';
 
 export interface LoreBookEntry {
   id: string;
@@ -969,30 +970,71 @@ export class NovelManager {
     name: string;
     description: string;
     hidden?: boolean;
-    isPremium?: boolean;
-    isNovelOnly?: boolean;
+    scenes?: string[];
+    actions?: {
+      name: string;
+      prompt: string;
+      usageActions?: {
+        actionType: 'attach_parent_scene_to_child' | 'suggest_advance_to_scene' | 'display_item' | 'hide_item';
+        suggestSceneId?: string;
+        itemId?: string;
+        parentSceneId?: string;
+        childSceneId?: string;
+      }[];
+    }[];
   }): Promise<string> {
     if (!this.novel.inventory) {
       this.novel.inventory = [];
     }
     const itemId = getId('item');
+
+    // Convert item actions (if provided)
+    const itemActions: NovelV3.InventoryAction[] =
+      args.actions?.map((action) => ({
+        id: getId('itemaction'),
+        name: action.name,
+        prompt: action.prompt,
+        usageActions:
+          action.usageActions?.map((usageAction) => {
+            switch (usageAction.actionType) {
+              case 'attach_parent_scene_to_child':
+                return {
+                  type: NovelActionType.ADD_CHILD_SCENES,
+                  params: { sceneId: usageAction.parentSceneId || '', children: [usageAction.childSceneId || ''] },
+                };
+              case 'suggest_advance_to_scene':
+                return {
+                  type: NovelActionType.SUGGEST_ADVANCE_SCENE,
+                  params: { sceneId: usageAction.suggestSceneId || '' },
+                };
+              case 'display_item':
+                return {
+                  type: NovelActionType.SHOW_ITEM,
+                  params: { itemId: usageAction.itemId || '' },
+                };
+              case 'hide_item':
+              default:
+                return {
+                  type: NovelActionType.HIDE_ITEM,
+                  params: { itemId: usageAction.itemId || '' },
+                };
+            }
+          }) || [],
+      })) || [];
+
+    // Create and store the item
     this.novel.inventory.push({
       id: itemId,
       name: args.name,
       description: args.description,
       icon: '',
       hidden: args.hidden ?? false,
-      isPremium: args.isPremium ?? false,
-      isNovelOnly: args.isNovelOnly ?? true,
-      actions: [
-        {
-          id: getId('itemaction'),
-          name: 'Default Action',
-          prompt: '',
-          usageActions: [],
-        },
-      ],
+      actions: itemActions.map((action) => ({
+        ...action,
+        usageCondition: args.scenes?.length ? { type: 'IN_SCENE', config: { sceneIds: args.scenes } } : undefined,
+      })),
     });
+
     return `Item created with ID: ${itemId}`;
   }
 
@@ -1001,18 +1043,70 @@ export class NovelManager {
     name?: string;
     description?: string;
     hidden?: boolean;
-    isPremium?: boolean;
-    isNovelOnly?: boolean;
+    scenes?: string[];
+    actions?: {
+      name: string;
+      prompt: string;
+      usageActions?: {
+        actionType: 'attach_parent_scene_to_child' | 'suggest_advance_to_scene' | 'display_item' | 'hide_item';
+        suggestSceneId?: string;
+        itemId?: string;
+        parentSceneId?: string;
+        childSceneId?: string;
+      }[];
+    }[];
   }): Promise<string> {
     if (!this.novel.inventory) return 'Error: No items in the inventory';
+
     const item = this.novel.inventory.find((itm) => itm.id === args.itemId);
     if (!item) return 'Error: Item not found';
 
+    // Update fields only if present in args
     if (args.name !== undefined) item.name = args.name;
     if (args.description !== undefined) item.description = args.description;
     if (args.hidden !== undefined) item.hidden = args.hidden;
-    if (args.isPremium !== undefined) item.isPremium = args.isPremium;
-    if (args.isNovelOnly !== undefined) item.isNovelOnly = args.isNovelOnly;
+    // If actions were provided, overwrite the existing actions
+    if (args.actions !== undefined) {
+      item.actions =
+        args.actions?.map((action) => ({
+          id: getId('itemaction'),
+          name: action.name,
+          prompt: action.prompt,
+          usageActions:
+            action.usageActions?.map((usageAction) => {
+              switch (usageAction.actionType) {
+                case 'attach_parent_scene_to_child':
+                  return {
+                    type: NovelActionType.ADD_CHILD_SCENES,
+                    params: { sceneId: usageAction.parentSceneId || '', children: [usageAction.childSceneId || ''] },
+                  };
+                case 'suggest_advance_to_scene':
+                  return {
+                    type: NovelActionType.SUGGEST_ADVANCE_SCENE,
+                    params: { sceneId: usageAction.suggestSceneId || '' },
+                  };
+                case 'display_item':
+                  return {
+                    type: NovelActionType.SHOW_ITEM,
+                    params: { itemId: usageAction.itemId || '' },
+                  };
+                case 'hide_item':
+                default:
+                  return {
+                    type: NovelActionType.HIDE_ITEM,
+                    params: { itemId: usageAction.itemId || '' },
+                  };
+              }
+            }) || [],
+        })) || [];
+    }
+
+    if (args.scenes) {
+      item.actions = item.actions.map((action) => ({
+        ...action,
+        usageCondition: args.scenes?.length ? { type: 'IN_SCENE', config: { sceneIds: args.scenes } } : undefined,
+      }));
+    }
 
     return 'Item updated successfully';
   }
@@ -1028,16 +1122,18 @@ export class NovelManager {
   // OBJECTIVES
   //
   async createObjective(args: {
+    sceneId: string;
     name: string;
     description?: string;
     hint?: string;
     condition?: string;
   }): Promise<string> {
-    if (!this.novel.objectives) {
-      (this.novel as any).objectives = []; // Casting to any to allow new field; or define it in the interface
-    }
+    const scene = this.novel.scenes.find((s) => s.id === args.sceneId);
+    if (!scene) return 'Error: Scene not found';
+    const objectives = this.novel.objectives || [];
+
     const newId = getId('objective');
-    (this.novel as any).objectives.push({
+    objectives.push({
       id: newId,
       name: args.name,
       description: args.description || '',
@@ -1047,25 +1143,33 @@ export class NovelManager {
       singleUse: true,
       stateCondition: {
         type: 'IN_SCENE',
-        config: { sceneIds: [] },
+        config: {
+          sceneIds: [args.sceneId],
+        },
       },
     });
-    return `Objective created with ID: ${newId}`;
+    return `Objective created with ID: ${newId} in scene ${args.sceneId}`;
   }
 
   async updateObjective(args: {
+    sceneId: string;
     objectiveId: string;
     name?: string;
     description?: string;
     hint?: string;
     condition?: string;
   }): Promise<string> {
-    if (!this.novel.objectives) return 'Error: No objectives in the novel';
-    const objective = (this.novel as any).objectives.find((obj: any) => obj.id === args.objectiveId);
+    const objective = this.novel.objectives?.find((obj: any) => obj.id === args.objectiveId);
     if (!objective) return 'Error: Objective not found';
-
     if (args.name !== undefined) objective.name = args.name;
     if (args.description !== undefined) objective.description = args.description;
+    if (args.sceneId !== undefined)
+      objective.stateCondition = {
+        type: 'IN_SCENE',
+        config: {
+          sceneIds: [args.sceneId],
+        },
+      };
     if (args.hint !== undefined) objective.hint = args.hint;
     if (args.condition !== undefined) objective.condition = args.condition;
 
@@ -1073,12 +1177,10 @@ export class NovelManager {
   }
 
   async removeObjective(objectiveId: string): Promise<string> {
-    if (!this.novel.objectives) return 'Error: No objectives in the novel';
-    const initialLength = (this.novel as any).objectives.length;
-    (this.novel as any).objectives = (this.novel as any).objectives.filter((obj: any) => obj.id !== objectiveId);
-    return initialLength !== (this.novel as any).objectives.length
-      ? 'Objective removed successfully'
-      : 'Error: Objective not found';
+    const objective = this.novel.objectives?.find((obj) => obj.id === objectiveId);
+    if (!objective) return 'Error: Objective not found';
+    this.novel.objectives = this.novel.objectives?.filter((obj) => obj.id !== objectiveId);
+    return 'Objective removed successfully';
   }
 
   //
@@ -1156,5 +1258,174 @@ export class NovelManager {
     const initialLength = map.places.length;
     map.places = map.places.filter((p) => p.id !== placeId);
     return initialLength !== map.places.length ? 'Place removed successfully' : 'Error: Place not found';
+  }
+
+  async addIndicatorToScene(args: {
+    sceneId: string;
+    name: string;
+    description?: string;
+    type: 'percentage' | 'amount' | 'discrete';
+    values?: string[];
+    initialValue: string;
+    inferred?: boolean;
+    step?: number;
+    min?: number;
+    max?: number;
+    hidden?: boolean;
+    editable?: boolean;
+    color?: string;
+  }): Promise<string> {
+    const scene = this.novel.scenes.find((s) => s.id === args.sceneId);
+    if (!scene) return 'Error: Scene not found';
+
+    if (!scene.indicators) {
+      scene.indicators = [];
+    }
+    const indicatorId = getId('indicator');
+
+    scene.indicators.push({
+      id: indicatorId,
+      name: args.name,
+      description: args.description ?? '',
+      type: args.type,
+      values: args.values || [],
+      initialValue: args.initialValue,
+      inferred: args.inferred ?? false,
+      step: args.step,
+      min: args.min,
+      max: args.max,
+      hidden: args.hidden ?? false,
+      editable: args.editable ?? false,
+      color: args.color || '#4CAF50',
+    });
+    return `Indicator created with ID: ${indicatorId}`;
+  }
+
+  async updateIndicatorInScene(args: {
+    sceneId: string;
+    indicatorId: string;
+    name?: string;
+    description?: string;
+    type?: 'percentage' | 'amount' | 'discrete';
+    values?: string[];
+    initialValue?: string;
+    inferred?: boolean;
+    step?: number;
+    min?: number;
+    max?: number;
+    hidden?: boolean;
+    editable?: boolean;
+    color?: string;
+  }): Promise<string> {
+    const scene = this.novel.scenes.find((s) => s.id === args.sceneId);
+    if (!scene) return 'Error: Scene not found';
+    if (!scene.indicators) return 'Error: No indicators in this scene';
+
+    const indicator = scene.indicators.find((i) => i.id === args.indicatorId);
+    if (!indicator) return 'Error: Indicator not found';
+
+    if (args.name !== undefined) indicator.name = args.name;
+    if (args.description !== undefined) indicator.description = args.description;
+    if (args.type !== undefined) indicator.type = args.type;
+    if (args.values !== undefined) indicator.values = args.values;
+    if (args.initialValue !== undefined) indicator.initialValue = args.initialValue;
+    if (args.inferred !== undefined) indicator.inferred = args.inferred;
+    if (args.step !== undefined) indicator.step = args.step;
+    if (args.min !== undefined) indicator.min = args.min;
+    if (args.max !== undefined) indicator.max = args.max;
+    if (args.hidden !== undefined) indicator.hidden = args.hidden;
+    if (args.editable !== undefined) indicator.editable = args.editable;
+    if (args.color !== undefined) indicator.color = args.color;
+
+    return 'Indicator updated successfully';
+  }
+
+  async removeIndicatorFromScene(sceneId: string, indicatorId: string): Promise<string> {
+    const scene = this.novel.scenes.find((s) => s.id === sceneId);
+    if (!scene) return 'Error: Scene not found';
+    if (!scene.indicators) return 'Error: No indicators in this scene';
+
+    const initialLength = scene.indicators.length;
+    scene.indicators = scene.indicators.filter((ind) => ind.id !== indicatorId);
+    return initialLength !== scene.indicators.length ? 'Indicator removed successfully' : 'Error: Indicator not found';
+  }
+
+  async getItems(): Promise<string> {
+    if (!this.novel.inventory || !this.novel.inventory.length) {
+      return 'No items found';
+    }
+    return JSON.stringify(
+      this.novel.inventory.map((item) => {
+        return {
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          hidden: item.hidden,
+          actions: item.actions.map((action) => ({
+            id: action.id,
+            name: action.name,
+            prompt: action.prompt,
+            usageActions: action.usageActions,
+          })),
+          scenes: item.actions.length ? item.actions[0].usageCondition?.config.sceneIds : [],
+        };
+      }),
+    );
+  }
+
+  async getObjectivesInScene(sceneId: string): Promise<string> {
+    const objectives = this.novel.objectives?.filter((obj) => obj.stateCondition.config.sceneIds.includes(sceneId));
+    if (!objectives || !objectives.length) return 'Error: Empty objectives';
+    return JSON.stringify(
+      objectives.map((objective) => {
+        return {
+          id: objective.id,
+          name: objective.name,
+          description: objective.description,
+          hint: objective.hint,
+          condition: objective.condition,
+          actions: objective.actions,
+          sceneId: objective.stateCondition?.config?.sceneIds[0],
+        };
+      }),
+    );
+  }
+
+  async getIndicatorsInScene(sceneId: string): Promise<string> {
+    const scene = this.novel.scenes.find((s) => s.id === sceneId);
+    if (!scene) return 'Error: Scene not found';
+    if (!scene.indicators || !scene.indicators.length) return 'Error: Empty indicators';
+    return JSON.stringify(scene.indicators);
+  }
+
+  async getMaps(): Promise<string> {
+    if (!this.novel.maps || !this.novel.maps.length) {
+      return 'Error: No maps found';
+    }
+    return JSON.stringify(
+      this.novel.maps.map((map) => ({
+        id: map.id,
+        name: map.name,
+        description: map.description,
+        places: map.places.map((place) => ({ id: place.id, name: place.name, description: place.description })),
+        sceneIdsWhereVisible: this.novel.scenes
+          .filter((scene) => scene.parentMapIds?.includes(map.id))
+          .map((scene) => scene.id),
+      })),
+    );
+  }
+
+  async setMapScenes(mapId: string, sceneIds: string[]): Promise<string> {
+    const map = this.novel.maps?.find((m) => m.id === mapId);
+    if (!map) return 'Error: Map not found';
+    this.novel.scenes
+      .filter((scene) => sceneIds.includes(scene.id))
+      .forEach((scene) => {
+        if (!scene.parentMapIds?.includes(mapId)) {
+          scene.parentMapIds = scene.parentMapIds || [];
+          scene.parentMapIds.push(mapId);
+        }
+      });
+    return 'Map scenes updated successfully';
   }
 }

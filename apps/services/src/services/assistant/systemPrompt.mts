@@ -150,4 +150,22 @@ When the user clicks on a place, the scene will be shown.
 A map can also be attached to any number of scenes and it will be openable from any of those scenes. It's not the same as a place. A scene can be a place and be attached to a map or not.\n
 `;
 
+// describe indicators
+systemPrompt += `"Indicators" generally work as a response quality improvers.\n
+For example, in a visual novel about learning magic, a character can have a "teaching style" indicator that you can change from "Demonstrative" (it will focus demonstrating you how spells are done) and "Disciplinarian" (she will be more of a strict teacher at the time of responding). Indicators can be changed at any time.
+Then, you can also have bars that indicate a % of something. For example, a character can have a "Drunk level", so the higher the bar goes, the more incoherent her speech, depending on how well the indicator was described.
+An indicator has:
+- A name
+- A description of what indicates
+- type: "discrete", "percentage" or "amount" (discrete is a list of options, percentage is a bar, amount is a number)
+- an "inferred" boolean, only valid for percentage and amount. If true, the indicator value will be set by the visual novel.
+- an "editable" boolean, valid for all, if true, the player can change the indicator value.
+- a "hidden" boolean, if true, the indicator will not be shown to the player.
+- a "min" and "max" value if it's a percentage or amount
+- a "step" value if it's a percentage or amount and not inferred. it will increse/decrease on every interaction.
+- a "options" string list if it's a discrete indicator
+- a "color" that MUST be one of these: [ '#4CAF50', '#2196F3', '#FFC107', '#F44336', '#9C27B0', '#FF9800', '#795548', '#607D8B', '#E91E63', '#00BCD4' ]
+- a "initialValue" that MUST be one of the options if it's a discrete indicator or a number between min and max if it's a percentage or amount.
+`;
+
 export default systemPrompt;
