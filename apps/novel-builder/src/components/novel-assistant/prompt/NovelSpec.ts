@@ -741,23 +741,33 @@ export class NovelManager {
     sceneId: string;
     name: string;
     short_description: string;
-    firstMessages: {
+    firstMessagePerCharacters: {
       characterId: string;
       message: string;
       emotionId: CharacterEmotion;
     }[];
   }): Promise<string> {
-    const { sceneId, name, short_description, firstMessages } = params;
+    const { sceneId, name, short_description, firstMessagePerCharacters } = params;
 
     // Validate scene exists
     const scene = this.novel.scenes.find((s) => s.id === sceneId);
     if (!scene) return 'Error: Scene not found';
 
     // Validate characters exist and emotions
-    for (const msg of firstMessages) {
+    for (const msg of firstMessagePerCharacters) {
       const character = this.novel.characters.find((c) => c.id === msg.characterId);
       if (!character) {
         return `Error: Character with ID ${msg.characterId} not found`;
+      }
+    }
+    // check if characters.length in the scene === firstMessages.length
+    if (scene.characters.length !== firstMessagePerCharacters.length) {
+      return 'Error: Number of characters in the scene does not match the number of characters in the first messages';
+    }
+    // check if all characters in the scene are in the first messages
+    for (const char of scene.characters) {
+      if (!firstMessagePerCharacters.some((msg) => msg.characterId === char.characterId)) {
+        return `Error: Character with ID ${char.characterId} not found in the first messages`;
       }
     }
 
@@ -766,7 +776,7 @@ export class NovelManager {
       title: name,
       description: short_description,
       sceneId,
-      characters: firstMessages.map((msg) => ({
+      characters: firstMessagePerCharacters.map((msg) => ({
         characterId: msg.characterId,
         text: msg.message,
         emotion: msg.emotionId,

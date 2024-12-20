@@ -777,7 +777,7 @@ export class FunctionRegistry {
         },
       },
       {
-        name: 'add_start',
+        name: 'create_start',
         description: 'Add a new starting point for the visual novel',
         parameters: {
           type: 'object',
@@ -794,7 +794,7 @@ export class FunctionRegistry {
               type: 'string',
               description: 'Brief description of this starting point',
             },
-            firstMessages: {
+            firstMessagePerCharacters: {
               type: 'array',
               items: {
                 type: 'object',
@@ -845,10 +845,11 @@ export class FunctionRegistry {
                 },
                 required: ['characterId', 'message', 'emotionId'],
               },
-              description: 'Initial messages from characters when starting from this point',
+              description:
+                'Initial messages from characters when starting from this point. A single message per character. The message can have several paragraphs in the string.',
             },
           },
-          required: ['sceneId', 'name', 'short_description', 'firstMessages'],
+          required: ['sceneId', 'name', 'short_description', 'firstMessagePerCharacters'],
         },
         handler: (args) => novelManager.addStart(args),
         displayData: {

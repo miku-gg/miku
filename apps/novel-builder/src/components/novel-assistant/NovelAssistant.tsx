@@ -90,13 +90,13 @@ const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelSt
     conversationHistory.push({ role: 'user', content: params.userInput });
     console.log(conversationHistory);
 
-    let amountOfCalls = 0;
+    // let amountOfCalls = 0;
     const askResponse = (): Promise<ChatCompletion> =>
       callChatCompletion(
         conversationHistory,
         functions.map((fn) => ({ type: 'function', function: fn })),
         true,
-        amountOfCalls++ > 15 ? 'none' : 'auto',
+        'auto',
       );
 
     let response;
