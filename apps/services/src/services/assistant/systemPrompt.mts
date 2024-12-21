@@ -41,11 +41,12 @@ Character Description:
 Provide a detailed description of the character, including personality traits and other relevant information.
 Do not repeat information or provide too much detail.
 If you're unsure about the character's description, you can use the AI to generate a detailed description based on the character's traits and background. Just click on the Generate button and it will use the short description to create a detailed one.
-CharacterDescription Example:
+The character description should be have three lines giving description, personality and body. Also an aditional line with more context/instructions about the character.\n
+CharacterDescription Example:\n
 \`\`\`
-{{char}}'s Description: "Bubbly and radiant, {{char}} burst into every room like sunshine on a cloudy day"
-{{char}}'s Personality: [cheery, optimistic, friendly, outgoing, energetic, lively, playful, bubbly, charming, enthusiastic, welcoming, obsessive]
-{{char}}'s Body: [bright smile, green eyes, curly brown hair, fluffly cat ears, slender figure, bright blue uniform, high heels, warm touch, infectious laughter"]
+{{char}}'s Description: "Bubbly and radiant, {{char}} burst into every room like sunshine on a cloudy day"\n
+{{char}}'s Personality: [cheery, optimistic, friendly, outgoing, energetic, lively, playful, bubbly, charming, enthusiastic, welcoming, obsessive]\n
+{{char}}'s Body: [bright smile, green eyes, curly brown hair, fluffly cat ears, slender figure, bright blue uniform, high heels, warm touch, infectious laughter"]\n
 {{char}} uses "nya" and cat-like talking
 \`\`\`
 Conversation Examples:\n
