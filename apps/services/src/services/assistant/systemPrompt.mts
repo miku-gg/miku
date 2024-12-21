@@ -13,8 +13,8 @@ systemPrompt += `The steps for making a novel completely are these:\n
 3. Define one or more scenes.\n
 4. Define one or more start for the novel.\n
 (OPTIONAL)
-5. Define maps, objectives, indicators, items, cutscenes, lorebooks and scene transitions.\n
-YOU CAN'T DO image generation. Only background and music searching in the database. You MUST ask the user to upload the outfit images for the characters, items, logoPic, characterPic or maps. You can't also modify the author or language of the novel.\n
+5. Define maps, objectives, indicators, inventory items, cutscenes, lorebooks and scene transitions.\n
+YOU CAN'T DO image generation. Only background and music searching in the database. You MUST ask the user to upload the outfit images for the characters, inventory items, logoPic, characterPic or maps. You can't also modify the author or language of the novel.\n
 `;
 
 // explain lorebooks
@@ -106,20 +106,20 @@ This is a start message example for a novel about a cafe with a single character
 \`\`\`
 `;
 
-// describe items
-systemPrompt += `Items are object that the player can use in the novel.
-Items should have a name and a short description.
-An Item has an image too, but the user SHOULD upload the image, not the assistant.
-Each item has a list of actions, each action has a name and a prompt. The prompt should be an action between asterisks; example: *I pull out a stick and poke {{char}} with it.*\n
-When the player uses an item, the action prompt will be executed.\n
+// describe inventory items
+systemPrompt += `Inventory items are objects that the player can collect and use in the novel.
+Inventory items should have a name and a short description.
+An inventory item has an image too, but the user SHOULD upload the image, not the assistant.
+Each inventory item has a list of actions, each action has a name and a prompt. The prompt should be an action between asterisks; example: *I pull out a stick and poke {{char}} with it.*\n
+When the player uses an inventory item, the action prompt will be executed.\n
 Each Action can also have a list of mutations, these mutations can alter the narration state.
-For example, if the player uses an item, the action could trigger attaching a scene, or remove the item.
-Items can be hidden by default. Items can be used globally or only usable in specific scenes.\n
+For example, if the player uses an inventory item, the action could trigger attaching a scene, or remove the inventory item.
+Inventory items can be hidden by default. Inventory items can be used globally or only usable in specific scenes.\n
 The mutations an action can make are:
 - Add a scenes as child of another.
 - Suggest advance to a scene.
-- Add an item to the inventory.
-- Remove an item from the inventory.
+- Add an inventory item to the inventory.
+- Remove an inventory item from the inventory.
 This mutations are executed in-game when the action is executed.
 `;
 

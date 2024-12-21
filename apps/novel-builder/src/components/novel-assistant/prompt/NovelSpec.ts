@@ -984,7 +984,11 @@ export class NovelManager {
       name: string;
       prompt: string;
       usageActions?: {
-        actionType: 'attach_parent_scene_to_child' | 'suggest_advance_to_scene' | 'display_item' | 'hide_item';
+        actionType:
+          | 'attach_parent_scene_to_child'
+          | 'suggest_advance_to_scene'
+          | 'display_inventory_item'
+          | 'hide_inventory_item';
         suggestSceneId?: string;
         itemId?: string;
         parentSceneId?: string;
@@ -1016,12 +1020,12 @@ export class NovelManager {
                   type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
                   params: { sceneId: usageAction.suggestSceneId || '' },
                 };
-              case 'display_item':
+              case 'display_inventory_item':
                 return {
                   type: NovelV3.NovelActionType.SHOW_ITEM,
                   params: { itemId: usageAction.itemId || '' },
                 };
-              case 'hide_item':
+              case 'hide_inventory_item':
               default:
                 return {
                   type: NovelV3.NovelActionType.HIDE_ITEM,
@@ -1038,10 +1042,10 @@ export class NovelManager {
       description: args.description,
       icon: '',
       hidden: args.hidden ?? false,
-      actions: itemActions.map((action) => ({
-        ...action,
-        usageCondition: args.scenes?.length ? { type: 'IN_SCENE', config: { sceneIds: args.scenes } } : undefined,
-      })),
+      isPremium: false,
+      isNovelOnly: true,
+      locked: args.scenes?.length ? { type: 'IN_SCENE', config: { sceneIds: args.scenes } } : undefined,
+      actions: itemActions,
     });
 
     return `Item created with ID: ${itemId}`;
@@ -1057,7 +1061,11 @@ export class NovelManager {
       name: string;
       prompt: string;
       usageActions?: {
-        actionType: 'attach_parent_scene_to_child' | 'suggest_advance_to_scene' | 'display_item' | 'hide_item';
+        actionType:
+          | 'attach_parent_scene_to_child'
+          | 'suggest_advance_to_scene'
+          | 'display_inventory_item'
+          | 'hide_inventory_item';
         suggestSceneId?: string;
         itemId?: string;
         parentSceneId?: string;
@@ -1094,12 +1102,12 @@ export class NovelManager {
                     type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
                     params: { sceneId: usageAction.suggestSceneId || '' },
                   };
-                case 'display_item':
+                case 'display_inventory_item':
                   return {
                     type: NovelV3.NovelActionType.SHOW_ITEM,
                     params: { itemId: usageAction.itemId || '' },
                   };
-                case 'hide_item':
+                case 'hide_inventory_item':
                 default:
                   return {
                     type: NovelV3.NovelActionType.HIDE_ITEM,
@@ -1111,10 +1119,7 @@ export class NovelManager {
     }
 
     if (args.scenes) {
-      item.actions = item.actions.map((action) => ({
-        ...action,
-        usageCondition: args.scenes?.length ? { type: 'IN_SCENE', config: { sceneIds: args.scenes } } : undefined,
-      }));
+      item.locked = args.scenes?.length ? { type: 'IN_SCENE', config: { sceneIds: args.scenes } } : undefined;
     }
 
     return 'Item updated successfully';

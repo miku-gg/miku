@@ -106,7 +106,7 @@ export class FunctionRegistry {
         },
       },
       {
-        name: 'get_lorebooks',
+        name: 'get_all_lorebooks_in_novel',
         description: 'Retrieve all lorebooks in the visual novel',
         parameters: { type: 'object', properties: {} },
         handler: () => novelManager.getLoreBooks(),
@@ -1180,7 +1180,7 @@ export class FunctionRegistry {
         },
       },
       {
-        name: 'create_item',
+        name: 'create_inventory_item',
         description: 'Create a new item in the novel inventory.',
         parameters: {
           type: 'object',
@@ -1210,8 +1210,8 @@ export class FunctionRegistry {
                           enum: [
                             'attach_parent_scene_to_child',
                             'suggest_advance_to_scene',
-                            'display_item',
-                            'hide_item',
+                            'display_inventory_item',
+                            'hide_inventory_item',
                           ],
                           description: 'Type of the action',
                         },
@@ -1238,7 +1238,7 @@ export class FunctionRegistry {
         },
       },
       {
-        name: 'update_item',
+        name: 'update_inventory_item',
         description: 'Update an existing item in the novel inventory.',
         parameters: {
           type: 'object',
@@ -1247,10 +1247,10 @@ export class FunctionRegistry {
             name: { type: 'string', description: 'New name for the item' },
             description: { type: 'string', description: 'Updated description' },
             hidden: { type: 'boolean', description: 'Whether the item is hidden from the player' },
-            scenes: {
+            scenesIds: {
               type: 'array',
               items: { type: 'string' },
-              description: 'List of scenes where the item can be used. Empty for every scene.',
+              description: 'List of scene ids where the item can be used. Empty for every scene.',
             },
             actions: {
               type: 'array',
@@ -1269,8 +1269,8 @@ export class FunctionRegistry {
                           enum: [
                             'attach_parent_scene_to_child',
                             'suggest_advance_to_scene',
-                            'display_item',
-                            'hide_item',
+                            'display_inventory_item',
+                            'hide_inventory_item',
                           ],
                           description: 'Type of the action',
                         },
@@ -1297,7 +1297,7 @@ export class FunctionRegistry {
         },
       },
       {
-        name: 'remove_item',
+        name: 'remove_inventory_item',
         description: 'Remove an item from the novel inventory.',
         parameters: {
           type: 'object',
@@ -1617,8 +1617,8 @@ export class FunctionRegistry {
         },
       },
       {
-        name: 'get_items',
-        description: 'Retrieve all items in the novel inventory',
+        name: 'get_all_inventory_items_in_novel',
+        description: 'Retrieve all inventory items in the novel inventory',
         parameters: { type: 'object', properties: {} },
         handler: () => novelManager.getItems(),
         displayData: {
@@ -1702,7 +1702,7 @@ export class FunctionRegistry {
         },
       },
       {
-        name: 'get_maps',
+        name: 'get_all_maps_in_novel',
         description: 'Retrieve all maps in the novel',
         parameters: {
           type: 'object',
