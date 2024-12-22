@@ -269,7 +269,7 @@ export class NovelManager {
     if (characterId) {
       // Update existing character
       const character = this.novel.characters.find((c) => c.id === characterId);
-      if (!character) return 'Character not found';
+      if (!character) return `Error: Character with id ${characterId} not found`;
 
       character.name = name;
       character.short_description = short_description;
@@ -342,13 +342,13 @@ export class NovelManager {
 
   async setCharacterPrompts(params: {
     characterId: string;
-    description: string;
+    prompt: string;
     conversation_examples: string;
   }): Promise<string> {
     const character = this.novel.characters.find((c) => c.id === params.characterId);
-    if (!character) return 'Character not found';
+    if (!character) return `Error: Character with id ${params.characterId} not found`;
 
-    character.card.data.description = params.description;
+    character.card.data.description = params.prompt;
     character.card.data.mes_example = params.conversation_examples;
 
     return 'Character prompts updated successfully';
@@ -358,7 +358,9 @@ export class NovelManager {
     const initialLength = this.novel.characters.length;
     this.novel.characters = this.novel.characters.filter((c) => c.id !== characterId);
 
-    return initialLength !== this.novel.characters.length ? 'Character deleted successfully' : 'Character not found';
+    return initialLength !== this.novel.characters.length
+      ? 'Character deleted successfully'
+      : `Error: Character with id ${characterId} not found`;
   }
 
   async getCharacters(): Promise<string> {
@@ -368,7 +370,7 @@ export class NovelManager {
       id: char.id,
       name: char.name,
       short_description: char.short_description,
-      description: char.card.data.description,
+      prompt: char.card.data.description,
       conversation_examples: char.card.data.mes_example,
       outfits: char.card.data.extensions.mikugg_v2.outfits.map((outfit) => ({
         id: outfit.id,
@@ -383,10 +385,10 @@ export class NovelManager {
 
   async attachLorebookToCharacter(characterId: string, lorebookId: string): Promise<string> {
     const character = this.novel.characters.find((c) => c.id === characterId);
-    if (!character) return 'Character not found';
+    if (!character) return `Error: Character with id ${characterId} not found`;
 
     const lorebook = this.novel.lorebooks?.find((l) => l.id === lorebookId);
-    if (!lorebook) return 'Lorebook not found';
+    if (!lorebook) return `Error: Lorebook with id ${lorebookId} not found`;
 
     if (!character.lorebookIds) {
       character.lorebookIds = [];
@@ -401,10 +403,10 @@ export class NovelManager {
 
   async detachLorebookFromCharacter(characterId: string, lorebookId: string): Promise<string> {
     const character = this.novel.characters.find((c) => c.id === characterId);
-    if (!character) return 'Character not found';
+    if (!character) return `Error: Character with id ${characterId} not found`;
 
     if (!character.lorebookIds) {
-      return 'Character has no lorebooks attached';
+      return `Error: Character with id ${characterId} has no lorebooks attached`;
     }
 
     character.lorebookIds = character.lorebookIds.filter((id) => id !== lorebookId);
@@ -431,7 +433,7 @@ export class NovelManager {
 
   async modifyBackgroundDescription(backgroundId: string, description: string): Promise<string> {
     const background = this.novel.backgrounds?.find((bg) => bg.id === backgroundId);
-    if (!background) return 'Background not found';
+    if (!background) return `Error: Background with id ${backgroundId} not found`;
 
     background.description = description;
     return 'Background description updated successfully';
@@ -445,7 +447,7 @@ export class NovelManager {
   }
 
   async getBackgrounds(): Promise<string> {
-    if (!this.novel.backgrounds.length) return 'empty value';
+    if (!this.novel.backgrounds.length) return "There's no backgrounds";
 
     const backgroundList = this.novel.backgrounds.map((bg) => ({
       id: bg.id,
@@ -472,7 +474,7 @@ export class NovelManager {
 
   async modifyMusicDescription(musicId: string, description: string): Promise<string> {
     const music = this.novel.songs?.find((s) => s.id === musicId);
-    if (!music) return 'Error: Music not found';
+    if (!music) return `Error: Music with id ${musicId} with id ${musicId} not found`;
 
     music.description = description;
     return 'Music description updated successfully';
@@ -482,7 +484,9 @@ export class NovelManager {
     const initialLength = this.novel.songs.length;
     this.novel.songs = this.novel.songs.filter((song) => song.id !== musicId);
 
-    return initialLength !== this.novel.songs.length ? 'Music removed successfully' : 'Music not found';
+    return initialLength !== this.novel.songs.length
+      ? 'Music removed successfully'
+      : `Error: Music with id ${musicId} not found`;
   }
 
   async getMusic(): Promise<string> {
@@ -943,7 +947,7 @@ export class NovelManager {
 
   async updateCharacterName(characterId: string, name: string): Promise<string> {
     const character = this.novel.characters.find((c) => c.id === characterId);
-    if (!character) return 'Error: Character not found';
+    if (!character) return `Error: Character with id ${characterId} not found`;
 
     character.name = name;
     character.card.data.name = name;
@@ -952,7 +956,7 @@ export class NovelManager {
 
   async updateCharacterShortDescription(characterId: string, shortDescription: string): Promise<string> {
     const character = this.novel.characters.find((c) => c.id === characterId);
-    if (!character) return 'Character not found';
+    if (!character) return `Error: Character with id ${characterId} not found`;
 
     character.short_description = shortDescription;
     character.card.data.extensions.mikugg_v2.short_description = shortDescription;
@@ -961,7 +965,7 @@ export class NovelManager {
 
   async updateCharacterTags(characterId: string, tags: string[]): Promise<string> {
     const character = this.novel.characters.find((c) => c.id === characterId);
-    if (!character) return 'Error: Character not found';
+    if (!character) return `Error: Character with id ${characterId} not found`;
 
     character.tags = tags;
     character.card.data.tags = tags;

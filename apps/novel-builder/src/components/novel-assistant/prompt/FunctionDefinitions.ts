@@ -292,7 +292,7 @@ export class FunctionRegistry {
         },
       },
       {
-        name: 'set_character_prompts',
+        name: 'set_character_prompt_and_examples',
         description: 'Set the detailed description and conversation examples for a character',
         parameters: {
           type: 'object',
@@ -301,16 +301,17 @@ export class FunctionRegistry {
               type: 'string',
               description: 'ID of the character to update',
             },
-            description: {
+            prompt: {
               type: 'string',
-              description: "Detailed description of the character's personality, background, and traits",
+              description:
+                "Detailed description of the character's personality, background, physical appearance and traits",
             },
             conversation_examples: {
               type: 'string',
               description: 'Examples of how the character typically speaks and interacts',
             },
           },
-          required: ['characterId', 'description', 'conversation_examples'],
+          required: ['characterId', 'prompt', 'conversation_examples'],
         },
         handler: (args) => novelManager.setCharacterPrompts(args),
         displayData: {

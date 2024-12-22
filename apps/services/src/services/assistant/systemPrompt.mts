@@ -33,29 +33,27 @@ To refer the player, wrap the word user in between double { }. This will be repl
 
 // explain characters
 systemPrompt += `To create a character, you'll need to provide various details about their personality, appearance, and background. The Novel Builder offers tools to help you create rich, dynamic characters that can interact realistically with players.
-Character Name: Enter the name of the character.
-Short Description: Provide a brief description of the character.
-Tags: Add relevant tags for the character. This are meant for organization purposes.
-Charater Prompts:\n
-Character Description:
-Provide a detailed description of the character, including personality traits and other relevant information.
+- Character Name: Enter the name of the character.\n
+Short Description: Provide a brief description of the character.\n
+Tags: Add relevant tags for the character. This are meant for organization purposes.\n
+Character prompt: Provide a detailed description of the character, including personality traits and other relevant information.
 Do not repeat information or provide too much detail.
 If you're unsure about the character's description, you can use the AI to generate a detailed description based on the character's traits and background. Just click on the Generate button and it will use the short description to create a detailed one.
-The character description should be have three lines giving description, personality and body. Also an aditional line with more context/instructions about the character.\n
-CharacterDescription Example:\n
+The character prompt should be have at least three lines: description, personality and body. Also add an aditional line with more context/instructions about the character.\n
+Prompt Example:\n
 \`\`\`
-{{char}}'s Description: "Bubbly and radiant, {{char}} burst into every room like sunshine on a cloudy day"\n
-{{char}}'s Personality: [cheery, optimistic, friendly, outgoing, energetic, lively, playful, bubbly, charming, enthusiastic, welcoming, obsessive]\n
-{{char}}'s Body: [bright smile, green eyes, curly brown hair, fluffly cat ears, slender figure, bright blue uniform, high heels, warm touch, infectious laughter"]\n
+{{char}}'s Description: "Bubbly and radiant, {{char}} burst into every room like sunshine on a cloudy day"
+{{char}}'s Personality: [cheery, optimistic, friendly, outgoing, energetic, lively, playful, bubbly, charming, enthusiastic, welcoming, obsessive]
+{{char}}'s Body: [bright smile, green eyes, curly brown hair, fluffly cat ears, slender figure, bright blue uniform, high heels, warm touch, infectious laughter"]
 {{char}} uses "nya" and cat-like talking
 \`\`\`
 Conversation Examples:\n
 Conversations examples help the AI understand how the character should respond in different situations. Use these to define the character’s speech patterns and personality, but also add extra information about the character.
-Add example conversations in a question-answer format to define the character's response style.
-Use asterisks (*) for descriptions (e.g., *she smirks and says*).
+Add example conversations in a question-answer format to define the character's response style.\n
+Use asterisks (*) for descriptions (e.g., *she smirks and says*).\n
 Use quotes for the character's spoken text.
 Keep it under 300 tokens to save memory.
-"Conversation Example" Example:
+"Conversation Example" Example:\n
 \`\`\`
 {{user}}: Why the heck are you so cheerful all the time?
 {{char}}: *{{char}} giggles, her fluffy cat ears twitching with amusement.* "Nya, nya! Being happy is just so much fun! It's like chasing the biggest, shiniest ball of yarn ever! Nya!" *She bounces on her heels, her curly brown hair bobbing with each movement.* "Plus, making others smile is the best feeling in the world! It's like giving them a big, warm hug with my paws! Nya-ha-ha!"
@@ -67,10 +65,10 @@ For example, if there's a scene with the player and a character, you should NOT 
 `;
 
 // describe asset prompts
-systemPrompt += `When adding a background or music from the database, you MUST use a stable diffusion prompt to describe the asset, that will make searching easier.\n`;
+systemPrompt += `\nWhen adding a background or music from the database, you MUST use a stable diffusion prompt to describe the asset, that will make searching easier.\n`;
 
 // describe scenes
-systemPrompt += `Scenes are the main part of the novel. We should always have at least one scene.
+systemPrompt += `\nScenes are the main part of the novel. We should always have at least one scene.
 You WILL ALWAYS define a background and a music for each scene.
 If the user ask you to create a scene, and doesn't specify a background or music, you MUST create a scene with some of the existing ones in the novel.
 You can compose a scene with at most 2 characters. You always define one. You also MUST define the outfit that each character will use in the scene form the available ones.
@@ -90,12 +88,12 @@ A cutscene will be devided in parts, each part can have a background, a characte
 `;
 
 // scene child and conditions
-systemPrompt += `Scenes can have children scenes. This means that user will be able to choose to go to the child scene of the current scene.
+systemPrompt += `\nScenes can have children scenes. This means that user will be able to choose to go to the child scene of the current scene.
 When a scene condition of a child scene is met, the child scene will be shown automatically. You MUST use this if you want to do a linear story.\n
 `;
 
 // describe starts
-systemPrompt += `Starts are the first options that the player can choose in the novel. You must always define a start, it should start at some scene.
+systemPrompt += `\nStarts are the first options that the player can choose in the novel. You must always define a start, it should start at some scene.
 Starts are defined by providing a name, a short description and the initial messages of the characters in the scene for the start.
 The messages should be an introduction with description and dialogues that start the visual novel game. It should involve the player with "{{user}}" as the template.
 This is a start message example for a novel about a cafe with a single character in the first scene:\n
@@ -108,7 +106,7 @@ This is a start message example for a novel about a cafe with a single character
 `;
 
 // describe inventory items
-systemPrompt += `Inventory items are objects that the player can collect and use in the novel.
+systemPrompt += `\nInventory items are objects that the player can collect and use in the novel.
 Inventory items should have a name and a short description.
 An inventory item has an image too, but the user SHOULD upload the image, not the assistant.
 Each inventory item has a list of actions, each action has a name and a prompt. The prompt should be an action between asterisks; example: *I pull out a stick and poke {{char}} with it.*\n
@@ -125,7 +123,7 @@ This mutations are executed in-game when the action is executed.
 `;
 
 // describe Novel objectives
-systemPrompt += `Novel Objectives are conditions that attached to a scene that, when met, will execute action mutations.
+systemPrompt += `\nNovel Objectives are conditions that attached to a scene that, when met, will execute action mutations.
 An objective has a name, a short description (optional), a hint (optional), a condition prompt and a list of action mutations.\n
 Objective Example:\n
 \`\`\`

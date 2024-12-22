@@ -8,6 +8,7 @@ import {
   uploadAsset,
 } from '@mikugg/bot-utils';
 import { BackgroundResult, CharacterResult, listSearch, SearchType, SongResult } from './libs/listSearch';
+import axios from 'axios';
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const VITE_ASSETS_UPLOAD_URL = import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/asset-upload';
@@ -16,6 +17,7 @@ interface BuilderConfig {
   assetsEndpoint: string;
   assetsEndpointOptimized: string;
   uploadAssetEndpoint: string;
+  isPremiumUser: () => Promise<boolean>;
   genAssetLink: (asset: string, displayPrefix: AssetDisplayPrefix) => string;
   uploadAsset: (
     file: File | string,
@@ -59,6 +61,10 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       assetsEndpoint: 'http://localhost:8585/s3/assets',
       assetsEndpointOptimized: 'http://localhost:8585/s3/assets',
       uploadAssetEndpoint: 'http://localhost:8585/asset-upload',
+      isPremiumUser: async (): Promise<boolean> => {
+        const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`http://localhost:8080/user`);
+        return !!(result.data.id && result.data.tier === 'PREMIUM');
+      },
       genAssetLink: (asset: string) => {
         if (asset.startsWith('data')) {
           return asset;
@@ -158,6 +164,10 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       assetsEndpoint: 'https://assets.miku.gg',
       assetsEndpointOptimized: 'https://mikugg-assets.nyc3.digitaloceanspaces.com',
       uploadAssetEndpoint: 'https://apidev.miku.gg/asset/upload',
+      isPremiumUser: async (): Promise<boolean> => {
+        const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`https://apidev.miku.gg/user`);
+        return !!(result.data.id && result.data.tier === 'PREMIUM');
+      },
       genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
           return asset;
@@ -264,6 +274,10 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       assetsEndpoint: 'https://assets.miku.gg',
       assetsEndpointOptimized: 'https://mikugg-assets.nyc3.digitaloceanspaces.com',
       uploadAssetEndpoint: 'https://api.miku.gg/asset/upload',
+      isPremiumUser: async (): Promise<boolean> => {
+        const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`https://api.miku.gg/user`);
+        return !!(result.data.id && result.data.tier === 'PREMIUM');
+      },
       genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
           return asset;

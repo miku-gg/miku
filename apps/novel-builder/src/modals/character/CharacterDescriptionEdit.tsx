@@ -275,7 +275,7 @@ export default function CharacterDescriptionEdit({ characterId }: { characterId?
       <div className="CharacterDescriptionEdit__description">
         <div className="CharacterDescriptionEdit__description__label">
           <div className="CharacterDescriptionEdit__description__label-group">
-            <label className="Input__label">Character Complete Description</label>
+            <label className="Input__label">Character Prompt</label>
             <button
               className="Input__label"
               onClick={() => {

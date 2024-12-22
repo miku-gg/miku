@@ -1,7 +1,7 @@
 import { Button, Input } from '@mikugg/ui-kit';
 import { BsStars } from 'react-icons/bs';
 import textCompletion from '../../libs/textCompletion';
-import { ModelType, descriptionAgent } from '../../libs/utils';
+import { ModelType, SERVICES_ENDPOINT, descriptionAgent } from '../../libs/utils';
 import { updateCharacter } from '../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 
@@ -12,7 +12,6 @@ import './CharacterDescriptionGeneration.scss';
 interface CharacterGenerationProps {
   characterID: string;
 }
-const SERVICES_ENDPOINT = import.meta.env.VITE_SERVICES_ENDPOINT || 'http://localhost:8484';
 
 export const CharacterDescriptionGeneration = ({ characterID }: CharacterGenerationProps) => {
   const [isGenerating, setIsGenerating] = useState(false);

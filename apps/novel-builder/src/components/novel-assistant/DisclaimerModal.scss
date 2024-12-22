@@ -1,0 +1,60 @@
+@import '../../styles/variables';
+
+.disclaimer-modal {
+  &__content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__section {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px;
+    border-radius: 8px;
+
+    &--premium {
+      background-color: rgba($color-gold, 0.1);
+      color: $color-gold;
+    }
+
+    &--warning {
+      background-color: rgba($color-red, 0.1);
+      color: $text-1;
+    }
+
+    &--info {
+      background-color: rgba($node-color, 0.1);
+      color: $text-1;
+    }
+  }
+
+  &__icon {
+    font-size: 20px;
+    margin-top: 4px;
+  }
+
+  &__text-container {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    margin-top: 2px;
+  }
+
+  &__text {
+    line-height: 1.5;
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
+
+  &__button-container {
+    display: flex;
+    justify-content: center;
+  }
+}
