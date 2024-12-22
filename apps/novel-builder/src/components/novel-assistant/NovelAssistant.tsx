@@ -73,6 +73,7 @@ const callChatCompletion = async (
     },
     {
       method: 'POST',
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },
