@@ -109,8 +109,10 @@ function PanelExplorer() {
               }
             }}
           />
-          <ErrorsDisplay />
-          <TokenDisplayer tokens={useAppSelector(selectTotalTokenCount)} limits={TOKEN_LIMITS.TOTAL} size="large" />
+          <div className="PanelExplorer__header-left__tokens">
+            <ErrorsDisplay />
+            <TokenDisplayer tokens={useAppSelector(selectTotalTokenCount)} limits={TOKEN_LIMITS.TOTAL} size="large" />
+          </div>
         </div>
         <ButtonGroup
           buttons={[

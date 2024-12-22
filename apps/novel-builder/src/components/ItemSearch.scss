@@ -97,3 +97,16 @@
     margin-top: 20px;
   }
 }
+
+//add media query for width 440px
+@media (max-width: 440px) {
+  .ItemSearch {
+    &__item {
+      flex-direction: column;
+
+      &__content {
+        margin-top: 10px;
+      }
+    }
+  }
+}

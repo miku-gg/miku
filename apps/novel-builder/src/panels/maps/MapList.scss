@@ -87,7 +87,6 @@
       cursor: pointer;
       transition: all 0.2s ease;
       opacity: 0;
-      z-index: 1;
 
       &:hover {
         color: $secondary-color;
@@ -108,7 +107,7 @@
     &:hover {
       background-color: rgba(27, 33, 66, 0.6);
       .MapList__container__edit {
-        opacity: 0;
+        opacity: 1;
       }
     }
   }
@@ -126,5 +125,18 @@
       color: #16a34a;
       user-select: none;
     }
+  }
+}
+//add media query for width 1024px
+@media (max-width: 1024px) {
+  .MapList__container__edit {
+    opacity: 1;
+  }
+}
+
+//add media query for width 585px
+@media (max-width: 585px) {
+  .MapList__container {
+    justify-content: center;
   }
 }

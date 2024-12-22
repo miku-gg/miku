@@ -129,3 +129,21 @@
     }
   }
 }
+//add media query for width 480px
+@media (max-width: 480px) {
+  .CutScenePartsRender {
+    &__header {
+      flex-direction: column;
+      align-items: center;
+
+      &__controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    &__container {
+      justify-content: center;
+    }
+  }
+}

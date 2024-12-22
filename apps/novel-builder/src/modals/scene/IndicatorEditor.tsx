@@ -162,9 +162,9 @@ export function IndicatorEditor({ indicator, onUpdate, onDelete }: IndicatorEdit
               maxLength={50}
               description="The name of the indicator that will be displayed. Used in the AI prompt."
             />
+            <div className="IndicatorEditor__type-color">{colorPickerSection}</div>
           </div>
 
-          <div className="IndicatorEditor__type-color">{colorPickerSection}</div>
           <div className="IndicatorEditor__type-dropdown">
             <label>Type</label>
             <Dropdown

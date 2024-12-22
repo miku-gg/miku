@@ -89,6 +89,14 @@
     & label {
       margin-left: 5px;
     }
+
+    &__button {
+      background-color: $secondary-color;
+      color: $text-1;
+      border-radius: 16px;
+      padding: 8px;
+      display: none;
+    }
   }
 
   &__placesContainer {
@@ -156,4 +164,91 @@
 }
 .MapEditModal {
   max-width: 850px !important;
+}
+
+@media (max-width: 815px) {
+  .MapEditModal {
+    max-width: 100% !important;
+    padding: 8px !important;
+  }
+  .MapEdit {
+    flex-direction: column;
+    align-items: center;
+
+    &__form {
+      width: 100%;
+      align-items: center;
+
+      &__top {
+        width: 100%;
+      }
+
+      &__name {
+        width: 50%;
+      }
+
+      &__description {
+        width: 50%;
+      }
+    }
+
+    &__createPlace {
+      width: 100%;
+      padding: 0 !important;
+      height: 100%;
+      display: flex;
+
+      &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+
+      &__button {
+        display: block;
+      }
+    }
+
+    &__placesContainer {
+      width: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+      height: fit-content;
+      justify-content: center;
+      max-height: 20rem;
+
+      &__button {
+        display: none;
+      }
+    }
+
+    &__place {
+      &__edit {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+@media (max-width: 575px) {
+  .MapEdit {
+    &__form {
+      &__top {
+        flex-direction: column;
+      }
+      &__name {
+        width: 100%;
+      }
+      &__description {
+        width: 100%;
+      }
+      &__uploadMap {
+        .mdSize {
+          width: 20rem !important;
+          height: 20rem !important;
+        }
+      }
+    }
+  }
 }

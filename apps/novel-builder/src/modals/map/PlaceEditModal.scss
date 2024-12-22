@@ -75,3 +75,43 @@
     }
   }
 }
+
+//add media query for width 825px
+@media (max-width: 825px) {
+  .PlaceEditModal {
+    max-width: 100% !important;
+  }
+
+  .PlaceEdit {
+    // flex-direction: column;
+
+    &__form {
+      width: 100%;
+
+      .mdSize {
+        width: 10rem !important;
+        height: 10rem !important;
+      }
+    }
+
+    &__maskImage {
+      width: 20rem;
+      height: 20rem;
+
+      .mdSize {
+        width: 20rem !important;
+        height: 20rem !important;
+      }
+    }
+  }
+}
+// add media query for width 585px
+@media (max-width: 585px) {
+  .PlaceEdit {
+    flex-direction: column;
+    align-items: center;
+    &__form {
+      width: 100%;
+    }
+  }
+}
