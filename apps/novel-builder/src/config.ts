@@ -65,7 +65,9 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       platformAPIEndpoint: 'http://localhost:8080',
       isPremiumUser: async (): Promise<boolean> => {
         try {
-          const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`http://localhost:8080/user`);
+          const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`http://localhost:8080/user`, {
+            withCredentials: true,
+          });
           return !!(result.data.id && result.data.tier === 'PREMIUM');
         } catch (error) {
           console.error('Failed to check premium status:', error);
@@ -174,7 +176,9 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       platformAPIEndpoint: 'https://apidev.miku.gg',
       isPremiumUser: async (): Promise<boolean> => {
         try {
-          const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`https://apidev.miku.gg/user`);
+          const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`https://apidev.miku.gg/user`, {
+            withCredentials: true,
+          });
           return !!(result.data.id && result.data.tier === 'PREMIUM');
         } catch (error) {
           console.error('Failed to check premium status:', error);
@@ -290,7 +294,9 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       platformAPIEndpoint: 'https://api.miku.gg',
       isPremiumUser: async (): Promise<boolean> => {
         try {
-          const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`https://api.miku.gg/user`);
+          const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`https://api.miku.gg/user`, {
+            withCredentials: true,
+          });
           return !!(result.data.id && result.data.tier === 'PREMIUM');
         } catch (error) {
           console.error('Failed to check premium status:', error);
