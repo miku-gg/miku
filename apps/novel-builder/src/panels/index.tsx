@@ -24,6 +24,7 @@ import { MapList } from './maps/MapList';
 import PreviewPanel from './preview/PreviewPanel';
 import SceneGraph from './scenes/SceneGraph';
 import StartsPanel from './starts/StartsPanel';
+import NovelAssistant from '../components/novel-assistant/NovelAssistant';
 
 function PanelExplorer() {
   const novel = useAppSelector((state) => state.novel);
@@ -40,6 +41,7 @@ function PanelExplorer() {
   const maxStep = allowUntilStep(novel);
   return (
     <div className="PanelExplorer">
+      <NovelAssistant />
       <div className="PanelExplorer__header">
         <div className="PanelExplorer__header-left">
           <ButtonGroup

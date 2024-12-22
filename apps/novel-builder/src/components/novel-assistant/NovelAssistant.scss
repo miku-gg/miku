@@ -1,0 +1,32 @@
+@import '../../styles/variables';
+
+.AssistantActivityLog {
+  font-style: italic;
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  background-color: rgba($background-1, 1);
+  width: 100%;
+  animation: fadeIn 0.5s ease-in-out;
+
+  &:first-child {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+
+  &__verb {
+    color: $secondary-color;
+  }
+
+  &__button {
+    color: $text-1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
