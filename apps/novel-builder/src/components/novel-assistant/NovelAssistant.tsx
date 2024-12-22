@@ -205,6 +205,9 @@ export default function NovelAssistant() {
     window.dispatchEvent(event);
   };
 
+  if (isCheckingPremium) {
+    return null;
+  }
   return (
     <>
       <DisclaimerModal opened={showDisclaimer} onClose={handleDisclaimerClose} />
@@ -295,7 +298,7 @@ export default function NovelAssistant() {
             maxCount: 6,
           },
           chatInput: {
-            disabled: !isPremium || isCheckingPremium,
+            disabled: !isPremium,
           },
         }}
       />

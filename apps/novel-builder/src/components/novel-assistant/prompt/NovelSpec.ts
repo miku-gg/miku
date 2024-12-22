@@ -1,4 +1,6 @@
 import { NovelV3, validateNovelState } from '@mikugg/bot-utils';
+import { BackgroundResult, listSearch, SearchType, SongResult } from '../../../libs/listSearch';
+import config from '../../../config';
 
 export interface LoreBookEntry {
   id: string;
@@ -415,20 +417,63 @@ export class NovelManager {
   }
 
   async addBackgroundFromDatabase(prompt: string): Promise<string> {
-    // In a real implementation, this would search a database
-    // For now, we'll create a mock background
-    const id = getId('background');
-    this.novel.backgrounds.push({
-      id,
-      name: `background_${id}`,
-      description: prompt,
-      source: {
-        jpg: 'empty_background.png',
-      },
-      attributes: [],
-    });
+    try {
+      let background: BackgroundResult = {
+        id: 'default_background',
+        description: 'default_background',
+        asset: 'default_background.png',
+        sdPrompt: null,
+        sdModel: null,
+        sdParams: null,
+        author: {
+          id: 'miku',
+          username: 'miku',
+          profilePic: null,
+        },
+        createdAt: new Date(),
+        tags: [],
+      };
+      let searchingError = false;
+      try {
+        // Use vector search to find the most similar background
+        const results = await listSearch<BackgroundResult>(config.platformAPIEndpoint, SearchType.BACKGROUND_VECTORS, {
+          search: prompt,
+          take: 1,
+          skip: 0,
+        });
 
-    return `Background added with ID: ${id}. Description: ${prompt}`;
+        if (!results.length) {
+          searchingError = true;
+          console.error('No matching background found for the given description');
+        } else {
+          background = results[0];
+        }
+      } catch (error) {
+        console.error('Error searching for background:', error);
+        searchingError = true;
+      }
+
+      const id = getId('background');
+
+      this.novel.backgrounds.push({
+        id,
+        name: `background_${id}`,
+        description: background.description,
+        source: {
+          jpg: background.asset,
+        },
+        attributes: background.tags?.map((tag) => ['tag', tag]) || [],
+      });
+
+      return `Background added with ID: ${id}. Description: ${background.description}.${
+        searchingError
+          ? ' There was an error searching for the background in the database. Using default background'
+          : ''
+      }`;
+    } catch (error) {
+      console.error('Error searching for background:', error);
+      return 'Error searching for background in database';
+    }
   }
 
   async modifyBackgroundDescription(backgroundId: string, description: string): Promise<string> {
@@ -458,18 +503,53 @@ export class NovelManager {
   }
 
   async addMusicFromDatabase(prompt: string): Promise<string> {
-    // In a real implementation, this would search a music database
-    // For now, we'll create a mock music entry
-    const id = getId('music');
-    this.novel.songs.push({
-      id,
-      name: `song_${id}`,
-      description: prompt,
-      source: 'empty_song.mp3',
-      tags: [],
-    });
+    try {
+      let song: SongResult = {
+        id: 'devonshire',
+        title: 'default_song',
+        description: 'default_song',
+        asset: 'devonshire.mp3',
+        tags: [],
+        authorId: 'miku',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      let searchingError = false;
+      try {
+        // Use vector search to find the most similar song
+        const results = await listSearch<SongResult>(config.platformAPIEndpoint, SearchType.SONG_VECTOR, {
+          search: prompt,
+          take: 1,
+          skip: 0,
+        });
 
-    return `Music added with ID: ${id}. Description: ${prompt}`;
+        if (!results.length) {
+          searchingError = true;
+        } else {
+          song = results[0];
+        }
+      } catch (error) {
+        searchingError = true;
+        console.error('Error searching for song:', error);
+      }
+
+      const id = getId('music');
+
+      this.novel.songs.push({
+        id,
+        name: song.title || `song_${id}`,
+        description: song.description,
+        source: song.asset,
+        tags: song.tags || [],
+      });
+
+      return `Music added with ID: ${id}. Description: ${song.description}.${
+        searchingError ? ' There was an error searching for the song in the database. Using default song' : ''
+      }`;
+    } catch (error) {
+      console.error('Error searching for song:', error);
+      return 'Error searching for song in database';
+    }
   }
 
   async modifyMusicDescription(musicId: string, description: string): Promise<string> {

@@ -17,6 +17,7 @@ interface BuilderConfig {
   assetsEndpoint: string;
   assetsEndpointOptimized: string;
   uploadAssetEndpoint: string;
+  platformAPIEndpoint: string;
   isPremiumUser: () => Promise<boolean>;
   genAssetLink: (asset: string, displayPrefix: AssetDisplayPrefix) => string;
   uploadAsset: (
@@ -61,9 +62,15 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       assetsEndpoint: 'http://localhost:8585/s3/assets',
       assetsEndpointOptimized: 'http://localhost:8585/s3/assets',
       uploadAssetEndpoint: 'http://localhost:8585/asset-upload',
+      platformAPIEndpoint: 'http://localhost:8080',
       isPremiumUser: async (): Promise<boolean> => {
-        const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`http://localhost:8080/user`);
-        return !!(result.data.id && result.data.tier === 'PREMIUM');
+        try {
+          const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`http://localhost:8080/user`);
+          return !!(result.data.id && result.data.tier === 'PREMIUM');
+        } catch (error) {
+          console.error('Failed to check premium status:', error);
+          return false;
+        }
       },
       genAssetLink: (asset: string) => {
         if (asset.startsWith('data')) {
@@ -164,9 +171,15 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       assetsEndpoint: 'https://assets.miku.gg',
       assetsEndpointOptimized: 'https://mikugg-assets.nyc3.digitaloceanspaces.com',
       uploadAssetEndpoint: 'https://apidev.miku.gg/asset/upload',
+      platformAPIEndpoint: 'https://apidev.miku.gg',
       isPremiumUser: async (): Promise<boolean> => {
-        const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`https://apidev.miku.gg/user`);
-        return !!(result.data.id && result.data.tier === 'PREMIUM');
+        try {
+          const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`https://apidev.miku.gg/user`);
+          return !!(result.data.id && result.data.tier === 'PREMIUM');
+        } catch (error) {
+          console.error('Failed to check premium status:', error);
+          return false;
+        }
       },
       genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
@@ -274,9 +287,15 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
       assetsEndpoint: 'https://assets.miku.gg',
       assetsEndpointOptimized: 'https://mikugg-assets.nyc3.digitaloceanspaces.com',
       uploadAssetEndpoint: 'https://api.miku.gg/asset/upload',
+      platformAPIEndpoint: 'https://api.miku.gg',
       isPremiumUser: async (): Promise<boolean> => {
-        const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`https://api.miku.gg/user`);
-        return !!(result.data.id && result.data.tier === 'PREMIUM');
+        try {
+          const result = await axios.get<{ id: string; tier: 'REGULAR' | 'PREMIUM' }>(`https://api.miku.gg/user`);
+          return !!(result.data.id && result.data.tier === 'PREMIUM');
+        } catch (error) {
+          console.error('Failed to check premium status:', error);
+          return false;
+        }
       },
       genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
