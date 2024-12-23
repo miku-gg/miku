@@ -66,7 +66,11 @@ app.post('/assistant', async (req: Request<any>, res: Response) => {
   try {
     await assistantHandler(req, res);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to process OpenAI request' }).end();
+    if (!res.headersSent) {
+      res.setHeader('Content-Type', 'application/json');
+      res.status(500).write(JSON.stringify({ error: 'Failed to process OpenAI request' }));
+      res.end();
+    }
   }
 });
 

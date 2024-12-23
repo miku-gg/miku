@@ -11,8 +11,6 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
   try {
     const { messages, tools, parallel_tool_calls, tool_choice } = req.body;
 
-    // Ensure the system prompt is first in the messages array
-
     const allMessages: ChatCompletionMessageParam[] = [
       { role: 'system', content: systemPrompt },
       ...messages.filter((msg: ChatCompletionMessageParam) => msg.role !== 'system'),
@@ -27,10 +25,18 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
     });
     console.log(response);
 
-    res.status(200).json(response).end();
+    // Set headers explicitly
+    res.setHeader('Content-Type', 'application/json');
+    // Send the response
+    res.write(JSON.stringify(response));
+    res.end();
   } catch (error) {
     console.error('OpenAI proxy error:', error);
-    res.status(500).json({ error: 'Failed to process OpenAI request' }).end();
+    if (!res.headersSent) {
+      res.setHeader('Content-Type', 'application/json');
+      res.status(500).write(JSON.stringify({ error: 'Failed to process OpenAI request' }));
+      res.end();
+    }
   }
 };
 
