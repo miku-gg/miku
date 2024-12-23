@@ -63,14 +63,6 @@ export const MapList = ({ onSelectMap, tooltipText, selectedMapId }: MapListProp
                   className={`MapList__container__map ${isSelected(id) ? 'selected' : ''}`}
                   onClick={() => onSelectMap && onSelectMap(id)}
                 >
-                  <FaPencil
-                    className="MapList__container__edit"
-                    onClick={(e: React.MouseEvent) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      dispatch(openModal({ modalType: 'mapEdit', editId: id }));
-                    }}
-                  />
                   <h3>{name}</h3>
                   <p>{description}</p>
                   {map.source.png && (
@@ -86,6 +78,14 @@ export const MapList = ({ onSelectMap, tooltipText, selectedMapId }: MapListProp
                       Selected
                     </div>
                   )}
+                  <FaPencil
+                    className="MapList__container__edit"
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      dispatch(openModal({ modalType: 'mapEdit', editId: id }));
+                    }}
+                  />
                 </div>
               </div>
             );
