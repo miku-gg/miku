@@ -62,7 +62,7 @@ app.post('/text/tokenize', async (req: Request<string>, res: Response) => {
   }
 });
 
-app.post('/openai/chat/completions', assistantHandler);
+app.post('/assitant', assistantHandler);
 
 app.post('/audio', async (req: Request<string>, res: Response) => {
   try {

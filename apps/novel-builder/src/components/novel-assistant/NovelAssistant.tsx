@@ -64,7 +64,7 @@ const callChatCompletion = async (
   tool_choice: 'none' | 'auto',
 ): Promise<ChatCompletion> => {
   const response = await axios.post(
-    SERVICES_ENDPOINT + '/openai/chat/completions',
+    SERVICES_ENDPOINT + '/assistant',
     {
       messages,
       tools,
