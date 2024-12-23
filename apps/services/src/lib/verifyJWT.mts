@@ -79,7 +79,7 @@ const jwtPermissionMiddleware = async (req: Request, res: Response, next: NextFu
       } else {
         next();
       }
-    } else if (req.path.startsWith('/openai')) {
+    } else if (req.path === '/assistant') {
       const permission = await verifyJWT(req.headers, 'smart');
       if (!permission) {
         return res.status(401).send('Unauthorized: Token expired or missing');

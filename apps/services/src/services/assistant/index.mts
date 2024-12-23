@@ -7,7 +7,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const assistantHandler = async (req: Request, res: Response) => {
+const assistantHandler = async (req: Request<any>, res: Response) => {
   try {
     const { messages, tools, parallel_tool_calls, tool_choice } = req.body;
 
