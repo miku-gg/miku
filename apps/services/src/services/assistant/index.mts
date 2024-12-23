@@ -25,11 +25,12 @@ const assistantHandler = async (req: Request, res: Response) => {
       parallel_tool_calls,
       tool_choice,
     });
+    console.log(response);
 
-    res.json(response);
+    res.status(200).json(response).end();
   } catch (error) {
     console.error('OpenAI proxy error:', error);
-    res.status(500).json({ error: 'Failed to process OpenAI request' });
+    res.status(500).json({ error: 'Failed to process OpenAI request' }).end();
   }
 };
 
