@@ -60,7 +60,7 @@ const jwtPermissionMiddleware = async (req: Request, res: Response, next: NextFu
         if (!permission) {
           return res.status(401).send('Unauthorized: Token expired or missing');
         } else {
-          next();
+          return next();
         }
       }
       if (model?.permission === RPModelPermission.TESTER) {
@@ -69,7 +69,7 @@ const jwtPermissionMiddleware = async (req: Request, res: Response, next: NextFu
         if (!permission) {
           return res.status(401).send('Unauthorized: Token expired or missing');
         } else {
-          next();
+          return next();
         }
       }
     } else if (req.path === '/audio') {
@@ -77,7 +77,7 @@ const jwtPermissionMiddleware = async (req: Request, res: Response, next: NextFu
       if (!permission) {
         return res.status(401).send('Unauthorized: Token expired or missing');
       } else {
-        next();
+        return next();
       }
     } else if (req.path === '/assistant') {
       const permission = await verifyJWT(req.headers, 'smart');
@@ -102,15 +102,15 @@ const jwtPermissionMiddleware = async (req: Request, res: Response, next: NextFu
           }
           userUsageMap[decoded.sub] = usage;
         }
-        next();
+        return next();
       }
     }
     // if (!(await verifyJWT(req.headers))) {
     //   return res.status(401).send("Unauthorized: Token expired or missing");
     // }
-    next();
+    return next();
   } else {
-    next();
+    return next();
   }
 };
 
