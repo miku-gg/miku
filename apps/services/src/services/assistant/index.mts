@@ -30,6 +30,9 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
     );
     console.log(response.data);
 
+    // print currently sent headers
+    console.log(res.getHeaders());
+
     res.status(200).json(response.data).end();
   } catch (error) {
     console.error('OpenAI proxy error:', error);

@@ -11,6 +11,10 @@ import { checkModelsHealth, getModelHealth } from './services/text/lib/healthChe
 import assistantHandler from './services/assistant/index.mjs';
 const PORT = process.env.SERVICES_PORT || 8484;
 
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+});
+
 const app: express.Application = express();
 app.use(
   cors({
