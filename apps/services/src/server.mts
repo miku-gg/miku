@@ -67,12 +67,7 @@ app.post('/text/tokenize', async (req: Request<string>, res: Response) => {
 });
 
 app.post('/assistant', async (req: Request<any>, res: Response) => {
-  try {
-    await assistantHandler(req, res);
-  } catch (error) {
-    // The only catch block that sends error responses
-    res.status(500).send('Failed to process OpenAI request');
-  }
+  await assistantHandler(req, res);
 });
 
 app.post('/audio', async (req: Request<string>, res: Response) => {

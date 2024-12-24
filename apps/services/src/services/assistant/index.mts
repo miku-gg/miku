@@ -11,7 +11,7 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
     ...messages.filter((msg: ChatCompletionMessageParam) => msg.role !== 'system'),
   ];
 
-  const response = await axios.post(
+  const assitantResponse = await axios.post(
     'https://api.openai.com/v1/chat/completions',
     {
       model: 'gpt-4o-mini',
@@ -27,12 +27,11 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
       },
     },
   );
-  console.log(response.data);
-
+  console.log(assitantResponse.data);
   // print currently sent headers
-  console.log(res.getHeaders());
+  console.log('headers', res.getHeaders());
 
-  res.status(200).json(response.data).end();
+  res.json(assitantResponse.data);
 };
 
 export default assistantHandler;
