@@ -27,9 +27,6 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
       },
     },
   );
-  console.log(assitantResponse.data);
-  // print currently sent headers
-  console.log('headers', res.getHeaders());
 
   res.json(assitantResponse.data);
 };
