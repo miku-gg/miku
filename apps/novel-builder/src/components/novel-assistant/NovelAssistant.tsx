@@ -206,7 +206,7 @@ export default function NovelAssistant() {
     window.dispatchEvent(event);
   };
 
-  if (isCheckingPremium) {
+  if (isCheckingPremium || !isPremium) {
     return null;
   }
   return (
