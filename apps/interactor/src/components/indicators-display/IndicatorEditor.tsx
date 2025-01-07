@@ -149,6 +149,11 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
           const min = Number(indicator.min);
           const max = Number(indicator.max);
           const step = Number(indicator.step);
+          console.log('values');
+          console.log(min, max, step, indicator.step);
+          console.log('!isNan', !isNaN(min) && !isNaN(max) && !isNaN(step));
+          console.log('min < max', min < max);
+          console.log('step > 0', step > 0);
           return !isNaN(min) && !isNaN(max) && (!indicator.inferred ? !isNaN(step) && step > 0 : true) && max > min;
         }
       case 4:
@@ -394,7 +399,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
           </div>
           <div className="IndicatorEditor__actions">
             <Button theme="transparent" onClick={() => onCancel()}>
-              {i18n('discard_changes')}
+              {i18n('cancel')}
             </Button>
             <Button
               theme="secondary"

@@ -106,7 +106,7 @@ export default function SceneEditModal() {
       values: [],
       initialValue: '',
       inferred: false,
-      step: 0,
+      step: 1,
       min: 0,
       max: 100,
       hidden: false,
