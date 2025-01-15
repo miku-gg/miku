@@ -1,26 +1,5 @@
 import { CharacterEmotion, NovelManager } from './NovelSpec';
-
-export type FunctionHandler = (...args: any[]) => Promise<string>;
-
-export type FunctionAction = 'created' | 'updated' | 'removed' | 'connected' | 'deleted';
-
-export interface FunctionDefinition {
-  name: string;
-  description: string;
-  parameters: {
-    type: string;
-    properties: Record<string, any>;
-    required?: string[];
-  };
-  handler: FunctionHandler;
-  displayData:
-    | { isSetter: false }
-    | {
-        isSetter: true;
-        action: FunctionAction;
-        subject: string;
-      };
-}
+import { FunctionDefinition, FunctionHandler, FunctionAction } from '../../../libs/assistantCall';
 
 export class FunctionRegistry {
   private functions: Map<string, FunctionHandler>;
