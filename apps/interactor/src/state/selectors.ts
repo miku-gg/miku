@@ -541,9 +541,35 @@ export const selectAllParentScenesIds = createSelector(
   },
 );
 
+export const selectShouldPlayGlobalStartCutscene = (state: RootState) => {
+  const hasNoInteractions = Object.keys(state.narration.interactions).length === 0;
+  return (
+    !state.narration.hasPlayedGlobalStartCutscene &&
+    hasNoInteractions &&
+    state.novel.globalStartCutsceneId &&
+    !!state.novel.cutscenes?.find((c) => c.id === state.novel.globalStartCutsceneId)
+  );
+};
+
+export const selectShouldShowStartSelectionModal = (state: RootState) => {
+  const hasNoInteractions = Object.keys(state.narration.interactions).length === 0;
+  return !state.narration.hasShownStartSelectionModal && hasNoInteractions && state.novel.starts.length > 1;
+};
+
 export const selectDisplayingCutScene = createSelector(
-  [selectCurrentScene, selectAllParentScenesIds, (state: RootState) => state.narration.input.seenCutscene],
-  (scene, parentSceneIds, isCurrentCutsceneSeen) => {
+  [
+    selectCurrentScene,
+    selectAllParentScenesIds,
+    (state: RootState) => state.narration.input.seenCutscene,
+    selectShouldPlayGlobalStartCutscene,
+  ],
+  (scene, parentSceneIds, isCurrentCutsceneSeen, shouldPlayGlobalStartCutscene) => {
+    // If the global start cutscene should play, we return true immediately
+    if (shouldPlayGlobalStartCutscene) {
+      return true;
+    }
+
+    // existing logic for per-scene cutscene
     const hasCutscene = !!scene?.cutScene;
     const isAlreadyTriggered =
       parentSceneIds.slice(0, parentSceneIds.length - 1).includes(scene?.id || '') && scene?.cutScene?.triggerOnlyOnce;

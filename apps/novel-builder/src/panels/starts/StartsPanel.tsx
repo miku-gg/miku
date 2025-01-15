@@ -1,20 +1,26 @@
-import { Button, Dropdown, Input, AreYouSure, Modal } from '@mikugg/ui-kit';
+import { Button, Dropdown, Input, AreYouSure } from '@mikugg/ui-kit';
 import { useAppDispatch, useAppSelector } from '../../state/store';
-import { createStart, deleteStart, updateStart, reorderStart } from '../../state/slices/novelFormSlice';
+import {
+  createStart,
+  deleteStart,
+  updateStart,
+  reorderStart,
+  updateUseModalStartSelection,
+} from '../../state/slices/novelFormSlice';
 import { selectScenes } from '../../state/selectors';
-import config from '../../config';
 import './StartsPanel.scss';
 import { useState } from 'react';
-import classNames from 'classnames';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
 import SceneSelector, { SceneSelectorModal } from '../../modals/scene/SceneSelector';
 import { EMOTION_GROUP_TEMPLATES } from '@mikugg/bot-utils';
 import { IoMdArrowUp, IoMdArrowDown } from 'react-icons/io';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CutScenePartsRenderForGlobal } from '../../modals/cutscenes/CutScenePartsRenderForGlobal';
 
 export default function StartsPanel() {
   const dispatch = useAppDispatch();
+  const useModalForStartSelection = useAppSelector((state) => state.novel.useModalForStartSelection);
   const starts = useAppSelector((state) => state.novel.starts);
   const characters = useAppSelector((state) => state.novel.characters);
   const scenes = useAppSelector(selectScenes);
@@ -41,9 +47,23 @@ export default function StartsPanel() {
   return (
     <div className="StartsPanel">
       <h1 className="StartsPanel__title">Starts</h1>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={{ display: 'inline-flex', alignItems: 'center' }}>
+          <input
+            type="checkbox"
+            checked={!!useModalForStartSelection}
+            onChange={(e) => dispatch(updateUseModalStartSelection(e.target.checked))}
+          />
+          <span style={{ marginLeft: 8 }}>Use modal for start selection</span>
+        </label>
+      </div>
+
+      <CutScenePartsRenderForGlobal />
+
       <div className="StartsPanel__description">
         List all possible starting points for your novel. For each, indicate the start scene and character's message.
       </div>
+
       <div className="StartsPanel__list">
         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
         {/* @ts-ignore */}
@@ -103,13 +123,27 @@ export default function StartsPanel() {
                       label="Title"
                       placeHolder="Title of this starting point..."
                       value={start.title || ''}
-                      onChange={(e) => dispatch(updateStart({ ...start, title: e.target.value }))}
+                      onChange={(e) =>
+                        dispatch(
+                          updateStart({
+                            ...start,
+                            title: e.target.value,
+                          }),
+                        )
+                      }
                     />
                     <Input
                       label="Description"
-                      value={start.description || ''}
                       placeHolder="Description of this starting point..."
-                      onChange={(e) => dispatch(updateStart({ ...start, description: e.target.value }))}
+                      value={start.description || ''}
+                      onChange={(e) =>
+                        dispatch(
+                          updateStart({
+                            ...start,
+                            description: e.target.value,
+                          }),
+                        )
+                      }
                     />
                   </div>
                 </div>

@@ -24,6 +24,8 @@ const initialState: NarrationState = {
   responses: {},
   seenHints: [],
   createdIndicatorIds: [],
+  hasPlayedGlobalStartCutscene: false,
+  hasShownStartSelectionModal: false,
 };
 
 const narrationSlice = createSlice({
@@ -509,6 +511,12 @@ const narrationSlice = createSlice({
         state.createdIndicatorIds = state.createdIndicatorIds.filter((id) => id !== action.payload);
       }
     },
+    setHasPlayedGlobalStartCutscene(state, action: PayloadAction<boolean>) {
+      state.hasPlayedGlobalStartCutscene = action.payload;
+    },
+    setHasShownStartSelectionModal(state, action: PayloadAction<boolean>) {
+      state.hasShownStartSelectionModal = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -551,6 +559,8 @@ export const {
   clearPrefillIndicators,
   addCreatedIndicatorId,
   removeCreatedIndicatorId,
+  setHasPlayedGlobalStartCutscene,
+  setHasShownStartSelectionModal,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;
