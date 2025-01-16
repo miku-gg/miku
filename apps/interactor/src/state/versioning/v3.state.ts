@@ -78,6 +78,8 @@ export interface NarrationState {
   };
   seenHints?: string[];
   createdIndicatorIds?: string[];
+  hasPlayedGlobalStartCutscene?: boolean;
+  hasShownStartSelectionModal?: boolean;
 }
 
 export interface NovelScene extends NovelV3.NovelScene {}

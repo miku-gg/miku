@@ -9,12 +9,12 @@ import {
 } from '../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { openModal } from '../../state/slices/inputSlice';
-import './CutscenesPartsRender.scss';
+import './CutscenePartsRender.scss';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { PartEditor } from './PartEditor';
 import { useEffect } from 'react';
 
-export const CutScenePartsRender = () => {
+export const CutScenePartsRenderForScene = () => {
   const dispatch = useAppDispatch();
   const scene = useAppSelector(selectEditingScene);
   const cutscenes = useAppSelector((state) => state.novel.cutscenes);
@@ -78,10 +78,10 @@ export const CutScenePartsRender = () => {
           </Button>
         </div>
       </div>
-      {parts.length > 0 && (
+      {parts.length > 0 && currentCutscene && (
         <div className="CutScenePartsRender__container">
           {parts.map((part) => (
-            <PartEditor key={part.id} part={part} />
+            <PartEditor key={part.id} part={part} cutsceneId={currentCutscene.id} />
           ))}
         </div>
       )}

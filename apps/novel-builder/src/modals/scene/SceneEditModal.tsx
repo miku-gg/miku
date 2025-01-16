@@ -19,7 +19,7 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelObjectives } from './NovelObjectives';
 import './SceneEditModal.scss';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
-import { CutScenePartsRender } from '../cutscenes/CutscenesPartsRender';
+import { CutScenePartsRenderForScene } from '../cutscenes/CutscenePartsRenderForScene';
 import { v4 as uuidv4 } from 'uuid';
 import { NovelV3 } from '@mikugg/bot-utils';
 import {
@@ -519,7 +519,7 @@ export default function SceneEditModal() {
               </div>
             </div>
             <div className="SceneEditModal__scene-cutscene">
-              <CutScenePartsRender />
+              <CutScenePartsRenderForScene />
             </div>
             <div className="SceneEditModal__scene-maps">
               {maps ? (
