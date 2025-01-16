@@ -9,7 +9,7 @@ import {
 } from '../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { openModal } from '../../state/slices/inputSlice';
-import './CutScenePartsRender.scss';
+import './CutscenePartsRender.scss';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { PartEditor } from './PartEditor';
 import { useEffect } from 'react';

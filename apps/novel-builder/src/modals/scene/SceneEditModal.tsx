@@ -19,7 +19,7 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelObjectives } from './NovelObjectives';
 import './SceneEditModal.scss';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
-import { CutScenePartsRenderForScene } from '../cutscenes/CutscenePartsRenderForScene';
+import { CutScenePartsRenderForScene } from '../cutscenes/CutScenePartsRenderForScene';
 import { v4 as uuidv4 } from 'uuid';
 import { NovelV3 } from '@mikugg/bot-utils';
 import {

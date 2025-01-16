@@ -7,7 +7,7 @@ import {
   deleteCutscene,
   updateGlobalCutscene,
 } from '../../state/slices/novelFormSlice';
-import './CutScenePartsRender.scss';
+import './CutscenePartsRender.scss';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { PartEditor } from './PartEditor';
 import { useEffect } from 'react';
