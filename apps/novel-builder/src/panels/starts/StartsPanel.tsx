@@ -1,4 +1,4 @@
-import { Button, Dropdown, Input, AreYouSure } from '@mikugg/ui-kit';
+import { Button, Dropdown, Input, AreYouSure, CheckBox } from '@mikugg/ui-kit';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import {
   createStart,
@@ -47,21 +47,15 @@ export default function StartsPanel() {
   return (
     <div className="StartsPanel">
       <h1 className="StartsPanel__title">Starts</h1>
-      <div style={{ marginBottom: '12px' }}>
-        <label style={{ display: 'inline-flex', alignItems: 'center' }}>
-          <input
-            type="checkbox"
-            checked={!!useModalForStartSelection}
-            onChange={(e) => dispatch(updateUseModalStartSelection(e.target.checked))}
-          />
-          <span style={{ marginLeft: 8 }}>Use modal for start selection</span>
-        </label>
-      </div>
-
-      <CutScenePartsRenderForGlobal />
-
       <div className="StartsPanel__description">
         List all possible starting points for your novel. For each, indicate the start scene and character's message.
+      </div>
+      <div className="StartsPanel__use-modal-checkbox">
+        <CheckBox
+          value={!!useModalForStartSelection}
+          onChange={(e) => dispatch(updateUseModalStartSelection(e.target.checked))}
+          label="Use modal for start selection"
+        />
       </div>
 
       <div className="StartsPanel__list">
@@ -123,6 +117,7 @@ export default function StartsPanel() {
                       label="Title"
                       placeHolder="Title of this starting point..."
                       value={start.title || ''}
+                      maxLength={30}
                       onChange={(e) =>
                         dispatch(
                           updateStart({
@@ -136,6 +131,7 @@ export default function StartsPanel() {
                       label="Description"
                       placeHolder="Description of this starting point..."
                       value={start.description || ''}
+                      maxLength={60}
                       onChange={(e) =>
                         dispatch(
                           updateStart({
@@ -246,6 +242,9 @@ export default function StartsPanel() {
         <Button theme="secondary" onClick={() => setNewStartOpened(true)}>
           Add Start
         </Button>
+      </div>
+      <div className="StartsPanel__global-cutscene">
+        <CutScenePartsRenderForGlobal />
       </div>
       <SceneSelectorModal
         opened={newStartOpened}

@@ -59,8 +59,8 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
   [
     'development',
     {
-      assetsEndpoint: 'http://localhost:8585/s3/assets',
-      assetsEndpointOptimized: 'http://localhost:8585/s3/assets',
+      assetsEndpoint: 'https://assets.miku.gg',
+      assetsEndpointOptimized: 'https://mikugg-assets.nyc3.digitaloceanspaces.com',
       uploadAssetEndpoint: 'http://localhost:8585/asset-upload',
       platformAPIEndpoint: 'http://localhost:8080',
       isPremiumUser: async (): Promise<boolean> => {
@@ -74,11 +74,18 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
           return false;
         }
       },
-      genAssetLink: (asset: string) => {
+      genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
           return asset;
         } else {
-          return `http://localhost:8585/s3/assets/${asset}`;
+          return getAssetLink(
+            {
+              optimized: 'https://mikugg-assets.nyc3.digitaloceanspaces.com',
+              fallback: 'https://assets.miku.gg',
+            },
+            asset,
+            displayPrefix || AssetDisplayPrefix.NOVEL_AD_VIDEO,
+          );
         }
       },
       uploadAsset: async (file: File | string, type) => {

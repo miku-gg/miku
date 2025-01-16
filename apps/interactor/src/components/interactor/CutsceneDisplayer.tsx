@@ -211,7 +211,10 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         </div>
         <div className="CutsceneDisplayer__buttons">
           <button
-            className="CutsceneDisplayer__buttons-left"
+            className={classNames({
+              'CutsceneDisplayer__buttons-left': true,
+              'CutsceneDisplayer__buttons-left--hidden': currentTextIndex === 0 && currentPartIndex === 0,
+            })}
             onClick={(e: React.MouseEvent) => {
               e.stopPropagation();
               handlePreviousClick();

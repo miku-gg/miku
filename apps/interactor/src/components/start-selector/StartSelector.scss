@@ -1,0 +1,133 @@
+@import '../../variables';
+
+.StartSelector {
+  &__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+  }
+
+  &__container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  &__cards {
+    // display: flex;
+    // gap: 16px;
+    // padding: 20px;
+    // overflow-x: auto;
+    // width: 100%;
+  }
+
+  &__slider {
+    width: 90%;
+
+    .slick-slide {
+      padding: 0 10px;
+    }
+
+    .slick-center {
+      .StartSelector__card {
+        opacity: 1;
+        border: 1px solid $secondary-color;
+        box-shadow: 0 0px 15px -3px rgba(124, 58, 237, 0.5), 0 4px 6px -2px rgba(124, 58, 237, 0.25);
+      }
+    }
+  }
+
+  &__card {
+    // flex: 0 0 300px;
+    height: 140px;
+    position: relative;
+    border: 1px solid #6c7293;
+    padding: 16px;
+    border-radius: 16px;
+    z-index: 1;
+    transition: all 0.2s ease-out;
+    cursor: pointer;
+    opacity: 0.8;
+    width: 100%;
+
+    &:hover {
+      box-shadow: 0 0px 15px -3px rgba(124, 58, 237, 0.5), 0 4px 6px -2px rgba(124, 58, 237, 0.25);
+      border: 1px solid $secondary-color;
+      opacity: 1;
+    }
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, #000000b3, #0000 50%);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+    }
+  }
+
+  .slick-center &__card {
+    // transform: scale(1.1);
+    opacity: 1;
+    transition: transform 0.3s ease-out;
+  }
+
+  &__card-title {
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  &__card-description {
+    font-size: 0.8rem;
+    text-align: left;
+    word-break: break-all;
+  }
+
+  &__card-text {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
+
+  &__card-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: all 0.2s ease-out;
+    overflow: hidden;
+    opacity: 0.7;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: 16px;
+  }
+
+  &__card-characters {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 70%;
+    width: auto;
+    display: flex;
+  }
+
+  &__card-character {
+    height: 200%;
+    width: auto;
+  }
+}

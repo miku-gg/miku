@@ -22,6 +22,7 @@ import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
 import { markCurrentCutsceneAsSeen, setHasPlayedGlobalStartCutscene } from '../../state/slices/narrationSlice';
 import IndicatorsDisplay from '../indicators-display/IndicatorsDisplay';
+import StartSelector from '../start-selector/StartSelector';
 
 const Interactor = () => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
@@ -54,6 +55,7 @@ const Interactor = () => {
             />
           </div>
         ) : null}
+        {!displayingCutscene && <StartSelector />}
         <div className="Interactor__content">
           <InteractorHeader />
           <IndicatorsDisplay />

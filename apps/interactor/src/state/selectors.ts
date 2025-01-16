@@ -551,10 +551,32 @@ export const selectShouldPlayGlobalStartCutscene = (state: RootState) => {
   );
 };
 
-export const selectShouldShowStartSelectionModal = (state: RootState) => {
-  const hasNoInteractions = Object.keys(state.narration.interactions).length === 0;
-  return !state.narration.hasShownStartSelectionModal && hasNoInteractions && state.novel.starts.length > 1;
-};
+export const selectShouldShowStartSelectionModal = createSelector(
+  [
+    (state: RootState) => Object.keys(state.narration.interactions).length === 0,
+    (state: RootState) => state.novel.cutscenes?.find((c) => c.id === state.novel.globalStartCutsceneId),
+    (state: RootState) => state.narration.hasShownStartSelectionModal,
+    (state: RootState) => state.novel.starts.length > 1,
+    (state: RootState) => state.novel.useModalForStartSelection,
+    selectShouldPlayGlobalStartCutscene,
+  ],
+  (
+    hasNoInteractions,
+    hasGlobalStartCutscene,
+    hasShownStartSelectionModal,
+    hasMultipleStarts,
+    useModalForStartSelection,
+    shouldPlayGlobalStartCutscene,
+  ) => {
+    return (
+      !hasShownStartSelectionModal &&
+      hasNoInteractions &&
+      hasMultipleStarts &&
+      useModalForStartSelection &&
+      (hasGlobalStartCutscene || !shouldPlayGlobalStartCutscene)
+    );
+  },
+);
 
 export const selectDisplayingCutScene = createSelector(
   [
