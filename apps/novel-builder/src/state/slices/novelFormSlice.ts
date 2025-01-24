@@ -1,9 +1,29 @@
-import { CharacterBook, NovelV3 } from '@mikugg/bot-utils';
+import { CharacterBook, NovelV3, AssetType } from '@mikugg/bot-utils';
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { v4 as randomUUID } from 'uuid';
+import { toast } from 'react-toastify';
+import apiClient from '../../libs/imageInferenceAPI';
+import config from '../../config';
 
-const initialState: NovelV3.NovelState = {
+// 1. Extend the state to track pending inferences
+interface PendingInference {
+  inferenceId: string;
+  status: 'pending' | 'done' | 'error';
+  createdAt: number;
+  resultImage?: string;
+
+  inferenceType: 'character' | 'emotion' | 'background' | 'item';
+  prompt: string; // store the description/prompt
+
+  characterId?: string; // used by character/emotion types
+  outfitId?: string; // used by character/emotion types
+  emotionId?: string; // used by the emotion type
+  backgroundId?: string; // used by background type
+  itemId?: string; // used by item type (if needed)
+}
+
+const initialState: NovelV3.NovelState & { pendingInferences?: PendingInference[] } = {
   title: '',
   description: '',
   logoPic: '',
@@ -19,6 +39,7 @@ const initialState: NovelV3.NovelState = {
   inventory: [],
   cutscenes: [],
   language: 'en',
+  pendingInferences: [],
 };
 
 const novelFormSlice = createSlice({
@@ -532,6 +553,103 @@ const novelFormSlice = createSlice({
     updateUseModalStartSelection: (state, action: PayloadAction<boolean>) => {
       state.useModalForStartSelection = action.payload;
     },
+    addPendingInference: (
+      state,
+      action: PayloadAction<Omit<PendingInference, 'status' | 'resultImage' | 'createdAt'>>,
+    ) => {
+      if (!state.pendingInferences) {
+        state.pendingInferences = [];
+      }
+      state.pendingInferences.push({
+        ...action.payload,
+        status: 'pending',
+        createdAt: Date.now(),
+      });
+    },
+    updateInferenceStatus: (
+      state,
+      action: PayloadAction<{ inferenceId: string; status: 'done' | 'error'; resultImage?: string }>,
+    ) => {
+      const pending = state.pendingInferences?.find((p) => p.inferenceId === action.payload.inferenceId);
+      if (!pending) return;
+
+      pending.status = action.payload.status;
+      pending.resultImage = action.payload.resultImage;
+
+      if (pending.status === 'done' && pending.resultImage) {
+        const { inferenceType, resultImage } = pending;
+        switch (inferenceType) {
+          case 'character': {
+            const charIndex = state.characters.findIndex((c) => c.id === pending.characterId);
+            if (charIndex < 0) break;
+            const char = state.characters[charIndex];
+            const outfits = char.card.data.extensions.mikugg_v2?.outfits;
+            if (!outfits) break;
+            const outfitIndex = outfits.findIndex((o) => o.id === pending.outfitId);
+            if (outfitIndex < 0) break;
+            const outfit = outfits[outfitIndex];
+            const neutralEmotion = outfit.emotions.find((e) => e.id === 'neutral');
+            if (neutralEmotion) {
+              neutralEmotion.sources.png = resultImage;
+              toast.success(`Character outfit image updated for ${outfit.name}!`);
+            }
+            state.characters[charIndex] = { ...char };
+            break;
+          }
+          case 'emotion': {
+            const charIndex = state.characters.findIndex((c) => c.id === pending.characterId);
+            if (charIndex < 0) break;
+            const char = state.characters[charIndex];
+            const outfits = char.card.data.extensions.mikugg_v2?.outfits;
+            if (!outfits) break;
+            const outfitIndex = outfits.findIndex((o) => o.id === pending.outfitId);
+            if (outfitIndex < 0) break;
+            const outfit = outfits[outfitIndex];
+            const emotionToReplace = outfit.emotions.find((e) => e.id === pending.emotionId);
+            if (emotionToReplace) {
+              emotionToReplace.sources.png = resultImage;
+              toast.success(`Character emotion "${pending.emotionId}" updated for outfit: ${outfit.name}!`);
+            }
+            state.characters[charIndex] = { ...char };
+            break;
+          }
+          case 'background': {
+            const bgId = pending.backgroundId;
+            if (!bgId) break;
+            let bg = state.backgrounds.find((b) => b.id === bgId);
+            if (!bg) {
+              // Create a new background if none found
+              bg = {
+                id: bgId,
+                name: pending.prompt ?? 'AI Background',
+                description: pending.prompt ?? '',
+                attributes: [],
+                source: { jpg: resultImage },
+              };
+              state.backgrounds.push(bg);
+              toast.success(`Background "${bg.name}" created!`);
+            } else {
+              bg.source.jpg = resultImage;
+              toast.success(`Background "${bg.name}" updated!`);
+            }
+            break;
+          }
+          case 'item': {
+            // (Optional) Implement your item logic here
+            toast.success('Item image inference completed! (Logic not yet implemented)');
+            break;
+          }
+        }
+        // Finally, remove the completed inference
+        if (state.pendingInferences) {
+          state.pendingInferences = state.pendingInferences.filter((inf) => inf.inferenceId !== pending.inferenceId);
+        }
+      }
+    },
+    removePendingInference: (state, action: PayloadAction<{ inferenceId: string }>) => {
+      if (!state.pendingInferences) return;
+      state.pendingInferences = state.pendingInferences.filter((p) => p.inferenceId !== action.payload.inferenceId);
+    },
   },
 });
 
@@ -589,6 +707,80 @@ export const {
   deleteIndicatorFromScene,
   updateGlobalCutscene,
   updateUseModalStartSelection,
+  addPendingInference,
+  updateInferenceStatus,
+  removePendingInference,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;
+
+export const pollInferences = (): any => async (dispatch: any, getState: any) => {
+  const novelState = getState().novel as NovelV3.NovelState & { pendingInferences?: PendingInference[] };
+  const pendingInferences = (novelState.pendingInferences || []).filter(
+    (p) => p.status === 'pending' || p.status === 'error',
+  );
+  if (!pendingInferences.length) return;
+
+  const inferenceIds = pendingInferences.map((p) => p.inferenceId);
+  try {
+    const response = await apiClient.retrieveMultipleInferences(inferenceIds);
+
+    for (const inf of response.data) {
+      const { status } = inf.status; // 'pending' | 'done' | 'error'
+      if (status === 'done') {
+        const rawImage = inf.status.result?.[0] || '';
+        const p = novelState.pendingInferences?.find((x) => x.inferenceId === inf.inferenceId);
+        if (!p) continue;
+
+        let assetType: AssetType = AssetType.EMOTION_IMAGE;
+        if (p.inferenceType === 'background') {
+          assetType = AssetType.BACKGROUND_IMAGE;
+        } else if (p.inferenceType === 'item') {
+          assetType = AssetType.ITEM_IMAGE;
+        }
+
+        let uploadedAssetId = '';
+        try {
+          const uploadRes = await config.uploadAsset(rawImage, assetType);
+          if (!uploadRes.success) {
+            console.error('Failed uploading generated asset:', uploadRes);
+            dispatch(
+              updateInferenceStatus({
+                inferenceId: inf.inferenceId,
+                status: 'error',
+              }),
+            );
+            continue;
+          }
+          uploadedAssetId = uploadRes.assetId;
+        } catch (err) {
+          console.error('Asset upload error:', err);
+          dispatch(
+            updateInferenceStatus({
+              inferenceId: inf.inferenceId,
+              status: 'error',
+            }),
+          );
+          continue;
+        }
+
+        dispatch(
+          updateInferenceStatus({
+            inferenceId: inf.inferenceId,
+            status: 'done',
+            resultImage: uploadedAssetId,
+          }),
+        );
+      } else if (status === 'error') {
+        dispatch(
+          updateInferenceStatus({
+            inferenceId: inf.inferenceId,
+            status: 'error',
+          }),
+        );
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};

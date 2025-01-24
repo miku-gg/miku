@@ -25,6 +25,7 @@ import { toast } from 'react-toastify';
 import { BsStars } from 'react-icons/bs';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
+import CharacterOutfitGenerateModal from './CharacterOutfitGenerateModal';
 
 export default function CharacterOutfitsEdit({ characterId }: { characterId?: string }) {
   const dispatch = useAppDispatch();
@@ -36,6 +37,7 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
   const [selectedItemByIndex, setSelectedItemByIndex] = useState<number>(-1);
   const [expandedTemplateDropdown, setExpandedTemplateDropdown] = useState(false);
   const { openModal } = AreYouSure.useAreYouSure();
+  const [showGenerateModalForIndex, setShowGenerateModalForIndex] = useState<number | null>(null);
 
   const decorateCharacterWithOutfits = (outfits: MikuCardV2['data']['extensions']['mikugg_v2']['outfits']) => {
     return {
@@ -384,6 +386,16 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
             />
           </div>
           <div className="CharacterOutfitsEdit__emotions">{renderEmotionImages()}</div>
+          <div className="CharacterOutfitsEdit__buttons-row">
+            <Button
+              theme="primary"
+              onClick={() => {
+                setShowGenerateModalForIndex(groupIndex);
+              }}
+            >
+              <BsStars /> Generate Outfit
+            </Button>
+          </div>
         </AccordionItem>
       );
     });
@@ -408,6 +420,15 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
           </Button>
         </a>
       </div>
+
+      {showGenerateModalForIndex !== null && (
+        <CharacterOutfitGenerateModal
+          isOpen={showGenerateModalForIndex !== null}
+          onClose={() => setShowGenerateModalForIndex(null)}
+          characterId={characterId}
+          outfitId={outfits[showGenerateModalForIndex].id}
+        />
+      )}
     </div>
   );
 }

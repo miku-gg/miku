@@ -130,14 +130,9 @@ Break down all character elements into face features, body characteristics, and 
 
 // Example usage:
 const generator = new CharacterPromptGenerator();
+export default generator;
 
-// Generate a prompt
-const example = async () => {
-  console.log('running example');
-  const result = await generator.generatePrompt('hacker girl character');
-  console.log(result);
-};
-
-// eslint-disable-next-line
-// @ts-ignore
-window.example = example;
+// Generate a prompt example
+//   console.log('running example');
+//   const result = await generator.generatePrompt('hacker girl character');
+//   console.log(result);
