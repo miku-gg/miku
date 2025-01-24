@@ -103,6 +103,207 @@ export class NovelManager {
 
   replaceState(state: NovelV3.NovelState) {
     this.novel = JSON.parse(JSON.stringify(state));
+
+    // RESET IDS for character (already present code)
+    const maxCharId = this.novel.characters.reduce((acc, character) => {
+      const parts = character.id.split('_');
+      if (parts.length === 2 && parts[0] === 'character') {
+        const num = parseInt(parts[1], 10);
+        if (!isNaN(num) && num > acc) {
+          acc = num;
+        }
+      }
+      return acc;
+    }, 0);
+    ids.set('character', maxCharId);
+
+    // NEW: RESET IDS for lorebook
+    let maxLorebookId = 0;
+    if (this.novel.lorebooks) {
+      for (const lb of this.novel.lorebooks) {
+        const parts = lb.id.split('_');
+        if (parts.length === 2 && parts[0] === 'lorebook') {
+          const num = parseInt(parts[1], 10);
+          if (!isNaN(num) && num > maxLorebookId) {
+            maxLorebookId = num;
+          }
+        }
+      }
+      ids.set('lorebook', maxLorebookId);
+    }
+
+    // NEW: RESET IDS for entry (note that entryId is stored as a number)
+    let maxEntryId = 0;
+    if (this.novel.lorebooks) {
+      for (const lb of this.novel.lorebooks) {
+        for (const e of lb.entries) {
+          // e.id is a number
+          if (typeof e.id === 'number' && e.id > maxEntryId) {
+            maxEntryId = e.id;
+          }
+        }
+      }
+      ids.set('entry', maxEntryId);
+    }
+
+    // NEW: RESET IDS for outfit
+    let maxOutfitId = 0;
+    for (const character of this.novel.characters) {
+      const outfits = character.card?.data?.extensions?.mikugg_v2?.outfits ?? [];
+      for (const outfit of outfits) {
+        const parts = outfit.id.split('_');
+        if (parts.length === 2 && parts[0] === 'outfit') {
+          const num = parseInt(parts[1], 10);
+          if (!isNaN(num) && num > maxOutfitId) {
+            maxOutfitId = num;
+          }
+        }
+      }
+    }
+    ids.set('outfit', maxOutfitId);
+
+    // NEW: RESET IDS for background
+    let maxBgId = 0;
+    for (const bg of this.novel.backgrounds) {
+      const parts = bg.id.split('_');
+      if (parts.length === 2 && parts[0] === 'background') {
+        const num = parseInt(parts[1], 10);
+        if (!isNaN(num) && num > maxBgId) {
+          maxBgId = num;
+        }
+      }
+    }
+    ids.set('background', maxBgId);
+
+    // NEW: RESET IDS for music
+    let maxMusicId = 0;
+    for (const s of this.novel.songs) {
+      const parts = s.id.split('_');
+      if (parts.length === 2 && parts[0] === 'music') {
+        const num = parseInt(parts[1], 10);
+        if (!isNaN(num) && num > maxMusicId) {
+          maxMusicId = num;
+        }
+      }
+    }
+    ids.set('music', maxMusicId);
+
+    // NEW: RESET IDS for cutscene
+    let maxCutsceneId = 0;
+    if (this.novel.cutscenes) {
+      for (const c of this.novel.cutscenes) {
+        const parts = c.id.split('_');
+        if (parts.length === 2 && parts[0] === 'cutscene') {
+          const num = parseInt(parts[1], 10);
+          if (!isNaN(num) && num > maxCutsceneId) {
+            maxCutsceneId = num;
+          }
+        }
+      }
+    }
+    ids.set('cutscene', maxCutsceneId);
+
+    // NEW: RESET IDS for scene
+    let maxSceneId = 0;
+    for (const sc of this.novel.scenes) {
+      const parts = sc.id.split('_');
+      if (parts.length === 2 && parts[0] === 'scene') {
+        const num = parseInt(parts[1], 10);
+        if (!isNaN(num) && num > maxSceneId) {
+          maxSceneId = num;
+        }
+      }
+    }
+    ids.set('scene', maxSceneId);
+
+    // NEW: RESET IDS for start
+    let maxStartId = 0;
+    for (const st of this.novel.starts) {
+      const parts = st.id.split('_');
+      if (parts.length === 2 && parts[0] === 'start') {
+        const num = parseInt(parts[1], 10);
+        if (!isNaN(num) && num > maxStartId) {
+          maxStartId = num;
+        }
+      }
+    }
+    ids.set('start', maxStartId);
+
+    // NEW: RESET IDS for item
+    let maxItemId = 0;
+    if (this.novel.inventory) {
+      for (const it of this.novel.inventory) {
+        const parts = it.id.split('_');
+        if (parts.length === 2 && parts[0] === 'item') {
+          const num = parseInt(parts[1], 10);
+          if (!isNaN(num) && num > maxItemId) {
+            maxItemId = num;
+          }
+        }
+      }
+    }
+    ids.set('item', maxItemId);
+
+    // NEW: RESET IDS for objective
+    if (!this.novel.objectives) {
+      this.novel.objectives = [];
+    }
+    let maxObjectiveId = 0;
+    for (const obj of this.novel.objectives) {
+      const parts = obj.id.split('_');
+      if (parts.length === 2 && parts[0] === 'objective') {
+        const num = parseInt(parts[1], 10);
+        if (!isNaN(num) && num > maxObjectiveId) {
+          maxObjectiveId = num;
+        }
+      }
+    }
+    ids.set('objective', maxObjectiveId);
+
+    // NEW: RESET IDS for map
+    let maxMapId = 0;
+    for (const m of this.novel.maps) {
+      const parts = m.id.split('_');
+      if (parts.length === 2 && parts[0] === 'map') {
+        const num = parseInt(parts[1], 10);
+        if (!isNaN(num) && num > maxMapId) {
+          maxMapId = num;
+        }
+      }
+    }
+    ids.set('map', maxMapId);
+
+    // NEW: RESET IDS for place
+    let maxPlaceId = 0;
+    for (const m of this.novel.maps) {
+      for (const p of m.places) {
+        const parts = p.id.split('_');
+        if (parts.length === 2 && parts[0] === 'place') {
+          const num = parseInt(parts[1], 10);
+          if (!isNaN(num) && num > maxPlaceId) {
+            maxPlaceId = num;
+          }
+        }
+      }
+    }
+    ids.set('place', maxPlaceId);
+
+    // NEW: RESET IDS for indicator
+    let maxIndicatorId = 0;
+    for (const sc of this.novel.scenes) {
+      if (sc.indicators) {
+        for (const ind of sc.indicators) {
+          const parts = ind.id.split('_');
+          if (parts.length === 2 && parts[0] === 'indicator') {
+            const num = parseInt(parts[1], 10);
+            if (!isNaN(num) && num > maxIndicatorId) {
+              maxIndicatorId = num;
+            }
+          }
+        }
+      }
+    }
+    ids.set('indicator', maxIndicatorId);
   }
 
   getNovelState(): NovelV3.NovelState {
@@ -742,7 +943,7 @@ export class NovelManager {
       if (sceneData.condition !== undefined) existingScene.condition = sceneData.condition || null;
       if (sceneData.actionText !== undefined) existingScene.actionText = sceneData.actionText;
 
-      return 'Scene updated successfully';
+      return `Scene ID ${sceneId} updated successfully`;
     } else {
       // Create new scene
       const newScene: NovelV3.NovelScene = {

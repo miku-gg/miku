@@ -1,4 +1,4 @@
-import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD, TavernCardV2, NovelV3 } from '@mikugg/bot-utils';
+import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD, NovelV3, TavernCardV2 } from '@mikugg/bot-utils';
 import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..';
 import {
   selectAllParentDialoguesWhereCharactersArePresent,
@@ -44,6 +44,21 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       .join('\n');
     const emotions = this.getCharacterEmotions(state, currentCharacterId);
     const emotionStrings = emotions.join(', ');
+    // get the charact outfit descriptions
+    const outfitDescriptions = characters
+      .map(({ outfit: outfitId, characterId }) => {
+        const character = state.novel.characters.find((character) => character.id === characterId);
+        const outfit = character?.card.data.extensions.mikugg_v2.outfits.find(
+          (outfit) => outfit.id === outfitId,
+        )?.description;
+        return outfit
+          ? {
+              characterName: character.name,
+              description: outfit,
+            }
+          : null;
+      })
+      .filter(Boolean);
 
     const { BOS, INPUT_START, SYSTEM_START, SYSTEM_END } = this.instructTemplate;
 
@@ -61,6 +76,17 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
 
     if (state.settings.prompt.systemPrompt) {
       template += `${state.settings.prompt.systemPrompt}\n`;
+    }
+
+    if (outfitDescriptions.length) {
+      for (const outfitDescription of outfitDescriptions) {
+        if (outfitDescription?.characterName && outfitDescription?.description) {
+          template += `\n${this.i18n('character_outfit_description', [
+            outfitDescription?.characterName || '',
+            outfitDescription?.description || '',
+          ])}\n`;
+        }
+      }
     }
 
     const lorebook = this.getContextForLorebookEntry(state, currentCharacterId);

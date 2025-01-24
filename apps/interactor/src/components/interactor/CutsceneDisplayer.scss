@@ -176,6 +176,8 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    background: linear-gradient(to top, #000000b3, #0000 100%);
+    z-index: 0;
 
     &-right,
     &-left {
@@ -202,6 +204,12 @@
           color: $secondary-color;
         }
       }
+    }
+
+    &-left--hidden {
+      opacity: 0;
+      pointer-events: none;
+      cursor: default;
     }
   }
 

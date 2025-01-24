@@ -243,6 +243,8 @@ export interface NovelState {
   objectives?: NovelObjective[];
   lorebooks?: NovelLorebook[];
   inventory?: InventoryItem[];
+  globalStartCutsceneId?: string;
+  useModalForStartSelection?: boolean;
 }
 
 export interface NovelIndicator {

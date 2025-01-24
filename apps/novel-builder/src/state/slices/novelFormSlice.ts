@@ -400,14 +400,14 @@ const novelFormSlice = createSlice({
         scene.cutScene.triggerOnlyOnce = action.payload.triggerOnlyOnce;
       }
     },
-    createCutscene: (state, action: PayloadAction<{ cutsceneId: string; sceneId: string }>) => {
+    createCutscene: (state, action: PayloadAction<{ cutsceneId: string; sceneId: string | null }>) => {
       const newCutscene: NovelV3.CutScene = {
         id: action.payload.cutsceneId,
         name: 'New Cutscene',
         parts: [],
       };
       const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
-      if (scene) {
+      if (scene && action.payload.sceneId) {
         scene.cutScene = {
           id: action.payload.cutsceneId,
           triggerOnlyOnce: false,
@@ -517,6 +517,21 @@ const novelFormSlice = createSlice({
         scene.indicators = scene.indicators.filter((indicator) => indicator.id !== action.payload.indicatorId);
       }
     },
+    updateGlobalCutscene: (state, action: PayloadAction<string | null>) => {
+      const cutsceneId = action.payload;
+      const existingCutscene = state.cutscenes?.find((cs) => cs.id === cutsceneId);
+      if (!cutsceneId || !existingCutscene?.id) {
+        // Clear any existing global cutscene
+        state.globalStartCutsceneId = undefined;
+        return;
+      }
+      // Try to locate existing cutscene
+      // If not found, create a basic new cutscene
+      state.globalStartCutsceneId = existingCutscene.id;
+    },
+    updateUseModalStartSelection: (state, action: PayloadAction<boolean>) => {
+      state.useModalForStartSelection = action.payload;
+    },
   },
 });
 
@@ -572,6 +587,8 @@ export const {
   addIndicatorToScene,
   updateIndicatorInScene,
   deleteIndicatorFromScene,
+  updateGlobalCutscene,
+  updateUseModalStartSelection,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

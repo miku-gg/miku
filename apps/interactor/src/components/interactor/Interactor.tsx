@@ -7,6 +7,7 @@ import {
   selectLastLoadedCharacters,
   selectLastSelectedCharacter,
   selectDisplayingCutScene,
+  selectShouldPlayGlobalStartCutscene,
 } from '../../state/selectors';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import ChatBox from '../chat-box/ChatBox';
@@ -19,8 +20,9 @@ import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
-import { markCurrentCutsceneAsSeen } from '../../state/slices/narrationSlice';
+import { markCurrentCutsceneAsSeen, setHasPlayedGlobalStartCutscene } from '../../state/slices/narrationSlice';
 import IndicatorsDisplay from '../indicators-display/IndicatorsDisplay';
+import StartSelector from '../start-selector/StartSelector';
 
 const Interactor = () => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
@@ -30,6 +32,7 @@ const Interactor = () => {
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
+  const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
 
   if (!scene) {
     return null;
@@ -43,11 +46,16 @@ const Interactor = () => {
           <div className="Interactor__cutscene">
             <CutsceneDisplayer
               onEndDisplay={() => {
-                dispatch(markCurrentCutsceneAsSeen());
+                if (shouldPlayGlobalCutscene) {
+                  dispatch(setHasPlayedGlobalStartCutscene(true));
+                } else {
+                  dispatch(markCurrentCutsceneAsSeen());
+                }
               }}
             />
           </div>
         ) : null}
+        {!displayingCutscene && <StartSelector />}
         <div className="Interactor__content">
           <InteractorHeader />
           <IndicatorsDisplay />
