@@ -299,11 +299,11 @@ const TTSPlayer2: React.FC = () => {
           inferAudio();
         }}
         // disabled={!inferencing && !isPremium && !freeTTS && !isFirstMessage}
-        data-tooltip-id="smart-tooltip"
+        data-tooltip-id="audio-tooltip"
         data-tooltip-content={
-          !isPremium && !freeTTS
+          !isPremium && !freeTTS && isProduction
             ? i18n('this_is_a_premium_feature')
-            : !isPremium && freeTTS
+            : !isPremium && freeTTS && isProduction
             ? i18n('free_for_a_limited_time')
             : ''
         }
