@@ -87,7 +87,6 @@ const jwtPermissionMiddleware = async (req: Request, res: Response, next: NextFu
         const authCookie = req.headers.cookie?.split(';').find((c) => c.includes('Authentication'));
         const bearerToken = authCookie?.split('=')[1] || '';
         const decoded = decodeJWT(bearerToken);
-        console.log(decoded);
 
         if (decoded?.sub) {
           const now = Date.now();

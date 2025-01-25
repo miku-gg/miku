@@ -34,14 +34,21 @@ const Settings = (): JSX.Element => {
   const { i18n } = useI18n();
 
   const voiceItems = [
-    { name: 'Sara', value: Voices.Sara },
-    { name: 'Sara - Whispering', value: Voices.SaraWhispering },
-    { name: 'Sonia', value: Voices.Sonia },
-    { name: 'Jane', value: Voices.Jane },
-    { name: 'Maisie', value: Voices.Maisie },
-    { name: 'Davis', value: Voices.Davis },
-    { name: 'Tony', value: Voices.Tony },
+    { name: 'Bella', value: Voices.Bella },
+    { name: 'Irulan', value: Voices.Irulan },
+    { name: 'Nicole', value: Voices.Nicole },
+    { name: 'Sarah', value: Voices.Sarah },
+    { name: 'Sky', value: Voices.Sky },
+    { name: 'SkyBella', value: Voices.SkyBella },
+    { name: 'Adam', value: Voices.Adam },
+    { name: 'Gurney', value: Voices.Gurney },
+    { name: 'Michael', value: Voices.Michael },
   ];
+
+  const voiceSelected = voiceItems.find((item) => item.value === settings.voice.voiceId) || {
+    name: 'SkyBella',
+    value: Voices.SkyBella,
+  };
 
   useEffect(() => {
     postMessage(CustomEventType.SETTINGS_UPDATE, settings);
@@ -153,7 +160,7 @@ const Settings = (): JSX.Element => {
                     <div
                       className="SettingsModal__voice-id-listen"
                       onClick={() => {
-                        audio.src = `https://assets.miku.gg/${settings.voice.voiceId}.mp3`;
+                        audio.src = `https://assets.miku.gg/${voiceSelected.value}.mp3`;
                         audio.play();
                       }}
                       tabIndex={0}
@@ -161,7 +168,7 @@ const Settings = (): JSX.Element => {
                       <MdRecordVoiceOver />
                     </div>
                     <Dropdown
-                      selectedIndex={voiceItems.findIndex((item) => item.value === settings.voice.voiceId)}
+                      selectedIndex={voiceItems.findIndex((item) => item.value === voiceSelected.value)}
                       onChange={(index) => dispatch(setVoiceId(voiceItems[index].value))}
                       items={voiceItems}
                     />

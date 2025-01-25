@@ -116,13 +116,19 @@ export enum Speed {
   Presto = 3,
 }
 export enum Voices {
-  Sara = 'azure_tts.en-US-SaraNeural',
-  SaraWhispering = 'azure_tts.en-US-SaraNeural.whispering',
-  Sonia = 'azure_tts.en-GB-SoniaNeural.sad',
-  Jane = 'azure_tts.en-US-JaneNeural.angry',
-  Maisie = 'azure_tts.en-GB-MaisieNeural',
-  Davis = 'azure_tts.en-US-DavisNeural',
-  Tony = 'azure_tts.en-US-TonyNeural',
+  Bella = 'af_bella',
+  Irulan = 'af_irulan',
+  Nicole = 'af_nicole',
+  Sarah = 'af_sarah',
+  Sky = 'af_sky',
+  SkyBella = 'af_sky+af_bella',
+  Adam = 'am_adam',
+  Gurney = 'am_gurney',
+  Michael = 'am_michael',
+  Emma = 'bf_emma',
+  Isabella = 'bf_isabella',
+  George = 'bm_george',
+  Lewis = 'bm_lewis',
 }
 
 export interface SettingsState {

@@ -70,7 +70,7 @@ app.post('/assistant', async (req: Request<any>, res: Response) => {
   await assistantHandler(req, res);
 });
 
-app.post('/audio', async (req: Request<string>, res: Response) => {
+app.post('/audio', async (req: Request<any>, res: Response) => {
   try {
     await audioHandler(req, res);
   } catch (error) {
