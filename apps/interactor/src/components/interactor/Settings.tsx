@@ -45,6 +45,11 @@ const Settings = (): JSX.Element => {
     { name: 'Michael', value: Voices.Michael },
   ];
 
+  const voiceSelected = voiceItems.find((item) => item.value === settings.voice.voiceId) || {
+    name: 'SkyBella',
+    value: Voices.SkyBella,
+  };
+
   useEffect(() => {
     postMessage(CustomEventType.SETTINGS_UPDATE, settings);
   }, [settings]);
@@ -155,7 +160,7 @@ const Settings = (): JSX.Element => {
                     <div
                       className="SettingsModal__voice-id-listen"
                       onClick={() => {
-                        audio.src = `https://assets.miku.gg/${settings.voice.voiceId}.mp3`;
+                        audio.src = `https://assets.miku.gg/${voiceSelected.value}.mp3`;
                         audio.play();
                       }}
                       tabIndex={0}
@@ -163,7 +168,7 @@ const Settings = (): JSX.Element => {
                       <MdRecordVoiceOver />
                     </div>
                     <Dropdown
-                      selectedIndex={voiceItems.findIndex((item) => item.value === settings.voice.voiceId)}
+                      selectedIndex={voiceItems.findIndex((item) => item.value === voiceSelected.value)}
                       onChange={(index) => dispatch(setVoiceId(voiceItems[index].value))}
                       items={voiceItems}
                     />

@@ -121,7 +121,7 @@ export enum Voices {
   Nicole = 'af_nicole',
   Sarah = 'af_sarah',
   Sky = 'af_sky',
-  SkyBella = 'af_sky_af_bella',
+  SkyBella = 'af_sky+af_bella',
   Adam = 'am_adam',
   Gurney = 'am_gurney',
   Michael = 'am_michael',

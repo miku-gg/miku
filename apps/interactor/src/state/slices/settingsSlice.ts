@@ -37,7 +37,7 @@ export const initialState: SettingsState = {
   voice: {
     autoplay: false,
     speed: Speed.Normal,
-    voiceId: Voices.Bella,
+    voiceId: Voices.SkyBella,
   },
   music: {
     enabled: true,

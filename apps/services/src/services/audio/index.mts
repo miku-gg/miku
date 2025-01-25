@@ -7,7 +7,7 @@ const voiceIds = [
   'af_nicole',
   'af_sarah',
   'af_sky',
-  'af_sky_af_bella',
+  'af_sky+af_bella',
   'am_adam',
   'am_gurney',
   'am_michael',
@@ -24,7 +24,7 @@ export default async (req: Request, res: Response) => {
     return res.status(400).send('Text is required');
   }
   if (!voiceIds.includes(voiceId)) {
-    voiceId = 'af_sky_af_bella';
+    voiceId = 'af_sky+af_bella';
   }
 
   try {
