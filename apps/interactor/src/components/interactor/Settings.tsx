@@ -34,13 +34,15 @@ const Settings = (): JSX.Element => {
   const { i18n } = useI18n();
 
   const voiceItems = [
-    { name: 'Sara', value: Voices.Sara },
-    { name: 'Sara - Whispering', value: Voices.SaraWhispering },
-    { name: 'Sonia', value: Voices.Sonia },
-    { name: 'Jane', value: Voices.Jane },
-    { name: 'Maisie', value: Voices.Maisie },
-    { name: 'Davis', value: Voices.Davis },
-    { name: 'Tony', value: Voices.Tony },
+    { name: 'Bella', value: Voices.Bella },
+    { name: 'Irulan', value: Voices.Irulan },
+    { name: 'Nicole', value: Voices.Nicole },
+    { name: 'Sarah', value: Voices.Sarah },
+    { name: 'Sky', value: Voices.Sky },
+    { name: 'SkyBella', value: Voices.SkyBella },
+    { name: 'Adam', value: Voices.Adam },
+    { name: 'Gurney', value: Voices.Gurney },
+    { name: 'Michael', value: Voices.Michael },
   ];
 
   useEffect(() => {
