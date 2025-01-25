@@ -294,11 +294,11 @@ const TTSPlayer2: React.FC = () => {
           ResponseBox__voice: true,
           'ResponseBox__voice--disabled': !inferencing && isProduction && !isPremium && !freeTTS,
         })}
+        disabled={!inferencing && isProduction && !isPremium && !freeTTS}
         onClick={() => {
           trackEvent('voice-gen-click');
           inferAudio();
         }}
-        // disabled={!inferencing && !isPremium && !freeTTS && !isFirstMessage}
         data-tooltip-id="audio-tooltip"
         data-tooltip-content={
           !isPremium && !freeTTS && isProduction
