@@ -44,10 +44,8 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
     },
   );
 
-  console.log(moderation.data);
-  const flagged =
-    moderation.data?.results &&
-    (moderation.data?.results[0].flagged || moderation.data?.results[0].categories['sexual/minors']);
+  console.log(moderation.data?.results[0].categories);
+  const flagged = moderation.data?.results && moderation.data?.results[0].categories['sexual/minors'];
   if (flagged) {
     return res.json({
       id: '',
