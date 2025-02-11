@@ -34,7 +34,7 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
     'https://api.openai.com/v1/moderations',
     {
       model: 'omni-moderation-latest',
-      input: allMessages,
+      input: allMessages.map((msg) => `${msg.role}: ${msg.content}`).join('\n'),
     },
     {
       headers: {
