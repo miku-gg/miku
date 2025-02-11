@@ -30,7 +30,7 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
     ...messages.filter((msg: ChatCompletionMessageParam) => msg.role !== 'system'),
   ];
 
-  const moderation = await axios.post<ModerationResult>(
+  const moderation = await axios.post<{ results: ModerationResult[] }>(
     'https://api.openai.com/v1/moderations',
     {
       model: 'omni-moderation-latest',
@@ -44,7 +44,10 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
     },
   );
 
-  const flagged = moderation.data?.flagged || moderation.data.categories['sexual/minors'];
+  console.log(moderation.data);
+  const flagged =
+    moderation.data?.results &&
+    (moderation.data?.results[0].flagged || moderation.data?.results[0].categories['sexual/minors']);
   if (flagged) {
     return res.json({
       id: '',
