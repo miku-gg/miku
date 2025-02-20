@@ -359,9 +359,6 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^2.0.1
         version: 2.0.1(react-redux@9.0.4)(react@18.2.0)
-      '@types/axios':
-        specifier: ^0.14.0
-        version: 0.14.0
       '@types/base-64':
         specifier: ^1.0.0
         version: 1.0.0
@@ -375,8 +372,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       axios:
-        specifier: ^1.2.4
-        version: 1.2.4
+        specifier: ^1.7.9
+        version: 1.7.9
       base-64:
         specifier: ^1.0.0
         version: 1.0.0
@@ -559,8 +556,8 @@ importers:
         specifier: ^2.17.1
         version: 2.17.1
       axios:
-        specifier: ^1.2.4
-        version: 1.2.4
+        specifier: ^1.7.9
+        version: 1.7.9
       body-parser:
         specifier: ^1.20.1
         version: 1.20.1
@@ -629,8 +626,8 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1
       axios:
-        specifier: ^1.2.4
-        version: 1.2.4
+        specifier: ^1.7.9
+        version: 1.7.9
       base-64:
         specifier: ^1.0.0
         version: 1.0.0
@@ -6479,15 +6476,6 @@ packages:
       '@types/node': 22.13.4
     dev: true
 
-  /@types/axios@0.14.0:
-    resolution: {integrity: sha512-KqQnQbdYE54D7oa/UmYVMZKq7CO4l8DEENzOKc4aBRwxCXSlJXGz83flFx5L7AWrOQnmuN3kVsRdt+GZPPjiVQ==}
-    deprecated: This is a stub types definition for axios (https://github.com/mzabriskie/axios). axios provides its own type definitions, so you don't need @types/axios installed!
-    dependencies:
-      axios: 1.2.4
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
   /@types/babel__core@7.20.5:
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
     dependencies:
@@ -8105,6 +8093,16 @@ packages:
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
+    dev: false
+
+  /axios@1.7.9:
+    resolution: {integrity: sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==}
+    dependencies:
+      follow-redirects: 1.15.9
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
 
   /axobject-query@3.1.1:
     resolution: {integrity: sha512-goKlv8DZrK9hUh975fnHzhNIO4jUnFCfv/dszV5VwUGDFjI6vQ2VwoyjYjYNEbBE8AH87TduWP5uyDR1D+Iteg==}
@@ -9211,6 +9209,7 @@ packages:
         optional: true
     dependencies:
       ms: 2.1.3
+    dev: false
 
   /debug@4.3.4:
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
@@ -10796,6 +10795,16 @@ packages:
         optional: true
     dependencies:
       debug: 4.1.1
+    dev: false
+
+  /follow-redirects@1.15.9:
+    resolution: {integrity: sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
 
   /for-each@0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
@@ -13622,7 +13631,7 @@ packages:
       '@yarnpkg/lockfile': 1.1.0
       '@yarnpkg/parsers': 3.0.0-rc.44
       '@zkochan/js-yaml': 0.0.6
-      axios: 1.2.4
+      axios: 1.7.9
       chalk: 4.1.2
       cli-cursor: 3.1.0
       cli-spinners: 2.6.1
