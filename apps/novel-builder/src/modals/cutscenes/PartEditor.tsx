@@ -257,11 +257,11 @@ export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneI
               <Characters
                 ignoreIds={
                   selectCharacterModal.characterIndex == 0
-                    ? characters[1]?.id
-                      ? [characters[1]?.id]
+                    ? partCharacters[1]?.id
+                      ? [partCharacters[1]?.id]
                       : []
-                    : characters[0]?.id
-                    ? [characters[0]?.id]
+                    : partCharacters[0]?.id
+                    ? [partCharacters[0]?.id]
                     : []
                 }
                 showNone
