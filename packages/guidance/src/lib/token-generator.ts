@@ -1,3 +1,4 @@
+/* tslint:disable */
 import OpenAI, { ClientOptions } from 'openai';
 import { CompletionCreateParams } from 'openai/resources/completions.mjs';
 
@@ -86,3 +87,4 @@ export class OpenAITokenGenerator extends AbstractTokenGenerator<
     }
   }
 }
+/* tslint:enable */
