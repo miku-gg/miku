@@ -4,7 +4,6 @@ import { SlSettings } from 'react-icons/sl';
 import {
   FontSize,
   Speed,
-  Voices,
   setFontSize,
   setName,
   setSettingsModal,
@@ -16,6 +15,7 @@ import {
   setVoiceSpeed,
   ResponseFormat,
   setResponseFormat,
+  getVoiceItems,
 } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './Settings.scss';
@@ -27,28 +27,16 @@ const audio = new Audio();
 
 const Settings = (): JSX.Element => {
   const dispatch = useAppDispatch();
+  const language = useAppSelector((state) => state.novel.language);
   const settings = useAppSelector((state) => state.settings);
   const settingsTab = useAppSelector((state) => state.settings.modals.settingsTab);
   const currentSystemPromptLenght = useAppSelector((state) => state.settings.prompt.systemPrompt.length);
   const systemPromptMaxLenght = 800;
   const { i18n } = useI18n();
 
-  const voiceItems = [
-    { name: 'Bella', value: Voices.Bella },
-    { name: 'Irulan', value: Voices.Irulan },
-    { name: 'Nicole', value: Voices.Nicole },
-    { name: 'Sarah', value: Voices.Sarah },
-    { name: 'Sky', value: Voices.Sky },
-    { name: 'SkyBella', value: Voices.SkyBella },
-    { name: 'Adam', value: Voices.Adam },
-    { name: 'Gurney', value: Voices.Gurney },
-    { name: 'Michael', value: Voices.Michael },
-  ];
+  const voiceItems = getVoiceItems(language || 'en');
 
-  const voiceSelected = voiceItems.find((item) => item.value === settings.voice.voiceId) || {
-    name: 'SkyBella',
-    value: Voices.SkyBella,
-  };
+  const voiceSelected = voiceItems.find((item) => item.value === settings.voice.voiceId) || voiceItems[0];
 
   useEffect(() => {
     postMessage(CustomEventType.SETTINGS_UPDATE, settings);
