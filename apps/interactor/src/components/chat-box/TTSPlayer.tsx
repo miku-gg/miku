@@ -41,13 +41,13 @@ const getAudioSpeed = (playSpeed: Speed): number => {
     case Speed.Slow:
       return 0.85;
     case Speed.Normal:
-      return 1.1;
+      return 1;
     case Speed.Fast:
       return 1.35;
     case Speed.Presto:
       return 1.75;
     default:
-      return 1.1;
+      return 1;
   }
 };
 
