@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Modal, Input, Button, Loader } from '@mikugg/ui-kit';
 import sdPromptImprover from '../../libs/sdPromptImprover';
 import apiClient from '../../libs/imageInferenceAPI';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '../../state/store';
 import { addPendingInference } from '../../state/slices/novelFormSlice';
+import { LuExternalLink } from 'react-icons/lu';
+import { BsStars } from 'react-icons/bs';
 
 export interface CharacterOutfitGenerateModalProps {
   isOpen: boolean;
@@ -40,6 +42,7 @@ export default function CharacterOutfitGenerateModal({
         return;
       }
       const finalPrompt = res.prompt;
+      const seed = Number(Math.random().toString(36).substring(2, 15));
 
       // 2) Call startInference
       const inferenceIdRes = await apiClient.startInference({
@@ -48,6 +51,8 @@ export default function CharacterOutfitGenerateModal({
         step: 'GEN',
         openposeImageHash: 'pose2.png',
         referenceImageWeight: 0,
+        seed,
+        modelToUse: 1,
       });
 
       toast.info(`Inference started!`);
@@ -59,6 +64,9 @@ export default function CharacterOutfitGenerateModal({
           outfitId,
           inferenceType: 'character',
           prompt: finalPrompt || '',
+          headPrompt: res.components?.character_head,
+          seed,
+          modelToUse: 1,
         }),
       );
       setIsLoading(false);
@@ -82,10 +90,22 @@ export default function CharacterOutfitGenerateModal({
             placeHolder="e.g. a stealthy hacker outfit with a futuristic vibe"
           />
         </div>
-        <div style={{ marginTop: '1rem' }}>
-          <Button theme="primary" onClick={handleGenerate} disabled={isLoading}>
-            {isLoading ? <Loader /> : 'Generate'}
+        <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between' }}>
+          <Button theme="gradient" onClick={handleGenerate} disabled={isLoading}>
+            {isLoading ? (
+              <Loader />
+            ) : (
+              <>
+                <BsStars />
+                Generate with AI
+              </>
+            )}
           </Button>
+          <a href="https://emotions.miku.gg" target="_blank">
+            <Button theme="transparent">
+              <LuExternalLink /> Generate Manually
+            </Button>
+          </a>
         </div>
       </div>
     </Modal>

@@ -68,6 +68,23 @@
     justify-content: space-between;
   }
 
+  &__group-generation-buttons {
+    position: absolute;
+    display: flex;
+    gap: 10px;
+    right: 5px;
+    top: 5px;
+
+    .Button {
+      font-size: 0.8em;
+      padding: 5px 10px;
+    }
+  }
+
+  &__emotions-container {
+    position: relative;
+  }
+
   &__emotions {
     display: flex;
     flex-wrap: wrap;

@@ -110,7 +110,11 @@ Break down all character elements into face features, body characteristics, and 
       const toolCalls = response?.choices[0].message?.tool_calls;
       if (toolCalls && toolCalls.length > 0) {
         const toolCall = toolCalls[0];
-        const args = JSON.parse(toolCall.function.arguments);
+        const args = JSON.parse(toolCall.function.arguments) as {
+          character_head: string;
+          character_body: string;
+          character_outfit: string;
+        };
         return {
           success: true,
           prompt: `${args.character_head},${args.character_body},${args.character_outfit}`,
@@ -136,3 +140,23 @@ export default generator;
 //   console.log('running example');
 //   const result = await generator.generatePrompt('hacker girl character');
 //   console.log(result);
+
+export const emotionSuffixPrompts: Record<string, string> = {
+  angry: '(angry:1.3),',
+  sad: '(sad:1.3), teary eyes, downturned mouth, looking down, (tired:1.2)',
+  happy: '(happy:1.3), bright eyes, relaxed, (laughing:1.2)',
+  disgusted: '(disgusted:1.3), open mouth, unhappy, glare, glaring at viewer',
+  scared: '(scared:1.2), open mouth, sweaty, fearful',
+  embarrased: '(embarrassed:1.3), (blushing:1.2), (looking down:1.4), nervous',
+  surprised: '(surprised:1.3), open mouth, looking at viewer',
+  neutral: '(relaxed:1.4), looking at viewer, calm, (slight smile:0.9)',
+  confused: '(thinking:1.3), (confused:1.3)',
+};
+
+export const getPromptForEmotion = (emotion: string, headPrompt = '') => {
+  if (!Object.keys(emotionSuffixPrompts).includes(emotion)) {
+    throw `Invalid emotion for generation: "${emotion}"`;
+  }
+
+  return `${headPrompt},${emotionSuffixPrompts[emotion]}`;
+};

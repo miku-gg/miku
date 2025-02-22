@@ -49,6 +49,8 @@ export interface InferenceQuery {
   emotion?: string;
   parentRequestId?: string;
   openposeImageHash?: string;
+  seed: number;
+  modelToUse: number;
 }
 
 export interface InferenceStatus {
@@ -73,6 +75,8 @@ export interface InferenceRequest {
   renderedPoseImageHash: string | null;
   emotion: string | null;
   emotionIndex: number | null;
+  seed: number;
+  modelToUse: number;
   createdAt: Date;
   updatedAt: Date;
   result: string[];
@@ -270,6 +274,8 @@ class APIClient {
         emotion: params.emotion,
         parentRequestId: params.parentRequestId,
         openposeImageHash: params.openposeImageHash,
+        seed: params.seed,
+        modelToUse: params.modelToUse,
       });
 
       return response;

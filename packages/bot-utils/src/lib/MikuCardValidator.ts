@@ -130,6 +130,14 @@ export type MikuCardV2 = TavernCardV2 & {
           attributes: string[][]; // attributes of the outfit
           template: string; // template of group of emotions to be used
           nsfw?: number; // whether the outfit is NSFW (0: false, 1: nudity, 2: explicit)
+          generationData?: {
+            headPrompt: string; // prompt that was used to generate the head of the outfit
+            prompt: string; // prompt that was used to generate the outfit
+            modelToUse: number; // model that was used to generate the outfit
+            seed: number; // seed that was used to generate the outfit
+            poseImage?: string; // pose that was used to generate the outfit
+            referenceImage?: string; // reference image that was used to generate the outfit
+          };
           emotions: {
             // list of emotions of the group, derived from the template
             id: string; // id of the emotion

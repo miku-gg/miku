@@ -15,6 +15,11 @@ interface PendingInference {
 
   inferenceType: 'character' | 'emotion' | 'background' | 'item';
   prompt: string; // store the description/prompt
+  headPrompt?: string;
+  modelToUse: number;
+  seed: number;
+  poseImage?: string;
+  referenceImage?: string;
 
   characterId?: string; // used by character/emotion types
   outfitId?: string; // used by character/emotion types
@@ -589,10 +594,25 @@ const novelFormSlice = createSlice({
             if (outfitIndex < 0) break;
             const outfit = outfits[outfitIndex];
             const neutralEmotion = outfit.emotions.find((e) => e.id === 'neutral');
+
             if (neutralEmotion) {
               neutralEmotion.sources.png = resultImage;
-              toast.success(`Character outfit image updated for ${outfit.name}!`);
+              toast.success(`Character outfit image updated for "${outfit.name}"!`);
             }
+
+            // Inject query data into generationData
+            outfit.generationData = {
+              ...outfit.generationData,
+              headPrompt: pending.headPrompt ?? outfit.generationData?.headPrompt ?? '',
+              prompt: pending.prompt ?? outfit.generationData?.prompt,
+              referenceImage: resultImage,
+              modelToUse: pending.modelToUse ?? outfit.generationData?.modelToUse ?? 1,
+              seed: pending.seed ?? outfit.generationData?.seed ?? 0,
+              poseImage: pending.poseImage || outfit.generationData?.poseImage,
+            };
+
+            outfits[outfitIndex] = { ...outfit };
+            char.card.data.extensions.mikugg_v2.outfits = outfits;
             state.characters[charIndex] = { ...char };
             break;
           }

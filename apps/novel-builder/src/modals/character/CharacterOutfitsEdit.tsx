@@ -26,7 +26,7 @@ import { BsStars } from 'react-icons/bs';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
 import CharacterOutfitGenerateModal from './CharacterOutfitGenerateModal';
-
+import CharacterOutfitEmotionsGenerateModal from './CharacterOutfitEmotionsGenerateModal';
 export default function CharacterOutfitsEdit({ characterId }: { characterId?: string }) {
   const dispatch = useAppDispatch();
   const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === characterId));
@@ -37,7 +37,8 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
   const [selectedItemByIndex, setSelectedItemByIndex] = useState<number>(-1);
   const [expandedTemplateDropdown, setExpandedTemplateDropdown] = useState(false);
   const { openModal } = AreYouSure.useAreYouSure();
-  const [showGenerateModalForIndex, setShowGenerateModalForIndex] = useState<number | null>(null);
+  const [showGenerateOutfitModalForIndex, setShowGenerateOutfitModalForIndex] = useState<number | null>(null);
+  const [showGenerateEmotionsModalForIndex, setShowGenerateEmotionsModalForIndex] = useState<number | null>(null);
 
   const decorateCharacterWithOutfits = (outfits: MikuCardV2['data']['extensions']['mikugg_v2']['outfits']) => {
     return {
@@ -385,16 +386,32 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
               selectedIndex={getDropdownEmotionTemplateIndex(groupIndex)}
             />
           </div>
-          <div className="CharacterOutfitsEdit__emotions">{renderEmotionImages()}</div>
-          <div className="CharacterOutfitsEdit__buttons-row">
-            <Button
-              theme="primary"
-              onClick={() => {
-                setShowGenerateModalForIndex(groupIndex);
-              }}
-            >
-              <BsStars /> Generate Outfit
-            </Button>
+          <div className="CharacterOutfitsEdit__emotions-container">
+            <div className="CharacterOutfitsEdit__emotions">{renderEmotionImages()}</div>
+            {group.template === 'single-emotion' ? (
+              <div className="CharacterOutfitsEdit__group-generation-buttons">
+                <Button
+                  theme="secondary"
+                  onClick={() => {
+                    setShowGenerateOutfitModalForIndex(groupIndex);
+                  }}
+                >
+                  <BsStars /> Generate Outfit
+                </Button>
+                <Button
+                  theme="secondary"
+                  // disabled={
+                  // group.emotions?.at(0)?.sources.png === 'empty_char_emotion.png' ||
+                  // !group.emotions?.at(0)?.sources.png
+                  // }
+                  onClick={() => {
+                    setShowGenerateEmotionsModalForIndex(groupIndex);
+                  }}
+                >
+                  <BsStars /> Generate Emotions
+                </Button>
+              </div>
+            ) : null}
           </div>
         </AccordionItem>
       );
@@ -414,19 +431,22 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
         <Button theme="secondary" onClick={handleAddGroup}>
           + Add Outfit
         </Button>
-        <a href="https://emotions.miku.gg" target="_blank">
-          <Button theme="gradient">
-            <BsStars /> Generate
-          </Button>
-        </a>
       </div>
 
-      {showGenerateModalForIndex !== null && (
+      {showGenerateOutfitModalForIndex !== null && (
         <CharacterOutfitGenerateModal
-          isOpen={showGenerateModalForIndex !== null}
-          onClose={() => setShowGenerateModalForIndex(null)}
+          isOpen={showGenerateOutfitModalForIndex !== null}
+          onClose={() => setShowGenerateOutfitModalForIndex(null)}
           characterId={characterId}
-          outfitId={outfits[showGenerateModalForIndex].id}
+          outfitId={outfits[showGenerateOutfitModalForIndex].id}
+        />
+      )}
+      {showGenerateEmotionsModalForIndex !== null && (
+        <CharacterOutfitEmotionsGenerateModal
+          isOpen={showGenerateEmotionsModalForIndex !== null}
+          onClose={() => setShowGenerateEmotionsModalForIndex(null)}
+          characterId={characterId}
+          outfitId={outfits[showGenerateEmotionsModalForIndex].id}
         />
       )}
     </div>
