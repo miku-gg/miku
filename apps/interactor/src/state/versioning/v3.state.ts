@@ -116,13 +116,59 @@ export enum Speed {
   Presto = 3,
 }
 export enum Voices {
-  Sara = 'azure_tts.en-US-SaraNeural',
-  SaraWhispering = 'azure_tts.en-US-SaraNeural.whispering',
-  Sonia = 'azure_tts.en-GB-SoniaNeural.sad',
-  Jane = 'azure_tts.en-US-JaneNeural.angry',
-  Maisie = 'azure_tts.en-GB-MaisieNeural',
-  Davis = 'azure_tts.en-US-DavisNeural',
-  Tony = 'azure_tts.en-US-TonyNeural',
+  EN_Heart = 'af_heart',
+  EN_Alloy = 'af_alloy',
+  EN_Aoede = 'af_aoede',
+  EN_Bella = 'af_bella',
+  EN_Jessica = 'af_jessica',
+  EN_KORE = 'af_kore',
+  EN_Irulan = 'af_v0irulan',
+  EN_Nicole = 'af_nicole',
+  EN_Nova = 'af_nova',
+  EN_River = 'af_river',
+  EN_Sarah = 'af_sarah',
+  EN_Sky = 'af_sky',
+  EN_SkyBella = 'af_sky+af_bella',
+
+  EN_Alice = 'bf_alice',
+  EN_Emma = 'bf_emma',
+  EN_Isabella = 'bf_isabella',
+  EN_Lily = 'bf_lily',
+
+  EN_Adam = 'am_adam',
+  EN_Echo = 'am_echo',
+  EN_Eric = 'am_eric',
+  EN_Fenrir = 'am_fenrir',
+  EN_Gurney = 'am_v0gurney',
+  EN_Liam = 'am_liam',
+  EN_Michael = 'am_michael',
+  EN_Onyx = 'am_onyx',
+  EN_Puck = 'am_puck',
+  EN_Santa = 'am_santa',
+
+  EN_Daniel = 'bm_daniel',
+  EN_Fable = 'bm_fable',
+  EN_George = 'bm_george',
+  EN_Lewis = 'bm_lewis',
+
+  ES_Dora = 'ef_dora',
+  ES_Alex = 'em_alex',
+  ES_Santa = 'em_santa',
+
+  FR_Siwis = 'ff_siwis',
+
+  IT_Sara = 'if_sara',
+  IT_Nicola = 'im_nicola',
+
+  JA_Alpha = 'jf_alpha',
+  JA_Gongitsune = 'jf_gongitsune',
+  JA_Nezumi = 'jf_nezumi',
+  JA_Tebukuro = 'jf_tebukuro',
+  JA_Kumo = 'jm_kumo',
+
+  PT_Dora = 'pf_dora',
+  PT_Alex = 'pm_alex',
+  PT_Santa = 'pm_santa',
 }
 
 export interface SettingsState {

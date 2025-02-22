@@ -15,6 +15,7 @@ interface DragAndDropImagesProps {
   size?: 'sm' | 'md' | 'lg';
   accept?: string;
   placeHolderImage?: React.ReactNode;
+  loading?: boolean;
 }
 
 const DragAndDropImages = ({
@@ -27,11 +28,14 @@ const DragAndDropImages = ({
   previewImage = '',
   size = 'md',
   accept = 'image/*',
+  loading: loadingProp,
   placeHolderImage = <DefaultImage />,
 }: DragAndDropImagesProps) => {
   const [dragOver, setDragOver] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [_loading, setLoading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null); // Create a ref for the file input
+
+  const loading = loadingProp ?? _loading;
 
   const handleClick = () => {
     fileInputRef.current?.click(); // Trigger click event of file input when dropzone is clicked

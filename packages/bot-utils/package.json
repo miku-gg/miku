@@ -1,6 +1,6 @@
 {
   "name": "@mikugg/bot-utils",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "",
   "repository": {
     "type": "git",
@@ -33,10 +33,10 @@
   },
   "dependencies": {
     "@types/base-64": "^1.0.0",
-    "@types/node": "^18.15.5",
+    "@types/node": "22.13.4",
     "@types/prop-types": "^15.7.5",
     "@types/utf8": "^3.0.1",
-    "axios": "^1.2.4",
+    "axios": "^1.7.9",
     "base-64": "^1.0.0",
     "buffer": "^6.0.3",
     "form-data": "^4.0.0",

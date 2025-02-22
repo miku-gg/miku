@@ -1,5 +1,6 @@
 import OpenAI, { ClientOptions } from 'openai';
 import { CompletionCreateParams } from 'openai/resources/completions.mjs';
+import { RequestOptions } from 'openai/core';
 
 export abstract class AbstractTokenGenerator<TRequestOptions = undefined> {
   abstract generateTokenLogProgs(
@@ -17,9 +18,7 @@ export abstract class AbstractTokenGenerator<TRequestOptions = undefined> {
  * OpenAI Token Generator
  *
  */
-export class OpenAITokenGenerator extends AbstractTokenGenerator<
-  OpenAI.RequestOptions<Record<string, unknown>> | undefined
-> {
+export class OpenAITokenGenerator extends AbstractTokenGenerator<RequestOptions<Record<string, unknown>> | undefined> {
   private openai: OpenAI;
   private model: string;
   private defaultCompletionParams?: CompletionCreateParams;
@@ -46,7 +45,7 @@ export class OpenAITokenGenerator extends AbstractTokenGenerator<
   override async generateTokenLogProgs(
     prompt: string,
     logit_bias: Record<string, number>,
-    reqOptions?: OpenAI.RequestOptions<Record<string, unknown>> | undefined,
+    reqOptions?: RequestOptions<Record<string, unknown>> | undefined,
   ): Promise<Record<string, number>> {
     const result = await this.openai.completions.create(
       {
@@ -67,7 +66,7 @@ export class OpenAITokenGenerator extends AbstractTokenGenerator<
   override async *generateString(
     prompt: string,
     options: Record<string, string | number | string[]>,
-    reqOptions?: OpenAI.RequestOptions<Record<string, unknown>> | undefined,
+    reqOptions?: RequestOptions<Record<string, unknown>> | undefined,
   ): AsyncGenerator<string> {
     const stream = await this.openai.completions.create(
       {

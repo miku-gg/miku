@@ -11,6 +11,77 @@ export enum ResponseFormat {
   VNStyle = 'VNStyle',
 }
 
+export const getVoiceItems = (_language: string): { name: string; value: Voices }[] => {
+  const language = _language.toLowerCase();
+  if (language.startsWith('es')) {
+    return [
+      { name: 'Dora', value: Voices.ES_Dora },
+      { name: 'Alex', value: Voices.ES_Alex },
+      { name: 'Santa', value: Voices.ES_Santa },
+    ];
+  }
+  if (language.startsWith('fr')) {
+    return [{ name: 'Siwis', value: Voices.FR_Siwis }];
+  }
+  if (language.startsWith('it')) {
+    return [
+      { name: 'Sara', value: Voices.IT_Sara },
+      { name: 'Nicola', value: Voices.IT_Nicola },
+    ];
+  }
+  if (language.startsWith('jp')) {
+    return [
+      { name: 'Alpha', value: Voices.JA_Alpha },
+      { name: 'Gongitsune', value: Voices.JA_Gongitsune },
+      { name: 'Nezumi', value: Voices.JA_Nezumi },
+      { name: 'Tebukuro', value: Voices.JA_Tebukuro },
+      { name: 'Kumo', value: Voices.JA_Kumo },
+    ];
+  }
+  if (language.startsWith('pt')) {
+    return [
+      { name: 'Dora', value: Voices.PT_Dora },
+      { name: 'Alex', value: Voices.PT_Alex },
+      { name: 'Santa', value: Voices.PT_Santa },
+    ];
+  }
+  return [
+    // Female voices
+    { name: 'SkyBella', value: Voices.EN_SkyBella },
+    { name: 'Heart', value: Voices.EN_Heart },
+    { name: 'Alloy', value: Voices.EN_Alloy },
+    { name: 'Aoede', value: Voices.EN_Aoede },
+    { name: 'Bella', value: Voices.EN_Bella },
+    { name: 'Jessica', value: Voices.EN_Jessica },
+    { name: 'KORE', value: Voices.EN_KORE },
+    { name: 'Irulan', value: Voices.EN_Irulan },
+    { name: 'Nicole', value: Voices.EN_Nicole },
+    { name: 'Nova', value: Voices.EN_Nova },
+    { name: 'River', value: Voices.EN_River },
+    { name: 'Sarah', value: Voices.EN_Sarah },
+    { name: 'Sky', value: Voices.EN_Sky },
+    { name: 'Alice', value: Voices.EN_Alice },
+    { name: 'Emma', value: Voices.EN_Emma },
+    { name: 'Isabella', value: Voices.EN_Isabella },
+    { name: 'Lily', value: Voices.EN_Lily },
+    // Male voices
+    { name: 'Adam', value: Voices.EN_Adam },
+    { name: 'Echo', value: Voices.EN_Echo },
+    { name: 'Eric', value: Voices.EN_Eric },
+    { name: 'Fenrir', value: Voices.EN_Fenrir },
+    { name: 'Gurney', value: Voices.EN_Gurney },
+    { name: 'Liam', value: Voices.EN_Liam },
+    { name: 'Michael', value: Voices.EN_Michael },
+    { name: 'Onyx', value: Voices.EN_Onyx },
+    { name: 'Puck', value: Voices.EN_Puck },
+    { name: 'Santa', value: Voices.EN_Santa },
+    { name: 'Daniel', value: Voices.EN_Daniel },
+    { name: 'Fable', value: Voices.EN_Fable },
+    { name: 'George', value: Voices.EN_George },
+    { name: 'Lewis', value: Voices.EN_Lewis },
+  ];
+};
+
 export const initialState: SettingsState = {
   model: ModelType.RP,
   user: {
@@ -37,7 +108,7 @@ export const initialState: SettingsState = {
   voice: {
     autoplay: false,
     speed: Speed.Normal,
-    voiceId: Voices.SaraWhispering,
+    voiceId: Voices.EN_SkyBella,
   },
   music: {
     enabled: true,

@@ -4,7 +4,6 @@ import { SlSettings } from 'react-icons/sl';
 import {
   FontSize,
   Speed,
-  Voices,
   setFontSize,
   setName,
   setSettingsModal,
@@ -16,6 +15,7 @@ import {
   setVoiceSpeed,
   ResponseFormat,
   setResponseFormat,
+  getVoiceItems,
 } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './Settings.scss';
@@ -27,21 +27,16 @@ const audio = new Audio();
 
 const Settings = (): JSX.Element => {
   const dispatch = useAppDispatch();
+  const language = useAppSelector((state) => state.novel.language);
   const settings = useAppSelector((state) => state.settings);
   const settingsTab = useAppSelector((state) => state.settings.modals.settingsTab);
   const currentSystemPromptLenght = useAppSelector((state) => state.settings.prompt.systemPrompt.length);
   const systemPromptMaxLenght = 800;
   const { i18n } = useI18n();
 
-  const voiceItems = [
-    { name: 'Sara', value: Voices.Sara },
-    { name: 'Sara - Whispering', value: Voices.SaraWhispering },
-    { name: 'Sonia', value: Voices.Sonia },
-    { name: 'Jane', value: Voices.Jane },
-    { name: 'Maisie', value: Voices.Maisie },
-    { name: 'Davis', value: Voices.Davis },
-    { name: 'Tony', value: Voices.Tony },
-  ];
+  const voiceItems = getVoiceItems(language || 'en');
+
+  const voiceSelected = voiceItems.find((item) => item.value === settings.voice.voiceId) || voiceItems[0];
 
   useEffect(() => {
     postMessage(CustomEventType.SETTINGS_UPDATE, settings);
@@ -153,7 +148,7 @@ const Settings = (): JSX.Element => {
                     <div
                       className="SettingsModal__voice-id-listen"
                       onClick={() => {
-                        audio.src = `https://assets.miku.gg/${settings.voice.voiceId}.mp3`;
+                        audio.src = `https://assets.miku.gg/${voiceSelected.value}.mp3`;
                         audio.play();
                       }}
                       tabIndex={0}
@@ -161,7 +156,7 @@ const Settings = (): JSX.Element => {
                       <MdRecordVoiceOver />
                     </div>
                     <Dropdown
-                      selectedIndex={voiceItems.findIndex((item) => item.value === settings.voice.voiceId)}
+                      selectedIndex={voiceItems.findIndex((item) => item.value === voiceSelected.value)}
                       onChange={(index) => dispatch(setVoiceId(voiceItems[index].value))}
                       items={voiceItems}
                     />
