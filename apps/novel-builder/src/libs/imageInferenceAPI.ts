@@ -321,6 +321,13 @@ class APIClient {
     );
     return response;
   }
+
+  async migrateInferenceToAssets(inferenceId: string): Promise<APIResponse<string>> {
+    const response: AxiosResponse<string> = await this.client.post(`/inference/migrate-results-to-mikugg`, {
+      inferenceId,
+    });
+    return response;
+  }
 }
 
 export default new APIClient(config.platformAPIEndpoint);

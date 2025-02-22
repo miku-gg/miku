@@ -1,10 +1,9 @@
-import { CharacterBook, NovelV3, AssetType } from '@mikugg/bot-utils';
+import { CharacterBook, NovelV3 } from '@mikugg/bot-utils';
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { v4 as randomUUID } from 'uuid';
 import { toast } from 'react-toastify';
 import apiClient from '../../libs/imageInferenceAPI';
-import config from '../../config';
 
 // 1. Extend the state to track pending inferences
 interface PendingInference {
@@ -629,6 +628,16 @@ const novelFormSlice = createSlice({
             if (emotionToReplace) {
               emotionToReplace.sources.png = resultImage;
               toast.success(`Character emotion "${pending.emotionId}" updated for outfit: ${outfit.name}!`);
+            } else {
+              outfit.emotions = [
+                ...outfit.emotions,
+                {
+                  id: pending.emotionId || '',
+                  sources: {
+                    png: resultImage,
+                  },
+                },
+              ];
             }
             state.characters[charIndex] = { ...char };
             break;
@@ -748,21 +757,13 @@ export const pollInferences = (): any => async (dispatch: any, getState: any) =>
     for (const inf of response.data) {
       const { status } = inf.status; // 'pending' | 'done' | 'error'
       if (status === 'done') {
-        const rawImage = inf.status.result?.[0] || '';
+        const resultImage = inf.status.result?.[0] || '';
         const p = novelState.pendingInferences?.find((x) => x.inferenceId === inf.inferenceId);
         if (!p) continue;
 
-        let assetType: AssetType = AssetType.EMOTION_IMAGE;
-        if (p.inferenceType === 'background') {
-          assetType = AssetType.BACKGROUND_IMAGE;
-        } else if (p.inferenceType === 'item') {
-          assetType = AssetType.ITEM_IMAGE;
-        }
-
-        let uploadedAssetId = '';
         try {
-          const uploadRes = await config.uploadAsset(rawImage, assetType);
-          if (!uploadRes.success) {
+          const uploadRes = await apiClient.migrateInferenceToAssets(inf.inferenceId);
+          if (uploadRes.status !== 200 && uploadRes.status !== 201) {
             console.error('Failed uploading generated asset:', uploadRes);
             dispatch(
               updateInferenceStatus({
@@ -772,7 +773,6 @@ export const pollInferences = (): any => async (dispatch: any, getState: any) =>
             );
             continue;
           }
-          uploadedAssetId = uploadRes.assetId;
         } catch (err) {
           console.error('Asset upload error:', err);
           dispatch(
@@ -788,7 +788,7 @@ export const pollInferences = (): any => async (dispatch: any, getState: any) =>
           updateInferenceStatus({
             inferenceId: inf.inferenceId,
             status: 'done',
-            resultImage: uploadedAssetId,
+            resultImage: resultImage,
           }),
         );
       } else if (status === 'error') {
