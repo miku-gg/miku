@@ -338,7 +338,7 @@ const BotTranslator = () => {
         </div>
       )}
       <ToastContainer
-        position="top-left"
+        position="bottom-left"
         autoClose={5000}
         hideProgressBar={true}
         newestOnTop={false}

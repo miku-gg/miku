@@ -104,7 +104,7 @@ export default function CharacterOutfitEmotionsGenerateModal({
             referenceImageHash: neutralImageHash,
             renderedPoseImageHash: neutralImageHash,
             emotion: emotionId,
-            seed: originalGenerationData.seed,
+            seed: String(originalGenerationData.seed),
             modelToUse: originalGenerationData.modelToUse,
             emotionIndex: index,
           });

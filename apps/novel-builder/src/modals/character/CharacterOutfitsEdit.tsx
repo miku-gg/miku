@@ -30,6 +30,7 @@ import CharacterOutfitEmotionsGenerateModal from './CharacterOutfitEmotionsGener
 export default function CharacterOutfitsEdit({ characterId }: { characterId?: string }) {
   const dispatch = useAppDispatch();
   const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === characterId));
+  const pendingInferences = useAppSelector((state) => state.novel.pendingInferences);
   if (!character || !characterId) {
     return null;
   }
@@ -276,6 +277,13 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
 
         return emotionsTemplate.emotionIds.map((emotionId) => {
           const emotion = group.emotions.find((img) => img.id === emotionId);
+          const isPending = pendingInferences?.some(
+            (inf) =>
+              inf.characterId === characterId &&
+              inf.outfitId === group.id &&
+              ((inf.inferenceType === 'emotion' && inf.emotionId === emotionId) ||
+                (inf.inferenceType === 'character' && 'neutral' === emotionId)),
+          );
 
           return (
             <div
@@ -292,6 +300,7 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
                     : undefined
                 }
                 placeHolder="(1024x1024)"
+                loading={isPending}
                 onFileValidate={(file) => {
                   return checkFileType(file, ['image/png', 'image/gif', 'image/webp', 'video/webm', 'audio/mpeg']);
                 }}

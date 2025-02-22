@@ -51,7 +51,7 @@ export default function CharacterOutfitGenerateModal({
         step: 'GEN',
         openposeImageHash: 'pose2.png',
         referenceImageWeight: 0,
-        seed,
+        seed: String(seed),
         modelToUse: 1,
       });
 

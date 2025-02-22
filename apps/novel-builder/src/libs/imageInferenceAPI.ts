@@ -49,7 +49,7 @@ export interface InferenceQuery {
   emotion?: string;
   parentRequestId?: string;
   openposeImageHash?: string;
-  seed: number;
+  seed: string;
   modelToUse: number;
 }
 
@@ -75,7 +75,7 @@ export interface InferenceRequest {
   renderedPoseImageHash: string | null;
   emotion: string | null;
   emotionIndex: number | null;
-  seed: number;
+  seed: string;
   modelToUse: number;
   createdAt: Date;
   updatedAt: Date;

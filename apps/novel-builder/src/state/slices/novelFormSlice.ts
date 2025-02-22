@@ -596,7 +596,9 @@ const novelFormSlice = createSlice({
 
             if (neutralEmotion) {
               neutralEmotion.sources.png = resultImage;
-              toast.success(`Character outfit image updated for "${outfit.name}"!`);
+              toast.success(`Character outfit image updated for "${outfit.name}"!`, {
+                position: 'bottom-left',
+              });
             }
 
             // Inject query data into generationData
