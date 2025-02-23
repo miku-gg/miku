@@ -173,9 +173,9 @@ export default function NovelAssistant() {
     window.dispatchEvent(event);
   };
 
-  // if (isCheckingPremium || !isPremium) {
-  //   return null;
-  // }
+  if (isCheckingPremium || !isPremium) {
+    return null;
+  }
   return (
     <>
       <DisclaimerModal opened={showDisclaimer} onClose={handleDisclaimerClose} />

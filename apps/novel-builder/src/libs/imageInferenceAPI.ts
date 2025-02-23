@@ -351,5 +351,5 @@ export default new APIClient(config.platformAPIEndpoint);
 //   referenceImageWeight: 0,
 //   referenceImageHash: null,
 //   step: 'GEN',
-//   openposeImageHash: 'pose2.png',
+//   openposeImageHash: 'pose2.jpg',
 // });

@@ -53,7 +53,7 @@ export default function CharacterOutfitGenerateModal({
         workflowId: 'character_pose', // or whichever workflow
         prompt: finalPrompt || '',
         step: 'GEN',
-        openposeImageHash: poses[res.components?.pose || ''] || 'pose2.png',
+        openposeImageHash: poses[res.components?.pose || ''] || 'pose2.jpg',
         referenceImageWeight: 0,
         seed,
         modelToUse: 1,

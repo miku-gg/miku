@@ -17,21 +17,21 @@ import { callChatCompletion, FunctionDefinition } from './assistantCall';
 // princess_like_standing pose22
 // moving_as_if_running pose23
 export const poses: Record<string, string> = {
-  neutral_with_left_arm_in_belly: 'pose2.png',
-  neutral_looking_right: 'pose3.png',
-  neutral_looking_left: 'pose5.png',
-  waving_left_hand: 'pose6.png',
-  hands_on_hips: 'pose7.png',
-  full_body_girl_walking: 'pose8.png',
-  full_body_fist_energy: 'pose9.png',
-  full_body_explaining: 'pose10.png',
-  wrapped_arms_crossed_legs: 'pose13.png',
-  leaning_in_with_hand_in_legs: 'pose14.png',
-  leaning_in_waving_hand: 'pose15.png',
-  hands_on_hips_crossed_legs: 'pose18.png',
-  touching_hair: 'pose21.png',
-  princess_like_standing: 'pose22.png',
-  moving_as_if_running: 'pose23.png',
+  neutral_with_left_arm_in_belly: 'pose2.jpg',
+  neutral_looking_right: 'pose3.jpg',
+  neutral_looking_left: 'pose5.jpg',
+  waving_left_hand: 'pose6.jpg',
+  hands_on_hips: 'pose7.jpg',
+  full_body_girl_walking: 'pose8.jpg',
+  full_body_fist_energy: 'pose9.jpg',
+  full_body_explaining: 'pose10.jpg',
+  wrapped_arms_crossed_legs: 'pose13.jpg',
+  leaning_in_with_hand_in_legs: 'pose14.jpg',
+  leaning_in_waving_hand: 'pose15.jpg',
+  hands_on_hips_crossed_legs: 'pose18.jpg',
+  touching_hair: 'pose21.jpg',
+  princess_like_standing: 'pose22.jpg',
+  moving_as_if_running: 'pose23.jpg',
 };
 
 class CharacterPromptGenerator {

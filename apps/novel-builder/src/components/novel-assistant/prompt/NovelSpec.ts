@@ -1776,7 +1776,7 @@ export class NovelManager {
       seed,
       step: 'GEN',
       emotion: 'neutral',
-      openposeImageHash: poses[promptResponse.components.pose] || 'pose2.png',
+      openposeImageHash: poses[promptResponse.components.pose] || 'pose2.jpg',
       referenceImageWeight: 0,
       headPrompt: promptResponse.components.character_head,
     });
