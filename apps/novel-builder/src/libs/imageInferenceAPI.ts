@@ -133,11 +133,21 @@ class APIClient {
     };
   }
 
-  async getPrices(): Promise<APIResponse<{ gen: number; emotions: number; upscale: number }>> {
+  async getPrices(): Promise<
+    APIResponse<{
+      item: number;
+      background: number;
+      emotion: number;
+      character: number;
+      character_upscale: number;
+    }>
+  > {
     const response: AxiosResponse<{
-      gen: number;
-      emotions: number;
-      upscale: number;
+      item: number;
+      background: number;
+      emotion: number;
+      character: number;
+      character_upscale: number;
     }> = await this.client.get('inference/prices');
     return response;
   }

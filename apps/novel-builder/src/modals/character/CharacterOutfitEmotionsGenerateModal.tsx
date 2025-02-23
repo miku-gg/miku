@@ -9,6 +9,7 @@ import { emotionTemplates } from '../../data/emotions';
 import apiClient from '../../libs/imageInferenceAPI';
 import './CharacterOutfitEmotionsGenerateModal.scss';
 import { BsStars } from 'react-icons/bs';
+import { consumeCredits } from '../../state/slices/userSlice';
 
 export interface CharacterOutfitEmotionsGenerateModalProps {
   isOpen: boolean;
@@ -124,6 +125,7 @@ export default function CharacterOutfitEmotionsGenerateModal({
               referenceImage: originalGenerationData.referenceImage,
             }),
           );
+          dispatch(consumeCredits('emotion'));
         }),
       );
 

@@ -7,6 +7,7 @@ import { useAppDispatch } from '../../state/store';
 import { addPendingInference } from '../../state/slices/novelFormSlice';
 import { LuExternalLink } from 'react-icons/lu';
 import { BsStars } from 'react-icons/bs';
+import { consumeCredits } from '../../state/slices/userSlice';
 
 export interface CharacterOutfitGenerateModalProps {
   isOpen: boolean;
@@ -69,6 +70,7 @@ export default function CharacterOutfitGenerateModal({
           modelToUse: 1,
         }),
       );
+      dispatch(consumeCredits('character'));
       setIsLoading(false);
       setDescription('');
       onClose();

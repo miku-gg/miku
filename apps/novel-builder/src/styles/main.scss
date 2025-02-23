@@ -58,6 +58,12 @@ a {
     align-items: center;
   }
 
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
   &__header-logo {
     display: flex;
     align-items: center;
