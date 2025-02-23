@@ -2,7 +2,7 @@ import { useAppSelector, useAppDispatch } from '../state/store';
 import { fetchPrices, fetchUser } from '../state/slices/userSlice';
 import { useEffect, useState } from 'react';
 import { PiCoinsLight } from 'react-icons/pi';
-import { IoClose, IoCog } from 'react-icons/io5';
+import { IoCog } from 'react-icons/io5';
 import './CreditsWidget.scss';
 
 interface PendingInference {

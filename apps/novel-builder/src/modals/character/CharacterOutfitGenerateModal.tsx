@@ -3,11 +3,12 @@ import { Modal, Input, Button, Loader } from '@mikugg/ui-kit';
 import sdPromptImprover from '../../libs/sdPromptImprover';
 import apiClient from '../../libs/imageInferenceAPI';
 import { toast } from 'react-toastify';
-import { useAppDispatch } from '../../state/store';
+import { useAppDispatch, useAppSelector } from '../../state/store';
 import { addPendingInference } from '../../state/slices/novelFormSlice';
 import { LuExternalLink } from 'react-icons/lu';
 import { BsStars } from 'react-icons/bs';
 import { consumeCredits } from '../../state/slices/userSlice';
+import { PiCoinsLight } from 'react-icons/pi';
 
 export interface CharacterOutfitGenerateModalProps {
   isOpen: boolean;
@@ -31,6 +32,8 @@ export default function CharacterOutfitGenerateModal({
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
+  const characterPrice = useAppSelector((state) => state.user.pricing.character);
+  const userCredits = useAppSelector((state) => state.user.user?.credits || 0);
 
   const handleGenerate = async () => {
     try {
@@ -93,16 +96,21 @@ export default function CharacterOutfitGenerateModal({
           />
         </div>
         <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between' }}>
-          <Button theme="gradient" onClick={handleGenerate} disabled={isLoading}>
-            {isLoading ? (
-              <Loader />
-            ) : (
-              <>
-                <BsStars />
-                Generate with AI
-              </>
-            )}
-          </Button>
+          <div style={{ position: 'relative' }}>
+            <Button theme="gradient" onClick={handleGenerate} disabled={isLoading || characterPrice > userCredits}>
+              {isLoading ? (
+                <Loader />
+              ) : (
+                <>
+                  <BsStars />
+                  Generate with AI
+                </>
+              )}
+            </Button>
+            <div style={{ fontSize: '0.7rem', color: 'gold', position: 'absolute', bottom: -17, right: 5 }}>
+              <PiCoinsLight /> {characterPrice} credits
+            </div>
+          </div>
           <a href="https://emotions.miku.gg" target="_blank">
             <Button theme="transparent">
               <LuExternalLink /> Generate Manually

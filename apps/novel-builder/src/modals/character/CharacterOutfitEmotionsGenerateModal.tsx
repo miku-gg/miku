@@ -10,6 +10,7 @@ import apiClient from '../../libs/imageInferenceAPI';
 import './CharacterOutfitEmotionsGenerateModal.scss';
 import { BsStars } from 'react-icons/bs';
 import { consumeCredits } from '../../state/slices/userSlice';
+import { PiCoinsLight } from 'react-icons/pi';
 
 export interface CharacterOutfitEmotionsGenerateModalProps {
   isOpen: boolean;
@@ -30,6 +31,8 @@ export default function CharacterOutfitEmotionsGenerateModal({
 
   // Find the character / outfit
   const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === characterId));
+  const userCredits = useAppSelector((state) => state.user.user?.credits || 0);
+  const totalPrice = useAppSelector((state) => state.user.pricing.emotion * 9);
   if (!character) return null;
 
   const outfits = character.card.data.extensions.mikugg_v2?.outfits || [];
@@ -172,8 +175,12 @@ export default function CharacterOutfitEmotionsGenerateModal({
               onChange={(e) => setHeadPrompt(e.target.value)}
               placeHolder="e.g. green eyes, red hair, etc."
             />
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
-              <Button theme="gradient" onClick={handleGenerateAllEmotions} disabled={isLoading || !neutralImageHash}>
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', position: 'relative' }}>
+              <Button
+                theme="gradient"
+                onClick={handleGenerateAllEmotions}
+                disabled={isLoading || !neutralImageHash || totalPrice > userCredits}
+              >
                 {isLoading ? (
                   'Generating...'
                 ) : (
@@ -182,6 +189,9 @@ export default function CharacterOutfitEmotionsGenerateModal({
                   </>
                 )}
               </Button>
+              <div style={{ fontSize: '0.7rem', color: 'gold', position: 'absolute', bottom: -17, right: 5 }}>
+                <PiCoinsLight /> {totalPrice} credits
+              </div>
             </div>
           </div>
         </div>
