@@ -1733,25 +1733,24 @@ export class FunctionRegistry {
           subject: 'an outfit',
         },
       },
-      // TODO: Uncomment this when we when implemented in the novelManager
-      // {
-      //   name: 'generate_outfit_emotions',
-      //   description: 'Given a character id and outfit id, generates the emotions for the outfit.',
-      //   parameters: {
-      //     type: 'object',
-      //     properties: {
-      //       characterId: { type: 'string', description: 'ID of the character to generate an outfit for' },
-      //       outfitId: { type: 'string', description: 'ID of the outfit to generate emotions for' },
-      //     },
-      //     required: ['characterId', 'outfitId'],
-      //   },
-      //   handler: (args) => novelManager.generateOutfitEmotions(args.characterId, args.outfitId),
-      //   displayData: {
-      //     isSetter: true,
-      //     action: 'created',
-      //     subject: 'emotions for an outfit',
-      //   },
-      // },
+      {
+        name: 'generate_outfit_emotions',
+        description: 'Given a character id and outfit id, generates the emotions for the outfit.',
+        parameters: {
+          type: 'object',
+          properties: {
+            characterId: { type: 'string', description: 'ID of the character to generate an outfit for' },
+            outfitId: { type: 'string', description: 'ID of the outfit to generate emotions for' },
+          },
+          required: ['characterId', 'outfitId'],
+        },
+        handler: (args) => novelManager.generateOutfitEmotions(args.characterId, args.outfitId),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'emotions for an outfit',
+        },
+      },
     ];
   }
 

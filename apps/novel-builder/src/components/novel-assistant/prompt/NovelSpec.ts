@@ -1,11 +1,12 @@
 import { NovelV3, validateNovelState } from '@mikugg/bot-utils';
 import { BackgroundResult, listSearch, SearchType, SongResult } from '../../../libs/listSearch';
 import config from '../../../config';
-import sdPromptImprover, { poses } from '../../../libs/sdPromptImprover';
+import sdPromptImprover, { poses, getPromptForEmotion } from '../../../libs/sdPromptImprover';
 import imageInferenceAPI from '../../../libs/imageInferenceAPI';
 import { store } from '../../../state/store';
 import { addPendingInference, PendingInference } from '../../../state/slices/novelFormSlice';
 import { consumeCredits } from '../../../state/slices/userSlice';
+import { emotionTemplates } from '../../../data/emotions';
 
 export interface LoreBookEntry {
   id: string;
@@ -1798,5 +1799,106 @@ export class NovelManager {
     });
     store.dispatch(consumeCredits('character'));
     return 'Outfit started generation successfully';
+  }
+
+  async generateOutfitEmotions(characterId: string, outfitId: string): Promise<string> {
+    const character = this.novel.characters.find((c) => c.id === characterId);
+    if (!character) return 'Error: characterId not found';
+
+    const outfit = character.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === outfitId);
+    if (!outfit) return 'Error: outfitId not found. Generate an outfit first.';
+
+    // Ensure the outfit's neutral emotion has been generated.
+    if (outfit.emotions.find((e) => e.id === 'neutral' && e.sources.png === 'empty_char_emotion.png')) {
+      const pendingInference = this.novel.pendingInferences?.find(
+        (i) => i.outfitId === outfitId && i.characterId === characterId,
+      );
+      if (pendingInference) {
+        return 'Error: Outfit has no neutral emotion. Generate an outfit first.';
+      } else {
+        return 'Error: The outfit is still generating. Please wait for it to finish.';
+      }
+    }
+
+    // check if emotions are being generated
+    const emotionsBeingGenerated = this.novel.pendingInferences?.filter(
+      (i) => i.outfitId === outfitId && i.characterId === characterId,
+    );
+    if (emotionsBeingGenerated && emotionsBeingGenerated.length > 0) {
+      return 'Error: The outfit is still generating. Please wait for it to finish.';
+    }
+
+    // Update outfit template to use tiny-emotions
+    outfit.template = 'tiny-emotions';
+
+    // Get the neutral emotion's image hash
+    const neutralEmotion = outfit.emotions.find((e) => e.id === 'neutral');
+    if (!neutralEmotion || !neutralEmotion.sources.png) {
+      return 'Error: Neutral emotion not found in outfit';
+    }
+    const neutralImageHash = neutralEmotion.sources.png;
+
+    // Determine head prompt from the outfit's generationData (or default to an empty string if not provided)
+    const headPrompt = (outfit.generationData && outfit.generationData.headPrompt) || '';
+
+    // Prepare the original generation data. If none exists, create and store a new one.
+    const originalGenerationData = outfit.generationData || {
+      seed: Math.random().toString(36).substring(2, 15),
+      modelToUse: 1,
+      referenceImage: neutralImageHash,
+      prompt: headPrompt,
+      poseImage: neutralImageHash,
+      headPrompt: headPrompt,
+    };
+    outfit.generationData = originalGenerationData;
+
+    // Get the tiny-emotions template and obtain its emotionIds (expected to be 9)
+    const tinyEmotionTemplate = emotionTemplates.find((t) => t.id === 'tiny-emotions');
+    const emotionsToGenerate = tinyEmotionTemplate ? tinyEmotionTemplate.emotionIds : [];
+    if (emotionsToGenerate.length === 0) {
+      return 'Error: No emotions configured for tiny-emotions template';
+    }
+
+    // Fire off an inference for each emotion
+    await Promise.all(
+      emotionsToGenerate.map(async (emotionId, index) => {
+        const finalPrompt = getPromptForEmotion(emotionId, headPrompt);
+        const inferenceResponse = await imageInferenceAPI.startInference({
+          workflowId: 'only_emotion',
+          prompt: finalPrompt,
+          step: 'EMOTION',
+          referenceImageWeight: 0.6,
+          referenceImageHash: neutralImageHash,
+          renderedPoseImageHash: neutralImageHash,
+          emotion: emotionId,
+          seed: String(originalGenerationData.seed),
+          modelToUse: originalGenerationData.modelToUse,
+          emotionIndex: index,
+        });
+
+        if (!this.novel.pendingInferences) {
+          this.novel.pendingInferences = [];
+        }
+        this.novel.pendingInferences.push({
+          inferenceId: inferenceResponse.data,
+          inferenceType: 'emotion',
+          prompt: finalPrompt,
+          headPrompt: headPrompt,
+          emotionId: emotionId,
+          seed: originalGenerationData.seed,
+          modelToUse: originalGenerationData.modelToUse,
+          referenceImage: originalGenerationData.referenceImage,
+          outfitId: outfit.id,
+          characterId,
+          status: 'pending',
+          createdAt: Date.now(),
+        });
+
+        // Deduct the price of the emotion generation
+        store.dispatch(consumeCredits('emotion'));
+      }),
+    );
+
+    return 'Outfit emotions generation started successfully';
   }
 }
