@@ -1765,7 +1765,10 @@ export class NovelManager {
       // new outfit
       character.card.data.extensions.mikugg_v2.outfits.push(outfit);
     }
-
+    const { user, pricing } = store.getState().user;
+    if ((user?.credits || 0) < pricing.character) {
+      return 'Error: Not enough credits. Please ask the user to buy more inference credits to generate images.';
+    }
     const promptResponse = await sdPromptImprover.generatePrompt(appearance);
     if (!promptResponse.prompt) return 'Error: No prompt generated';
     const seed = String(Math.floor(Math.random() * 1000000000));
@@ -1859,6 +1862,10 @@ export class NovelManager {
       return 'Error: No emotions configured for tiny-emotions template';
     }
 
+    const { user, pricing } = store.getState().user;
+    if ((user?.credits || 0) < pricing.emotion * 9) {
+      return 'Error: Not enough credits. Please ask the user to buy more inference credits to generate images.';
+    }
     // Fire off an inference for each emotion
     await Promise.all(
       emotionsToGenerate.map(async (emotionId, index) => {
