@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import apiClient from '../../libs/imageInferenceAPI';
 
 // 1. Extend the state to track pending inferences
-interface PendingInference {
+export interface PendingInference {
   inferenceId: string;
   status: 'pending' | 'done' | 'error';
   createdAt: number;
@@ -16,7 +16,7 @@ interface PendingInference {
   prompt: string; // store the description/prompt
   headPrompt?: string;
   modelToUse: number;
-  seed: number;
+  seed: string;
   poseImage?: string;
   referenceImage?: string;
 

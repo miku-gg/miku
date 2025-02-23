@@ -1,6 +1,11 @@
 import { NovelV3, validateNovelState } from '@mikugg/bot-utils';
 import { BackgroundResult, listSearch, SearchType, SongResult } from '../../../libs/listSearch';
 import config from '../../../config';
+import sdPromptImprover, { poses } from '../../../libs/sdPromptImprover';
+import imageInferenceAPI from '../../../libs/imageInferenceAPI';
+import { store } from '../../../state/store';
+import { addPendingInference, PendingInference } from '../../../state/slices/novelFormSlice';
+import { consumeCredits } from '../../../state/slices/userSlice';
 
 export interface LoreBookEntry {
   id: string;
@@ -79,7 +84,7 @@ function getId(prefix: string): string {
 }
 
 export class NovelManager {
-  private novel: NovelV3.NovelState;
+  private novel: NovelV3.NovelState & { pendingInferences?: PendingInference[] };
 
   constructor() {
     this.novel = {
@@ -98,6 +103,7 @@ export class NovelManager {
       inventory: [],
       cutscenes: [],
       language: 'en',
+      pendingInferences: [],
     };
   }
 
@@ -1726,5 +1732,71 @@ export class NovelManager {
         }
       });
     return 'Map scenes updated successfully';
+  }
+
+  async generateCharacterOutfit(characterId: string, appearance: string): Promise<string> {
+    const character = this.novel.characters.find((c) => c.id === characterId);
+    if (!character) return 'Error: characterId not found';
+    const firstOutfit = character.card.data.extensions.mikugg_v2.outfits[0];
+    let outfit = {
+      id: getId('outfit'),
+      name: 'New Outfit',
+      description: 'A new outfit for the character',
+      template: 'single-emotion',
+      emotions: [
+        {
+          id: 'neutral',
+          sources: {
+            png: 'empty_char_emotion.png',
+          },
+        },
+      ],
+      attributes: [] as string[][],
+    };
+    if (
+      firstOutfit.template === 'single-emotion' &&
+      (!firstOutfit.emotions.length ||
+        firstOutfit.emotions[0].sources.png === 'empty_char_emotion.png' ||
+        !firstOutfit.emotions[0].sources.png)
+    ) {
+      outfit = firstOutfit;
+    } else {
+      // new outfit
+      character.card.data.extensions.mikugg_v2.outfits.push(outfit);
+    }
+
+    const promptResponse = await sdPromptImprover.generatePrompt(appearance);
+    if (!promptResponse.prompt) return 'Error: No prompt generated';
+    const seed = String(Math.floor(Math.random() * 1000000000));
+    const inferenceResponse = await imageInferenceAPI.startInference({
+      modelToUse: 1,
+      prompt: promptResponse.prompt || '',
+      workflowId: 'character_pose',
+      seed,
+      step: 'GEN',
+      emotion: 'neutral',
+      openposeImageHash: poses[promptResponse.components.pose] || 'pose2.png',
+      referenceImageWeight: 0,
+      headPrompt: promptResponse.components.character_head,
+    });
+    if (!inferenceResponse.data) return 'Error: No inference response';
+    const inferenceId = inferenceResponse.data;
+    if (!this.novel.pendingInferences) {
+      this.novel.pendingInferences = [];
+    }
+    this.novel.pendingInferences.push({
+      inferenceId,
+      inferenceType: 'character',
+      prompt: promptResponse.prompt || '',
+      modelToUse: 1,
+      seed,
+      headPrompt: promptResponse.components.character_head,
+      outfitId: outfit.id,
+      characterId,
+      status: 'pending',
+      createdAt: Date.now(),
+    });
+    store.dispatch(consumeCredits('character'));
+    return 'Outfit started generation successfully';
   }
 }

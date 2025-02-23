@@ -134,7 +134,7 @@ export type MikuCardV2 = TavernCardV2 & {
             headPrompt: string; // prompt that was used to generate the head of the outfit
             prompt: string; // prompt that was used to generate the outfit
             modelToUse: number; // model that was used to generate the outfit
-            seed: number; // seed that was used to generate the outfit
+            seed: string; // seed that was used to generate the outfit
             poseImage?: string; // pose that was used to generate the outfit
             referenceImage?: string; // reference image that was used to generate the outfit
           };

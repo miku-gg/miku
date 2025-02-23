@@ -88,7 +88,7 @@ export default function CharacterOutfitEmotionsGenerateModal({
       );
 
       const originalGenerationData = updatedOutfit.generationData || {
-        seed: Number(Math.random().toString(36).substring(2, 15)),
+        seed: Math.random().toString(36).substring(2, 15),
         modelToUse: 1,
         referenceImage: neutralImageHash,
         prompt: headPrompt,

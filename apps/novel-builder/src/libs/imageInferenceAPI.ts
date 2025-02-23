@@ -51,6 +51,7 @@ export interface InferenceQuery {
   openposeImageHash?: string;
   seed: string;
   modelToUse: number;
+  headPrompt?: string;
 }
 
 export interface InferenceStatus {
@@ -286,6 +287,7 @@ class APIClient {
         openposeImageHash: params.openposeImageHash,
         seed: params.seed,
         modelToUse: params.modelToUse,
+        headPrompt: params.headPrompt,
       });
 
       return response;

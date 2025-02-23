@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Modal, Input, Button, Loader } from '@mikugg/ui-kit';
-import sdPromptImprover from '../../libs/sdPromptImprover';
+import sdPromptImprover, { poses } from '../../libs/sdPromptImprover';
 import apiClient from '../../libs/imageInferenceAPI';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from '../../state/store';
@@ -46,16 +46,16 @@ export default function CharacterOutfitGenerateModal({
         return;
       }
       const finalPrompt = res.prompt;
-      const seed = Number(Math.random().toString(36).substring(2, 15));
+      const seed = Math.random().toString(36).substring(2, 15);
 
       // 2) Call startInference
       const inferenceIdRes = await apiClient.startInference({
         workflowId: 'character_pose', // or whichever workflow
         prompt: finalPrompt || '',
         step: 'GEN',
-        openposeImageHash: 'pose2.png',
+        openposeImageHash: poses[res.components?.pose || ''] || 'pose2.png',
         referenceImageWeight: 0,
-        seed: String(seed),
+        seed,
         modelToUse: 1,
       });
 

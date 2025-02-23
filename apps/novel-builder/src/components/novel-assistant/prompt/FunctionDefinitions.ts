@@ -1715,6 +1715,43 @@ export class FunctionRegistry {
           subject: 'the scenes that have a map',
         },
       },
+      {
+        name: 'generate_character_outfit',
+        description: 'Given a character id and appearance, generate a new outfit for the character.',
+        parameters: {
+          type: 'object',
+          properties: {
+            characterId: { type: 'string', description: 'ID of the character to generate an outfit for' },
+            appearance: { type: 'string', description: 'Appearance of the character' },
+          },
+          required: ['characterId', 'appearance'],
+        },
+        handler: (args) => novelManager.generateCharacterOutfit(args.characterId, args.appearance),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'an outfit',
+        },
+      },
+      // TODO: Uncomment this when we when implemented in the novelManager
+      // {
+      //   name: 'generate_outfit_emotions',
+      //   description: 'Given a character id and outfit id, generates the emotions for the outfit.',
+      //   parameters: {
+      //     type: 'object',
+      //     properties: {
+      //       characterId: { type: 'string', description: 'ID of the character to generate an outfit for' },
+      //       outfitId: { type: 'string', description: 'ID of the outfit to generate emotions for' },
+      //     },
+      //     required: ['characterId', 'outfitId'],
+      //   },
+      //   handler: (args) => novelManager.generateOutfitEmotions(args.characterId, args.outfitId),
+      //   displayData: {
+      //     isSetter: true,
+      //     action: 'created',
+      //     subject: 'emotions for an outfit',
+      //   },
+      // },
     ];
   }
 

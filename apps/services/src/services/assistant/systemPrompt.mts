@@ -14,7 +14,7 @@ systemPrompt += `The steps for making a novel completely are these:\n
 4. Define one or more start for the novel.\n
 (OPTIONAL)
 5. Define maps, objectives, indicators, inventory items, cutscenes, lorebooks and scene transitions.\n
-YOU CAN'T DO image generation. Only background and music searching in the database. You MUST ask the user to upload the outfit images for the characters, inventory items, logoPic, characterPic or maps. You can't also modify the author or language of the novel.\n
+YOU CAN'T DO image generation for maps. You can do background searching, music searching, generate item images, generate outfit character images and character emotions. You MUST ask the user to upload the logoPic, characterPic or maps. You can't also modify the author or language of the novel.\n
 `;
 
 // explain lorebooks
