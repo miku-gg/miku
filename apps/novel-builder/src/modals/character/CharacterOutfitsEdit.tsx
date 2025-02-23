@@ -409,10 +409,10 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
                 </Button>
                 <Button
                   theme="secondary"
-                  // disabled={
-                  // group.emotions?.at(0)?.sources.png === 'empty_char_emotion.png' ||
-                  // !group.emotions?.at(0)?.sources.png
-                  // }
+                  disabled={
+                    group.emotions?.at(0)?.sources.png === 'empty_char_emotion.png' ||
+                    !group.emotions?.at(0)?.sources.png
+                  }
                   onClick={() => {
                     setShowGenerateEmotionsModalForIndex(groupIndex);
                   }}
