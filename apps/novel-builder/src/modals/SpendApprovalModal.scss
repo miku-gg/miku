@@ -1,0 +1,23 @@
+.SpendApprovalModal {
+  &__info {
+    width: 100%;
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+
+  &__amount {
+    font-weight: bold;
+    color: gold;
+  }
+
+  &__reason {
+    font-style: italic;
+    font-weight: bold;
+  }
+
+  &__buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+}

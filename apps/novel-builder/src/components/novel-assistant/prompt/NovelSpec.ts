@@ -7,6 +7,9 @@ import { store } from '../../../state/store';
 import { addPendingInference, PendingInference } from '../../../state/slices/novelFormSlice';
 import { consumeCredits } from '../../../state/slices/userSlice';
 import { emotionTemplates } from '../../../data/emotions';
+import { openSpendApprovalModal } from '../../../state/slices/inputSlice';
+import { addApprovalListener } from '../../../services/spendApprovalService';
+import { v4 } from 'uuid';
 
 export interface LoreBookEntry {
   id: string;
@@ -1735,6 +1738,19 @@ export class NovelManager {
     return 'Map scenes updated successfully';
   }
 
+  // NEW: askForSpendApproval function
+  async askForSpendApproval(amount: number, reason: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Generate a unique approval ID using our getId function.
+      const approvalId = v4();
+      // Save the resolve/reject callbacks in our approval service
+      addApprovalListener(approvalId, resolve, reject);
+      // Dispatch an action to open the spend approval modal,
+      // passing the approval ID plus the amount and reason.
+      store.dispatch(openSpendApprovalModal({ id: approvalId, amount, reason }));
+    });
+  }
+
   async generateCharacterOutfit(characterId: string, appearance: string): Promise<string> {
     const character = this.novel.characters.find((c) => c.id === characterId);
     if (!character) return 'Error: characterId not found';
@@ -1768,6 +1784,12 @@ export class NovelManager {
     const { user, pricing } = store.getState().user;
     if ((user?.credits || 0) < pricing.character) {
       return 'Error: Not enough credits. Please ask the user to buy more inference credits to generate images.';
+    }
+    // NEW: Wait for spend approval before starting the inference.
+    try {
+      await this.askForSpendApproval(pricing.character, 'generate character outfit');
+    } catch (err) {
+      return 'Approval denied for character outfit generation';
     }
     const promptResponse = await sdPromptImprover.generatePrompt(appearance);
     if (!promptResponse.prompt) return 'Error: No prompt generated';
@@ -1865,6 +1887,12 @@ export class NovelManager {
     const { user, pricing } = store.getState().user;
     if ((user?.credits || 0) < pricing.emotion * 9) {
       return 'Error: Not enough credits. Please ask the user to buy more inference credits to generate images.';
+    }
+    // NEW: Ask for spend approval before generating emotions.
+    try {
+      await this.askForSpendApproval(pricing.emotion * 9, 'generate outfit emotions');
+    } catch (err) {
+      return 'Approval denied for outfit emotions generation';
     }
     // Fire off an inference for each emotion
     await Promise.all(

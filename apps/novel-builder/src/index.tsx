@@ -22,6 +22,7 @@ import { store } from './state/store';
 import './styles/main.scss';
 import { GiBookPile } from 'react-icons/gi';
 import CreditsWidget from './components/CreditsWidget';
+import SpendApprovalModal from './modals/SpendApprovalModal';
 
 const toastRoot = document.getElementById('toast-root');
 
@@ -71,6 +72,7 @@ ReactDOM.render(
         <ObjectiveEditModal />
         <ItemEditModal />
         <ActionEditModal />
+        <SpendApprovalModal />
       </AreYouSure.AreYouSureProvider>
       <ToastPortal />
     </Provider>

@@ -8,7 +8,7 @@ import './NovelAssistant.scss';
 import { FunctionRegistry } from './prompt/FunctionDefinitions';
 import { NovelManager } from './prompt/NovelSpec';
 import { NovelV3 } from '@mikugg/bot-utils';
-import { useAppDispatch, useAppSelector } from '../../state/store';
+import { store, useAppDispatch } from '../../state/store';
 import { loadCompleteState } from '../../state/slices/novelFormSlice';
 import { callChatCompletion, FunctionAction } from '../../libs/assistantCall';
 import '../../libs/sdPromptImprover';
@@ -72,6 +72,7 @@ const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelSt
     for (response = await askResponse(); response?.choices[0].message?.tool_calls; response = await askResponse()) {
       const message = response.choices[0].message;
       conversationHistory.push(message);
+      novelManager.replaceState(store.getState().novel);
       if (message?.tool_calls) {
         for (const toolCall of message.tool_calls) {
           const fnName = toolCall.function.name;
@@ -117,7 +118,6 @@ const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelSt
 
 export default function NovelAssistant() {
   const dispatch = useAppDispatch();
-  const state = useAppSelector((state) => state.novel);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [hasAcceptedDisclaimer, setHasAcceptedDisclaimer] = useState(() => false);
   const [isPremium, setIsPremium] = useState(false);
@@ -138,10 +138,6 @@ export default function NovelAssistant() {
 
     checkPremiumStatus();
   }, []);
-
-  useEffect(() => {
-    novelManager.replaceState(state);
-  }, [state.title]);
 
   useEffect(() => {
     const handleToggleChatWindow = (event: RcbToggleChatWindowEvent) => {

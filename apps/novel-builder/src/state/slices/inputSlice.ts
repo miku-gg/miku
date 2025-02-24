@@ -37,6 +37,12 @@ export interface InputState {
       text?: string;
     };
   };
+  spendApprovalModal: {
+    open: boolean;
+    id?: string;
+    amount: number;
+    reason: string;
+  };
 }
 
 const initialState: InputState = {
@@ -100,6 +106,12 @@ const initialState: InputState = {
       opened: false,
     },
   },
+  spendApprovalModal: {
+    open: false,
+    id: undefined,
+    amount: 0,
+    reason: '',
+  },
 };
 
 const inputSlice = createSlice({
@@ -137,9 +149,26 @@ const inputSlice = createSlice({
     navigatePage(state, action: PayloadAction<'homepage' | 'edit'>) {
       state.navigation.page = action.payload;
     },
+    openSpendApprovalModal: (state, action: PayloadAction<{ id: string; amount: number; reason: string }>) => {
+      state.spendApprovalModal = {
+        open: true,
+        id: action.payload.id,
+        amount: action.payload.amount,
+        reason: action.payload.reason,
+      };
+    },
+    closeSpendApprovalModal: (state) => {
+      state.spendApprovalModal = {
+        open: false,
+        id: undefined,
+        amount: 0,
+        reason: '',
+      };
+    },
   },
 });
 
-export const { openModal, closeModal, navigatePage, navigatePanel } = inputSlice.actions;
+export const { openModal, closeModal, navigatePage, navigatePanel, openSpendApprovalModal, closeSpendApprovalModal } =
+  inputSlice.actions;
 
 export default inputSlice.reducer;
