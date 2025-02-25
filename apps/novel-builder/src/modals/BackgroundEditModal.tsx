@@ -12,6 +12,8 @@ import { deleteBackground, updateBackground } from '../state/slices/novelFormSli
 import { useAppSelector } from '../state/store';
 import './BackgroundEditModal.scss';
 import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
+import BackgroundGenerateModal from './background/BackgroundGenerateModal';
+import { BsStars } from 'react-icons/bs';
 
 export default function BackgroundEditModal() {
   const background = useAppSelector(selectEditingBackground);
@@ -19,6 +21,7 @@ export default function BackgroundEditModal() {
   const { openModal } = AreYouSure.useAreYouSure();
   const [backgroundUploading, setBackgroundUploading] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<string>('image');
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
 
   const handleDeleteBackground = () => {
     openModal({
@@ -132,16 +135,15 @@ export default function BackgroundEditModal() {
               ]}
             />
           </div>
-          {background.source.jpg.length > 0 && selectedTab === 'image' ? (
-            <div
-              className="BackgroundEditModal__background"
-              style={{
-                backgroundImage: `url(${config.genAssetLink(
-                  background.source.jpg,
-                  AssetDisplayPrefix.BACKGROUND_IMAGE,
-                )})`,
-              }}
-            />
+          {selectedTab === 'image' ? (
+            <div className="BackgroundEditModal__background">
+              <img src={config.genAssetLink(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE)} alt="" />
+              <div className="BackgroundEditModal__background__generate-button">
+                <Button theme="gradient" onClick={() => setShowGenerateModal(true)}>
+                  <BsStars />
+                </Button>
+              </div>
+            </div>
           ) : null}
           {background.source.mp4 && selectedTab === 'video' ? (
             <div className="BackgroundEditModal__video">
@@ -226,6 +228,11 @@ export default function BackgroundEditModal() {
               }
             />
           </div>
+          <div className="BackgroundEditModal__generate">
+            <Button theme="gradient" onClick={() => setShowGenerateModal(true)}>
+              <BsStars /> Generate New Image
+            </Button>
+          </div>
           <div className="BackgroundEditModal__delete">
             <Button onClick={handleDeleteBackground} theme="primary">
               Delete background
@@ -233,6 +240,13 @@ export default function BackgroundEditModal() {
           </div>
         </div>
       ) : null}
+      {showGenerateModal && (
+        <BackgroundGenerateModal
+          isOpen={showGenerateModal}
+          onClose={() => setShowGenerateModal(false)}
+          backgroundId={background?.id}
+        />
+      )}
     </Modal>
   );
 }

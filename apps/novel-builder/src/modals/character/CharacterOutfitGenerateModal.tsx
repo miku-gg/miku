@@ -113,7 +113,7 @@ export default function CharacterOutfitGenerateModal({
           </div>
           <a href="https://emotions.miku.gg" target="_blank">
             <Button theme="transparent">
-              <LuExternalLink /> Generate Manually
+              <LuExternalLink /> Go to Library
             </Button>
           </a>
         </div>

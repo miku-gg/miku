@@ -359,12 +359,19 @@ const novelFormSlice = createSlice({
       map.places = map.places.filter((place) => place.id !== action.payload.placeId);
     },
 
-    createNewInventoryItem: (state, action: PayloadAction<{ itemId: string }>) => {
+    createNewInventoryItem: (
+      state,
+      action: PayloadAction<{
+        itemId: string;
+        name?: string;
+        description?: string;
+      }>,
+    ) => {
       if (!state.inventory) state.inventory = [];
       state.inventory.push({
         id: action.payload.itemId,
-        name: 'New Item',
-        description: '',
+        name: action.payload.name || 'New Item',
+        description: action.payload.description || '',
         actions: [
           {
             name: 'New action',
@@ -666,8 +673,11 @@ const novelFormSlice = createSlice({
             break;
           }
           case 'item': {
-            // (Optional) Implement your item logic here
-            toast.success('Item image inference completed! (Logic not yet implemented)');
+            const itemIndex = state.inventory?.findIndex((item) => item.id === pending.itemId);
+            if (itemIndex !== undefined && itemIndex >= 0 && state.inventory) {
+              state.inventory[itemIndex].icon = resultImage;
+            }
+            toast.success(`Item "${pending.prompt}" updated!`);
             break;
           }
         }

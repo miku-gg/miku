@@ -18,12 +18,15 @@ import { checkFileType } from '../../libs/utils';
 import SceneSelector from '../scene/SceneSelector';
 import './ItemEditModal.scss';
 import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
+import ItemGenerateModal from './ItemGenerateModal';
+import { BsStars } from 'react-icons/bs';
 
 export default function ItemEditModal() {
   const dispatch = useDispatch();
   const areYouSure = AreYouSure.useAreYouSure();
   const item = useAppSelector(selectEditingInventoryItem);
   const [isUploading, setIsUploading] = useState(false);
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
 
   const handleUploadImage = async (file: File) => {
     if (file && item) {
@@ -160,6 +163,11 @@ export default function ItemEditModal() {
                   return true;
                 }}
               />
+              <div className="ItemEdit__form__image__generate-button">
+                <Button theme="gradient" onClick={() => setShowGenerateModal(true)}>
+                  <BsStars />
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -264,6 +272,9 @@ export default function ItemEditModal() {
           </div>
         </div>
       ) : null}
+      {showGenerateModal && (
+        <ItemGenerateModal isOpen={showGenerateModal} onClose={() => setShowGenerateModal(false)} itemId={item?.id} />
+      )}
     </Modal>
   );
 }
