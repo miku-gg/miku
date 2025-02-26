@@ -1751,6 +1751,45 @@ export class FunctionRegistry {
           subject: 'emotions for an outfit',
         },
       },
+      {
+        name: 'generate_background_image',
+        description: 'Given a background prompt, creates a new background image.',
+        parameters: {
+          type: 'object',
+          properties: {
+            backgroundName: { type: 'string', description: 'Name of the background' },
+            prompt: { type: 'string', description: 'Prompt for the background image' },
+          },
+          required: ['backgroundName', 'prompt'],
+        },
+        handler: (args) => {
+          const backgroundId = novelManager.createBackground(args.backgroundName, args.prompt);
+          return novelManager.generateBackgroundImage(backgroundId, args.prompt);
+        },
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'a background image',
+        },
+      },
+      {
+        name: 'generate_item_image',
+        description: 'Given an item id and prompt, generates a new item image.',
+        parameters: {
+          type: 'object',
+          properties: {
+            itemId: { type: 'string', description: 'ID of the item to generate an image for' },
+            prompt: { type: 'string', description: 'Prompt for the item image' },
+          },
+          required: ['itemId', 'prompt'],
+        },
+        handler: (args) => novelManager.generateItemImage(args.itemId, args.prompt),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'an item image',
+        },
+      },
     ];
   }
 

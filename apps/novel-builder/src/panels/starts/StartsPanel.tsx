@@ -54,7 +54,7 @@ export default function StartsPanel() {
         <CheckBox
           value={!!useModalForStartSelection}
           onChange={(e) => dispatch(updateUseModalStartSelection(e.target.checked))}
-          label="Use modal for start selection"
+          label="Use carousel for start selection"
         />
       </div>
 

@@ -1789,7 +1789,7 @@ export class NovelManager {
     try {
       await this.askForSpendApproval(pricing.character, 'generate character outfit');
     } catch (err) {
-      return 'Approval denied for character outfit generation';
+      return 'Error: Generation denied by user';
     }
     const promptResponse = await sdPromptImprover.generatePrompt(appearance);
     if (!promptResponse.prompt) return 'Error: No prompt generated';
@@ -1805,7 +1805,7 @@ export class NovelManager {
       referenceImageWeight: 0,
       headPrompt: promptResponse.components.character_head,
     });
-    if (!inferenceResponse.data) return 'Error: No inference response';
+    if (!inferenceResponse.data) return 'Error: Error sending inference to server';
     const inferenceId = inferenceResponse.data;
     if (!this.novel.pendingInferences) {
       this.novel.pendingInferences = [];
@@ -1823,7 +1823,7 @@ export class NovelManager {
       createdAt: Date.now(),
     });
     store.dispatch(consumeCredits('character'));
-    return 'Outfit started generation successfully';
+    return `Outfit with id "${outfit.id}" started generation successfully`;
   }
 
   async generateOutfitEmotions(characterId: string, outfitId: string): Promise<string> {
@@ -1839,9 +1839,9 @@ export class NovelManager {
         (i) => i.outfitId === outfitId && i.characterId === characterId,
       );
       if (pendingInference) {
-        return 'Error: Outfit has no neutral emotion. Generate an outfit first.';
+        return 'Error: The outfit is still generating. Please wait for it to finish before generating emotions.';
       } else {
-        return 'Error: The outfit is still generating. Please wait for it to finish.';
+        return 'Error: Outfit has no neutral emotion. Generate an outfit first.';
       }
     }
 
@@ -1892,7 +1892,7 @@ export class NovelManager {
     try {
       await this.askForSpendApproval(pricing.emotion * 9, 'generate outfit emotions');
     } catch (err) {
-      return 'Approval denied for outfit emotions generation';
+      return 'Error: Generation denied by user';
     }
     // Fire off an inference for each emotion
     await Promise.all(
@@ -1910,6 +1910,7 @@ export class NovelManager {
           modelToUse: originalGenerationData.modelToUse,
           emotionIndex: index,
         });
+        if (!inferenceResponse.data) return 'Error: Error sending inference to server';
 
         if (!this.novel.pendingInferences) {
           this.novel.pendingInferences = [];
@@ -1935,5 +1936,106 @@ export class NovelManager {
     );
 
     return 'Outfit emotions generation started successfully';
+  }
+
+  async generateBackgroundImage(backgroundId: string, prompt: string): Promise<string> {
+    const background = this.novel.backgrounds.find((b) => b.id === backgroundId);
+    if (!background) return 'Error: backgroundId not found';
+
+    const { user, pricing } = store.getState().user;
+    if ((user?.credits || 0) < pricing.background) {
+      return 'Error: Not enough credits. Please ask the user to buy more inference credits to generate images.';
+    }
+    // NEW: Ask for spend approval before generating emotions.
+    try {
+      await this.askForSpendApproval(pricing.background, 'generate a background');
+    } catch (err) {
+      return 'Error: Generation denied by user';
+    }
+
+    const seed = String(Math.floor(Math.random() * 1000000000));
+    const inferenceResponse = await imageInferenceAPI.startInference({
+      modelToUse: 1,
+      prompt: prompt || '',
+      workflowId: 'backgrounds',
+      seed,
+      step: 'GEN',
+      referenceImageWeight: 0,
+    });
+    if (!inferenceResponse.data) return 'Error: Error sending inference to server';
+    const inferenceId = inferenceResponse.data;
+    if (!this.novel.pendingInferences) {
+      this.novel.pendingInferences = [];
+    }
+    this.novel.pendingInferences.push({
+      inferenceId,
+      inferenceType: 'background',
+      backgroundId,
+      prompt: prompt || '',
+      modelToUse: 1,
+      seed,
+      status: 'pending',
+      createdAt: Date.now(),
+    });
+    store.dispatch(consumeCredits('background'));
+    return `Background generation for id "${backgroundId}" started successfully`;
+  }
+
+  async generateItemImage(itemId: string, prompt: string): Promise<string> {
+    const item = this.novel.inventory?.find((i) => i.id === itemId);
+    if (!item) return 'Error: itemId not found';
+
+    const { user, pricing } = store.getState().user;
+    if ((user?.credits || 0) < pricing.item) {
+      return 'Error: Not enough credits. Please ask the user to buy more inference credits to generate images.';
+    }
+    // NEW: Ask for spend approval before generating emotions.
+    try {
+      await this.askForSpendApproval(pricing.item, 'generate an item image');
+    } catch (err) {
+      return 'Error: Generation denied by user';
+    }
+
+    const seed = String(Math.floor(Math.random() * 1000000000));
+    const inferenceResponse = await imageInferenceAPI.startInference({
+      modelToUse: 1,
+      prompt: prompt || '',
+      workflowId: 'rpg_item',
+      seed,
+      step: 'GEN',
+      referenceImageWeight: 0,
+    });
+    if (!inferenceResponse.data) return 'Error: Error sending inference to server';
+    const inferenceId = inferenceResponse.data;
+    if (!this.novel.pendingInferences) {
+      this.novel.pendingInferences = [];
+    }
+    this.novel.pendingInferences.push({
+      inferenceId,
+      inferenceType: 'item',
+      itemId,
+      prompt: prompt || '',
+      modelToUse: 1,
+      seed,
+      status: 'pending',
+      createdAt: Date.now(),
+    });
+    store.dispatch(consumeCredits('item'));
+    return `Item image generation for id "${itemId}" started successfully`;
+  }
+
+  createBackground(name: string, description: string): string {
+    const id = getId('background');
+    const background = {
+      id,
+      name,
+      description,
+      attributes: [],
+      source: {
+        jpg: 'empty_background.jpg',
+      },
+    };
+    this.novel.backgrounds.push(background);
+    return id;
   }
 }
