@@ -432,7 +432,17 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
       <Accordion
         selectedIndex={selectedItemByIndex}
         onChange={(index) => setSelectedItemByIndex(index)}
-        onRemoveItem={(index) => handleRemoveGroup(index)}
+        onRemoveItem={(index) => {
+          openModal({
+            onYes: () => {
+              handleRemoveGroup(index);
+            },
+            title: 'Are you sure?',
+            description: 'This action will remove the outfit and all the emotions associated with it.',
+            noLabel: 'Cancel',
+            yesLabel: 'Remove',
+          });
+        }}
       >
         {renderEmotionGroups()}
       </Accordion>

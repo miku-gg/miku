@@ -228,11 +228,6 @@ export default function BackgroundEditModal() {
               }
             />
           </div>
-          <div className="BackgroundEditModal__generate">
-            <Button theme="gradient" onClick={() => setShowGenerateModal(true)}>
-              <BsStars /> Generate New Image
-            </Button>
-          </div>
           <div className="BackgroundEditModal__delete">
             <Button onClick={handleDeleteBackground} theme="primary">
               Delete background
