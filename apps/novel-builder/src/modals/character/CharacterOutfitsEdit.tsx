@@ -29,6 +29,7 @@ import CharacterOutfitGenerateModal from './CharacterOutfitGenerateModal';
 import CharacterOutfitEmotionsGenerateModal from './CharacterOutfitEmotionsGenerateModal';
 export default function CharacterOutfitsEdit({ characterId }: { characterId?: string }) {
   const dispatch = useAppDispatch();
+  const isPremium = useAppSelector((state) => state.user.user?.tier === 'PREMIUM');
   const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === characterId));
   const pendingInferences = useAppSelector((state) => state.novel.pendingInferences);
   if (!character || !characterId) {
@@ -399,14 +400,16 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
             <div className="CharacterOutfitsEdit__emotions">{renderEmotionImages()}</div>
             {group.template === 'single-emotion' ? (
               <div className="CharacterOutfitsEdit__group-generation-buttons">
-                <Button
-                  theme="secondary"
-                  onClick={() => {
-                    setShowGenerateOutfitModalForIndex(groupIndex);
-                  }}
-                >
-                  <BsStars /> Generate Outfit
-                </Button>
+                {isPremium ? (
+                  <Button
+                    theme="secondary"
+                    onClick={() => {
+                      setShowGenerateOutfitModalForIndex(groupIndex);
+                    }}
+                  >
+                    <BsStars /> Generate Outfit
+                  </Button>
+                ) : null}
                 <Button
                   theme="secondary"
                   disabled={
