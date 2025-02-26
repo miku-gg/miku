@@ -59,8 +59,8 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
   [
     'development',
     {
-      assetsEndpoint: 'https://assets.miku.gg',
-      assetsEndpointOptimized: 'https://assets.miku.gg',
+      assetsEndpoint: 'http://localhost:8585/s3/assets',
+      assetsEndpointOptimized: 'http://localhost:8585/s3/assets',
       uploadAssetEndpoint: 'http://localhost:8585/asset-upload',
       platformAPIEndpoint: 'http://localhost:8080',
       isPremiumUser: async (): Promise<boolean> => {
@@ -78,7 +78,7 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
         if (asset.startsWith('data')) {
           return asset;
         } else {
-          return `https://assets.miku.gg/${asset}`;
+          return `http://localhost:8585/s3/assets/${asset}`;
         }
       },
       uploadAsset: async (file: File | string, type) => {
