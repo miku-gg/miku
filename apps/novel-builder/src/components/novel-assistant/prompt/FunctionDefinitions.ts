@@ -1,26 +1,5 @@
 import { CharacterEmotion, NovelManager } from './NovelSpec';
-
-export type FunctionHandler = (...args: any[]) => Promise<string>;
-
-export type FunctionAction = 'created' | 'updated' | 'removed' | 'connected' | 'deleted';
-
-export interface FunctionDefinition {
-  name: string;
-  description: string;
-  parameters: {
-    type: string;
-    properties: Record<string, any>;
-    required?: string[];
-  };
-  handler: FunctionHandler;
-  displayData:
-    | { isSetter: false }
-    | {
-        isSetter: true;
-        action: FunctionAction;
-        subject: string;
-      };
-}
+import { FunctionDefinition, FunctionHandler, FunctionAction } from '../../../libs/assistantCall';
 
 export class FunctionRegistry {
   private functions: Map<string, FunctionHandler>;
@@ -1734,6 +1713,81 @@ export class FunctionRegistry {
           isSetter: true,
           action: 'updated',
           subject: 'the scenes that have a map',
+        },
+      },
+      {
+        name: 'generate_character_outfit',
+        description: 'Given a character id and appearance, generate a new outfit for the character.',
+        parameters: {
+          type: 'object',
+          properties: {
+            characterId: { type: 'string', description: 'ID of the character to generate an outfit for' },
+            appearance: { type: 'string', description: 'Appearance of the character' },
+          },
+          required: ['characterId', 'appearance'],
+        },
+        handler: (args) => novelManager.generateCharacterOutfit(args.characterId, args.appearance),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'an outfit',
+        },
+      },
+      {
+        name: 'generate_outfit_emotions',
+        description: 'Given a character id and outfit id, generates the emotions for the outfit.',
+        parameters: {
+          type: 'object',
+          properties: {
+            characterId: { type: 'string', description: 'ID of the character to generate an outfit for' },
+            outfitId: { type: 'string', description: 'ID of the outfit to generate emotions for' },
+          },
+          required: ['characterId', 'outfitId'],
+        },
+        handler: (args) => novelManager.generateOutfitEmotions(args.characterId, args.outfitId),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'emotions for an outfit',
+        },
+      },
+      {
+        name: 'generate_background_image',
+        description: 'Given a background prompt, creates a new background image.',
+        parameters: {
+          type: 'object',
+          properties: {
+            backgroundName: { type: 'string', description: 'Name of the background' },
+            prompt: { type: 'string', description: 'Prompt for the background image' },
+          },
+          required: ['backgroundName', 'prompt'],
+        },
+        handler: (args) => {
+          const backgroundId = novelManager.createBackground(args.backgroundName, args.prompt);
+          return novelManager.generateBackgroundImage(backgroundId, args.prompt);
+        },
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'a background image',
+        },
+      },
+      {
+        name: 'generate_item_image',
+        description: 'Given an item id and prompt, generates a new item image.',
+        parameters: {
+          type: 'object',
+          properties: {
+            itemId: { type: 'string', description: 'ID of the item to generate an image for' },
+            prompt: { type: 'string', description: 'Prompt for the item image' },
+          },
+          required: ['itemId', 'prompt'],
+        },
+        handler: (args) => novelManager.generateItemImage(args.itemId, args.prompt),
+        displayData: {
+          isSetter: true,
+          action: 'created',
+          subject: 'an item image',
         },
       },
     ];

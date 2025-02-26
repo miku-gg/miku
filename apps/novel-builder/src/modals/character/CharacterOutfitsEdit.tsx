@@ -25,10 +25,12 @@ import { toast } from 'react-toastify';
 import { BsStars } from 'react-icons/bs';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
-
+import CharacterOutfitGenerateModal from './CharacterOutfitGenerateModal';
+import CharacterOutfitEmotionsGenerateModal from './CharacterOutfitEmotionsGenerateModal';
 export default function CharacterOutfitsEdit({ characterId }: { characterId?: string }) {
   const dispatch = useAppDispatch();
   const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === characterId));
+  const pendingInferences = useAppSelector((state) => state.novel.pendingInferences);
   if (!character || !characterId) {
     return null;
   }
@@ -36,6 +38,8 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
   const [selectedItemByIndex, setSelectedItemByIndex] = useState<number>(-1);
   const [expandedTemplateDropdown, setExpandedTemplateDropdown] = useState(false);
   const { openModal } = AreYouSure.useAreYouSure();
+  const [showGenerateOutfitModalForIndex, setShowGenerateOutfitModalForIndex] = useState<number | null>(null);
+  const [showGenerateEmotionsModalForIndex, setShowGenerateEmotionsModalForIndex] = useState<number | null>(null);
 
   const decorateCharacterWithOutfits = (outfits: MikuCardV2['data']['extensions']['mikugg_v2']['outfits']) => {
     return {
@@ -273,6 +277,13 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
 
         return emotionsTemplate.emotionIds.map((emotionId) => {
           const emotion = group.emotions.find((img) => img.id === emotionId);
+          const isPending = pendingInferences?.some(
+            (inf) =>
+              inf.characterId === characterId &&
+              inf.outfitId === group.id &&
+              ((inf.inferenceType === 'emotion' && inf.emotionId === emotionId) ||
+                (inf.inferenceType === 'character' && 'neutral' === emotionId)),
+          );
 
           return (
             <div
@@ -289,6 +300,7 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
                     : undefined
                 }
                 placeHolder="(1024x1024)"
+                loading={isPending}
                 onFileValidate={(file) => {
                   return checkFileType(file, ['image/png', 'image/gif', 'image/webp', 'video/webm', 'audio/mpeg']);
                 }}
@@ -383,7 +395,33 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
               selectedIndex={getDropdownEmotionTemplateIndex(groupIndex)}
             />
           </div>
-          <div className="CharacterOutfitsEdit__emotions">{renderEmotionImages()}</div>
+          <div className="CharacterOutfitsEdit__emotions-container">
+            <div className="CharacterOutfitsEdit__emotions">{renderEmotionImages()}</div>
+            {group.template === 'single-emotion' ? (
+              <div className="CharacterOutfitsEdit__group-generation-buttons">
+                <Button
+                  theme="secondary"
+                  onClick={() => {
+                    setShowGenerateOutfitModalForIndex(groupIndex);
+                  }}
+                >
+                  <BsStars /> Generate Outfit
+                </Button>
+                <Button
+                  theme="secondary"
+                  disabled={
+                    group.emotions?.at(0)?.sources.png === 'empty_char_emotion.png' ||
+                    !group.emotions?.at(0)?.sources.png
+                  }
+                  onClick={() => {
+                    setShowGenerateEmotionsModalForIndex(groupIndex);
+                  }}
+                >
+                  <BsStars /> Generate Emotions
+                </Button>
+              </div>
+            ) : null}
+          </div>
         </AccordionItem>
       );
     });
@@ -394,7 +432,17 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
       <Accordion
         selectedIndex={selectedItemByIndex}
         onChange={(index) => setSelectedItemByIndex(index)}
-        onRemoveItem={(index) => handleRemoveGroup(index)}
+        onRemoveItem={(index) => {
+          openModal({
+            onYes: () => {
+              handleRemoveGroup(index);
+            },
+            title: 'Are you sure?',
+            description: 'This action will remove the outfit and all the emotions associated with it.',
+            noLabel: 'Cancel',
+            yesLabel: 'Remove',
+          });
+        }}
       >
         {renderEmotionGroups()}
       </Accordion>
@@ -402,12 +450,24 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
         <Button theme="secondary" onClick={handleAddGroup}>
           + Add Outfit
         </Button>
-        <a href="https://emotions.miku.gg" target="_blank">
-          <Button theme="gradient">
-            <BsStars /> Generate
-          </Button>
-        </a>
       </div>
+
+      {showGenerateOutfitModalForIndex !== null && (
+        <CharacterOutfitGenerateModal
+          isOpen={showGenerateOutfitModalForIndex !== null}
+          onClose={() => setShowGenerateOutfitModalForIndex(null)}
+          characterId={characterId}
+          outfitId={outfits[showGenerateOutfitModalForIndex].id}
+        />
+      )}
+      {showGenerateEmotionsModalForIndex !== null && (
+        <CharacterOutfitEmotionsGenerateModal
+          isOpen={showGenerateEmotionsModalForIndex !== null}
+          onClose={() => setShowGenerateEmotionsModalForIndex(null)}
+          characterId={characterId}
+          outfitId={outfits[showGenerateEmotionsModalForIndex].id}
+        />
+      )}
     </div>
   );
 }

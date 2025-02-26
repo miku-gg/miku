@@ -12,6 +12,8 @@ import { deleteBackground, updateBackground } from '../state/slices/novelFormSli
 import { useAppSelector } from '../state/store';
 import './BackgroundEditModal.scss';
 import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
+import BackgroundGenerateModal from './background/BackgroundGenerateModal';
+import { BsStars } from 'react-icons/bs';
 
 export default function BackgroundEditModal() {
   const background = useAppSelector(selectEditingBackground);
@@ -19,6 +21,7 @@ export default function BackgroundEditModal() {
   const { openModal } = AreYouSure.useAreYouSure();
   const [backgroundUploading, setBackgroundUploading] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<string>('image');
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
 
   const handleDeleteBackground = () => {
     openModal({
@@ -132,9 +135,14 @@ export default function BackgroundEditModal() {
               ]}
             />
           </div>
-          {background.source.jpg.length > 0 && selectedTab === 'image' ? (
+          {selectedTab === 'image' ? (
             <div className="BackgroundEditModal__background">
-              <img src={config.genAssetLink(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE)} />
+              <img src={config.genAssetLink(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE)} alt="" />
+              <div className="BackgroundEditModal__background__generate-button">
+                <Button theme="gradient" onClick={() => setShowGenerateModal(true)}>
+                  <BsStars />
+                </Button>
+              </div>
             </div>
           ) : null}
           {background.source.mp4 && selectedTab === 'video' ? (
@@ -227,6 +235,13 @@ export default function BackgroundEditModal() {
           </div>
         </div>
       ) : null}
+      {showGenerateModal && (
+        <BackgroundGenerateModal
+          isOpen={showGenerateModal}
+          onClose={() => setShowGenerateModal(false)}
+          backgroundId={background?.id}
+        />
+      )}
     </Modal>
   );
 }

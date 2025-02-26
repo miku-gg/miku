@@ -25,6 +25,10 @@
     width: 100%;
     border-radius: 15px;
     margin: 1em 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
 
     & img {
       width: 100%;
@@ -38,6 +42,13 @@
       width: 100%;
       border: 1px solid $node-conector-color;
       border-radius: 16px;
+    }
+
+    &__generate-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
     }
   }
 

@@ -10,6 +10,9 @@ import { createNewInventoryItem } from '../../../state/slices/novelFormSlice';
 import { useAppSelector } from '../../../state/store';
 import './InventoryItems.scss'; // Import the SCSS file
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { BsStars } from 'react-icons/bs';
+import { useState } from 'react';
+import ItemGenerateModal from '../../../modals/items/ItemGenerateModal';
 
 const InventoryItems = ({
   selectedItemIds,
@@ -25,6 +28,8 @@ const InventoryItems = ({
   const dispatch = useDispatch();
   const items = useAppSelector((state) => state.novel.inventory);
   const currentItems = items?.filter((item) => !skipItemIds?.includes(item.id));
+  const [showGenerateModal, setShowGenerateModal] = useState<boolean>(false);
+  const pendingInferences = useAppSelector((state) => state.novel.pendingInferences);
 
   const handleCreateInventoryItem = () => {
     const id = randomUUID();
@@ -35,24 +40,30 @@ const InventoryItems = ({
   const createItemBlocks = () => {
     if (!currentItems) return [];
 
-    return currentItems.map((item) => ({
-      id: `item-${item.id}`,
-      tooltip: item.name,
-      highlighted: selectedItemIds && selectedItemIds.includes(item.id),
-      content: {
-        text: !item.icon && item.name,
-        image: item.icon && config.genAssetLink(item.icon, AssetDisplayPrefix.ITEM_IMAGE_SMALL),
-      },
-      onEditClick: () =>
-        dispatch(
-          openModal({
-            modalType: 'editInventoryItem',
-            editId: item.id,
-          }),
-        ),
-      editIcon: <FaPencil />,
-      onClick: () => onSelect?.(item.id),
-    }));
+    return currentItems.map((item) => {
+      // Check if this item has a pending inference
+      const isPending = pendingInferences?.some((p) => p.itemId === item.id && p.status === 'pending');
+
+      return {
+        id: `item-${item.id}`,
+        tooltip: item.name,
+        highlighted: selectedItemIds && selectedItemIds.includes(item.id),
+        content: {
+          text: !item.icon && item.name,
+          image: item.icon && config.genAssetLink(item.icon, AssetDisplayPrefix.ITEM_IMAGE_SMALL),
+        },
+        onEditClick: () =>
+          dispatch(
+            openModal({
+              modalType: 'editInventoryItem',
+              editId: item.id,
+            }),
+          ),
+        editIcon: <FaPencil />,
+        onClick: () => onSelect?.(item.id),
+        loading: isPending,
+      };
+    });
   };
 
   return (
@@ -72,7 +83,6 @@ const InventoryItems = ({
           tooltipId="InventoryItems"
           items={[
             ...createItemBlocks(),
-
             {
               id: 'create',
               content: {
@@ -81,9 +91,19 @@ const InventoryItems = ({
               },
               onClick: () => handleCreateInventoryItem(),
             },
+            {
+              id: 'generate',
+              content: {
+                icon: <BsStars />,
+                text: 'Gen',
+              },
+              onClick: () => setShowGenerateModal(true),
+            },
           ]}
         />
       </div>
+
+      <ItemGenerateModal isOpen={showGenerateModal} onClose={() => setShowGenerateModal(false)} />
     </div>
   );
 };

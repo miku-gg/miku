@@ -1,17 +1,17 @@
 import ChatBot, { Button, Params, RcbToggleChatWindowEvent } from 'react-chatbotify';
 import { ChatCompletion, ChatCompletionMessageParam } from 'openai/src/resources/index.js';
-import axios from 'axios';
 import { useState, useEffect } from 'react';
 import DisclaimerModal from './DisclaimerModal';
 import config from '../../config';
 
 import './NovelAssistant.scss';
-import { FunctionAction, FunctionRegistry } from './prompt/FunctionDefinitions';
+import { FunctionRegistry } from './prompt/FunctionDefinitions';
 import { NovelManager } from './prompt/NovelSpec';
 import { NovelV3 } from '@mikugg/bot-utils';
-import { useAppDispatch, useAppSelector } from '../../state/store';
+import { store, useAppDispatch } from '../../state/store';
 import { loadCompleteState } from '../../state/slices/novelFormSlice';
-import { SERVICES_ENDPOINT } from '../../libs/utils';
+import { callChatCompletion, FunctionAction } from '../../libs/assistantCall';
+import '../../libs/sdPromptImprover';
 
 function getFunctionActionColor(action: FunctionAction): string {
   switch (action) {
@@ -54,39 +54,6 @@ const functions = functionRegistry.getFunctionDefinitions();
 // Load existing history if it exists
 const conversationHistory: ChatCompletionMessageParam[] = [];
 
-// Load
-
-const callChatCompletion = async (
-  messages: ChatCompletionMessageParam[],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  tools: any[],
-  parallel_tool_calls: boolean,
-  tool_choice: 'none' | 'auto',
-): Promise<ChatCompletion> => {
-  const response = await axios.post(
-    SERVICES_ENDPOINT + '/assistant',
-    {
-      messages,
-      tools,
-      parallel_tool_calls,
-      tool_choice,
-    },
-    {
-      method: 'POST',
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  );
-
-  if (response.status !== 200) {
-    throw new Error('Failed to get completion from proxy');
-  }
-
-  return response.data;
-};
-
 const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelState) => void) => {
   try {
     conversationHistory.push({ role: 'user', content: params.userInput });
@@ -105,6 +72,7 @@ const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelSt
     for (response = await askResponse(); response?.choices[0].message?.tool_calls; response = await askResponse()) {
       const message = response.choices[0].message;
       conversationHistory.push(message);
+      novelManager.replaceState(store.getState().novel);
       if (message?.tool_calls) {
         for (const toolCall of message.tool_calls) {
           const fnName = toolCall.function.name;
@@ -150,7 +118,6 @@ const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelSt
 
 export default function NovelAssistant() {
   const dispatch = useAppDispatch();
-  const state = useAppSelector((state) => state.novel);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [hasAcceptedDisclaimer, setHasAcceptedDisclaimer] = useState(() => false);
   const [isPremium, setIsPremium] = useState(false);
@@ -171,10 +138,6 @@ export default function NovelAssistant() {
 
     checkPremiumStatus();
   }, []);
-
-  useEffect(() => {
-    novelManager.replaceState(state);
-  }, [state.title]);
 
   useEffect(() => {
     const handleToggleChatWindow = (event: RcbToggleChatWindowEvent) => {

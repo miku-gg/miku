@@ -71,6 +71,13 @@
         z-index: 10;
         border-radius: 16px;
       }
+
+      &__generate-button {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+      }
     }
 
     &__text {

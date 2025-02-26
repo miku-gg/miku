@@ -1,0 +1,79 @@
+@import '../styles/variables';
+.CreditsWidget {
+  position: relative; // Ensure the dropdown is positioned relative to the widget
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: normal;
+
+  &__credits {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__pending {
+    cursor: pointer;
+    display: inline-flex;
+  }
+
+  .rotating-cog {
+    font-size: 1.2rem;
+    /* Rotating animation for the cog */
+    animation: rotation 2s linear infinite;
+    color: $text-2;
+    transition: color 0.2s ease-out;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  @keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background-color: $background-1;
+    border: 1px solid $text-2;
+    width: 300px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    padding: 0.5rem;
+    border-radius: 4px;
+  }
+
+  &__dropdown-header {
+    font-size: 0.9rem;
+    font-weight: normal;
+    padding: 0.2rem;
+    text-align: right;
+  }
+
+  &__dropdown-content {
+    padding: 0.2rem;
+    overflow: auto;
+    max-height: 150px;
+  }
+
+  &__inference {
+    background-color: $background-2;
+    padding: 4px;
+    margin-bottom: 4px;
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}

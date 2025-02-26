@@ -14,12 +14,15 @@ import { openModal } from '../../../state/slices/inputSlice';
 import { addBackground } from '../../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../../state/store';
 import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
+import BackgroundGenerateModal from '../../../modals/background/BackgroundGenerateModal';
 
 export default function Backgrounds({ selected, onSelect }: { selected?: string; onSelect?: (id: string) => void }) {
   const backgrounds = useAppSelector(selectBackgrounds);
   const dispatch = useAppDispatch();
   const [backgroundUploading, setBackgroundUploading] = useState<boolean>(false);
+  const [showGenerateModal, setShowGenerateModal] = useState<boolean>(false);
   const uploadBackground = useRef<HTMLInputElement>(null);
+  const pendingInferences = useAppSelector((state) => state.novel.pendingInferences);
 
   const handleUploadBackground = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -56,26 +59,35 @@ export default function Backgrounds({ selected, onSelect }: { selected?: string;
       <Blocks
         tooltipId="backgrounds"
         items={[
-          ...backgrounds.map((background) => ({
-            id: `backgrounds-${background.id}`,
-            tooltip: background.name,
-            highlighted: selected === background.id,
-            editIcon: <FaPencil />,
-            onEditClick: () => {
-              dispatch(
-                openModal({
-                  modalType: 'background',
-                  editId: background.id,
-                }),
-              );
-            },
-            content: {
-              image: config.genAssetLink(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE),
-            },
-            onClick: () => {
-              onSelect?.(background.id);
-            },
-          })),
+          ...backgrounds.map((background) => {
+            const isPending = pendingInferences?.some(
+              (p) => p.backgroundId === background.id && p.status === 'pending',
+            );
+
+            return {
+              id: `backgrounds-${background.id}`,
+              tooltip: background.name,
+              highlighted: selected === background.id,
+              editIcon: <FaPencil />,
+              onEditClick: () => {
+                dispatch(
+                  openModal({
+                    modalType: 'background',
+                    editId: background.id,
+                  }),
+                );
+              },
+              content: {
+                image: background.source.jpg
+                  ? config.genAssetLink(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE)
+                  : '',
+              },
+              onClick: () => {
+                onSelect?.(background.id);
+              },
+              loading: isPending,
+            };
+          }),
           {
             id: 'upload',
             highlighted: false,
@@ -94,7 +106,7 @@ export default function Backgrounds({ selected, onSelect }: { selected?: string;
               icon: <BsStars />,
               text: 'Gen',
             },
-            onClick: () => window.open('https://emotions.miku.gg/background-generation', '_blank'),
+            onClick: () => setShowGenerateModal(true),
             loading: backgroundUploading,
             disabled: backgroundUploading,
           },
@@ -110,6 +122,8 @@ export default function Backgrounds({ selected, onSelect }: { selected?: string;
         ]}
       />
       <input type="file" onChange={handleUploadBackground} ref={uploadBackground} hidden />
+
+      <BackgroundGenerateModal isOpen={showGenerateModal} onClose={() => setShowGenerateModal(false)} />
     </div>
   );
 }
