@@ -1,5 +1,6 @@
 import { Button, Modal } from '@mikugg/ui-kit';
 import { BiSolidError } from 'react-icons/bi';
+import { PiVideoCamera } from 'react-icons/pi';
 import { MdOutlineTimer } from 'react-icons/md';
 import './DisclaimerModal.scss';
 
@@ -31,6 +32,18 @@ export default function DisclaimerModal({ opened, onClose }: DisclaimerModalProp
             <p className="disclaimer-modal__text">
               Due to the significant computational costs involved, there are usage limits in place. Please use the
               assistant thoughtfully and efficiently.
+            </p>
+          </div>
+        </div>
+
+        <div className="disclaimer-modal__section disclaimer-modal__section--info">
+          <PiVideoCamera className="disclaimer-modal__icon" />
+          <div className="disclaimer-modal__text-container">
+            <h3 className="disclaimer-modal__title">Moderated Content</h3>
+            <p className="disclaimer-modal__text">
+              We use an external service for the assistant. So the assistant may occasionally flag content as sensitive.
+              Please be aware that the assistant may not always be able to generate content that is not flagged as
+              sensitive.
             </p>
           </div>
         </div>

@@ -78,7 +78,7 @@
     "react-chatbotify": "2.0.0-beta.26",
     "react-color": "^2.19.3",
     "react-country-flag": "^3.1.0",
-    "react-icons": "^4.12.0",
+    "react-icons": "^5.5.0",
     "react-redux": "^9.0.4",
     "react-toastify": "^9.1.1",
     "reactflow": "^11.10.1",
