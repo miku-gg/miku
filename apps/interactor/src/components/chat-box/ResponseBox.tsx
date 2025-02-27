@@ -35,7 +35,7 @@ import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch();
-  const { servicesEndpoint, apiEndpoint, isInteractionDisabled, assetLinkLoader } = useAppContext();
+  const { servicesEndpoint, apiEndpoint, isInteractionDisabled, assetLinkLoader, isPublishedDemo } = useAppContext();
   const responseDiv = useRef<HTMLDivElement>(null);
   const lastReponse = useAppSelector(selectLastLoadedResponse);
   const isLastResponseFetching = useAppSelector(
@@ -227,7 +227,7 @@ const ResponseBox = (): JSX.Element | null => {
         </div>
       ) : null}
       <div className="ResponseBox__actions">
-        {!disabled ? <TTSPlayer /> : null}
+        {!disabled || isPublishedDemo ? <TTSPlayer /> : null}
         {!disabled && lastReponse?.parentInteractionId && (swipes?.length || 0) < 8 ? (
           <button className="ResponseBox__regenerate" onClick={handleRegenerateClick}>
             <FaDice />

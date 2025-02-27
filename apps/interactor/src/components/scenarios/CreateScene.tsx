@@ -459,7 +459,7 @@ const SearchCharacterModal = () => {
   );
 };
 const CreateSceneBackgroundModal = () => {
-  const { assetLinkLoader, isMobileApp } = useAppContext();
+  const { assetLinkLoader, isMobileApp, isPublishedDemo } = useAppContext();
 
   const dispatch = useAppDispatch();
 
@@ -549,7 +549,7 @@ const CreateSceneBackgroundModal = () => {
             <MdOutlineImageSearch />
             <p>Search</p>
           </div>{' '}
-          {!isMobileApp && (
+          {!isMobileApp && !isPublishedDemo && (
             <>
               <div className="CreateScene__selector__item CreateScene__selector__item--upload">
                 <DragAndDropImages
@@ -695,7 +695,7 @@ export const GEN_BACKGROUND_COST = 20;
 const GenerateBackgroundModal = () => {
   const dispatch = useAppDispatch();
   const [prompt, setPrompt] = useState<string>('');
-  const { apiEndpoint, servicesEndpoint } = useAppContext();
+  const { apiEndpoint, servicesEndpoint, isPublishedDemo } = useAppContext();
   const opened = useAppSelector((state) => state.creation.scene.background.gen.opened);
   const { credits } = useAppSelector((state) => state.settings.user);
 
@@ -736,33 +736,35 @@ const GenerateBackgroundModal = () => {
             onChange={(e) => setPrompt(e.target.value)}
           />
         </div>
-        <div className="CreateScene__generator__button">
-          <Button
-            theme="gradient"
-            disabled={!prompt || credits < GEN_BACKGROUND_COST}
-            onClick={async () => {
-              dispatch(
-                backgroundInferenceStart({
-                  id: randomUUID(),
-                  prompt,
-                  apiEndpoint,
-                  servicesEndpoint,
-                }),
-              );
-              dispatch(
-                setModalOpened({
-                  id: 'background-gen',
-                  opened: false,
-                }),
-              );
-            }}
-          >
-            {i18n('generate_background')}{' '}
-            <span>
-              {GEN_BACKGROUND_COST} <FaCoins />
-            </span>
-          </Button>
-        </div>
+        {!isPublishedDemo ? (
+          <div className="CreateScene__generator__button">
+            <Button
+              theme="gradient"
+              disabled={!prompt || credits < GEN_BACKGROUND_COST}
+              onClick={async () => {
+                dispatch(
+                  backgroundInferenceStart({
+                    id: randomUUID(),
+                    prompt,
+                    apiEndpoint,
+                    servicesEndpoint,
+                  }),
+                );
+                dispatch(
+                  setModalOpened({
+                    id: 'background-gen',
+                    opened: false,
+                  }),
+                );
+              }}
+            >
+              {i18n('generate_background')}{' '}
+              <span>
+                {GEN_BACKGROUND_COST} <FaCoins />
+              </span>
+            </Button>
+          </div>
+        ) : null}
       </div>
     </Modal>
   );

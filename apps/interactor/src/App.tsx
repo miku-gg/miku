@@ -28,6 +28,7 @@ function App(props: AppProps) {
     assetUploader: props.assetUploader,
     assetLinkLoader: props.assetLinkLoader,
     novelLoader: props.novelLoader,
+    isPublishedDemo: props.isPublishedDemo,
   };
 
   useEffect(() => {

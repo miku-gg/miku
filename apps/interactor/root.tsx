@@ -60,6 +60,7 @@ export function getCongurationFromParams(): {
   servicesEndpoint: string;
   persona: PersonaResult;
   settings: object;
+  isPublishedDemo: boolean;
 } {
   const queryParams = queryString.parse(window.location.search);
   const cardId = (queryParams.cardId || '') as string;
@@ -69,6 +70,7 @@ export function getCongurationFromParams(): {
   const disabled = queryParams.disabled === 'true';
   const configuration = queryParams.configuration as string;
   const isMobileApp = queryParams.isMobileApp === 'true';
+  const isPublishedDemo = queryParams.isPublishedDemo === 'true';
 
   try {
     const configurationJson = JSON.parse(decodeText(configuration)) as {
@@ -105,6 +107,7 @@ export function getCongurationFromParams(): {
       servicesEndpoint: configurationJson.servicesEndpoint || SERVICES_ENDPOINT,
       persona: configurationJson.persona,
       settings: configurationJson.settings || {},
+      isPublishedDemo,
     };
   } catch (e) {
     return {
@@ -138,6 +141,7 @@ export function getCongurationFromParams(): {
         },
       },
       settings: mergeWith({}, initialSettingsState),
+      isPublishedDemo,
     };
   }
 }
@@ -264,6 +268,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       botId={params.botId}
       isProduction={params.production}
       isInteractionDisabled={params.disabled}
+      isPublishedDemo={params.isPublishedDemo}
       servicesEndpoint={params.servicesEndpoint}
       apiEndpoint={params.apiEndpoint}
       cardEndpoint={params.cardEndpoint}

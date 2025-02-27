@@ -19,7 +19,7 @@ export default function Inventory() {
   const { isPremium } = useAppSelector((state) => state.settings.user);
   const { showInventory, selectedItem, items } = useAppSelector((state) => state.inventory);
   const currentScene = useAppSelector(selectCurrentScene);
-  const { servicesEndpoint, isInteractionDisabled, apiEndpoint, assetLinkLoader } = useAppContext();
+  const { servicesEndpoint, isInteractionDisabled, apiEndpoint, assetLinkLoader, isProduction } = useAppContext();
   const scene = useAppSelector(selectCurrentScene);
   const lastResponse = useAppSelector(selectLastLoadedResponse);
   const { i18n } = useI18n();
@@ -40,61 +40,63 @@ export default function Inventory() {
       </div>
       <div className="Inventory__content">
         <div className="Inventory__items scrollbar">
-          {items.map((item) => {
-            const speed = 5;
-            const position = Math.max(item.name.length + 10, 20);
-            const animationDuration = Math.max(item.name.length / speed, 3);
-            const isSelectedItem = item.id === selectedItem?.id;
-            const isLocked = item.locked?.config.sceneIds.includes(currentScene?.id || '');
-            const disabled = (!isPremium && item.isPremium) || (item.locked && !isLocked);
-            const isHidden = item.hidden;
-            return (
-              <div
-                key={item.id}
-                className={classNames({
-                  Inventory__item: true,
-                  selected: isSelectedItem,
-                  disabled: disabled,
-                  hidden: isHidden,
-                  highlighted: item.isNovelOnly && !disabled,
-                })}
-                onClick={() => {
-                  if (disabled) return;
-                  if (!isSelectedItem) {
-                    dispatch(setItemModalVisibility('open'));
-                    dispatch(setSelectedItem(item));
-                  } else {
-                    dispatch(setItemModalVisibility('closed'));
-
-                    setTimeout(() => {
-                      dispatch(setSelectedItem(null));
-                    }, 150);
-                  }
-                }}
-                data-tooltip-id={disabled ? 'premium-item-inventory' : undefined}
-                data-tooltip-varaint="light"
-                data-tooltip-content={disabled && item.isPremium ? i18n('this_is_a_premium_only_item') : undefined}
-              >
-                <img
-                  className="Inventory__item-image"
-                  src={assetLinkLoader(item.icon || 'default_item.jpg', AssetDisplayPrefix.ITEM_IMAGE)}
-                  alt={item.name}
-                />
+          {items
+            .filter((item) => isProduction || !item.isPremium)
+            .map((item) => {
+              const speed = 5;
+              const position = Math.max(item.name.length + 10, 20);
+              const animationDuration = Math.max(item.name.length / speed, 3);
+              const isSelectedItem = item.id === selectedItem?.id;
+              const isLocked = item.locked?.config.sceneIds.includes(currentScene?.id || '');
+              const disabled = (!isPremium && item.isPremium) || (item.locked && !isLocked);
+              const isHidden = item.hidden;
+              return (
                 <div
-                  className={`Inventory__item-name ${7 < item.name.length ? 'animated-item-name' : ''}`}
-                  style={
-                    {
-                      '--initial-text-position': `100%`,
-                      '--ending-text-position': `${-position}ch`,
-                      '--animation-duration': `${animationDuration}s`,
-                    } as React.CSSProperties
-                  }
+                  key={item.id}
+                  className={classNames({
+                    Inventory__item: true,
+                    selected: isSelectedItem,
+                    disabled: disabled,
+                    hidden: isHidden,
+                    highlighted: item.isNovelOnly && !disabled,
+                  })}
+                  onClick={() => {
+                    if (disabled) return;
+                    if (!isSelectedItem) {
+                      dispatch(setItemModalVisibility('open'));
+                      dispatch(setSelectedItem(item));
+                    } else {
+                      dispatch(setItemModalVisibility('closed'));
+
+                      setTimeout(() => {
+                        dispatch(setSelectedItem(null));
+                      }, 150);
+                    }
+                  }}
+                  data-tooltip-id={disabled ? 'premium-item-inventory' : undefined}
+                  data-tooltip-varaint="light"
+                  data-tooltip-content={disabled && item.isPremium ? i18n('this_is_a_premium_only_item') : undefined}
                 >
-                  {item.name}
+                  <img
+                    className="Inventory__item-image"
+                    src={assetLinkLoader(item.icon || 'default_item.jpg', AssetDisplayPrefix.ITEM_IMAGE)}
+                    alt={item.name}
+                  />
+                  <div
+                    className={`Inventory__item-name ${7 < item.name.length ? 'animated-item-name' : ''}`}
+                    style={
+                      {
+                        '--initial-text-position': `100%`,
+                        '--ending-text-position': `${-position}ch`,
+                        '--animation-duration': `${animationDuration}s`,
+                      } as React.CSSProperties
+                    }
+                  >
+                    {item.name}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
         <Tooltip id="premium-item-inventory" place="right" />
         <Tooltip id="item-name" place="top" />
