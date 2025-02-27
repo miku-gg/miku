@@ -276,7 +276,7 @@ export default function CharacterDescriptionEdit({ characterId }: { characterId?
         <div className="CharacterDescriptionEdit__description__label">
           <div className="CharacterDescriptionEdit__description__label-group">
             <label className="Input__label">Character Prompt</label>
-            {/* <button
+            <button
               className="Input__label"
               onClick={() => {
                 dispatch(openModal({ modalType: 'characterGeneration' }));
@@ -284,7 +284,7 @@ export default function CharacterDescriptionEdit({ characterId }: { characterId?
             >
               <BsStars />
               Generate
-            </button> */}
+            </button>
           </div>
           <Modal
             opened={GenerateCharacterModal}
@@ -356,7 +356,7 @@ export default function CharacterDescriptionEdit({ characterId }: { characterId?
           <div className="CharacterDescriptionEdit__examples__label-group">
             <label className="Input__label">Character Reference Conversation</label>
             <div className={!character.card.data.description || isGenerating === true ? 'disabled' : ''}>
-              {/* <button
+              <button
                 className="Input__label"
                 disabled={!character.card.data.description || isGenerating === true}
                 onClick={() => {
@@ -365,7 +365,7 @@ export default function CharacterDescriptionEdit({ characterId }: { characterId?
               >
                 <BsStars />
                 {isGenerating ? 'Generating...' : 'Generate'}
-              </button> */}
+              </button>
             </div>
           </div>
           <TokenDisplayer
