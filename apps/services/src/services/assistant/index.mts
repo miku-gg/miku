@@ -44,22 +44,26 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
     },
   );
 
-  console.log(moderation.data?.results[0].categories);
-  const flagged = moderation.data?.results && moderation.data?.results[0].categories['sexual/minors'];
+  // console.log(moderation.data?.results);
+  const flagged = moderation.data?.results?.some((result) => result.flagged);
   if (flagged) {
+    const categories = Object.keys(moderation.data?.results[0].categories || {});
+    const flaggedCategories = categories.filter((category) => {
+      return moderation.data?.results.some((result) => result.categories[category as keyof typeof result.categories]);
+    });
     return res.json({
       id: '',
       choices: [
         {
           message: {
-            content: 'Error: Content was flagged as sensitive',
+            content: `Content was flagged as sensitive: ${flaggedCategories.join(', ')}`,
             role: 'assistant',
-            refusal: 'Content was flagged as sensitive',
+            refusal: `Content was flagged as sensitive: ${flaggedCategories.join(', ')}`,
           },
         },
       ],
       created: 0,
-      model: '',
+      model: 'gpt-4o-mini',
       object: 'chat.completion',
     });
   }
