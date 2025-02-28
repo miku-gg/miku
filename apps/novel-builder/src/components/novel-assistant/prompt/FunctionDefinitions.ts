@@ -1294,64 +1294,6 @@ export class FunctionRegistry {
         },
       },
       {
-        name: 'create_objective',
-        description: 'Create a new objective for the novel.',
-        parameters: {
-          type: 'object',
-          properties: {
-            name: { type: 'string', description: 'Name of the objective' },
-            description: { type: 'string', description: 'Short description of the objective' },
-            hint: { type: 'string', description: 'Hint for the player about this objective' },
-            condition: { type: 'string', description: 'Condition prompt that triggers the objective' },
-          },
-          required: ['name'],
-        },
-        handler: (args) => novelManager.createObjective(args),
-        displayData: {
-          isSetter: true,
-          action: 'created',
-          subject: 'an objective',
-        },
-      },
-      {
-        name: 'update_objective',
-        description: 'Update an existing objective in the novel.',
-        parameters: {
-          type: 'object',
-          properties: {
-            objectiveId: { type: 'string', description: 'ID of the objective to update' },
-            name: { type: 'string', description: 'Name of the objective' },
-            description: { type: 'string', description: 'Short description' },
-            hint: { type: 'string', description: 'Hint for the player' },
-            condition: { type: 'string', description: 'Condition prompt that triggers the objective' },
-          },
-          required: ['objectiveId'],
-        },
-        handler: (args) => novelManager.updateObjective(args),
-        displayData: {
-          isSetter: true,
-          action: 'updated',
-          subject: 'an objective',
-        },
-      },
-      {
-        name: 'remove_objective',
-        description: 'Remove an objective from the novel.',
-        parameters: {
-          type: 'object',
-          properties: {
-            objectiveId: { type: 'string', description: 'ID of the objective to remove' },
-          },
-          required: ['objectiveId'],
-        },
-        handler: (args) => novelManager.removeObjective(args.objectiveId),
-        displayData: {
-          isSetter: true,
-          action: 'removed',
-          subject: 'an objective',
-        },
-      },
-      {
         name: 'create_map',
         description: 'Create a new map for the novel.',
         parameters: {

@@ -39,7 +39,14 @@ export const callChatCompletion = async (
     SERVICES_ENDPOINT + '/assistant',
     {
       messages,
-      tools,
+      tools: tools.map((tool) => ({
+        type: 'function',
+        function: {
+          name: tool.function.name,
+          description: tool.function.description,
+          parameters: tool.function.parameters,
+        },
+      })),
       parallel_tool_calls,
       tool_choice,
     },
