@@ -90,7 +90,9 @@ export default function EmotionRenderer({
   } else {
     return (
       <img
-        className={`${className} ${!loading && upDownAnimation ? 'fade-in up-and-down' : ''}`}
+        className={`${className} ${!loading && upDownAnimation ? 'fade-in up-and-down' : ''} ${
+          loading && !blobUrl ? 'EmotionRenderer__hidden' : ''
+        }`}
         src={blobUrl}
         alt="character"
         onError={({ currentTarget }) => {

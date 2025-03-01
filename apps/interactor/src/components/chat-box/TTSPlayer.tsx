@@ -58,7 +58,7 @@ const setAudioSpeed = (audioRef: React.RefObject<HTMLAudioElement>, playSpeed: S
 };
 
 const TTSPlayer2: React.FC = () => {
-  const { servicesEndpoint, isProduction, freeTTS } = useAppContext();
+  const { servicesEndpoint, isProduction, freeTTS, isPublishedDemo } = useAppContext();
   const voiceId = useAppSelector((state) => state.settings.voice.voiceId);
   const audioRef = useRef<HTMLAudioElement>(null);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
@@ -276,7 +276,7 @@ const TTSPlayer2: React.FC = () => {
     }
   }, [inferAudio, autoPlay]);
 
-  // if (!isProduction) return null;
+  if (!isProduction || isPublishedDemo) return null;
 
   return (
     <>
