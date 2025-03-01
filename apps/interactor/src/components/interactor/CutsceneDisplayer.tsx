@@ -204,6 +204,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
               }}
             >
               <TextFormatterStatic
+                noAnimation={index < currentTextIndex}
                 text={textItem.type === 'description' ? textItem.content : `"${textItem.content}"`}
               />
             </div>
