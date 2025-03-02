@@ -1,4 +1,4 @@
-import { NovelV3, validateNovelState } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, getAssetLink, NovelV3, validateNovelState } from '@mikugg/bot-utils';
 import { BackgroundResult, listSearch, SearchType, SongResult } from '../../../libs/listSearch';
 import config from '../../../config';
 import sdPromptImprover, { poses, getPromptForEmotion } from '../../../libs/sdPromptImprover';
@@ -10,6 +10,16 @@ import { emotionTemplates } from '../../../data/emotions';
 import { openSpendApprovalModal } from '../../../state/slices/inputSlice';
 import { addApprovalListener } from '../../../services/spendApprovalService';
 import { v4 } from 'uuid';
+
+const blobUrlToFile = (blobUrl: string, filename: string): Promise<File> =>
+  new Promise((resolve) => {
+    fetch(blobUrl).then((res) => {
+      res.blob().then((blob) => {
+        const file = new File([blob], filename, { type: blob.type });
+        resolve(file);
+      });
+    });
+  });
 
 export interface LoreBookEntry {
   id: string;
@@ -1861,21 +1871,6 @@ export class NovelManager {
     if (!neutralEmotion || !neutralEmotion.sources.png) {
       return 'Error: Neutral emotion not found in outfit';
     }
-    const neutralImageHash = neutralEmotion.sources.png;
-
-    // Determine head prompt from the outfit's generationData (or default to an empty string if not provided)
-    const headPrompt = (outfit.generationData && outfit.generationData.headPrompt) || '';
-
-    // Prepare the original generation data. If none exists, create and store a new one.
-    const originalGenerationData = outfit.generationData || {
-      seed: Math.random().toString(36).substring(2, 15),
-      modelToUse: 1,
-      referenceImage: neutralImageHash,
-      prompt: headPrompt,
-      poseImage: neutralImageHash,
-      headPrompt: headPrompt,
-    };
-    outfit.generationData = originalGenerationData;
 
     // Get the tiny-emotions template and obtain its emotionIds (expected to be 9)
     const tinyEmotionTemplate = emotionTemplates.find((t) => t.id === 'tiny-emotions');
@@ -1888,12 +1883,37 @@ export class NovelManager {
     if ((user?.credits || 0) < pricing.emotion * 9) {
       return 'Error: Not enough credits. Please ask the user to buy more inference credits to generate images.';
     }
+
     // NEW: Ask for spend approval before generating emotions.
     try {
       await this.askForSpendApproval(pricing.emotion * 9, 'generate outfit emotions');
     } catch (err) {
       return 'Error: Generation denied by user';
     }
+    const imageUrl = getAssetLink(
+      {
+        optimized: config.assetsEndpointOptimized,
+        fallback: config.assetsEndpoint,
+      },
+      neutralEmotion.sources.png,
+      AssetDisplayPrefix.EMOTION_IMAGE,
+    );
+    const file = await blobUrlToFile(imageUrl, 'file.png');
+    const neutralImageHashResponse = await imageInferenceAPI.uploadImageToWizardAssets(file);
+    const neutralImageHash = neutralImageHashResponse.data.image_hash;
+    // Determine head prompt from the outfit's generationData (or default to an empty string if not provided)
+    const headPrompt = (outfit.generationData && outfit.generationData.headPrompt) || '';
+    // Prepare the original generation data. If none exists, create and store a new one.
+    const originalGenerationData = outfit.generationData || {
+      seed: String(Math.floor(Math.random() * 1000000000)),
+      modelToUse: 1,
+      referenceImage: neutralImageHash,
+      prompt: headPrompt,
+      poseImage: neutralImageHash,
+      headPrompt: headPrompt,
+    };
+    outfit.generationData = originalGenerationData;
+
     // Fire off an inference for each emotion
     await Promise.all(
       emotionsToGenerate.map(async (emotionId, index) => {

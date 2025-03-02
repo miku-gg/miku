@@ -158,7 +158,7 @@ class APIClient {
     return response;
   }
 
-  async uploadImage(image: File): Promise<APIResponse<{ image_hash: string }>> {
+  async uploadImageToWizardAssets(image: File): Promise<APIResponse<{ image_hash: string }>> {
     if (image.size > 2200000) {
       toast.error('Image size is too large, max 2MB');
       throw new Error('Image size is too large, max 2MB');
