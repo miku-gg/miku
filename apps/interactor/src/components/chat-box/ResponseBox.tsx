@@ -6,7 +6,6 @@ import { FaDice, FaForward } from 'react-icons/fa';
 import { FaPencil } from 'react-icons/fa6';
 import { IoIosBookmarks, IoIosMove } from 'react-icons/io';
 import {
-  selectCharacterOutfits,
   selectCurrentScene,
   selectCurrentSwipeResponses,
   selectDisplayingCutScene,
@@ -22,12 +21,16 @@ import { useFillTextTemplate } from '../../libs/hooks';
 import {
   characterResponseStart,
   continueResponse,
-  regenerationStart,
   selectCharacterOfResponse,
   swipeResponse,
 } from '../../state/slices/narrationSlice';
-import { ResponseFormat, setEditModal, setIsDraggable } from '../../state/slices/settingsSlice';
-import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
+import {
+  ResponseFormat,
+  setEditModal,
+  setIsDraggable,
+  setRegenerateEmotionModal,
+} from '../../state/slices/settingsSlice';
+import { useAppDispatch, useAppSelector } from '../../state/store';
 import { TextFormatter, TextFormatterStatic } from '../common/TextFormatter';
 import './ResponseBox.scss';
 import TTSPlayer from './TTSPlayer';
@@ -61,28 +64,7 @@ const ResponseBox = (): JSX.Element | null => {
 
   const handleRegenerateClick = () => {
     trackEvent('interaction_regenerate');
-    const characterIndex = Math.floor(Math.random() * (scene?.characters.length || 0));
-    const { outfit: outfitId, characterId } = scene?.characters[characterIndex] || {
-      outfit: '',
-      characterId: '',
-    };
-    const outfits = selectCharacterOutfits(
-      {
-        novel: { characters },
-      } as RootState,
-      characterId,
-    );
-    const outfit = outfits.find((o) => o.id === outfitId);
-    const randomIndex = Math.floor(Math.random() * (outfit?.emotions?.length || 0));
-    const randomEmotion = outfit?.emotions[randomIndex].id || '';
-    dispatch(
-      regenerationStart({
-        apiEndpoint,
-        servicesEndpoint,
-        emotion: randomEmotion,
-        characterId,
-      }),
-    );
+    dispatch(setRegenerateEmotionModal({ opened: true }));
   };
 
   const handleContinueClick = () => {

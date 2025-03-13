@@ -158,6 +158,7 @@ const labels: Record<string, Record<string, string>> = {
     select_initial_value: 'Select initial value...',
     initial_value_label: 'Initial Value',
     regenerate: 'Regenerate',
+    select_reaction: 'Select Reaction',
   },
   es: {
     loading_novel: 'Cargando Novela',
@@ -477,6 +478,7 @@ const labels: Record<string, Record<string, string>> = {
     select_initial_value: 'Selecionar valor inicial...',
     initial_value_label: 'Valor Inicial',
     regenerate: 'Regenerar',
+    select_reaction: 'Selecionar Reação',
   },
   de: {
     loading_novel: 'Roman wird geladen',
@@ -637,6 +639,7 @@ const labels: Record<string, Record<string, string>> = {
     select_initial_value: 'Anfangswert auswählen...',
     initial_value_label: 'Anfangswert',
     regenerate: 'Regenerieren',
+    select_reaction: 'Reaktion auswählen',
   },
   fr: {
     loading_novel: 'Chargement du Roman',
@@ -796,6 +799,7 @@ const labels: Record<string, Record<string, string>> = {
     numeric_description_placeholder: "Ex: Indique la quantité d'alcool que Elina a bu",
     initial_value_label: 'Valeur Initiale',
     regenerate: 'Régénérer',
+    select_reaction: 'Sélectionner une réaction',
   },
   ru: {
     loading_novel: 'Загрузка романа',
@@ -956,6 +960,7 @@ const labels: Record<string, Record<string, string>> = {
     select_initial_value: 'Выберите начальное значение...',
     initial_value_label: 'Начальное значение',
     regenerate: 'Повторить',
+    select_reaction: 'Выбрать реакцию',
   },
   jp: {
     loading_novel: '小説を読み込み中',
@@ -1114,6 +1119,7 @@ const labels: Record<string, Record<string, string>> = {
     select_initial_value: '初期値を選択...',
     initial_value_label: '初期値',
     regenerate: '再生成',
+    select_reaction: '反応を選択',
   },
 };
 

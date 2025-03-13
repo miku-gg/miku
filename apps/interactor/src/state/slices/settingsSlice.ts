@@ -103,7 +103,7 @@ export const initialState: SettingsState = {
     speed: Speed.Normal,
     fontSize: FontSize.Medium,
     autoContinue: false,
-    responseFormat: ResponseFormat.FullText, // Added this line
+    responseFormat: ResponseFormat.FullText,
   },
   voice: {
     autoplay: false,
@@ -125,6 +125,10 @@ export const initialState: SettingsState = {
     modelSelector: false,
     memoryCapacity: false,
     deviceExport: false,
+    regenerateEmotion: {
+      opened: false,
+      selectedCharacterIndex: 0,
+    },
     edit: {
       opened: false,
       id: '',
@@ -245,6 +249,21 @@ export const settingSlice = createSlice({
     setDisplayingLastSentence: (state, action: PayloadAction<boolean>) => {
       state.displayingLastSentence = action.payload;
     },
+    setRegenerateEmotionModal: (state, action: PayloadAction<{ opened: boolean; selectedCharacterIndex?: number }>) => {
+      if (!state.modals.regenerateEmotion) {
+        state.modals.regenerateEmotion = {
+          opened: false,
+          selectedCharacterIndex: 0,
+        };
+      }
+      state.modals.regenerateEmotion.opened = action.payload.opened;
+      if (action.payload.selectedCharacterIndex !== undefined) {
+        state.modals.regenerateEmotion.selectedCharacterIndex = action.payload.selectedCharacterIndex;
+      } else if (action.payload.opened) {
+        // Reset to 0 when opening if no index is provided
+        state.modals.regenerateEmotion.selectedCharacterIndex = 0;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -285,6 +304,7 @@ export const {
   userDataFetchEnd,
   setResponseFormat,
   setDisplayingLastSentence,
+  setRegenerateEmotionModal,
 } = settingSlice.actions;
 
 export default settingSlice.reducer;

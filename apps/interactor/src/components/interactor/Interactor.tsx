@@ -11,6 +11,7 @@ import {
 } from '../../state/selectors';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import ChatBox from '../chat-box/ChatBox';
+import RegenerateEmotionModal from '../chat-box/RegenerateEmotionModal';
 import DebugModal from './DebugModal';
 import ModelSelectorModal from './ModelSelectorModal';
 import './Interactor.scss';
@@ -135,6 +136,7 @@ const Interactor = () => {
           <Inventory />
           <DebugModal />
           <ModelSelectorModal />
+          <RegenerateEmotionModal />
         </div>
       </div>
     </AreYouSure.AreYouSureProvider>

@@ -214,6 +214,10 @@ export interface SettingsState {
     modelSelector: boolean;
     deviceExport: boolean;
     memoryCapacity: boolean;
+    regenerateEmotion: {
+      opened: boolean;
+      selectedCharacterIndex: number;
+    };
     edit: {
       opened: boolean;
       id: string;
