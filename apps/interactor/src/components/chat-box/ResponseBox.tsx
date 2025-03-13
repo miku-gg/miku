@@ -32,6 +32,7 @@ import { TextFormatter, TextFormatterStatic } from '../common/TextFormatter';
 import './ResponseBox.scss';
 import TTSPlayer from './TTSPlayer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { useI18n } from '../../libs/i18n';
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch();
@@ -56,6 +57,7 @@ const ResponseBox = (): JSX.Element | null => {
   );
   const { isMobileApp } = useAppContext();
   const responseFormat = useAppSelector((state) => state.settings.text.responseFormat);
+  const { i18n } = useI18n();
 
   const handleRegenerateClick = () => {
     trackEvent('interaction_regenerate');
@@ -231,7 +233,7 @@ const ResponseBox = (): JSX.Element | null => {
         {!disabled && lastReponse?.parentInteractionId && (swipes?.length || 0) < 8 ? (
           <button className="ResponseBox__regenerate" onClick={handleRegenerateClick}>
             <FaDice />
-            <span className="ResponseBox__action-text">Regenerate</span>
+            <span className="ResponseBox__action-text">{i18n('regenerate')}</span>
           </button>
         ) : null}
         {!disabled && !isInteractionDisabled ? (
