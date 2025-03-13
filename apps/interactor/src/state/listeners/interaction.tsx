@@ -330,6 +330,7 @@ const interactionEffect = async (
                       name: objective.name,
                       description: objective.description || '',
                       inventoryItem: action.params.reward,
+                      collectibleImage: action.params.collectibleImage,
                     },
                   });
                   unlockAchievement(apiEndpoint, action.params.achievementId);

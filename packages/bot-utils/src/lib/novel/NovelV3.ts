@@ -159,6 +159,7 @@ export type NovelAction =
       params: {
         achievementId: string;
         reward: InventoryItem | null;
+        collectibleImage?: string;
       };
     }
   | {
