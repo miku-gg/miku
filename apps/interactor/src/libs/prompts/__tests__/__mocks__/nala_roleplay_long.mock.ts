@@ -71,6 +71,7 @@ export default {
       debug: false,
       testing: false,
       edit: { opened: false, id: '' },
+      regenerateEmotion: { opened: false, selectedCharacterIndex: 0 },
       modelSelector: false,
       memoryCapacity: false,
       deviceExport: false,
