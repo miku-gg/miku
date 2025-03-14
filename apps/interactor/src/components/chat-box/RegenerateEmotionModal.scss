@@ -3,11 +3,6 @@
 .RegenerateEmotionModal {
   max-width: 875px !important;
 
-  &.mobile {
-    max-width: 100%;
-    width: 90%;
-  }
-
   &__content {
     display: flex;
     flex-direction: column;

@@ -103,7 +103,7 @@ const emotionIcons: Record<string, React.ReactNode> = {
 
 const RegenerateEmotionModal = (): JSX.Element => {
   const dispatch = useAppDispatch();
-  const { servicesEndpoint, apiEndpoint, isMobileApp, assetLinkLoader } = useAppContext();
+  const { servicesEndpoint, apiEndpoint, assetLinkLoader } = useAppContext();
   const { opened: isOpen, selectedCharacterIndex } = useAppSelector(
     (state) =>
       state.settings.modals.regenerateEmotion || {
@@ -196,7 +196,7 @@ const RegenerateEmotionModal = (): JSX.Element => {
       opened={isOpen}
       onCloseModal={handleClose}
       title={i18n('select_reaction')}
-      className={`RegenerateEmotionModal ${isMobileApp ? 'mobile' : ''}`}
+      className={`RegenerateEmotionModal`}
     >
       <div className="RegenerateEmotionModal__content">
         {/* Character selector */}
