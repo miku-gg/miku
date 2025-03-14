@@ -290,31 +290,36 @@ const interactionEffect = async (
       await Promise.all(
         objectives.map(async (objective) => {
           const condition = objective.condition;
-          const conditionResultStream = textCompletion({
-            template: fillTextTemplate(
-              prefixConditionPrompt +
-                RoleplayPromptStrategy.getConditionPrompt({
-                  condition,
-                  instructionPrefix: primaryStrategy.template().instruction,
-                  responsePrefix: primaryStrategy.template().response,
-                  language,
-                }),
-              {
-                user: state.settings.user.name,
-                bot: currentCharacter?.card.data.name || '',
-              },
-            ),
-            model: secondary.id,
-            serviceBaseUrl: servicesEndpoint,
-            identifier,
-            variables: {
-              cond_opt: [` Yes`, ` No`],
-            },
-          });
           let response = '';
-          for await (const result of conditionResultStream) {
-            response = result.get('cond') || '';
+          if (condition) {
+            const conditionResultStream = textCompletion({
+              template: fillTextTemplate(
+                prefixConditionPrompt +
+                  RoleplayPromptStrategy.getConditionPrompt({
+                    condition,
+                    instructionPrefix: primaryStrategy.template().instruction,
+                    responsePrefix: primaryStrategy.template().response,
+                    language,
+                  }),
+                {
+                  user: state.settings.user.name,
+                  bot: currentCharacter?.card.data.name || '',
+                },
+              ),
+              model: secondary.id,
+              serviceBaseUrl: servicesEndpoint,
+              identifier,
+              variables: {
+                cond_opt: [` Yes`, ` No`],
+              },
+            });
+            for await (const result of conditionResultStream) {
+              response = result.get('cond') || '';
+            }
+          } else {
+            response = ' Yes';
           }
+
           if (response === ` Yes`) {
             objective.actions.forEach((action) => {
               const stateActions = novelActionToStateAction(action);
