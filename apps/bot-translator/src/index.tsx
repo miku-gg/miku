@@ -146,16 +146,10 @@ const BotTranslator = () => {
     // Collect texts from novel
     pushText('title', novel.title);
     pushText('description', novel.description);
-    novel.tags?.forEach((tag, index) => {
-      pushText(`tags[${index}]`, tag);
-    });
     // Collect texts from characters
     novel.characters?.forEach((character, charIndex) => {
       pushText(`characters[${charIndex}].name`, character.name);
       pushText(`characters[${charIndex}].short_description`, character.short_description);
-      character.tags?.forEach((tag, tagIndex) => {
-        pushText(`characters[${charIndex}].tags[${tagIndex}]`, tag);
-      });
       const card = character.card;
       if (card?.data) {
         pushText(`characters[${charIndex}].card.data.description`, card.data.description);
@@ -172,6 +166,12 @@ const BotTranslator = () => {
         card.data.alternate_greetings?.forEach((greeting, greetIndex) => {
           pushText(`characters[${charIndex}].card.data.alternate_greetings[${greetIndex}]`, greeting);
         });
+        card.data.extensions.mikugg_v2.outfits?.forEach((outfit, outfitIndex) => {
+          pushText(
+            `characters[${charIndex}].card.data.extensions.mikugg_v2.outfits[${outfitIndex}].description`,
+            outfit.description,
+          );
+        });
       }
     });
     // Collect texts from backgrounds
@@ -182,9 +182,6 @@ const BotTranslator = () => {
     novel.songs?.forEach((song, songIndex) => {
       pushText(`songs[${songIndex}].name`, song.name);
       pushText(`songs[${songIndex}].description`, song.description);
-      song.tags?.forEach((tag, tagIndex) => {
-        pushText(`songs[${songIndex}].tags[${tagIndex}]`, tag);
-      });
     });
     // Collect texts from scenes
     novel.scenes?.forEach((scene, sceneIndex) => {
@@ -239,6 +236,14 @@ const BotTranslator = () => {
       });
     });
 
+    novel.cutscenes?.forEach((cutscene, cutsceneIndex) => {
+      cutscene.parts?.forEach((part, partIndex) => {
+        part.text.forEach((text, textIndex) => {
+          pushText(`cutscenes[${cutsceneIndex}].parts[${partIndex}].text[${textIndex}].content`, text.content);
+        });
+      });
+    });
+
     return texts;
   };
 
@@ -255,29 +260,36 @@ const BotTranslator = () => {
     return translatedNovel;
   };
 
-  const translateText = async (text: string, languageKey: string, apiKey: string): Promise<string> => {
-    const targetLanguage = languageCodeToName.get(languageKey);
-    const extraPrompt = languageCodeToExtraPrompt.get(languageKey);
-    const prompt = `Translate the following text to ${targetLanguage}. This text for a visual novel narration. ${extraPrompt}, but do NOT translate content inside curly braces {} or angle brackets <>. Respond only with the translated text.\n\n${text}`;
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    });
+  const translateText = async (text: string, languageKey: string, apiKey: string, tries = 0): Promise<string> => {
+    try {
+      const targetLanguage = languageCodeToName.get(languageKey);
+      const extraPrompt = languageCodeToExtraPrompt.get(languageKey);
+      const prompt = `Translate the following text to ${targetLanguage}. This text for a visual novel narration. ${extraPrompt}, but do NOT translate content inside curly braces {} or angle brackets <>. Respond only with the translated text.\n\n${text}`;
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+        }),
+      });
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`OpenAI API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const translatedText = data.choices[0].message.content.trim();
+      return translatedText;
+    } catch (e) {
+      if (tries < 3) {
+        return translateText(text, languageKey, apiKey, tries + 1);
+      }
+      throw e;
     }
-
-    const data = await response.json();
-    const translatedText = data.choices[0].message.content.trim();
-    return translatedText;
   };
 
   const handleDownload = () => {
