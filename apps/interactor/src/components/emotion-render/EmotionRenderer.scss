@@ -2,3 +2,7 @@
   opacity: 1;
   transition: opacity 0.5s ease;
 }
+
+.EmotionRenderer__hidden {
+  opacity: 0;
+}

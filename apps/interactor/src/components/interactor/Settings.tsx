@@ -4,7 +4,6 @@ import { SlSettings } from 'react-icons/sl';
 import {
   FontSize,
   Speed,
-  Voices,
   setFontSize,
   setName,
   setSettingsModal,
@@ -16,6 +15,7 @@ import {
   setVoiceSpeed,
   ResponseFormat,
   setResponseFormat,
+  getVoiceItems,
 } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './Settings.scss';
@@ -23,25 +23,22 @@ import { trackEvent } from '../../libs/analytics';
 import { useI18n } from '../../libs/i18n';
 import { useEffect } from 'react';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
+import { useAppContext } from '../../App.context';
 const audio = new Audio();
 
 const Settings = (): JSX.Element => {
   const dispatch = useAppDispatch();
+  const { isPublishedDemo } = useAppContext();
+  const language = useAppSelector((state) => state.novel.language);
   const settings = useAppSelector((state) => state.settings);
   const settingsTab = useAppSelector((state) => state.settings.modals.settingsTab);
   const currentSystemPromptLenght = useAppSelector((state) => state.settings.prompt.systemPrompt.length);
   const systemPromptMaxLenght = 800;
   const { i18n } = useI18n();
 
-  const voiceItems = [
-    { name: 'Sara', value: Voices.Sara },
-    { name: 'Sara - Whispering', value: Voices.SaraWhispering },
-    { name: 'Sonia', value: Voices.Sonia },
-    { name: 'Jane', value: Voices.Jane },
-    { name: 'Maisie', value: Voices.Maisie },
-    { name: 'Davis', value: Voices.Davis },
-    { name: 'Tony', value: Voices.Tony },
-  ];
+  const voiceItems = getVoiceItems(language || 'en');
+
+  const voiceSelected = voiceItems.find((item) => item.value === settings.voice.voiceId) || voiceItems[0];
 
   useEffect(() => {
     postMessage(CustomEventType.SETTINGS_UPDATE, settings);
@@ -133,54 +130,56 @@ const Settings = (): JSX.Element => {
                   ]}
                 />
               </div>
-              <div className="SettingsModal__voice">
-                <div className="SettingsModal__voice-header">
-                  <div className="SettingsModal__voice-header-title">
-                    <div className="SettingsModal__voice-title">{i18n('narration_voice')}</div>
-                    <div className="SettingsModal__voice-description">{i18n('narration_voice_description')}</div>
-                  </div>
-                  <div className="SettingsModal__voice-enabled">
-                    <CheckBox
-                      label={i18n('autoplay')}
-                      value={settings.voice.autoplay}
-                      onChange={(event) => dispatch(setVoiceAutoplay(event.target.checked))}
-                    />
-                  </div>
-                </div>
-                <div className="SettingsModal__voice-id">
-                  <p>{i18n('voice_id')}</p>
-                  <div className="SettingsModal__voice-id-input">
-                    <div
-                      className="SettingsModal__voice-id-listen"
-                      onClick={() => {
-                        audio.src = `https://assets.miku.gg/${settings.voice.voiceId}.mp3`;
-                        audio.play();
-                      }}
-                      tabIndex={0}
-                    >
-                      <MdRecordVoiceOver />
+              {!isPublishedDemo ? (
+                <div className="SettingsModal__voice">
+                  <div className="SettingsModal__voice-header">
+                    <div className="SettingsModal__voice-header-title">
+                      <div className="SettingsModal__voice-title">{i18n('narration_voice')}</div>
+                      <div className="SettingsModal__voice-description">{i18n('narration_voice_description')}</div>
                     </div>
-                    <Dropdown
-                      selectedIndex={voiceItems.findIndex((item) => item.value === settings.voice.voiceId)}
-                      onChange={(index) => dispatch(setVoiceId(voiceItems[index].value))}
-                      items={voiceItems}
+                    <div className="SettingsModal__voice-enabled">
+                      <CheckBox
+                        label={i18n('autoplay')}
+                        value={settings.voice.autoplay}
+                        onChange={(event) => dispatch(setVoiceAutoplay(event.target.checked))}
+                      />
+                    </div>
+                  </div>
+                  <div className="SettingsModal__voice-id">
+                    <p>{i18n('voice_id')}</p>
+                    <div className="SettingsModal__voice-id-input">
+                      <div
+                        className="SettingsModal__voice-id-listen"
+                        onClick={() => {
+                          audio.src = `https://assets.miku.gg/${voiceSelected.value}.mp3`;
+                          audio.play();
+                        }}
+                        tabIndex={0}
+                      >
+                        <MdRecordVoiceOver />
+                      </div>
+                      <Dropdown
+                        selectedIndex={voiceItems.findIndex((item) => item.value === voiceSelected.value)}
+                        onChange={(index) => dispatch(setVoiceId(voiceItems[index].value))}
+                        items={voiceItems}
+                      />
+                    </div>
+                  </div>
+                  <div className="SettingsModal__voice-speed">
+                    <p>{i18n('reading_speed')}</p>
+                    <Slider
+                      value={settings.voice.speed}
+                      onChange={(value) => dispatch(setVoiceSpeed(value as Speed))}
+                      steps={[
+                        { label: i18n('slow'), value: Speed.Slow },
+                        { label: i18n('normal'), value: Speed.Normal },
+                        { label: i18n('fast'), value: Speed.Fast },
+                        { label: i18n('presto'), value: Speed.Presto },
+                      ]}
                     />
                   </div>
                 </div>
-                <div className="SettingsModal__voice-speed">
-                  <p>{i18n('reading_speed')}</p>
-                  <Slider
-                    value={settings.voice.speed}
-                    onChange={(value) => dispatch(setVoiceSpeed(value as Speed))}
-                    steps={[
-                      { label: i18n('slow'), value: Speed.Slow },
-                      { label: i18n('normal'), value: Speed.Normal },
-                      { label: i18n('fast'), value: Speed.Fast },
-                      { label: i18n('presto'), value: Speed.Presto },
-                    ]}
-                  />
-                </div>
-              </div>
+              ) : null}
               <div className="SettingsModal__response-format">
                 <p>{i18n('response_format')}</p>
                 <div className="SettingsModal__response-format-buttons">

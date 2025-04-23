@@ -32,7 +32,7 @@ import { useI18n } from '../../libs/i18n';
 
 export default function SceneSuggestion() {
   const [buttonOpened, setButtonOpened] = useState<boolean>(false);
-  const { servicesEndpoint, apiEndpoint } = useAppContext();
+  const { servicesEndpoint, apiEndpoint, isPublishedDemo } = useAppContext();
   const nsfw = useAppSelector((state) => state.settings.user.nsfw);
   const dispatch = useAppDispatch();
   const { suggestedScenes, fetchingSuggestions, shouldSuggestScenes } = useAppSelector(
@@ -85,7 +85,7 @@ export default function SceneSuggestion() {
               </div>
               <TbPlayerTrackNextFilled />
             </button>
-          ) : !disabled && shouldSuggestScenes ? (
+          ) : !disabled && shouldSuggestScenes && !isPublishedDemo ? (
             <button
               {...swipeHandlers}
               className="SceneSuggestion__button"

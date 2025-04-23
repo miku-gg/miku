@@ -19,7 +19,7 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelObjectives } from './NovelObjectives';
 import './SceneEditModal.scss';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
-import { CutScenePartsRender } from '../cutscenes/CutscenesPartsRender';
+import { CutScenePartsRenderForScene } from '../cutscenes/CutscenePartsRenderForScene';
 import { v4 as uuidv4 } from 'uuid';
 import { NovelV3 } from '@mikugg/bot-utils';
 import {
@@ -106,7 +106,7 @@ export default function SceneEditModal() {
       values: [],
       initialValue: '',
       inferred: false,
-      step: 0,
+      step: 1,
       min: 0,
       max: 100,
       hidden: false,
@@ -342,7 +342,7 @@ export default function SceneEditModal() {
                 </div>
               </div>
               <div className="SceneEditModal__scene-details-row">
-                <div>
+                <div className="SceneEditModal__scene-details-row__prompt">
                   <div className="SceneEditModal__scene-details-row__label">
                     <label className="Input__label">
                       Prompt <IoInformationCircleOutline data-tooltip-id="scene-prompt-tooltip" />
@@ -519,7 +519,7 @@ export default function SceneEditModal() {
               </div>
             </div>
             <div className="SceneEditModal__scene-cutscene">
-              <CutScenePartsRender />
+              <CutScenePartsRenderForScene />
             </div>
             <div className="SceneEditModal__scene-maps">
               {maps ? (

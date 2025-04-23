@@ -87,6 +87,7 @@ export default function LorebookEditModal() {
     <Modal
       opened={!!lorebook}
       shouldCloseOnOverlayClick
+      className="LorebookEditModal"
       onCloseModal={() => dispatch(closeModal({ modalType: 'lorebookEdit' }))}
     >
       {lorebook ? (

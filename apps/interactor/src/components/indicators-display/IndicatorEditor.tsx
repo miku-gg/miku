@@ -394,7 +394,7 @@ export default function IndicatorEditor({ indicator, onUpdate, onSave, onCancel,
           </div>
           <div className="IndicatorEditor__actions">
             <Button theme="transparent" onClick={() => onCancel()}>
-              {i18n('discard_changes')}
+              {i18n('cancel')}
             </Button>
             <Button
               theme="secondary"

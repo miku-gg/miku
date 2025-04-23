@@ -1,6 +1,5 @@
 import { AreYouSure, Button, Carousel, Dropdown, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import { useAppDispatch, useAppSelector } from '../../state/store';
-import { selectEditingScene } from '../../state/selectors';
 import { closeModal } from '../../state/slices/inputSlice';
 import { deleteCutscenePart, updateCutscenePart } from '../../state/slices/novelFormSlice';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
@@ -17,11 +16,10 @@ import './PartEditor.scss';
 import { CutScenePart } from '@mikugg/bot-utils/dist/lib/novel/NovelV3';
 import { BsChatLeftText } from 'react-icons/bs';
 
-export const PartEditor = ({ part }: { part: CutScenePart }) => {
+export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneId: string }) => {
   const dispatch = useAppDispatch();
   const { openModal } = AreYouSure.useAreYouSure();
-  const scene = useAppSelector(selectEditingScene);
-  const currentCutscene = useAppSelector((state) => state.novel.cutscenes?.find((c) => c.id === scene?.cutScene?.id));
+  const currentCutscene = useAppSelector((state) => state.novel.cutscenes?.find((c) => c.id === cutsceneId));
   const selectedMusic = useAppSelector((state) => state.novel.songs.find((s) => s.id === part?.music));
   const selectedBackground = useAppSelector((state) => state.novel.backgrounds.find((b) => b.id === part?.background));
   const characters = useAppSelector((state) => state.novel.characters);
@@ -259,11 +257,11 @@ export const PartEditor = ({ part }: { part: CutScenePart }) => {
               <Characters
                 ignoreIds={
                   selectCharacterModal.characterIndex == 0
-                    ? characters[1]?.id
-                      ? [characters[1]?.id]
+                    ? partCharacters[1]?.id
+                      ? [partCharacters[1]?.id]
                       : []
-                    : characters[0]?.id
-                    ? [characters[0]?.id]
+                    : partCharacters[0]?.id
+                    ? [partCharacters[0]?.id]
                     : []
                 }
                 showNone

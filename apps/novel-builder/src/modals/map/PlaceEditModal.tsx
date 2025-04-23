@@ -16,14 +16,28 @@ import './PlaceEditModal.scss';
 import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
 
 function isBlackAndWhite(pixels: Uint8ClampedArray): boolean {
-  const tolerance = 50;
+  const tolerance = 20;
 
   const isNearBlack = (r: number, g: number, b: number) => {
-    return r <= tolerance && g <= tolerance && b <= tolerance;
+    return (
+      r <= tolerance &&
+      g <= tolerance &&
+      b <= tolerance &&
+      Math.abs(r - g) < 10 &&
+      Math.abs(g - b) < 10 &&
+      Math.abs(r - b) < 10
+    );
   };
 
   const isNearWhite = (r: number, g: number, b: number) => {
-    return r >= 255 - tolerance && g >= 255 - tolerance && b >= 255 - tolerance;
+    return (
+      r >= 255 - tolerance &&
+      g >= 255 - tolerance &&
+      b >= 255 - tolerance &&
+      Math.abs(r - g) < 10 &&
+      Math.abs(g - b) < 10 &&
+      Math.abs(r - b) < 10
+    );
   };
 
   let hasBlack = false;
@@ -269,6 +283,7 @@ export default function PlaceEditModal() {
             />
             <DragAndDropImages
               placeHolder="Add a Preview Image"
+              size="md"
               previewImage={
                 place.previewSource
                   ? config.genAssetLink(

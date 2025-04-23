@@ -39,7 +39,8 @@ export const getUnlockableAchievements = async (
         inventoryItemId: string;
         createdAt: Date;
         updatedAt: Date;
-        inventoryItem: {
+        collectibleImage?: string;
+        inventoryItem?: {
           id: string;
           name: string;
           description: string;
@@ -78,19 +79,22 @@ export const getUnlockableAchievements = async (
             type: NovelV3.NovelActionType.ACHIEVEMENT_UNLOCK,
             params: {
               achievementId: achievement.id,
-              reward: {
-                id: achievement.inventoryItem.id,
-                name: achievement.inventoryItem.name,
-                description: achievement.inventoryItem.description,
-                icon: achievement.inventoryItem.icon,
-                isPremium: achievement.inventoryItem.isPremium,
-                actions: achievement.inventoryItem.actions.map((action) => {
-                  return {
-                    name: action.name,
-                    prompt: action.prompt,
-                  };
-                }),
-              },
+              reward: achievement.inventoryItem
+                ? {
+                    id: achievement.inventoryItem.id,
+                    name: achievement.inventoryItem.name,
+                    description: achievement.inventoryItem.description,
+                    icon: achievement.inventoryItem.icon,
+                    isPremium: achievement.inventoryItem.isPremium,
+                    actions: achievement.inventoryItem.actions.map((action) => {
+                      return {
+                        name: action.name,
+                        prompt: action.prompt,
+                      };
+                    }),
+                  }
+                : null,
+              collectibleImage: achievement.collectibleImage,
             },
           },
         ],

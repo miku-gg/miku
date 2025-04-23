@@ -157,6 +157,8 @@ const labels: Record<string, Record<string, string>> = {
     numeric_description_placeholder: 'Eg: Indicates the amount of alcohol Elina has drunk',
     select_initial_value: 'Select initial value...',
     initial_value_label: 'Initial Value',
+    regenerate: 'Regenerate',
+    select_reaction: 'Select Reaction',
   },
   es: {
     loading_novel: 'Cargando Novela',
@@ -316,6 +318,7 @@ const labels: Record<string, Record<string, string>> = {
     numeric_description_placeholder: 'Ej: Indica la cantidad de alcohol que ha bebido Elina',
     select_initial_value: 'Seleccionar valor inicial...',
     initial_value_label: 'Valor Inicial',
+    regenerate: 'Regenerar',
   },
   pt: {
     loading_novel: 'Carregando Romance',
@@ -474,6 +477,8 @@ const labels: Record<string, Record<string, string>> = {
     numeric_description_placeholder: 'Ex: Indica a quantidade de álcool que Elina getrunken hat',
     select_initial_value: 'Selecionar valor inicial...',
     initial_value_label: 'Valor Inicial',
+    regenerate: 'Regenerar',
+    select_reaction: 'Selecionar Reação',
   },
   de: {
     loading_novel: 'Roman wird geladen',
@@ -633,6 +638,8 @@ const labels: Record<string, Record<string, string>> = {
     numeric_description_placeholder: 'Beispiel: Indikator für die Menge an Alkohol, die Elina getrunken hat',
     select_initial_value: 'Anfangswert auswählen...',
     initial_value_label: 'Anfangswert',
+    regenerate: 'Regenerieren',
+    select_reaction: 'Reaktion auswählen',
   },
   fr: {
     loading_novel: 'Chargement du Roman',
@@ -791,6 +798,8 @@ const labels: Record<string, Record<string, string>> = {
     select_initial_value: 'Sélectionner la valeur initiale...',
     numeric_description_placeholder: "Ex: Indique la quantité d'alcool que Elina a bu",
     initial_value_label: 'Valeur Initiale',
+    regenerate: 'Régénérer',
+    select_reaction: 'Sélectionner une réaction',
   },
   ru: {
     loading_novel: 'Загрузка романа',
@@ -950,6 +959,8 @@ const labels: Record<string, Record<string, string>> = {
     numeric_description_placeholder: 'Пример: Показывает количество алкоголя, которое Элина выпила',
     select_initial_value: 'Выберите начальное значение...',
     initial_value_label: 'Начальное значение',
+    regenerate: 'Повторить',
+    select_reaction: 'Выбрать реакцию',
   },
   jp: {
     loading_novel: '小説を読み込み中',
@@ -1107,6 +1118,8 @@ const labels: Record<string, Record<string, string>> = {
     numeric_description_placeholder: '例: エリナが飲んだアルコールの量を示す',
     select_initial_value: '初期値を選択...',
     initial_value_label: '初期値',
+    regenerate: '再生成',
+    select_reaction: '反応を選択',
   },
 };
 

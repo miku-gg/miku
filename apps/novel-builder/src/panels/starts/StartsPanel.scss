@@ -136,6 +136,19 @@
       border-radius: 10px;
     }
   }
+
+  &__global-cutscene {
+    margin-top: 40px;
+    background-color: $background-1;
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  &__use-modal-checkbox {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -150,6 +163,26 @@
     }
     .SceneNode {
       width: 200px;
+    }
+  }
+}
+
+@media (max-width: 525px) {
+  .StartsPanel {
+    &__item {
+      padding: 6px;
+
+      &-spec {
+        padding: 0;
+      }
+
+      &-docs {
+        padding: 0;
+      }
+    }
+    &__item-prompt-character-header {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 }

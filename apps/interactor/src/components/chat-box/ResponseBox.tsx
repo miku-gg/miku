@@ -6,7 +6,6 @@ import { FaDice, FaForward } from 'react-icons/fa';
 import { FaPencil } from 'react-icons/fa6';
 import { IoIosBookmarks, IoIosMove } from 'react-icons/io';
 import {
-  selectCharacterOutfits,
   selectCurrentScene,
   selectCurrentSwipeResponses,
   selectDisplayingCutScene,
@@ -22,20 +21,25 @@ import { useFillTextTemplate } from '../../libs/hooks';
 import {
   characterResponseStart,
   continueResponse,
-  regenerationStart,
   selectCharacterOfResponse,
   swipeResponse,
 } from '../../state/slices/narrationSlice';
-import { ResponseFormat, setEditModal, setIsDraggable } from '../../state/slices/settingsSlice';
-import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
+import {
+  ResponseFormat,
+  setEditModal,
+  setIsDraggable,
+  setRegenerateEmotionModal,
+} from '../../state/slices/settingsSlice';
+import { useAppDispatch, useAppSelector } from '../../state/store';
 import { TextFormatter, TextFormatterStatic } from '../common/TextFormatter';
 import './ResponseBox.scss';
 import TTSPlayer from './TTSPlayer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { useI18n } from '../../libs/i18n';
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch();
-  const { servicesEndpoint, apiEndpoint, isInteractionDisabled, assetLinkLoader } = useAppContext();
+  const { servicesEndpoint, apiEndpoint, isInteractionDisabled, assetLinkLoader, isPublishedDemo } = useAppContext();
   const responseDiv = useRef<HTMLDivElement>(null);
   const lastReponse = useAppSelector(selectLastLoadedResponse);
   const isLastResponseFetching = useAppSelector(
@@ -56,31 +60,11 @@ const ResponseBox = (): JSX.Element | null => {
   );
   const { isMobileApp } = useAppContext();
   const responseFormat = useAppSelector((state) => state.settings.text.responseFormat);
+  const { i18n } = useI18n();
 
   const handleRegenerateClick = () => {
     trackEvent('interaction_regenerate');
-    const characterIndex = Math.floor(Math.random() * (scene?.characters.length || 0));
-    const { outfit: outfitId, characterId } = scene?.characters[characterIndex] || {
-      outfit: '',
-      characterId: '',
-    };
-    const outfits = selectCharacterOutfits(
-      {
-        novel: { characters },
-      } as RootState,
-      characterId,
-    );
-    const outfit = outfits.find((o) => o.id === outfitId);
-    const randomIndex = Math.floor(Math.random() * (outfit?.emotions?.length || 0));
-    const randomEmotion = outfit?.emotions[randomIndex].id || '';
-    dispatch(
-      regenerationStart({
-        apiEndpoint,
-        servicesEndpoint,
-        emotion: randomEmotion,
-        characterId,
-      }),
-    );
+    dispatch(setRegenerateEmotionModal({ opened: true }));
   };
 
   const handleContinueClick = () => {
@@ -227,11 +211,11 @@ const ResponseBox = (): JSX.Element | null => {
         </div>
       ) : null}
       <div className="ResponseBox__actions">
-        {!disabled ? <TTSPlayer /> : null}
+        {!disabled || isPublishedDemo ? <TTSPlayer /> : null}
         {!disabled && lastReponse?.parentInteractionId && (swipes?.length || 0) < 8 ? (
           <button className="ResponseBox__regenerate" onClick={handleRegenerateClick}>
             <FaDice />
-            <span className="ResponseBox__action-text">Regenerate</span>
+            <span className="ResponseBox__action-text">{i18n('regenerate')}</span>
           </button>
         ) : null}
         {!disabled && !isInteractionDisabled ? (

@@ -8,13 +8,14 @@ export const getEmptyIndicator = (): NovelIndicator => {
     description: '',
     type: 'percentage',
     color: '#4caf50',
-    initialValue: '',
+    initialValue: '1',
     inferred: false,
     editable: true,
     hidden: false,
     persistent: false,
     min: 0,
     max: 100,
+    step: 1,
   };
 };
 

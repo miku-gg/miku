@@ -86,7 +86,7 @@ export default function SongEditModal() {
               />
             </div>
           </div>
-          <div className="SongEditModal_delete">
+          <div className="SongEditModal__delete">
             <Button onClick={handleDeleteSong} theme="primary">
               Delete song
             </Button>

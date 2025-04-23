@@ -71,6 +71,13 @@
         z-index: 10;
         border-radius: 16px;
       }
+
+      &__generate-button {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+      }
     }
 
     &__text {
@@ -175,6 +182,25 @@
         align-items: center;
         gap: 4px;
       }
+    }
+  }
+}
+@media (max-width: 540px) {
+  .ItemEdit {
+    &__actionList {
+      flex-direction: column;
+
+      &__action {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 440px) {
+  .ItemEdit {
+    &__form {
+      flex-direction: column;
     }
   }
 }

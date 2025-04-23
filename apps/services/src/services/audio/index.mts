@@ -1,79 +1,89 @@
-import { Request, Response } from "express";
-import axios, { AxiosResponse } from "axios";
-import { Readable } from "stream";
+import { Request, Response } from 'express';
+import axios from 'axios';
 
-let tempKey = "";
-
-const getTempKey = async (): Promise<string> => {
-  return axios({
-    url: "https://eastus.api.cognitive.microsoft.com/sts/v1.0/issuetoken",
-    method: "post",
-    headers: {
-      "Ocp-Apim-Subscription-Key": process.env.AZURE_API_KEY || "",
-      "Content-Type": "application/json",
-    },
-    data: {},
-  })
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      return "";
-    });
-};
-
-const updateTempKey = async (): Promise<string> => {
-  const _tempKey = await getTempKey();
-  if (_tempKey) tempKey = _tempKey;
-  return tempKey;
-};
-
-export default async (req: Request<string>, res: Response) => {
+const voiceIds = [
+  'af_sky+af_bella',
+  'af_heart',
+  'af_alloy',
+  'af_aoede',
+  'af_bella',
+  'af_jessica',
+  'af_kore',
+  'af_v0irulan',
+  'af_nicole',
+  'af_nova',
+  'af_river',
+  'af_sarah',
+  'af_sky',
+  'bf_alice',
+  'bf_emma',
+  'bf_isabella',
+  'bf_lily',
+  'am_adam',
+  'am_echo',
+  'am_eric',
+  'am_fenrir',
+  'am_v0gurney',
+  'am_liam',
+  'am_michael',
+  'am_onyx',
+  'am_puck',
+  'am_santa',
+  'bm_daniel',
+  'bm_fable',
+  'bm_george',
+  'bm_lewis',
+  'ef_dora',
+  'em_alex',
+  'em_santa',
+  'ff_siwis',
+  'if_sara',
+  'im_nicola',
+  'jf_alpha',
+  'jf_gongitsune',
+  'jf_nezumi',
+  'jf_tebukuro',
+  'jm_kumo',
+  'pf_dora',
+  'pm_alex',
+  'pm_santa',
+];
+export default async (req: Request, res: Response) => {
+  // We'll just use "text" from the request body
   const text = req.body.text;
-  const voiceId = req.body.voiceId;
-  const speakingStyle = req.body.speakingStyle;
+  let voiceId = req.body.voiceId;
   if (!text) {
-    return res.status(400).send("Text is required");
+    return res.status(400).send('Text is required');
   }
-  res.write("");
+  if (!voiceIds.includes(voiceId)) {
+    voiceId = 'af_sky+af_bella';
+  }
+
   try {
-    // Replace with your Azure endpoint and key
-    const azureEndpoint =
-      "https://westus.tts.speech.microsoft.com/cognitiveservices/v1";
+    // Example: local endpoint for an OpenAI-compatible service
+    const openAiEndpoint = `${process.env.OPENAI_AUDIO_ENDPOINT}/audio/speech`;
 
-    const doQuery = () =>
-      axios.post(
-        azureEndpoint,
-        `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version='1.0' xml:lang='en-US'><voice name='${voiceId}'> <mstts:express-as style="${speakingStyle}"> ${text} </mstts:express-as> </voice></speak>`,
-        {
-          headers: {
-            "Content-Type": "application/ssml+xml",
-            "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
-            Authorization: `Bearer ${tempKey}`,
-            "User-Agent": "mikugg",
-          },
-          responseType: "stream",
-        }
-      );
+    // Use "af_bella" and "kokoro" for model
+    const response = await axios.post(
+      openAiEndpoint,
+      {
+        model: 'kokoro',
+        voice: voiceId,
+        response_format: 'mp3',
+        input: text,
+      },
+      {
+        responseType: 'stream',
+      },
+    );
 
-    let response: AxiosResponse<Readable>;
-    try {
-      // Prepare the request for Azure Text to Speech
-      response = await doQuery();
-    } catch (e) {
-      try {
-        await updateTempKey();
-        response = await doQuery();
-      } catch (e) {
-        res.status(500).send("Error processing text to speech");
-        return;
-      }
-    }
+    // Set the correct content type header for MP3
+    res.setHeader('Content-Type', 'audio/mpeg');
 
-    // Stream the audio response back
+    // Pipe the streaming audio response back to the client
     response.data.pipe(res);
   } catch (error) {
-    console.error("Error calling Azure Text to Speech:", error);
-    res.status(500).send("Error processing text to speech");
+    console.error('Error calling OpenAI-like text to speech:', error);
+    res.status(500).send('Error processing text to speech');
   }
 };

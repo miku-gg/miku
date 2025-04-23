@@ -58,6 +58,12 @@ a {
     align-items: center;
   }
 
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
   &__header-logo {
     display: flex;
     align-items: center;
@@ -68,4 +74,12 @@ a {
 #toast-root {
   z-index: 999999;
   position: relative;
+}
+
+@media (max-width: 400px) {
+  .app__header {
+    flex-direction: column;
+    font-size: 1.8rem;
+    gap: 10px;
+  }
 }

@@ -160,6 +160,7 @@ export type NovelAction =
       params: {
         achievementId: string;
         reward: InventoryItem | null;
+        collectibleImage?: string;
       };
     }
   | {
@@ -244,6 +245,8 @@ export interface NovelState {
   objectives?: NovelObjective[];
   lorebooks?: NovelLorebook[];
   inventory?: InventoryItem[];
+  globalStartCutsceneId?: string;
+  useModalForStartSelection?: boolean;
   rpg: NovelRPG;
 }
 

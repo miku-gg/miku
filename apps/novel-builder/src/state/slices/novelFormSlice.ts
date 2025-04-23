@@ -2,8 +2,32 @@ import { CharacterBook, NovelV3 } from '@mikugg/bot-utils';
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { v4 as randomUUID } from 'uuid';
+import { toast } from 'react-toastify';
+import apiClient from '../../libs/imageInferenceAPI';
 
-const initialState: NovelV3.NovelState = {
+// 1. Extend the state to track pending inferences
+export interface PendingInference {
+  inferenceId: string;
+  status: 'pending' | 'done' | 'error';
+  createdAt: number;
+  resultImage?: string;
+
+  inferenceType: 'character' | 'emotion' | 'background' | 'item';
+  prompt: string; // store the description/prompt
+  headPrompt?: string;
+  modelToUse: number;
+  seed: string;
+  poseImage?: string;
+  referenceImage?: string;
+
+  characterId?: string; // used by character/emotion types
+  outfitId?: string; // used by character/emotion types
+  emotionId?: string; // used by the emotion type
+  backgroundId?: string; // used by background type
+  itemId?: string; // used by item type (if needed)
+}
+
+const initialState: NovelV3.NovelState & { pendingInferences?: PendingInference[] } = {
   title: '',
   description: '',
   logoPic: '',
@@ -19,6 +43,7 @@ const initialState: NovelV3.NovelState = {
   inventory: [],
   cutscenes: [],
   language: 'en',
+  pendingInferences: [],
 };
 
 const novelFormSlice = createSlice({
@@ -334,12 +359,19 @@ const novelFormSlice = createSlice({
       map.places = map.places.filter((place) => place.id !== action.payload.placeId);
     },
 
-    createNewInventoryItem: (state, action: PayloadAction<{ itemId: string }>) => {
+    createNewInventoryItem: (
+      state,
+      action: PayloadAction<{
+        itemId: string;
+        name?: string;
+        description?: string;
+      }>,
+    ) => {
       if (!state.inventory) state.inventory = [];
       state.inventory.push({
         id: action.payload.itemId,
-        name: 'New Item',
-        description: '',
+        name: action.payload.name || 'New Item',
+        description: action.payload.description || '',
         actions: [
           {
             name: 'New action',
@@ -400,14 +432,14 @@ const novelFormSlice = createSlice({
         scene.cutScene.triggerOnlyOnce = action.payload.triggerOnlyOnce;
       }
     },
-    createCutscene: (state, action: PayloadAction<{ cutsceneId: string; sceneId: string }>) => {
+    createCutscene: (state, action: PayloadAction<{ cutsceneId: string; sceneId: string | null }>) => {
       const newCutscene: NovelV3.CutScene = {
         id: action.payload.cutsceneId,
         name: 'New Cutscene',
         parts: [],
       };
       const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
-      if (scene) {
+      if (scene && action.payload.sceneId) {
         scene.cutScene = {
           id: action.payload.cutsceneId,
           triggerOnlyOnce: false,
@@ -517,6 +549,148 @@ const novelFormSlice = createSlice({
         scene.indicators = scene.indicators.filter((indicator) => indicator.id !== action.payload.indicatorId);
       }
     },
+    updateGlobalCutscene: (state, action: PayloadAction<string | null>) => {
+      const cutsceneId = action.payload;
+      const existingCutscene = state.cutscenes?.find((cs) => cs.id === cutsceneId);
+      if (!cutsceneId || !existingCutscene?.id) {
+        // Clear any existing global cutscene
+        state.globalStartCutsceneId = undefined;
+        return;
+      }
+      // Try to locate existing cutscene
+      // If not found, create a basic new cutscene
+      state.globalStartCutsceneId = existingCutscene.id;
+    },
+    updateUseModalStartSelection: (state, action: PayloadAction<boolean>) => {
+      state.useModalForStartSelection = action.payload;
+    },
+    addPendingInference: (
+      state,
+      action: PayloadAction<Omit<PendingInference, 'status' | 'resultImage' | 'createdAt'>>,
+    ) => {
+      if (!state.pendingInferences) {
+        state.pendingInferences = [];
+      }
+      state.pendingInferences.push({
+        ...action.payload,
+        status: 'pending',
+        createdAt: Date.now(),
+      });
+    },
+    updateInferenceStatus: (
+      state,
+      action: PayloadAction<{ inferenceId: string; status: 'done' | 'error'; resultImage?: string }>,
+    ) => {
+      const pending = state.pendingInferences?.find((p) => p.inferenceId === action.payload.inferenceId);
+      if (!pending) return;
+
+      pending.status = action.payload.status;
+      pending.resultImage = action.payload.resultImage;
+
+      if (pending.status === 'done' && pending.resultImage) {
+        const { inferenceType, resultImage } = pending;
+        switch (inferenceType) {
+          case 'character': {
+            const charIndex = state.characters.findIndex((c) => c.id === pending.characterId);
+            if (charIndex < 0) break;
+            const char = state.characters[charIndex];
+            const outfits = char.card.data.extensions.mikugg_v2?.outfits;
+            if (!outfits) break;
+            const outfitIndex = outfits.findIndex((o) => o.id === pending.outfitId);
+            if (outfitIndex < 0) break;
+            const outfit = outfits[outfitIndex];
+            const neutralEmotion = outfit.emotions.find((e) => e.id === 'neutral');
+
+            if (neutralEmotion) {
+              neutralEmotion.sources.png = resultImage;
+              toast.success(`Character outfit image updated for "${outfit.name}"!`, {
+                position: 'bottom-left',
+              });
+            }
+
+            // Inject query data into generationData
+            outfit.generationData = {
+              ...outfit.generationData,
+              headPrompt: pending.headPrompt ?? outfit.generationData?.headPrompt ?? '',
+              prompt: pending.prompt ?? outfit.generationData?.prompt,
+              referenceImage: resultImage,
+              modelToUse: pending.modelToUse ?? outfit.generationData?.modelToUse ?? 1,
+              seed: pending.seed ?? outfit.generationData?.seed ?? 0,
+              poseImage: pending.poseImage || outfit.generationData?.poseImage,
+            };
+
+            outfits[outfitIndex] = { ...outfit };
+            char.card.data.extensions.mikugg_v2.outfits = outfits;
+            state.characters[charIndex] = { ...char };
+            break;
+          }
+          case 'emotion': {
+            const charIndex = state.characters.findIndex((c) => c.id === pending.characterId);
+            if (charIndex < 0) break;
+            const char = state.characters[charIndex];
+            const outfits = char.card.data.extensions.mikugg_v2?.outfits;
+            if (!outfits) break;
+            const outfitIndex = outfits.findIndex((o) => o.id === pending.outfitId);
+            if (outfitIndex < 0) break;
+            const outfit = outfits[outfitIndex];
+            const emotionToReplace = outfit.emotions.find((e) => e.id === pending.emotionId);
+            if (emotionToReplace) {
+              emotionToReplace.sources.png = resultImage;
+              toast.success(`Character emotion "${pending.emotionId}" updated for outfit: ${outfit.name}!`);
+            } else {
+              outfit.emotions = [
+                ...outfit.emotions,
+                {
+                  id: pending.emotionId || '',
+                  sources: {
+                    png: resultImage,
+                  },
+                },
+              ];
+            }
+            state.characters[charIndex] = { ...char };
+            break;
+          }
+          case 'background': {
+            const bgId = pending.backgroundId;
+            if (!bgId) break;
+            let bg = state.backgrounds.find((b) => b.id === bgId);
+            if (!bg) {
+              // Create a new background if none found
+              bg = {
+                id: bgId,
+                name: pending.prompt ?? 'AI Background',
+                description: pending.prompt ?? '',
+                attributes: [],
+                source: { jpg: resultImage },
+              };
+              state.backgrounds.push(bg);
+              toast.success(`Background "${bg.name}" created!`);
+            } else {
+              bg.source.jpg = resultImage;
+              toast.success(`Background "${bg.name}" updated!`);
+            }
+            break;
+          }
+          case 'item': {
+            const itemIndex = state.inventory?.findIndex((item) => item.id === pending.itemId);
+            if (itemIndex !== undefined && itemIndex >= 0 && state.inventory) {
+              state.inventory[itemIndex].icon = resultImage;
+            }
+            toast.success(`Item "${pending.prompt}" updated!`);
+            break;
+          }
+        }
+        // Finally, remove the completed inference
+        if (state.pendingInferences) {
+          state.pendingInferences = state.pendingInferences.filter((inf) => inf.inferenceId !== pending.inferenceId);
+        }
+      }
+    },
+    removePendingInference: (state, action: PayloadAction<{ inferenceId: string }>) => {
+      if (!state.pendingInferences) return;
+      state.pendingInferences = state.pendingInferences.filter((p) => p.inferenceId !== action.payload.inferenceId);
+    },
   },
 });
 
@@ -572,6 +746,73 @@ export const {
   addIndicatorToScene,
   updateIndicatorInScene,
   deleteIndicatorFromScene,
+  updateGlobalCutscene,
+  updateUseModalStartSelection,
+  addPendingInference,
+  updateInferenceStatus,
+  removePendingInference,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;
+
+export const pollInferences = (): any => async (dispatch: any, getState: any) => {
+  const novelState = getState().novel as NovelV3.NovelState & { pendingInferences?: PendingInference[] };
+  const pendingInferences = (novelState.pendingInferences || []).filter(
+    (p) => p.status === 'pending' || p.status === 'error',
+  );
+  if (!pendingInferences.length) return;
+
+  const inferenceIds = pendingInferences.map((p) => p.inferenceId);
+  try {
+    const response = await apiClient.retrieveMultipleInferences(inferenceIds);
+
+    for (const inf of response.data) {
+      const { status } = inf.status; // 'pending' | 'done' | 'error'
+      if (status === 'done') {
+        const resultImage = inf.status.result?.[0] || '';
+        const p = novelState.pendingInferences?.find((x) => x.inferenceId === inf.inferenceId);
+        if (!p) continue;
+
+        try {
+          const uploadRes = await apiClient.migrateInferenceToAssets(inf.inferenceId);
+          if (uploadRes.status !== 200 && uploadRes.status !== 201) {
+            console.error('Failed uploading generated asset:', uploadRes);
+            dispatch(
+              updateInferenceStatus({
+                inferenceId: inf.inferenceId,
+                status: 'error',
+              }),
+            );
+            continue;
+          }
+        } catch (err) {
+          console.error('Asset upload error:', err);
+          dispatch(
+            updateInferenceStatus({
+              inferenceId: inf.inferenceId,
+              status: 'error',
+            }),
+          );
+          continue;
+        }
+
+        dispatch(
+          updateInferenceStatus({
+            inferenceId: inf.inferenceId,
+            status: 'done',
+            resultImage: resultImage,
+          }),
+        );
+      } else if (status === 'error') {
+        dispatch(
+          updateInferenceStatus({
+            inferenceId: inf.inferenceId,
+            status: 'error',
+          }),
+        );
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};

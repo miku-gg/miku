@@ -9,6 +9,7 @@ export interface AppProps {
   botId: string;
   isProduction: boolean;
   isInteractionDisabled: boolean;
+  isPublishedDemo: boolean;
   apiEndpoint: string;
   isMobileApp: boolean;
   cardEndpoint: string;
@@ -31,6 +32,7 @@ const AppContext = createContext<AppProps>({
   botId: '',
   isProduction: false,
   isInteractionDisabled: false,
+  isPublishedDemo: false,
   apiEndpoint: '',
   cardEndpoint: '',
   isMobileApp: false,

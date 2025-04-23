@@ -1,20 +1,26 @@
-import { Button, Dropdown, Input, AreYouSure, Modal } from '@mikugg/ui-kit';
+import { Button, Dropdown, Input, AreYouSure, CheckBox } from '@mikugg/ui-kit';
 import { useAppDispatch, useAppSelector } from '../../state/store';
-import { createStart, deleteStart, updateStart, reorderStart } from '../../state/slices/novelFormSlice';
+import {
+  createStart,
+  deleteStart,
+  updateStart,
+  reorderStart,
+  updateUseModalStartSelection,
+} from '../../state/slices/novelFormSlice';
 import { selectScenes } from '../../state/selectors';
-import config from '../../config';
 import './StartsPanel.scss';
 import { useState } from 'react';
-import classNames from 'classnames';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
 import SceneSelector, { SceneSelectorModal } from '../../modals/scene/SceneSelector';
 import { EMOTION_GROUP_TEMPLATES } from '@mikugg/bot-utils';
 import { IoMdArrowUp, IoMdArrowDown } from 'react-icons/io';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CutScenePartsRenderForGlobal } from '../../modals/cutscenes/CutScenePartsRenderForGlobal';
 
 export default function StartsPanel() {
   const dispatch = useAppDispatch();
+  const useModalForStartSelection = useAppSelector((state) => state.novel.useModalForStartSelection);
   const starts = useAppSelector((state) => state.novel.starts);
   const characters = useAppSelector((state) => state.novel.characters);
   const scenes = useAppSelector(selectScenes);
@@ -44,6 +50,14 @@ export default function StartsPanel() {
       <div className="StartsPanel__description">
         List all possible starting points for your novel. For each, indicate the start scene and character's message.
       </div>
+      <div className="StartsPanel__use-modal-checkbox">
+        <CheckBox
+          value={!!useModalForStartSelection}
+          onChange={(e) => dispatch(updateUseModalStartSelection(e.target.checked))}
+          label="Use carousel for start selection"
+        />
+      </div>
+
       <div className="StartsPanel__list">
         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
         {/* @ts-ignore */}
@@ -103,13 +117,29 @@ export default function StartsPanel() {
                       label="Title"
                       placeHolder="Title of this starting point..."
                       value={start.title || ''}
-                      onChange={(e) => dispatch(updateStart({ ...start, title: e.target.value }))}
+                      maxLength={30}
+                      onChange={(e) =>
+                        dispatch(
+                          updateStart({
+                            ...start,
+                            title: e.target.value,
+                          }),
+                        )
+                      }
                     />
                     <Input
                       label="Description"
-                      value={start.description || ''}
                       placeHolder="Description of this starting point..."
-                      onChange={(e) => dispatch(updateStart({ ...start, description: e.target.value }))}
+                      value={start.description || ''}
+                      maxLength={60}
+                      onChange={(e) =>
+                        dispatch(
+                          updateStart({
+                            ...start,
+                            description: e.target.value,
+                          }),
+                        )
+                      }
                     />
                   </div>
                 </div>
@@ -212,6 +242,9 @@ export default function StartsPanel() {
         <Button theme="secondary" onClick={() => setNewStartOpened(true)}>
           Add Start
         </Button>
+      </div>
+      <div className="StartsPanel__global-cutscene">
+        <CutScenePartsRenderForGlobal />
       </div>
       <SceneSelectorModal
         opened={newStartOpened}

@@ -11,6 +11,7 @@ import { setDisplayingLastSentence } from '../../state/slices/settingsSlice';
 interface TextFormatterProps {
   text: string;
   children?: React.ReactNode;
+  noAnimation?: boolean;
 }
 
 interface TextElement {
@@ -139,12 +140,12 @@ const useAnimatedText = (text: string) => {
   return { displayedText, isAnimationComplete, skipAnimation };
 };
 
-export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, children }) => {
+export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, children, noAnimation }) => {
   const fontSize = useAppSelector((state) => state.settings.text.fontSize);
   const textFormatterDiv = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
 
-  const { displayedText, isAnimationComplete } = useAnimatedText(text);
+  const { displayedText, isAnimationComplete, skipAnimation } = useAnimatedText(text);
 
   const elements = useMemo(() => {
     const parsedElements = parseTextElements(displayedText);
@@ -162,6 +163,13 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, childr
       }
     });
   }, [displayedText]);
+
+  useEffect(() => {
+    if (noAnimation) {
+      console.log('skipping animation');
+      skipAnimation();
+    }
+  }, [noAnimation, skipAnimation]);
 
   useEffect(() => {
     if (textFormatterDiv.current) {

@@ -1,0 +1,123 @@
+@import '../../variables';
+
+.RegenerateEmotionModal {
+  max-width: 875px !important;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem 0.5rem;
+  }
+
+  &__characters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+
+  &__character-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+
+    &.selected {
+      border-color: $secondary-color;
+      background-color: rgba($secondary-color, 0.1);
+    }
+
+    &:hover {
+      background-color: rgba($secondary-color, 0.05);
+    }
+
+    img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 0.25rem;
+    }
+
+    span {
+      font-size: 0.8rem;
+      max-width: 80px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &__emotions-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  &__button {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 80px;
+    width: 150px !important;
+    transition: all 0.3s ease;
+    padding: 0.75rem;
+    border: 1px solid $background-color-light;
+    border-radius: 0.5rem;
+    background-color: $background-color-dark;
+    color: white;
+    opacity: 0.8;
+
+    &:hover {
+      box-shadow: 0 0 15px -3px #7c3aed80, 0 4px 6px -2px #7c3aed40;
+      border: 1px solid #9747ff;
+      background-color: #25284b;
+      opacity: 1;
+    }
+
+    &-emoji {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      font-size: 1.5rem;
+    }
+
+    &-text {
+      position: absolute;
+      bottom: 0.5rem;
+      right: 0.5rem;
+      font-size: 0.9rem;
+      text-transform: capitalize;
+    }
+  }
+
+  &__button-random {
+    opacity: 1;
+    background-color: $background-color-light;
+  }
+}
+
+@media (max-width: 480px) {
+  .RegenerateEmotionModal {
+    &__button {
+      height: 70px;
+
+      &-emoji {
+        font-size: 1.3rem;
+      }
+
+      &-text {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}

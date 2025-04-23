@@ -21,14 +21,17 @@ import Planels from './panels';
 import { store } from './state/store';
 import './styles/main.scss';
 import { GiBookPile } from 'react-icons/gi';
+import CreditsWidget from './components/CreditsWidget';
+import SpendApprovalModal from './modals/SpendApprovalModal';
 
 const toastRoot = document.getElementById('toast-root');
 
 export class ToastPortal extends React.PureComponent {
   render() {
     return ReactDOM.createPortal(
+      // eslint-disable-next-line
       // @ts-ignore
-      <ToastContainer theme="dark" position="top-center" />,
+      <ToastContainer theme="dark" position="bottom-left" />,
       toastRoot!,
     );
   }
@@ -44,7 +47,8 @@ ReactDOM.render(
               <img src="/logo.png" width={40} />
               Novel Builder
             </div>
-            <div>
+            <div className="app__header-right">
+              <CreditsWidget />
               <a href="https://docs.miku.gg/guides/novel-builder/1-get-started/" target="_blank" rel="noreferrer">
                 <Button theme="transparent">
                   <GiBookPile size={24} />
@@ -68,6 +72,7 @@ ReactDOM.render(
         <ObjectiveEditModal />
         <ItemEditModal />
         <ActionEditModal />
+        <SpendApprovalModal />
       </AreYouSure.AreYouSureProvider>
       <ToastPortal />
     </Provider>

@@ -8,7 +8,12 @@ import textHandler, { tokenizeHandler } from './services/text/index.mjs';
 import { TokenizerType, loadTokenizer } from './services/text/lib/tokenize.mjs';
 import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
 import { checkModelsHealth, getModelHealth } from './services/text/lib/healthChecker.mjs';
+import assistantHandler from './services/assistant/index.mjs';
 const PORT = process.env.SERVICES_PORT || 8484;
+
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+});
 
 const app: express.Application = express();
 app.use(
@@ -61,7 +66,11 @@ app.post('/text/tokenize', async (req: Request<string>, res: Response) => {
   }
 });
 
-app.post('/audio', async (req: Request<string>, res: Response) => {
+app.post('/assistant', async (req: Request<any>, res: Response) => {
+  await assistantHandler(req, res);
+});
+
+app.post('/audio', async (req: Request<any>, res: Response) => {
   try {
     await audioHandler(req, res);
   } catch (error) {

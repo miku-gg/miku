@@ -59,7 +59,7 @@ export default {
     voice: {
       autoplay: false,
       speed: 1,
-      voiceId: 'azure_tts.en-US-SaraNeural.whispering',
+      voiceId: 'af_bella',
     },
     music: { enabled: true, volume: 0.2 },
     modals: {
@@ -71,6 +71,7 @@ export default {
       debug: false,
       testing: false,
       edit: { opened: false, id: '' },
+      regenerateEmotion: { opened: false, selectedCharacterIndex: 0 },
       modelSelector: false,
       memoryCapacity: false,
       deviceExport: false,

@@ -22,3 +22,11 @@
     }
   }
 }
+
+@media (max-width: 582px) {
+  .DetailsPanel {
+    &__form {
+      flex-direction: column;
+    }
+  }
+}

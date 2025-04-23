@@ -88,3 +88,19 @@
     }
   }
 }
+
+@media (max-width: 981px) {
+  .CharacterDescriptionEdit {
+    &__base-text {
+      flex-direction: column;
+    }
+  }
+}
+
+@media (max-width: 521px) {
+  .CharacterDescriptionEdit {
+    &__public-specs {
+      flex-direction: column;
+    }
+  }
+}

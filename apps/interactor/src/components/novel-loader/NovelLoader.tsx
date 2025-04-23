@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useAppContext } from '../../App.context';
 import { registerTrackSessionData } from '../../libs/analytics';
 import { replaceState } from '../../state/slices/replaceState';
-import { setName, setSystemPrompt } from '../../state/slices/settingsSlice';
+import { getVoiceItems, setName, setSystemPrompt } from '../../state/slices/settingsSlice';
 import { RootState, useAppDispatch, useAppSelector } from '../../state/store';
 import { Loader } from '../common/Loader';
 import { useI18n } from '../../libs/i18n';
@@ -32,6 +32,10 @@ const NovelLoader = (): JSX.Element => {
           }
         });
       });
+      const voicesItems = getVoiceItems(state.novel.language || 'en');
+      state.settings.voice.voiceId =
+        voicesItems.find((v) => v.value === state.settings.voice.voiceId)?.value || voicesItems[0].value;
+
       dispatch(replaceState(state));
       if (persona?.name) {
         if (persona?.description) {

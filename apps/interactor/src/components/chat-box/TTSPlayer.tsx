@@ -8,7 +8,6 @@ import classNames from 'classnames';
 import { Speed } from '../../state/versioning';
 import { useAppContext } from '../../App.context';
 import { trackEvent } from '../../libs/analytics';
-import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { useI18n } from '../../libs/i18n';
 
 function isFirefoxOrSafari(): boolean {
@@ -42,13 +41,13 @@ const getAudioSpeed = (playSpeed: Speed): number => {
     case Speed.Slow:
       return 0.85;
     case Speed.Normal:
-      return 1.1;
+      return 1;
     case Speed.Fast:
       return 1.35;
     case Speed.Presto:
       return 1.75;
     default:
-      return 1.1;
+      return 1;
   }
 };
 
@@ -59,7 +58,7 @@ const setAudioSpeed = (audioRef: React.RefObject<HTMLAudioElement>, playSpeed: S
 };
 
 const TTSPlayer2: React.FC = () => {
-  const { servicesEndpoint, isProduction, freeTTS, assetLinkLoader } = useAppContext();
+  const { servicesEndpoint, isProduction, freeTTS, isPublishedDemo } = useAppContext();
   const voiceId = useAppSelector((state) => state.settings.voice.voiceId);
   const audioRef = useRef<HTMLAudioElement>(null);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
@@ -72,15 +71,10 @@ const TTSPlayer2: React.FC = () => {
   const lastCharacterText = lastCharacter?.text || '';
   const autoPlay = useAppSelector((state) => state.settings.voice.autoplay);
   const playSpeed = useAppSelector((state) => state.settings.voice.speed);
-  const isFirstMessage = useAppSelector(
-    (state) => state.narration.responses[state.narration.currentResponseId]?.parentInteractionId === null,
-  );
-  const characterId = lastCharacter?.id;
   const isPremium = useAppSelector((state) => state.settings.user.isPremium);
   const [inferencing, setInferencing] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_provider, _voiceId, speakingStyle = 'default'] = voiceId.split('.');
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
@@ -140,7 +134,7 @@ const TTSPlayer2: React.FC = () => {
   };
 
   const inferAudio = useCallback(() => {
-    const _inferenceSignature = `${lastCharacterText}.${_voiceId}.${speakingStyle}`;
+    const _inferenceSignature = `${lastCharacterText}.${voiceId}`;
     stopAudio();
     if (!window.MediaSource || isFirefoxOrSafari()) {
       (async () => {
@@ -155,8 +149,7 @@ const TTSPlayer2: React.FC = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               text: replaceAll(lastCharacterText, '*', ''),
-              voiceId: _voiceId,
-              speakingStyle: speakingStyle,
+              voiceId,
             }),
             signal,
             credentials: 'include',
@@ -216,8 +209,7 @@ const TTSPlayer2: React.FC = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             text: replaceAll(lastCharacterText, '*', ''),
-            voiceId: _voiceId,
-            speakingStyle: speakingStyle,
+            voiceId,
           }),
           signal,
           credentials: 'include',
@@ -276,7 +268,7 @@ const TTSPlayer2: React.FC = () => {
       }
       queueRef.current = [];
     };
-  }, [lastCharacterText, servicesEndpoint, _voiceId, speakingStyle, playSpeed]);
+  }, [lastCharacterText, servicesEndpoint, voiceId, playSpeed]);
 
   useEffect(() => {
     if (autoPlay) {
@@ -284,7 +276,7 @@ const TTSPlayer2: React.FC = () => {
     }
   }, [inferAudio, autoPlay]);
 
-  // if (!isProduction) return null;
+  if (!isProduction || isPublishedDemo) return null;
 
   return (
     <>
@@ -293,35 +285,25 @@ const TTSPlayer2: React.FC = () => {
         controls
         style={{ position: 'absolute', display: 'none' }}
         autoPlay={autoPlay}
-        src={
-          isFirstMessage && isProduction
-            ? assetLinkLoader(`${characterId}.${_voiceId}.${speakingStyle}.wav`, AssetDisplayPrefix.MUSIC)
-            : undefined
-        }
+        src={undefined}
       >
         Your browser does not support the audio element.
       </audio>
       <button
         className={classNames({
           ResponseBox__voice: true,
-          'ResponseBox__voice--disabled': !inferencing && !isPremium && !freeTTS && !isFirstMessage,
+          'ResponseBox__voice--disabled': !inferencing && isProduction && !isPremium && !freeTTS,
         })}
+        disabled={!inferencing && isProduction && !isPremium && !freeTTS}
         onClick={() => {
           trackEvent('voice-gen-click');
-          if (isFirstMessage && audioRef.current) {
-            setAudioSpeed(audioRef, playSpeed);
-            audioRef.current.play();
-            audioRef.current.currentTime = 0;
-          } else {
-            inferAudio();
-          }
+          inferAudio();
         }}
-        // disabled={!inferencing && !isPremium && !freeTTS && !isFirstMessage}
-        data-tooltip-id="smart-tooltip"
+        data-tooltip-id="audio-tooltip"
         data-tooltip-content={
-          !isPremium && !freeTTS && !isFirstMessage
+          !isPremium && !freeTTS && isProduction
             ? i18n('this_is_a_premium_feature')
-            : !isPremium && freeTTS
+            : !isPremium && freeTTS && isProduction
             ? i18n('free_for_a_limited_time')
             : ''
         }

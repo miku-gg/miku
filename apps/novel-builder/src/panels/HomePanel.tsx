@@ -47,7 +47,11 @@ export default function HomePanel() {
           uploadBatchSize: 10,
         });
         dispatch(closeModal({ modalType: 'loading' }));
-        dispatch(loadCompleteState(novelWithUploadedAssets));
+        dispatch(
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          loadCompleteState({ ...novelWithUploadedAssets, pendingInferences: data.novel.pendingInferences || [] }),
+        );
         dispatch(navigatePage('edit'));
         dispatch(navigatePanel('details'));
       } catch (e) {
