@@ -8,6 +8,7 @@ import {
   continueResponse,
   characterResponseStart,
   addSummary,
+  setCurrentBattle,
 } from '../slices/narrationSlice';
 import { RootState } from '../store';
 import textCompletion from '../../libs/textCompletion';
@@ -34,6 +35,7 @@ import { removeObjective } from '../slices/objectivesSlice';
 import { toast } from 'react-toastify';
 import { GiOpenChest } from 'react-icons/gi';
 import { novelActionToStateAction } from '../mutations';
+import type { BattleState } from '../versioning/v3.state';
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -378,6 +380,42 @@ const interactionEffect = async (
                       },
                     },
                   );
+                  break;
+                case NovelV3.NovelActionType.BATTLE_START: {
+                  // Initialize battle state when a battle starts
+                  const battleId = action.params.battleId;
+                  const battleConfig = state.novel.battles?.find((b) => b.battleId === battleId);
+                  const rpgConfig = state.novel.rpg;
+                  if (battleConfig && rpgConfig) {
+                    const activeHeroes = rpgConfig.heroes
+                      .filter((h) => h.isInParty)
+                      .map((h) => ({
+                        characterId: h.characterId,
+                        currentHealth: h.stats.health,
+                        currentMana: h.stats.mana,
+                      }));
+                    const activeEnemies = battleConfig.enemies.map((e, index) => {
+                      const enemyCfg = rpgConfig.enemies.find((en) => en.characterId === e.enemyId);
+                      return {
+                        enemyId: e.enemyId,
+                        position: index,
+                        currentHealth: enemyCfg?.stats.health || 0,
+                        currentMana: enemyCfg?.stats.mana || 0,
+                      };
+                    });
+                    const initialBattleState: BattleState = {
+                      battleId: battleConfig.battleId,
+                      turn: 1,
+                      activeHeroes,
+                      activeEnemies,
+                      status: 'intro',
+                      battleLog: [],
+                    };
+                    dispatch(setCurrentBattle({ state: initialBattleState, isActive: false }));
+                  }
+                  break;
+                }
+                default:
                   break;
               }
             });

@@ -306,7 +306,15 @@ const novel: NovelV3.NovelState = {
       },
     },
   ],
-  songs: [],
+  songs: [
+    {
+      id: 'battle-song',
+      name: 'Battle Song',
+      description: 'A battle song',
+      tags: ['RPG', 'Fantasy'],
+      source: 'optimized/5a967b4b-b773-46b9-94f4-4c0214a2ea0f/fd13a9ad-79dc-47b4-8df8-a007c5814cd6.mpeg',
+    },
+  ],
   title: 'Seraphina',
   tags: ['RPG', 'Fantasy', 'Famale'],
   starts: [
@@ -405,9 +413,9 @@ const novel: NovelV3.NovelState = {
       allowRetry: true,
       backgroundId: 'dcf6eb1c-3f12-499e-ae47-6410c3e4ad36',
       music: {
-        battleId: 'magic_forest.mp3',
-        victoryId: 'magic_forest.mp3',
-        defeatId: 'magic_forest.mp3',
+        battleId: 'battle-song',
+        victoryId: 'battle-song',
+        defeatId: 'battle-song',
       },
       enemies: [
         {
@@ -451,3 +459,5 @@ const novel: NovelV3.NovelState = {
     },
   ],
 };
+
+console.log(JSON.stringify(novel, null, 2));

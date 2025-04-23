@@ -3,7 +3,7 @@ import { v4 as randomUUID } from 'uuid';
 import { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
 import { toast } from 'react-toastify';
 import trim from 'lodash.trim';
-import { NarrationSceneSuggestion, NarrationSummarySentence } from '../versioning/v3.state';
+import { NarrationSceneSuggestion, NarrationSummarySentence, BattleState } from '../versioning/v3.state';
 
 export type { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
 
@@ -517,6 +517,75 @@ const narrationSlice = createSlice({
     setHasShownStartSelectionModal(state, action: PayloadAction<boolean>) {
       state.hasShownStartSelectionModal = action.payload;
     },
+    setCurrentBattle(state, action: PayloadAction<{ state: BattleState; isActive: boolean }>) {
+      state.currentBattle = action.payload;
+    },
+    activateBattle(state) {
+      if (state.currentBattle) {
+        state.currentBattle.isActive = true;
+      }
+    },
+    // Player meleé attack against a specific enemy
+    battleMeleeAttack(state, action: PayloadAction<{ targetId: string }>) {
+      const cb = state.currentBattle;
+      if (!cb) return;
+      const { targetId } = action.payload;
+      // Player attack
+      const enemy = cb.state.activeEnemies.find((e) => e.enemyId === targetId);
+      if (enemy) {
+        const damage = 10; // stub damage
+        enemy.currentHealth = Math.max(0, enemy.currentHealth - damage);
+        cb.state.battleLog.push({
+          turn: cb.state.turn,
+          actorId: 'player',
+          actionType: 'melee attack',
+          targets: [targetId],
+          result: `${damage} damage`,
+        });
+      }
+      // Check for victory
+      if (cb.state.activeEnemies.every((e) => e.currentHealth <= 0)) {
+        cb.state.status = 'victory';
+        return;
+      }
+      // Enemy counterattack
+      const aliveHeroes = cb.state.activeHeroes.filter((h) => h.currentHealth > 0);
+      if (aliveHeroes.length) {
+        const idx = Math.floor(Math.random() * aliveHeroes.length);
+        const hero = aliveHeroes[idx];
+        const counterDamage = 5; // stub enemy damage
+        hero.currentHealth = Math.max(0, hero.currentHealth - counterDamage);
+        cb.state.battleLog.push({
+          turn: cb.state.turn,
+          actorId: 'enemy',
+          actionType: 'melee attack',
+          targets: [hero.characterId],
+          result: `${counterDamage} damage`,
+        });
+        // Check for defeat
+        if (cb.state.activeHeroes.every((h) => h.currentHealth <= 0)) {
+          cb.state.status = 'defeat';
+          return;
+        }
+      }
+      // Advance turn
+      cb.state.turn += 1;
+    },
+    battleWin(state) {
+      const cb = state.currentBattle;
+      if (cb) {
+        cb.state.status = 'victory';
+      }
+    },
+    battleLose(state) {
+      const cb = state.currentBattle;
+      if (cb) {
+        cb.state.status = 'defeat';
+      }
+    },
+    clearCurrentBattle(state) {
+      delete state.currentBattle;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -561,6 +630,12 @@ export const {
   removeCreatedIndicatorId,
   setHasPlayedGlobalStartCutscene,
   setHasShownStartSelectionModal,
+  setCurrentBattle,
+  activateBattle,
+  battleMeleeAttack,
+  battleWin,
+  battleLose,
+  clearCurrentBattle,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;

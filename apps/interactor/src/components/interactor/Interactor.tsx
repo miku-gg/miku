@@ -21,20 +21,29 @@ import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
-import { markCurrentCutsceneAsSeen, setHasPlayedGlobalStartCutscene } from '../../state/slices/narrationSlice';
+import {
+  markCurrentCutsceneAsSeen,
+  setHasPlayedGlobalStartCutscene,
+  activateBattle,
+} from '../../state/slices/narrationSlice';
 import IndicatorsDisplay from '../indicators-display/IndicatorsDisplay';
 import StartSelector from '../start-selector/StartSelector';
+import BattleScreen from './BattleScreen';
 
 const Interactor = () => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
   const dispatch = useAppDispatch();
   const scene = useAppSelector(selectCurrentScene);
+  const currentBattle = useAppSelector((state) => state.narration.currentBattle);
   const lastCharacters = useAppSelector(selectLastLoadedCharacters);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
 
+  if (currentBattle?.isActive) {
+    return <BattleScreen />;
+  }
   if (!scene) {
     return null;
   }
@@ -57,6 +66,18 @@ const Interactor = () => {
           </div>
         ) : null}
         {!displayingCutscene && <StartSelector />}
+        {currentBattle && !currentBattle.isActive && (
+          <div className="SceneSuggestion__button-container">
+            <button
+              className="SceneSuggestion__button"
+              onClick={() => {
+                dispatch(activateBattle());
+              }}
+            >
+              Start Battle
+            </button>
+          </div>
+        )}
         <div className="Interactor__content">
           <InteractorHeader />
           <IndicatorsDisplay />

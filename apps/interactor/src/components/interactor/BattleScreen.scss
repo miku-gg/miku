@@ -1,0 +1,175 @@
+.BattleScreen {
+  padding: 16px;
+  background-color: #1e1e2f;
+  color: #ffffff;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.BattleScreen__turn {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.BattleScreen__section {
+  margin-bottom: 16px;
+}
+
+.BattleScreen__section h3 {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.BattleScreen__section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.BattleScreen__section li {
+  margin-bottom: 4px;
+}
+
+/* BattleScreen core layout */
+.BattleScreen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #1e1e2f;
+  overflow: hidden;
+}
+
+/* Background image layer */
+.BattleScreen__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Battlefield: party left, enemies right */
+.BattleScreen__battlefield {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+.BattleScreen__party-group,
+.BattleScreen__enemy-group {
+  display: flex;
+  align-items: flex-end;
+  flex: 1;
+}
+.BattleScreen__party-group {
+  justify-content: flex-start;
+}
+.BattleScreen__enemy-group {
+  justify-content: flex-end;
+}
+
+/* Individual battler (character or enemy) */
+.BattleScreen__battler {
+  position: relative;
+  margin: 0 8px;
+  width: 50%;
+}
+.BattleScreen__battler-emotion {
+  width: 100%;
+}
+
+/* HP/MP bars above each character image */
+.BattleScreen__bar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.BattleScreen__bar.hp {
+  top: 0;
+  background: #550000;
+}
+.BattleScreen__bar.mp {
+  top: 8px;
+  background: #000055;
+}
+.BattleScreen__fill {
+  height: 100%;
+  background: #ff4444;
+}
+.BattleScreen__bar.mp .BattleScreen__fill {
+  background: #4444ff;
+}
+
+/* Bottom controls box */
+.BattleScreen__controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 2;
+}
+
+/* Avatars for party members */
+.BattleScreen__avatars-row {
+  display: flex;
+  gap: 8px;
+}
+.BattleScreen__avatars-row img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid transparent;
+}
+.BattleScreen__avatars-row .selected {
+  opacity: 1;
+  border-color: #fff;
+}
+.BattleScreen__avatars-row .faded {
+  opacity: 0.5;
+}
+
+/* Stats for current character */
+.BattleScreen__stats-row {
+  margin-left: 16px;
+  color: #fff;
+  font-size: 14px;
+}
+.BattleScreen__stats-row span {
+  margin-right: 12px;
+}
+
+/* Abilities list */
+.BattleScreen__abilities-list {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* Modal content for target and outcome */
+.BattleScreen__modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #282a36;
+  border-radius: 8px;
+  color: #fff;
+}
