@@ -49,6 +49,7 @@ const BattleScreen: React.FC = () => {
       battleOutfit: outfitId,
       img,
       profilePic: heroDef?.profile_pic || '',
+      wear: heroRpg?.wear || [],
     };
   });
   const enemies = activeEnemies.map((e) => {
@@ -144,6 +145,7 @@ const BattleScreen: React.FC = () => {
       </div>
       {/* Controls at bottom */}
       <div className="BattleScreen__controls">
+        {/* Character avatars row */}
         <div className="BattleScreen__avatars-row">
           {party.map((h, idx) => (
             <img
@@ -154,19 +156,102 @@ const BattleScreen: React.FC = () => {
             />
           ))}
         </div>
-        <div className="BattleScreen__stats-row">
-          <span>
-            HP: {party[currentHeroIdx].currentHealth}/{party[currentHeroIdx].stats.health}
-          </span>
-          <span>
-            MP: {party[currentHeroIdx].currentMana}/{party[currentHeroIdx].stats.mana}
-          </span>
-        </div>
-        <div className="BattleScreen__abilities-list">
-          <Button theme="primary" onClick={() => setIsTargetSelectOpen(true)}>
-            Melee Attack
-          </Button>
-          {/* Additional abilities can go here */}
+
+        <div className="BattleScreen__controls-content">
+          {/* First column: Character name and HP/MP bars */}
+          <div className="BattleScreen__char-info">
+            <h2>
+              {characters.find((c) => c.id === party[currentHeroIdx]?.characterId)?.name ||
+                party[currentHeroIdx]?.characterId}
+            </h2>
+            <div className="BattleScreen__status-bar hp">
+              <div
+                className="BattleScreen__status-fill"
+                style={{
+                  width: `${(party[currentHeroIdx].currentHealth / party[currentHeroIdx].stats.health) * 100}%`,
+                }}
+              ></div>
+              <span>
+                HP {party[currentHeroIdx].currentHealth}/{party[currentHeroIdx].stats.health}
+              </span>
+            </div>
+            <div className="BattleScreen__status-bar mp">
+              <div
+                className="BattleScreen__status-fill"
+                style={{ width: `${(party[currentHeroIdx].currentMana / party[currentHeroIdx].stats.mana) * 100}%` }}
+              ></div>
+              <span>
+                MP {party[currentHeroIdx].currentMana}/{party[currentHeroIdx].stats.mana}
+              </span>
+            </div>
+          </div>
+
+          {/* Second column: Abilities list */}
+          <div className="BattleScreen__abilities-list">
+            <Button theme="primary" onClick={() => setIsTargetSelectOpen(true)}>
+              Attack
+            </Button>
+            <Button
+              theme="secondary"
+              onClick={() => {
+                if (party[currentHeroIdx].currentMana >= 2) {
+                  // Here we would implement heal logic
+                  // For now, just open target selection
+                  setIsTargetSelectOpen(true);
+                }
+              }}
+              disabled={party[currentHeroIdx].currentMana < 2}
+            >
+              Heal <span className="BattleScreen__ability-cost">2 MP</span>
+            </Button>
+            <Button
+              theme="secondary"
+              onClick={() => {
+                if (party[currentHeroIdx].currentMana >= 3) {
+                  // Here we would implement drain logic
+                  // For now, just open target selection
+                  setIsTargetSelectOpen(true);
+                }
+              }}
+              disabled={party[currentHeroIdx].currentMana < 3}
+            >
+              Flare <span className="BattleScreen__ability-cost">3 MP</span>
+            </Button>
+            {/* Additional abilities can go here */}
+          </div>
+
+          {/* Third column: Character stats and equipment */}
+          <div className="BattleScreen__stats-list">
+            <h3>Status</h3>
+            <div className="BattleScreen__stat-row">
+              <span className="BattleScreen__stat-label">Speed</span>
+              <span className="BattleScreen__stat-value">{party[currentHeroIdx].stats.intelligence || 11}</span>
+            </div>
+            <div className="BattleScreen__stat-row">
+              <span className="BattleScreen__stat-label">Strength</span>
+              <span className="BattleScreen__stat-value">{party[currentHeroIdx].stats.attack || 14}</span>
+            </div>
+            <div className="BattleScreen__stat-row">
+              <span className="BattleScreen__stat-label">Defense</span>
+              <span className="BattleScreen__stat-value">{party[currentHeroIdx].stats.defense || 9}</span>
+            </div>
+
+            {party[currentHeroIdx].wear && party[currentHeroIdx].wear.length > 0 && (
+              <>
+                <h3 className="BattleScreen__equipment-title">Equipment</h3>
+                <div className="BattleScreen__equipment-list">
+                  {party[currentHeroIdx].wear.map((item: { wearableId: string }) => {
+                    const wearable = rpgConfig?.wearables.find((w) => w.wearableId === item.wearableId);
+                    return wearable ? (
+                      <div key={item.wearableId} className="BattleScreen__equipment-item">
+                        <span className="BattleScreen__equipment-name">{wearable.name}</span>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
       {/* Target selection modal */}
@@ -177,20 +262,31 @@ const BattleScreen: React.FC = () => {
       >
         <div className="BattleScreen__modal">
           <h3>Select Target</h3>
-          {activeEnemies
-            .filter((e) => e.currentHealth > 0)
-            .map((e) => (
-              <Button
-                key={e.enemyId}
-                theme="primary"
-                onClick={() => {
-                  dispatch(battleMeleeAttack({ targetId: e.enemyId }));
-                  setIsTargetSelectOpen(false);
-                }}
-              >
-                {enemies.find((en) => en.enemyId === e.enemyId)?.name || e.enemyId}
-              </Button>
-            ))}
+          <div className="BattleScreen__target-list">
+            {activeEnemies
+              .filter((e) => e.currentHealth > 0)
+              .map((e) => (
+                <Button
+                  key={e.enemyId}
+                  theme="primary"
+                  onClick={() => {
+                    dispatch(battleMeleeAttack({ targetId: e.enemyId }));
+                    setIsTargetSelectOpen(false);
+                  }}
+                >
+                  <div className="BattleScreen__target-button-content">
+                    <span>{enemies.find((en) => en.enemyId === e.enemyId)?.name || e.enemyId}</span>
+                    <span className="BattleScreen__target-hp">
+                      HP: {e.currentHealth}/
+                      {rpgConfig?.enemies.find((en) => en.characterId === e.enemyId)?.stats.health || 100}
+                    </span>
+                  </div>
+                </Button>
+              ))}
+          </div>
+          <Button theme="secondary" onClick={() => setIsTargetSelectOpen(false)}>
+            Cancel
+          </Button>
         </div>
       </Modal>
       {/* Outcome modal */}
