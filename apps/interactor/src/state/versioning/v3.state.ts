@@ -80,6 +80,10 @@ export interface NarrationState {
   createdIndicatorIds?: string[];
   hasPlayedGlobalStartCutscene?: boolean;
   hasShownStartSelectionModal?: boolean;
+  currentBattle?: {
+    state: BattleState;
+    isActive: boolean;
+  } | null;
 }
 
 export interface NovelScene extends NovelV3.NovelScene {}
@@ -91,6 +95,10 @@ export interface NovelMap extends NovelV3.NovelMap {}
 export interface NovelSong extends NovelV3.NovelSong {}
 export interface NovelStart extends NovelV3.NovelStart {}
 export interface NovelIndicator extends NovelV3.NovelIndicator {}
+export interface NovelBattle extends NovelV3.NovelBattle {}
+export interface NovelRPG extends NovelV3.NovelRPG {}
+export interface BattleState extends NovelV3.BattleState {}
+export type WearableSlot = NovelV3.WearableSlot;
 
 export enum NovelNSFW {
   NONE = NovelV3.NovelNSFW.NONE,

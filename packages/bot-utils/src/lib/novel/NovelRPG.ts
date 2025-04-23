@@ -33,6 +33,8 @@ export interface NovelRPG {
   enemies: {
     /** Unique identifier for the enemy */
     characterId: string;
+    /** Description or identifier of the enemy's battle outfit */
+    battleOutfit: string;
     /** Name of the enemy */
     stats: {
       /** Current health points of the enemy */
@@ -52,8 +54,8 @@ export interface NovelRPG {
     abilities: {
       abilityId: string;
     }[];
-    /** Difficulty rating of the enemy */
-    level: number;
+    /** Difficulty multiplier of the enemy */
+    difficultyMultiplier: number;
   }[];
 
   /** List of wearable items that can be equipped by heroes */
@@ -149,11 +151,21 @@ export interface NovelBattle {
     }[];
   }[];
 
+  /** Prompt to be used for the battle */
+  prompt: string;
+
   /** Enemy configuration for this battle */
   enemies: {
     /** ID of the enemy from NovelRPG.enemies */
     enemyId: string;
   }[];
 
-  nextSceneId: string;
+  /** Next scene ID to be shown after defeating all enemies */
+  nextSceneIdWin?: string;
+
+  /** Next scene ID to be shown after losing all heroes */
+  nextSceneIdLoss?: string;
+
+  /** Allow the player to retry the battle */
+  allowRetry: boolean;
 }

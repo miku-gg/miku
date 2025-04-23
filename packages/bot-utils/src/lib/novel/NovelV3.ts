@@ -1,5 +1,6 @@
 import { CharacterBook, EmotionTemplateSlug, MikuCardV2 } from '../MikuCardValidator';
-import { NovelRPG } from './NovelRPG';
+import { NovelBattle, NovelRPG } from './NovelRPG';
+export * from './NovelRPG';
 
 export enum NovelNSFW {
   NONE = 0,
@@ -143,6 +144,7 @@ export enum NovelActionType {
   HIDE_ITEM = 'HIDE_ITEM',
   SHOW_ITEM = 'SHOW_ITEM',
   ADD_CHILD_SCENES = 'ADD_CHILD_SCENES',
+  BATTLE_START = 'BATTLE_START',
 }
 
 export type NovelAction =
@@ -180,6 +182,12 @@ export type NovelAction =
       params: {
         sceneId: string;
         children: string[];
+      };
+    }
+  | {
+      type: NovelActionType.BATTLE_START;
+      params: {
+        battleId: string;
       };
     };
 
@@ -247,7 +255,8 @@ export interface NovelState {
   inventory?: InventoryItem[];
   globalStartCutsceneId?: string;
   useModalForStartSelection?: boolean;
-  rpg: NovelRPG;
+  rpg?: NovelRPG;
+  battles?: NovelBattle[];
 }
 
 export interface NovelIndicator {
