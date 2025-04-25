@@ -387,6 +387,7 @@ const novel: NovelV3.NovelState = {
         wear: [],
         isAvailable: true,
         isInParty: true,
+        abilities: [],
       },
     ],
     enemies: [
@@ -406,6 +407,7 @@ const novel: NovelV3.NovelState = {
       },
     ],
     wearables: [],
+    abilities: [],
   },
   battles: [
     {

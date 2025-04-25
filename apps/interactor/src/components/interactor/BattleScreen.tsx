@@ -4,9 +4,16 @@ import { useAppContext } from '../../App.context';
 import { selectCurrentScene } from '../../state/selectors';
 import { Modal, Button } from '@mikugg/ui-kit';
 import ProgressiveImage from 'react-progressive-graceful-image';
-import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
-import { interactionStart, clearCurrentBattle, battleMeleeAttack } from '../../state/slices/narrationSlice';
+import {
+  interactionStart,
+  clearCurrentBattle,
+  addHealth,
+  addMana,
+  addBattleLog,
+  moveNextTurn,
+} from '../../state/slices/narrationSlice';
 import './BattleScreen.scss';
 
 const BattleScreen: React.FC = () => {
@@ -14,7 +21,8 @@ const BattleScreen: React.FC = () => {
   const { assetLinkLoader, servicesEndpoint, apiEndpoint } = useAppContext();
   const currentScene = useAppSelector(selectCurrentScene);
   const currentBattle = useAppSelector((state) => state.narration.currentBattle);
-  const [isTargetSelectOpen, setIsTargetSelectOpen] = useState(false);
+  const [pendingAbility, setPendingAbility] = useState<NovelV3.NovelRPGAbility | null>(null);
+  const [victimId, setVictimId] = useState<string | null>(null);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const battles = useAppSelector((state) => state.novel.battles || []);
   const characters = useAppSelector((state) => state.novel.characters);
@@ -118,27 +126,35 @@ const BattleScreen: React.FC = () => {
       <div className="BattleScreen__battlefield">
         <div className="BattleScreen__party-group">
           {party.map((h) => (
-            <div key={h.characterId} className="BattleScreen__battler">
+            <div key={h.characterId} className={`BattleScreen__battler ${h.characterId === victimId ? 'victim' : ''}`}>
               <EmotionRenderer
                 className="BattleScreen__battler-emotion"
                 assetLinkLoader={assetLinkLoader}
                 assetUrl={h.img}
               />
-              <div className="BattleScreen__bar hp" title={`HP: ${h.currentHealth}/${h.stats.health}`} />
-              <div className="BattleScreen__bar mp" title={`MP: ${h.currentMana}/${h.stats.mana}`} />
+              <div className="BattleScreen__bar hp" title={`HP: ${h.currentHealth}/${h.stats.health}`}>
+                <div className="BattleScreen__fill" style={{ width: `${(h.currentHealth / h.stats.health) * 100}%` }} />
+              </div>
+              <div className="BattleScreen__bar mp" title={`MP: ${h.currentMana}/${h.stats.mana}`}>
+                <div className="BattleScreen__fill" style={{ width: `${(h.currentMana / h.stats.mana) * 100}%` }} />
+              </div>
             </div>
           ))}
         </div>
         <div className="BattleScreen__enemy-group">
           {enemies.map((e) => (
-            <div key={e.enemyId} className="BattleScreen__battler">
+            <div key={e.enemyId} className={`BattleScreen__battler ${e.enemyId === victimId ? 'victim' : ''}`}>
               <EmotionRenderer
                 className="BattleScreen__battler-emotion"
                 assetLinkLoader={assetLinkLoader}
                 assetUrl={e.img}
               />
-              <div className="BattleScreen__bar hp" title={`HP: ${e.currentHealth}/${e.stats.health}`} />
-              <div className="BattleScreen__bar mp" title={`MP: ${e.currentMana}/${e.stats.mana}`} />
+              <div className="BattleScreen__bar hp" title={`HP: ${e.currentHealth}/${e.stats.health}`}>
+                <div className="BattleScreen__fill" style={{ width: `${(e.currentHealth / e.stats.health) * 100}%` }} />
+              </div>
+              <div className="BattleScreen__bar mp" title={`MP: ${e.currentMana}/${e.stats.mana}`}>
+                <div className="BattleScreen__fill" style={{ width: `${(e.currentMana / e.stats.mana) * 100}%` }} />
+              </div>
             </div>
           ))}
         </div>
@@ -188,36 +204,186 @@ const BattleScreen: React.FC = () => {
 
           {/* Second column: Abilities list */}
           <div className="BattleScreen__abilities-list">
-            <Button theme="primary" onClick={() => setIsTargetSelectOpen(true)}>
-              Attack
-            </Button>
-            <Button
-              theme="secondary"
-              onClick={() => {
-                if (party[currentHeroIdx].currentMana >= 2) {
-                  // Here we would implement heal logic
-                  // For now, just open target selection
-                  setIsTargetSelectOpen(true);
-                }
-              }}
-              disabled={party[currentHeroIdx].currentMana < 2}
-            >
-              Heal <span className="BattleScreen__ability-cost">2 MP</span>
-            </Button>
-            <Button
-              theme="secondary"
-              onClick={() => {
-                if (party[currentHeroIdx].currentMana >= 3) {
-                  // Here we would implement drain logic
-                  // For now, just open target selection
-                  setIsTargetSelectOpen(true);
-                }
-              }}
-              disabled={party[currentHeroIdx].currentMana < 3}
-            >
-              Flare <span className="BattleScreen__ability-cost">3 MP</span>
-            </Button>
-            {/* Additional abilities can go here */}
+            {pendingAbility ? (
+              <>
+                <div className="BattleScreen__enemy-select-back" onClick={() => setPendingAbility(null)}>
+                  Go Back
+                </div>
+                {pendingAbility.target === 'enemy'
+                  ? activeEnemies
+                      .filter((e) => e.currentHealth > 0)
+                      .map((e) => (
+                        <div
+                          key={e.enemyId}
+                          className="BattleScreen__enemy-select-row"
+                          onClick={() => {
+                            const heroId = party[currentHeroIdx].characterId;
+                            const enemyId = e.enemyId;
+                            // Flicker enemy before damage
+                            setVictimId(enemyId);
+                            setTimeout(() => {
+                              // Hero uses ability: spend mana, damage enemy, log, next turn
+                              const ability = pendingAbility!;
+                              dispatch(
+                                addMana({
+                                  targetId: heroId,
+                                  amount: -ability.manaCost,
+                                  maxValue: party[currentHeroIdx].stats.mana,
+                                  isEnemy: false,
+                                }),
+                              );
+                              // Compute enemy max health from RPG config
+                              const enemyDef = rpgConfig?.enemies.find((er) => er.characterId === enemyId);
+                              const enemyMaxHealth = enemyDef?.stats.health ?? 0;
+                              dispatch(
+                                addHealth({
+                                  targetId: enemyId,
+                                  amount: -ability.damage,
+                                  maxValue: enemyMaxHealth,
+                                  isEnemy: true,
+                                }),
+                              );
+                              dispatch(
+                                addBattleLog({
+                                  turn,
+                                  actorId: heroId,
+                                  actionType: ability.name,
+                                  targets: [enemyId],
+                                  result: `${ability.damage} damage`,
+                                }),
+                              );
+                              dispatch(moveNextTurn());
+                              setPendingAbility(null);
+                              setVictimId(null);
+                              // Schedule enemy counterattack
+                              const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
+                              if (aliveHeroes.length > 0) {
+                                const targetHero =
+                                  aliveHeroes[Math.floor(Math.random() * aliveHeroes.length)].characterId;
+                                setVictimId(targetHero);
+                                setTimeout(() => {
+                                  const enemyStats = rpgConfig?.enemies.find((er) => er.characterId === enemyId)?.stats;
+                                  const damage = enemyStats?.attack || 0;
+                                  dispatch(
+                                    addHealth({
+                                      targetId: targetHero,
+                                      amount: -damage,
+                                      maxValue: party.find((h) => h.characterId === targetHero)!.stats.health,
+                                      isEnemy: false,
+                                    }),
+                                  );
+                                  dispatch(
+                                    addBattleLog({
+                                      turn: battleState.turn,
+                                      actorId: enemyId,
+                                      actionType: 'Melee Attack',
+                                      targets: [targetHero],
+                                      result: `${damage} damage`,
+                                    }),
+                                  );
+                                  dispatch(moveNextTurn());
+                                  setVictimId(null);
+                                }, 2000);
+                              }
+                            }, 2000);
+                          }}
+                        >
+                          <span>{enemies.find((en) => en.enemyId === e.enemyId)?.name || e.enemyId}</span>
+                          <span>HP: {e.currentHealth}</span>
+                        </div>
+                      ))
+                  : party
+                      .filter((h) => h.currentHealth > 0)
+                      .map((h) => (
+                        <div
+                          key={h.characterId}
+                          className="BattleScreen__enemy-select-row"
+                          onClick={() => {
+                            const heroId = party[currentHeroIdx].characterId;
+                            const allyId = h.characterId;
+                            // Flicker ally before heal
+                            setVictimId(allyId);
+                            setTimeout(() => {
+                              const ability = pendingAbility!;
+                              dispatch(
+                                addHealth({
+                                  targetId: allyId,
+                                  amount: ability.damage,
+                                  maxValue: party[currentHeroIdx].stats.health,
+                                  isEnemy: false,
+                                }),
+                              );
+                              dispatch(
+                                addBattleLog({
+                                  turn,
+                                  actorId: heroId,
+                                  actionType: ability.name,
+                                  targets: [allyId],
+                                  result: `Healed ${ability.damage}`,
+                                }),
+                              );
+                              dispatch(moveNextTurn());
+                              setPendingAbility(null);
+                              setVictimId(null);
+                              // Counterattack
+                              const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
+                              if (aliveHeroes.length > 0) {
+                                const targetHero =
+                                  aliveHeroes[Math.floor(Math.random() * aliveHeroes.length)].characterId;
+                                const enemy = activeEnemies[Math.floor(Math.random() * activeEnemies.length)];
+                                setVictimId(targetHero);
+                                setTimeout(() => {
+                                  const dmg =
+                                    rpgConfig?.enemies.find((er) => er.characterId === enemy.enemyId)?.stats.attack ||
+                                    0;
+                                  dispatch(
+                                    addHealth({
+                                      targetId: targetHero,
+                                      amount: -dmg,
+                                      maxValue: party.find((h) => h.characterId === targetHero)!.stats.health,
+                                      isEnemy: false,
+                                    }),
+                                  );
+                                  dispatch(
+                                    addBattleLog({
+                                      turn: battleState.turn,
+                                      actorId: enemy.enemyId,
+                                      actionType: 'Melee Attack',
+                                      targets: [targetHero],
+                                      result: `${dmg} damage`,
+                                    }),
+                                  );
+                                  dispatch(moveNextTurn());
+                                  setVictimId(null);
+                                }, 2000);
+                              }
+                            }, 2000);
+                          }}
+                        >
+                          <span>{characters.find((c) => c.id === h.characterId)?.name || h.characterId}</span>
+                          <span>HP: {h.currentHealth}</span>
+                        </div>
+                      ))}
+              </>
+            ) : (
+              [
+                {
+                  abilityId: 'melee',
+                  name: 'Melee Attack',
+                  description: 'Basic melee attack',
+                  manaCost: 0,
+                  target: 'enemy',
+                  damage: party[currentHeroIdx]?.stats.attack ?? 0,
+                } as NovelV3.NovelRPGAbility,
+              ]
+                .concat(rpgConfig?.abilities || [])
+                .map((ability, idx) => (
+                  <div key={idx} className="BattleScreen__enemy-select-row" onClick={() => setPendingAbility(ability)}>
+                    <span style={{ color: ability.target === 'ally' ? '#4af' : '#fff' }}>{ability.name}</span>
+                    <span>{ability.manaCost}</span>
+                  </div>
+                ))
+            )}
           </div>
 
           {/* Third column: Character stats and equipment */}
@@ -254,41 +420,6 @@ const BattleScreen: React.FC = () => {
           </div>
         </div>
       </div>
-      {/* Target selection modal */}
-      <Modal
-        opened={isTargetSelectOpen}
-        shouldCloseOnOverlayClick={false}
-        onCloseModal={() => setIsTargetSelectOpen(false)}
-      >
-        <div className="BattleScreen__modal">
-          <h3>Select Target</h3>
-          <div className="BattleScreen__target-list">
-            {activeEnemies
-              .filter((e) => e.currentHealth > 0)
-              .map((e) => (
-                <Button
-                  key={e.enemyId}
-                  theme="primary"
-                  onClick={() => {
-                    dispatch(battleMeleeAttack({ targetId: e.enemyId }));
-                    setIsTargetSelectOpen(false);
-                  }}
-                >
-                  <div className="BattleScreen__target-button-content">
-                    <span>{enemies.find((en) => en.enemyId === e.enemyId)?.name || e.enemyId}</span>
-                    <span className="BattleScreen__target-hp">
-                      HP: {e.currentHealth}/
-                      {rpgConfig?.enemies.find((en) => en.characterId === e.enemyId)?.stats.health || 100}
-                    </span>
-                  </div>
-                </Button>
-              ))}
-          </div>
-          <Button theme="secondary" onClick={() => setIsTargetSelectOpen(false)}>
-            Cancel
-          </Button>
-        </div>
-      </Modal>
       {/* Outcome modal */}
       {(isVictory || isDefeat) && (
         <Modal opened={true} shouldCloseOnOverlayClick={false}>

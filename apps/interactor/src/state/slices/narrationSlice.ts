@@ -525,52 +525,6 @@ const narrationSlice = createSlice({
         state.currentBattle.isActive = true;
       }
     },
-    // Player meleé attack against a specific enemy
-    battleMeleeAttack(state, action: PayloadAction<{ targetId: string }>) {
-      const cb = state.currentBattle;
-      if (!cb) return;
-      const { targetId } = action.payload;
-      // Player attack
-      const enemy = cb.state.activeEnemies.find((e) => e.enemyId === targetId);
-      if (enemy) {
-        const damage = 10; // stub damage
-        enemy.currentHealth = Math.max(0, enemy.currentHealth - damage);
-        cb.state.battleLog.push({
-          turn: cb.state.turn,
-          actorId: 'player',
-          actionType: 'melee attack',
-          targets: [targetId],
-          result: `${damage} damage`,
-        });
-      }
-      // Check for victory
-      if (cb.state.activeEnemies.every((e) => e.currentHealth <= 0)) {
-        cb.state.status = 'victory';
-        return;
-      }
-      // Enemy counterattack
-      const aliveHeroes = cb.state.activeHeroes.filter((h) => h.currentHealth > 0);
-      if (aliveHeroes.length) {
-        const idx = Math.floor(Math.random() * aliveHeroes.length);
-        const hero = aliveHeroes[idx];
-        const counterDamage = 5; // stub enemy damage
-        hero.currentHealth = Math.max(0, hero.currentHealth - counterDamage);
-        cb.state.battleLog.push({
-          turn: cb.state.turn,
-          actorId: 'enemy',
-          actionType: 'melee attack',
-          targets: [hero.characterId],
-          result: `${counterDamage} damage`,
-        });
-        // Check for defeat
-        if (cb.state.activeHeroes.every((h) => h.currentHealth <= 0)) {
-          cb.state.status = 'defeat';
-          return;
-        }
-      }
-      // Advance turn
-      cb.state.turn += 1;
-    },
     battleWin(state) {
       const cb = state.currentBattle;
       if (cb) {
@@ -585,6 +539,69 @@ const narrationSlice = createSlice({
     },
     clearCurrentBattle(state) {
       delete state.currentBattle;
+    },
+    // Adjust health (positive to heal, negative to damage) and check win/lose
+    addHealth(state, action: PayloadAction<{ targetId: string; amount: number; maxValue: number; isEnemy: boolean }>) {
+      const cb = state.currentBattle;
+      if (!cb) return;
+      const { targetId, amount, maxValue, isEnemy } = action.payload;
+      if (isEnemy) {
+        const enemy = cb.state.activeEnemies.find((e) => e.enemyId === targetId);
+        if (enemy) {
+          enemy.currentHealth = Math.max(0, Math.min(enemy.currentHealth + amount, maxValue));
+        }
+        // victory if all enemies are down
+        if (cb.state.activeEnemies.every((e) => e.currentHealth <= 0)) {
+          cb.state.status = 'victory';
+        }
+      } else {
+        const hero = cb.state.activeHeroes.find((h) => h.characterId === targetId);
+        if (hero) {
+          hero.currentHealth = Math.max(0, Math.min(hero.currentHealth + amount, maxValue));
+        }
+        // defeat if all heroes are down
+        if (cb.state.activeHeroes.every((h) => h.currentHealth <= 0)) {
+          cb.state.status = 'defeat';
+        }
+      }
+    },
+    // Adjust mana (positive to regain, negative to spend)
+    addMana(state, action: PayloadAction<{ targetId: string; amount: number; maxValue: number; isEnemy: boolean }>) {
+      const cb = state.currentBattle;
+      if (!cb) return;
+      const { targetId, amount, maxValue, isEnemy } = action.payload;
+      if (isEnemy) {
+        const enemy = cb.state.activeEnemies.find((e) => e.enemyId === targetId);
+        if (enemy) {
+          enemy.currentMana = Math.max(0, Math.min(enemy.currentMana + amount, maxValue));
+        }
+      } else {
+        const hero = cb.state.activeHeroes.find((h) => h.characterId === targetId);
+        if (hero) {
+          hero.currentMana = Math.max(0, Math.min(hero.currentMana + amount, maxValue));
+        }
+      }
+    },
+    // Log a battle action
+    addBattleLog(
+      state,
+      action: PayloadAction<{
+        turn: number;
+        actorId: string;
+        actionType: string;
+        targets: string[];
+        result: string;
+      }>,
+    ) {
+      const cb = state.currentBattle;
+      if (!cb) return;
+      cb.state.battleLog.push(action.payload);
+    },
+    // Advance to next turn
+    moveNextTurn(state) {
+      const cb = state.currentBattle;
+      if (!cb) return;
+      cb.state.turn += 1;
     },
   },
   extraReducers: (builder) => {
@@ -632,10 +649,13 @@ export const {
   setHasShownStartSelectionModal,
   setCurrentBattle,
   activateBattle,
-  battleMeleeAttack,
   battleWin,
   battleLose,
   clearCurrentBattle,
+  addHealth,
+  addMana,
+  addBattleLog,
+  moveNextTurn,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;

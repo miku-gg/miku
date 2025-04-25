@@ -53,7 +53,6 @@
   z-index: 0;
 }
 
-/* Battlefield: party left, enemies right */
 .BattleScreen__battlefield {
   flex: 1;
   display: flex;
@@ -65,11 +64,27 @@
   width: 100%;
   height: 70%;
 }
+
+/* Dark overlay to dim battlefield, allow child highlight */
+.BattleScreen__battlefield::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .BattleScreen__party-group,
 .BattleScreen__enemy-group {
   display: flex;
   align-items: flex-end;
   flex: 1;
+  position: relative;
+  z-index: 2;
 }
 .BattleScreen__party-group {
   justify-content: flex-start;
@@ -109,10 +124,10 @@
 }
 .BattleScreen__fill {
   height: 100%;
-  background: #ff4444;
+  background: lighten($color-red, 20%);
 }
 .BattleScreen__bar.mp .BattleScreen__fill {
-  background: #4444ff;
+  background: lighten($color-blue, 20%);
 }
 
 /* Bottom controls box */
@@ -217,28 +232,6 @@
 
 /* Second column: Abilities */
 .BattleScreen__abilities-list {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 200px;
-}
-
-.BattleScreen__abilities-list button {
-  position: relative;
-  padding: 10px 15px;
-  text-align: left;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.BattleScreen__ability-cost {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 12px;
-  opacity: 0.8;
 }
 
 /* Third column: Stats */
@@ -351,4 +344,113 @@
   font-size: 12px;
   opacity: 0.8;
   margin-top: 4px;
+}
+
+/* Attack and victim animations */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  80% {
+    transform: translateX(-5px);
+  }
+  40%,
+  60% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes whiten {
+  0%,
+  100% {
+    filter: none;
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+}
+
+/* Flicker red filter for victims */
+@keyframes flickerRed {
+  0%,
+  100% {
+    filter: none;
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    filter: grayscale(100%) sepia(100%) hue-rotate(-50deg);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    filter: none;
+  }
+}
+
+/* Attacking character highlight */
+.BattleScreen__battler.attacking {
+  border: 2px solid #fff;
+  z-index: 3;
+  animation: whiten 2s ease-in-out both;
+}
+
+/* Victim enemy highlight */
+.BattleScreen__battler.victim {
+  border: 2px solid #f00;
+  z-index: 3;
+  animation: flickerRed 2s linear both;
+}
+
+/* Animate only the emotion image when attacking */
+.BattleScreen__battler.attacking .BattleScreen__battler-emotion {
+  animation: whiten 2s ease-in-out both;
+}
+
+/* Animate only the emotion image when being attacked */
+.BattleScreen__battler.victim .BattleScreen__battler-emotion {
+  animation: flickerRed 2s linear both;
+}
+
+/* Enemy selection list box (replaces abilities list) */
+.BattleScreen__enemy-select {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  background: rgba($background-color-dark, 0.9);
+  border: 1px solid rgba($secondary-color, 0.8);
+  border-radius: 4px;
+  padding: 16px;
+  z-index: 3;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.BattleScreen__enemy-select-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  color: #fff;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.BattleScreen__enemy-select-row:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.BattleScreen__enemy-select-back {
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  color: #fff;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.BattleScreen__enemy-select-back:hover {
+  background: rgba(255, 255, 255, 0.1);
 }

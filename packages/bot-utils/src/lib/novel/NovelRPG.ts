@@ -1,3 +1,11 @@
+export interface NovelRPGAbility {
+  abilityId: string;
+  name: string;
+  description: string;
+  manaCost: number;
+  target: 'enemy' | 'ally';
+  damage: number;
+}
 export interface NovelRPG {
   heroes: {
     /** Unique identifier for the character */
@@ -27,6 +35,9 @@ export interface NovelRPG {
     isAvailable: boolean;
     /** Indicates if the character is currently in the active party */
     isInParty: boolean;
+    abilities: {
+      abilityId: string;
+    }[];
   }[];
 
   /** List of enemies that can appear in battles */
@@ -80,6 +91,8 @@ export interface NovelRPG {
     /** Slot where the wearable item can be equipped */
     slot: WearableSlot;
   }[];
+
+  abilities?: NovelRPGAbility[];
 }
 
 export type WearableSlot = 'head' | 'body' | 'hands' | 'feet' | 'accessory';
