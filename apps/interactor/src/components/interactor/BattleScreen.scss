@@ -65,19 +65,6 @@
   height: 70%;
 }
 
-/* Dark overlay to dim battlefield, allow child highlight */
-.BattleScreen__battlefield::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  pointer-events: none;
-  z-index: 1;
-}
-
 .BattleScreen__party-group,
 .BattleScreen__enemy-group {
   display: flex;
@@ -453,4 +440,64 @@
 }
 .BattleScreen__enemy-select-back:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* Battle log popups */
+.BattleScreen__log-container {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes shrinkUp {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-10px) scale(0.8);
+    opacity: 0.6;
+  }
+}
+
+.BattleScreen__log {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-size: 16px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.BattleScreen__log.new {
+  animation: grow 0.3s ease-out both;
+}
+.BattleScreen__log.old {
+  animation: shrinkUp 0.3s ease-out both;
+}
+
+/* log text colors */
+.BattleScreen__log .log-actor {
+  color: $color-gold;
+  font-weight: bold;
+  margin-right: 4px;
+}
+.BattleScreen__log .log-ability {
+  color: $primary-color;
+  font-style: italic;
+  margin: 0 4px;
+}
+.BattleScreen__log .log-target {
+  color: $color-red;
+  font-weight: bold;
+  margin-left: 4px;
 }

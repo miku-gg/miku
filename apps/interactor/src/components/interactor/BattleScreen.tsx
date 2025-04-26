@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from '../../state/store';
 import { useAppContext } from '../../App.context';
 import { selectCurrentScene } from '../../state/selectors';
@@ -21,6 +21,7 @@ const BattleScreen: React.FC = () => {
   const { assetLinkLoader, servicesEndpoint, apiEndpoint } = useAppContext();
   const currentScene = useAppSelector(selectCurrentScene);
   const currentBattle = useAppSelector((state) => state.narration.currentBattle);
+  const battleLog = useAppSelector((state) => state.narration.currentBattle?.state.battleLog || []);
   const [pendingAbility, setPendingAbility] = useState<NovelV3.NovelRPGAbility | null>(null);
   const [victimId, setVictimId] = useState<string | null>(null);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
@@ -28,6 +29,34 @@ const BattleScreen: React.FC = () => {
   const characters = useAppSelector((state) => state.novel.characters);
   const rpgConfig = useAppSelector((state) => state.novel.rpg);
   const songs = useAppSelector((state) => state.novel.songs);
+  const [uiLogs, setUiLogs] = useState<{ id: string; actorName: string; abilityName: string; targetName: string }[]>(
+    [],
+  );
+  const lastLogIndex = useRef(0);
+
+  useEffect(() => {
+    if (battleLog.length > lastLogIndex.current) {
+      const entry = battleLog[battleLog.length - 1];
+      const actorName = characters.find((c) => c.id === entry.actorId)?.name || entry.actorId;
+      const abilityName = entry.actionType;
+      const targetId = entry.targets[0];
+      const targetName = characters.find((c) => c.id === targetId)?.name || targetId;
+      const uiEntry = {
+        id: `${entry.turn}-${entry.actorId}-${targetId}-${Date.now()}`,
+        actorName,
+        abilityName,
+        targetName,
+      };
+      setUiLogs((logs) => {
+        const next = logs.slice(-1).concat(uiEntry);
+        return next;
+      });
+      lastLogIndex.current = battleLog.length;
+      setTimeout(() => {
+        setUiLogs((logs) => logs.filter((l) => l.id !== uiEntry.id));
+      }, 3000);
+    }
+  }, [battleLog, characters]);
 
   if (!currentBattle) {
     return null;
@@ -221,6 +250,15 @@ const BattleScreen: React.FC = () => {
                             const enemyId = e.enemyId;
                             // Flicker enemy before damage
                             setVictimId(enemyId);
+                            dispatch(
+                              addBattleLog({
+                                turn,
+                                actorId: heroId,
+                                actionType: pendingAbility.name,
+                                targets: [enemyId],
+                                result: `${pendingAbility.damage} damage`,
+                              }),
+                            );
                             setTimeout(() => {
                               // Hero uses ability: spend mana, damage enemy, log, next turn
                               const ability = pendingAbility!;
@@ -243,15 +281,6 @@ const BattleScreen: React.FC = () => {
                                   isEnemy: true,
                                 }),
                               );
-                              dispatch(
-                                addBattleLog({
-                                  turn,
-                                  actorId: heroId,
-                                  actionType: ability.name,
-                                  targets: [enemyId],
-                                  result: `${ability.damage} damage`,
-                                }),
-                              );
                               dispatch(moveNextTurn());
                               setPendingAbility(null);
                               setVictimId(null);
@@ -261,24 +290,24 @@ const BattleScreen: React.FC = () => {
                                 const targetHero =
                                   aliveHeroes[Math.floor(Math.random() * aliveHeroes.length)].characterId;
                                 setVictimId(targetHero);
+                                const enemyStats = rpgConfig?.enemies.find((er) => er.characterId === enemyId)?.stats;
+                                const damage = enemyStats?.attack || 0;
+                                dispatch(
+                                  addBattleLog({
+                                    turn: battleState.turn,
+                                    actorId: enemyId,
+                                    actionType: 'Melee Attack',
+                                    targets: [targetHero],
+                                    result: `${damage} damage`,
+                                  }),
+                                );
                                 setTimeout(() => {
-                                  const enemyStats = rpgConfig?.enemies.find((er) => er.characterId === enemyId)?.stats;
-                                  const damage = enemyStats?.attack || 0;
                                   dispatch(
                                     addHealth({
                                       targetId: targetHero,
                                       amount: -damage,
                                       maxValue: party.find((h) => h.characterId === targetHero)!.stats.health,
                                       isEnemy: false,
-                                    }),
-                                  );
-                                  dispatch(
-                                    addBattleLog({
-                                      turn: battleState.turn,
-                                      actorId: enemyId,
-                                      actionType: 'Melee Attack',
-                                      targets: [targetHero],
-                                      result: `${damage} damage`,
                                     }),
                                   );
                                   dispatch(moveNextTurn());
@@ -431,6 +460,16 @@ const BattleScreen: React.FC = () => {
           </div>
         </Modal>
       )}
+      {/* Battle log messages */}
+      <div className="BattleScreen__log-container">
+        {uiLogs.map((log, index) => (
+          <div key={log.id} className={`BattleScreen__log ${index === uiLogs.length - 1 ? 'new' : 'old'}`}>
+            <span className="log-actor">{log.actorName}</span> used{' '}
+            <span className="log-ability">{log.abilityName}</span> on{' '}
+            <span className="log-target">{log.targetName}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
