@@ -78,15 +78,45 @@ const BattleScreen: React.FC = () => {
     const outfitId = heroRpg?.battleOutfit ?? '';
     const outfit = heroDef?.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === outfitId);
     const img = outfit?.emotions.find((e) => e.id === 'neutral')?.sources.png || '';
+    const wearableDefs =
+      heroRpg && rpgConfig
+        ? heroRpg.wear
+            .map((item) => rpgConfig.wearables.find((w) => w.wearableId === item.wearableId))
+            .filter((w): w is NovelV3.NovelRPG['wearables'][0] => !!w)
+        : [];
+    const statBonuses = wearableDefs.reduce(
+      (acc, w) => {
+        acc.attack += w.stats.attack;
+        acc.defense += w.stats.defense;
+        acc.intelligence += w.stats.intelligence;
+        acc.magicDefense += w.stats.magicDefense;
+        return acc;
+      },
+      { attack: 0, defense: 0, intelligence: 0, magicDefense: 0 },
+    );
+    const baseStats = heroRpg?.stats || { health: 0, mana: 0, attack: 0, intelligence: 0, defense: 0, magicDefense: 0 };
+    const adjustedStats = {
+      ...baseStats,
+      attack: baseStats.attack + statBonuses.attack,
+      intelligence: baseStats.intelligence + statBonuses.intelligence,
+      defense: baseStats.defense + statBonuses.defense,
+      magicDefense: baseStats.magicDefense + statBonuses.magicDefense,
+    };
     return {
       characterId: h.characterId,
       currentHealth: h.currentHealth,
       currentMana: h.currentMana,
-      stats: heroRpg?.stats ?? { health: 0, mana: 0, attack: 0, intelligence: 0, defense: 0, magicDefense: 0 },
+      stats: heroRpg?.stats ?? baseStats,
+      wearables: wearableDefs,
+      statBonuses,
+      adjustedStats,
       battleOutfit: outfitId,
       img,
       profilePic: heroDef?.profile_pic || '',
       wear: heroRpg?.wear || [],
+      abilities: ((heroRpg?.abilities || [])
+        .map(({ abilityId }) => rpgConfig?.abilities?.find((a) => a.abilityId === abilityId))
+        .filter((a) => a) || []) as NovelV3.NovelRPGAbility[],
     };
   });
   const enemies = activeEnemies.map((e) => {
@@ -104,6 +134,7 @@ const BattleScreen: React.FC = () => {
       battleOutfit: outfitId,
       img,
       name: eneDef?.name,
+      abilities: enemyRpg?.abilities || [],
     };
   });
 
@@ -249,34 +280,55 @@ const BattleScreen: React.FC = () => {
                             const heroId = party[currentHeroIdx].characterId;
                             const enemyId = e.enemyId;
                             // Flicker enemy before damage
+                            const ability = pendingAbility!;
                             setVictimId(enemyId);
+                            // Compute damage with stats and wearables
+                            const heroStats = party[currentHeroIdx].adjustedStats;
+                            // Lookup defender stats from RPG config (state.activeEnemies lacks stats)
+                            const defenderStats = rpgConfig?.enemies.find((er) => er.characterId === enemyId)
+                              ?.stats || {
+                              health: 0,
+                              mana: 0,
+                              attack: 0,
+                              intelligence: 0,
+                              defense: 0,
+                              magicDefense: 0,
+                            };
+                            const baseDmg = ability.damage;
+                            const finalDamage = Math.max(
+                              0,
+                              Math.floor(
+                                baseDmg +
+                                  heroStats.attack +
+                                  heroStats.intelligence -
+                                  (defenderStats.defense + defenderStats.magicDefense),
+                              ),
+                            );
                             dispatch(
                               addBattleLog({
                                 turn,
                                 actorId: heroId,
-                                actionType: pendingAbility.name,
+                                actionType: ability.name,
                                 targets: [enemyId],
-                                result: `${pendingAbility.damage} damage`,
+                                result: `${finalDamage} damage`,
+                              }),
+                            );
+                            // Hero uses ability: spend mana
+                            dispatch(
+                              addMana({
+                                targetId: heroId,
+                                amount: -ability.manaCost,
+                                maxValue: party[currentHeroIdx].stats.mana,
+                                isEnemy: false,
                               }),
                             );
                             setTimeout(() => {
-                              // Hero uses ability: spend mana, damage enemy, log, next turn
-                              const ability = pendingAbility!;
-                              dispatch(
-                                addMana({
-                                  targetId: heroId,
-                                  amount: -ability.manaCost,
-                                  maxValue: party[currentHeroIdx].stats.mana,
-                                  isEnemy: false,
-                                }),
-                              );
-                              // Compute enemy max health from RPG config
                               const enemyDef = rpgConfig?.enemies.find((er) => er.characterId === enemyId);
-                              const enemyMaxHealth = enemyDef?.stats.health ?? 0;
+                              const enemyMaxHealth = enemyDef?.stats.health ?? defenderStats.health;
                               dispatch(
                                 addHealth({
                                   targetId: enemyId,
-                                  amount: -ability.damage,
+                                  amount: -finalDamage,
                                   maxValue: enemyMaxHealth,
                                   isEnemy: true,
                                 }),
@@ -330,25 +382,33 @@ const BattleScreen: React.FC = () => {
                           onClick={() => {
                             const heroId = party[currentHeroIdx].characterId;
                             const allyId = h.characterId;
+                            const ability = pendingAbility!;
                             // Flicker ally before heal
                             setVictimId(allyId);
+                            dispatch(
+                              addBattleLog({
+                                turn,
+                                actorId: heroId,
+                                actionType: ability.name,
+                                targets: [allyId],
+                                result: `Healed ${ability.damage}`,
+                              }),
+                            );
+                            dispatch(
+                              addMana({
+                                targetId: heroId,
+                                amount: -ability.manaCost,
+                                maxValue: party[currentHeroIdx].stats.mana,
+                                isEnemy: false,
+                              }),
+                            );
                             setTimeout(() => {
-                              const ability = pendingAbility!;
                               dispatch(
                                 addHealth({
                                   targetId: allyId,
                                   amount: ability.damage,
                                   maxValue: party[currentHeroIdx].stats.health,
                                   isEnemy: false,
-                                }),
-                              );
-                              dispatch(
-                                addBattleLog({
-                                  turn,
-                                  actorId: heroId,
-                                  actionType: ability.name,
-                                  targets: [allyId],
-                                  result: `Healed ${ability.damage}`,
                                 }),
                               );
                               dispatch(moveNextTurn());
@@ -405,7 +465,7 @@ const BattleScreen: React.FC = () => {
                   damage: party[currentHeroIdx]?.stats.attack ?? 0,
                 } as NovelV3.NovelRPGAbility,
               ]
-                .concat(rpgConfig?.abilities || [])
+                .concat(party[currentHeroIdx].abilities || [])
                 .map((ability, idx) => (
                   <div key={idx} className="BattleScreen__enemy-select-row" onClick={() => setPendingAbility(ability)}>
                     <span style={{ color: ability.target === 'ally' ? '#4af' : '#fff' }}>{ability.name}</span>
@@ -420,15 +480,67 @@ const BattleScreen: React.FC = () => {
             <h3>Status</h3>
             <div className="BattleScreen__stat-row">
               <span className="BattleScreen__stat-label">Speed</span>
-              <span className="BattleScreen__stat-value">{party[currentHeroIdx].stats.intelligence || 11}</span>
+              <div className="BattleScreen__stat-value-with-tooltip">
+                <span className="BattleScreen__stat-value">{party[currentHeroIdx].adjustedStats.intelligence}</span>
+                {party[currentHeroIdx].statBonuses.intelligence > 0 && (
+                  <span className="BattleScreen__stat-bonus">+{party[currentHeroIdx].statBonuses.intelligence}</span>
+                )}
+                <div className="BattleScreen__stat-tooltip">
+                  {party[currentHeroIdx].wearables.map((w) => (
+                    <div key={w.wearableId}>
+                      {w.name}: +{w.stats.intelligence}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
             <div className="BattleScreen__stat-row">
               <span className="BattleScreen__stat-label">Strength</span>
-              <span className="BattleScreen__stat-value">{party[currentHeroIdx].stats.attack || 14}</span>
+              <div className="BattleScreen__stat-value-with-tooltip">
+                <span className="BattleScreen__stat-value">{party[currentHeroIdx].adjustedStats.attack}</span>
+                {party[currentHeroIdx].statBonuses.attack > 0 && (
+                  <span className="BattleScreen__stat-bonus">+{party[currentHeroIdx].statBonuses.attack}</span>
+                )}
+                <div className="BattleScreen__stat-tooltip">
+                  {party[currentHeroIdx].wearables.map((w) => (
+                    <div key={w.wearableId}>
+                      {w.name}: +{w.stats.attack}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
             <div className="BattleScreen__stat-row">
               <span className="BattleScreen__stat-label">Defense</span>
-              <span className="BattleScreen__stat-value">{party[currentHeroIdx].stats.defense || 9}</span>
+              <div className="BattleScreen__stat-value-with-tooltip">
+                <span className="BattleScreen__stat-value">{party[currentHeroIdx].adjustedStats.defense}</span>
+                {party[currentHeroIdx].statBonuses.defense > 0 && (
+                  <span className="BattleScreen__stat-bonus">+{party[currentHeroIdx].statBonuses.defense}</span>
+                )}
+                <div className="BattleScreen__stat-tooltip">
+                  {party[currentHeroIdx].wearables.map((w) => (
+                    <div key={w.wearableId}>
+                      {w.name}: +{w.stats.defense}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="BattleScreen__stat-row">
+              <span className="BattleScreen__stat-label">Magic Def.</span>
+              <div className="BattleScreen__stat-value-with-tooltip">
+                <span className="BattleScreen__stat-value">{party[currentHeroIdx].adjustedStats.magicDefense}</span>
+                {party[currentHeroIdx].statBonuses.magicDefense > 0 && (
+                  <span className="BattleScreen__stat-bonus">+{party[currentHeroIdx].statBonuses.magicDefense}</span>
+                )}
+                <div className="BattleScreen__stat-tooltip">
+                  {party[currentHeroIdx].wearables.map((w) => (
+                    <div key={w.wearableId}>
+                      {w.name}: +{w.stats.magicDefense}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {party[currentHeroIdx].wear && party[currentHeroIdx].wear.length > 0 && (

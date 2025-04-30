@@ -263,6 +263,35 @@
   margin-right: 12px;
 }
 
+/* Stats value tooltip */
+.BattleScreen__stat-value-with-tooltip {
+  position: relative;
+  display: inline-block;
+}
+.BattleScreen__stat-value-with-tooltip .BattleScreen__stat-tooltip {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  background: rgba($background-color-dark, 0.9);
+  color: $color-white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: $font-sm;
+  white-space: nowrap;
+  z-index: 5;
+}
+.BattleScreen__stat-value-with-tooltip:hover .BattleScreen__stat-tooltip {
+  display: block;
+}
+/* Bonus number highlight */
+.BattleScreen__stat-bonus {
+  color: $color-gold;
+  margin-left: 4px;
+  font-size: $font-sm;
+}
+
 /* Equipment section */
 .BattleScreen__equipment-title {
   margin: 12px 0 8px 0;

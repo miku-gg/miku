@@ -384,10 +384,21 @@ const novel: NovelV3.NovelState = {
           defense: 10,
           magicDefense: 10,
         },
-        wear: [],
+        wear: [
+          {
+            wearableId: 'power-ring',
+          },
+        ],
         isAvailable: true,
         isInParty: true,
-        abilities: [],
+        abilities: [
+          {
+            abilityId: 'cure-spell',
+          },
+          {
+            abilityId: 'lightning-spell',
+          },
+        ],
       },
     ],
     enemies: [
@@ -406,8 +417,39 @@ const novel: NovelV3.NovelState = {
         difficultyMultiplier: 1,
       },
     ],
-    wearables: [],
-    abilities: [],
+    wearables: [
+      {
+        // Ring that throws spell that attacks shadowfangs
+        name: 'Power Ring',
+        description: '',
+        slot: 'accessory',
+        wearableId: 'power-ring',
+        stats: {
+          intelligence: 3,
+          attack: 0,
+          defense: 0,
+          magicDefense: 0,
+        },
+      },
+    ],
+    abilities: [
+      {
+        abilityId: 'cure-spell',
+        name: 'Cure Spell',
+        description: 'Cures the target of poison',
+        manaCost: 20,
+        target: 'ally',
+        damage: 10,
+      },
+      {
+        abilityId: 'lightning-spell',
+        name: 'Lightning Spell',
+        description: 'Casts a lightning spell on the target',
+        manaCost: 20,
+        target: 'enemy',
+        damage: 20,
+      },
+    ],
   },
   battles: [
     {
