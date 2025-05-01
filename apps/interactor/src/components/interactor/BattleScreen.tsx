@@ -16,6 +16,7 @@ import {
   moveNextTurn,
 } from '../../state/slices/narrationSlice';
 import './BattleScreen.scss';
+import MusicPlayer from './MusicPlayer';
 
 const ABILITY_ANIMATION_DURATION = 1000;
 
@@ -31,7 +32,6 @@ const BattleScreen: React.FC = () => {
   const battles = useAppSelector((state) => state.novel.battles || []);
   const characters = useAppSelector((state) => state.novel.characters);
   const rpgConfig = useAppSelector((state) => state.novel.rpg);
-  const songs = useAppSelector((state) => state.novel.songs);
   const [uiLogs, setUiLogs] = useState<{ id: string; actorName: string; abilityName: string; targetName: string }[]>(
     [],
   );
@@ -165,17 +165,7 @@ const BattleScreen: React.FC = () => {
 
   return (
     <div className="BattleScreen">
-      {/* Play battle music */}
-      {battleConfig?.music?.battleId && (
-        <audio
-          src={assetLinkLoader(
-            songs.find((s) => s.id === battleConfig.music.battleId)?.source || '',
-            AssetDisplayPrefix.MUSIC,
-          )}
-          autoPlay
-          loop
-        />
-      )}
+      {/* Battle music via MusicPlayer */}
       {/* Background */}
       {bg && (
         <ProgressiveImage
@@ -185,6 +175,9 @@ const BattleScreen: React.FC = () => {
           {(src) => <img className="BattleScreen__background" src={src} alt="battle background" />}
         </ProgressiveImage>
       )}
+      <div className="BattleScreen__header">
+        <MusicPlayer />
+      </div>
       {/* Battlefield layout */}
       <div className="BattleScreen__battlefield">
         <div className="BattleScreen__party-group">

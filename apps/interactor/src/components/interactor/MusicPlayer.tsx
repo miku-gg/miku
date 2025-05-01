@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './MusicPlayer.scss';
 import { useAppContext } from '../../App.context';
 import { useAppDispatch, useAppSelector } from '../../state/store';
@@ -29,6 +29,8 @@ export const MusicNegated = () => {
 };
 
 const MusicPlayer: React.FC = () => {
+  const [rangeVisible, setRangeVisible] = useState(false);
+  const [inRangeHover, setInRangeHover] = useState(false);
   const dispatch = useAppDispatch();
   const { assetLinkLoader } = useAppContext();
   const volume = useAppSelector((state) => state.settings.music.volume);
@@ -38,11 +40,18 @@ const MusicPlayer: React.FC = () => {
   const scene = useAppSelector(selectCurrentScene);
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const currentCutScenePart = useAppSelector(selectCurrentCutScenePart);
+  const currentBattle = useAppSelector((state) => state.narration.currentBattle);
+  const battles = useAppSelector((state) => state.novel.battles || []);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   let _src = '';
-
-  if (displayingCutscene && currentCutScenePart?.music) {
+  if (currentBattle?.isActive) {
+    const battleId = currentBattle.state.battleId;
+    const battleConfig = battles.find((b) => b.battleId === battleId);
+    if (battleConfig?.music?.battleId) {
+      _src = songs.find((s) => s.id === battleConfig.music.battleId)?.source || battleConfig.music.battleId;
+    }
+  } else if (displayingCutscene && currentCutScenePart?.music) {
     _src = songs.find((s) => s.id === currentCutScenePart.music)?.source || currentCutScenePart.music;
   } else if (scene?.musicId) {
     _src = songs.find((s) => s.id === scene?.musicId)?.source || scene?.musicId;
@@ -81,12 +90,32 @@ const MusicPlayer: React.FC = () => {
   if (audioRef.current) audioRef.current.volume = volume;
 
   return (
-    <div className="MusicPlayer">
+    <div
+      className={`MusicPlayer ${rangeVisible ? 'range-visible' : ''}`}
+      onMouseEnter={() => {
+        setRangeVisible(true);
+        console.log('[music] mouse enter');
+      }}
+      onMouseLeave={() => {
+        setRangeVisible(false);
+        console.log('[music] mouse leave');
+      }}
+    >
       <audio ref={audioRef} src={src} autoPlay={enabled} loop />
       <button onClick={togglePlay} className="MusicPlayer__icon icon-button">
         {enabled ? <Music /> : <MusicNegated />}
       </button>
-      <div className="MusicPlayer__range">
+      <div
+        className="MusicPlayer__range"
+        onMouseEnter={() => {
+          setInRangeHover(true);
+          console.log('[range] mouse enter');
+        }}
+        onMouseLeave={() => {
+          setInRangeHover(false);
+          console.log('[range]mouse leave');
+        }}
+      >
         <input type="range" min="0" max="1" step="0.01" value={volume} onChange={handleVolumeChange} />
       </div>
     </div>

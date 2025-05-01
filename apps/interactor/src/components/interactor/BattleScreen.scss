@@ -640,3 +640,32 @@
   font-weight: bold;
   margin-left: 4px;
 }
+
+// Mobile portrait mode: rotate the entire battle screen 90 degrees
+@media screen and (orientation: portrait) {
+  .BattleScreen {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100vh;
+    height: 100vw;
+    transform-origin: top left;
+    transform: rotate(90deg) translate(0, -100vh);
+    /* adjust scrolling since content is rotated */
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
+}
+
+.BattleScreen__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 16px;
+  z-index: 3;
+  height: 100px;
+}

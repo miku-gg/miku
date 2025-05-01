@@ -37,6 +37,16 @@
     }
   }
 
+  &.range-visible {
+    // margin-bottom: 32px;
+
+    .MusicPlayer__range {
+      opacity: 1;
+      pointer-events: initial;
+      user-select: initial;
+    }
+  }
+
   input[type='range'] {
     background-color: transparent;
     cursor: pointer;
