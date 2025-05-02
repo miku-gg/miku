@@ -525,16 +525,14 @@
   }
 }
 
-/* Attacking character highlight */
+/* Attacking character highlight (only emotion) */
 .BattleScreen__battler.attacking {
-  border: 2px solid #fff;
   z-index: 3;
   animation: whiten 2s ease-in-out both;
 }
 
-/* Victim enemy highlight */
+/* Victim enemy highlight (only emotion) */
 .BattleScreen__battler.victim {
-  border: 2px solid #f00;
   z-index: 3;
   animation: flickerRed 2s linear both;
 }
@@ -547,6 +545,32 @@
 /* Animate only the emotion image when being attacked */
 .BattleScreen__battler.victim .BattleScreen__battler-emotion {
   animation: flickerRed 2s linear both;
+}
+
+/* Green glow filter for healing targets */
+@keyframes greenGlow {
+  0%,
+  100% {
+    filter: none;
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+}
+
+/* Apply green glow for healing */
+.BattleScreen__battler.heal-victim {
+  z-index: 3;
+}
+.BattleScreen__battler.heal-victim .BattleScreen__battler-emotion {
+  animation: greenGlow 2s ease-in-out both;
+}
+
+/* Borders are removed by default for animated states */
+.BattleScreen__battler.attacking,
+.BattleScreen__battler.victim,
+.BattleScreen__battler.heal-victim {
+  border: none !important;
 }
 
 /* Enemy selection list box (replaces abilities list) */

@@ -29,6 +29,8 @@ const BattleScreen: React.FC = () => {
   const [pendingAbility, setPendingAbility] = useState<NovelV3.NovelRPGAbility | null>(null);
   const [victimId, setVictimId] = useState<string | null>(null);
   const [controlsDisabled, setControlsDisabled] = useState(false);
+  const [attackerId, setAttackerId] = useState<string | null>(null);
+  const [healMode, setHealMode] = useState(false);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const battles = useAppSelector((state) => state.novel.battles || []);
   const characters = useAppSelector((state) => state.novel.characters);
@@ -37,6 +39,9 @@ const BattleScreen: React.FC = () => {
     [],
   );
   const lastLogIndex = useRef(0);
+  const attackSpellAudio = useRef<HTMLAudioElement>(new Audio('/sound_effects/attack_spell.mp3'));
+  const buffSpellAudio = useRef<HTMLAudioElement>(new Audio('/sound_effects/buff_spell.mp3'));
+  const buttonHoverAudio = useRef<HTMLAudioElement>(new Audio('/sound_effects/button_hover.mp3'));
 
   useEffect(() => {
     if (battleLog.length > lastLogIndex.current) {
@@ -129,6 +134,10 @@ const BattleScreen: React.FC = () => {
     const outfitId = enemyRpg?.battleOutfit ?? '';
     const outfit = eneDef?.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === outfitId);
     const img = outfit?.emotions.find((em) => em.id === 'neutral')?.sources.png || '';
+    const enemyRefAbilities = enemyRpg?.abilities || [];
+    const fullEnemyAbilities = enemyRefAbilities
+      .map(({ abilityId }) => rpgConfig?.abilities?.find((a) => a.abilityId === abilityId))
+      .filter((a): a is NovelV3.NovelRPGAbility => !!a);
     return {
       enemyId: e.enemyId,
       position: e.position,
@@ -138,7 +147,7 @@ const BattleScreen: React.FC = () => {
       battleOutfit: outfitId,
       img,
       name: eneDef?.name,
-      abilities: enemyRpg?.abilities || [],
+      abilities: fullEnemyAbilities,
     };
   });
 
@@ -164,6 +173,76 @@ const BattleScreen: React.FC = () => {
     );
   };
 
+  // Add utility for enemy turn with mana filtering
+  const performEnemyTurn = () => {
+    const aliveHeroesIds = activeHeroes.filter((h) => h.currentHealth > 0).map((h) => h.characterId);
+    const aliveEnemiesList = enemies.filter((e) => e.currentHealth > 0);
+    if (aliveEnemiesList.length === 0 || aliveHeroesIds.length === 0) {
+      setControlsDisabled(false);
+      return;
+    }
+    const selectedEnemy = aliveEnemiesList[Math.floor(Math.random() * aliveEnemiesList.length)];
+    const defaultEnemyAbility: NovelV3.NovelRPGAbility = {
+      abilityId: 'melee',
+      name: 'Melee Attack',
+      description: 'Basic melee attack',
+      manaCost: 0,
+      target: 'enemy',
+      damage: selectedEnemy.stats.attack,
+    };
+    const usableAbilities = [defaultEnemyAbility, ...selectedEnemy.abilities].filter(
+      (ability) => ability.manaCost <= selectedEnemy.currentMana,
+    );
+    const abilityToUse = usableAbilities[Math.floor(Math.random() * usableAbilities.length)];
+    const targetHero = aliveHeroesIds[Math.floor(Math.random() * aliveHeroesIds.length)];
+    setAttackerId(selectedEnemy.enemyId);
+    setVictimId(targetHero);
+    attackSpellAudio.current.currentTime = 0;
+    attackSpellAudio.current.play().catch(() => {});
+    dispatch(
+      addBattleLog({
+        turn: battleState.turn,
+        actorId: selectedEnemy.enemyId,
+        actionType: abilityToUse.name,
+        targets: [targetHero],
+        result: `${abilityToUse.damage} damage`,
+      }),
+    );
+    dispatch(
+      addMana({
+        targetId: selectedEnemy.enemyId,
+        amount: -abilityToUse.manaCost,
+        maxValue: selectedEnemy.stats.mana,
+        isEnemy: true,
+      }),
+    );
+    setTimeout(() => {
+      dispatch(
+        addHealth({
+          targetId: targetHero,
+          amount: -abilityToUse.damage,
+          maxValue: party.find((h) => h.characterId === targetHero)!.stats.health,
+          isEnemy: false,
+        }),
+      );
+      dispatch(moveNextTurn());
+      setVictimId(null);
+      setAttackerId(null);
+      setControlsDisabled(false);
+    }, ABILITY_ANIMATION_DURATION);
+  };
+
+  // Handler for skipping hero turn
+  const handleDoNothing = () => {
+    setControlsDisabled(true);
+    dispatch(moveNextTurn());
+    setPendingAbility(null);
+    setVictimId(null);
+    setAttackerId(null);
+    setHealMode(false);
+    performEnemyTurn();
+  };
+
   return (
     <div className="BattleScreen">
       {/* Battle music via MusicPlayer */}
@@ -183,7 +262,12 @@ const BattleScreen: React.FC = () => {
       <div className="BattleScreen__battlefield">
         <div className="BattleScreen__party-group">
           {party.map((h) => (
-            <div key={h.characterId} className={`BattleScreen__battler ${h.characterId === victimId ? 'victim' : ''}`}>
+            <div
+              key={h.characterId}
+              className={`BattleScreen__battler ${h.characterId === attackerId ? 'attacking' : ''} ${
+                h.characterId === victimId ? (healMode ? 'heal-victim' : 'victim') : ''
+              }`}
+            >
               <EmotionRenderer
                 className="BattleScreen__battler-emotion"
                 assetLinkLoader={assetLinkLoader}
@@ -202,7 +286,12 @@ const BattleScreen: React.FC = () => {
           {enemies
             .filter((e) => e.currentHealth > 0)
             .map((e) => (
-              <div key={e.enemyId} className={`BattleScreen__battler ${e.enemyId === victimId ? 'victim' : ''}`}>
+              <div
+                key={e.enemyId}
+                className={`BattleScreen__battler ${e.enemyId === attackerId ? 'attacking' : ''} ${
+                  e.enemyId === victimId ? (healMode ? 'heal-victim' : 'victim') : ''
+                }`}
+              >
                 <EmotionRenderer
                   className="BattleScreen__battler-emotion"
                   assetLinkLoader={assetLinkLoader}
@@ -328,7 +417,11 @@ const BattleScreen: React.FC = () => {
             <div className="BattleScreen__abilities-panel">
               {pendingAbility ? (
                 <>
-                  <div className="BattleScreen__enemy-select-back" onClick={() => setPendingAbility(null)}>
+                  <div
+                    className="BattleScreen__enemy-select-back"
+                    onClick={() => setPendingAbility(null)}
+                    onMouseEnter={() => buttonHoverAudio.current.play()}
+                  >
                     Go Back
                   </div>
                   {pendingAbility.target === 'enemy'
@@ -338,9 +431,12 @@ const BattleScreen: React.FC = () => {
                           <div
                             key={e.enemyId}
                             className="BattleScreen__ability-row target"
+                            onMouseEnter={() => buttonHoverAudio.current.play()}
                             onClick={() => {
                               // Disable controls on attack start
                               setControlsDisabled(true);
+                              attackSpellAudio.current.currentTime = 0;
+                              attackSpellAudio.current.play().catch(() => {});
                               const heroId = party[currentHeroIdx].characterId;
                               const enemyId = e.enemyId;
                               // Flicker enemy before damage
@@ -411,34 +507,7 @@ const BattleScreen: React.FC = () => {
                                   return;
                                 }
                                 // Schedule counterattack from this enemy
-                                const targetHero =
-                                  aliveHeroes[Math.floor(Math.random() * aliveHeroes.length)].characterId;
-                                setVictimId(targetHero);
-                                const enemyStats = rpgConfig?.enemies.find((er) => er.characterId === enemyId)?.stats;
-                                const damage = enemyStats?.attack || 0;
-                                dispatch(
-                                  addBattleLog({
-                                    turn: battleState.turn,
-                                    actorId: enemyId,
-                                    actionType: 'Melee Attack',
-                                    targets: [targetHero],
-                                    result: `${damage} damage`,
-                                  }),
-                                );
-                                setTimeout(() => {
-                                  dispatch(
-                                    addHealth({
-                                      targetId: targetHero,
-                                      amount: -damage,
-                                      maxValue: party.find((h) => h.characterId === targetHero)!.stats.health,
-                                      isEnemy: false,
-                                    }),
-                                  );
-                                  dispatch(moveNextTurn());
-                                  setVictimId(null);
-                                  // Re-enable controls after counterattack
-                                  setControlsDisabled(false);
-                                }, ABILITY_ANIMATION_DURATION);
+                                performEnemyTurn();
                               }, ABILITY_ANIMATION_DURATION);
                             }}
                           >
@@ -454,9 +523,15 @@ const BattleScreen: React.FC = () => {
                           <div
                             key={h.characterId}
                             className="BattleScreen__ability-row target"
+                            onMouseEnter={() => buttonHoverAudio.current.play()}
                             onClick={() => {
                               // Disable controls on ability start
                               setControlsDisabled(true);
+                              // Set healing animation state
+                              setAttackerId(party[currentHeroIdx].characterId);
+                              setHealMode(true);
+                              buffSpellAudio.current.currentTime = 0;
+                              buffSpellAudio.current.play().catch(() => {});
                               const heroId = party[currentHeroIdx].characterId;
                               const allyId = h.characterId;
                               const ability = pendingAbility!;
@@ -490,41 +565,15 @@ const BattleScreen: React.FC = () => {
                                 );
                                 dispatch(moveNextTurn());
                                 setPendingAbility(null);
+                                // Clear heal animation
                                 setVictimId(null);
+                                setAttackerId(null);
+                                setHealMode(false);
                                 // Counterattack
                                 const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
                                 const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
                                 if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
-                                  const targetHero =
-                                    aliveHeroes[Math.floor(Math.random() * aliveHeroes.length)].characterId;
-                                  const enemy = activeEnemies[Math.floor(Math.random() * activeEnemies.length)];
-                                  setVictimId(targetHero);
-                                  setTimeout(() => {
-                                    const dmg =
-                                      rpgConfig?.enemies.find((er) => er.characterId === enemy.enemyId)?.stats.attack ||
-                                      0;
-                                    dispatch(
-                                      addHealth({
-                                        targetId: targetHero,
-                                        amount: -dmg,
-                                        maxValue: party.find((h) => h.characterId === targetHero)!.stats.health,
-                                        isEnemy: false,
-                                      }),
-                                    );
-                                    dispatch(
-                                      addBattleLog({
-                                        turn: battleState.turn,
-                                        actorId: enemy.enemyId,
-                                        actionType: 'Melee Attack',
-                                        targets: [targetHero],
-                                        result: `${dmg} damage`,
-                                      }),
-                                    );
-                                    dispatch(moveNextTurn());
-                                    setVictimId(null);
-                                    // Re-enable controls after counterattack
-                                    setControlsDisabled(false);
-                                  }, ABILITY_ANIMATION_DURATION);
+                                  performEnemyTurn();
                                 } else {
                                   // No enemies left, re-enable controls immediately
                                   setControlsDisabled(false);
@@ -540,28 +589,50 @@ const BattleScreen: React.FC = () => {
                         ))}
                 </>
               ) : (
-                [
-                  {
-                    abilityId: 'melee',
-                    name: 'Melee Attack',
-                    description: 'Basic melee attack',
-                    manaCost: 0,
-                    target: 'enemy',
-                    damage: party[currentHeroIdx]?.stats.attack ?? 0,
-                  } as NovelV3.NovelRPGAbility,
-                ]
-                  .concat(party[currentHeroIdx].abilities || [])
-                  .map((ability, idx) => (
-                    <div key={idx} className="BattleScreen__ability-row" onClick={() => setPendingAbility(ability)}>
-                      <span className={`ability-name ${ability.target === 'ally' ? 'heal' : 'attack'}`}>
-                        {ability.name}
-                      </span>
-                      <div className="ability-details">
-                        <span className="ability-description">{ability.description}</span>
-                        <span className="ability-cost">MP: {ability.manaCost}</span>
-                      </div>
-                    </div>
-                  ))
+                <>
+                  {[
+                    {
+                      abilityId: 'melee',
+                      name: 'Melee Attack',
+                      description: 'Basic melee attack',
+                      manaCost: 0,
+                      target: 'enemy',
+                      damage: party[currentHeroIdx]?.stats.attack ?? 0,
+                    } as NovelV3.NovelRPGAbility,
+                  ]
+                    .concat(party[currentHeroIdx].abilities || [])
+                    .map((ability, idx) => {
+                      const disabled = ability.manaCost > party[currentHeroIdx].currentMana;
+                      return (
+                        <div
+                          key={idx}
+                          className={`BattleScreen__ability-row ${disabled ? 'disabled' : ''}`}
+                          onClick={() => {
+                            if (!disabled) setPendingAbility(ability);
+                          }}
+                          onMouseEnter={() => {
+                            if (!disabled) buttonHoverAudio.current.play();
+                          }}
+                        >
+                          <span className={`ability-name ${ability.target === 'ally' ? 'heal' : 'attack'}`}>
+                            {ability.name}
+                          </span>
+                          <div className="ability-details">
+                            <span className="ability-description">{ability.description}</span>
+                            <span className="ability-cost">MP: {ability.manaCost}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  <div
+                    key="do-nothing"
+                    className="BattleScreen__ability-row do-nothing"
+                    onClick={handleDoNothing}
+                    onMouseEnter={() => buttonHoverAudio.current.play()}
+                  >
+                    <span className="ability-name">Do Nothing</span>
+                  </div>
+                </>
               )}
             </div>
           </div>
