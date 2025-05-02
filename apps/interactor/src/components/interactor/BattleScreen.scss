@@ -133,6 +133,12 @@
   overflow: hidden;
 }
 
+/* Disabled state styling */
+.BattleScreen__controls.disabled {
+  filter: grayscale(80%) opacity(60%);
+  pointer-events: none;
+}
+
 /* Player section: party + stats + abilities */
 .BattleScreen__controls-player {
   display: flex;
