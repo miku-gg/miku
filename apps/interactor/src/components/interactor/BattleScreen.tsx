@@ -7,6 +7,7 @@ import ProgressiveImage from 'react-progressive-graceful-image';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { GiSwordman, GiShield, GiSpellBook, GiMagicSwirl } from 'react-icons/gi';
+import { BsDropletHalf } from 'react-icons/bs';
 import {
   interactionStart,
   clearCurrentBattle,
@@ -19,6 +20,12 @@ import './BattleScreen.scss';
 import MusicPlayer from './MusicPlayer';
 
 const ABILITY_ANIMATION_DURATION = 1000;
+
+const playSoundEffect = (audio: 'button_hover' | 'attack_spell' | 'buff_spell') => {
+  const audioElement = new Audio(`/sound_effects/${audio}.mp3`);
+  audioElement.currentTime = 0;
+  audioElement.play().catch(() => {});
+};
 
 const BattleScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -39,9 +46,6 @@ const BattleScreen: React.FC = () => {
     [],
   );
   const lastLogIndex = useRef(0);
-  const attackSpellAudio = useRef<HTMLAudioElement>(new Audio('/sound_effects/attack_spell.mp3'));
-  const buffSpellAudio = useRef<HTMLAudioElement>(new Audio('/sound_effects/buff_spell.mp3'));
-  const buttonHoverAudio = useRef<HTMLAudioElement>(new Audio('/sound_effects/button_hover.mp3'));
 
   useEffect(() => {
     if (battleLog.length > lastLogIndex.current) {
@@ -197,8 +201,7 @@ const BattleScreen: React.FC = () => {
     const targetHero = aliveHeroesIds[Math.floor(Math.random() * aliveHeroesIds.length)];
     setAttackerId(selectedEnemy.enemyId);
     setVictimId(targetHero);
-    attackSpellAudio.current.currentTime = 0;
-    attackSpellAudio.current.play().catch(() => {});
+    playSoundEffect('attack_spell');
     dispatch(
       addBattleLog({
         turn: battleState.turn,
@@ -414,13 +417,13 @@ const BattleScreen: React.FC = () => {
               </div>
               <Tooltip id="stat-label-tooltip" place="top" />
             </div>
-            <div className="BattleScreen__abilities-panel">
+            <div className="BattleScreen__abilities-panel scrollbar">
               {pendingAbility ? (
                 <>
                   <div
                     className="BattleScreen__enemy-select-back"
                     onClick={() => setPendingAbility(null)}
-                    onMouseEnter={() => buttonHoverAudio.current.play()}
+                    onMouseEnter={() => playSoundEffect('button_hover')}
                   >
                     Go Back
                   </div>
@@ -431,12 +434,11 @@ const BattleScreen: React.FC = () => {
                           <div
                             key={e.enemyId}
                             className="BattleScreen__ability-row target"
-                            onMouseEnter={() => buttonHoverAudio.current.play()}
+                            onMouseEnter={() => playSoundEffect('button_hover')}
                             onClick={() => {
                               // Disable controls on attack start
                               setControlsDisabled(true);
-                              attackSpellAudio.current.currentTime = 0;
-                              attackSpellAudio.current.play().catch(() => {});
+                              playSoundEffect('attack_spell');
                               const heroId = party[currentHeroIdx].characterId;
                               const enemyId = e.enemyId;
                               // Flicker enemy before damage
@@ -523,15 +525,14 @@ const BattleScreen: React.FC = () => {
                           <div
                             key={h.characterId}
                             className="BattleScreen__ability-row target"
-                            onMouseEnter={() => buttonHoverAudio.current.play()}
+                            onMouseEnter={() => playSoundEffect('button_hover')}
                             onClick={() => {
                               // Disable controls on ability start
                               setControlsDisabled(true);
                               // Set healing animation state
                               setAttackerId(party[currentHeroIdx].characterId);
                               setHealMode(true);
-                              buffSpellAudio.current.currentTime = 0;
-                              buffSpellAudio.current.play().catch(() => {});
+                              playSoundEffect('buff_spell');
                               const heroId = party[currentHeroIdx].characterId;
                               const allyId = h.characterId;
                               const ability = pendingAbility!;
@@ -611,7 +612,7 @@ const BattleScreen: React.FC = () => {
                             if (!disabled) setPendingAbility(ability);
                           }}
                           onMouseEnter={() => {
-                            if (!disabled) buttonHoverAudio.current.play();
+                            if (!disabled) playSoundEffect('button_hover');
                           }}
                         >
                           <span className={`ability-name ${ability.target === 'ally' ? 'heal' : 'attack'}`}>
@@ -619,7 +620,10 @@ const BattleScreen: React.FC = () => {
                           </span>
                           <div className="ability-details">
                             <span className="ability-description">{ability.description}</span>
-                            <span className="ability-cost">MP: {ability.manaCost}</span>
+                            <span className="ability-cost">
+                              <BsDropletHalf />
+                              {ability.manaCost}
+                            </span>
                           </div>
                         </div>
                       );
@@ -628,9 +632,15 @@ const BattleScreen: React.FC = () => {
                     key="do-nothing"
                     className="BattleScreen__ability-row do-nothing"
                     onClick={handleDoNothing}
-                    onMouseEnter={() => buttonHoverAudio.current.play()}
+                    onMouseEnter={() => playSoundEffect('button_hover')}
                   >
                     <span className="ability-name">Do Nothing</span>
+                    <div className="ability-details">
+                      <span className="ability-description">Skip your turn</span>
+                      <span className="ability-cost">
+                        <BsDropletHalf />0
+                      </span>
+                    </div>
                   </div>
                 </>
               )}

@@ -323,7 +323,8 @@
 
 .BattleScreen__ability-row {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   padding: 8px 12px;
   background: rgba(0, 0, 0, 0.4);
   margin-bottom: 8px;
@@ -366,6 +367,7 @@
   justify-content: space-between;
   font-size: 12px;
   text-align: left;
+  align-items: center;
 }
 
 .BattleScreen__ability-row .ability-description {
@@ -376,6 +378,14 @@
 .BattleScreen__ability-row .ability-cost {
   color: #88f;
   margin-left: 8px;
+  gap: 2px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+
+  svg {
+    font-size: 11px;
+  }
 }
 
 .BattleScreen__ability-row .target-name {
@@ -636,7 +646,6 @@
 }
 
 .BattleScreen__log {
-  background: rgba(0, 0, 0, 0.7);
   padding: 8px 12px;
   border-radius: 4px;
   margin-bottom: 4px;
@@ -645,6 +654,7 @@
   display: flex;
   align-items: center;
   pointer-events: none;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
 }
 
 .BattleScreen__log.new {
