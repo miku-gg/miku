@@ -47,6 +47,8 @@ export interface NovelScene {
     triggered?: boolean;
   };
   indicators?: NovelIndicator[];
+  /** Optional battle to start when this scene begins */
+  battleAtBeginning?: string;
 }
 
 export interface NovelCharacterOutfit {

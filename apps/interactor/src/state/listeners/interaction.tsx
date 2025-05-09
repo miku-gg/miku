@@ -35,7 +35,7 @@ import { removeObjective } from '../slices/objectivesSlice';
 import { toast } from 'react-toastify';
 import { GiOpenChest } from 'react-icons/gi';
 import { novelActionToStateAction } from '../mutations';
-import type { BattleState } from '../versioning/v3.state';
+import { getInitialBattleState } from '../utils/battleUtils';
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -382,35 +382,11 @@ const interactionEffect = async (
                   );
                   break;
                 case NovelV3.NovelActionType.BATTLE_START: {
-                  // Initialize battle state when a battle starts
                   const battleId = action.params.battleId;
                   const battleConfig = state.novel.battles?.find((b) => b.battleId === battleId);
                   const rpgConfig = state.novel.rpg;
                   if (battleConfig && rpgConfig) {
-                    const activeHeroes = rpgConfig.heroes
-                      .filter((h) => h.isInParty)
-                      .map((h) => ({
-                        characterId: h.characterId,
-                        currentHealth: h.stats.health,
-                        currentMana: h.stats.mana,
-                      }));
-                    const activeEnemies = battleConfig.enemies.map((e, index) => {
-                      const enemyCfg = rpgConfig.enemies.find((en) => en.characterId === e.enemyId);
-                      return {
-                        enemyId: e.enemyId,
-                        position: index,
-                        currentHealth: enemyCfg?.stats.health || 0,
-                        currentMana: enemyCfg?.stats.mana || 0,
-                      };
-                    });
-                    const initialBattleState: BattleState = {
-                      battleId: battleConfig.battleId,
-                      turn: 1,
-                      activeHeroes,
-                      activeEnemies,
-                      status: 'intro',
-                      battleLog: [],
-                    };
+                    const initialBattleState = getInitialBattleState(battleConfig, rpgConfig);
                     dispatch(setCurrentBattle({ state: initialBattleState, isActive: false }));
                   }
                   break;
@@ -528,6 +504,21 @@ export const interactionListenerMiddleware = createListenerMiddleware();
 interactionListenerMiddleware.startListening({
   actionCreator: interactionStart,
   effect: async (action, listenerApi) => {
+    // Trigger battle at scene start if configured
+    const state = listenerApi.getState() as RootState;
+    if (action.payload.isNewScene) {
+      const scene = state.novel.scenes.find((s) => s.id === action.payload.sceneId);
+      const battleId = scene?.battleAtBeginning;
+      if (battleId) {
+        const battleConfig = state.novel.battles?.find((b) => b.battleId === battleId);
+        const rpgConfig = state.novel.rpg;
+        if (battleConfig && rpgConfig) {
+          const initialBattleState = getInitialBattleState(battleConfig, rpgConfig);
+          listenerApi.dispatch(setCurrentBattle({ state: initialBattleState, isActive: false }));
+        }
+      }
+    }
+    // Proceed with normal interaction effect
     await interactionEffect(
       listenerApi.dispatch,
       listenerApi.getState() as RootState,
