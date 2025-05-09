@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Rnd } from 'react-rnd';
 import { useAppContext } from '../../App.context';
-import { useAppSelector } from '../../state/store';
+import { useAppDispatch, useAppSelector } from '../../state/store';
 import './ChatBox.scss';
 import InputBox from './InputBox';
 import ResponseBox from './ResponseBox';
 import { ResponseFormat } from '../../state/slices/settingsSlice';
+import { activateBattle } from '../../state/slices/narrationSlice';
 
 const ChatBox = (): JSX.Element | null => {
   const { isMobileApp } = useAppContext();
@@ -15,7 +16,8 @@ const ChatBox = (): JSX.Element | null => {
   const isDraggable = useAppSelector((state) => state.settings.chatBox.isDraggable);
   const centeredPositionX = (window.innerWidth - window.innerWidth * 0.75) / 2;
   const isVnStyle = useAppSelector((state) => state.settings.text.responseFormat === ResponseFormat.VNStyle);
-
+  const currentBattle = useAppSelector((state) => state.narration.currentBattle);
+  const dispatch = useAppDispatch();
   const handleTouch = () => {
     const currentTime = new Date().getTime();
     const tapTimeDiff = currentTime - lastTapTime;
@@ -30,12 +32,27 @@ const ChatBox = (): JSX.Element | null => {
 
     setLastTapTime(currentTime);
   };
+  const inputboxNode =
+    currentBattle && !currentBattle.isActive ? (
+      <div className="ChatBox__start-battle-container">
+        <button
+          className="ChatBox__start-battle-button"
+          onClick={() => {
+            dispatch(activateBattle());
+          }}
+        >
+          Start Battle
+        </button>
+      </div>
+    ) : (
+      <InputBox />
+    );
 
   if (isMobileApp || window.innerWidth < 820) {
     return (
       <div className={`ChatBox ${isExpanded && !isVnStyle ? 'expanded' : ''}`} onTouchEnd={handleTouch}>
         <ResponseBox />
-        <InputBox />
+        {inputboxNode}
       </div>
     );
   } else {
@@ -55,7 +72,7 @@ const ChatBox = (): JSX.Element | null => {
           enableResizing={isDraggable && !isMobileApp}
         >
           <ResponseBox />
-          <InputBox />
+          {inputboxNode}
         </Rnd>
       </div>
     );

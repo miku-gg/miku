@@ -510,7 +510,8 @@
     filter: none;
   }
   50% {
-    filter: brightness(1.5);
+    // filter: grayscale(100%) sepia(100%) hue-rotate(50deg);
+    filter: brightness(1.2);
   }
 }
 
@@ -520,41 +521,21 @@
   100% {
     filter: none;
   }
-  10%,
-  30%,
-  50%,
-  70%,
-  90% {
+  50% {
     filter: grayscale(100%) sepia(100%) hue-rotate(-50deg);
-  }
-  20%,
-  40%,
-  60%,
-  80% {
-    filter: none;
   }
 }
 
 /* Attacking character highlight (only emotion) */
-.BattleScreen__battler.attacking {
+.BattleScreen__battler.heal-victim {
   z-index: 3;
-  animation: whiten 2s ease-in-out both;
+  animation: whiten 0.5s ease-in-out both;
 }
 
 /* Victim enemy highlight (only emotion) */
 .BattleScreen__battler.victim {
   z-index: 3;
-  animation: flickerRed 2s linear both;
-}
-
-/* Animate only the emotion image when attacking */
-.BattleScreen__battler.attacking .BattleScreen__battler-emotion {
-  animation: whiten 2s ease-in-out both;
-}
-
-/* Animate only the emotion image when being attacked */
-.BattleScreen__battler.victim .BattleScreen__battler-emotion {
-  animation: flickerRed 2s linear both;
+  animation: flickerRed 0.5s linear both, shake 0.5s linear both;
 }
 
 /* Green glow filter for healing targets */
@@ -654,7 +635,7 @@
   display: flex;
   align-items: center;
   pointer-events: none;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  text-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
 }
 
 .BattleScreen__log.new {
@@ -665,7 +646,7 @@
 }
 
 /* log text colors */
-.BattleScreen__log .log-actor {
+.BattleScreen__log .hero {
   color: $color-gold;
   font-weight: bold;
   margin-right: 4px;
@@ -675,8 +656,11 @@
   font-style: italic;
   margin: 0 4px;
 }
-.BattleScreen__log .log-target {
-  color: $color-red;
+.BattleScreen__log .heal {
+  color: $color-blue;
+}
+.BattleScreen__log .enemy {
+  color: #ccc;
   font-weight: bold;
   margin-left: 4px;
 }
@@ -708,4 +692,126 @@
   padding: 16px;
   z-index: 3;
   height: 100px;
+}
+
+// Outcome modal default styling
+.BattleScreen__modal {
+  position: relative;
+  z-index: 10;
+  padding: 24px;
+  border-radius: 8px;
+  text-align: center;
+  color: #fff;
+}
+
+// Victory scenario: blur background, green modal
+.BattleScreen.victory .BattleScreen__background,
+.BattleScreen.victory .BattleScreen__battlefield,
+.BattleScreen.victory .BattleScreen__controls {
+  filter: blur(4px);
+}
+.BattleScreen.victory .BattleScreen__modal {
+  background-color: rgba(0, 128, 0, 0.9);
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+}
+
+// Defeat scenario: blur+grayscale background, red modal
+.BattleScreen.defeat .BattleScreen__background,
+.BattleScreen.defeat .BattleScreen__battlefield,
+.BattleScreen.defeat .BattleScreen__controls {
+  filter: blur(4px) grayscale(80%);
+}
+.BattleScreen.defeat .BattleScreen__modal {
+  background-color: rgba(128, 0, 0, 0.9);
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+}
+
+// Modal buttons container
+.BattleScreen__modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.BattleScreen__finish-modal.Modal {
+  background: transparent;
+  // box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+}
+
+// Text animation for Victory and Defeat messages
+@keyframes shimmer {
+  0% {
+    background-position: -200px;
+  }
+  100% {
+    background-position: 200px;
+  }
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.BattleScreen__modal h2 {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 4rem;
+  margin: 0;
+}
+
+.BattleScreen__modal h2.victory-text {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 400%;
+  animation: shimmer 2s ease-in-out infinite, scaleUp 1.5s ease-out;
+  text-shadow: 0 0 1px rgba(249, 212, 35, 0.8), 0 0 5px rgba(249, 212, 35, 0.6), 0 0 20px rgba(249, 212, 35, 0.4);
+}
+
+.BattleScreen__modal h2.defeat-text {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 400%;
+  animation: shimmer 2s ease-in-out infinite, scaleUp 1.5s ease-out;
+  text-shadow: 0 0 1px rgba(255, 0, 0, 0.8), 0 0 5px rgba(255, 0, 0, 0.6), 0 0 20px rgba(255, 0, 0, 0.4);
+}
+
+.BattleScreen__retry-button {
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+}
+
+.BattleScreen__continue-button {
+  // background: rgba(0, 255, 0, 0.5);
+  background: $background-color-dark;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
 }

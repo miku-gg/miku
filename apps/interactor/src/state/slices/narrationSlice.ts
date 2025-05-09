@@ -591,6 +591,8 @@ const narrationSlice = createSlice({
         actionType: string;
         targets: string[];
         result: string;
+        actorType: 'hero' | 'enemy';
+        targetType: 'hero' | 'enemy';
       }>,
     ) {
       const cb = state.currentBattle;

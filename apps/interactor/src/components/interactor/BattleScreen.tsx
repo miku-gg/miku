@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from '../../state/store';
 import { useAppContext } from '../../App.context';
 import { selectCurrentScene } from '../../state/selectors';
-import { Modal, Button, Tooltip } from '@mikugg/ui-kit';
+import { Modal, Tooltip } from '@mikugg/ui-kit';
 import ProgressiveImage from 'react-progressive-graceful-image';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
@@ -11,6 +11,7 @@ import { BsDropletHalf } from 'react-icons/bs';
 import {
   interactionStart,
   clearCurrentBattle,
+  setCurrentBattle,
   addHealth,
   addMana,
   addBattleLog,
@@ -21,7 +22,7 @@ import MusicPlayer from './MusicPlayer';
 
 const ABILITY_ANIMATION_DURATION = 1000;
 
-const playSoundEffect = (audio: 'button_hover' | 'attack_spell' | 'buff_spell') => {
+const playSoundEffect = (audio: 'button_hover' | 'attack_spell' | 'buff_spell' | 'win' | 'lose') => {
   const audioElement = new Audio(`/sound_effects/${audio}.mp3`);
   audioElement.currentTime = 0;
   audioElement.play().catch(() => {});
@@ -42,9 +43,16 @@ const BattleScreen: React.FC = () => {
   const battles = useAppSelector((state) => state.novel.battles || []);
   const characters = useAppSelector((state) => state.novel.characters);
   const rpgConfig = useAppSelector((state) => state.novel.rpg);
-  const [uiLogs, setUiLogs] = useState<{ id: string; actorName: string; abilityName: string; targetName: string }[]>(
-    [],
-  );
+  const [uiLogs, setUiLogs] = useState<
+    {
+      id: string;
+      actorName: string;
+      abilityName: string;
+      targetName: string;
+      actorType: 'hero' | 'enemy';
+      targetType: 'hero' | 'enemy';
+    }[]
+  >([]);
   const lastLogIndex = useRef(0);
 
   useEffect(() => {
@@ -59,6 +67,8 @@ const BattleScreen: React.FC = () => {
         actorName,
         abilityName,
         targetName,
+        actorType: entry.actorType,
+        targetType: entry.targetType,
       };
       setUiLogs((logs) => {
         const next = logs.slice(-1).concat(uiEntry);
@@ -71,17 +81,23 @@ const BattleScreen: React.FC = () => {
     }
   }, [battleLog, characters]);
 
+  // Play win/lose sound when battle ends (hook called unconditionally)
+  const isVictory = currentBattle?.state.status === 'victory';
+  const isDefeat = currentBattle?.state.status === 'defeat';
+  useEffect(() => {
+    if (isVictory) playSoundEffect('win');
+    if (isDefeat) playSoundEffect('lose');
+  }, [isVictory, isDefeat]);
+
   if (!currentBattle) {
     return null;
   }
 
   const { state: battleState } = currentBattle;
-  const { battleId, status, turn, activeHeroes, activeEnemies } = battleState;
-  const isVictory = status === 'victory';
-  const isDefeat = status === 'defeat';
+  const { battleId, turn, activeHeroes, activeEnemies } = battleState;
+  const battleConfig = battles.find((b) => b.battleId === battleId);
 
   // Background
-  const battleConfig = battles.find((b) => b.battleId === battleId);
   const bg = backgrounds.find((b) => b.id === battleConfig?.backgroundId);
 
   // Prepare party and enemies
@@ -159,6 +175,33 @@ const BattleScreen: React.FC = () => {
   const heroCount = party.length || 1;
   const currentHeroIdx = (turn - 1) % heroCount;
 
+  // Handler for retrying the battle if allowed
+  const handleRetry = () => {
+    if (battleConfig && rpgConfig) {
+      const initialHeroes = rpgConfig.heroes
+        .filter((h) => h.isInParty)
+        .map((h) => ({ characterId: h.characterId, currentHealth: h.stats.health, currentMana: h.stats.mana }));
+      const initialEnemies = battleConfig.enemies.map((e, idx) => {
+        const enemyCfg = rpgConfig.enemies.find((en) => en.characterId === e.enemyId);
+        return {
+          enemyId: e.enemyId,
+          position: idx,
+          currentHealth: enemyCfg?.stats.health || 0,
+          currentMana: enemyCfg?.stats.mana || 0,
+        };
+      });
+      const initialBattleState: NovelV3.BattleState = {
+        battleId: battleConfig.battleId,
+        turn: 1,
+        activeHeroes: initialHeroes,
+        activeEnemies: initialEnemies,
+        status: 'intro',
+        battleLog: [],
+      };
+      dispatch(setCurrentBattle({ state: initialBattleState, isActive: true }));
+    }
+  };
+
   const handleContinue = () => {
     const nextSceneId = isVictory ? battleConfig?.nextSceneIdWin : battleConfig?.nextSceneIdLoss;
     dispatch(clearCurrentBattle());
@@ -207,6 +250,8 @@ const BattleScreen: React.FC = () => {
         turn: battleState.turn,
         actorId: selectedEnemy.enemyId,
         actionType: abilityToUse.name,
+        actorType: 'enemy',
+        targetType: 'hero',
         targets: [targetHero],
         result: `${abilityToUse.damage} damage`,
       }),
@@ -247,7 +292,7 @@ const BattleScreen: React.FC = () => {
   };
 
   return (
-    <div className="BattleScreen">
+    <div className={`BattleScreen ${isVictory ? 'victory' : isDefeat ? 'defeat' : ''}`}>
       {/* Battle music via MusicPlayer */}
       {/* Background */}
       {bg && (
@@ -473,6 +518,8 @@ const BattleScreen: React.FC = () => {
                                   actionType: ability.name,
                                   targets: [enemyId],
                                   result: `${finalDamage} damage`,
+                                  actorType: 'hero',
+                                  targetType: 'enemy',
                                 }),
                               );
                               // Capture initial HP before applying damage
@@ -545,6 +592,8 @@ const BattleScreen: React.FC = () => {
                                   actionType: ability.name,
                                   targets: [allyId],
                                   result: `Healed ${ability.damage}`,
+                                  actorType: 'hero',
+                                  targetType: 'hero',
                                 }),
                               );
                               dispatch(
@@ -671,24 +720,37 @@ const BattleScreen: React.FC = () => {
       </div>
       {/* Outcome modal */}
       {(isVictory || isDefeat) && (
-        <Modal opened={true} shouldCloseOnOverlayClick={false}>
+        <Modal opened={true} shouldCloseOnOverlayClick={false} className="BattleScreen__finish-modal">
           <div className="BattleScreen__modal">
-            <h2>{isVictory ? 'Victory!' : 'Defeat...'}</h2>
-            <Button theme="primary" onClick={handleContinue}>
-              Continue
-            </Button>
+            <h2 className={isVictory ? 'victory-text' : 'defeat-text'}>{isVictory ? 'Victory!' : 'Defeat...'}</h2>
+            <div className="BattleScreen__modal-buttons">
+              {battleConfig?.allowRetry && isDefeat && (
+                <button onClick={handleRetry} className="BattleScreen__retry-button">
+                  Retry
+                </button>
+              )}
+              <button onClick={handleContinue} className="BattleScreen__continue-button">
+                Continue
+              </button>
+            </div>
           </div>
         </Modal>
       )}
       {/* Battle log messages */}
       <div className="BattleScreen__log-container">
-        {uiLogs.map((log, index) => (
-          <div key={log.id} className={`BattleScreen__log ${index === uiLogs.length - 1 ? 'new' : 'old'}`}>
-            <span className="log-actor">{log.actorName}</span> used{' '}
-            <span className="log-ability">{log.abilityName}</span> on{' '}
-            <span className="log-target">{log.targetName}</span>
-          </div>
-        ))}
+        {uiLogs.map((log, index) => {
+          const selfUse = log.targetName === log.actorName;
+          return (
+            <div key={log.id} className={`BattleScreen__log ${index === uiLogs.length - 1 ? 'new' : 'old'}`}>
+              <span className={`log-actor ${log.actorType === 'hero' ? 'hero' : 'enemy'}`}>{log.actorName}</span> used{' '}
+              <span className={`log-ability ${log.actorType === log.targetType ? 'heal' : ''}`}>{log.abilityName}</span>{' '}
+              {selfUse ? '' : 'on '}
+              <span className={`log-target ${log.targetType === 'hero' ? 'hero' : 'enemy'}`}>
+                {selfUse ? '' : log.targetName}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

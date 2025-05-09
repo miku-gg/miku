@@ -134,6 +134,10 @@ export interface BattleState {
     targets: string[];
     /** Result of the action (damage dealt, effects applied, etc.) */
     result: string;
+    /** Type of target (hero, enemy) */
+    actorType: 'hero' | 'enemy';
+    /** Type of target (hero, enemy) */
+    targetType: 'hero' | 'enemy';
   }[];
 }
 
@@ -148,10 +152,6 @@ export interface NovelBattle {
   music: {
     /** Music track ID for the main battle theme */
     battleId: string;
-    /** Music track ID for the victory theme */
-    victoryId?: string;
-    /** Music track ID for the defeat theme */
-    defeatId?: string;
   };
 
   /** Battle introduction text or dialogue */
