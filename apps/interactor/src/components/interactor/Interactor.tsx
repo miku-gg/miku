@@ -21,7 +21,11 @@ import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
-import { markCurrentCutsceneAsSeen, setHasPlayedGlobalStartCutscene } from '../../state/slices/narrationSlice';
+import {
+  markCurrentCutsceneAsSeen,
+  setHasPlayedGlobalStartCutscene,
+  startBattle,
+} from '../../state/slices/narrationSlice';
 import IndicatorsDisplay from '../indicators-display/IndicatorsDisplay';
 import StartSelector from '../start-selector/StartSelector';
 import BattleScreen from './BattleScreen';
@@ -36,8 +40,17 @@ const Interactor = () => {
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
+  const battles = useAppSelector((state) => state.novel.battles);
 
   if (currentBattle?.isActive) {
+    const battleConfig = battles?.find((b) => b.battleId === currentBattle.state.battleId);
+    if (currentBattle.state.status === 'intro' && battleConfig?.introCutsceneId) {
+      return (
+        <div className="Interactor__cutscene">
+          <CutsceneDisplayer cutsceneId={battleConfig.introCutsceneId} onEndDisplay={() => dispatch(startBattle())} />
+        </div>
+      );
+    }
     return <BattleScreen />;
   }
   if (!scene) {

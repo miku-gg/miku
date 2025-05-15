@@ -12,6 +12,7 @@ interface TextFormatterProps {
   text: string;
   children?: React.ReactNode;
   noAnimation?: boolean;
+  doNotSplit?: boolean;
 }
 
 interface TextElement {
@@ -140,7 +141,7 @@ const useAnimatedText = (text: string) => {
   return { displayedText, isAnimationComplete, skipAnimation };
 };
 
-export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, children, noAnimation }) => {
+export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, children, noAnimation, doNotSplit }) => {
   const fontSize = useAppSelector((state) => state.settings.text.fontSize);
   const textFormatterDiv = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
@@ -148,6 +149,9 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, childr
   const { displayedText, isAnimationComplete, skipAnimation } = useAnimatedText(text);
 
   const elements = useMemo(() => {
+    if (doNotSplit) {
+      return <q key={0}>{displayedText}</q>;
+    }
     const parsedElements = parseTextElements(displayedText);
     return parsedElements.map((element, index) => {
       if (element.type === 'dialogue') {

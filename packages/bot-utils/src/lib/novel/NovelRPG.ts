@@ -181,4 +181,13 @@ export interface NovelBattle {
 
   /** Allow the player to retry the battle */
   allowRetry: boolean;
+
+  /** Optional cutscene to play before the battle starts */
+  introCutsceneId?: string;
+
+  /** Optional cutscene to play when the player wins the battle */
+  winCutsceneId?: string;
+
+  /** Optional cutscene to play when the player loses the battle */
+  lossCutsceneId?: string;
 }

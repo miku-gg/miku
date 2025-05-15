@@ -12,6 +12,7 @@ import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { useI18n } from '../../libs/i18n';
 import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
 import { selectShouldPlayGlobalStartCutscene } from '../../state/selectors';
+import { useFillTextTemplateFunction } from '../../libs/hooks';
 
 const PartRenderer = ({
   part,
@@ -53,11 +54,23 @@ const PartRenderer = ({
       >
         {(src) =>
           (isMobileApp || window.innerWidth < 600) && background?.source.mp4Mobile ? (
-            <video className="CutsceneDisplayer__background-mobileVideo" loop autoPlay muted>
+            <video
+              key={assetLinkLoader(background.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_IMAGE)}
+              className="CutsceneDisplayer__background-mobileVideo"
+              loop
+              autoPlay
+              muted
+            >
               <source src={assetLinkLoader(background.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_IMAGE)}></source>
             </video>
           ) : background?.source.mp4 ? (
-            <video className="CutsceneDisplayer__background-video" loop autoPlay muted>
+            <video
+              key={assetLinkLoader(background.source.mp4, AssetDisplayPrefix.BACKGROUND_VIDEO)}
+              className="CutsceneDisplayer__background-video"
+              loop
+              autoPlay
+              muted
+            >
               <source src={assetLinkLoader(background.source.mp4, AssetDisplayPrefix.BACKGROUND_VIDEO)}></source>
             </video>
           ) : (
@@ -105,10 +118,11 @@ const PartRenderer = ({
   );
 };
 
-export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }) => {
+export const CutsceneDisplayer = ({ onEndDisplay, cutsceneId }: { onEndDisplay: () => void; cutsceneId?: string }) => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
   const { i18n } = useI18n();
   const dispatch = useAppDispatch();
+  const fillTextTemplate = useFillTextTemplateFunction();
   const scene = useAppSelector(selectCurrentScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
   const globalCutscene = useAppSelector(
@@ -116,9 +130,15 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
       state.novel.globalStartCutsceneId &&
       state.novel.cutscenes?.find((c) => c.id === state.novel.globalStartCutsceneId),
   );
-  const currentCutscene = useAppSelector((state) =>
-    shouldPlayGlobalCutscene ? globalCutscene : state.novel.cutscenes?.find((c) => c.id === scene?.cutScene?.id),
-  );
+  const currentCutscene = useAppSelector((state) => {
+    if (cutsceneId) {
+      return state.novel.cutscenes?.find((c) => c.id === cutsceneId);
+    }
+    if (shouldPlayGlobalCutscene) {
+      return globalCutscene;
+    }
+    return state.novel.cutscenes?.find((c) => c.id === scene?.cutScene?.id);
+  });
 
   const currentPartIndex = useAppSelector((state) => state.narration.input.cutscenePartIndex || 0);
   const currentTextIndex = useAppSelector((state) => state.narration.input.cutsceneTextIndex || 0);
@@ -205,7 +225,8 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
             >
               <TextFormatterStatic
                 noAnimation={index < currentTextIndex}
-                text={textItem.type === 'description' ? textItem.content : `"${textItem.content}"`}
+                doNotSplit={textItem.type === 'dialogue'}
+                text={fillTextTemplate(textItem.content)}
               />
             </div>
           ))}

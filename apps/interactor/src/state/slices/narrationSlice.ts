@@ -523,7 +523,16 @@ const narrationSlice = createSlice({
     activateBattle(state) {
       if (state.currentBattle) {
         state.currentBattle.isActive = true;
+        state.input.cutscenePartIndex = 0;
+        state.input.cutsceneTextIndex = 0;
       }
+    },
+    startBattle(state) {
+      if (state.currentBattle) {
+        state.currentBattle.state.status = 'active';
+      }
+      state.input.cutscenePartIndex = 0;
+      state.input.cutsceneTextIndex = 0;
     },
     battleWin(state) {
       const cb = state.currentBattle;
@@ -651,6 +660,7 @@ export const {
   setHasShownStartSelectionModal,
   setCurrentBattle,
   activateBattle,
+  startBattle,
   battleWin,
   battleLose,
   clearCurrentBattle,
