@@ -29,6 +29,11 @@
     overflow: hidden;
     border-radius: 0.75rem; // Equivalent to 'rounded-xl' in Tailwind
 
+    video,
+    img {
+      animation: brightnessfade 1s ease-out forwards;
+    }
+
     &::after {
       content: '';
       position: absolute;
@@ -287,4 +292,27 @@
   50% {
     transform: translateY(2px);
   }
+}
+
+/* Crossfade fade-in/out for background assets */
+.CutsceneDisplayer__fade-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+.CutsceneDisplayer__fade-image--in {
+  opacity: 1;
+}
+
+.CutsceneDisplayer__fade-image--out {
+  opacity: 0;
 }

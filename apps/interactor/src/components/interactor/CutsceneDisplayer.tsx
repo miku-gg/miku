@@ -1,4 +1,3 @@
-import ProgressiveImage from 'react-progressive-graceful-image';
 import { useAppContext } from '../../App.context';
 import { selectCurrentScene } from '../../state/selectors';
 import { useAppSelector, useAppDispatch } from '../../state/store';
@@ -6,7 +5,7 @@ import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import classNames from 'classnames';
 import './CutsceneDisplayer.scss';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { useI18n } from '../../libs/i18n';
@@ -31,63 +30,84 @@ const PartRenderer = ({
   const background = backgrounds.find((b) => b.id === part.background);
   const currentCharacters = part.characters.filter((c) => characters?.find((ch) => ch?.id === c?.id));
 
+  // Crossfade state for background asset
+  const FADE_DURATION = 300; // ms
+  const [assets, setAssets] = useState<
+    Array<{ key: string; src: string; type: 'video' | 'image'; isExiting?: boolean }>
+  >(() => []);
+  // Determine current asset source and type
+  const computeAsset = () => {
+    if (!background) return { src: '', type: 'image' as const };
+    if ((isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile) {
+      return {
+        src: assetLinkLoader(background.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_IMAGE),
+        type: 'video' as const,
+      };
+    } else if (background.source.mp4) {
+      return {
+        src: assetLinkLoader(background.source.mp4, AssetDisplayPrefix.BACKGROUND_VIDEO),
+        type: 'video' as const,
+      };
+    }
+    return {
+      src: assetLinkLoader(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE),
+      type: 'image' as const,
+    };
+  };
+  // Update assets on background change
+  useEffect(() => {
+    const { src, type } = computeAsset();
+    const key = src;
+    if (!assets.length) {
+      setAssets([{ key, src, type }]);
+      return;
+    }
+    const [current] = assets;
+    if (current.src !== src) {
+      // Fade out previous and show new
+      const exiting = { ...current, isExiting: true };
+      const incoming = { key, src, type };
+      setAssets([incoming, exiting]);
+      const timeout = setTimeout(() => setAssets([incoming]), FADE_DURATION);
+      return () => clearTimeout(timeout);
+    }
+    // Re-run when background or display mode changes
+  }, [background?.id, isMobileApp, assetLinkLoader]);
+
   return (
     <div className={`CutsceneDisplayer__main-image-container ${isMobileApp ? 'MobileDisplay' : ''}`}>
-      <ProgressiveImage
-        src={
-          background
-            ? assetLinkLoader(
-                (isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile
-                  ? background.source.mp4Mobile
-                  : background.source.mp4 || background.source.jpg,
-                (isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile
-                  ? AssetDisplayPrefix.BACKGROUND_VIDEO
-                  : background.source.mp4
-                  ? AssetDisplayPrefix.BACKGROUND_VIDEO
-                  : AssetDisplayPrefix.BACKGROUND_IMAGE,
-              )
-            : ''
-        }
-        placeholder={
-          background ? assetLinkLoader(background.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL) : ''
-        }
-      >
-        {(src) =>
-          (isMobileApp || window.innerWidth < 600) && background?.source.mp4Mobile ? (
-            <video
-              key={assetLinkLoader(background.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_IMAGE)}
-              className="CutsceneDisplayer__background-mobileVideo"
-              loop
-              autoPlay
-              muted
-            >
-              <source src={assetLinkLoader(background.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_IMAGE)}></source>
-            </video>
-          ) : background?.source.mp4 ? (
-            <video
-              key={assetLinkLoader(background.source.mp4, AssetDisplayPrefix.BACKGROUND_VIDEO)}
-              className="CutsceneDisplayer__background-video"
-              loop
-              autoPlay
-              muted
-            >
-              <source src={assetLinkLoader(background.source.mp4, AssetDisplayPrefix.BACKGROUND_VIDEO)}></source>
-            </video>
-          ) : (
-            <img
-              className="CutsceneDisplayer__background-image"
-              src={`${src}`}
-              alt="background"
-              onError={({ currentTarget }) => {
-                if (currentTarget.src !== '/images/default_background.png') {
-                  currentTarget.onerror = null;
-                  currentTarget.src = '/images/default_background.png';
-                }
-              }}
-            />
-          )
-        }
-      </ProgressiveImage>
+      {/* Crossfade background assets */}
+      {assets.map(({ key, src, type, isExiting }) =>
+        type === 'video' ? (
+          <video
+            key={key}
+            src={src}
+            className={classNames('CutsceneDisplayer__fade-image', {
+              'CutsceneDisplayer__fade-image--in': !isExiting,
+              'CutsceneDisplayer__fade-image--out': !!isExiting,
+            })}
+            loop
+            autoPlay
+            muted
+          />
+        ) : (
+          <img
+            key={key}
+            src={src}
+            className={classNames('CutsceneDisplayer__fade-image', {
+              'CutsceneDisplayer__fade-image--in': !isExiting,
+              'CutsceneDisplayer__fade-image--out': !!isExiting,
+            })}
+            alt="background"
+            onError={({ currentTarget }) => {
+              if (currentTarget.src !== '/images/default_background.png') {
+                currentTarget.onerror = null;
+                currentTarget.src = '/images/default_background.png';
+              }
+            }}
+          />
+        ),
+      )}
       {currentCharacters.length > 0 && (
         <div
           className={classNames({
@@ -194,11 +214,45 @@ export const CutsceneDisplayer = ({ onEndDisplay, cutsceneId }: { onEndDisplay: 
     }
   }, [currentTextIndex]);
 
+  // Prefetch next part background asset to cache before transition
+  const backgrounds = useAppSelector((state) => state.novel.backgrounds);
+  const parts = (currentCutscene as NovelV3.CutScene)?.parts || [];
+
+  useEffect(() => {
+    if (!currentCutscene || !scene) return;
+    const nextPart = parts[currentPartIndex + 1];
+    if (!nextPart) return;
+    const nextBackground = backgrounds.find((b) => b.id === nextPart.background);
+    if (!nextBackground) return;
+
+    let url: string;
+    let asType: 'video' | 'image';
+    if (isMobileDisplay && nextBackground.source.mp4Mobile) {
+      url = assetLinkLoader(nextBackground.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_IMAGE);
+      asType = 'video';
+    } else if (nextBackground.source.mp4) {
+      url = assetLinkLoader(nextBackground.source.mp4, AssetDisplayPrefix.BACKGROUND_VIDEO);
+      asType = 'video';
+    } else {
+      url = assetLinkLoader(nextBackground.source.jpg, AssetDisplayPrefix.BACKGROUND_IMAGE);
+      asType = 'image';
+    }
+
+    if (asType === 'image') {
+      const img = new Image();
+      img.src = url;
+    } else {
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = url;
+      link.as = 'video';
+      document.head.appendChild(link);
+    }
+  }, [currentPartIndex, parts, backgrounds, assetLinkLoader, isMobileDisplay]);
+
   if (!currentCutscene || !scene) {
     return null;
   }
-
-  const parts = currentCutscene.parts;
 
   return (
     <>
@@ -214,7 +268,7 @@ export const CutsceneDisplayer = ({ onEndDisplay, cutsceneId }: { onEndDisplay: 
           ref={textContainerRef}
           className={`CutsceneDisplayer__text-container ${isMobileDisplay ? 'MobileDisplay' : ''}`}
         >
-          {getCurrentTextsToShow().map((textItem, index) => (
+          {getCurrentTextsToShow().map((textItem: NovelV3.CutScenePart['text'][number], index: number) => (
             <div
               key={`${textItem.content}-${index}`}
               className={`CutsceneDisplayer__text ${textItem.type}`}
