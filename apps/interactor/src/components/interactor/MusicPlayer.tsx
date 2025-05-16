@@ -45,14 +45,14 @@ const MusicPlayer: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   let _src = '';
-  if (currentBattle?.isActive) {
+  if (displayingCutscene && currentCutScenePart?.music) {
+    _src = songs.find((s) => s.id === currentCutScenePart.music)?.source || currentCutScenePart.music;
+  } else if (currentBattle?.isActive) {
     const battleId = currentBattle.state.battleId;
     const battleConfig = battles.find((b) => b.battleId === battleId);
     if (battleConfig?.music?.battleId) {
       _src = songs.find((s) => s.id === battleConfig.music.battleId)?.source || battleConfig.music.battleId;
     }
-  } else if (displayingCutscene && currentCutScenePart?.music) {
-    _src = songs.find((s) => s.id === currentCutScenePart.music)?.source || currentCutScenePart.music;
   } else if (scene?.musicId) {
     _src = songs.find((s) => s.id === scene?.musicId)?.source || scene?.musicId;
   }

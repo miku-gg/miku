@@ -1,5 +1,5 @@
 import { useAppContext } from '../../App.context';
-import { selectCurrentScene } from '../../state/selectors';
+import { selectCurrentScene, selectCurrentCutscene } from '../../state/selectors';
 import { useAppSelector, useAppDispatch } from '../../state/store';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
@@ -10,7 +10,6 @@ import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { useI18n } from '../../libs/i18n';
 import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
-import { selectShouldPlayGlobalStartCutscene } from '../../state/selectors';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
 
 const PartRenderer = ({
@@ -138,27 +137,13 @@ const PartRenderer = ({
   );
 };
 
-export const CutsceneDisplayer = ({ onEndDisplay, cutsceneId }: { onEndDisplay: () => void; cutsceneId?: string }) => {
+export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }) => {
   const { assetLinkLoader, isMobileApp } = useAppContext();
   const { i18n } = useI18n();
   const dispatch = useAppDispatch();
   const fillTextTemplate = useFillTextTemplateFunction();
   const scene = useAppSelector(selectCurrentScene);
-  const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
-  const globalCutscene = useAppSelector(
-    (state) =>
-      state.novel.globalStartCutsceneId &&
-      state.novel.cutscenes?.find((c) => c.id === state.novel.globalStartCutsceneId),
-  );
-  const currentCutscene = useAppSelector((state) => {
-    if (cutsceneId) {
-      return state.novel.cutscenes?.find((c) => c.id === cutsceneId);
-    }
-    if (shouldPlayGlobalCutscene) {
-      return globalCutscene;
-    }
-    return state.novel.cutscenes?.find((c) => c.id === scene?.cutScene?.id);
-  });
+  const currentCutscene = useAppSelector(selectCurrentCutscene);
 
   const currentPartIndex = useAppSelector((state) => state.narration.input.cutscenePartIndex || 0);
   const currentTextIndex = useAppSelector((state) => state.narration.input.cutsceneTextIndex || 0);

@@ -482,6 +482,8 @@ const narrationSlice = createSlice({
     },
     markCurrentCutsceneAsSeen(state) {
       state.input.seenCutscene = true;
+      state.input.cutscenePartIndex = 0;
+      state.input.cutsceneTextIndex = 0;
     },
     resetCutsceneIndices(state) {
       state.input.cutscenePartIndex = 0;
@@ -513,6 +515,8 @@ const narrationSlice = createSlice({
     },
     setHasPlayedGlobalStartCutscene(state, action: PayloadAction<boolean>) {
       state.hasPlayedGlobalStartCutscene = action.payload;
+      state.input.cutscenePartIndex = 0;
+      state.input.cutsceneTextIndex = 0;
     },
     setHasShownStartSelectionModal(state, action: PayloadAction<boolean>) {
       state.hasShownStartSelectionModal = action.payload;
@@ -539,12 +543,16 @@ const narrationSlice = createSlice({
       if (cb) {
         cb.state.status = 'victory';
       }
+      state.input.cutscenePartIndex = 0;
+      state.input.cutsceneTextIndex = 0;
     },
     battleLose(state) {
       const cb = state.currentBattle;
       if (cb) {
         cb.state.status = 'defeat';
       }
+      state.input.cutscenePartIndex = 0;
+      state.input.cutsceneTextIndex = 0;
     },
     clearCurrentBattle(state) {
       delete state.currentBattle;

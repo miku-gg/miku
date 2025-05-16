@@ -6,6 +6,7 @@
   color: #ffffff;
   height: 100%;
   overflow-y: auto;
+  border-radius: 0.75rem;
 }
 
 .BattleScreen__turn {
@@ -667,7 +668,7 @@
 
 // Mobile portrait mode: rotate the entire battle screen 90 degrees
 @media screen and (orientation: portrait) {
-  .BattleScreen {
+  .Interactor--battle {
     position: fixed;
     top: 0;
     right: 0;

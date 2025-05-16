@@ -584,31 +584,32 @@ export const selectDisplayingCutScene = createSelector(
     selectAllParentScenesIds,
     (state: RootState) => state.narration.input.seenCutscene,
     selectShouldPlayGlobalStartCutscene,
+    (state: RootState) => state.narration.currentBattle,
+    (state: RootState) => state.novel.battles,
   ],
-  (scene, parentSceneIds, isCurrentCutsceneSeen, shouldPlayGlobalStartCutscene) => {
-    // If the global start cutscene should play, we return true immediately
+  (scene, parentSceneIds, isCurrentCutsceneSeen, shouldPlayGlobalStartCutscene, currentBattle, battles) => {
+    // battle cutscenes: intro, win, loss
+    if (currentBattle && currentBattle.isActive) {
+      const battleConfig = battles?.find((b) => b.battleId === currentBattle.state.battleId);
+      if (currentBattle.state.status === 'intro' && battleConfig?.introCutsceneId) {
+        return true;
+      }
+      if (currentBattle.state.status === 'victory' && battleConfig?.winCutsceneId) {
+        return true;
+      }
+      if (currentBattle.state.status === 'defeat' && battleConfig?.lossCutsceneId) {
+        return true;
+      }
+    }
+    // global start cutscene
     if (shouldPlayGlobalStartCutscene) {
       return true;
     }
-
-    // existing logic for per-scene cutscene
+    // per-scene cutscene
     const hasCutscene = !!scene?.cutScene;
     const isAlreadyTriggered =
       parentSceneIds.slice(0, parentSceneIds.length - 1).includes(scene?.id || '') && scene?.cutScene?.triggerOnlyOnce;
     return hasCutscene && !isAlreadyTriggered && !isCurrentCutsceneSeen;
-  },
-);
-
-export const selectCurrentCutScenePart = createSelector(
-  [
-    (state: RootState) => state.narration.input.cutscenePartIndex || 0,
-    selectCurrentScene,
-    (state: RootState) => state.novel.cutscenes,
-  ],
-  (currentPartIndex, scene, cutscenes) => {
-    if (!scene || !scene.cutScene) return null;
-    const currentCutscene = cutscenes?.find((c) => c.id === scene.cutScene?.id);
-    return currentCutscene?.parts[currentPartIndex] || null;
   },
 );
 
@@ -634,3 +635,41 @@ export const selectCurrentInteraction = (state: RootState) => {
     ? state.narration.interactions[currentResponse.parentInteractionId]
     : null;
 };
+
+export const selectCurrentCutscene = (state: RootState) => {
+  // battle cutscenes: intro, win, loss
+  const currentBattle = state.narration.currentBattle;
+  const battles = state.novel.battles;
+  if (currentBattle) {
+    const battleConfig = battles?.find((b) => b.battleId === currentBattle.state.battleId);
+    if (currentBattle.state.status === 'intro' && battleConfig?.introCutsceneId) {
+      return state.novel.cutscenes?.find((c) => c.id === battleConfig.introCutsceneId);
+    }
+    if (currentBattle.state.status === 'victory' && battleConfig?.winCutsceneId) {
+      return state.novel.cutscenes?.find((c) => c.id === battleConfig.winCutsceneId);
+    }
+    if (currentBattle.state.status === 'defeat' && battleConfig?.lossCutsceneId) {
+      return state.novel.cutscenes?.find((c) => c.id === battleConfig.lossCutsceneId);
+    }
+  }
+  // global start cutscene
+  const shouldPlayGlobal = selectShouldPlayGlobalStartCutscene(state);
+  if (shouldPlayGlobal && state.novel.globalStartCutsceneId) {
+    return state.novel.cutscenes?.find((c) => c.id === state.novel.globalStartCutsceneId);
+  }
+  // per-scene cutscene
+  const scene = selectCurrentScene(state);
+  const cutsceneId = scene?.cutScene?.id;
+  if (cutsceneId) {
+    return state.novel.cutscenes?.find((c) => c.id === cutsceneId);
+  }
+  return undefined;
+};
+
+export const selectCurrentCutScenePart = createSelector(
+  [(state: RootState) => state.narration.input.cutscenePartIndex || 0, selectCurrentCutscene],
+  (currentPartIndex, cutscene) => {
+    if (!cutscene || !cutscene.parts) return null;
+    return cutscene.parts[currentPartIndex] || null;
+  },
+);

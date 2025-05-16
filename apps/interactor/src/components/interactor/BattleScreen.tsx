@@ -18,7 +18,6 @@ import {
   moveNextTurn,
 } from '../../state/slices/narrationSlice';
 import './BattleScreen.scss';
-import MusicPlayer from './MusicPlayer';
 
 const ABILITY_ANIMATION_DURATION = 1000;
 
@@ -303,9 +302,6 @@ const BattleScreen: React.FC = () => {
           {(src) => <img className="BattleScreen__background" src={src} alt="battle background" />}
         </ProgressiveImage>
       )}
-      <div className="BattleScreen__header">
-        <MusicPlayer />
-      </div>
       {/* Battlefield layout */}
       <div className="BattleScreen__battlefield">
         <div className="BattleScreen__party-group">
