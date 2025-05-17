@@ -47,7 +47,11 @@ const MusicPlayer: React.FC = () => {
   let _src = '';
   if (displayingCutscene && currentCutScenePart?.music) {
     _src = songs.find((s) => s.id === currentCutScenePart.music)?.source || currentCutScenePart.music;
-  } else if (currentBattle?.isActive) {
+  } else if (
+    currentBattle?.isActive &&
+    currentBattle.state.status !== 'victory-cutscene' &&
+    currentBattle.state.status !== 'defeat-cutscene'
+  ) {
     const battleId = currentBattle.state.battleId;
     const battleConfig = battles.find((b) => b.battleId === battleId);
     if (battleConfig?.music?.battleId) {

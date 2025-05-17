@@ -538,22 +538,6 @@ const narrationSlice = createSlice({
       state.input.cutscenePartIndex = 0;
       state.input.cutsceneTextIndex = 0;
     },
-    battleWin(state) {
-      const cb = state.currentBattle;
-      if (cb) {
-        cb.state.status = 'victory';
-      }
-      state.input.cutscenePartIndex = 0;
-      state.input.cutsceneTextIndex = 0;
-    },
-    battleLose(state) {
-      const cb = state.currentBattle;
-      if (cb) {
-        cb.state.status = 'defeat';
-      }
-      state.input.cutscenePartIndex = 0;
-      state.input.cutsceneTextIndex = 0;
-    },
     clearCurrentBattle(state) {
       delete state.currentBattle;
     },
@@ -669,8 +653,6 @@ export const {
   setCurrentBattle,
   activateBattle,
   startBattle,
-  battleWin,
-  battleLose,
   clearCurrentBattle,
   addHealth,
   addMana,

@@ -127,6 +127,18 @@ const novelSlice = createSlice({
         }
       }
     },
+    changeSceneCharacterOutfit: (
+      state,
+      action: PayloadAction<{ sceneId: string; characterId: string; outfitId: string }>,
+    ) => {
+      const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
+      if (scene) {
+        const char = scene.characters.find((c) => c.characterId === action.payload.characterId);
+        if (char) {
+          char.outfit = action.payload.outfitId;
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -144,6 +156,7 @@ export const {
   addIndicatorToScene,
   removeIndicatorFromScene,
   updateIndicatorInScene,
+  changeSceneCharacterOutfit,
 } = novelSlice.actions;
 
 export default novelSlice.reducer;

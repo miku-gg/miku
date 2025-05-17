@@ -594,10 +594,10 @@ export const selectDisplayingCutScene = createSelector(
       if (currentBattle.state.status === 'intro' && battleConfig?.introCutsceneId) {
         return true;
       }
-      if (currentBattle.state.status === 'victory' && battleConfig?.winCutsceneId) {
+      if (currentBattle.state.status === 'victory-cutscene' && battleConfig?.winCutsceneId) {
         return true;
       }
-      if (currentBattle.state.status === 'defeat' && battleConfig?.lossCutsceneId) {
+      if (currentBattle.state.status === 'defeat-cutscene' && battleConfig?.lossCutsceneId) {
         return true;
       }
     }
@@ -645,10 +645,10 @@ export const selectCurrentCutscene = (state: RootState) => {
     if (currentBattle.state.status === 'intro' && battleConfig?.introCutsceneId) {
       return state.novel.cutscenes?.find((c) => c.id === battleConfig.introCutsceneId);
     }
-    if (currentBattle.state.status === 'victory' && battleConfig?.winCutsceneId) {
+    if (currentBattle.state.status === 'victory-cutscene' && battleConfig?.winCutsceneId) {
       return state.novel.cutscenes?.find((c) => c.id === battleConfig.winCutsceneId);
     }
-    if (currentBattle.state.status === 'defeat' && battleConfig?.lossCutsceneId) {
+    if (currentBattle.state.status === 'defeat-cutscene' && battleConfig?.lossCutsceneId) {
       return state.novel.cutscenes?.find((c) => c.id === battleConfig.lossCutsceneId);
     }
   }

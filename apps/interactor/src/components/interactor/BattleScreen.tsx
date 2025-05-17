@@ -18,6 +18,7 @@ import {
   moveNextTurn,
 } from '../../state/slices/narrationSlice';
 import './BattleScreen.scss';
+import { novelActionToStateAction } from '../../state/mutations';
 
 const ABILITY_ANIMATION_DURATION = 1000;
 
@@ -203,7 +204,19 @@ const BattleScreen: React.FC = () => {
 
   const handleContinue = () => {
     const nextSceneId = isVictory ? battleConfig?.nextSceneIdWin : battleConfig?.nextSceneIdLoss;
-    dispatch(clearCurrentBattle());
+    if (isVictory && battleConfig?.winCutsceneId) {
+      dispatch(setCurrentBattle({ state: { ...battleState, status: 'victory-cutscene' }, isActive: true }));
+      battleConfig.winActions?.forEach((action) => {
+        novelActionToStateAction(action).forEach((sa) => dispatch(sa));
+      });
+    } else if (isDefeat && battleConfig?.lossCutsceneId) {
+      dispatch(setCurrentBattle({ state: { ...battleState, status: 'defeat-cutscene' }, isActive: true }));
+      battleConfig.lossActions?.forEach((action) => {
+        novelActionToStateAction(action).forEach((sa) => dispatch(sa));
+      });
+    } else {
+      dispatch(clearCurrentBattle());
+    }
     dispatch(
       interactionStart({
         servicesEndpoint,
@@ -211,8 +224,8 @@ const BattleScreen: React.FC = () => {
         sceneId: nextSceneId || currentScene?.id || '',
         isNewScene: !!nextSceneId,
         text: isVictory
-          ? 'OOC: The battle was won. Please describe the aftermath.'
-          : 'OOC: The battle was lost. Please describe the aftermath.',
+          ? battleConfig?.winPromptMessage || 'OOC: The battle was won. Please describe the aftermath.'
+          : battleConfig?.lossPromptMessage || 'OOC: The battle was lost. Please describe the aftermath.',
         characters: party.map((h) => h.characterId),
         selectedCharacterId: party[currentHeroIdx]?.characterId || '',
       }),

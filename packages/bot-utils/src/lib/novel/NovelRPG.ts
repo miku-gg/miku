@@ -1,3 +1,5 @@
+import { NovelAction } from './NovelV3';
+
 export interface NovelRPGAbility {
   abilityId: string;
   name: string;
@@ -121,7 +123,7 @@ export interface BattleState {
     currentMana: number;
   }[];
   /** Battle status (active, completed, failed, dialogue) */
-  status: 'active' | 'victory' | 'defeat' | 'intro';
+  status: 'active' | 'victory' | 'defeat' | 'intro' | 'victory-cutscene' | 'defeat-cutscene';
   /** Log of actions taken during the battle */
   battleLog: {
     /** Turn when the action occurred */
@@ -154,16 +156,6 @@ export interface NovelBattle {
     battleId: string;
   };
 
-  /** Battle introduction text or dialogue */
-  intro: {
-    text: {
-      /** Text to be displayed */
-      content: string;
-      /** ID of the character speaking the text. If no id it means it's a description */
-      characterId?: string;
-    }[];
-  }[];
-
   /** Prompt to be used for the battle */
   prompt: string;
 
@@ -179,15 +171,27 @@ export interface NovelBattle {
   /** Next scene ID to be shown after losing all heroes */
   nextSceneIdLoss?: string;
 
+  /** Actions to be performed after winning the battle */
+  winActions?: NovelAction[];
+
+  /** Actions to be performed after losing the battle */
+  lossActions?: NovelAction[];
+
+  /** Prompt to be used when changing to the win scene (instead of the default scene prompt) */
+  winPromptMessage?: string;
+
+  /** Prompt to be used when changing to the loss scene (instead of the default scene prompt) */
+  lossPromptMessage?: string;
+
   /** Allow the player to retry the battle */
   allowRetry: boolean;
 
-  /** Optional cutscene to play before the battle starts */
+  /** cutscene to play before the battle starts */
   introCutsceneId?: string;
 
-  /** Optional cutscene to play when the player wins the battle */
+  /** cutscene to play when the player wins the battle */
   winCutsceneId?: string;
 
-  /** Optional cutscene to play when the player loses the battle */
+  /** cutscene to play when the player loses the battle */
   lossCutsceneId?: string;
 }

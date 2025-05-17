@@ -147,6 +147,7 @@ export enum NovelActionType {
   SHOW_ITEM = 'SHOW_ITEM',
   ADD_CHILD_SCENES = 'ADD_CHILD_SCENES',
   BATTLE_START = 'BATTLE_START',
+  CHANGE_SCENE_CHARACTER_OUTFIT = 'CHANGE_SCENE_CHARACTER_OUTFIT',
 }
 
 export type NovelAction =
@@ -190,6 +191,14 @@ export type NovelAction =
       type: NovelActionType.BATTLE_START;
       params: {
         battleId: string;
+      };
+    }
+  | {
+      type: NovelActionType.CHANGE_SCENE_CHARACTER_OUTFIT;
+      params: {
+        sceneId: string;
+        characterId: string;
+        outfitId: string;
       };
     };
 

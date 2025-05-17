@@ -25,8 +25,6 @@ import {
   markCurrentCutsceneAsSeen,
   setHasPlayedGlobalStartCutscene,
   startBattle,
-  battleWin,
-  battleLose,
   clearCurrentBattle,
 } from '../../state/slices/narrationSlice';
 import IndicatorsDisplay from '../indicators-display/IndicatorsDisplay';
@@ -68,11 +66,9 @@ const Interactor = () => {
                   : undefined;
                 if (currentBattle?.state.status === 'intro') {
                   dispatch(startBattle());
-                } else if (currentBattle?.state.status === 'victory' && battleConfig?.winCutsceneId) {
-                  dispatch(battleWin());
+                } else if (currentBattle?.state.status === 'victory-cutscene' && battleConfig?.winCutsceneId) {
                   dispatch(clearCurrentBattle());
-                } else if (currentBattle?.state.status === 'defeat' && battleConfig?.lossCutsceneId) {
-                  dispatch(battleLose());
+                } else if (currentBattle?.state.status === 'defeat-cutscene' && battleConfig?.lossCutsceneId) {
                   dispatch(clearCurrentBattle());
                 } else if (shouldPlayGlobalCutscene) {
                   dispatch(setHasPlayedGlobalStartCutscene(true));
