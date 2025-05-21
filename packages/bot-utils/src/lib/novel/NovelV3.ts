@@ -128,7 +128,8 @@ export interface NovelMap {
   };
   places: {
     id: string;
-    sceneId: string;
+    sceneId?: string;
+    battleId?: string;
     name: string;
     description: string;
     previewSource: string;

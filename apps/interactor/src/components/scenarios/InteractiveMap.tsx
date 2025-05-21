@@ -6,11 +6,12 @@ import './InteractiveMap.scss';
 import { Button, Modal } from '@mikugg/ui-kit';
 import { setMapModal } from '../../state/slices/settingsSlice';
 import { trackEvent } from '../../libs/analytics';
-import { interactionStart } from '../../state/slices/narrationSlice';
+import { interactionStart, setCurrentBattle } from '../../state/slices/narrationSlice';
 import { useAppContext } from '../../App.context';
 import { setModalOpened } from '../../state/slices/creationSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
+import { getInitialBattleState } from '../../state/utils/battleUtils';
 
 const isTouchScreen = window.navigator.maxTouchPoints > 0;
 
@@ -20,6 +21,15 @@ const InteractiveMapToggle = () => {
   const maps = useAppSelector(selectCurrentMaps);
   const [selectedMap, setSelectedMap] = useState<(typeof maps)[number] | null>(null);
   const { disabled: inputDisabled } = useAppSelector((state) => state.narration.input);
+  const mapHash =
+    (selectedMap?.id || '') + (selectedMap?.places.reduce((acc, place) => acc + (place.id || ''), '') || '');
+  const [mapHighlighted, setMapHighlighted] = useState(false);
+
+  useEffect(() => {
+    if (mapHash) {
+      setMapHighlighted(true);
+    }
+  }, [mapHash]);
 
   useEffect(() => {
     if (maps.length) {
@@ -31,10 +41,11 @@ const InteractiveMapToggle = () => {
     <>
       {maps.length ? (
         <button
-          className="InteractiveMap__toggle"
+          className={`InteractiveMap__toggle ${mapHighlighted ? 'InteractiveMap__toggle--highlighted' : ''}`}
           disabled={inputDisabled}
           onClick={() => {
             dispatch(setMapModal(true));
+            setMapHighlighted(false);
           }}
         >
           <GiPathDistance />
@@ -84,7 +95,8 @@ const InteractiveMapModal = ({
       name: string;
       description: string;
       maskSource: string;
-      sceneId: string;
+      sceneId?: string;
+      battleId?: string;
     }[];
   } | null;
 }) => {
@@ -92,6 +104,8 @@ const InteractiveMapModal = ({
   const { servicesEndpoint, apiEndpoint, assetLinkLoader } = useAppContext();
   const currentScene = useAppSelector(selectCurrentScene);
   const currentIndicators = useAppSelector(selectCurrentIndicators);
+  const battles = useAppSelector((state) => state.novel.battles || []);
+  const rpgConfig = useAppSelector((state) => state.novel.rpg);
   const mapBackgroundRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const offScreenCanvasRef = useRef(document.createElement('canvas'));
@@ -243,16 +257,33 @@ const InteractiveMapModal = ({
     };
   }, [currentScene?.id, map, assetLinkLoader]);
 
+  const handleStartBattle = () => {
+    if (highlightedPlace?.battleId) {
+      dispatch(setMapModal(false));
+      const battleConfig = battles.find((b) => b.battleId === highlightedPlace.battleId);
+      if (battleConfig && rpgConfig) {
+        const initialBattleState = getInitialBattleState(battleConfig, rpgConfig);
+        dispatch(setCurrentBattle({ state: initialBattleState, isActive: true }));
+        trackEvent('battle-start');
+      }
+    }
+  };
+
   const handleMapClick = () => {
-    if (highlightedPlace && scene && highlightedPlace.sceneId !== currentScene?.id) {
-      dispatch(
-        setModalOpened({
-          id: 'scene-preview',
-          opened: true,
-          itemId: scene.id,
-        }),
-      );
-      trackEvent('scene-select');
+    if (highlightedPlace) {
+      const selectedPlace = map?.places.find((p) => p.id === highlightedPlaceId);
+      if (selectedPlace?.battleId) {
+        handleStartBattle();
+      } else if (scene && selectedPlace?.sceneId !== currentScene?.id) {
+        dispatch(
+          setModalOpened({
+            id: 'scene-preview',
+            opened: true,
+            itemId: scene.id,
+          }),
+        );
+        trackEvent('scene-select');
+      }
     }
   };
 
@@ -312,7 +343,11 @@ const InteractiveMapModal = ({
             <div className="InteractiveMap__place-info__title">{highlightedPlace.name}</div>
             <div className="InteractiveMap__place-info__description">{highlightedPlace.description}</div>
             <div>
-              {highlightedPlace.sceneId !== currentScene?.id ? (
+              {highlightedPlace.battleId ? (
+                <Button theme="secondary" onClick={handleStartBattle}>
+                  Start Battle
+                </Button>
+              ) : highlightedPlace.sceneId !== currentScene?.id ? (
                 <Button theme="secondary" onClick={handleGoToScene}>
                   Go to place
                 </Button>

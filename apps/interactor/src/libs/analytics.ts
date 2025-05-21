@@ -20,7 +20,8 @@ type TrackableEvent =
   | 'download-history-click'
   | 'activate-standard-mode'
   | 'activate-summary-mode'
-  | 'memory-premium-click';
+  | 'memory-premium-click'
+  | 'battle-start';
 
 const sessionData: Record<string, string | boolean | number> = {};
 
