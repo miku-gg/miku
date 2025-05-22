@@ -134,6 +134,7 @@ export interface NovelMap {
     description: string;
     previewSource: string;
     maskSource: string;
+    hidden?: boolean;
   }[];
 }
 
@@ -149,6 +150,7 @@ export enum NovelActionType {
   ADD_CHILD_SCENES = 'ADD_CHILD_SCENES',
   BATTLE_START = 'BATTLE_START',
   CHANGE_SCENE_CHARACTER_OUTFIT = 'CHANGE_SCENE_CHARACTER_OUTFIT',
+  CHANGE_VISIBILITY_OF_PLACE_IN_MAP = 'CHANGE_VISIBILITY_OF_PLACE_IN_MAP',
 }
 
 export type NovelAction =
@@ -200,6 +202,14 @@ export type NovelAction =
         sceneId: string;
         characterId: string;
         outfitId: string;
+      };
+    }
+  | {
+      type: NovelActionType.CHANGE_VISIBILITY_OF_PLACE_IN_MAP;
+      params: {
+        mapId: string;
+        placeId: string;
+        hidden: boolean;
       };
     };
 

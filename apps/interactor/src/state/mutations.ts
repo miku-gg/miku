@@ -1,5 +1,5 @@
 import { NovelV3 } from '@mikugg/bot-utils';
-import { addChildrenScenes, changeSceneCharacterOutfit } from './slices/novelSlice';
+import { addChildrenScenes, changeSceneCharacterOutfit, changeVisibilityOfPlaceInMap } from './slices/novelSlice';
 import { toggleItemVisibility } from './slices/inventorySlice';
 import { setNextSceneToCurrentResponse, setSceneCreationSuggestionToCurrentResponse } from './slices/narrationSlice';
 import { Action } from '@reduxjs/toolkit';
@@ -45,6 +45,14 @@ export const novelActionToStateAction = (action: NovelV3.NovelAction): Action[] 
           sceneId: action.params.sceneId,
           characterId: action.params.characterId,
           outfitId: action.params.outfitId,
+        }),
+      ];
+    case NovelV3.NovelActionType.CHANGE_VISIBILITY_OF_PLACE_IN_MAP:
+      return [
+        changeVisibilityOfPlaceInMap({
+          mapId: action.params.mapId,
+          placeId: action.params.placeId,
+          hidden: action.params.hidden,
         }),
       ];
   }

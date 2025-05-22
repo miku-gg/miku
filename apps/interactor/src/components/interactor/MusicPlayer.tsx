@@ -98,11 +98,9 @@ const MusicPlayer: React.FC = () => {
       className={`MusicPlayer ${rangeVisible ? 'range-visible' : ''}`}
       onMouseEnter={() => {
         setRangeVisible(true);
-        console.log('[music] mouse enter');
       }}
       onMouseLeave={() => {
         setRangeVisible(false);
-        console.log('[music] mouse leave');
       }}
     >
       <audio ref={audioRef} src={src} autoPlay={enabled} loop />
@@ -113,11 +111,9 @@ const MusicPlayer: React.FC = () => {
         className="MusicPlayer__range"
         onMouseEnter={() => {
           setInRangeHover(true);
-          console.log('[range] mouse enter');
         }}
         onMouseLeave={() => {
           setInRangeHover(false);
-          console.log('[range]mouse leave');
         }}
       >
         <input type="range" min="0" max="1" step="0.01" value={volume} onChange={handleVolumeChange} />

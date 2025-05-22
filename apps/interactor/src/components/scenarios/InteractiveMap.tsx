@@ -22,7 +22,8 @@ const InteractiveMapToggle = () => {
   const [selectedMap, setSelectedMap] = useState<(typeof maps)[number] | null>(null);
   const { disabled: inputDisabled } = useAppSelector((state) => state.narration.input);
   const mapHash =
-    (selectedMap?.id || '') + (selectedMap?.places.reduce((acc, place) => acc + (place.id || ''), '') || '');
+    (selectedMap?.id || '') +
+    (selectedMap?.places.reduce((acc, place) => acc + (place.hidden ? '' : place.id || ''), '') || '');
   const [mapHighlighted, setMapHighlighted] = useState(false);
 
   useEffect(() => {
@@ -75,7 +76,16 @@ const InteractiveMapToggle = () => {
             ))}
           </div>
         ) : null}
-        <InteractiveMapModal map={selectedMap} />
+        <InteractiveMapModal
+          map={
+            selectedMap
+              ? {
+                  ...selectedMap,
+                  places: selectedMap.places.filter((place) => !place.hidden),
+                }
+              : null
+          }
+        />
       </Modal>
     </>
   );

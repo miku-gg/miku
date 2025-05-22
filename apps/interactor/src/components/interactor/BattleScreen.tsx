@@ -58,10 +58,18 @@ const BattleScreen: React.FC = () => {
   useEffect(() => {
     if (battleLog.length > lastLogIndex.current) {
       const entry = battleLog[battleLog.length - 1];
-      const actorName = characters.find((c) => c.id === entry.actorId)?.name || entry.actorId;
+      const actorName =
+        entry.actorType === 'enemy'
+          ? characters.find((c) => c.id === rpgConfig?.enemies.find((er) => er.enemyId === entry.actorId)?.characterId)
+              ?.name || entry.actorId
+          : characters.find((c) => c.id === entry.actorId)?.name || entry.actorId;
       const abilityName = entry.actionType;
       const targetId = entry.targets[0];
-      const targetName = characters.find((c) => c.id === targetId)?.name || targetId;
+      const targetName =
+        entry.targetType === 'enemy'
+          ? characters.find((c) => c.id === rpgConfig?.enemies.find((er) => er.enemyId === targetId)?.characterId)
+              ?.name || targetId
+          : characters.find((c) => c.id === targetId)?.name || targetId;
       const uiEntry = {
         id: `${entry.turn}-${entry.actorId}-${targetId}-${Date.now()}`,
         actorName,
@@ -79,7 +87,7 @@ const BattleScreen: React.FC = () => {
         setUiLogs((logs) => logs.filter((l) => l.id !== uiEntry.id));
       }, 3000);
     }
-  }, [battleLog, characters]);
+  }, [battleLog, characters, rpgConfig]);
 
   // Play win/lose sound when battle ends (hook called unconditionally)
   const isVictory = currentBattle?.state.status === 'victory';
@@ -149,8 +157,8 @@ const BattleScreen: React.FC = () => {
     };
   });
   const enemies = activeEnemies.map((e) => {
-    const enemyRpg = rpgConfig?.enemies.find((er) => er.characterId === e.enemyId);
-    const eneDef = characters.find((c) => c.id === e.enemyId);
+    const enemyRpg = rpgConfig?.enemies.find((er) => er.enemyId === e.enemyId);
+    const eneDef = characters.find((c) => c.id === enemyRpg?.characterId);
     const outfitId = enemyRpg?.battleOutfit ?? '';
     const outfit = eneDef?.card.data.extensions.mikugg_v2.outfits.find((o) => o.id === outfitId);
     const img = outfit?.emotions.find((em) => em.id === 'neutral')?.sources.png || '';
@@ -160,6 +168,7 @@ const BattleScreen: React.FC = () => {
       .filter((a): a is NovelV3.NovelRPGAbility => !!a);
     return {
       enemyId: e.enemyId,
+      characterId: enemyRpg?.characterId,
       position: e.position,
       currentHealth: e.currentHealth,
       currentMana: e.currentMana,
@@ -182,7 +191,7 @@ const BattleScreen: React.FC = () => {
         .filter((h) => h.isInParty)
         .map((h) => ({ characterId: h.characterId, currentHealth: h.stats.health, currentMana: h.stats.mana }));
       const initialEnemies = battleConfig.enemies.map((e, idx) => {
-        const enemyCfg = rpgConfig.enemies.find((en) => en.characterId === e.enemyId);
+        const enemyCfg = rpgConfig.enemies.find((en) => en.enemyId === e.enemyId);
         return {
           enemyId: e.enemyId,
           position: idx,
@@ -204,16 +213,20 @@ const BattleScreen: React.FC = () => {
 
   const handleContinue = () => {
     const nextSceneId = isVictory ? battleConfig?.nextSceneIdWin : battleConfig?.nextSceneIdLoss;
-    if (isVictory && battleConfig?.winCutsceneId) {
-      dispatch(setCurrentBattle({ state: { ...battleState, status: 'victory-cutscene' }, isActive: true }));
+    if (isVictory && battleConfig?.winActions) {
       battleConfig.winActions?.forEach((action) => {
         novelActionToStateAction(action).forEach((sa) => dispatch(sa));
       });
-    } else if (isDefeat && battleConfig?.lossCutsceneId) {
-      dispatch(setCurrentBattle({ state: { ...battleState, status: 'defeat-cutscene' }, isActive: true }));
+    }
+    if (isDefeat && battleConfig?.lossActions) {
       battleConfig.lossActions?.forEach((action) => {
         novelActionToStateAction(action).forEach((sa) => dispatch(sa));
       });
+    }
+    if (isVictory && battleConfig?.winCutsceneId) {
+      dispatch(setCurrentBattle({ state: { ...battleState, status: 'victory-cutscene' }, isActive: true }));
+    } else if (isDefeat && battleConfig?.lossCutsceneId) {
+      dispatch(setCurrentBattle({ state: { ...battleState, status: 'defeat-cutscene' }, isActive: true }));
     } else {
       dispatch(clearCurrentBattle());
     }
@@ -501,8 +514,7 @@ const BattleScreen: React.FC = () => {
                               // Compute damage with stats and wearables
                               const heroStats = party[currentHeroIdx].adjustedStats;
                               // Lookup defender stats from RPG config (state.activeEnemies lacks stats)
-                              const defenderStats = rpgConfig?.enemies.find((er) => er.characterId === enemyId)
-                                ?.stats || {
+                              const defenderStats = rpgConfig?.enemies.find((er) => er.enemyId === enemyId)?.stats || {
                                 health: 0,
                                 mana: 0,
                                 attack: 0,
@@ -543,7 +555,7 @@ const BattleScreen: React.FC = () => {
                                 }),
                               );
                               setTimeout(() => {
-                                const enemyDef = rpgConfig?.enemies.find((er) => er.characterId === enemyId);
+                                const enemyDef = rpgConfig?.enemies.find((er) => er.enemyId === enemyId);
                                 const enemyMaxHealth = enemyDef?.stats.health ?? defenderStats.health;
                                 // Apply damage to enemy
                                 dispatch(

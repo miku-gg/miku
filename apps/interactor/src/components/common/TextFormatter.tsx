@@ -170,7 +170,6 @@ export const TextFormatterStatic: React.FC<TextFormatterProps> = ({ text, childr
 
   useEffect(() => {
     if (noAnimation) {
-      console.log('skipping animation');
       skipAnimation();
     }
   }, [noAnimation, skipAnimation]);

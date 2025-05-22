@@ -7,6 +7,7 @@ export interface NovelRPGAbility {
   manaCost: number;
   target: 'enemy' | 'ally';
   damage: number;
+  allFoes: boolean;
 }
 export interface NovelRPG {
   heroes: {
@@ -45,6 +46,8 @@ export interface NovelRPG {
   /** List of enemies that can appear in battles */
   enemies: {
     /** Unique identifier for the enemy */
+    enemyId: string;
+    /** Charater to use */
     characterId: string;
     /** Description or identifier of the enemy's battle outfit */
     battleOutfit: string;

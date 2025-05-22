@@ -14,9 +14,10 @@ export function getInitialBattleState(battleConfig: NovelV3.NovelBattle, rpgConf
     }));
 
   const activeEnemies = battleConfig.enemies.map((e, index) => {
-    const enemyCfg = rpgConfig.enemies.find((en) => en.characterId === e.enemyId);
+    const enemyCfg = rpgConfig.enemies.find((en) => en.enemyId === e.enemyId);
     return {
       enemyId: e.enemyId,
+      characterId: enemyCfg?.characterId,
       position: index,
       currentHealth: enemyCfg?.stats.health || 0,
       currentMana: enemyCfg?.stats.mana || 0,

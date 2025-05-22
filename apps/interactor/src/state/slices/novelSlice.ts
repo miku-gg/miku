@@ -139,6 +139,18 @@ const novelSlice = createSlice({
         }
       }
     },
+    changeVisibilityOfPlaceInMap: (
+      state,
+      action: PayloadAction<{ mapId: string; placeId: string; hidden: boolean }>,
+    ) => {
+      const map = state.maps.find((map) => map.id === action.payload.mapId);
+      if (map) {
+        const place = map.places.find((place) => place.id === action.payload.placeId);
+        if (place) {
+          place.hidden = action.payload.hidden;
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -157,6 +169,7 @@ export const {
   removeIndicatorFromScene,
   updateIndicatorInScene,
   changeSceneCharacterOutfit,
+  changeVisibilityOfPlaceInMap,
 } = novelSlice.actions;
 
 export default novelSlice.reducer;
