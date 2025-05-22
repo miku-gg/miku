@@ -261,11 +261,59 @@ const BattleScreen: React.FC = () => {
       manaCost: 0,
       target: 'enemy',
       damage: selectedEnemy.stats.attack,
+      allFoes: false,
     };
     const usableAbilities = [defaultEnemyAbility, ...selectedEnemy.abilities].filter(
       (ability) => ability.manaCost <= selectedEnemy.currentMana,
     );
     const abilityToUse = usableAbilities[Math.floor(Math.random() * usableAbilities.length)];
+    // Handle all-target enemy abilities
+    if (abilityToUse.allFoes) {
+      setAttackerId(selectedEnemy.enemyId);
+      playSoundEffect('attack_spell');
+      // Spend mana for the enemy
+      dispatch(
+        addMana({
+          targetId: selectedEnemy.enemyId,
+          amount: -abilityToUse.manaCost,
+          maxValue: selectedEnemy.stats.mana,
+          isEnemy: true,
+        }),
+      );
+      // Log attack on all heroes
+      const targets = aliveHeroesIds;
+      targets.forEach((targetHero) => {
+        dispatch(
+          addBattleLog({
+            turn: battleState.turn,
+            actorId: selectedEnemy.enemyId,
+            actionType: abilityToUse.name,
+            targets: [targetHero],
+            result: `${abilityToUse.damage} damage`,
+            actorType: 'enemy',
+            targetType: 'hero',
+          }),
+        );
+      });
+      // Apply damage after animation
+      setTimeout(() => {
+        targets.forEach((targetHero) => {
+          dispatch(
+            addHealth({
+              targetId: targetHero,
+              amount: -abilityToUse.damage,
+              maxValue: party.find((h) => h.characterId === targetHero)!.stats.health,
+              isEnemy: false,
+            }),
+          );
+        });
+        dispatch(moveNextTurn());
+        setVictimId(null);
+        setAttackerId(null);
+        setControlsDisabled(false);
+      }, ABILITY_ANIMATION_DURATION);
+      return;
+    }
     const targetHero = aliveHeroesIds[Math.floor(Math.random() * aliveHeroesIds.length)];
     setAttackerId(selectedEnemy.enemyId);
     setVictimId(targetHero);
@@ -494,170 +542,325 @@ const BattleScreen: React.FC = () => {
                   >
                     Go Back
                   </div>
-                  {pendingAbility.target === 'enemy'
-                    ? activeEnemies
-                        .filter((e) => e.currentHealth > 0)
-                        .map((e) => (
-                          <div
-                            key={e.enemyId}
-                            className="BattleScreen__ability-row target"
-                            onMouseEnter={() => playSoundEffect('button_hover')}
-                            onClick={() => {
-                              // Disable controls on attack start
-                              setControlsDisabled(true);
-                              playSoundEffect('attack_spell');
-                              const heroId = party[currentHeroIdx].characterId;
-                              const enemyId = e.enemyId;
-                              // Flicker enemy before damage
-                              const ability = pendingAbility!;
-                              setVictimId(enemyId);
-                              // Compute damage with stats and wearables
-                              const heroStats = party[currentHeroIdx].adjustedStats;
-                              // Lookup defender stats from RPG config (state.activeEnemies lacks stats)
-                              const defenderStats = rpgConfig?.enemies.find((er) => er.enemyId === enemyId)?.stats || {
-                                health: 0,
-                                mana: 0,
-                                attack: 0,
-                                intelligence: 0,
-                                defense: 0,
-                                magicDefense: 0,
-                              };
-                              const baseDmg = ability.damage;
-                              const finalDamage = Math.max(
-                                0,
-                                Math.floor(
-                                  baseDmg +
-                                    heroStats.attack +
-                                    heroStats.intelligence -
-                                    (defenderStats.defense + defenderStats.magicDefense),
-                                ),
-                              );
+                  {pendingAbility.allFoes && pendingAbility.target === 'enemy' && (
+                    <div
+                      key="everyone"
+                      className="BattleScreen__ability-row target"
+                      onMouseEnter={() => playSoundEffect('button_hover')}
+                      onClick={() => {
+                        // Attack all enemies
+                        setControlsDisabled(true);
+                        playSoundEffect('attack_spell');
+                        const heroId = party[currentHeroIdx].characterId;
+                        const ability = pendingAbility!;
+                        const targets = activeEnemies.filter((e) => e.currentHealth > 0).map((e) => e.enemyId);
+                        // Spend mana
+                        dispatch(
+                          addMana({
+                            targetId: heroId,
+                            amount: -ability.manaCost,
+                            maxValue: party[currentHeroIdx].stats.mana,
+                            isEnemy: false,
+                          }),
+                        );
+                        // Log attacks
+                        const heroStats = party[currentHeroIdx].adjustedStats;
+                        targets.forEach((enemyId) => {
+                          const defenderStats = rpgConfig?.enemies.find((er) => er.enemyId === enemyId)?.stats || {
+                            health: 0,
+                            mana: 0,
+                            attack: 0,
+                            intelligence: 0,
+                            defense: 0,
+                            magicDefense: 0,
+                          };
+                          const finalDamage = Math.max(
+                            0,
+                            Math.floor(
+                              ability.damage +
+                                heroStats.attack +
+                                heroStats.intelligence -
+                                (defenderStats.defense + defenderStats.magicDefense),
+                            ),
+                          );
+                          dispatch(
+                            addBattleLog({
+                              turn,
+                              actorId: heroId,
+                              actionType: ability.name,
+                              targets: [enemyId],
+                              result: `${finalDamage} damage`,
+                              actorType: 'hero',
+                              targetType: 'enemy',
+                            }),
+                          );
+                        });
+                        // Apply damage
+                        setTimeout(() => {
+                          activeEnemies
+                            .filter((e) => e.currentHealth > 0)
+                            .forEach((e) => {
+                              const enemyDef = rpgConfig?.enemies.find((er) => er.enemyId === e.enemyId);
+                              const maxHp = enemyDef?.stats.health ?? 0;
                               dispatch(
-                                addBattleLog({
-                                  turn,
-                                  actorId: heroId,
-                                  actionType: ability.name,
-                                  targets: [enemyId],
-                                  result: `${finalDamage} damage`,
-                                  actorType: 'hero',
-                                  targetType: 'enemy',
+                                addHealth({
+                                  targetId: e.enemyId,
+                                  amount: -ability.damage,
+                                  maxValue: maxHp,
+                                  isEnemy: true,
                                 }),
                               );
-                              // Capture initial HP before applying damage
-                              const initialHp = e.currentHealth;
-                              // Hero uses ability: spend mana
-                              dispatch(
-                                addMana({
-                                  targetId: heroId,
-                                  amount: -ability.manaCost,
-                                  maxValue: party[currentHeroIdx].stats.mana,
-                                  isEnemy: false,
-                                }),
-                              );
-                              setTimeout(() => {
-                                const enemyDef = rpgConfig?.enemies.find((er) => er.enemyId === enemyId);
-                                const enemyMaxHealth = enemyDef?.stats.health ?? defenderStats.health;
-                                // Apply damage to enemy
-                                dispatch(
-                                  addHealth({
-                                    targetId: enemyId,
-                                    amount: -finalDamage,
-                                    maxValue: enemyMaxHealth,
-                                    isEnemy: true,
-                                  }),
-                                );
-                                dispatch(moveNextTurn());
-                                setPendingAbility(null);
-                                setVictimId(null);
-                                // Robust guard: skip counterattack if enemy died or no heroes/enemies remain
-                                const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
-                                const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
-                                if (initialHp <= finalDamage || aliveHeroes.length === 0 || aliveEnemies.length === 0) {
-                                  setControlsDisabled(false);
-                                  return;
-                                }
-                                // Schedule counterattack from this enemy
-                                performEnemyTurn();
-                              }, ABILITY_ANIMATION_DURATION);
-                            }}
-                          >
-                            <span className="target-name">
-                              {enemies.find((en) => en.enemyId === e.enemyId)?.name || e.enemyId}
-                            </span>
-                            <span className="target-health">HP: {e.currentHealth}</span>
-                          </div>
-                        ))
-                    : party
-                        .filter((h) => h.currentHealth > 0)
-                        .map((h) => (
-                          <div
-                            key={h.characterId}
-                            className="BattleScreen__ability-row target"
-                            onMouseEnter={() => playSoundEffect('button_hover')}
-                            onClick={() => {
-                              // Disable controls on ability start
-                              setControlsDisabled(true);
-                              // Set healing animation state
-                              setAttackerId(party[currentHeroIdx].characterId);
-                              setHealMode(true);
-                              playSoundEffect('buff_spell');
-                              const heroId = party[currentHeroIdx].characterId;
-                              const allyId = h.characterId;
-                              const ability = pendingAbility!;
-                              // Flicker ally before heal
-                              setVictimId(allyId);
-                              dispatch(
-                                addBattleLog({
-                                  turn,
-                                  actorId: heroId,
-                                  actionType: ability.name,
-                                  targets: [allyId],
-                                  result: `Healed ${ability.damage}`,
-                                  actorType: 'hero',
-                                  targetType: 'hero',
-                                }),
-                              );
-                              dispatch(
-                                addMana({
-                                  targetId: heroId,
-                                  amount: -ability.manaCost,
-                                  maxValue: party[currentHeroIdx].stats.mana,
-                                  isEnemy: false,
-                                }),
-                              );
-                              setTimeout(() => {
-                                dispatch(
-                                  addHealth({
-                                    targetId: allyId,
-                                    amount: ability.damage,
-                                    maxValue: party[currentHeroIdx].stats.health,
-                                    isEnemy: false,
-                                  }),
-                                );
-                                dispatch(moveNextTurn());
-                                setPendingAbility(null);
-                                // Clear heal animation
-                                setVictimId(null);
-                                setAttackerId(null);
-                                setHealMode(false);
-                                // Counterattack
-                                const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
-                                const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
-                                if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
-                                  performEnemyTurn();
-                                } else {
-                                  // No enemies left, re-enable controls immediately
-                                  setControlsDisabled(false);
-                                }
-                              }, ABILITY_ANIMATION_DURATION);
-                            }}
-                          >
-                            <span className="target-name">
-                              {characters.find((c) => c.id === h.characterId)?.name || h.characterId}
-                            </span>
-                            <span className="target-health">HP: {h.currentHealth}</span>
-                          </div>
-                        ))}
+                            });
+                          dispatch(moveNextTurn());
+                          setPendingAbility(null);
+                          const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
+                          const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
+                          if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
+                            performEnemyTurn();
+                          } else {
+                            setControlsDisabled(false);
+                          }
+                        }, ABILITY_ANIMATION_DURATION);
+                      }}
+                    >
+                      <span className="target-name">Everyone</span>
+                    </div>
+                  )}
+                  {pendingAbility.allFoes && pendingAbility.target === 'ally' && (
+                    <div
+                      key="everyone"
+                      className="BattleScreen__ability-row target"
+                      onMouseEnter={() => playSoundEffect('button_hover')}
+                      onClick={() => {
+                        // Heal all allies
+                        setControlsDisabled(true);
+                        setAttackerId(party[currentHeroIdx].characterId);
+                        setHealMode(true);
+                        playSoundEffect('buff_spell');
+                        const heroId = party[currentHeroIdx].characterId;
+                        const ability = pendingAbility!;
+                        const targets = party.filter((h) => h.currentHealth > 0).map((h) => h.characterId);
+                        dispatch(
+                          addMana({
+                            targetId: heroId,
+                            amount: -ability.manaCost,
+                            maxValue: party[currentHeroIdx].stats.mana,
+                            isEnemy: false,
+                          }),
+                        );
+                        dispatch(
+                          addBattleLog({
+                            turn,
+                            actorId: heroId,
+                            actionType: ability.name,
+                            targets,
+                            result: `Healed ${ability.damage}`,
+                            actorType: 'hero',
+                            targetType: 'hero',
+                          }),
+                        );
+                        setTimeout(() => {
+                          targets.forEach((allyId) => {
+                            dispatch(
+                              addHealth({
+                                targetId: allyId,
+                                amount: ability.damage,
+                                maxValue: party[currentHeroIdx].stats.health,
+                                isEnemy: false,
+                              }),
+                            );
+                          });
+                          dispatch(moveNextTurn());
+                          setPendingAbility(null);
+                          setVictimId(null);
+                          setAttackerId(null);
+                          setHealMode(false);
+                          const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
+                          const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
+                          if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
+                            performEnemyTurn();
+                          } else {
+                            setControlsDisabled(false);
+                          }
+                        }, ABILITY_ANIMATION_DURATION);
+                      }}
+                    >
+                      <span className="target-name">Everyone</span>
+                    </div>
+                  )}
+                  {!pendingAbility.allFoes && (
+                    <>
+                      {pendingAbility.target === 'enemy'
+                        ? activeEnemies
+                            .filter((e) => e.currentHealth > 0)
+                            .map((e) => (
+                              <div
+                                key={e.enemyId}
+                                className="BattleScreen__ability-row target"
+                                onMouseEnter={() => playSoundEffect('button_hover')}
+                                onClick={() => {
+                                  // Disable controls on attack start
+                                  setControlsDisabled(true);
+                                  playSoundEffect('attack_spell');
+                                  const heroId = party[currentHeroIdx].characterId;
+                                  const enemyId = e.enemyId;
+                                  // Flicker enemy before damage
+                                  const ability = pendingAbility!;
+                                  setVictimId(enemyId);
+                                  // Compute damage with stats and wearables
+                                  const heroStats = party[currentHeroIdx].adjustedStats;
+                                  // Lookup defender stats from RPG config (state.activeEnemies lacks stats)
+                                  const defenderStats = rpgConfig?.enemies.find((er) => er.enemyId === enemyId)
+                                    ?.stats || {
+                                    health: 0,
+                                    mana: 0,
+                                    attack: 0,
+                                    intelligence: 0,
+                                    defense: 0,
+                                    magicDefense: 0,
+                                  };
+                                  const baseDmg = ability.damage;
+                                  const finalDamage = Math.max(
+                                    0,
+                                    Math.floor(
+                                      baseDmg +
+                                        heroStats.attack +
+                                        heroStats.intelligence -
+                                        (defenderStats.defense + defenderStats.magicDefense),
+                                    ),
+                                  );
+                                  dispatch(
+                                    addBattleLog({
+                                      turn,
+                                      actorId: heroId,
+                                      actionType: ability.name,
+                                      targets: [enemyId],
+                                      result: `${finalDamage} damage`,
+                                      actorType: 'hero',
+                                      targetType: 'enemy',
+                                    }),
+                                  );
+                                  // Capture initial HP before applying damage
+                                  const initialHp = e.currentHealth;
+                                  // Hero uses ability: spend mana
+                                  dispatch(
+                                    addMana({
+                                      targetId: heroId,
+                                      amount: -ability.manaCost,
+                                      maxValue: party[currentHeroIdx].stats.mana,
+                                      isEnemy: false,
+                                    }),
+                                  );
+                                  setTimeout(() => {
+                                    const enemyDef = rpgConfig?.enemies.find((er) => er.enemyId === enemyId);
+                                    const enemyMaxHealth = enemyDef?.stats.health ?? defenderStats.health;
+                                    // Apply damage to enemy
+                                    dispatch(
+                                      addHealth({
+                                        targetId: enemyId,
+                                        amount: -finalDamage,
+                                        maxValue: enemyMaxHealth,
+                                        isEnemy: true,
+                                      }),
+                                    );
+                                    dispatch(moveNextTurn());
+                                    setPendingAbility(null);
+                                    setVictimId(null);
+                                    // Robust guard: skip counterattack if enemy died or no heroes/enemies remain
+                                    const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
+                                    const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
+                                    if (
+                                      initialHp <= finalDamage ||
+                                      aliveHeroes.length === 0 ||
+                                      aliveEnemies.length === 0
+                                    ) {
+                                      setControlsDisabled(false);
+                                      return;
+                                    }
+                                    // Schedule counterattack from this enemy
+                                    performEnemyTurn();
+                                  }, ABILITY_ANIMATION_DURATION);
+                                }}
+                              >
+                                <span className="target-name">
+                                  {enemies.find((en) => en.enemyId === e.enemyId)?.name || e.enemyId}
+                                </span>
+                                <span className="target-health">HP: {e.currentHealth}</span>
+                              </div>
+                            ))
+                        : party
+                            .filter((h) => h.currentHealth > 0)
+                            .map((h) => (
+                              <div
+                                key={h.characterId}
+                                className="BattleScreen__ability-row target"
+                                onMouseEnter={() => playSoundEffect('button_hover')}
+                                onClick={() => {
+                                  // Disable controls on ability start
+                                  setControlsDisabled(true);
+                                  // Set healing animation state
+                                  setAttackerId(party[currentHeroIdx].characterId);
+                                  setHealMode(true);
+                                  playSoundEffect('buff_spell');
+                                  const heroId = party[currentHeroIdx].characterId;
+                                  const allyId = h.characterId;
+                                  const ability = pendingAbility!;
+                                  // Flicker ally before heal
+                                  setVictimId(allyId);
+                                  dispatch(
+                                    addBattleLog({
+                                      turn,
+                                      actorId: heroId,
+                                      actionType: ability.name,
+                                      targets: [allyId],
+                                      result: `Healed ${ability.damage}`,
+                                      actorType: 'hero',
+                                      targetType: 'hero',
+                                    }),
+                                  );
+                                  dispatch(
+                                    addMana({
+                                      targetId: heroId,
+                                      amount: -ability.manaCost,
+                                      maxValue: party[currentHeroIdx].stats.mana,
+                                      isEnemy: false,
+                                    }),
+                                  );
+                                  setTimeout(() => {
+                                    dispatch(
+                                      addHealth({
+                                        targetId: allyId,
+                                        amount: ability.damage,
+                                        maxValue: party[currentHeroIdx].stats.health,
+                                        isEnemy: false,
+                                      }),
+                                    );
+                                    dispatch(moveNextTurn());
+                                    setPendingAbility(null);
+                                    // Clear heal animation
+                                    setVictimId(null);
+                                    setAttackerId(null);
+                                    setHealMode(false);
+                                    // Counterattack
+                                    const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
+                                    const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
+                                    if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
+                                      performEnemyTurn();
+                                    } else {
+                                      // No enemies left, re-enable controls immediately
+                                      setControlsDisabled(false);
+                                    }
+                                  }, ABILITY_ANIMATION_DURATION);
+                                }}
+                              >
+                                <span className="target-name">
+                                  {characters.find((c) => c.id === h.characterId)?.name || h.characterId}
+                                </span>
+                                <span className="target-health">HP: {h.currentHealth}</span>
+                              </div>
+                            ))}
+                    </>
+                  )}
                 </>
               ) : (
                 <>
@@ -669,6 +872,7 @@ const BattleScreen: React.FC = () => {
                       manaCost: 0,
                       target: 'enemy',
                       damage: party[currentHeroIdx]?.stats.attack ?? 0,
+                      allFoes: false,
                     } as NovelV3.NovelRPGAbility,
                   ]
                     .concat(party[currentHeroIdx].abilities || [])
