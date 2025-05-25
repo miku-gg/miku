@@ -35,7 +35,7 @@ const BattleScreen: React.FC = () => {
   const currentBattle = useAppSelector((state) => state.narration.currentBattle);
   const battleLog = useAppSelector((state) => state.narration.currentBattle?.state.battleLog || []);
   const [pendingAbility, setPendingAbility] = useState<NovelV3.NovelRPGAbility | null>(null);
-  const [victimId, setVictimId] = useState<string | null>(null);
+  const [victimIds, setVictimIds] = useState<string[]>([]);
   const [controlsDisabled, setControlsDisabled] = useState(false);
   const [attackerId, setAttackerId] = useState<string | null>(null);
   const [healMode, setHealMode] = useState(false);
@@ -295,6 +295,8 @@ const BattleScreen: React.FC = () => {
           }),
         );
       });
+      // Set all heroes as victims for animation
+      setVictimIds(targets);
       // Apply damage after animation
       setTimeout(() => {
         targets.forEach((targetHero) => {
@@ -308,7 +310,7 @@ const BattleScreen: React.FC = () => {
           );
         });
         dispatch(moveNextTurn());
-        setVictimId(null);
+        setVictimIds([]);
         setAttackerId(null);
         setControlsDisabled(false);
       }, ABILITY_ANIMATION_DURATION);
@@ -316,7 +318,7 @@ const BattleScreen: React.FC = () => {
     }
     const targetHero = aliveHeroesIds[Math.floor(Math.random() * aliveHeroesIds.length)];
     setAttackerId(selectedEnemy.enemyId);
-    setVictimId(targetHero);
+    setVictimIds([targetHero]);
     playSoundEffect('attack_spell');
     dispatch(
       addBattleLog({
@@ -347,7 +349,7 @@ const BattleScreen: React.FC = () => {
         }),
       );
       dispatch(moveNextTurn());
-      setVictimId(null);
+      setVictimIds([]);
       setAttackerId(null);
       setControlsDisabled(false);
     }, ABILITY_ANIMATION_DURATION);
@@ -358,7 +360,7 @@ const BattleScreen: React.FC = () => {
     setControlsDisabled(true);
     dispatch(moveNextTurn());
     setPendingAbility(null);
-    setVictimId(null);
+    setVictimIds([]);
     setAttackerId(null);
     setHealMode(false);
     performEnemyTurn();
@@ -383,7 +385,7 @@ const BattleScreen: React.FC = () => {
             <div
               key={h.characterId}
               className={`BattleScreen__battler ${h.characterId === attackerId ? 'attacking' : ''} ${
-                h.characterId === victimId ? (healMode ? 'heal-victim' : 'victim') : ''
+                victimIds.includes(h.characterId) ? (healMode ? 'heal-victim' : 'victim') : ''
               }`}
             >
               <EmotionRenderer
@@ -407,7 +409,7 @@ const BattleScreen: React.FC = () => {
               <div
                 key={e.enemyId}
                 className={`BattleScreen__battler ${e.enemyId === attackerId ? 'attacking' : ''} ${
-                  e.enemyId === victimId ? (healMode ? 'heal-victim' : 'victim') : ''
+                  victimIds.includes(e.enemyId) ? (healMode ? 'heal-victim' : 'victim') : ''
                 }`}
               >
                 <EmotionRenderer
@@ -554,6 +556,8 @@ const BattleScreen: React.FC = () => {
                         const heroId = party[currentHeroIdx].characterId;
                         const ability = pendingAbility!;
                         const targets = activeEnemies.filter((e) => e.currentHealth > 0).map((e) => e.enemyId);
+                        // Set all enemies as victims for animation
+                        setVictimIds(targets);
                         // Spend mana
                         dispatch(
                           addMana({
@@ -613,6 +617,7 @@ const BattleScreen: React.FC = () => {
                             });
                           dispatch(moveNextTurn());
                           setPendingAbility(null);
+                          setVictimIds([]);
                           const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
                           const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
                           if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
@@ -640,6 +645,8 @@ const BattleScreen: React.FC = () => {
                         const heroId = party[currentHeroIdx].characterId;
                         const ability = pendingAbility!;
                         const targets = party.filter((h) => h.currentHealth > 0).map((h) => h.characterId);
+                        // Set all allies as victims for heal animation
+                        setVictimIds(targets);
                         dispatch(
                           addMana({
                             targetId: heroId,
@@ -672,7 +679,7 @@ const BattleScreen: React.FC = () => {
                           });
                           dispatch(moveNextTurn());
                           setPendingAbility(null);
-                          setVictimId(null);
+                          setVictimIds([]);
                           setAttackerId(null);
                           setHealMode(false);
                           const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
@@ -706,7 +713,7 @@ const BattleScreen: React.FC = () => {
                                   const enemyId = e.enemyId;
                                   // Flicker enemy before damage
                                   const ability = pendingAbility!;
-                                  setVictimId(enemyId);
+                                  setVictimIds([enemyId]);
                                   // Compute damage with stats and wearables
                                   const heroStats = party[currentHeroIdx].adjustedStats;
                                   // Lookup defender stats from RPG config (state.activeEnemies lacks stats)
@@ -765,7 +772,7 @@ const BattleScreen: React.FC = () => {
                                     );
                                     dispatch(moveNextTurn());
                                     setPendingAbility(null);
-                                    setVictimId(null);
+                                    setVictimIds([]);
                                     // Robust guard: skip counterattack if enemy died or no heroes/enemies remain
                                     const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
                                     const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
@@ -806,7 +813,7 @@ const BattleScreen: React.FC = () => {
                                   const allyId = h.characterId;
                                   const ability = pendingAbility!;
                                   // Flicker ally before heal
-                                  setVictimId(allyId);
+                                  setVictimIds([allyId]);
                                   dispatch(
                                     addBattleLog({
                                       turn,
@@ -838,7 +845,7 @@ const BattleScreen: React.FC = () => {
                                     dispatch(moveNextTurn());
                                     setPendingAbility(null);
                                     // Clear heal animation
-                                    setVictimId(null);
+                                    setVictimIds([]);
                                     setAttackerId(null);
                                     setHealMode(false);
                                     // Counterattack

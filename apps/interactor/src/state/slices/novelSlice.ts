@@ -151,6 +151,41 @@ const novelSlice = createSlice({
         }
       }
     },
+    addAbilityToCharacter: (state, action: PayloadAction<{ characterId: string; abilityId: string }>) => {
+      const hero = state.rpg?.heroes.find((hero) => hero.characterId === action.payload.characterId);
+      if (hero) {
+        const existingAbility = hero.abilities.find((ability) => ability.abilityId === action.payload.abilityId);
+        if (!existingAbility) {
+          hero.abilities.push({
+            abilityId: action.payload.abilityId,
+          });
+        }
+      }
+    },
+    addCharacterToParty: (state, action: PayloadAction<{ characterId: string }>) => {
+      const hero = state.rpg?.heroes.find((hero) => hero.characterId === action.payload.characterId);
+      if (hero) {
+        hero.isInParty = true;
+      }
+    },
+    changeCharacterBattleOutfit: (state, action: PayloadAction<{ characterId: string; outfitId: string }>) => {
+      const hero = state.rpg?.heroes.find((hero) => hero.characterId === action.payload.characterId);
+      if (hero) {
+        hero.battleOutfit = action.payload.outfitId;
+      }
+    },
+    changeCutscenePartBackground: (
+      state,
+      action: PayloadAction<{ cutsceneId: string; partId: string; backgroundId: string }>,
+    ) => {
+      const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
+      if (cutscene) {
+        const part = cutscene.parts.find((part) => part.id === action.payload.partId);
+        if (part) {
+          part.background = action.payload.backgroundId;
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -170,6 +205,10 @@ export const {
   updateIndicatorInScene,
   changeSceneCharacterOutfit,
   changeVisibilityOfPlaceInMap,
+  addAbilityToCharacter,
+  addCharacterToParty,
+  changeCharacterBattleOutfit,
+  changeCutscenePartBackground,
 } = novelSlice.actions;
 
 export default novelSlice.reducer;

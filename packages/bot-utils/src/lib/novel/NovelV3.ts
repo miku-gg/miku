@@ -151,6 +151,10 @@ export enum NovelActionType {
   BATTLE_START = 'BATTLE_START',
   CHANGE_SCENE_CHARACTER_OUTFIT = 'CHANGE_SCENE_CHARACTER_OUTFIT',
   CHANGE_VISIBILITY_OF_PLACE_IN_MAP = 'CHANGE_VISIBILITY_OF_PLACE_IN_MAP',
+  CHANGE_CUTSCENE_PART_BACKGROUND = 'CHANGE_CUTSCENE_PART_BACKGROUND',
+  RPG_ADD_ABILITY_TO_CHARACTER = 'RPG_ADD_ABILITY_TO_CHARACTER',
+  RPG_ADD_CHARACTER_TO_PARTY = 'RPG_ADD_CHARACTER_TO_PARTY',
+  RPG_CHANGE_BATTLE_OUTFIT = 'RPG_CHANGE_BATTLE_OUTFIT',
 }
 
 export type NovelAction =
@@ -210,6 +214,34 @@ export type NovelAction =
         mapId: string;
         placeId: string;
         hidden: boolean;
+      };
+    }
+  | {
+      type: NovelActionType.RPG_ADD_ABILITY_TO_CHARACTER;
+      params: {
+        characterId: string;
+        abilityId: string;
+      };
+    }
+  | {
+      type: NovelActionType.RPG_ADD_CHARACTER_TO_PARTY;
+      params: {
+        characterId: string;
+      };
+    }
+  | {
+      type: NovelActionType.RPG_CHANGE_BATTLE_OUTFIT;
+      params: {
+        characterId: string;
+        outfitId: string;
+      };
+    }
+  | {
+      type: NovelActionType.CHANGE_CUTSCENE_PART_BACKGROUND;
+      params: {
+        cutsceneId: string;
+        partId: string;
+        backgroundId: string;
       };
     };
 
