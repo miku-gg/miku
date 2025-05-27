@@ -798,13 +798,14 @@
     flex-direction: row;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 10px;
+    gap: 0px;
     padding: 0;
 
     .BattleScreen__battler {
       top: 0 !important;
       left: 0 !important;
       position: relative !important;
+      flex: 1 !important;
     }
 
     .BattleScreen__bar.hp {

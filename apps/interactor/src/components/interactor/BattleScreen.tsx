@@ -361,11 +361,11 @@ const BattleScreen: React.FC = () => {
   // Handler for skipping hero turn
   const handleDoNothing = () => {
     setControlsDisabled(true);
-    dispatch(moveNextTurn());
     setPendingAbility(null);
     setVictimIds([]);
     setAttackerId(null);
     setHealMode(false);
+    // Enemy turn will advance the turn (same as attack actions)
     performEnemyTurn();
   };
 
