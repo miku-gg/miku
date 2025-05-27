@@ -59,37 +59,82 @@
   flex: 1;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   padding: 20px;
   position: relative;
   z-index: 1;
   width: 100%;
   height: 70%;
+  overflow: hidden;
 }
 
 .BattleScreen__party-group,
 .BattleScreen__enemy-group {
-  display: flex;
-  align-items: flex-end;
-  flex: 1;
   position: relative;
   z-index: 2;
+  height: 100%;
+  width: 45%;
+  max-width: 400px;
 }
+
 .BattleScreen__party-group {
-  justify-content: flex-start;
+  align-items: flex-start;
+  justify-content: center;
+  padding-left: 20px;
 }
+
 .BattleScreen__enemy-group {
-  justify-content: flex-end;
+  align-items: flex-end;
+  justify-content: center;
+  padding-right: 20px;
 }
 
 /* Individual battler (character or enemy) */
 .BattleScreen__battler {
-  position: relative;
-  margin: 0 8px;
-  width: 50%;
+  position: absolute;
+  // width: 300px;
+  height: 320px;
+  margin: 8px 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
+
+/* Cascade positioning */
+.BattleScreen__enemy-group,
+.BattleScreen__party-group {
+  .BattleScreen__battler:nth-child(1) {
+    // transform: translateX(-60px);
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+  .BattleScreen__battler:nth-child(2) {
+    // transform: translateX(-40px);
+    top: 20px;
+    right: 0px;
+    z-index: 2;
+  }
+  .BattleScreen__battler:nth-child(3) {
+    // transform: translateX(-20px);
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+  }
+  .BattleScreen__battler:nth-child(4) {
+    // transform: translateX(0px);
+    bottom: 0;
+    right: 0;
+    z-index: 4;
+  }
+}
+
 .BattleScreen__battler-emotion {
-  width: 100%;
+  // width: 100%;
+  height: 100%;
+  object-fit: contain;
+  max-width: 400px;
+  max-height: 400px;
 }
 
 /* HP/MP bars above each character image */
@@ -97,18 +142,19 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 6px;
+  width: 80px;
+  height: 8px;
   background: #333;
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 .BattleScreen__bar.hp {
-  top: 0;
+  top: -20px;
   background: #550000;
 }
 .BattleScreen__bar.mp {
-  top: 8px;
+  top: -10px;
   background: #000055;
 }
 .BattleScreen__fill {
@@ -528,14 +574,14 @@
 }
 
 /* Attacking character highlight (only emotion) */
-.BattleScreen__battler.heal-victim {
-  z-index: 3;
+.BattleScreen__battler.attacking {
+  z-index: 10 !important;
   animation: whiten 0.5s ease-in-out both;
 }
 
 /* Victim enemy highlight (only emotion) */
 .BattleScreen__battler.victim {
-  z-index: 3;
+  z-index: 10 !important;
   animation: flickerRed 0.5s linear both, shake 0.5s linear both;
 }
 
@@ -552,16 +598,54 @@
 
 /* Apply green glow for healing */
 .BattleScreen__battler.heal-victim {
-  z-index: 3;
+  z-index: 10 !important;
 }
 .BattleScreen__battler.heal-victim .BattleScreen__battler-emotion {
   animation: greenGlow 2s ease-in-out both;
 }
 
+/* Death animation and styling for dead heroes */
+@keyframes deathFade {
+  0% {
+    filter: none;
+    transform: scale(1);
+  }
+  50% {
+    filter: grayscale(100%) brightness(0.5);
+    transform: scale(0.95);
+  }
+  100% {
+    filter: grayscale(100%) brightness(0.3);
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}
+
+.BattleScreen__battler.dead {
+  filter: grayscale(100%) brightness(0.3);
+  opacity: 0.6;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+
+.BattleScreen__battler.dead .BattleScreen__battler-emotion {
+  animation: deathFade 1s ease-out both;
+}
+
+.BattleScreen__party-member.dead {
+  filter: grayscale(100%) brightness(0.5);
+  opacity: 0.7;
+}
+
+.BattleScreen__party-member.dead .BattleScreen__party-member-image {
+  filter: grayscale(100%) brightness(0.3);
+}
+
 /* Borders are removed by default for animated states */
 .BattleScreen__battler.attacking,
 .BattleScreen__battler.victim,
-.BattleScreen__battler.heal-victim {
+.BattleScreen__battler.heal-victim,
+.BattleScreen__battler.dead {
   border: none !important;
 }
 
@@ -679,6 +763,107 @@
     /* adjust scrolling since content is rotated */
     overflow-y: hidden;
     overflow-x: auto;
+  }
+}
+
+// Responsive adjustments for smaller screens
+@media screen and (max-width: 1024px) {
+  .ability-description {
+    display: none;
+  }
+
+  .BattleScreen__battler {
+    width: 150px;
+    height: 170px;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
+  .BattleScreen__battlefield {
+    padding: 0;
+  }
+
+  .BattleScreen__controls {
+    padding: 5px;
+    height: 157px;
+  }
+
+  .BattleScreen__controls-player {
+    border-radius: 8px;
+  }
+
+  .BattleScreen__party-group,
+  .BattleScreen__enemy-group {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0;
+
+    .BattleScreen__battler {
+      top: 0 !important;
+      left: 0 !important;
+      position: relative !important;
+    }
+
+    .BattleScreen__bar.hp {
+      top: 10px !important;
+    }
+    .BattleScreen__bar.mp {
+      top: 20px !important;
+    }
+  }
+
+  .BattleScreen__battler-emotion {
+    max-width: 150px;
+    max-height: 150px;
+  }
+  // .BattleScreen__party-group .BattleScreen__battler:nth-child(2) {
+  //   transform: translateX(15px);
+  // }
+  // .BattleScreen__party-group .BattleScreen__battler:nth-child(3) {
+  //   transform: translateX(30px);
+  // }
+  // .BattleScreen__party-group .BattleScreen__battler:nth-child(4) {
+  //   transform: translateX(45px);
+  // }
+
+  // .BattleScreen__enemy-group .BattleScreen__battler:nth-child(2) {
+  //   transform: translateX(-15px);
+  // }
+  // .BattleScreen__enemy-group .BattleScreen__battler:nth-child(3) {
+  //   transform: translateX(-30px);
+  // }
+  // .BattleScreen__enemy-group .BattleScreen__battler:nth-child(4) {
+  //   transform: translateX(-45px);
+  // }
+}
+
+@media screen and (max-width: 768px) {
+  .BattleScreen__battler {
+    width: 150px;
+    height: 170px;
+  }
+
+  .BattleScreen__battler-emotion {
+    max-width: 150px;
+    max-height: 150px;
+  }
+  // .BattleScreen__battler {
+  //   width: 80px;
+  //   height: 100px;
+  //   margin: 6px 0;
+  // }
+
+  // .BattleScreen__battler-emotion {
+  //   max-width: 80px;
+  //   max-height: 80px;
+  // }
+
+  .BattleScreen__bar {
+    width: 60px;
+    height: 6px;
   }
 }
 

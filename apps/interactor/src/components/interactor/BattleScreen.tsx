@@ -180,9 +180,12 @@ const BattleScreen: React.FC = () => {
     };
   });
 
-  // Determine current actor index
-  const heroCount = party.length || 1;
-  const currentHeroIdx = (turn - 1) % heroCount;
+  // Determine current actor index (only alive heroes)
+  const aliveParty = party.filter((h) => h.currentHealth > 0);
+  const heroCount = aliveParty.length || 1;
+  const currentAliveHeroIdx = (turn - 1) % heroCount;
+  const currentHero = aliveParty[currentAliveHeroIdx];
+  const currentHeroIdx = party.findIndex((h) => h.characterId === currentHero?.characterId);
 
   // Handler for retrying the battle if allowed
   const handleRetry = () => {
@@ -239,8 +242,8 @@ const BattleScreen: React.FC = () => {
         text: isVictory
           ? battleConfig?.winPromptMessage || 'OOC: The battle was won. Please describe the aftermath.'
           : battleConfig?.lossPromptMessage || 'OOC: The battle was lost. Please describe the aftermath.',
-        characters: party.map((h) => h.characterId),
-        selectedCharacterId: party[currentHeroIdx]?.characterId || '',
+        characters: party.filter((h) => h.currentHealth > 0).map((h) => h.characterId),
+        selectedCharacterId: party.find((h) => h.currentHealth > 0)?.characterId || party[0]?.characterId || '',
       }),
     );
   };
@@ -386,7 +389,7 @@ const BattleScreen: React.FC = () => {
               key={h.characterId}
               className={`BattleScreen__battler ${h.characterId === attackerId ? 'attacking' : ''} ${
                 victimIds.includes(h.characterId) ? (healMode ? 'heal-victim' : 'victim') : ''
-              }`}
+              } ${h.currentHealth <= 0 ? 'dead' : ''}`}
             >
               <EmotionRenderer
                 className="BattleScreen__battler-emotion"
@@ -437,7 +440,9 @@ const BattleScreen: React.FC = () => {
             {party.map((h, idx) => (
               <div
                 key={h.characterId}
-                className={`BattleScreen__party-member ${idx === currentHeroIdx ? 'active' : ''}`}
+                className={`BattleScreen__party-member ${idx === currentHeroIdx ? 'active' : ''} ${
+                  h.currentHealth <= 0 ? 'dead' : ''
+                }`}
               >
                 <img
                   src={assetLinkLoader(h.profilePic, AssetDisplayPrefix.CHARACTER_PIC_SMALL)}
@@ -483,8 +488,8 @@ const BattleScreen: React.FC = () => {
                 >
                   <GiSwordman />
                 </span>
-                <span className="BattleScreen__stat-value">{party[currentHeroIdx].adjustedStats.attack}</span>
-                {party[currentHeroIdx].statBonuses.attack > 0 && (
+                <span className="BattleScreen__stat-value">{party[currentHeroIdx]?.adjustedStats.attack || 0}</span>
+                {party[currentHeroIdx]?.statBonuses.attack > 0 && (
                   <span className="BattleScreen__stat-bonus">+{party[currentHeroIdx].statBonuses.attack}</span>
                 )}
               </div>
@@ -498,8 +503,8 @@ const BattleScreen: React.FC = () => {
                 >
                   <GiShield />
                 </span>
-                <span className="BattleScreen__stat-value">{party[currentHeroIdx].adjustedStats.defense}</span>
-                {party[currentHeroIdx].statBonuses.defense > 0 && (
+                <span className="BattleScreen__stat-value">{party[currentHeroIdx]?.adjustedStats.defense || 0}</span>
+                {party[currentHeroIdx]?.statBonuses.defense > 0 && (
                   <span className="BattleScreen__stat-bonus">+{party[currentHeroIdx].statBonuses.defense}</span>
                 )}
               </div>
@@ -513,8 +518,10 @@ const BattleScreen: React.FC = () => {
                 >
                   <GiSpellBook />
                 </span>
-                <span className="BattleScreen__stat-value">{party[currentHeroIdx].adjustedStats.intelligence}</span>
-                {party[currentHeroIdx].statBonuses.intelligence > 0 && (
+                <span className="BattleScreen__stat-value">
+                  {party[currentHeroIdx]?.adjustedStats.intelligence || 0}
+                </span>
+                {party[currentHeroIdx]?.statBonuses.intelligence > 0 && (
                   <span className="BattleScreen__stat-bonus">+{party[currentHeroIdx].statBonuses.intelligence}</span>
                 )}
               </div>
@@ -527,15 +534,19 @@ const BattleScreen: React.FC = () => {
                 >
                   <GiMagicSwirl />
                 </span>
-                <span className="BattleScreen__stat-value">{party[currentHeroIdx].adjustedStats.magicDefense}</span>
-                {party[currentHeroIdx].statBonuses.magicDefense > 0 && (
+                <span className="BattleScreen__stat-value">
+                  {party[currentHeroIdx]?.adjustedStats.magicDefense || 0}
+                </span>
+                {party[currentHeroIdx]?.statBonuses.magicDefense > 0 && (
                   <span className="BattleScreen__stat-bonus">+{party[currentHeroIdx].statBonuses.magicDefense}</span>
                 )}
               </div>
               <Tooltip id="stat-label-tooltip" place="top" />
             </div>
             <div className="BattleScreen__abilities-panel scrollbar">
-              {pendingAbility ? (
+              {!party[currentHeroIdx] || party[currentHeroIdx].currentHealth <= 0 ? (
+                <div style={{ textAlign: 'center', color: '#ccc', padding: '20px' }}>No active hero available</div>
+              ) : pendingAbility ? (
                 <>
                   <div
                     className="BattleScreen__enemy-select-back"
@@ -553,7 +564,10 @@ const BattleScreen: React.FC = () => {
                         // Attack all enemies
                         setControlsDisabled(true);
                         playSoundEffect('attack_spell');
-                        const heroId = party[currentHeroIdx].characterId;
+                        const currentActiveHero = party[currentHeroIdx];
+                        if (!currentActiveHero || currentActiveHero.currentHealth <= 0) return;
+
+                        const heroId = currentActiveHero.characterId;
                         const ability = pendingAbility!;
                         const targets = activeEnemies.filter((e) => e.currentHealth > 0).map((e) => e.enemyId);
                         // Set all enemies as victims for animation
@@ -563,12 +577,12 @@ const BattleScreen: React.FC = () => {
                           addMana({
                             targetId: heroId,
                             amount: -ability.manaCost,
-                            maxValue: party[currentHeroIdx].stats.mana,
+                            maxValue: currentActiveHero.stats.mana,
                             isEnemy: false,
                           }),
                         );
                         // Log attacks
-                        const heroStats = party[currentHeroIdx].adjustedStats;
+                        const heroStats = currentActiveHero.adjustedStats;
                         targets.forEach((enemyId) => {
                           const defenderStats = rpgConfig?.enemies.find((er) => er.enemyId === enemyId)?.stats || {
                             health: 0,
@@ -615,14 +629,16 @@ const BattleScreen: React.FC = () => {
                                 }),
                               );
                             });
-                          dispatch(moveNextTurn());
                           setPendingAbility(null);
                           setVictimIds([]);
                           const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
                           const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
                           if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
+                            // Enemy turn will advance the turn
                             performEnemyTurn();
                           } else {
+                            // No enemies left, advance turn and re-enable controls
+                            dispatch(moveNextTurn());
                             setControlsDisabled(false);
                           }
                         }, ABILITY_ANIMATION_DURATION);
@@ -638,11 +654,14 @@ const BattleScreen: React.FC = () => {
                       onMouseEnter={() => playSoundEffect('button_hover')}
                       onClick={() => {
                         // Heal all allies
+                        const currentActiveHero = party[currentHeroIdx];
+                        if (!currentActiveHero || currentActiveHero.currentHealth <= 0) return;
+
                         setControlsDisabled(true);
-                        setAttackerId(party[currentHeroIdx].characterId);
+                        setAttackerId(currentActiveHero.characterId);
                         setHealMode(true);
                         playSoundEffect('buff_spell');
-                        const heroId = party[currentHeroIdx].characterId;
+                        const heroId = currentActiveHero.characterId;
                         const ability = pendingAbility!;
                         const targets = party.filter((h) => h.currentHealth > 0).map((h) => h.characterId);
                         // Set all allies as victims for heal animation
@@ -651,7 +670,7 @@ const BattleScreen: React.FC = () => {
                           addMana({
                             targetId: heroId,
                             amount: -ability.manaCost,
-                            maxValue: party[currentHeroIdx].stats.mana,
+                            maxValue: currentActiveHero.stats.mana,
                             isEnemy: false,
                           }),
                         );
@@ -672,12 +691,11 @@ const BattleScreen: React.FC = () => {
                               addHealth({
                                 targetId: allyId,
                                 amount: ability.damage,
-                                maxValue: party[currentHeroIdx].stats.health,
+                                maxValue: party.find((h) => h.characterId === allyId)?.stats.health || 0,
                                 isEnemy: false,
                               }),
                             );
                           });
-                          dispatch(moveNextTurn());
                           setPendingAbility(null);
                           setVictimIds([]);
                           setAttackerId(null);
@@ -685,8 +703,11 @@ const BattleScreen: React.FC = () => {
                           const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
                           const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
                           if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
+                            // Enemy turn will advance the turn
                             performEnemyTurn();
                           } else {
+                            // No enemies left, advance turn and re-enable controls
+                            dispatch(moveNextTurn());
                             setControlsDisabled(false);
                           }
                         }, ABILITY_ANIMATION_DURATION);
@@ -707,15 +728,18 @@ const BattleScreen: React.FC = () => {
                                 onMouseEnter={() => playSoundEffect('button_hover')}
                                 onClick={() => {
                                   // Disable controls on attack start
+                                  const currentActiveHero = party[currentHeroIdx];
+                                  if (!currentActiveHero || currentActiveHero.currentHealth <= 0) return;
+
                                   setControlsDisabled(true);
                                   playSoundEffect('attack_spell');
-                                  const heroId = party[currentHeroIdx].characterId;
+                                  const heroId = currentActiveHero.characterId;
                                   const enemyId = e.enemyId;
                                   // Flicker enemy before damage
                                   const ability = pendingAbility!;
                                   setVictimIds([enemyId]);
                                   // Compute damage with stats and wearables
-                                  const heroStats = party[currentHeroIdx].adjustedStats;
+                                  const heroStats = currentActiveHero.adjustedStats;
                                   // Lookup defender stats from RPG config (state.activeEnemies lacks stats)
                                   const defenderStats = rpgConfig?.enemies.find((er) => er.enemyId === enemyId)
                                     ?.stats || {
@@ -754,7 +778,7 @@ const BattleScreen: React.FC = () => {
                                     addMana({
                                       targetId: heroId,
                                       amount: -ability.manaCost,
-                                      maxValue: party[currentHeroIdx].stats.mana,
+                                      maxValue: currentActiveHero.stats.mana,
                                       isEnemy: false,
                                     }),
                                   );
@@ -770,7 +794,6 @@ const BattleScreen: React.FC = () => {
                                         isEnemy: true,
                                       }),
                                     );
-                                    dispatch(moveNextTurn());
                                     setPendingAbility(null);
                                     setVictimIds([]);
                                     // Robust guard: skip counterattack if enemy died or no heroes/enemies remain
@@ -781,10 +804,12 @@ const BattleScreen: React.FC = () => {
                                       aliveHeroes.length === 0 ||
                                       aliveEnemies.length === 0
                                     ) {
+                                      // Move turn only when battle ends or enemy dies
+                                      dispatch(moveNextTurn());
                                       setControlsDisabled(false);
                                       return;
                                     }
-                                    // Schedule counterattack from this enemy
+                                    // Schedule counterattack from this enemy (enemy turn will advance the turn)
                                     performEnemyTurn();
                                   }, ABILITY_ANIMATION_DURATION);
                                 }}
@@ -804,12 +829,15 @@ const BattleScreen: React.FC = () => {
                                 onMouseEnter={() => playSoundEffect('button_hover')}
                                 onClick={() => {
                                   // Disable controls on ability start
+                                  const currentActiveHero = party[currentHeroIdx];
+                                  if (!currentActiveHero || currentActiveHero.currentHealth <= 0) return;
+
                                   setControlsDisabled(true);
                                   // Set healing animation state
-                                  setAttackerId(party[currentHeroIdx].characterId);
+                                  setAttackerId(currentActiveHero.characterId);
                                   setHealMode(true);
                                   playSoundEffect('buff_spell');
-                                  const heroId = party[currentHeroIdx].characterId;
+                                  const heroId = currentActiveHero.characterId;
                                   const allyId = h.characterId;
                                   const ability = pendingAbility!;
                                   // Flicker ally before heal
@@ -829,7 +857,7 @@ const BattleScreen: React.FC = () => {
                                     addMana({
                                       targetId: heroId,
                                       amount: -ability.manaCost,
-                                      maxValue: party[currentHeroIdx].stats.mana,
+                                      maxValue: currentActiveHero.stats.mana,
                                       isEnemy: false,
                                     }),
                                   );
@@ -838,11 +866,10 @@ const BattleScreen: React.FC = () => {
                                       addHealth({
                                         targetId: allyId,
                                         amount: ability.damage,
-                                        maxValue: party[currentHeroIdx].stats.health,
+                                        maxValue: party.find((p) => p.characterId === allyId)?.stats.health || 0,
                                         isEnemy: false,
                                       }),
                                     );
-                                    dispatch(moveNextTurn());
                                     setPendingAbility(null);
                                     // Clear heal animation
                                     setVictimIds([]);
@@ -852,9 +879,11 @@ const BattleScreen: React.FC = () => {
                                     const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
                                     const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
                                     if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
+                                      // Enemy turn will advance the turn
                                       performEnemyTurn();
                                     } else {
-                                      // No enemies left, re-enable controls immediately
+                                      // No enemies left, advance turn and re-enable controls
+                                      dispatch(moveNextTurn());
                                       setControlsDisabled(false);
                                     }
                                   }, ABILITY_ANIMATION_DURATION);
@@ -882,9 +911,9 @@ const BattleScreen: React.FC = () => {
                       allFoes: false,
                     } as NovelV3.NovelRPGAbility,
                   ]
-                    .concat(party[currentHeroIdx].abilities || [])
+                    .concat(party[currentHeroIdx]?.abilities || [])
                     .map((ability, idx) => {
-                      const disabled = ability.manaCost > party[currentHeroIdx].currentMana;
+                      const disabled = ability.manaCost > (party[currentHeroIdx]?.currentMana ?? 0);
                       return (
                         <div
                           key={idx}
@@ -928,7 +957,7 @@ const BattleScreen: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="BattleScreen__enemy-panel">
+        <div className="BattleScreen__enemy-panel scrollbar">
           <h3>Enemies</h3>
           {enemies
             .filter((e) => e.currentHealth > 0)
