@@ -3,7 +3,7 @@ import { v4 as randomUUID } from 'uuid';
 import { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
 import { toast } from 'react-toastify';
 import trim from 'lodash.trim';
-import { NarrationSceneSuggestion, NarrationSummarySentence } from '../versioning/v3.state';
+import { NarrationSceneSuggestion, NarrationSummarySentence, BattleState } from '../versioning/v3.state';
 
 export type { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
 
@@ -52,9 +52,13 @@ const narrationSlice = createSlice({
         characters: string[];
         selectedCharacterId: string;
         emotion?: string;
+        afterBattle?: {
+          battleId: string;
+          isWin: boolean;
+        };
       }>,
     ) {
-      const { text, sceneId, isNewScene } = action.payload;
+      const { text, sceneId, isNewScene, afterBattle } = action.payload;
       const newInteractionId = randomUUID();
       const response: NarrationResponse = {
         id: randomUUID(),
@@ -80,6 +84,7 @@ const narrationSlice = createSlice({
         query: text,
         sceneId,
         responsesId: [response.id],
+        ...(afterBattle && { afterBattle }),
       };
       const currentResponse = state.responses[state.currentResponseId];
       currentResponse?.childrenInteractions.forEach((child) => {
@@ -147,9 +152,11 @@ const narrationSlice = createSlice({
           sentences: NarrationSummarySentence[];
         };
         indicators?: NarrationResponse['indicators'];
+        battleStartId?: string;
+        objectiveCompletedIds?: string[];
       }>,
     ) {
-      const { characters, indicators } = action.payload;
+      const { characters, indicators, battleStartId, objectiveCompletedIds } = action.payload;
       const response = state.responses[state.currentResponseId];
       const interaction = state.interactions[response?.parentInteractionId || ''];
       const currentScene = interaction?.sceneId;
@@ -179,6 +186,12 @@ const narrationSlice = createSlice({
         }
         if (indicators) {
           response.indicators = indicators;
+        }
+        if (battleStartId) {
+          response.battleStartId = battleStartId;
+        }
+        if (objectiveCompletedIds && objectiveCompletedIds.length > 0) {
+          response.objectiveCompletedIds = objectiveCompletedIds;
         }
       }
       if (action.payload.completed) {
@@ -482,6 +495,8 @@ const narrationSlice = createSlice({
     },
     markCurrentCutsceneAsSeen(state) {
       state.input.seenCutscene = true;
+      state.input.cutscenePartIndex = 0;
+      state.input.cutsceneTextIndex = 0;
     },
     resetCutsceneIndices(state) {
       state.input.cutscenePartIndex = 0;
@@ -513,9 +528,96 @@ const narrationSlice = createSlice({
     },
     setHasPlayedGlobalStartCutscene(state, action: PayloadAction<boolean>) {
       state.hasPlayedGlobalStartCutscene = action.payload;
+      state.input.cutscenePartIndex = 0;
+      state.input.cutsceneTextIndex = 0;
     },
     setHasShownStartSelectionModal(state, action: PayloadAction<boolean>) {
       state.hasShownStartSelectionModal = action.payload;
+    },
+    setCurrentBattle(state, action: PayloadAction<{ state: BattleState; isActive: boolean }>) {
+      state.currentBattle = action.payload;
+    },
+    activateBattle(state) {
+      if (state.currentBattle) {
+        state.currentBattle.isActive = true;
+        state.input.cutscenePartIndex = 0;
+        state.input.cutsceneTextIndex = 0;
+      }
+    },
+    startBattle(state) {
+      if (state.currentBattle) {
+        state.currentBattle.state.status = 'active';
+      }
+      state.input.cutscenePartIndex = 0;
+      state.input.cutsceneTextIndex = 0;
+    },
+    clearCurrentBattle(state) {
+      delete state.currentBattle;
+    },
+    // Adjust health (positive to heal, negative to damage) and check win/lose
+    addHealth(state, action: PayloadAction<{ targetId: string; amount: number; maxValue: number; isEnemy: boolean }>) {
+      const cb = state.currentBattle;
+      if (!cb) return;
+      const { targetId, amount, maxValue, isEnemy } = action.payload;
+      if (isEnemy) {
+        const enemy = cb.state.activeEnemies.find((e) => e.enemyId === targetId);
+        if (enemy) {
+          enemy.currentHealth = Math.max(0, Math.min(enemy.currentHealth + amount, maxValue));
+        }
+        // victory if all enemies are down
+        if (cb.state.activeEnemies.every((e) => e.currentHealth <= 0)) {
+          cb.state.status = 'victory';
+        }
+      } else {
+        const hero = cb.state.activeHeroes.find((h) => h.characterId === targetId);
+        if (hero) {
+          hero.currentHealth = Math.max(0, Math.min(hero.currentHealth + amount, maxValue));
+        }
+        // defeat if all heroes are down
+        if (cb.state.activeHeroes.every((h) => h.currentHealth <= 0)) {
+          cb.state.status = 'defeat';
+        }
+      }
+    },
+    // Adjust mana (positive to regain, negative to spend)
+    addMana(state, action: PayloadAction<{ targetId: string; amount: number; maxValue: number; isEnemy: boolean }>) {
+      const cb = state.currentBattle;
+      if (!cb) return;
+      const { targetId, amount, maxValue, isEnemy } = action.payload;
+      if (isEnemy) {
+        const enemy = cb.state.activeEnemies.find((e) => e.enemyId === targetId);
+        if (enemy) {
+          enemy.currentMana = Math.max(0, Math.min(enemy.currentMana + amount, maxValue));
+        }
+      } else {
+        const hero = cb.state.activeHeroes.find((h) => h.characterId === targetId);
+        if (hero) {
+          hero.currentMana = Math.max(0, Math.min(hero.currentMana + amount, maxValue));
+        }
+      }
+    },
+    // Log a battle action
+    addBattleLog(
+      state,
+      action: PayloadAction<{
+        turn: number;
+        actorId: string;
+        actionType: string;
+        targets: string[];
+        result: string;
+        actorType: 'hero' | 'enemy';
+        targetType: 'hero' | 'enemy';
+      }>,
+    ) {
+      const cb = state.currentBattle;
+      if (!cb) return;
+      cb.state.battleLog.push(action.payload);
+    },
+    // Advance to next turn
+    moveNextTurn(state) {
+      const cb = state.currentBattle;
+      if (!cb) return;
+      cb.state.turn += 1;
     },
   },
   extraReducers: (builder) => {
@@ -561,6 +663,14 @@ export const {
   removeCreatedIndicatorId,
   setHasPlayedGlobalStartCutscene,
   setHasShownStartSelectionModal,
+  setCurrentBattle,
+  activateBattle,
+  startBattle,
+  clearCurrentBattle,
+  addHealth,
+  addMana,
+  addBattleLog,
+  moveNextTurn,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;

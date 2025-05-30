@@ -1,3 +1,25 @@
+@font-face {
+  font-display: swap;
+  font-family: 'Cinzel Decorative';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/CinzelDecorative-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Cinzel Decorative';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/CinzelDecorative-Bold.ttf') format('truetype');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Cinzel Decorative';
+  font-style: normal;
+  font-weight: 900;
+  src: url('/fonts/CinzelDecorative-Black.ttf') format('truetype');
+}
+
 /* poppins-100 - latin */
 @font-face {
   font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import './EmotionRenderer.scss';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 
@@ -10,7 +10,7 @@ const assets = new Map<
   }
 >();
 
-export default function EmotionRenderer({
+function EmotionRenderer({
   assetUrl,
   className = '',
   upDownAnimation = false,
@@ -103,3 +103,7 @@ export default function EmotionRenderer({
     );
   }
 }
+
+const MemoizedEmotionRenderer = memo(EmotionRenderer);
+MemoizedEmotionRenderer.displayName = 'EmotionRenderer';
+export default MemoizedEmotionRenderer;

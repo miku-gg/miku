@@ -125,7 +125,7 @@
 }
 
 .StarsEffect__star {
-  $star-count: 50;
+  $star-count: 15;
   --star-color: hsl(196, 78%, 61%);
   --star-tail-length: 6em;
   --star-tail-height: 2px;
@@ -141,14 +141,13 @@
   color: var(--star-color);
   background: linear-gradient(45deg, currentColor, transparent);
   border-radius: 50%;
-  filter: drop-shadow(0 0 6px currentColor);
+  filter: none;
   transform: translate3d(30em, 0, 0);
-  animation: fall var(--fall-duration) var(--fall-delay) linear infinite,
-    tail-fade var(--tail-fade-duration) var(--fall-delay) ease-out infinite;
+  animation: fall var(--fall-duration) var(--fall-delay) linear infinite;
 
   @include sp-layout {
     // For mobile performance, tail-fade animation will be removed QAQ
-    animation: fall var(--fall-duration) var(--fall-delay) linear infinite;
+    animation: none;
   }
 
   @for $i from 1 through $star-count {
@@ -170,7 +169,7 @@
     height: 100%;
     background: linear-gradient(45deg, transparent, currentColor, transparent);
     border-radius: inherit;
-    animation: blink 2s linear infinite;
+    animation: none;
   }
 
   &::before {

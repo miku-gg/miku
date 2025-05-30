@@ -1,0 +1,1004 @@
+@import '../../variables';
+
+.BattleScreen {
+  padding: 16px;
+  background-color: #1e1e2f;
+  color: #ffffff;
+  height: 100%;
+  overflow-y: auto;
+  border-radius: 0.75rem;
+}
+
+.BattleScreen__turn {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.BattleScreen__section {
+  margin-bottom: 16px;
+}
+
+.BattleScreen__section h3 {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.BattleScreen__section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.BattleScreen__section li {
+  margin-bottom: 4px;
+}
+
+/* BattleScreen core layout */
+.BattleScreen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #1e1e2f;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Background image layer */
+.BattleScreen__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.BattleScreen__battlefield {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 70%;
+  overflow: hidden;
+}
+
+.BattleScreen__party-group,
+.BattleScreen__enemy-group {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  width: 45%;
+  max-width: 400px;
+}
+
+.BattleScreen__party-group {
+  align-items: flex-start;
+  justify-content: center;
+  padding-left: 20px;
+}
+
+.BattleScreen__enemy-group {
+  align-items: flex-end;
+  justify-content: center;
+  padding-right: 20px;
+}
+
+/* Individual battler (character or enemy) */
+.BattleScreen__battler {
+  position: absolute;
+  // width: 300px;
+  height: 320px;
+  margin: 8px 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Cascade positioning */
+.BattleScreen__enemy-group,
+.BattleScreen__party-group {
+  .BattleScreen__battler:nth-child(1) {
+    // transform: translateX(-60px);
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+  .BattleScreen__battler:nth-child(2) {
+    // transform: translateX(-40px);
+    top: 20px;
+    right: 0px;
+    z-index: 2;
+  }
+  .BattleScreen__battler:nth-child(3) {
+    // transform: translateX(-20px);
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+  }
+  .BattleScreen__battler:nth-child(4) {
+    // transform: translateX(0px);
+    bottom: 0;
+    right: 0;
+    z-index: 4;
+  }
+}
+
+.BattleScreen__battler-emotion {
+  // width: 100%;
+  height: 100%;
+  object-fit: contain;
+  max-width: 400px;
+  max-height: 400px;
+}
+
+/* HP/MP bars above each character image */
+.BattleScreen__bar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.BattleScreen__bar.hp {
+  top: -20px;
+  background: #550000;
+}
+.BattleScreen__bar.mp {
+  top: -10px;
+  background: #000055;
+}
+.BattleScreen__fill {
+  height: 100%;
+  background: lighten($color-red, 20%);
+}
+.BattleScreen__bar.mp .BattleScreen__fill {
+  background: lighten($color-blue, 20%);
+}
+
+/* Bottom controls box */
+.BattleScreen__controls {
+  display: flex;
+  flex-direction: row;
+  padding: 12px 20px;
+  // background: rgba($background-color-dark, 0.85);
+  z-index: 2;
+  // border: 1px solid rgba($secondary-color, 0.8);
+  height: 200px;
+  gap: 20px;
+  border-radius: 8px 8px 0 0;
+  // box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* Disabled state styling */
+.BattleScreen__controls.disabled {
+  filter: grayscale(80%) opacity(60%);
+  pointer-events: none;
+}
+
+/* Player section: party + stats + abilities */
+.BattleScreen__controls-player {
+  display: flex;
+  flex: 3;
+  overflow: hidden;
+  background-color: rgba(60, 60, 100, 0.7);
+}
+
+/* Party list */
+.BattleScreen__party-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  max-width: 280px;
+  border-radius: 4px;
+  overflow-y: auto;
+  border-radius: 4px 0 0 4px;
+  border: 1px solid #8c8cff;
+  border-right: none;
+}
+
+.BattleScreen__party-member {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  // background: rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  height: 33%;
+}
+
+.BattleScreen__party-member.active {
+  background: rgba($background-color-dark, 0.5);
+  border-color: #8c8cff;
+  box-shadow: 0 0 8px rgba(140, 140, 255, 0.4);
+}
+
+.BattleScreen__party-member-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #444;
+  margin-right: 10px;
+}
+
+.BattleScreen__party-member-info {
+  flex: 1;
+}
+
+.BattleScreen__party-member-name {
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #fff;
+  font-size: 14px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  text-align: left;
+}
+
+.BattleScreen__party-member-bars {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.BattleScreen__party-member-bar {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.BattleScreen__party-member-bar.hp .BattleScreen__party-member-fill {
+  background: linear-gradient(to bottom, #ff6666, #cc0000);
+}
+
+.BattleScreen__party-member-bar.mp .BattleScreen__party-member-fill {
+  background: linear-gradient(to bottom, #6666ff, #0000cc);
+}
+
+.BattleScreen__party-member-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.BattleScreen__party-member-bar span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
+
+/* Main controls content with three columns */
+.BattleScreen__controls-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex: 1;
+}
+
+/* Hero actions section (stats + abilities) */
+.BattleScreen__hero-actions {
+  display: flex;
+  flex: 2;
+  overflow: hidden;
+}
+
+/* Stats panel */
+.BattleScreen__stats-panel {
+  padding: 12px;
+  border: 1px solid #8c8cff;
+  border-right: none;
+  border-left: none;
+  max-width: 200px;
+  overflow-y: auto;
+  background: rgba($background-color-dark, 0.5);
+}
+
+.BattleScreen__stat-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  width: 50%;
+}
+
+.BattleScreen__stat-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.BattleScreen__stat-label {
+  flex: 1;
+  color: #ccc;
+  font-size: 14px;
+}
+
+.BattleScreen__stat-value {
+  font-weight: bold;
+  color: #fff;
+  font-size: 14px;
+}
+
+.BattleScreen__stat-bonus {
+  color: #ffcc00;
+  margin-left: 4px;
+  font-size: 12px;
+}
+
+/* Abilities panel */
+.BattleScreen__abilities-panel {
+  flex: 2;
+  padding: 12px;
+  border: 1px solid #8c8cff;
+  border-radius: 0 8px 8px 0;
+  border-left: none;
+  overflow-y: auto;
+  background: rgba($background-color-dark, 0.5);
+}
+
+.BattleScreen__abilities-panel h3 {
+  margin: 0 0 12px 0;
+  text-align: center;
+  color: #fff;
+  font-size: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 6px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.BattleScreen__ability-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.4);
+  margin-bottom: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.BattleScreen__ability-row:hover {
+  background: rgba(30, 30, 80, 0.6);
+  border-color: rgba(140, 140, 255, 0.5);
+}
+
+.BattleScreen__ability-row.target {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.BattleScreen__ability-row .ability-name {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: #fff;
+  text-align: left;
+}
+
+.BattleScreen__ability-row .ability-name.heal {
+  color: #4af;
+}
+
+.BattleScreen__ability-row .ability-name.attack {
+  color: #fa4;
+}
+
+.BattleScreen__ability-row .ability-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  text-align: left;
+  align-items: center;
+}
+
+.BattleScreen__ability-row .ability-description {
+  color: #aaa;
+  flex: 1;
+}
+
+.BattleScreen__ability-row .ability-cost {
+  color: #88f;
+  margin-left: 8px;
+  gap: 2px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+
+  svg {
+    font-size: 11px;
+  }
+}
+
+.BattleScreen__ability-row .target-name {
+  font-weight: bold;
+  color: #fff;
+}
+
+.BattleScreen__ability-row .target-health {
+  color: #f66;
+}
+
+.BattleScreen__enemy-select-back {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  background: rgba(80, 80, 80, 0.5);
+  text-align: center;
+  font-weight: bold;
+}
+
+.BattleScreen__enemy-select-back:hover {
+  background: rgba(100, 100, 100, 0.7);
+}
+
+/* Enemy panel */
+.BattleScreen__enemy-panel {
+  flex: 1;
+  background: rgba(100, 60, 60, 0.6);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #ff8c8c;
+  max-width: 250px;
+  overflow-y: auto;
+}
+
+.BattleScreen__enemy-panel h3 {
+  margin: 0 0 12px 0;
+  text-align: center;
+  color: #fff;
+  font-size: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 6px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.BattleScreen__enemy-row {
+  display: flex;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  margin-bottom: 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.BattleScreen__enemy-info {
+  flex: 1;
+}
+
+.BattleScreen__enemy-name {
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #fff;
+  font-size: 14px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.BattleScreen__enemy-health-bar {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.BattleScreen__enemy-health-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(to bottom, #ff6666, #cc0000);
+  transition: width 0.3s ease;
+}
+
+.BattleScreen__enemy-health-bar span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
+
+/* Attack and victim animations */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  80% {
+    transform: translateX(-5px);
+  }
+  40%,
+  60% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes whiten {
+  0%,
+  100% {
+    filter: none;
+  }
+  50% {
+    // filter: grayscale(100%) sepia(100%) hue-rotate(50deg);
+    filter: brightness(1.2);
+  }
+}
+
+/* Flicker red filter for victims */
+@keyframes flickerRed {
+  0%,
+  100% {
+    filter: none;
+  }
+  50% {
+    filter: grayscale(100%) sepia(100%) hue-rotate(-50deg);
+  }
+}
+
+/* Attacking character highlight (only emotion) */
+.BattleScreen__battler.attacking {
+  z-index: 10 !important;
+  animation: whiten 0.5s ease-in-out both;
+}
+
+/* Victim enemy highlight (only emotion) */
+.BattleScreen__battler.victim {
+  z-index: 10 !important;
+  animation: flickerRed 0.5s linear both, shake 0.5s linear both;
+}
+
+/* Green glow filter for healing targets */
+@keyframes greenGlow {
+  0%,
+  100% {
+    filter: none;
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+}
+
+/* Apply green glow for healing */
+.BattleScreen__battler.heal-victim {
+  z-index: 10 !important;
+}
+.BattleScreen__battler.heal-victim .BattleScreen__battler-emotion {
+  animation: greenGlow 2s ease-in-out both;
+}
+
+/* Death animation and styling for dead heroes */
+@keyframes deathFade {
+  0% {
+    filter: none;
+    transform: scale(1);
+  }
+  50% {
+    filter: grayscale(100%) brightness(0.5);
+    transform: scale(0.95);
+  }
+  100% {
+    filter: grayscale(100%) brightness(0.3);
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}
+
+.BattleScreen__battler.dead {
+  filter: grayscale(100%) brightness(0.3);
+  opacity: 0.6;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+
+.BattleScreen__battler.dead .BattleScreen__battler-emotion {
+  animation: deathFade 1s ease-out both;
+}
+
+.BattleScreen__party-member.dead {
+  filter: grayscale(100%) brightness(0.5);
+  opacity: 0.7;
+}
+
+.BattleScreen__party-member.dead .BattleScreen__party-member-image {
+  filter: grayscale(100%) brightness(0.3);
+}
+
+/* Borders are removed by default for animated states */
+.BattleScreen__battler.attacking,
+.BattleScreen__battler.victim,
+.BattleScreen__battler.heal-victim,
+.BattleScreen__battler.dead {
+  border: none !important;
+}
+
+/* Enemy selection list box (replaces abilities list) */
+.BattleScreen__enemy-select {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  background: rgba($background-color-dark, 0.9);
+  border: 1px solid rgba($secondary-color, 0.8);
+  border-radius: 4px;
+  padding: 16px;
+  z-index: 3;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.BattleScreen__enemy-select-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  color: #fff;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.BattleScreen__enemy-select-row:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.BattleScreen__enemy-select-back {
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  color: #fff;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.BattleScreen__enemy-select-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Battle log popups */
+.BattleScreen__log-container {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes shrinkUp {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-10px) scale(0.8);
+    opacity: 0.6;
+  }
+}
+
+.BattleScreen__log {
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-size: 16px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  text-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
+}
+
+.BattleScreen__log.new {
+  animation: grow 0.3s ease-out both;
+}
+.BattleScreen__log.old {
+  animation: shrinkUp 0.3s ease-out both;
+}
+
+/* log text colors */
+.BattleScreen__log .hero {
+  color: $color-gold;
+  font-weight: bold;
+  margin-right: 4px;
+}
+.BattleScreen__log .log-ability {
+  color: $primary-color;
+  font-style: italic;
+  margin: 0 4px;
+}
+.BattleScreen__log .heal {
+  color: $color-blue;
+}
+.BattleScreen__log .enemy {
+  color: #ccc;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+// Mobile portrait mode: rotate the entire battle screen 90 degrees
+@media screen and (orientation: portrait) {
+  .Interactor--battle {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100vh;
+    height: 100vw;
+    transform-origin: top left;
+    transform: rotate(90deg) translate(0, -100vh);
+    /* adjust scrolling since content is rotated */
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
+}
+
+// Responsive adjustments for smaller screens
+@media screen and (max-width: 1024px) {
+  .ability-description {
+    display: none;
+  }
+
+  .BattleScreen__battler {
+    width: 150px;
+    height: 170px;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
+  .BattleScreen__battlefield {
+    padding: 0;
+  }
+
+  .BattleScreen__controls {
+    padding: 5px;
+    height: 157px;
+  }
+
+  .BattleScreen__controls-player {
+    border-radius: 8px;
+  }
+
+  .BattleScreen__party-group,
+  .BattleScreen__enemy-group {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0px;
+    padding: 0;
+
+    .BattleScreen__battler {
+      top: 0 !important;
+      left: 0 !important;
+      position: relative !important;
+      flex: 1 !important;
+    }
+
+    .BattleScreen__bar.hp {
+      top: 10px !important;
+    }
+    .BattleScreen__bar.mp {
+      top: 20px !important;
+    }
+  }
+
+  .BattleScreen__battler-emotion {
+    max-width: 150px;
+    max-height: 150px;
+  }
+  // .BattleScreen__party-group .BattleScreen__battler:nth-child(2) {
+  //   transform: translateX(15px);
+  // }
+  // .BattleScreen__party-group .BattleScreen__battler:nth-child(3) {
+  //   transform: translateX(30px);
+  // }
+  // .BattleScreen__party-group .BattleScreen__battler:nth-child(4) {
+  //   transform: translateX(45px);
+  // }
+
+  // .BattleScreen__enemy-group .BattleScreen__battler:nth-child(2) {
+  //   transform: translateX(-15px);
+  // }
+  // .BattleScreen__enemy-group .BattleScreen__battler:nth-child(3) {
+  //   transform: translateX(-30px);
+  // }
+  // .BattleScreen__enemy-group .BattleScreen__battler:nth-child(4) {
+  //   transform: translateX(-45px);
+  // }
+}
+
+@media screen and (max-width: 768px) {
+  .BattleScreen__battler {
+    width: 150px;
+    height: 170px;
+  }
+
+  .BattleScreen__battler-emotion {
+    max-width: 150px;
+    max-height: 150px;
+  }
+  // .BattleScreen__battler {
+  //   width: 80px;
+  //   height: 100px;
+  //   margin: 6px 0;
+  // }
+
+  // .BattleScreen__battler-emotion {
+  //   max-width: 80px;
+  //   max-height: 80px;
+  // }
+
+  .BattleScreen__bar {
+    width: 60px;
+    height: 6px;
+  }
+}
+
+.BattleScreen__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 16px;
+  z-index: 3;
+  height: 100px;
+}
+
+// Outcome modal default styling
+.BattleScreen__modal {
+  position: relative;
+  z-index: 10;
+  padding: 24px;
+  border-radius: 8px;
+  text-align: center;
+  color: #fff;
+}
+
+// Victory scenario: blur background, green modal
+.BattleScreen.victory .BattleScreen__background,
+.BattleScreen.victory .BattleScreen__battlefield,
+.BattleScreen.victory .BattleScreen__controls {
+  filter: blur(4px);
+}
+.BattleScreen.victory .BattleScreen__modal {
+  background-color: rgba(0, 128, 0, 0.9);
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+}
+
+// Defeat scenario: blur+grayscale background, red modal
+.BattleScreen.defeat .BattleScreen__background,
+.BattleScreen.defeat .BattleScreen__battlefield,
+.BattleScreen.defeat .BattleScreen__controls {
+  filter: blur(4px) grayscale(80%);
+}
+.BattleScreen.defeat .BattleScreen__modal {
+  background-color: rgba(128, 0, 0, 0.9);
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+}
+
+// Modal buttons container
+.BattleScreen__modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.BattleScreen__finish-modal.Modal {
+  background: transparent;
+  // box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+}
+
+// Text animation for Victory and Defeat messages
+@keyframes shimmer {
+  0% {
+    background-position: -200px;
+  }
+  100% {
+    background-position: 200px;
+  }
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.BattleScreen__modal h2 {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 4rem;
+  margin: 0;
+}
+
+.BattleScreen__modal h2.victory-text {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 400%;
+  animation: shimmer 2s ease-in-out infinite, scaleUp 1.5s ease-out;
+  text-shadow: 0 0 1px rgba(249, 212, 35, 0.8), 0 0 5px rgba(249, 212, 35, 0.6), 0 0 20px rgba(249, 212, 35, 0.4);
+}
+
+.BattleScreen__modal h2.defeat-text {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 400%;
+  animation: shimmer 2s ease-in-out infinite, scaleUp 1.5s ease-out;
+  text-shadow: 0 0 1px rgba(255, 0, 0, 0.8), 0 0 5px rgba(255, 0, 0, 0.6), 0 0 20px rgba(255, 0, 0, 0.4);
+}
+
+.BattleScreen__retry-button {
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+}
+
+.BattleScreen__continue-button {
+  // background: rgba(0, 255, 0, 0.5);
+  background: $background-color-dark;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+}

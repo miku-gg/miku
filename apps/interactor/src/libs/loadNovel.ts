@@ -6,6 +6,7 @@ import { v4 as randomUUID } from 'uuid';
 import { NarrationResponse, VersionId } from '../state/versioning';
 import { toast } from 'react-toastify';
 import { NovelState as DeprecatedNovelV2, NarrationState as DeprecatedNarrationV2 } from '../state/versioning/v2.state';
+import { getInitialBattleState } from '../state/utils/battleUtils';
 
 export async function loadNovelFromSingleCard({
   cardId,
@@ -135,6 +136,17 @@ export async function loadNovelFromSingleCard({
         asset: firstSceneBackground,
         type: AssetDisplayPrefix.BACKGROUND_IMAGE,
       });
+
+    // Initialize battle at beginning if the start scene specifies battleAtBeginning
+    if (startScene?.battleAtBeginning && novel.battles && novel.rpg) {
+      const battleConfig = novel.battles.find((b) => b.battleId === startScene.battleAtBeginning);
+      if (battleConfig) {
+        narration.currentBattle = {
+          state: getInitialBattleState(battleConfig, novel.rpg),
+          isActive: false,
+        };
+      }
+    }
 
     // await all assets load dummy fetch
     if (assetLinkLoader) {

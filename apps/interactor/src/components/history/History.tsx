@@ -21,7 +21,6 @@ import { trackEvent } from '../../libs/analytics';
 import { DEFAULT_INVENTORY, getItemByActionPrompt } from '../../libs/inventoryItems';
 import { initialState as initialCreationState } from '../../state/slices/creationSlice';
 import { initialState as initialInventoryState } from '../../state/slices/inventorySlice';
-import { scenesToObjectives } from '../../state/slices/objectivesSlice';
 import { initialState as initialSettingsState } from '../../state/slices/settingsSlice';
 import { migrateV1toV2, migrateV2toV3 } from '../../state/versioning/migrations';
 import { VersionId as V1VersionId } from '../../state/versioning/v1.state';
@@ -82,7 +81,7 @@ const HistoryActions = () => {
         dispatch(
           replaceState({
             ...stateJson,
-            objectives: [...scenesToObjectives(stateJson.novel.scenes), ...(stateJson.novel.objectives || [])],
+            objectives: stateJson.objectives,
             inventory: {
               ...initialInventoryState,
               ...(stateJson.inventory || {}),

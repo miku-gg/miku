@@ -1,4 +1,6 @@
 import { CharacterBook, EmotionTemplateSlug, MikuCardV2 } from '../MikuCardValidator';
+import { NovelBattle, NovelRPG } from './NovelRPG';
+export * from './NovelRPG';
 
 export enum NovelNSFW {
   NONE = 0,
@@ -45,6 +47,8 @@ export interface NovelScene {
     triggered?: boolean;
   };
   indicators?: NovelIndicator[];
+  /** Optional battle to start when this scene begins */
+  battleAtBeginning?: string;
 }
 
 export interface NovelCharacterOutfit {
@@ -124,11 +128,13 @@ export interface NovelMap {
   };
   places: {
     id: string;
-    sceneId: string;
+    sceneId?: string;
+    battleId?: string;
     name: string;
     description: string;
     previewSource: string;
     maskSource: string;
+    hidden?: boolean;
   }[];
 }
 
@@ -142,6 +148,13 @@ export enum NovelActionType {
   HIDE_ITEM = 'HIDE_ITEM',
   SHOW_ITEM = 'SHOW_ITEM',
   ADD_CHILD_SCENES = 'ADD_CHILD_SCENES',
+  BATTLE_START = 'BATTLE_START',
+  CHANGE_SCENE_CHARACTER_OUTFIT = 'CHANGE_SCENE_CHARACTER_OUTFIT',
+  CHANGE_VISIBILITY_OF_PLACE_IN_MAP = 'CHANGE_VISIBILITY_OF_PLACE_IN_MAP',
+  CHANGE_CUTSCENE_PART_BACKGROUND = 'CHANGE_CUTSCENE_PART_BACKGROUND',
+  RPG_ADD_ABILITY_TO_CHARACTER = 'RPG_ADD_ABILITY_TO_CHARACTER',
+  RPG_ADD_CHARACTER_TO_PARTY = 'RPG_ADD_CHARACTER_TO_PARTY',
+  RPG_CHANGE_BATTLE_OUTFIT = 'RPG_CHANGE_BATTLE_OUTFIT',
 }
 
 export type NovelAction =
@@ -179,6 +192,56 @@ export type NovelAction =
       params: {
         sceneId: string;
         children: string[];
+      };
+    }
+  | {
+      type: NovelActionType.BATTLE_START;
+      params: {
+        battleId: string;
+      };
+    }
+  | {
+      type: NovelActionType.CHANGE_SCENE_CHARACTER_OUTFIT;
+      params: {
+        sceneId: string;
+        characterId: string;
+        outfitId: string;
+      };
+    }
+  | {
+      type: NovelActionType.CHANGE_VISIBILITY_OF_PLACE_IN_MAP;
+      params: {
+        mapId: string;
+        placeId: string;
+        hidden: boolean;
+      };
+    }
+  | {
+      type: NovelActionType.RPG_ADD_ABILITY_TO_CHARACTER;
+      params: {
+        characterId: string;
+        abilityId: string;
+      };
+    }
+  | {
+      type: NovelActionType.RPG_ADD_CHARACTER_TO_PARTY;
+      params: {
+        characterId: string;
+      };
+    }
+  | {
+      type: NovelActionType.RPG_CHANGE_BATTLE_OUTFIT;
+      params: {
+        characterId: string;
+        outfitId: string;
+      };
+    }
+  | {
+      type: NovelActionType.CHANGE_CUTSCENE_PART_BACKGROUND;
+      params: {
+        cutsceneId: string;
+        partId: string;
+        backgroundId: string;
       };
     };
 
@@ -246,6 +309,8 @@ export interface NovelState {
   inventory?: InventoryItem[];
   globalStartCutsceneId?: string;
   useModalForStartSelection?: boolean;
+  rpg?: NovelRPG;
+  battles?: NovelBattle[];
 }
 
 export interface NovelIndicator {
