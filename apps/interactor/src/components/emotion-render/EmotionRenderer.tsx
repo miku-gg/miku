@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, memo } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import './EmotionRenderer.scss';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 

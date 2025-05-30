@@ -30,7 +30,6 @@ export const MusicNegated = () => {
 
 const MusicPlayer: React.FC = () => {
   const [rangeVisible, setRangeVisible] = useState(false);
-  const [inRangeHover, setInRangeHover] = useState(false);
   const dispatch = useAppDispatch();
   const { assetLinkLoader } = useAppContext();
   const volume = useAppSelector((state) => state.settings.music.volume);
@@ -107,15 +106,7 @@ const MusicPlayer: React.FC = () => {
       <button onClick={togglePlay} className="MusicPlayer__icon icon-button">
         {enabled ? <Music /> : <MusicNegated />}
       </button>
-      <div
-        className="MusicPlayer__range"
-        onMouseEnter={() => {
-          setInRangeHover(true);
-        }}
-        onMouseLeave={() => {
-          setInRangeHover(false);
-        }}
-      >
+      <div className="MusicPlayer__range">
         <input type="range" min="0" max="1" step="0.01" value={volume} onChange={handleVolumeChange} />
       </div>
     </div>
