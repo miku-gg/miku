@@ -52,9 +52,13 @@ const narrationSlice = createSlice({
         characters: string[];
         selectedCharacterId: string;
         emotion?: string;
+        afterBattle?: {
+          battleId: string;
+          isWin: boolean;
+        };
       }>,
     ) {
-      const { text, sceneId, isNewScene } = action.payload;
+      const { text, sceneId, isNewScene, afterBattle } = action.payload;
       const newInteractionId = randomUUID();
       const response: NarrationResponse = {
         id: randomUUID(),
@@ -80,6 +84,7 @@ const narrationSlice = createSlice({
         query: text,
         sceneId,
         responsesId: [response.id],
+        ...(afterBattle && { afterBattle }),
       };
       const currentResponse = state.responses[state.currentResponseId];
       currentResponse?.childrenInteractions.forEach((child) => {
@@ -147,9 +152,11 @@ const narrationSlice = createSlice({
           sentences: NarrationSummarySentence[];
         };
         indicators?: NarrationResponse['indicators'];
+        battleStartId?: string;
+        objectiveCompletedIds?: string[];
       }>,
     ) {
-      const { characters, indicators } = action.payload;
+      const { characters, indicators, battleStartId, objectiveCompletedIds } = action.payload;
       const response = state.responses[state.currentResponseId];
       const interaction = state.interactions[response?.parentInteractionId || ''];
       const currentScene = interaction?.sceneId;
@@ -179,6 +186,12 @@ const narrationSlice = createSlice({
         }
         if (indicators) {
           response.indicators = indicators;
+        }
+        if (battleStartId) {
+          response.battleStartId = battleStartId;
+        }
+        if (objectiveCompletedIds && objectiveCompletedIds.length > 0) {
+          response.objectiveCompletedIds = objectiveCompletedIds;
         }
       }
       if (action.payload.completed) {

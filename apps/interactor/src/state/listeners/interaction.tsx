@@ -102,6 +102,15 @@ const interactionEffect = async (
       }),
     ];
 
+    // Track battle starts and completed objectives
+    let battleStartId: string | undefined = undefined;
+    const completedObjectiveIds: string[] = [];
+
+    // Check if a battle starts at the beginning of this scene
+    if (currentScene?.battleAtBeginning) {
+      battleStartId = currentScene.battleAtBeginning;
+    }
+
     // Indicators stuff
     // ----------------------------
     const indicators = [...(currentResponseState.indicators || [])];
@@ -323,6 +332,9 @@ const interactionEffect = async (
           }
 
           if (response === ` Yes`) {
+            // Track that this objective was completed
+            completedObjectiveIds.push(objective.id);
+
             objective.actions.forEach((action) => {
               const stateActions = novelActionToStateAction(action);
               for (const stateAction of stateActions) {
@@ -383,6 +395,10 @@ const interactionEffect = async (
                   break;
                 case NovelV3.NovelActionType.BATTLE_START: {
                   const battleId = action.params.battleId;
+                  // Track that a battle started from this objective
+                  if (!battleStartId) {
+                    battleStartId = battleId;
+                  }
                   const battleConfig = state.novel.battles?.find((b) => b.battleId === battleId);
                   const rpgConfig = state.novel.rpg;
                   if (battleConfig && rpgConfig) {
@@ -403,6 +419,22 @@ const interactionEffect = async (
       );
     } catch (error) {
       dispatch(interactionFailure('Failed to check a condition'));
+    }
+
+    // Update the response with battle start and completed objectives
+    if (battleStartId || completedObjectiveIds.length > 0) {
+      const updatedResponse = {
+        ...currentResponseState,
+        ...(battleStartId && { battleStartId }),
+        ...(completedObjectiveIds.length > 0 && { objectiveCompletedIds: completedObjectiveIds }),
+      };
+
+      dispatch(
+        interactionSuccess({
+          ...updatedResponse,
+          completed: true,
+        }),
+      );
     }
 
     try {

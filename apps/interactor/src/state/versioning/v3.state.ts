@@ -6,6 +6,10 @@ export interface NarrationInteraction {
   query: string;
   sceneId: string;
   responsesId: string[];
+  afterBattle?: {
+    battleId: string;
+    isWin: boolean;
+  };
 }
 
 export interface NarrationSceneSuggestion {
@@ -52,6 +56,8 @@ export interface NarrationResponse {
     id: string;
     value: string;
   }[];
+  battleStartId?: string;
+  objectiveCompletedIds?: string[];
 }
 
 export interface NarrationState {

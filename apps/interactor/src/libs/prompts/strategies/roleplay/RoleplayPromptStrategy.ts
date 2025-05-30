@@ -274,6 +274,17 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     let sceneId = '';
     let scene: NovelV3.NovelScene | undefined = undefined;
     const temp = this.template();
+
+    const transformCutsceneToPrompt = (cutscene: NovelV3.CutScene): string => {
+      return cutscene.parts
+        .map((part) =>
+          part.text
+            .map((textPart) => (textPart.type === 'description' ? `*${textPart.content}*` : `"${textPart.content}"`))
+            .join('\n'),
+        )
+        .join('\n');
+    };
+
     for (const message of [...messages].reverse().slice(-maxLines)) {
       const messageSceneId =
         (message.type === 'interaction'
@@ -283,19 +294,47 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         scene = state.novel.scenes.find((scene) => scene.id === messageSceneId);
         const cutscene = state.novel.cutscenes?.find((cutscene) => cutscene.id === scene?.cutScene?.id);
         if (cutscene?.parts.length) {
-          prompt += `${temp.response}${cutscene.parts
-            .map((part) =>
-              part.text
-                .map((textPart) =>
-                  textPart.type === 'description' ? `*${textPart.content}*` : `"${textPart.content}"`,
-                )
-                .join('\n'),
-            )
-            .join('\n')}\n`;
+          prompt += `${temp.response}${transformCutsceneToPrompt(cutscene)}\n`;
         }
         sceneId = messageSceneId;
       }
+
+      // Handle battle-related content for interactions
+      if (message.type === 'interaction' && message.item.afterBattle) {
+        const battleConfig = state.novel.battles?.find((b) => b.battleId === message.item.afterBattle!.battleId);
+        if (battleConfig) {
+          const isWin = message.item.afterBattle.isWin;
+          const cutsceneId = isWin ? battleConfig.winCutsceneId : battleConfig.lossCutsceneId;
+
+          if (cutsceneId) {
+            const cutscene = state.novel.cutscenes?.find((c) => c.id === cutsceneId);
+            if (cutscene?.parts.length) {
+              prompt += `${temp.response}${transformCutsceneToPrompt(cutscene)}\n`;
+            }
+          }
+        }
+      }
+
       prompt += this.getDialogueLine(message, currentCharacter, prompt, scene?.indicators);
+
+      // Handle battle-related content for responses
+      if (message.type === 'response' && message.item.battleStartId) {
+        const battleConfig = state.novel.battles?.find((b) => b.battleId === message.item.battleStartId);
+        if (battleConfig) {
+          // Add battle prompt
+          if (battleConfig.prompt) {
+            prompt += `${temp.response}*${battleConfig.prompt}*\n`;
+          }
+
+          // Add intro cutscene if it exists
+          if (battleConfig.introCutsceneId) {
+            const introCutscene = state.novel.cutscenes?.find((c) => c.id === battleConfig.introCutsceneId);
+            if (introCutscene?.parts.length) {
+              prompt += `${temp.response}${transformCutsceneToPrompt(introCutscene)}\n`;
+            }
+          }
+        }
+      }
     }
     return prompt;
   }

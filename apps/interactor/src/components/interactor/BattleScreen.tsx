@@ -244,6 +244,10 @@ const BattleScreen: React.FC = () => {
           : battleConfig?.lossPromptMessage || 'OOC: The battle was lost. Please describe the aftermath.',
         characters: party.filter((h) => h.currentHealth > 0).map((h) => h.characterId),
         selectedCharacterId: party.find((h) => h.currentHealth > 0)?.characterId || party[0]?.characterId || '',
+        afterBattle: {
+          battleId: battleState.battleId,
+          isWin: isVictory,
+        },
       }),
     );
   };
