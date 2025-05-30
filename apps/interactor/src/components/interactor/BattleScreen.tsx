@@ -267,8 +267,9 @@ const BattleScreen: React.FC = () => {
       description: 'Basic melee attack',
       manaCost: 0,
       target: 'enemy',
-      damage: selectedEnemy.stats.attack,
+      damage: 10,
       allFoes: false,
+      type: 'physical',
     };
     const usableAbilities = [defaultEnemyAbility, ...selectedEnemy.abilities].filter(
       (ability) => ability.manaCost <= selectedEnemy.currentMana,
@@ -290,13 +291,35 @@ const BattleScreen: React.FC = () => {
       // Log attack on all heroes
       const targets = aliveHeroesIds;
       targets.forEach((targetHero) => {
+        // Calculate damage for each hero using FF-style formula
+        const defenderStats = party.find((h) => h.characterId === targetHero)?.adjustedStats || {
+          attack: 0,
+          intelligence: 0,
+          defense: 0,
+          magicDefense: 0,
+        };
+
+        let attackPower: number;
+        let defensePower: number;
+
+        if (abilityToUse.type === 'physical') {
+          attackPower = selectedEnemy.stats.attack;
+          defensePower = defenderStats.defense;
+        } else {
+          attackPower = selectedEnemy.stats.intelligence;
+          defensePower = defenderStats.magicDefense;
+        }
+
+        const rawDamage = (abilityToUse.damage * attackPower) / Math.max(1, defensePower);
+        const finalDamage = Math.max(1, Math.floor(rawDamage));
+
         dispatch(
           addBattleLog({
             turn: battleState.turn,
             actorId: selectedEnemy.enemyId,
             actionType: abilityToUse.name,
             targets: [targetHero],
-            result: `${abilityToUse.damage} damage`,
+            result: `${finalDamage} damage`,
             actorType: 'enemy',
             targetType: 'hero',
           }),
@@ -307,10 +330,32 @@ const BattleScreen: React.FC = () => {
       // Apply damage after animation
       setTimeout(() => {
         targets.forEach((targetHero) => {
+          // Recalculate damage for application
+          const defenderStats = party.find((h) => h.characterId === targetHero)?.adjustedStats || {
+            attack: 0,
+            intelligence: 0,
+            defense: 0,
+            magicDefense: 0,
+          };
+
+          let attackPower: number;
+          let defensePower: number;
+
+          if (abilityToUse.type === 'physical') {
+            attackPower = selectedEnemy.stats.attack;
+            defensePower = defenderStats.defense;
+          } else {
+            attackPower = selectedEnemy.stats.intelligence;
+            defensePower = defenderStats.magicDefense;
+          }
+
+          const rawDamage = (abilityToUse.damage * attackPower) / Math.max(1, defensePower);
+          const finalDamage = Math.max(1, Math.floor(rawDamage));
+
           dispatch(
             addHealth({
               targetId: targetHero,
-              amount: -abilityToUse.damage,
+              amount: -finalDamage,
               maxValue: party.find((h) => h.characterId === targetHero)!.stats.health,
               isEnemy: false,
             }),
@@ -327,6 +372,29 @@ const BattleScreen: React.FC = () => {
     setAttackerId(selectedEnemy.enemyId);
     setVictimIds([targetHero]);
     playSoundEffect('attack_spell');
+
+    // Calculate damage using FF-style formula
+    const defenderStats = party.find((h) => h.characterId === targetHero)?.adjustedStats || {
+      attack: 0,
+      intelligence: 0,
+      defense: 0,
+      magicDefense: 0,
+    };
+
+    let attackPower: number;
+    let defensePower: number;
+
+    if (abilityToUse.type === 'physical') {
+      attackPower = selectedEnemy.stats.attack;
+      defensePower = defenderStats.defense;
+    } else {
+      attackPower = selectedEnemy.stats.intelligence;
+      defensePower = defenderStats.magicDefense;
+    }
+
+    const rawDamage = (abilityToUse.damage * attackPower) / Math.max(1, defensePower);
+    const finalDamage = Math.max(1, Math.floor(rawDamage));
+
     dispatch(
       addBattleLog({
         turn: battleState.turn,
@@ -335,7 +403,7 @@ const BattleScreen: React.FC = () => {
         actorType: 'enemy',
         targetType: 'hero',
         targets: [targetHero],
-        result: `${abilityToUse.damage} damage`,
+        result: `${finalDamage} damage`,
       }),
     );
     dispatch(
@@ -350,7 +418,7 @@ const BattleScreen: React.FC = () => {
       dispatch(
         addHealth({
           targetId: targetHero,
-          amount: -abilityToUse.damage,
+          amount: -finalDamage,
           maxValue: party.find((h) => h.characterId === targetHero)!.stats.health,
           isEnemy: false,
         }),
@@ -359,6 +427,202 @@ const BattleScreen: React.FC = () => {
       setVictimIds([]);
       setAttackerId(null);
       setControlsDisabled(false);
+    }, ABILITY_ANIMATION_DURATION);
+  };
+
+  // Unified attack function for player actions
+  const performAttack = (playerId: string, targets: string[], abilityId: string) => {
+    const currentActiveHero = party[currentHeroIdx];
+    if (!currentActiveHero || currentActiveHero.currentHealth <= 0 || currentActiveHero.characterId !== playerId) {
+      return;
+    }
+
+    // Find the ability being used
+    const defaultAbility: NovelV3.NovelRPGAbility = {
+      abilityId: 'melee',
+      name: 'Melee Attack',
+      description: 'Basic melee attack',
+      manaCost: 0,
+      target: 'enemy',
+      damage: 10,
+      allFoes: false,
+      type: 'physical',
+    };
+    const allAbilities = [defaultAbility, ...currentActiveHero.abilities];
+    const ability = allAbilities.find((a) => a.abilityId === abilityId);
+    if (!ability) return;
+
+    setControlsDisabled(true);
+
+    // Set animation states
+    if (ability.target === 'ally') {
+      setAttackerId(playerId);
+      setHealMode(true);
+      playSoundEffect('buff_spell');
+    } else {
+      playSoundEffect('attack_spell');
+    }
+
+    // Set victims for animation
+    setVictimIds(targets);
+
+    // Spend mana
+    dispatch(
+      addMana({
+        targetId: playerId,
+        amount: -ability.manaCost,
+        maxValue: currentActiveHero.stats.mana,
+        isEnemy: false,
+      }),
+    );
+
+    // Process each target
+    targets.forEach((targetId) => {
+      if (ability.target === 'enemy') {
+        // Attack enemy with Final Fantasy-style damage calculation
+        const heroStats = currentActiveHero.adjustedStats;
+        const defenderStats = rpgConfig?.enemies.find((er) => er.enemyId === targetId)?.stats || {
+          health: 0,
+          mana: 0,
+          attack: 0,
+          intelligence: 0,
+          defense: 0,
+          magicDefense: 0,
+        };
+
+        // Final Fantasy-style damage calculation
+        let attackPower: number;
+        let defensePower: number;
+
+        if (ability.type === 'physical') {
+          attackPower = heroStats.attack;
+          defensePower = defenderStats.defense;
+        } else {
+          attackPower = heroStats.intelligence;
+          defensePower = defenderStats.magicDefense;
+        }
+
+        // FF-style formula: (Ability Base Damage * Attack Stat) / Defense Stat
+        const rawDamage = (ability.damage * attackPower) / Math.max(1, defensePower);
+        const finalDamage = Math.max(1, Math.floor(rawDamage)); // Minimum 1 damage
+
+        dispatch(
+          addBattleLog({
+            turn: battleState.turn,
+            actorId: playerId,
+            actionType: ability.name,
+            targets: [targetId],
+            result: `${finalDamage} damage`,
+            actorType: 'hero',
+            targetType: 'enemy',
+          }),
+        );
+      } else {
+        // Heal ally - healing is based on intelligence regardless of ability type
+        const heroStats = currentActiveHero.adjustedStats;
+        const healAmount = Math.floor(ability.damage * (heroStats.intelligence / 10));
+
+        dispatch(
+          addBattleLog({
+            turn: battleState.turn,
+            actorId: playerId,
+            actionType: ability.name,
+            targets: [targetId],
+            result: `Healed ${healAmount}`,
+            actorType: 'hero',
+            targetType: 'hero',
+          }),
+        );
+      }
+    });
+
+    // Apply effects after animation
+    setTimeout(() => {
+      const damageList = targets.map((targetId) => {
+        if (ability.target === 'enemy') {
+          // Apply damage to enemy
+          const enemyDef = rpgConfig?.enemies.find((er) => er.enemyId === targetId);
+          const enemyMaxHealth = enemyDef?.stats.health ?? 0;
+          const heroStats = currentActiveHero.adjustedStats;
+          const defenderStats = enemyDef?.stats || {
+            health: 0,
+            mana: 0,
+            attack: 0,
+            intelligence: 0,
+            defense: 0,
+            magicDefense: 0,
+          };
+
+          // Final Fantasy-style damage calculation
+          let attackPower: number;
+          let defensePower: number;
+
+          if (ability.type === 'physical') {
+            attackPower = heroStats.attack;
+            defensePower = defenderStats.defense;
+          } else {
+            attackPower = heroStats.intelligence;
+            defensePower = defenderStats.magicDefense;
+          }
+
+          // FF-style formula: (Ability Base Damage * Attack Stat) / Defense Stat
+          const rawDamage = (ability.damage * attackPower) / Math.max(1, defensePower);
+          const finalDamage = Math.max(1, Math.floor(rawDamage)); // Minimum 1 damage
+
+          dispatch(
+            addHealth({
+              targetId: targetId,
+              amount: -finalDamage,
+              maxValue: enemyMaxHealth,
+              isEnemy: true,
+            }),
+          );
+          return {
+            targetId,
+            damage: finalDamage,
+          };
+        } else {
+          // Heal ally - healing is based on intelligence regardless of ability type
+          const heroStats = currentActiveHero.adjustedStats;
+          const healAmount = Math.floor(ability.damage * (heroStats.intelligence / 10));
+
+          dispatch(
+            addHealth({
+              targetId: targetId,
+              amount: healAmount,
+              maxValue: party.find((h) => h.characterId === targetId)?.stats.health || 0,
+              isEnemy: false,
+            }),
+          );
+          return {
+            targetId,
+            damage: healAmount,
+          };
+        }
+      });
+
+      // Clear pending ability and animation states
+      setPendingAbility(null);
+      setVictimIds([]);
+      setAttackerId(null);
+      setHealMode(false);
+
+      // Check if battle should continue
+      const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
+      const aliveEnemies = activeEnemies.filter((e) => {
+        const health = e.currentHealth;
+        const damage = damageList.find((d) => d.targetId === e.enemyId)?.damage;
+        return health - (damage ?? 0) > 0;
+      });
+
+      if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
+        // Enemy turn will advance the turn
+        performEnemyTurn();
+      } else {
+        // Battle ended, advance turn and re-enable controls
+        dispatch(moveNextTurn());
+        setControlsDisabled(false);
+      }
     }, ABILITY_ANIMATION_DURATION);
   };
 
@@ -566,86 +830,11 @@ const BattleScreen: React.FC = () => {
                       onMouseEnter={() => playSoundEffect('button_hover')}
                       onClick={() => {
                         // Attack all enemies
-                        setControlsDisabled(true);
-                        playSoundEffect('attack_spell');
                         const currentActiveHero = party[currentHeroIdx];
                         if (!currentActiveHero || currentActiveHero.currentHealth <= 0) return;
 
-                        const heroId = currentActiveHero.characterId;
-                        const ability = pendingAbility!;
                         const targets = activeEnemies.filter((e) => e.currentHealth > 0).map((e) => e.enemyId);
-                        // Set all enemies as victims for animation
-                        setVictimIds(targets);
-                        // Spend mana
-                        dispatch(
-                          addMana({
-                            targetId: heroId,
-                            amount: -ability.manaCost,
-                            maxValue: currentActiveHero.stats.mana,
-                            isEnemy: false,
-                          }),
-                        );
-                        // Log attacks
-                        const heroStats = currentActiveHero.adjustedStats;
-                        targets.forEach((enemyId) => {
-                          const defenderStats = rpgConfig?.enemies.find((er) => er.enemyId === enemyId)?.stats || {
-                            health: 0,
-                            mana: 0,
-                            attack: 0,
-                            intelligence: 0,
-                            defense: 0,
-                            magicDefense: 0,
-                          };
-                          const finalDamage = Math.max(
-                            0,
-                            Math.floor(
-                              ability.damage +
-                                heroStats.attack +
-                                heroStats.intelligence -
-                                (defenderStats.defense + defenderStats.magicDefense),
-                            ),
-                          );
-                          dispatch(
-                            addBattleLog({
-                              turn,
-                              actorId: heroId,
-                              actionType: ability.name,
-                              targets: [enemyId],
-                              result: `${finalDamage} damage`,
-                              actorType: 'hero',
-                              targetType: 'enemy',
-                            }),
-                          );
-                        });
-                        // Apply damage
-                        setTimeout(() => {
-                          activeEnemies
-                            .filter((e) => e.currentHealth > 0)
-                            .forEach((e) => {
-                              const enemyDef = rpgConfig?.enemies.find((er) => er.enemyId === e.enemyId);
-                              const maxHp = enemyDef?.stats.health ?? 0;
-                              dispatch(
-                                addHealth({
-                                  targetId: e.enemyId,
-                                  amount: -ability.damage,
-                                  maxValue: maxHp,
-                                  isEnemy: true,
-                                }),
-                              );
-                            });
-                          setPendingAbility(null);
-                          setVictimIds([]);
-                          const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
-                          const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
-                          if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
-                            // Enemy turn will advance the turn
-                            performEnemyTurn();
-                          } else {
-                            // No enemies left, advance turn and re-enable controls
-                            dispatch(moveNextTurn());
-                            setControlsDisabled(false);
-                          }
-                        }, ABILITY_ANIMATION_DURATION);
+                        performAttack(currentActiveHero.characterId, targets, pendingAbility!.abilityId);
                       }}
                     >
                       <span className="target-name">Everyone</span>
@@ -661,60 +850,8 @@ const BattleScreen: React.FC = () => {
                         const currentActiveHero = party[currentHeroIdx];
                         if (!currentActiveHero || currentActiveHero.currentHealth <= 0) return;
 
-                        setControlsDisabled(true);
-                        setAttackerId(currentActiveHero.characterId);
-                        setHealMode(true);
-                        playSoundEffect('buff_spell');
-                        const heroId = currentActiveHero.characterId;
-                        const ability = pendingAbility!;
                         const targets = party.filter((h) => h.currentHealth > 0).map((h) => h.characterId);
-                        // Set all allies as victims for heal animation
-                        setVictimIds(targets);
-                        dispatch(
-                          addMana({
-                            targetId: heroId,
-                            amount: -ability.manaCost,
-                            maxValue: currentActiveHero.stats.mana,
-                            isEnemy: false,
-                          }),
-                        );
-                        dispatch(
-                          addBattleLog({
-                            turn,
-                            actorId: heroId,
-                            actionType: ability.name,
-                            targets,
-                            result: `Healed ${ability.damage}`,
-                            actorType: 'hero',
-                            targetType: 'hero',
-                          }),
-                        );
-                        setTimeout(() => {
-                          targets.forEach((allyId) => {
-                            dispatch(
-                              addHealth({
-                                targetId: allyId,
-                                amount: ability.damage,
-                                maxValue: party.find((h) => h.characterId === allyId)?.stats.health || 0,
-                                isEnemy: false,
-                              }),
-                            );
-                          });
-                          setPendingAbility(null);
-                          setVictimIds([]);
-                          setAttackerId(null);
-                          setHealMode(false);
-                          const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
-                          const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
-                          if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
-                            // Enemy turn will advance the turn
-                            performEnemyTurn();
-                          } else {
-                            // No enemies left, advance turn and re-enable controls
-                            dispatch(moveNextTurn());
-                            setControlsDisabled(false);
-                          }
-                        }, ABILITY_ANIMATION_DURATION);
+                        performAttack(currentActiveHero.characterId, targets, pendingAbility!.abilityId);
                       }}
                     >
                       <span className="target-name">Everyone</span>
@@ -731,91 +868,11 @@ const BattleScreen: React.FC = () => {
                                 className="BattleScreen__ability-row target"
                                 onMouseEnter={() => playSoundEffect('button_hover')}
                                 onClick={() => {
-                                  // Disable controls on attack start
+                                  // Attack single enemy
                                   const currentActiveHero = party[currentHeroIdx];
                                   if (!currentActiveHero || currentActiveHero.currentHealth <= 0) return;
 
-                                  setControlsDisabled(true);
-                                  playSoundEffect('attack_spell');
-                                  const heroId = currentActiveHero.characterId;
-                                  const enemyId = e.enemyId;
-                                  // Flicker enemy before damage
-                                  const ability = pendingAbility!;
-                                  setVictimIds([enemyId]);
-                                  // Compute damage with stats and wearables
-                                  const heroStats = currentActiveHero.adjustedStats;
-                                  // Lookup defender stats from RPG config (state.activeEnemies lacks stats)
-                                  const defenderStats = rpgConfig?.enemies.find((er) => er.enemyId === enemyId)
-                                    ?.stats || {
-                                    health: 0,
-                                    mana: 0,
-                                    attack: 0,
-                                    intelligence: 0,
-                                    defense: 0,
-                                    magicDefense: 0,
-                                  };
-                                  const baseDmg = ability.damage;
-                                  const finalDamage = Math.max(
-                                    0,
-                                    Math.floor(
-                                      baseDmg +
-                                        heroStats.attack +
-                                        heroStats.intelligence -
-                                        (defenderStats.defense + defenderStats.magicDefense),
-                                    ),
-                                  );
-                                  dispatch(
-                                    addBattleLog({
-                                      turn,
-                                      actorId: heroId,
-                                      actionType: ability.name,
-                                      targets: [enemyId],
-                                      result: `${finalDamage} damage`,
-                                      actorType: 'hero',
-                                      targetType: 'enemy',
-                                    }),
-                                  );
-                                  // Capture initial HP before applying damage
-                                  const initialHp = e.currentHealth;
-                                  // Hero uses ability: spend mana
-                                  dispatch(
-                                    addMana({
-                                      targetId: heroId,
-                                      amount: -ability.manaCost,
-                                      maxValue: currentActiveHero.stats.mana,
-                                      isEnemy: false,
-                                    }),
-                                  );
-                                  setTimeout(() => {
-                                    const enemyDef = rpgConfig?.enemies.find((er) => er.enemyId === enemyId);
-                                    const enemyMaxHealth = enemyDef?.stats.health ?? defenderStats.health;
-                                    // Apply damage to enemy
-                                    dispatch(
-                                      addHealth({
-                                        targetId: enemyId,
-                                        amount: -finalDamage,
-                                        maxValue: enemyMaxHealth,
-                                        isEnemy: true,
-                                      }),
-                                    );
-                                    setPendingAbility(null);
-                                    setVictimIds([]);
-                                    // Robust guard: skip counterattack if enemy died or no heroes/enemies remain
-                                    const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
-                                    const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
-                                    if (
-                                      initialHp <= finalDamage ||
-                                      aliveHeroes.length === 0 ||
-                                      aliveEnemies.length === 0
-                                    ) {
-                                      // Move turn only when battle ends or enemy dies
-                                      dispatch(moveNextTurn());
-                                      setControlsDisabled(false);
-                                      return;
-                                    }
-                                    // Schedule counterattack from this enemy (enemy turn will advance the turn)
-                                    performEnemyTurn();
-                                  }, ABILITY_ANIMATION_DURATION);
+                                  performAttack(currentActiveHero.characterId, [e.enemyId], pendingAbility!.abilityId);
                                 }}
                               >
                                 <span className="target-name">
@@ -832,65 +889,15 @@ const BattleScreen: React.FC = () => {
                                 className="BattleScreen__ability-row target"
                                 onMouseEnter={() => playSoundEffect('button_hover')}
                                 onClick={() => {
-                                  // Disable controls on ability start
+                                  // Heal single ally
                                   const currentActiveHero = party[currentHeroIdx];
                                   if (!currentActiveHero || currentActiveHero.currentHealth <= 0) return;
 
-                                  setControlsDisabled(true);
-                                  // Set healing animation state
-                                  setAttackerId(currentActiveHero.characterId);
-                                  setHealMode(true);
-                                  playSoundEffect('buff_spell');
-                                  const heroId = currentActiveHero.characterId;
-                                  const allyId = h.characterId;
-                                  const ability = pendingAbility!;
-                                  // Flicker ally before heal
-                                  setVictimIds([allyId]);
-                                  dispatch(
-                                    addBattleLog({
-                                      turn,
-                                      actorId: heroId,
-                                      actionType: ability.name,
-                                      targets: [allyId],
-                                      result: `Healed ${ability.damage}`,
-                                      actorType: 'hero',
-                                      targetType: 'hero',
-                                    }),
+                                  performAttack(
+                                    currentActiveHero.characterId,
+                                    [h.characterId],
+                                    pendingAbility!.abilityId,
                                   );
-                                  dispatch(
-                                    addMana({
-                                      targetId: heroId,
-                                      amount: -ability.manaCost,
-                                      maxValue: currentActiveHero.stats.mana,
-                                      isEnemy: false,
-                                    }),
-                                  );
-                                  setTimeout(() => {
-                                    dispatch(
-                                      addHealth({
-                                        targetId: allyId,
-                                        amount: ability.damage,
-                                        maxValue: party.find((p) => p.characterId === allyId)?.stats.health || 0,
-                                        isEnemy: false,
-                                      }),
-                                    );
-                                    setPendingAbility(null);
-                                    // Clear heal animation
-                                    setVictimIds([]);
-                                    setAttackerId(null);
-                                    setHealMode(false);
-                                    // Counterattack
-                                    const aliveHeroes = activeHeroes.filter((h) => h.currentHealth > 0);
-                                    const aliveEnemies = activeEnemies.filter((e) => e.currentHealth > 0);
-                                    if (aliveEnemies.length > 0 && aliveHeroes.length > 0) {
-                                      // Enemy turn will advance the turn
-                                      performEnemyTurn();
-                                    } else {
-                                      // No enemies left, advance turn and re-enable controls
-                                      dispatch(moveNextTurn());
-                                      setControlsDisabled(false);
-                                    }
-                                  }, ABILITY_ANIMATION_DURATION);
                                 }}
                               >
                                 <span className="target-name">
@@ -911,8 +918,9 @@ const BattleScreen: React.FC = () => {
                       description: 'Basic melee attack',
                       manaCost: 0,
                       target: 'enemy',
-                      damage: party[currentHeroIdx]?.stats.attack ?? 0,
+                      damage: 5,
                       allFoes: false,
+                      type: 'physical',
                     } as NovelV3.NovelRPGAbility,
                   ]
                     .concat(party[currentHeroIdx]?.abilities || [])

@@ -8,6 +8,7 @@ export interface NovelRPGAbility {
   target: 'enemy' | 'ally';
   damage: number;
   allFoes: boolean;
+  type: 'physical' | 'magical';
 }
 export interface NovelRPG {
   heroes: {
