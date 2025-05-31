@@ -1,7 +1,7 @@
 import llamaTokenizer from './_llama-tokenizer';
 import { encode, decode } from 'gpt-tokenizer';
 import mistralTokenizer from './_mistral-tokenizer';
-
+import { TokenizerLoader } from '@lenml/tokenizers';
 export abstract class AbstractTokenizer {
   public name: string = 'abstract';
   abstract encodeString(str: string): number[];
@@ -82,5 +82,62 @@ export class MistralTokenizer extends AbstractTokenizer {
 
   override getEOS(): string {
     return '</s>';
+  }
+}
+
+export class LenMLTokenizer extends AbstractTokenizer {
+  private tokenizer: {
+    encode: (
+      str: string,
+      options?: { add_special_tokens?: boolean; return_token_type_ids?: boolean; text_pair?: string },
+    ) => number[];
+    decode: (
+      arr: number[],
+      options?: { skip_special_tokens?: boolean | undefined; clean_up_tokenization_spaces?: boolean | undefined },
+    ) => string;
+    eos_token: string | null;
+    bos_token: string | null;
+  } | null = null;
+
+  private tokenizerPromise: Promise<void>;
+
+  constructor(baseUrl: string) {
+    super();
+    const sourceUrls = {
+      tokenizerJSON: `${baseUrl}/tokenizer.json?download=true`,
+      tokenizerConfig: `${baseUrl}/tokenizer_config.json?download=true`,
+    };
+    this.tokenizerPromise = TokenizerLoader.fromPreTrainedUrls(sourceUrls).then((tokenizer) => {
+      this.tokenizer = tokenizer;
+    });
+  }
+
+  async ready(): Promise<void> {
+    return this.tokenizerPromise;
+  }
+
+  override encodeString(str: string, add_special_tokens: boolean = true): number[] {
+    return (
+      this.tokenizer?.encode(str, {
+        add_special_tokens,
+      }) || []
+    );
+  }
+
+  override decodeString(
+    arr: number[],
+    skip_special_tokens: boolean = true,
+    clean_up_tokenization_spaces: boolean = true,
+  ): string {
+    return (
+      this.tokenizer?.decode(arr, {
+        skip_special_tokens,
+        clean_up_tokenization_spaces,
+      }) || ''
+    );
+  }
+
+  override getEOS(): string {
+    return this.tokenizer?.eos_token || '';
   }
 }

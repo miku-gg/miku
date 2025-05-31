@@ -27,6 +27,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "@lenml/tokenizers": "^3.4.0",
     "gpt-tokenizer": "^2.1.2",
     "openai": "4.19.0"
   },

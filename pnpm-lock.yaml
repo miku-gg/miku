@@ -178,6 +178,9 @@ importers:
 
   apps/interactor:
     dependencies:
+      '@lenml/tokenizers':
+        specifier: ^3.4.0
+        version: 3.4.0
       '@mikugg/bot-utils':
         specifier: workspace:^
         version: link:../../packages/bot-utils
@@ -671,6 +674,9 @@ importers:
 
   packages/guidance:
     dependencies:
+      '@lenml/tokenizers':
+        specifier: ^3.4.0
+        version: 3.4.0
       gpt-tokenizer:
         specifier: ^2.1.2
         version: 2.1.2
@@ -1490,7 +1496,7 @@ packages:
     dependencies:
       '@babel/core': 7.23.6
       '@babel/helper-create-class-features-plugin': 7.21.8(@babel/core@7.23.6)
-      '@babel/helper-plugin-utils': 7.22.5
+      '@babel/helper-plugin-utils': 7.21.5
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -4426,6 +4432,10 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
+
+  /@lenml/tokenizers@3.4.0:
+    resolution: {integrity: sha512-BRDGqddggcsd4YwubhXzHuUdpkPq5GxcYLp+40SxfyV6/kkSQU7rNaQ8iS+HMD+XfqzXaYsHuHNPlaLA6gnM5A==}
+    dev: false
 
   /@lerna/add@6.4.1:
     resolution: {integrity: sha512-YSRnMcsdYnQtQQK0NSyrS9YGXvB3jzvx183o+JTH892MKzSlBqwpBHekCknSibyxga1HeZ0SNKQXgsHAwWkrRw==}
