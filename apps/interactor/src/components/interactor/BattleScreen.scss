@@ -117,13 +117,13 @@
   }
   .BattleScreen__battler:nth-child(3) {
     // transform: translateX(-20px);
-    bottom: 0;
+    top: 120px;
     left: 0;
     z-index: 3;
   }
   .BattleScreen__battler:nth-child(4) {
     // transform: translateX(0px);
-    bottom: 0;
+    top: 120px;
     right: 0;
     z-index: 4;
   }
