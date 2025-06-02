@@ -81,13 +81,14 @@ const PartRenderer = ({
           <video
             key={key}
             src={src}
-            className={classNames('CutsceneDisplayer__fade-image', {
+            className={classNames('CutsceneDisplayer__fade-image', 'CutsceneDisplayer__fade-image--video', {
               'CutsceneDisplayer__fade-image--in': !isExiting,
               'CutsceneDisplayer__fade-image--out': !!isExiting,
             })}
             loop
             autoPlay
             muted
+            playsInline
           />
         ) : (
           <img

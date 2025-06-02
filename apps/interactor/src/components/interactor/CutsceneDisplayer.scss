@@ -297,6 +297,15 @@
   border-radius: 0.75rem;
   pointer-events: none;
   user-select: none;
+
+  &--video {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    max-width: 100%;
+    max-height: 100%;
+  }
 }
 
 .CutsceneDisplayer__fade-image--in {
