@@ -178,9 +178,6 @@ importers:
 
   apps/interactor:
     dependencies:
-      '@lenml/tokenizers':
-        specifier: ^3.4.0
-        version: 3.4.0
       '@mikugg/bot-utils':
         specifier: workspace:^
         version: link:../../packages/bot-utils
@@ -532,8 +529,8 @@ importers:
   apps/services:
     dependencies:
       '@mikugg/guidance':
-        specifier: ^0.17.1
-        version: 0.17.1
+        specifier: ^0.19.0
+        version: link:../../packages/guidance
       '@types/body-parser':
         specifier: ^1.19.2
         version: 1.19.2
@@ -1862,7 +1859,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.21.3
-      '@babel/helper-plugin-utils': 7.21.5
+      '@babel/helper-plugin-utils': 7.22.5
     dev: true
 
   /@babel/plugin-syntax-class-properties@7.12.13(@babel/core@7.23.6):
@@ -2162,7 +2159,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.21.3
-      '@babel/helper-plugin-utils': 7.21.5
+      '@babel/helper-plugin-utils': 7.22.5
     dev: true
 
   /@babel/plugin-syntax-top-level-await@7.14.5(@babel/core@7.23.6):
@@ -5159,18 +5156,6 @@ packages:
       npmlog: 6.0.2
       write-file-atomic: 4.0.2
     dev: true
-
-  /@mikugg/guidance@0.17.1:
-    resolution: {integrity: sha512-337mDDPdsMfKRLBJkOtb85uukIk95qOXzCnSbus+tYu3bhUq4Xk7d6sSw02xGD4H1Zh71vRnNi3sq/aAMsn70Q==}
-    dependencies:
-      gpt-tokenizer: 2.1.2
-      openai: 4.85.3
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-      - ws
-      - zod
-    dev: false
 
   /@multiformats/base-x@4.0.1:
     resolution: {integrity: sha512-eMk0b9ReBbV23xXU693TAIrLyeO5iTgBZGSJfpqriG8UkYvr/hC9u9pyMlAakDNHWmbhMZCDs6KQO0jzKD8OTw==}
@@ -13843,30 +13828,6 @@ packages:
     peerDependencies:
       zod: ^3.23.8
     peerDependenciesMeta:
-      zod:
-        optional: true
-    dependencies:
-      '@types/node': 18.15.5
-      '@types/node-fetch': 2.6.4
-      abort-controller: 3.0.0
-      agentkeepalive: 4.3.0
-      form-data-encoder: 1.7.2
-      formdata-node: 4.4.1
-      node-fetch: 2.6.11
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-    dev: false
-
-  /openai@4.85.3:
-    resolution: {integrity: sha512-KTMXAK6FPd2IvsPtglMt0J1GyVrjMxCYzu/mVbCPabzzquSJoZlYpHtE0p0ScZPyt11XTc757xSO4j39j5g+Xw==}
-    hasBin: true
-    peerDependencies:
-      ws: ^8.18.0
-      zod: ^3.23.8
-    peerDependenciesMeta:
-      ws:
-        optional: true
       zod:
         optional: true
     dependencies:
