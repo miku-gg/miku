@@ -8,19 +8,25 @@ import { getModelHealth } from './lib/healthChecker.mjs';
 
 const getTokenizer = (_tokenizer: string): Guidance.Tokenizer.AbstractTokenizer => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  if (_tokenizer === 'mistral') return tokenizers.get(TokenizerType.MISTRAL)!;
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  if (_tokenizer === 'solar') return tokenizers.get(TokenizerType.SOLAR)!;
   if (_tokenizer === 'nemo') return tokenizers.get(TokenizerType.NEMO)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  if (_tokenizer === 'llama3') return tokenizers.get(TokenizerType.LLAMA_3)!;
-  if (_tokenizer === 'wizardlm2')
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return tokenizers.get(TokenizerType.WIZARDLM2)!;
+  if (_tokenizer === 'llama3') return tokenizers.get(TokenizerType.LLAMA31)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  if (_tokenizer === 'cohere') return tokenizers.get(TokenizerType.COHERE)!;
+  if (_tokenizer === 'deepseek') return tokenizers.get(TokenizerType.DEEPSEEK)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return tokenizers.get(TokenizerType.LLAMA_2)!;
+  if (_tokenizer === 'qwen3') return tokenizers.get(TokenizerType.QWEN3)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  if (_tokenizer === 'qwq') return tokenizers.get(TokenizerType.QWQ)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  if (_tokenizer === 'mistral-small') return tokenizers.get(TokenizerType.MISTRAL_SMALL)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  if (_tokenizer === 'llama4') return tokenizers.get(TokenizerType.LLAMA4)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  if (_tokenizer === 'gemma3') return tokenizers.get(TokenizerType.GEMMA3)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  if (_tokenizer === 'claude') return tokenizers.get(TokenizerType.CLAUDE)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return tokenizers.get(TokenizerType.LLAMA31)!;
 };
 
 export default async (req: Request<string>, res: Response) => {

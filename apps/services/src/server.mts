@@ -160,14 +160,17 @@ app.get('/refresh-settings', async (req, res) => {
 });
 
 console.log('Loading tokenizers...');
+// Comment tokenizers out to save memory
 Promise.all([
-  loadTokenizer(TokenizerType.LLAMA_2),
-  loadTokenizer(TokenizerType.LLAMA_3),
-  loadTokenizer(TokenizerType.MISTRAL),
-  loadTokenizer(TokenizerType.SOLAR),
+  // loadTokenizer(TokenizerType.LLAMA31),
   loadTokenizer(TokenizerType.NEMO),
-  loadTokenizer(TokenizerType.COHERE),
-  loadTokenizer(TokenizerType.WIZARDLM2),
+  // loadTokenizer(TokenizerType.DEEPSEEK),
+  loadTokenizer(TokenizerType.QWEN3),
+  loadTokenizer(TokenizerType.QWQ),
+  loadTokenizer(TokenizerType.MISTRAL_SMALL),
+  loadTokenizer(TokenizerType.LLAMA4),
+  loadTokenizer(TokenizerType.GEMMA3),
+  // loadTokenizer(TokenizerType.CLAUDE),
 ]).then(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

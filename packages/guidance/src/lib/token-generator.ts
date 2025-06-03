@@ -60,6 +60,15 @@ export class OpenAITokenGenerator extends AbstractTokenGenerator<RequestOptions<
     );
     const logprobsResult = result.choices[0].logprobs?.top_logprobs || [];
     const top_logprobs: Record<string, number> = logprobsResult ? logprobsResult[0] : { '2': 0 };
+    Object.keys(top_logprobs).forEach((_key) => {
+      let key = _key;
+      if (key.startsWith('Ġ')) {
+        key = key.slice(1);
+        key = ' ' + key;
+        top_logprobs[key] = top_logprobs[_key];
+        delete top_logprobs[_key];
+      }
+    });
     return top_logprobs;
   }
 
