@@ -1,5 +1,5 @@
 export enum RPModelTokenizers {
-  LLAMA31 = 'llama3.1',
+  LLAMA3 = 'llama3',
   NEMO = 'nemo',
   DEEPSEEK = 'deepseek',
   QWEN3 = 'qwen3',

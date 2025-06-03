@@ -3,7 +3,7 @@ import * as Guidance from '@mikugg/guidance';
 const FRONTEND_TOKENIZER_DB_URL = process.env.FRONTEND_TOKENIZER_DB_URL || 'https://interactor.miku.gg/tokenizers';
 
 export enum TokenizerType {
-  LLAMA31 = 'llama3.1',
+  LLAMA3 = 'llama3',
   NEMO = 'nemo',
   DEEPSEEK = 'deepseek',
   QWEN3 = 'qwen3',
@@ -29,7 +29,7 @@ export const tokenizers = new Map<TokenizerType, Guidance.Tokenizer.AbstractToke
 export async function loadTokenizer(tokenizerType: TokenizerType): Promise<void> {
   let tokenizer: Guidance.Tokenizer.LenMLTokenizer;
   switch (tokenizerType) {
-    case TokenizerType.LLAMA31:
+    case TokenizerType.LLAMA3:
       tokenizer = new LenMLTokenizer(`${FRONTEND_TOKENIZER_DB_URL}/Llama-3.1`);
       break;
     case TokenizerType.NEMO:

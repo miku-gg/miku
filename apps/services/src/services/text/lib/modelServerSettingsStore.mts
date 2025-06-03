@@ -20,7 +20,7 @@ const DEFAULT_MODEL: RPModelSettings = {
   // @ts-ignore
   preset: (backend_config?.preset as PresetType) || PresetType.DIVINE_INTELECT,
   strategy: (backend_config?.strategy as RPModelStrategy) || RPModelStrategy.ALPACA,
-  tokenizer: (backend_config?.tokenizer as RPModelTokenizers) || RPModelTokenizers.LLAMA31,
+  tokenizer: (backend_config?.tokenizer as RPModelTokenizers) || RPModelTokenizers.LLAMA3,
   permission: RPModelPermission.FREE,
   model_id_for_select: null,
   cost: 0,

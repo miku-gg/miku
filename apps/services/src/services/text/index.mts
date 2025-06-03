@@ -10,7 +10,7 @@ const getTokenizer = (_tokenizer: string): Guidance.Tokenizer.AbstractTokenizer 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (_tokenizer === 'nemo') return tokenizers.get(TokenizerType.NEMO)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  if (_tokenizer === 'llama3') return tokenizers.get(TokenizerType.LLAMA31)!;
+  if (_tokenizer === 'llama3') return tokenizers.get(TokenizerType.LLAMA3)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (_tokenizer === 'deepseek') return tokenizers.get(TokenizerType.DEEPSEEK)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -26,7 +26,7 @@ const getTokenizer = (_tokenizer: string): Guidance.Tokenizer.AbstractTokenizer 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (_tokenizer === 'claude') return tokenizers.get(TokenizerType.CLAUDE)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return tokenizers.get(TokenizerType.LLAMA31)!;
+  return tokenizers.get(TokenizerType.LLAMA3)!;
 };
 
 export default async (req: Request<string>, res: Response) => {
