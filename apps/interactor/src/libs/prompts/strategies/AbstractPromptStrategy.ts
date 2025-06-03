@@ -26,14 +26,17 @@ export abstract class AbstractPromptStrategy<Input, Output> {
   private tokenizer: Tokenizer;
   protected instructTemplate: InstructTemplate;
   protected language: string; // Added language property
+  protected hasReasoning: boolean;
 
   constructor(
     _instructTemplate: InstructTemplateSlug = 'chatml',
     language: string = 'en', // Added language parameter with default 'en'
+    hasReasoning: boolean = false,
   ) {
     this.tokenizer = mistralTokenizer;
     this.instructTemplate = getInstructTemplateFromSlug(_instructTemplate);
     this.language = language;
+    this.hasReasoning = hasReasoning;
   }
   public abstract buildGuidancePrompt(
     maxNewTokens: number,

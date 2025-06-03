@@ -277,7 +277,7 @@ const VNStyleTextFormatter: React.FC<VNStyleTextFormatterProps> = ({ text, child
   return (
     <div
       className={classNames({
-        'TextFormatter scrollbar': true,
+        TextFormatter: true,
         [`TextFormatter--small`]: FontSize.Small === fontSize,
         [`TextFormatter--large`]: FontSize.Large === fontSize,
       })}

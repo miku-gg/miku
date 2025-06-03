@@ -107,12 +107,14 @@ app.get('/text/metadata/:model', async (req, res) => {
       truncation_length: metadata?.truncation_length || 4096,
       max_new_tokens: metadata?.new_tokens || 200,
       cost: metadata?.cost || 0,
+      has_reasoning: metadata?.has_reasoning || false,
       secondary: {
         id: secondaryMetadata?.id,
         strategy: secondaryMetadata?.strategy || 'llama3',
         tokenizer: secondaryMetadata?.tokenizer || 'llama',
         truncation_length: secondaryMetadata?.truncation_length || 4096,
         max_new_tokens: secondaryMetadata?.new_tokens || 200,
+        has_reasoning: secondaryMetadata?.has_reasoning || false,
       },
     });
   } catch (error) {
@@ -122,12 +124,14 @@ app.get('/text/metadata/:model', async (req, res) => {
       truncation_length: 4096,
       max_new_tokens: 200,
       cost: 0,
+      has_reasoning: false,
       secondary: {
         strategy: 'llama3',
         tokenizer: 'llama',
         truncation_length: 4096,
         max_new_tokens: 200,
         cost: 0,
+        has_reasoning: false,
       },
     });
   }
@@ -143,6 +147,7 @@ app.get('/text/models', async (req, res) => {
         description: model.description,
         permission: model.permission,
         cost: model.cost,
+        has_reasoning: model.has_reasoning,
       };
     }),
   );

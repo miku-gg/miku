@@ -159,6 +159,9 @@ const labels: Record<string, Record<string, string>> = {
     initial_value_label: 'Initial Value',
     regenerate: 'Regenerate',
     select_reaction: 'Select Reaction',
+
+    enable_reasoning_title: 'Enable Reasoning',
+    enable_reasoning_description: 'The AI will think more deeply before giving a response.',
   },
   es: {
     loading_novel: 'Cargando Novela',
@@ -319,6 +322,8 @@ const labels: Record<string, Record<string, string>> = {
     select_initial_value: 'Seleccionar valor inicial...',
     initial_value_label: 'Valor Inicial',
     regenerate: 'Regenerar',
+    enable_reasoning_title: 'Habilitar Razonamiento',
+    enable_reasoning_description: 'La AI pensará más profundamente antes de dar una respuesta.',
   },
   pt: {
     loading_novel: 'Carregando Romance',
@@ -479,6 +484,8 @@ const labels: Record<string, Record<string, string>> = {
     initial_value_label: 'Valor Inicial',
     regenerate: 'Regenerar',
     select_reaction: 'Selecionar Reação',
+    enable_reasoning_title: 'Habilitar Razonamento',
+    enable_reasoning_description: 'A IA pensará mais profundamente antes de dar uma resposta.',
   },
   de: {
     loading_novel: 'Roman wird geladen',
@@ -640,6 +647,8 @@ const labels: Record<string, Record<string, string>> = {
     initial_value_label: 'Anfangswert',
     regenerate: 'Regenerieren',
     select_reaction: 'Reaktion auswählen',
+    enable_reasoning_title: 'Verstanden',
+    enable_reasoning_description: 'Das AI wird sich tiefer Gedanken machen, bevor sie eine Antwort gibt.',
   },
   fr: {
     loading_novel: 'Chargement du Roman',
@@ -800,6 +809,8 @@ const labels: Record<string, Record<string, string>> = {
     initial_value_label: 'Valeur Initiale',
     regenerate: 'Régénérer',
     select_reaction: 'Sélectionner une réaction',
+    enable_reasoning_title: 'Activer le raisonnement',
+    enable_reasoning_description: "L'IA pensera plus profondément avant de donner une réponse.",
   },
   ru: {
     loading_novel: 'Загрузка романа',
@@ -961,6 +972,8 @@ const labels: Record<string, Record<string, string>> = {
     initial_value_label: 'Начальное значение',
     regenerate: 'Повторить',
     select_reaction: 'Выбрать реакцию',
+    enable_reasoning_title: 'Включить мышление',
+    enable_reasoning_description: 'ИИ будет более глубоко мыслить перед ответом.',
   },
   jp: {
     loading_novel: '小説を読み込み中',
@@ -1120,6 +1133,8 @@ const labels: Record<string, Record<string, string>> = {
     initial_value_label: '初期値',
     regenerate: '再生成',
     select_reaction: '反応を選択',
+    enable_reasoning_title: '思考を有効化',
+    enable_reasoning_description: 'AIはより深く思考してから応答します。',
   },
 };
 

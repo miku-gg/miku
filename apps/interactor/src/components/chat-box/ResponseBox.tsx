@@ -1,6 +1,6 @@
-import { Tooltip } from '@mikugg/ui-kit';
+import { Tooltip, Loader } from '@mikugg/ui-kit';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { FaDice, FaForward } from 'react-icons/fa';
 import { FaPencil } from 'react-icons/fa6';
@@ -31,15 +31,44 @@ import {
   setRegenerateEmotionModal,
 } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
-import { TextFormatter, TextFormatterStatic } from '../common/TextFormatter';
+import { TextFormatter } from '../common/TextFormatter';
 import './ResponseBox.scss';
 import TTSPlayer from './TTSPlayer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { useI18n } from '../../libs/i18n';
+import { GiBrain } from 'react-icons/gi';
+
+const ReasoningText = ({ text }: { text: string }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="ResponseBox__reasoning-wrapper">
+      <button className="ResponseBox__reasoning-toggle" onClick={() => setOpen(!open)}>
+        <GiBrain className="ResponseBox__brain-icon-small" />
+        <span className="ResponseBox__reasoning-toggle-text">{open ? 'Hide reasoning' : 'Show reasoning'}</span>
+      </button>
+      <div className={classNames('ResponseBox__reasoning-content', { open })}>So,{text}</div>
+    </div>
+  );
+};
+
+const TextToSpanPerLetter = ({ text }: { text: string }) => {
+  return text.split('').map((letter, index) => <span key={index}>{letter}</span>);
+};
+
+// Indicator shown when the response is loading: thinking or reasoning
+const ThinkingIndicator = ({ reasoningEnabled }: { reasoningEnabled: boolean }) => (
+  <div className={classNames('ResponseBox__thinking', { 'ResponseBox__thinking--reasoning': reasoningEnabled })}>
+    <Loader />
+    <span className="ResponseBox__thinking-text">
+      <TextToSpanPerLetter text="Thinking..." />
+    </span>
+  </div>
+);
 
 const ResponseBox = (): JSX.Element | null => {
   const dispatch = useAppDispatch();
   const { servicesEndpoint, apiEndpoint, isInteractionDisabled, assetLinkLoader, isPublishedDemo } = useAppContext();
+  const reasoningEnabled = useAppSelector((state) => state.settings.prompt.reasoningEnabled);
   const responseDiv = useRef<HTMLDivElement>(null);
   const lastReponse = useAppSelector(selectLastLoadedResponse);
   const isLastResponseFetching = useAppSelector(
@@ -135,23 +164,26 @@ const ResponseBox = (): JSX.Element | null => {
         </button>
       ) : null}
 
-      <div className={`ResponseBox__text ${isMobile ? 'MobileApp__text' : ''}`} ref={responseDiv}>
+      <div className={`ResponseBox__text ${isMobile ? 'MobileApp__text' : ''} scrollbar`} ref={responseDiv}>
         {isLastResponseFetching ? (
-          <TextFormatterStatic text="*Typing...*" />
+          <ThinkingIndicator reasoningEnabled={reasoningEnabled} />
         ) : (
-          <TextFormatter
-            text={displayText}
-            children={
-              !disabled &&
-              !isInteractionDisabled &&
-              displayCharacter.id === lastCharacters[lastCharacters.length - 1].id ? (
-                <button className="ResponseBox__continue" onClick={handleContinueClick}>
-                  continue
-                  <FaForward />
-                </button>
-              ) : null
-            }
-          />
+          <>
+            {displayCharacter.reasoning ? <ReasoningText text={displayCharacter.reasoning} /> : null}
+            <TextFormatter
+              text={displayText}
+              children={
+                !disabled &&
+                !isInteractionDisabled &&
+                displayCharacter.id === lastCharacters[lastCharacters.length - 1].id ? (
+                  <button className="ResponseBox__continue" onClick={handleContinueClick}>
+                    continue
+                    <FaForward />
+                  </button>
+                ) : null
+              }
+            />
+          </>
         )}
       </div>
 

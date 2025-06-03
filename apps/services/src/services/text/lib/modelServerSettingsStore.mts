@@ -24,6 +24,7 @@ const DEFAULT_MODEL: RPModelSettings = {
   permission: RPModelPermission.FREE,
   model_id_for_select: null,
   cost: 0,
+  has_reasoning: backend_config?.has_reasoning || false,
   endpoint: {
     url: backend_config?.apiUrl || 'http://localhost:2242/v1',
     api_key: backend_config?.apiKey || '',

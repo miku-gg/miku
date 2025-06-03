@@ -37,7 +37,8 @@
     // border-radius: 10px;
     text-shadow: 1.41px 1.41px black, 2px 0 black, 1.41px -1.41px black, 0 -2px black, -1.41px -1.41px black,
       -2px 0 black, -1.41px 1.41px black, 0 2px black;
-    // overflow: auto;
+    overflow: auto;
+    text-align: left;
 
     // background: radial-gradient(
     //   circle,
@@ -349,4 +350,134 @@
   .MobileApp__text {
     padding: 0.8rem;
   }
+}
+
+/* Thinking indicator animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+@keyframes sliding-window {
+  0% {
+    left: -30%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: -30%;
+  }
+}
+
+@keyframes thinking-glow {
+  0%,
+  20% {
+    color: rgba(255, 255, 255, 0.6);
+    text-shadow: none;
+  }
+  10% {
+    color: white;
+    text-shadow: 0 0 8px white;
+  }
+}
+
+/* Thinking/Reasoning indicator */
+.ResponseBox__thinking {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: white;
+
+  .Loader {
+    top: 3px;
+  }
+}
+.ResponseBox__brain-icon {
+  width: 1em;
+  height: 1em;
+  animation: spin 1s linear infinite;
+}
+.ResponseBox__thinking--reasoning .ResponseBox__brain-icon {
+  color: $secondary-color;
+}
+.ResponseBox__thinking-text {
+  font-size: 1rem;
+  user-select: none;
+
+  span {
+    $glow-duration: 1s;
+    $glow-delay-step: 0.05s;
+    display: inline-block;
+    animation: thinking-glow #{$glow-duration} ease-in-out infinite;
+    color: rgba(255, 255, 255, 0.6);
+
+    @for $i from 1 through 20 {
+      &:nth-child(#{$i}) {
+        animation-delay: $glow-delay-step * ($i - 1);
+      }
+    }
+  }
+}
+
+/* Reasoning toggle and content */
+.ResponseBox__reasoning-wrapper {
+  text-align: left;
+  margin-left: 5px;
+}
+.ResponseBox__reasoning-toggle {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  user-select: none;
+  &:focus {
+    outline: none;
+  }
+}
+.ResponseBox__reasoning-toggle:hover {
+  opacity: 1;
+}
+.ResponseBox__brain-icon-small {
+  width: 0.8em;
+  height: 0.8em;
+}
+.ResponseBox__reasoning-content {
+  max-height: 0;
+  overflow: auto;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  font-size: 0.8rem;
+  font-style: italic;
+  padding: 0;
+  margin-top: 0.25rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.5);
+  // background-color: rgba(255, 255, 255, 0.1);
+  background-color: black;
+  line-height: 0.9rem;
+}
+.ResponseBox__reasoning-content.open {
+  max-height: 500px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 10px;
 }

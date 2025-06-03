@@ -10,7 +10,18 @@ export interface InstructTemplate {
   STOPS: string[];
 }
 
-export const instructTemplateSlugs = ['alpaca', 'metharme', 'mistral', 'vicuna', 'llama3', 'chatml', 'lyra'] as const;
+export const instructTemplateSlugs = [
+  'alpaca',
+  'metharme',
+  'mistral',
+  'vicuna',
+  'llama3',
+  'chatml',
+  'lyra',
+  'gemma3',
+  'deepseek',
+  'danchat2',
+] as const;
 export type InstructTemplateSlug = (typeof instructTemplateSlugs)[number];
 export function isInstructTemplateSlug(slug: string | undefined): slug is InstructTemplateSlug {
   return typeof slug === typeof undefined ? false : (instructTemplateSlugs as readonly string[]).includes(slug!);
@@ -113,6 +124,48 @@ const templates = new Map<InstructTemplateSlug, InstructTemplate>([
       OUTPUT_END: '[/INST]\n',
       EOS: '</s>',
       STOPS: ['INST', '/INST', '<|im_end|>', '</s>'],
+    },
+  ],
+  [
+    'gemma3',
+    {
+      BOS: '<bos>',
+      SYSTEM_START: '<start_of_turn>user',
+      SYSTEM_END: '<end_of_turn>',
+      INPUT_START: '<start_of_turn>user',
+      INPUT_END: '<end_of_turn>',
+      OUTPUT_START: '<start_of_turn>assistant',
+      OUTPUT_END: '<end_of_turn>',
+      EOS: '<eos>',
+      STOPS: ['<start_of_turn>', '<end_of_turn>', '<bos>', '<eos>'],
+    },
+  ],
+  [
+    'deepseek',
+    {
+      BOS: '',
+      SYSTEM_START: '',
+      SYSTEM_END: '',
+      INPUT_START: '<｜User｜>',
+      INPUT_END: '',
+      OUTPUT_START: '<｜Assistant｜>',
+      OUTPUT_END: '',
+      EOS: '',
+      STOPS: ['<|', '<｜', '<｜User｜>', '<｜Assistant｜>'],
+    },
+  ],
+  [
+    'danchat2',
+    {
+      BOS: '',
+      SYSTEM_START: '<|system|>',
+      SYSTEM_END: '<|endoftext|>',
+      INPUT_START: '<|user|>',
+      INPUT_END: '<|endoftext|>',
+      OUTPUT_START: '<|assistant|>',
+      OUTPUT_END: '<|endoftext|>',
+      EOS: '<|endoftext|>',
+      STOPS: ['<|system|>', '<|user|>', '<|assistant|>', '<|endoftext|>'],
     },
   ],
 ]);

@@ -12,8 +12,8 @@ $flex-wrap-gap: 10px;
 
 .TextFormatter {
   text-align: left;
-  height: 100%;
-  overflow: auto;
+  height: calc(100% - 25px);
+  // overflow: auto;
   overflow-x: visible;
   padding: 0 0.1rem;
   font-size: 1.1rem;

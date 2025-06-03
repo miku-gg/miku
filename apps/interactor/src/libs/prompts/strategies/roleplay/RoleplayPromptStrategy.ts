@@ -234,9 +234,11 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       text: currentCharacterResponse?.text || '',
       emotion: currentCharacterResponse?.emotion || '',
       pose: currentCharacterResponse?.pose || '',
+      reasoning: currentCharacterResponse?.reasoning || '',
     };
     characterResponse.emotion = variables.get('emotion')?.trim() || characterResponse.emotion;
     characterResponse.text = parseLLMResponse(variables.get('text')?.trim() || '', currentCharacterName);
+    characterResponse.reasoning = variables.get('reasoning')?.trim() || '';
 
     const index = response.characters.findIndex(({ characterId }) => characterId === input.currentCharacterId);
 
@@ -449,6 +451,19 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const userSanitized = state.settings.user.name.replace(/"/g, '\\"');
 
     let response = temp.askLine;
+    let alreadyReacted = false;
+
+    if (this.hasReasoning) {
+      if (state.settings.prompt.reasoningEnabled) {
+        response += `<think>\nOkay, the reaction that {{char}} will show is${
+          existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'
+        }. So,{{GEN reasoning max_tokens=512 stop=["</think>"]}}</think>\n`;
+        alreadyReacted = true;
+      } else {
+        response += '<think></think>\n';
+      }
+    }
+
     response += `${this.i18n('reaction_instruction')}\n`;
 
     if (scene?.indicators) {
@@ -468,9 +483,11 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       });
     }
 
-    response += `${this.i18n('character_reaction', ['{{char}}'])}:${
-      existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'
-    }\n`;
+    if (!alreadyReacted) {
+      response += `${this.i18n('character_reaction', ['{{char}}'])}:${
+        existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'
+      }\n`;
+    }
     response += `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`;
     return response;
   }

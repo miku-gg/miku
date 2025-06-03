@@ -40,7 +40,8 @@ $flex-wrap-gap: 10px;
   &__text-speed,
   &__text-font-size,
   &__voice,
-  &__systemPrompt {
+  &__systemPrompt,
+  &__reasoning {
     padding: $padding-standard;
     background-color: $primary-background-color;
     border-radius: $border-radius;
@@ -56,7 +57,8 @@ $flex-wrap-gap: 10px;
     gap: $flex-wrap-gap;
   }
 
-  &__voice {
+  &__voice,
+  &__reasoning {
     border: 1px solid $secondary-background-color;
   }
 
@@ -64,6 +66,38 @@ $flex-wrap-gap: 10px;
     font-size: $font-size-small;
     font-style: italic;
     color: $font-color-light-gray;
+  }
+
+  &__reasoning {
+    &.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+
+  &__reasoning-description {
+    font-size: $font-size-small;
+    font-style: italic;
+    color: $font-color-light-gray;
+  }
+
+  &__reasoning-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $gap;
+  }
+
+  &__reasoning-header-title {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  &__reasoning-checkbox {
+    display: flex;
+    align-items: center;
   }
 
   &__voice-enabled,

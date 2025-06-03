@@ -44,6 +44,7 @@ export interface NarrationResponse {
     emotion: string;
     pose: string;
     text: string;
+    reasoning?: string;
   }[];
   childrenInteractions: {
     interactionId: string;
@@ -198,6 +199,7 @@ export interface SettingsState {
   };
   prompt: {
     systemPrompt: string;
+    reasoningEnabled: boolean;
   };
   chatBox: {
     isDraggable: boolean;

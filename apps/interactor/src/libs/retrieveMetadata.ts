@@ -6,12 +6,14 @@ interface ModelMetadata {
   tokenizer: string;
   truncation_length: number;
   max_new_tokens: number;
+  has_reasoning: boolean;
   secondary: {
     id: ModelType;
     strategy: InstructTemplateSlug;
     tokenizer: string;
     truncation_length: number;
     max_new_tokens: number;
+    has_reasoning: boolean;
   };
 }
 
@@ -40,12 +42,14 @@ export async function retrieveModelMetadata(servicesEndpoint: string, model: Mod
       tokenizer: metadata?.tokenizer || 'llama',
       truncation_length: metadata?.truncation_length || 4096,
       max_new_tokens: metadata?.max_new_tokens || 200,
+      has_reasoning: metadata?.has_reasoning || false,
       secondary: {
         id: (metadata?.secondary?.id as ModelType) || 'RP',
         strategy: metadata?.secondary?.strategy || 'llama3',
         tokenizer: metadata?.secondary?.tokenizer || 'llama',
         truncation_length: metadata?.secondary?.truncation_length || 4096,
         max_new_tokens: metadata?.secondary?.max_new_tokens || 200,
+        has_reasoning: metadata?.secondary?.has_reasoning || false,
       },
     };
   } catch (error) {
@@ -55,12 +59,14 @@ export async function retrieveModelMetadata(servicesEndpoint: string, model: Mod
       tokenizer: 'llama',
       truncation_length: 4096,
       max_new_tokens: 200,
+      has_reasoning: false,
       secondary: {
         id: ModelType.RP,
         strategy: 'llama3',
         tokenizer: 'llama',
         truncation_length: 4096,
         max_new_tokens: 200,
+        has_reasoning: false,
       },
     };
   }
@@ -76,12 +82,14 @@ export function getExistingModelMetadata(model: ModelType): ModelMetadata {
       tokenizer: 'llama',
       truncation_length: 4096,
       max_new_tokens: 200,
+      has_reasoning: false,
       secondary: {
         id: ModelType.RP,
         strategy: 'llama3',
         tokenizer: 'llama',
         truncation_length: 4096,
         max_new_tokens: 200,
+        has_reasoning: false,
       },
     };
   }

@@ -75,7 +75,7 @@ const interactionEffect = async (
     const identifier = simpleHash(state.settings.user.name + '_' + state.narration.id);
     const currentScene = selectCurrentScene(state);
     const currentInteraction = selectCurrentInteraction(state);
-    const { secondary, strategy, truncation_length } = (await retrieveModelMetadata(
+    const { secondary, strategy, truncation_length, has_reasoning } = (await retrieveModelMetadata(
       servicesEndpoint,
       state.settings.model,
     )) || {
@@ -87,7 +87,7 @@ const interactionEffect = async (
     const maxMessages = selectSummaryEnabled(state)
       ? Math.max(messagesSinceLastSummary, 16)
       : selectAllParentDialogues(state).length;
-    const primaryStrategy = new RoleplayPromptStrategy(strategy, state.novel.language || 'en');
+    const primaryStrategy = new RoleplayPromptStrategy(strategy, state.novel.language || 'en', has_reasoning);
 
     const [responsePromptBuilder, secondaryPromptBuilder] = [
       new PromptBuilder<RoleplayPromptStrategy>({
@@ -97,7 +97,7 @@ const interactionEffect = async (
       }),
       new PromptBuilder<RoleplayPromptStrategy>({
         maxNewTokens: 200,
-        strategy: new RoleplayPromptStrategy(secondary.strategy, state.novel.language || 'en'),
+        strategy: new RoleplayPromptStrategy(secondary.strategy, state.novel.language || 'en', secondary.has_reasoning),
         truncationLength: secondary.truncation_length - 150,
       }),
     ];

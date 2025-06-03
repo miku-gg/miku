@@ -98,6 +98,7 @@ export const initialState: SettingsState = {
   },
   prompt: {
     systemPrompt: '',
+    reasoningEnabled: false,
   },
   text: {
     speed: Speed.Normal,
@@ -264,6 +265,9 @@ export const settingSlice = createSlice({
         state.modals.regenerateEmotion.selectedCharacterIndex = 0;
       }
     },
+    setReasoningEnabled: (state, action: PayloadAction<boolean>) => {
+      state.prompt.reasoningEnabled = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -305,6 +309,7 @@ export const {
   setResponseFormat,
   setDisplayingLastSentence,
   setRegenerateEmotionModal,
+  setReasoningEnabled,
 } = settingSlice.actions;
 
 export default settingSlice.reducer;

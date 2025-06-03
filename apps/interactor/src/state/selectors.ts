@@ -130,6 +130,7 @@ export const selectLastLoadedCharacters = createSelector(
           image: selectLastImageOfCharacter(state, characterId, response?.id),
           emotion: emotionSlug,
           selected: characterId === response?.selectedCharacterId,
+          reasoning: characterResponse?.reasoning || '',
         };
       }) || []
     );

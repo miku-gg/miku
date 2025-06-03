@@ -19,6 +19,8 @@ export enum RPModelStrategy {
   CHATML = 'chatml',
   LYRA = 'lyra',
   GEMMA3 = 'gemma3',
+  DEEPSEEK = 'deepseek',
+  DANCHAT2 = 'danchat2',
 }
 
 export enum PresetType {
@@ -27,6 +29,8 @@ export enum PresetType {
   MINIMAL_WORK = 'MINIMAL_WORK',
   STHENO_V3 = 'STHENO_V3',
   NEMO = 'NEMO',
+  QWEN3_30B_NO_THINK = 'QWEN3_30B_NO_THINK',
+  PERSONALITY_ENGINE = 'PERSONALITY_ENGINE',
 }
 
 export enum RPModelPermission {
@@ -52,6 +56,7 @@ export interface RPModelSettings {
     api_key: string;
     model: string;
   };
+  has_reasoning: boolean;
 }
 
 export interface ModelServerSettings {

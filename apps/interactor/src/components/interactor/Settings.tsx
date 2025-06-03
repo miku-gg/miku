@@ -16,6 +16,7 @@ import {
   ResponseFormat,
   setResponseFormat,
   getVoiceItems,
+  setReasoningEnabled,
 } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './Settings.scss';
@@ -101,6 +102,22 @@ const Settings = (): JSX.Element => {
                   {currentSystemPromptLenght}/{systemPromptMaxLenght}
                 </p>
               </div>
+              {settings.user.isTester ? (
+                <div className={`SettingsModal__reasoning ${!settings.user.isTester ? 'disabled' : ''}`}>
+                  <div className="SettingsModal__reasoning-header">
+                    <div className="SettingsModal__reasoning-header-title">
+                      <div className="SettingsModal__reasoning-title">{i18n('enable_reasoning_title')}</div>
+                      <div className="SettingsModal__reasoning-description">{i18n('enable_reasoning_description')}</div>
+                    </div>
+                    <div className="SettingsModal__reasoning-checkbox">
+                      <CheckBox
+                        value={settings.prompt.reasoningEnabled}
+                        onChange={(event) => dispatch(setReasoningEnabled(!!event.target.checked))}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : null}
             </>
           )}
           {settingsTab === 'general' && (
