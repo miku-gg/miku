@@ -219,6 +219,10 @@
             id="max_new_tokens"
           />
         </div>
+        <div class="flex gap-2">
+          <p class="text-white w-24">Has reasoning</p>
+          <input type="checkbox" name="has_reasoning" id="has_reasoning" />
+        </div>
         <button class="ui button save-button w-64" onclick="save_backend_config(); toggle_backend_modal(false)">
           Save
         </button>
@@ -260,6 +264,7 @@
         $('#tokenizer').dropdown('set selected', data.tokenizer);
         document.getElementById('truncation_length').value = data.truncation_length;
         document.getElementById('max_new_tokens').value = data.max_new_tokens;
+        document.getElementById('has_reasoning').checked = data.has_reasoning;
       });
 
       function change_theme(dark_mode) {
@@ -314,6 +319,7 @@
         const tokenizer = document.getElementById('tokenizer').value;
         const truncation_length = document.getElementById('truncation_length').value;
         const max_new_tokens = document.getElementById('max_new_tokens').value;
+        const has_reasoning = document.getElementById('has_reasoning').checked;
 
         const config = {
           apiUrl: apiUrl,
@@ -323,6 +329,7 @@
           tokenizer: tokenizer,
           truncation_length: Number(truncation_length || 0) || 0,
           max_new_tokens: Number(max_new_tokens || 0) || 0,
+          has_reasoning: has_reasoning || false,
         };
         fetch('/save', {
           method: 'POST',

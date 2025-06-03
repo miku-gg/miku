@@ -54,7 +54,7 @@ export default {
       loading: false,
       sceneSuggestionsLeft: 0,
     },
-    prompt: { systemPrompt: '' },
+    prompt: { systemPrompt: '', reasoningEnabled: false },
     text: { speed: 1, fontSize: 1, autoContinue: false, responseFormat: 'FullText' },
     voice: {
       autoplay: false,

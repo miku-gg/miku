@@ -29,7 +29,7 @@ export const selectTokensCount = (state: RootState) => {
 
   const responsePromptBuilder = new PromptBuilder<RoleplayPromptStrategy>({
     maxNewTokens: 200,
-    strategy: new RoleplayPromptStrategy('llama3'),
+    strategy: new RoleplayPromptStrategy('lyra'),
     truncationLength: 32000,
   });
 

@@ -178,6 +178,9 @@ importers:
 
   apps/interactor:
     dependencies:
+      '@lenml/tokenizer-mistral_nemo':
+        specifier: ^3.4.2
+        version: 3.4.2
       '@mikugg/bot-utils':
         specifier: workspace:^
         version: link:../../packages/bot-utils
@@ -2021,7 +2024,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.23.6
-      '@babel/helper-plugin-utils': 7.21.5
+      '@babel/helper-plugin-utils': 7.22.5
     dev: true
 
   /@babel/plugin-syntax-logical-assignment-operators@7.10.4(@babel/core@7.21.3):
@@ -4429,6 +4432,12 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
+
+  /@lenml/tokenizer-mistral_nemo@3.4.2:
+    resolution: {integrity: sha512-fFdohhec1CJgEbfP9V2yXSQYVx4UtbtGVjCgTV14AILoCCFfg9F745BoFfaiqEAHKMN72V0etZq7jxz++wU8eg==}
+    dependencies:
+      '@lenml/tokenizers': 3.4.0
+    dev: false
 
   /@lenml/tokenizers@3.4.0:
     resolution: {integrity: sha512-BRDGqddggcsd4YwubhXzHuUdpkPq5GxcYLp+40SxfyV6/kkSQU7rNaQ8iS+HMD+XfqzXaYsHuHNPlaLA6gnM5A==}

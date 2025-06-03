@@ -1,5 +1,7 @@
-import mistralTokenizer, { Tokenizer } from '../_mistral-tokenizer';
+import { fromPreTrained } from '@lenml/tokenizer-mistral_nemo';
 import { getInstructTemplateFromSlug, InstructTemplate, InstructTemplateSlug } from './instructTemplates';
+
+const nemoTokenizer = fromPreTrained();
 
 const cache: { [key: string]: number } = {};
 
@@ -7,7 +9,10 @@ export const memoizedTokenize = (line: string): number => {
   if (line in cache) {
     return cache[line];
   }
-  const result = mistralTokenizer.encode(line).length;
+  const result = nemoTokenizer.encode(line).length;
+  if (!result) {
+    throw new Error('Tokenizer not found');
+  }
   cache[line] = result;
   return result;
 };
@@ -33,7 +38,7 @@ export abstract class AbstractPromptStrategy<Input, Output> {
     language: string = 'en', // Added language parameter with default 'en'
     hasReasoning: boolean = false,
   ) {
-    this.tokenizer = mistralTokenizer;
+    this.tokenizer = nemoTokenizer;
     this.instructTemplate = getInstructTemplateFromSlug(_instructTemplate);
     this.language = language;
     this.hasReasoning = hasReasoning;

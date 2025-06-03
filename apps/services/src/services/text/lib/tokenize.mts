@@ -1,6 +1,6 @@
 import * as Guidance from '@mikugg/guidance';
 
-const FRONTEND_TOKENIZER_DB_URL = process.env.FRONTEND_TOKENIZER_DB_URL || 'https://interactor.miku.gg/tokenizers';
+const FRONTEND_TOKENIZER_DB_URL = process.env.FRONTEND_TOKENIZER_DB_URL || 'http://localhost:5173/tokenizers';
 
 export enum TokenizerType {
   LLAMA3 = 'llama3',
@@ -21,6 +21,9 @@ class LenMLTokenizer extends Guidance.Tokenizer.LenMLTokenizer {
     clean_up_tokenization_spaces: boolean = true,
   ): string {
     return super.decodeString(arr, false, false);
+  }
+  override encodeString(str: string, add_special_tokens: boolean = true): number[] {
+    return super.encodeString(str, false);
   }
 }
 
