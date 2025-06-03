@@ -1,11 +1,13 @@
 export enum RPModelTokenizers {
-  MISTRAL = 'mistral',
-  SOLAR = 'solar',
-  LLAMA = 'llama',
-  LLAMA3 = 'llama3',
-  COHERE = 'cohere',
-  WIZARDLM2 = 'wizardlm2',
+  LLAMA31 = 'llama3.1',
   NEMO = 'nemo',
+  DEEPSEEK = 'deepseek',
+  QWEN3 = 'qwen3',
+  QWQ = 'qwq',
+  MISTRAL_SMALL = 'mistral-small',
+  LLAMA4 = 'llama4',
+  GEMMA3 = 'gemma3',
+  CLAUDE = 'claude',
 }
 
 export enum RPModelStrategy {
@@ -16,6 +18,7 @@ export enum RPModelStrategy {
   LLAMA3 = 'llama3',
   CHATML = 'chatml',
   LYRA = 'lyra',
+  GEMMA3 = 'gemma3',
 }
 
 export enum PresetType {

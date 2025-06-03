@@ -17,6 +17,7 @@
     ]
   },
   "dependencies": {
+    "@lenml/tokenizers": "^3.4.0",
     "@mikugg/bot-utils": "workspace:^",
     "@mikugg/ui-kit": "workspace:^",
     "@reduxjs/toolkit": "^2.0.1",

@@ -10,7 +10,16 @@ export interface InstructTemplate {
   STOPS: string[];
 }
 
-export const instructTemplateSlugs = ['alpaca', 'metharme', 'mistral', 'vicuna', 'llama3', 'chatml', 'lyra'] as const;
+export const instructTemplateSlugs = [
+  'alpaca',
+  'metharme',
+  'mistral',
+  'vicuna',
+  'llama3',
+  'chatml',
+  'lyra',
+  'gemma3',
+] as const;
 export type InstructTemplateSlug = (typeof instructTemplateSlugs)[number];
 export function isInstructTemplateSlug(slug: string | undefined): slug is InstructTemplateSlug {
   return typeof slug === typeof undefined ? false : (instructTemplateSlugs as readonly string[]).includes(slug!);
@@ -113,6 +122,20 @@ const templates = new Map<InstructTemplateSlug, InstructTemplate>([
       OUTPUT_END: '[/INST]\n',
       EOS: '</s>',
       STOPS: ['INST', '/INST', '<|im_end|>', '</s>'],
+    },
+  ],
+  [
+    'gemma3',
+    {
+      BOS: '<bos>',
+      SYSTEM_START: '<start_of_turn>system\n',
+      SYSTEM_END: '<end_of_turn>\n',
+      INPUT_START: '<start_of_turn>user\n',
+      INPUT_END: '<end_of_turn>\n',
+      OUTPUT_START: '<start_of_turn>assistant\n',
+      OUTPUT_END: '<end_of_turn>\n',
+      EOS: '<eos>',
+      STOPS: ['end_of_turn', 'start_of_turn', '<bos>', '<eos>'],
     },
   ],
 ]);
