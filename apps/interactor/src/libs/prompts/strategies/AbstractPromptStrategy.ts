@@ -10,9 +10,6 @@ export const memoizedTokenize = (line: string): number => {
     return cache[line];
   }
   const result = nemoTokenizer.encode(line).length;
-  if (!result) {
-    throw new Error('Tokenizer not found');
-  }
   cache[line] = result;
   return result;
 };
