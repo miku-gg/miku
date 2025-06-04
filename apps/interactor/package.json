@@ -17,7 +17,6 @@
     ]
   },
   "dependencies": {
-    "@lenml/tokenizer-mistral_nemo": "^3.4.2",
     "@mikugg/bot-utils": "workspace:^",
     "@mikugg/ui-kit": "workspace:^",
     "@reduxjs/toolkit": "^2.0.1",

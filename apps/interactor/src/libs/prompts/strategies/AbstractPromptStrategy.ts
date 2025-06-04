@@ -1,7 +1,7 @@
-import { fromPreTrained } from '@lenml/tokenizer-mistral_nemo';
+import mistralTokenizer, { Tokenizer } from '../_mistral-tokenizer';
 import { getInstructTemplateFromSlug, InstructTemplate, InstructTemplateSlug } from './instructTemplates';
 
-const nemoTokenizer = fromPreTrained();
+const nemoTokenizer = mistralTokenizer;
 
 const cache: { [key: string]: number } = {};
 
