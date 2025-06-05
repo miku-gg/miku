@@ -14,7 +14,7 @@ export enum TokenizerType {
   CLAUDE = 'claude',
 }
 
-class LenMLTokenizer extends Guidance.Tokenizer.LenMLTokenizer {
+export class LenMLTokenizer extends Guidance.Tokenizer.LenMLTokenizer {
   override decodeString(
     arr: number[],
     skip_special_tokens: boolean = true,
@@ -165,6 +165,144 @@ export class NemoTokenizer extends Guidance.Tokenizer.AbstractTokenizer {
   }
 }
 
+export class Qwen3Tokenizer extends Guidance.Tokenizer.AbstractTokenizer {
+  private cache: Map<string, number[]> = new Map<string, number[]>([
+    [' Yes', [1, 7414]],
+    [' No', [1, 2308]],
+    [' angry', [1, 18514]],
+    [' sad', [1, 12421]],
+    [' happy', [1, 6247]],
+    [' disgusted', [1, 90074]],
+    [' begging', [1, 59106]],
+    [' scared', [1, 26115]],
+    [' excited', [1, 12035]],
+    [' hopeful', [1, 37550]],
+    [' longing', [1, 78322]],
+    [' proud', [1, 12409]],
+    [' neutral', [1, 20628]],
+    [' rage', [1, 32949]],
+    [' scorn', [1, 87006]],
+    [' blushed', [1, 1501, 51978]],
+    [' pleasure', [1, 16656]],
+    [' lustful', [1, 40102, 1262]],
+    [' shocked', [1, 26620]],
+    [' confused', [1, 21815]],
+    [' disappointed', [1, 24402]],
+    [' embarrassed', [1, 48130]],
+    [' guilty', [1, 16007]],
+    [' shy', [1, 32294]],
+    [' frustrated', [1, 32530]],
+    [' annoyed', [1, 56030]],
+    [' exhausted', [1, 37919]],
+    [' tired', [1, 19227]],
+    [' curious', [1, 22208]],
+    [' intrigued', [1, 68018]],
+    [' amused', [1, 85224]],
+    [' angry', [1, 18514]],
+    [' sad', [1, 12421]],
+    [' happy', [1, 6247]],
+    [' disgusted', [1, 90074]],
+    [' scared', [1, 26115]],
+    [' embarrased', [1, 7967, 1118, 1475]],
+    [' surprised', [1, 14453]],
+    [' neutral', [1, 20628]],
+    [' confused', [1, 21815]],
+    [' desire', [1, 12591]],
+    [' pleasure', [1, 16656]],
+    [' anticipation', [1, 49819]],
+    [' condescension', [1, 390, 8614, 2645]],
+    [' arousal', [1, 86817]],
+    [' ecstasy', [1, 92563]],
+    [' relief', [1, 15957]],
+    [' release', [1, 4879]],
+    [' intensity', [1, 20612]],
+    [' comfort', [1, 6838]],
+    [' humiliation', [1, 71718]],
+    [' discomfort', [1, 43676]],
+    [' submission', [1, 20503]],
+    [' pain', [1, 6646]],
+    [' teasing', [1, 70363]],
+    [' arrogant', [1, 65368]],
+  ]);
+  private cache2: Map<string, string> = new Map<string, string>([
+    ['1,7414', ' Yes'],
+    ['1,2308', ' No'],
+    ['1,18514', ' angry'],
+    ['1,12421', ' sad'],
+    ['1,6247', ' happy'],
+    ['1,90074', ' disgusted'],
+    ['1,59106', ' begging'],
+    ['1,26115', ' scared'],
+    ['1,12035', ' excited'],
+    ['1,37550', ' hopeful'],
+    ['1,78322', ' longing'],
+    ['1,12409', ' proud'],
+    ['1,20628', ' neutral'],
+    ['1,32949', ' rage'],
+    ['1,87006', ' scorn'],
+    ['1,1501,51978', ' blushed'],
+    ['1,16656', ' pleasure'],
+    ['1,40102,1262', ' lustful'],
+    ['1,26620', ' shocked'],
+    ['1,21815', ' confused'],
+    ['1,24402', ' disappointed'],
+    ['1,48130', ' embarrassed'],
+    ['1,16007', ' guilty'],
+    ['1,32294', ' shy'],
+    ['1,32530', ' frustrated'],
+    ['1,56030', ' annoyed'],
+    ['1,37919', ' exhausted'],
+    ['1,19227', ' tired'],
+    ['1,22208', ' curious'],
+    ['1,68018', ' intrigued'],
+    ['1,85224', ' amused'],
+    ['1,18514', ' angry'],
+    ['1,12421', ' sad'],
+    ['1,6247', ' happy'],
+    ['1,90074', ' disgusted'],
+    ['1,26115', ' scared'],
+    ['1,7967,1118,1475', ' embarrased'],
+    ['1,14453', ' surprised'],
+    ['1,20628', ' neutral'],
+    ['1,21815', ' confused'],
+    ['1,12591', ' desire'],
+    ['1,16656', ' pleasure'],
+    ['1,49819', ' anticipation'],
+    ['1,390,8614,2645', ' condescension'],
+    ['1,86817', ' arousal'],
+    ['1,92563', ' ecstasy'],
+    ['1,15957', ' relief'],
+    ['1,4879', ' release'],
+    ['1,20612', ' intensity'],
+    ['1,6838', ' comfort'],
+    ['1,71718', ' humiliation'],
+    ['1,43676', ' discomfort'],
+    ['1,20503', ' submission'],
+    ['1,6646', ' pain'],
+    ['1,70363', ' teasing'],
+    ['1,65368', ' arrogant'],
+  ]);
+
+  public name: string = 'nemo';
+  override encodeString(
+    str: string,
+    add_bos_token?: boolean,
+    add_preceding_space?: boolean,
+    log_performance?: boolean,
+  ): number[] {
+    return [...(this.cache.get(str) || [])];
+  }
+
+  override decodeString(arr: number[], add_bos_token?: boolean, add_preceding_space?: boolean): string {
+    const arrString = arr.join(',');
+    return this.cache2.get(arrString) || '';
+  }
+
+  override getEOS(): string {
+    return '<|end_of_text|>';
+  }
+}
+
 export const tokenizers = new Map<TokenizerType, Guidance.Tokenizer.AbstractTokenizer>();
 
 export async function loadTokenizer(tokenizerType: TokenizerType): Promise<void> {
@@ -180,7 +318,7 @@ export async function loadTokenizer(tokenizerType: TokenizerType): Promise<void>
       tokenizer = new LenMLTokenizer(`${FRONTEND_TOKENIZER_DB_URL}/DeepSeek-R1-0528`);
       break;
     case TokenizerType.QWEN3:
-      tokenizer = new LenMLTokenizer(`${FRONTEND_TOKENIZER_DB_URL}/Qwen3`);
+      tokenizer = new Qwen3Tokenizer();
       break;
     case TokenizerType.QWQ:
       tokenizer = new LenMLTokenizer(`${FRONTEND_TOKENIZER_DB_URL}/QwQ`);

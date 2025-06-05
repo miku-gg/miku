@@ -167,7 +167,7 @@ app.get('/refresh-settings', async (req, res) => {
 console.log('Loading tokenizers...');
 // Comment tokenizers out to save memory
 Promise.all([
-  loadTokenizer(TokenizerType.LLAMA3),
+  // loadTokenizer(TokenizerType.LLAMA3),
   loadTokenizer(TokenizerType.NEMO),
   // loadTokenizer(TokenizerType.DEEPSEEK),
   loadTokenizer(TokenizerType.QWEN3),

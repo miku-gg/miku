@@ -443,7 +443,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         const character = state.novel.characters.find((char) => char.id === characterId);
         const charName = (character?.name || '').replace(/"/g, '\\"');
 
-        return `"\\n${charName}:","\\n${charName}'s reaction:"`;
+        return `"\\n${charName}:","\\n${charName}'s reaction:","# "`;
       })
       .concat(temp.stops.map((stop) => `"${stop}"`))
       .join(',');
