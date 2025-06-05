@@ -115,7 +115,7 @@ const templates = new Map<InstructTemplateSlug, InstructTemplate>([
   [
     'lyra',
     {
-      BOS: '<s>',
+      BOS: '',
       SYSTEM_START: '<|im_start|>system\n',
       SYSTEM_END: '<|im_end|>\n',
       INPUT_START: '<|im_start|>user\n',
