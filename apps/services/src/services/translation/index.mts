@@ -96,7 +96,7 @@ const translationHandler = async (req: Request, res: Response) => {
     sendProgress(0);
     const downloadUrl = `${downloadEndpoint}/${jsonName}`;
     const response = await axios.get(downloadUrl);
-    const { novel: novelData } = response.data;
+    const novelData = response.data;
 
     // Extract texts for translation
     const textsToTranslate = extractTexts(novelData);
