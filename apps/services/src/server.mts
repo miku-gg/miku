@@ -2,6 +2,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 import monitor from 'express-status-monitor';
+import fs from 'fs/promises';
+import path from 'path';
 import jwtPermissionMiddleware from './lib/verifyJWT.mjs';
 import audioHandler from './services/audio/index.mjs';
 import textHandler, { tokenizeHandler } from './services/text/index.mjs';
@@ -9,6 +11,7 @@ import { TokenizerType, loadTokenizer } from './services/text/lib/tokenize.mjs';
 import modelServerSettingsStore from './services/text/lib/modelServerSettingsStore.mjs';
 import { checkModelsHealth, getModelHealth } from './services/text/lib/healthChecker.mjs';
 import assistantHandler from './services/assistant/index.mjs';
+import translationHandler from './services/translation/index.mjs';
 const PORT = process.env.SERVICES_PORT || 8484;
 
 process.on('unhandledRejection', (reason, p) => {
@@ -22,6 +25,7 @@ app.use(
     origin: [
       'http://localhost:5173',
       'http://localhost:5100',
+      'https://localhost:5100',
       'http://localhost:8586',
       'https://miku.gg',
       'https://dev.miku.gg',
@@ -68,6 +72,34 @@ app.post('/text/tokenize', async (req: Request<string>, res: Response) => {
 
 app.post('/assistant', async (req: Request<any>, res: Response) => {
   await assistantHandler(req, res);
+});
+
+app.post('/translate', async (req: Request<any>, res: Response) => {
+  await translationHandler(req, res);
+});
+
+app.get('/translate/download/:filename', async (req: Request<any>, res: Response) => {
+  try {
+    const { filename } = req.params;
+    if (!filename.match(/^[a-zA-Z0-9_-]+\.json$/)) {
+      res.status(400).send('Invalid filename');
+      return;
+    }
+    const tempDir = path.join(process.cwd(), 'temp');
+    const filePath = path.join(tempDir, filename);
+
+    // Check if file exists
+    await fs.access(filePath);
+
+    res.download(filePath, filename, (err) => {
+      if (err) {
+        console.error('Download error:', err);
+        res.status(404).send('File not found');
+      }
+    });
+  } catch (error) {
+    res.status(404).send('File not found');
+  }
 });
 
 app.post('/audio', async (req: Request<any>, res: Response) => {

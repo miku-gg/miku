@@ -103,6 +103,13 @@ const jwtPermissionMiddleware = async (req: Request, res: Response, next: NextFu
         }
         return next();
       }
+    } else if (req.path?.startsWith('/translate')) {
+      const permission = await verifyJWT(req.headers, 'tester');
+      if (!permission) {
+        return res.status(401).send('Unauthorized: Token expired or missing');
+      } else {
+        return next();
+      }
     }
     // if (!(await verifyJWT(req.headers))) {
     //   return res.status(401).send("Unauthorized: Token expired or missing");

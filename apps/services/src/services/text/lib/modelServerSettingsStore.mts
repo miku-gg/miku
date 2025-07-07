@@ -32,6 +32,28 @@ const DEFAULT_MODEL: RPModelSettings = {
   },
 };
 
+const DEFAULT_ASSISTANT: RPModelSettings = {
+  id: 'ASSISTANT',
+  name: 'Assistant',
+  description: 'Default assistant',
+  // these are not used for assistant
+  new_tokens: 200,
+  truncation_length: 8192,
+  preset: PresetType.LLAMA_PRECISE,
+  strategy: RPModelStrategy.ALPACA,
+  tokenizer: RPModelTokenizers.LLAMA3,
+  permission: RPModelPermission.FREE,
+  model_id_for_select: null,
+  cost: 0,
+  has_reasoning: false,
+  // these are used for assistant
+  endpoint: {
+    url: process.env.ASSISTANT_API_ENDPOINT || '',
+    api_key: process.env.ASSISTANT_API_KEY || '',
+    model: process.env.ASSISTANT_API_MODEL || '',
+  },
+};
+
 class ModelServerSettingsStore {
   // 5 minutes TTL
   private SETTINGS_TTL_MS = 5 * 60 * 1000;
@@ -84,6 +106,14 @@ class ModelServerSettingsStore {
         console.error('Error while fetching model server settings', error);
       }
     }
+  }
+
+  public getNovelAssistant(): RPModelSettings {
+    return this.settings.assistants?.novel_assistant || DEFAULT_ASSISTANT;
+  }
+
+  public getTranslatorAssistant(): RPModelSettings {
+    return this.settings.assistants?.translator_assistant || DEFAULT_ASSISTANT;
   }
 }
 

@@ -39,6 +39,12 @@ export enum RPModelPermission {
   TESTER = 'tester',
 }
 
+export interface ModelEndpoint {
+  url: string;
+  api_key: string;
+  model: string;
+}
+
 export interface RPModelSettings {
   id: string;
   name: string;
@@ -51,11 +57,7 @@ export interface RPModelSettings {
   permission: RPModelPermission;
   model_id_for_select: string | null;
   cost: number;
-  endpoint: {
-    url: string;
-    api_key: string;
-    model: string;
-  };
+  endpoint: ModelEndpoint;
   has_reasoning: boolean;
 }
 
@@ -64,6 +66,10 @@ export interface ModelServerSettings {
   embedding_server: {
     url: string;
     api_key: string;
+  };
+  assistants?: {
+    novel_assistant?: RPModelSettings;
+    translator_assistant?: RPModelSettings;
   };
 }
 export interface ValidationError {
