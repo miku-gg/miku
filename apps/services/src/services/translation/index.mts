@@ -73,8 +73,10 @@ const translationHandler = async (req: Request, res: Response) => {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     Connection: 'keep-alive',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Cache-Control',
+    'Access-Control-Allow-Origin': req.headers.origin || '*',
+    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Methods': '*',
+    'Access-Control-Allow-Credentials': 'true',
   });
 
   const sendProgress = (percentage: number) => {
@@ -279,6 +281,74 @@ const applyTranslations = (novel: NovelState, translations: { path: string; tran
   return translatedNovel;
 };
 
+const translateExampleShots = (languageKey: string) => {
+  return [
+    { role: 'user', content: 'Roxy is a magic tutor' },
+    {
+      role: 'assistant',
+      content:
+        'TRANSLATION:\n' +
+        (() => {
+          switch (languageKey) {
+            case 'es':
+              return 'Roxy es un tutor de magia';
+            case 'es_ar':
+              return 'Roxy es una tutora de magia';
+            case 'pt':
+              return 'Roxy é um tutor de magia';
+            case 'pt_br':
+              return 'Roxy é uma tutora de magia';
+            case 'fr':
+              return 'Roxy est un tutor de magie';
+            case 'de':
+              return 'Roxy ist ein Zauberschüler';
+            case 'ru':
+              return 'Roxy - маг-учитель';
+            case 'jp':
+              return 'Roxyは魔法の先生です';
+            case 'pl':
+              return 'Roxy jest nauczycielem magii';
+            default:
+              return '';
+          }
+        })(),
+    },
+    {
+      role: 'user',
+      content: `Roxy = [Calm, Collected, Headstrong, Wise, Gentle, Intelligent, Rational, Clumsy, Slightly Reserved., Sleepy]`,
+    },
+    {
+      role: 'assistant',
+      content:
+        'TRANSLATION:\n' +
+        (() => {
+          switch (languageKey) {
+            case 'es':
+              return `Roxy = [Calmada, Colectada, Cabeza dura, Inteligente, Amable, Intelectual, Racional, Clave, Dormilona]`;
+            case 'es_ar':
+              return `Roxy = [Calma, Colectada, Cabeza dura, Inteligente, Amable, Intelectual, Racional, Clave, Dormilona]`;
+            case 'pt':
+              return `Roxy = [Calma, Coletada, Cabeça dura, Inteligente, Amável, Intelectual, Racional, Clave, Dormilona]`;
+            case 'pt_br':
+              return `Roxy = [Calma, Coletada, Cabeça dura, Inteligente, Amável, Intelectual, Racional, Clave, Dormilona]`;
+            case 'fr':
+              return `Roxy = [Calme, Collectée, Tête dure, Intelligente, Amable, Intelligente, Rationnelle, Maladroit, Légèrement réservée, Endormie]`;
+            case 'de':
+              return `Roxy = [Gemütlich, Sammler, Hartnäckig, Klug, Zart, Intelligenter, Rational, Klumpig, Leicht reserviert, Schlafend]`;
+            case 'ru':
+              return `Roxy = [Спокойная, Собранная, Настойчивая, Мудрая, Доброжелательная, Умная, Рациональная, Неловкая, Слегка замкнутая, Спящая]`;
+            case 'jp':
+              return `Roxy = [冷静, 集まり, 頭が固い, 賢い, 優しい, 知性, 合理的, 不器用, 少し控えめ, 眠っている]`;
+            case 'pl':
+              return `Roxy = [Spokojna, Zbierana, Trudna, Mądra, Dobra, Inteligentna, Racionalna, Niezdolna, Trochę rezerwowana, Spoczywająca]`;
+            default:
+              return '';
+          }
+        })(),
+    },
+  ];
+};
+
 const translateText = async (
   text: string,
   languageKey: string,
@@ -290,13 +360,28 @@ const translateText = async (
   try {
     const targetLanguage = languageCodeToName.get(languageKey);
     const extraPrompt = languageCodeToExtraPrompt.get(languageKey);
-    const prompt = `Translate the following text to ${targetLanguage}. This text for a visual novel narration. ${extraPrompt}, but do NOT translate content inside curly braces {} or angle brackets <>. Respond only with the translated text.\n\n${text}`;
+
+    const messages = [
+      {
+        role: 'system',
+        content: `Translate the following text to ${targetLanguage}. This text for a visual novel narration. ${extraPrompt}, but do NOT translate content inside curly braces {} or angle brackets <>. Respond only with the translated text.`,
+      },
+      ...translateExampleShots(languageKey),
+      {
+        role: 'user',
+        content: text,
+      },
+      {
+        role: 'assistant',
+        content: 'TRANSLATION:\n',
+      },
+    ];
 
     const response = await axios.post(
-      apiEndpoint,
+      `${apiEndpoint}/chat/completions`,
       {
         model,
-        messages: [{ role: 'user', content: prompt }],
+        messages: messages,
       },
       {
         headers: {
@@ -310,7 +395,7 @@ const translateText = async (
       throw new Error(`API error: ${response.statusText}`);
     }
 
-    const translatedText = response.data.choices[0].message.content.trim();
+    const translatedText = response.data.choices[0].message.content.trim().replace('TRANSLATION:\n', '');
     return translatedText;
   } catch (e) {
     if (tries < 3) {

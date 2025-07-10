@@ -57,7 +57,7 @@ const conversationHistory: ChatCompletionMessageParam[] = [];
 const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelState) => void) => {
   try {
     conversationHistory.push({ role: 'user', content: params.userInput });
-    console.log(conversationHistory);
+    // console.log(conversationHistory);
 
     // let amountOfCalls = 0;
     const askResponse = (): Promise<ChatCompletion> =>
@@ -69,9 +69,17 @@ const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelSt
       );
 
     let response;
-    for (response = await askResponse(); response?.choices[0].message?.tool_calls; response = await askResponse()) {
+    for (
+      response = await askResponse();
+      response?.choices[0].message?.tool_calls?.length;
+      response = await askResponse()
+    ) {
       const message = response.choices[0].message;
-      conversationHistory.push(message);
+      conversationHistory.push({
+        role: message.role,
+        content: message.content,
+        tool_calls: message.tool_calls,
+      });
       novelManager.replaceState(store.getState().novel);
       if (message?.tool_calls) {
         for (const toolCall of message.tool_calls) {
@@ -84,6 +92,9 @@ const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelSt
 
           conversationHistory.push({
             role: 'tool',
+            // eslint-disable-next-line
+            // @ts-ignore
+            name: fnName,
             tool_call_id: toolCall.id,
             content: functionResponse,
           });
@@ -102,14 +113,13 @@ const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelSt
           }
         }
       }
-      if (message.content) {
+      if (message.content?.trim()) {
         await params.injectMessage(String(message?.content) || '');
       }
     }
-    conversationHistory.push(response.choices[0].message);
-    console.log(conversationHistory);
-    if (response.choices[0].message.content) {
-      await params.injectMessage(String(response.choices[0].message?.content) || '');
+    if (response.choices[0].message.content?.trim()) {
+      conversationHistory.push(response.choices[0].message);
+      await params.injectMessage(String(response.choices[0].message?.content?.trim()) || '');
     }
   } catch (error) {
     await params.injectMessage('Error: ' + error);
