@@ -118,7 +118,11 @@ const call_openai = async (params: Params, replaceState: (state: NovelV3.NovelSt
       }
     }
     if (response.choices[0].message.content?.trim()) {
-      conversationHistory.push(response.choices[0].message);
+      conversationHistory.push({
+        role: response.choices[0].message.role,
+        content: response.choices[0].message.content,
+        tool_calls: response.choices[0].message.tool_calls,
+      });
       await params.injectMessage(String(response.choices[0].message?.content?.trim()) || '');
     }
   } catch (error) {

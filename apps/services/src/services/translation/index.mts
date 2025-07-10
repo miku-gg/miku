@@ -63,6 +63,7 @@ const translationHandler = async (req: Request, res: Response) => {
   const apiEndpoint = translatorAssistant.endpoint.url;
   const apiKey = translatorAssistant.endpoint.api_key;
   const model = translatorAssistant.endpoint.model;
+  const hasReasoning = translatorAssistant.has_reasoning;
 
   if (!downloadEndpoint || !apiEndpoint || !apiKey) {
     return res.status(500).json({ error: 'Missing required environment variables' });
@@ -115,7 +116,7 @@ const translationHandler = async (req: Request, res: Response) => {
       const batch = textsToTranslate.slice(i, i + batchSize);
       const batchTranslations = await Promise.all(
         batch.map(async ({ path, text }) => {
-          const translatedText = await translateText(text, language, apiEndpoint, apiKey, model);
+          const translatedText = await translateText(text, language, apiEndpoint, apiKey, model, hasReasoning);
           translatedCount++;
           const progress = 5 + (translatedCount / totalTexts) * 90; // Reserve 5% for download and 5% for file saving
           sendProgress(Math.round(progress));
@@ -281,13 +282,13 @@ const applyTranslations = (novel: NovelState, translations: { path: string; tran
   return translatedNovel;
 };
 
-const translateExampleShots = (languageKey: string) => {
+const translateExampleShots = (languageKey: string, hasReasoning: boolean) => {
   return [
     { role: 'user', content: 'Roxy is a magic tutor' },
     {
       role: 'assistant',
       content:
-        'TRANSLATION:\n' +
+        `${hasReasoning ? '<think></think>\n' : ''}TRANSLATION:\n` +
         (() => {
           switch (languageKey) {
             case 'es':
@@ -355,6 +356,7 @@ const translateText = async (
   apiEndpoint: string,
   apiKey: string,
   model: string,
+  hasReasoning: boolean,
   tries = 0,
 ): Promise<string> => {
   try {
@@ -366,14 +368,14 @@ const translateText = async (
         role: 'system',
         content: `Translate the following text to ${targetLanguage}. This text for a visual novel narration. ${extraPrompt}, but do NOT translate content inside curly braces {} or angle brackets <>. Respond only with the translated text.`,
       },
-      ...translateExampleShots(languageKey),
+      ...translateExampleShots(languageKey, hasReasoning),
       {
         role: 'user',
         content: text,
       },
       {
         role: 'assistant',
-        content: 'TRANSLATION:\n',
+        content: `${hasReasoning ? '<think></think>\n' : ''}TRANSLATION:\n`,
       },
     ];
 
@@ -395,12 +397,15 @@ const translateText = async (
       throw new Error(`API error: ${response.statusText}`);
     }
 
-    const translatedText = response.data.choices[0].message.content.trim().replace('TRANSLATION:\n', '');
+    const translatedText = response.data.choices[0].message.content
+      .replace('TRANSLATION:\n', '')
+      .replace('<think></think>\n', '')
+      .trim();
     return translatedText;
   } catch (e) {
     if (tries < 3) {
       await new Promise((resolve) => setTimeout(resolve, 1000 * (tries + 1))); // Progressive delay
-      return translateText(text, languageKey, apiEndpoint, apiKey, model, tries + 1);
+      return translateText(text, languageKey, apiEndpoint, apiKey, model, hasReasoning, tries + 1);
     }
     throw e;
   }
