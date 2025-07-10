@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import systemPrompt from './systemPrompt.mjs';
 import { ChatCompletionMessageParam } from 'openai/resources/index.js';
 import axios from 'axios';
+import modelServerSettingsStore from '../text/lib/modelServerSettingsStore.mjs';
 
 const assistantHandler = async (req: Request<any>, res: Response) => {
   const { messages, tools, parallel_tool_calls, tool_choice } = req.body;
@@ -10,27 +11,13 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
     { role: 'system', content: systemPrompt },
     ...messages.filter((msg: ChatCompletionMessageParam) => msg.role !== 'system'),
   ];
-
-  // console.log(
-  //   {
-  //     model: process.env.ASSISTANT_API_MODEL || '',
-  //     messages: allMessages,
-  //     tools,
-  //     parallel_tool_calls,
-  //     tool_choice,
-  //   },
-  //   {
-  //     headers: {
-  //       Authorization: `Bearer ${process.env.ASSISTANT_API_KEY}`,
-  //       'Content-Type': 'application/json',
-  //     },
-  //   },
-  // );
+  const modelConfig = modelServerSettingsStore.getNovelAssistant();
+  const { url, api_key, model } = modelConfig.endpoint;
   const assitantResponse = await axios
     .post(
-      `${process.env.ASSISTANT_API_ENDPOINT || ''}/chat/completions`,
+      `${url}/chat/completions`,
       {
-        model: process.env.ASSISTANT_API_MODEL || '',
+        model,
         messages: allMessages,
         tools,
         parallel_tool_calls,
@@ -38,7 +25,7 @@ const assistantHandler = async (req: Request<any>, res: Response) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.ASSISTANT_API_KEY}`,
+          Authorization: `Bearer ${api_key}`,
           'Content-Type': 'application/json',
         },
       },
