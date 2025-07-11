@@ -80,8 +80,13 @@ const translationHandler = async (req: Request, res: Response) => {
     'Access-Control-Allow-Credentials': 'true',
   });
 
+  let prevProgress = 0;
+
   const sendProgress = (percentage: number) => {
-    res.write(`data: ${JSON.stringify({ type: 'progress', percentage })}\n\n`);
+    if (percentage > prevProgress) {
+      res.write(`data: ${JSON.stringify({ type: 'progress', percentage })}\n\n`);
+      prevProgress = percentage;
+    }
   };
 
   const sendComplete = (filename: string) => {
