@@ -248,6 +248,8 @@ const TTSPlayer2: React.FC = () => {
     // Function to process the data queue
     function processQueue() {
       if (sourceBufferRef.current && !sourceBufferRef.current.updating && queueRef.current.length) {
+        // eslint-disable-next-line
+        // @ts-ignore
         sourceBufferRef.current.appendBuffer(queueRef.current.shift()!);
       }
     }

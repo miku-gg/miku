@@ -21,7 +21,7 @@ export enum RPModelStrategy {
   GEMMA3 = 'gemma3',
   DEEPSEEK = 'deepseek',
   DANCHAT2 = 'danchat2',
-  GLM = 'glm',
+  GLM45 = 'glm45',
 }
 
 export enum PresetType {

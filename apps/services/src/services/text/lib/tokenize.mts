@@ -12,6 +12,7 @@ export enum TokenizerType {
   LLAMA4 = 'llama4',
   GEMMA3 = 'gemma3',
   CLAUDE = 'claude',
+  GLM45 = 'glm45',
 }
 
 export class LenMLTokenizer extends Guidance.Tokenizer.LenMLTokenizer {
@@ -334,6 +335,9 @@ export async function loadTokenizer(tokenizerType: TokenizerType): Promise<void>
       break;
     case TokenizerType.CLAUDE:
       tokenizer = new LenMLTokenizer(`${FRONTEND_TOKENIZER_DB_URL}/Claude`);
+      break;
+    case TokenizerType.GLM45:
+      tokenizer = new LenMLTokenizer(`${FRONTEND_TOKENIZER_DB_URL}/GLM-4.5`);
       break;
     default:
       console.error(`Tokenizer ${tokenizerType} not found`);
