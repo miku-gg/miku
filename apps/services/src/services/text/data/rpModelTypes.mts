@@ -8,6 +8,7 @@ export enum RPModelTokenizers {
   LLAMA4 = 'llama4',
   GEMMA3 = 'gemma3',
   CLAUDE = 'claude',
+  GLM45 = 'glm45',
 }
 
 export enum RPModelStrategy {

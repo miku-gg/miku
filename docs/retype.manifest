@@ -1,6 +1,6 @@
 {
-  "version": "3.6.0",
-  "created": "2025-02-20T14:53:15Z",
+  "version": "3.11.0",
+  "created": "2025-08-08T20:50:04Z",
   "files": [
     {
       "path": ".nojekyll"
@@ -12,7 +12,8 @@
       "path": "architecture/index.html"
     },
     {
-      "path": "assets/.ds_store"
+      "path": "assets/.ds_store",
+      "old": true
     },
     {
       "path": "assets/add_bot_response.png"
@@ -164,7 +165,8 @@
       "path": "assets/miku_file.png"
     },
     {
-      "path": "assets/novel-builder/.ds_store"
+      "path": "assets/novel-builder/.ds_store",
+      "old": true
     },
     {
       "path": "assets/novel-builder/homepage.png"
