@@ -21,6 +21,7 @@ export const instructTemplateSlugs = [
   'gemma3',
   'deepseek',
   'danchat2',
+  'glm',
 ] as const;
 export type InstructTemplateSlug = (typeof instructTemplateSlugs)[number];
 export function isInstructTemplateSlug(slug: string | undefined): slug is InstructTemplateSlug {
@@ -166,6 +167,20 @@ const templates = new Map<InstructTemplateSlug, InstructTemplate>([
       OUTPUT_END: '<|endoftext|>',
       EOS: '<|endoftext|>',
       STOPS: ['<|system|>', '<|user|>', '<|assistant|>', '<|endoftext|>'],
+    },
+  ],
+  [
+    'glm',
+    {
+      BOS: '',
+      SYSTEM_START: '<|system|>',
+      SYSTEM_END: '',
+      INPUT_START: '<|user|>',
+      INPUT_END: '>',
+      OUTPUT_START: '<|assistant|>',
+      OUTPUT_END: '',
+      EOS: '',
+      STOPS: ['<|system|>', '<|user|>', '<|assistant|>'],
     },
   ],
 ]);
