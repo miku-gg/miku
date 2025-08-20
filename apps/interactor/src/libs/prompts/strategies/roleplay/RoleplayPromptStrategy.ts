@@ -191,13 +191,28 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const parentEmotion =
       selectLastLoadedCharacters(input.state).find(({ id }) => id === input.currentCharacterId)?.emotion || '';
 
+    // Get the character's emotion template to determine filtering logic
+    const characterOutfits = selectCurrentCharacterOutfits(input.state);
+    const characterTemplate =
+      characterOutfits.find((character) => character.id === input.currentCharacterId)?.outfit?.template ||
+      'base-emotions';
+
+    // For tiny-emotions, only filter out current emotion if the last two emotions were the same
+    // For other templates, use the existing logic of always filtering out the current emotion
+    let filteredEmotions: string[];
+    if (characterTemplate === 'tiny-emotions' && emotions.length > 1) {
+      const lastTwoEmotions = this.getLastTwoEmotions(input.state, input.currentCharacterId);
+      const shouldFilterCurrent = lastTwoEmotions.length >= 2 && lastTwoEmotions[0] === lastTwoEmotions[1];
+      filteredEmotions = emotions.filter((emotion) => (shouldFilterCurrent ? emotion !== parentEmotion : true));
+    } else {
+      filteredEmotions = emotions.filter((emotion) => (emotions.length > 1 ? emotion !== parentEmotion : true));
+    }
+
     const scene = selectCurrentScene(input.state);
     const variables: Record<string, string | string[]> = {
       scene_opt: [' Yes', ' No'],
       cond_opt: Array.from({ length: 10 }, (_, i) => ' ' + i.toString()),
-      emotions: emotions
-        .filter((emotion) => (emotions.length > 1 ? emotion !== parentEmotion : true))
-        .map((emotion) => ' ' + emotion),
+      emotions: filteredEmotions.map((emotion) => ' ' + emotion),
     };
 
     if (scene?.indicators) {
@@ -540,6 +555,29 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         characters.find((character) => character.id === characterId)?.outfit?.template || 'base-emotions'
       ].emotionIds;
     return characterEmotions;
+  }
+
+  /**
+   * Gets the last two emotions for a character from the dialogue history
+   */
+  private getLastTwoEmotions(state: RootState, characterId: string): string[] {
+    const messages = selectAllParentDialoguesWhereCharactersArePresent(state, [characterId]);
+    const emotions: string[] = [];
+
+    // Go through messages in reverse order to get the most recent emotions first
+    for (const message of messages.reverse()) {
+      if (message.type === 'response') {
+        const characterResponse = message.item.characters.find((char) => char.characterId === characterId);
+        if (characterResponse?.emotion && characterResponse.text) {
+          emotions.push(characterResponse.emotion);
+          if (emotions.length >= 2) {
+            break;
+          }
+        }
+      }
+    }
+
+    return emotions;
   }
 
   private parseAttributes(s: string): [string, string][] {
