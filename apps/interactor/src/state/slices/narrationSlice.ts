@@ -619,6 +619,65 @@ const narrationSlice = createSlice({
       if (!cb) return;
       cb.state.turn += 1;
     },
+    // Image generation actions
+    imageGenerationStart(
+      state,
+      action: PayloadAction<{
+        responseId: string;
+        prompt: string;
+        characterImagePath?: string;
+      }>,
+    ) {
+      const response = state.responses[action.payload.responseId];
+      if (response) {
+        const imageId = randomUUID();
+        const newImage = {
+          id: imageId,
+          prompt: action.payload.prompt,
+          imageUrl: '',
+          characterImagePath: action.payload.characterImagePath,
+          createdAt: Date.now(),
+          status: 'generating' as const,
+        };
+
+        if (!response.generatedImages) {
+          response.generatedImages = [];
+        }
+        response.generatedImages.push(newImage);
+      }
+    },
+    imageGenerationSuccess(
+      state,
+      action: PayloadAction<{
+        responseId: string;
+        imageId: string;
+        imageUrl: string;
+      }>,
+    ) {
+      const response = state.responses[action.payload.responseId];
+      if (response && response.generatedImages) {
+        const image = response.generatedImages.find((img) => img.id === action.payload.imageId);
+        if (image) {
+          image.imageUrl = action.payload.imageUrl;
+          image.status = 'completed';
+        }
+      }
+    },
+    imageGenerationFailure(
+      state,
+      action: PayloadAction<{
+        responseId: string;
+        imageId: string;
+      }>,
+    ) {
+      const response = state.responses[action.payload.responseId];
+      if (response && response.generatedImages) {
+        const image = response.generatedImages.find((img) => img.id === action.payload.imageId);
+        if (image) {
+          image.status = 'failed';
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -671,6 +730,9 @@ export const {
   addMana,
   addBattleLog,
   moveNextTurn,
+  imageGenerationStart,
+  imageGenerationSuccess,
+  imageGenerationFailure,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;

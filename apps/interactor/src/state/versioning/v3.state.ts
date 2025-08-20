@@ -59,6 +59,14 @@ export interface NarrationResponse {
   }[];
   battleStartId?: string;
   objectiveCompletedIds?: string[];
+  generatedImages?: {
+    id: string;
+    prompt: string;
+    imageUrl: string;
+    characterImagePath?: string;
+    createdAt: number;
+    status: 'generating' | 'completed' | 'failed';
+  }[];
 }
 
 export interface NarrationState {

@@ -1,17 +1,14 @@
 import { FaPaperPlane } from 'react-icons/fa';
-import { GiFeather } from 'react-icons/gi';
+import { BsCamera } from 'react-icons/bs';
 import { useAppContext } from '../../App.context';
 import { selectCurrentScene, selectLastLoadedResponse } from '../../state/selectors';
-import { interactionStart, setInputText, setSuggestions } from '../../state/slices/narrationSlice';
+import { interactionStart, setInputText } from '../../state/slices/narrationSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 
 import { Tooltip } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import React, { RefObject, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import PromptBuilder from '../../libs/prompts/PromptBuilder';
-import { ResponseSuggestionPromptStrategy } from '../../libs/prompts/strategies/suggestion/ResponseSuggestionPromptStrategy';
-import textCompletion from '../../libs/textCompletion';
 import {
   ModelType,
   ResponseFormat,
@@ -20,10 +17,9 @@ import {
   setModelSelectorModal,
   userDataFetchStart,
 } from '../../state/slices/settingsSlice';
-import { Loader } from '../common/Loader';
 import './InputBox.scss';
-import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
 import { useI18n } from '../../libs/i18n';
+import ImageGenerationModal from './ImageGenerationModal';
 
 const InputBox = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -41,8 +37,7 @@ const InputBox = (): JSX.Element => {
   const state = useAppSelector((state) => state);
   const scene = useAppSelector(selectCurrentScene);
   const lastResponse = useAppSelector(selectLastLoadedResponse);
-  const suggestions = useAppSelector((state) => state.narration.input.suggestions);
-  const [isAutocompleteLoading, setIsAutocompleteLoading] = useState<boolean>(false);
+  const [isImageGenerationModalOpen, setIsImageGenerationModalOpen] = useState<boolean>(false);
   const displayingLastSentence = useAppSelector(
     (state) => state.settings.displayingLastSentence && state.settings.text.responseFormat === ResponseFormat.VNStyle,
   );
@@ -111,7 +106,59 @@ const InputBox = (): JSX.Element => {
     sendMessage(text);
   };
 
-  const onAutocomplete = async (e: React.MouseEvent<unknown>) => {
+  // const onAutocomplete = async (e: React.MouseEvent<unknown>) => {
+  //   e.stopPropagation();
+  //   e.preventDefault();
+  //   if (isInteractionDisabled) {
+  //     toast.warn('Please log in to interact.', {
+  //       position: 'top-center',
+  //       style: {
+  //         top: 10,
+  //       },
+  //     });
+  //     return;
+  //   }
+  //   if (suggestions.length > 0) {
+  //     const newSuggestions = [...suggestions];
+  //     const first = newSuggestions.shift();
+  //     if (first) newSuggestions.push(first);
+  //     dispatch(setSuggestions(newSuggestions));
+  //     dispatch(setInputText(newSuggestions[0]));
+  //     TextAreaRowCalculator(newSuggestions[0]);
+  //     return;
+  //   }
+  //   setIsAutocompleteLoading(true);
+  //   try {
+  //     const modelMetadata = await retrieveModelMetadata(servicesEndpoint, state.settings.model);
+  //     const promptBuilder = new PromptBuilder<ResponseSuggestionPromptStrategy>({
+  //       maxNewTokens: 35,
+  //       strategy: new ResponseSuggestionPromptStrategy(modelMetadata.strategy),
+  //       truncationLength: 4096,
+  //     });
+  //     const prompt = promptBuilder.buildPrompt(state, 30);
+  //     const stream = textCompletion({
+  //       template: prompt.template,
+  //       variables: prompt.variables,
+  //       model: state.settings.model,
+  //       serviceBaseUrl: servicesEndpoint,
+  //       identifier: `${Date.now()}`,
+  //     });
+
+  //     let response: string[] = [];
+  //     for await (const result of stream) {
+  //       response = promptBuilder.completeResponse(response, result, state);
+  //     }
+  //     dispatch(setInputText(response[0]));
+  //     dispatch(setSuggestions(response));
+  //     TextAreaRowCalculator(response[0]);
+  //     setIsAutocompleteLoading(false);
+  //   } catch (err) {
+  //     setIsAutocompleteLoading(false);
+  //     console.error(err);
+  //   }
+  // };
+
+  const onImageGeneration = (e: React.MouseEvent<unknown>) => {
     e.stopPropagation();
     e.preventDefault();
     if (isInteractionDisabled) {
@@ -123,43 +170,14 @@ const InputBox = (): JSX.Element => {
       });
       return;
     }
-    if (suggestions.length > 0) {
-      const newSuggestions = [...suggestions];
-      const first = newSuggestions.shift();
-      if (first) newSuggestions.push(first);
-      dispatch(setSuggestions(newSuggestions));
-      dispatch(setInputText(newSuggestions[0]));
-      TextAreaRowCalculator(newSuggestions[0]);
-      return;
-    }
-    setIsAutocompleteLoading(true);
-    try {
-      const modelMetadata = await retrieveModelMetadata(servicesEndpoint, state.settings.model);
-      const promptBuilder = new PromptBuilder<ResponseSuggestionPromptStrategy>({
-        maxNewTokens: 35,
-        strategy: new ResponseSuggestionPromptStrategy(modelMetadata.strategy),
-        truncationLength: 4096,
-      });
-      const prompt = promptBuilder.buildPrompt(state, 30);
-      const stream = textCompletion({
-        template: prompt.template,
-        variables: prompt.variables,
-        model: state.settings.model,
-        serviceBaseUrl: servicesEndpoint,
-        identifier: `${Date.now()}`,
-      });
-
-      let response: string[] = [];
-      for await (const result of stream) {
-        response = promptBuilder.completeResponse(response, result, state);
-      }
-      dispatch(setInputText(response[0]));
-      dispatch(setSuggestions(response));
-      TextAreaRowCalculator(response[0]);
-      setIsAutocompleteLoading(false);
-    } catch (err) {
-      setIsAutocompleteLoading(false);
-      console.error(err);
+    // Check if there are existing images for current response
+    const currentResponse = state.narration.responses[state.narration.currentResponseId];
+    if (currentResponse?.generatedImages && currentResponse.generatedImages.length > 0) {
+      // Show carousel of existing images
+      setIsImageGenerationModalOpen(true);
+    } else {
+      // Open modal to generate new image
+      setIsImageGenerationModalOpen(true);
     }
   };
 
@@ -199,15 +217,14 @@ const InputBox = (): JSX.Element => {
           className={classNames({
             'InputBox__suggestion-trigger': true,
             'InputBox__suggestion-trigger--disabled': disabled || displayingLastSentence,
-            'InputBox__suggestion-trigger--generated': suggestions.length > 0,
           })}
-          disabled={disabled || displayingLastSentence || isAutocompleteLoading}
-          data-tooltip-id={`suggestion-tooltip`}
-          data-tooltip-html={!suggestions.length && !isMobileApp ? 'Autocomplete' : ''}
+          disabled={disabled || displayingLastSentence}
+          data-tooltip-id={`image-generation-tooltip`}
+          data-tooltip-html={!isMobileApp ? 'Generate Image of Current Scene' : ''}
           data-tooltip-varaint="light"
-          onClick={onAutocomplete}
+          onClick={onImageGeneration}
         >
-          {isAutocompleteLoading ? <Loader /> : <GiFeather />}
+          <BsCamera />
         </button>
 
         <textarea
@@ -231,7 +248,9 @@ const InputBox = (): JSX.Element => {
         </button>
       </form>
       <Tooltip id="inventory-tooltip" place="top" />
-      <Tooltip id="suggestion-tooltip" place="top" />
+      <Tooltip id="image-generation-tooltip" place="top" />
+
+      <ImageGenerationModal opened={isImageGenerationModalOpen} onClose={() => setIsImageGenerationModalOpen(false)} />
     </div>
   );
 };

@@ -202,11 +202,11 @@ Promise.all([
   // loadTokenizer(TokenizerType.LLAMA3),
   loadTokenizer(TokenizerType.NEMO),
   // loadTokenizer(TokenizerType.DEEPSEEK),
-  loadTokenizer(TokenizerType.QWEN3),
-  loadTokenizer(TokenizerType.QWQ),
-  loadTokenizer(TokenizerType.MISTRAL_SMALL),
-  loadTokenizer(TokenizerType.LLAMA4),
-  loadTokenizer(TokenizerType.GEMMA3),
+  // loadTokenizer(TokenizerType.QWEN3),
+  // loadTokenizer(TokenizerType.QWQ),
+  // loadTokenizer(TokenizerType.MISTRAL_SMALL),
+  // loadTokenizer(TokenizerType.LLAMA4),
+  // loadTokenizer(TokenizerType.GEMMA3),
   // loadTokenizer(TokenizerType.CLAUDE),
 ]).then(() => {
   app.listen(PORT, () => {
