@@ -25,11 +25,11 @@ import { Button } from '@mikugg/ui-kit';
 import { createSceneWithDefaults } from '../../state/slices/novelFormSlice';
 import './SceneGraph.scss';
 import { useAppSelector, useAppDispatch } from '../../state/store';
-import { addChildScene, deleteChildScene } from '../../state/slices/novelFormSlice';
+import { addChildScene, deleteChildScene, duplicateScene } from '../../state/slices/novelFormSlice';
 import { selectScenes } from '../../state/selectors';
 import config from '../../config';
 import { getEdgeParams, graphToTree, setAllNodesPosition } from './utils.js';
-import { RiDragMove2Line, RiEdit2Line } from 'react-icons/ri';
+import { RiDragMove2Line, RiEdit2Line, RiFileCopyLine } from 'react-icons/ri';
 
 function FloatingEdge({ id, source, target, markerEnd, style }: Edge) {
   const sourceNode = useStore(useCallback((store) => store.nodeInternals.get(source), [source]));
@@ -67,6 +67,10 @@ const SceneNode = ({
     dispatch(openModal({ modalType: 'scene', editId: id }));
   };
 
+  const handleDuplicateScene = () => {
+    dispatch(duplicateScene(id));
+  };
+
   const isConnecting = !!connectionNodeId;
 
   return (
@@ -79,6 +83,7 @@ const SceneNode = ({
         </div>
         <div className="SceneNode__edit-icon-container">
           <RiEdit2Line className="SceneNode__edit-icon" onClick={openSceneEditModal} />
+          <RiFileCopyLine className="SceneNode__duplicate-icon" onClick={handleDuplicateScene} />
         </div>
         <div className="SceneNode__characters">
           {data.characters.map((charImg, index) => (

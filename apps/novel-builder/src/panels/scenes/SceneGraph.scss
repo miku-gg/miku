@@ -107,11 +107,16 @@
   opacity: 1;
 }
 
-// Styles for the delete scene button
-.SceneNode__edit-icon {
+// Styles for the edit and duplicate scene buttons
+.SceneNode__edit-icon-container {
   position: absolute;
   bottom: -20px;
   right: 0px;
+  display: flex;
+  gap: 8px;
+}
+
+.SceneNode__edit-icon {
   color: #4978fa;
   cursor: pointer;
   transition: all 0.2s ease-out;
@@ -123,8 +128,23 @@
   }
 }
 
+.SceneNode__duplicate-icon {
+  color: #47b347;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  opacity: 0;
+
+  &:hover {
+    color: #2c7a2c;
+    opacity: 1;
+  }
+}
+
 .SceneNode:hover {
   .SceneNode__edit-icon {
+    opacity: 0.8;
+  }
+  .SceneNode__duplicate-icon {
     opacity: 0.8;
   }
   .SceneNode__start-icon {

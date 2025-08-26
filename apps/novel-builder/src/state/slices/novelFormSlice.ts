@@ -197,6 +197,27 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.scenes[index] = action.payload;
     },
+    duplicateScene: (state, action: PayloadAction<string>) => {
+      const sceneId = action.payload;
+      const originalScene = state.scenes.find((scene) => scene.id === sceneId);
+      if (!originalScene) return;
+
+      const duplicatedScene: NovelV3.NovelScene = {
+        ...originalScene,
+        id: randomUUID(),
+        name: `${originalScene.name} (Copy)`,
+        children: [], // New scene starts with no children
+      };
+
+      state.scenes.push(duplicatedScene);
+
+      // Add the duplicated scene as a child to all parents of the original scene
+      state.scenes.forEach((scene) => {
+        if (scene.children.includes(sceneId)) {
+          scene.children.push(duplicatedScene.id);
+        }
+      });
+    },
     createStart: (state, action: PayloadAction<string>) => {
       const sceneId = action.payload;
       const scene = state.scenes.find((scene) => scene.id === sceneId);
@@ -710,6 +731,7 @@ export const {
   createSceneWithDefaults,
   deleteSceneById,
   updateScene,
+  duplicateScene,
   createStart,
   updateStart,
   deleteStart,
