@@ -197,8 +197,8 @@ const novelFormSlice = createSlice({
       if (index === -1) return;
       state.scenes[index] = action.payload;
     },
-    duplicateScene: (state, action: PayloadAction<string>) => {
-      const sceneId = action.payload;
+    duplicateScene: (state, action: PayloadAction<{ sceneId: string; withBranches?: boolean }>) => {
+      const { sceneId, withBranches = false } = action.payload;
       const originalScene = state.scenes.find((scene) => scene.id === sceneId);
       if (!originalScene) return;
 
@@ -209,14 +209,16 @@ const novelFormSlice = createSlice({
         children: [], // New scene starts with no children
       };
 
+      // Add the duplicated scene as a child to all parents of the original scene only if withBranches is true
+      if (withBranches) {
+        state.scenes.forEach((scene) => {
+          if (scene.children.includes(sceneId)) {
+            scene.children.push(duplicatedScene.id);
+          }
+        });
+        duplicatedScene.children = [...originalScene.children];
+      }
       state.scenes.push(duplicatedScene);
-
-      // Add the duplicated scene as a child to all parents of the original scene
-      state.scenes.forEach((scene) => {
-        if (scene.children.includes(sceneId)) {
-          scene.children.push(duplicatedScene.id);
-        }
-      });
     },
     createStart: (state, action: PayloadAction<string>) => {
       const sceneId = action.payload;

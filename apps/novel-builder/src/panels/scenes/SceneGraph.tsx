@@ -1,4 +1,4 @@
-import React, { ComponentType, useCallback, useEffect, useMemo } from 'react';
+import React, { ComponentType, useCallback, useEffect, useMemo, useState } from 'react';
 import ReactFlow, {
   Position,
   Node,
@@ -30,6 +30,7 @@ import { selectScenes } from '../../state/selectors';
 import config from '../../config';
 import { getEdgeParams, graphToTree, setAllNodesPosition } from './utils.js';
 import { RiDragMove2Line, RiEdit2Line, RiFileCopyLine } from 'react-icons/ri';
+import { DuplicateSceneModal } from './DuplicateSceneModal';
 
 function FloatingEdge({ id, source, target, markerEnd, style }: Edge) {
   const sourceNode = useStore(useCallback((store) => store.nodeInternals.get(source), [source]));
@@ -60,6 +61,7 @@ const SceneNode = ({
   title: string;
   background: string;
   characters: string[];
+  onOpenDuplicateModal: (sceneId: string, event: React.MouseEvent) => void;
 }>) => {
   const connectionNodeId = useStore((state) => state.connectionNodeId);
   const dispatch = useAppDispatch();
@@ -67,8 +69,9 @@ const SceneNode = ({
     dispatch(openModal({ modalType: 'scene', editId: id }));
   };
 
-  const handleDuplicateScene = () => {
-    dispatch(duplicateScene(id));
+  const handleDuplicateScene = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    data.onOpenDuplicateModal(id, event);
   };
 
   const isConnecting = !!connectionNodeId;
@@ -104,7 +107,10 @@ const edgeTypes = {
 
 const startPos = { x: 0, y: 0 };
 
-const generateNodes = (scenes: ReturnType<typeof selectScenes>) => [
+const generateNodes = (
+  scenes: ReturnType<typeof selectScenes>,
+  onOpenDuplicateModal: (sceneId: string, event: React.MouseEvent) => void,
+) => [
   ...scenes.map((scene, index) => {
     return {
       id: scene.id,
@@ -116,6 +122,7 @@ const generateNodes = (scenes: ReturnType<typeof selectScenes>) => [
         characters: scene.characters.map((char) =>
           config.genAssetLink(char.profile_pic || '', AssetDisplayPrefix.PROFILE_PIC_SMALL),
         ),
+        onOpenDuplicateModal,
       },
     };
   }),
@@ -144,14 +151,62 @@ const generateEdges = (scenes: ReturnType<typeof selectScenes>) =>
 export default function SceneGraph() {
   const scenes = useAppSelector(selectScenes);
   const startScenes = useAppSelector((state) => state.novel.starts.map((s) => s.sceneId));
-  const nodesConfig = useMemo(() => generateNodes(scenes), [scenes]);
-  const edgesConfig = useMemo(() => generateEdges(scenes), [scenes]);
-  const [nodes, setNodes, onNodesChange] = useNodesState(nodesConfig);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(edgesConfig);
   const dispatch = useAppDispatch();
+
+  const [duplicateModal, setDuplicateModal] = useState<{
+    isOpen: boolean;
+    sceneId: string | null;
+    position: { x: number; y: number };
+  }>({
+    isOpen: false,
+    sceneId: null,
+    position: { x: 0, y: 0 },
+  });
 
   const handleAddScene = () => {
     dispatch(createSceneWithDefaults());
+  };
+
+  const handleOpenDuplicateModal = useCallback((sceneId: string, event: React.MouseEvent) => {
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    setDuplicateModal({
+      isOpen: true,
+      sceneId,
+      position: {
+        x: rect.left - 160,
+        y: rect.top, // Position above the button
+      },
+    });
+  }, []);
+
+  const nodesConfig = useMemo(
+    () => generateNodes(scenes, handleOpenDuplicateModal),
+    [scenes, handleOpenDuplicateModal],
+  );
+  const edgesConfig = useMemo(() => generateEdges(scenes), [scenes]);
+  const [nodes, setNodes, onNodesChange] = useNodesState(nodesConfig);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(edgesConfig);
+
+  const handleCloseDuplicateModal = () => {
+    setDuplicateModal({
+      isOpen: false,
+      sceneId: null,
+      position: { x: 0, y: 0 },
+    });
+  };
+
+  const handleDuplicateJustScene = () => {
+    if (duplicateModal.sceneId) {
+      dispatch(duplicateScene({ sceneId: duplicateModal.sceneId, withBranches: false }));
+    }
+    handleCloseDuplicateModal();
+  };
+
+  const handleDuplicateWithBranches = () => {
+    if (duplicateModal.sceneId) {
+      dispatch(duplicateScene({ sceneId: duplicateModal.sceneId, withBranches: true }));
+    }
+    handleCloseDuplicateModal();
   };
 
   useEffect(() => {
@@ -255,6 +310,13 @@ export default function SceneGraph() {
           </Panel>
         </ReactFlow>
       </div>
+      <DuplicateSceneModal
+        isOpen={duplicateModal.isOpen}
+        onClose={handleCloseDuplicateModal}
+        onDuplicateJustScene={handleDuplicateJustScene}
+        onDuplicateWithBranches={handleDuplicateWithBranches}
+        position={duplicateModal.position}
+      />
     </div>
   );
 }
