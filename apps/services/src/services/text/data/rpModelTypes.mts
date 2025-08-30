@@ -9,6 +9,7 @@ export enum RPModelTokenizers {
   GEMMA3 = 'gemma3',
   CLAUDE = 'claude',
   GLM45 = 'glm45',
+  GPT_OSS = 'gpt-oss',
 }
 
 export enum RPModelStrategy {
@@ -23,6 +24,7 @@ export enum RPModelStrategy {
   DEEPSEEK = 'deepseek',
   DANCHAT2 = 'danchat2',
   GLM45 = 'glm45',
+  HARMONY = 'harmony',
 }
 
 export enum PresetType {
@@ -33,6 +35,7 @@ export enum PresetType {
   NEMO = 'NEMO',
   QWEN3_30B_NO_THINK = 'QWEN3_30B_NO_THINK',
   PERSONALITY_ENGINE = 'PERSONALITY_ENGINE',
+  GLM_45 = 'GLM_45',
 }
 
 export enum RPModelPermission {

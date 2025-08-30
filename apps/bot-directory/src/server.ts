@@ -109,20 +109,20 @@ app.get(`/bot/config/:hash`, (req, res) => {
   if (file) {
     const configFile = file.toString('utf-8');
     const completeCard = JSON.parse(configFile) as MikuCard;
-    const card: MikuCard = {
-      ...EMPTY_MIKU_CARD,
-      data: {
-        ...EMPTY_MIKU_CARD.data,
-        first_mes: completeCard.data.first_mes,
-        name: completeCard.data.name,
-        extensions: {
-          mikugg: completeCard.data.extensions.mikugg,
-        },
-      },
-    };
+    // const card: MikuCard = {
+    //   ...EMPTY_MIKU_CARD,
+    //   data: {
+    //     ...EMPTY_MIKU_CARD.data,
+    //     first_mes: completeCard.data.first_mes,
+    //     name: completeCard.data.name,
+    //     extensions: {
+    //       mikugg: completeCard.data.extensions.mikugg,
+    //     },
+    //   },
+    // };
     res.setHeader('Access-Control-Allow-Origin', process.env.INTERACTOR_ENDPOINT || 'http://localhost:5173');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.send(card);
+    res.send(completeCard);
   } else {
     res.status(404).send('File not found.');
   }

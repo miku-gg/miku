@@ -33,7 +33,7 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 
 const ASSETS_ENDPOINT = import.meta.env.VITE_ASSETS_ENDPOINT || 'http://localhost:8585/s3/assets';
 const ASSETS_UPLOAD_ENDPOINT = import.meta.env.VITE_ASSETS_UPLOAD_URL || 'http://localhost:8585/asset-upload';
-const CARD_ENDPOINT = import.meta.env.VITE_CARD_ENDPOINT || 'https://apidev.miku.gg/bot/config';
+const CARD_ENDPOINT = import.meta.env.VITE_CARD_ENDPOINT || 'http://localhost:8585/bot/config';
 const CARD_ID = import.meta.env.VITE_CARD_ID || 'QmNTiMDQKh2ZhNzujupeGjWBFGC3WfcNHHNvDNXsC9rPBF.json';
 const SERVICES_ENDPOINT = import.meta.env.VITE_SERVICES_ENDPOINT || 'http://localhost:8484';
 const BACKGROUND_SEARCH_ENDPOINT =

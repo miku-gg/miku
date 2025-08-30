@@ -140,9 +140,9 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   }
 
   public template() {
-    const { INPUT_START, INPUT_END, OUTPUT_START, OUTPUT_END, STOPS } = this.instructTemplate;
+    const { INPUT_START, INPUT_END, OUTPUT_START, OUTPUT_ASK = '', OUTPUT_END, STOPS } = this.instructTemplate;
     return {
-      askLine: `${INPUT_END}${OUTPUT_START}`,
+      askLine: `${INPUT_END}${OUTPUT_ASK || OUTPUT_START}`,
       instruction: `${OUTPUT_END}${INPUT_START}`,
       response: `${INPUT_END}${OUTPUT_START}`,
       stops: STOPS,

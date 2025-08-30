@@ -26,6 +26,10 @@ const getTokenizer = (_tokenizer: string): Guidance.Tokenizer.AbstractTokenizer 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (_tokenizer === 'claude') return tokenizers.get(TokenizerType.CLAUDE)!;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  if (_tokenizer === 'gpt-oss') return tokenizers.get(TokenizerType.GPT_OSS)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  if (_tokenizer === 'glm45') return tokenizers.get(TokenizerType.GLM45)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return tokenizers.get(TokenizerType.LLAMA3)!;
 };
 
@@ -43,6 +47,7 @@ export default async (req: Request<string>, res: Response) => {
   //     throw { message: 'Model down.', status: 500 };
   //   }
   // }
+  console.log(modelSettings.tokenizer, getTokenizer(modelSettings.tokenizer));
   const templateProcessor = new Guidance.Template.TemplateProcessor(
     getTokenizer(modelSettings.tokenizer),
     new Guidance.TokenGenerator.OpenAITokenGenerator(
