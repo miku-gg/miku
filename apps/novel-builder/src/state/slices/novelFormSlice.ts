@@ -209,6 +209,25 @@ const novelFormSlice = createSlice({
         children: [], // New scene starts with no children
       };
 
+      if (originalScene.cutScene?.id) {
+        const originalCutscene = state.cutscenes?.find((cutscene) => cutscene.id === originalScene.cutScene?.id);
+        if (originalCutscene) {
+          const newCutscene: NovelV3.CutScene = {
+            id: randomUUID(),
+            name: originalCutscene.name,
+            parts: originalCutscene.parts.map((part) => ({
+              ...part,
+              id: randomUUID(),
+            })),
+          };
+          state.cutscenes?.push(newCutscene);
+          duplicatedScene.cutScene = {
+            id: newCutscene.id,
+            triggerOnlyOnce: false,
+          };
+        }
+      }
+
       // Add the duplicated scene as a child to all parents of the original scene only if withBranches is true
       if (withBranches) {
         state.scenes.forEach((scene) => {
