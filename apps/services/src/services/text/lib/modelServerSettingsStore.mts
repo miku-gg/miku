@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import {
   ModelServerSettings,
   PresetType,
@@ -8,7 +11,11 @@ import {
   RPModelTokenizers,
   validateServicesSettings,
 } from '../data/rpModelTypes.mjs';
-import backend_config from '../../../../backend_config.json' assert { type: 'json' };
+
+// @ts-ignore - JSON import compatibility
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const backend_config = JSON.parse(readFileSync(join(__dirname, '../../../../backend_config.json'), 'utf-8'));
 import { setModelHealthChecker } from './healthChecker.mjs';
 
 const DEFAULT_MODEL: RPModelSettings = {
