@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import './CutsceneDisplayer.scss';
 import { useRef, useEffect, useState } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
-import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
+import { IoIosArrowBack, IoIosArrowForward, IoIosSkipForward } from 'react-icons/io';
 import { useI18n } from '../../libs/i18n';
 import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
@@ -284,20 +284,36 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
           >
             <IoIosArrowBack />
           </button>
-          <button
-            className="CutsceneDisplayer__buttons-right"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (isAtEnd()) {
+          <div className="CutsceneDisplayer__buttons-right-group">
+            <button
+              className={classNames({
+                'CutsceneDisplayer__buttons-right': true,
+              })}
+              onClick={(e) => {
+                e.stopPropagation();
                 onEndDisplay();
-              } else {
-                handleContinueClick();
-              }
-            }}
-          >
-            {isAtEnd() ? <p className="CutsceneDisplayer__buttons-right__text">{i18n('go_to_scene')}</p> : null}
-            <IoIosArrowForward />
-          </button>
+              }}
+            >
+              <p className="CutsceneDisplayer__buttons-right__text">{i18n('go_to_scene')}</p>
+              <IoIosSkipForward />
+            </button>
+            <button
+              className={classNames({
+                'CutsceneDisplayer__buttons-right': true,
+                'CutsceneDisplayer__buttons-right--hidden': isAtEnd(),
+              })}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isAtEnd()) {
+                  onEndDisplay();
+                } else {
+                  handleContinueClick();
+                }
+              }}
+            >
+              <IoIosArrowForward />
+            </button>
+          </div>
         </div>
       </div>
     </>

@@ -175,6 +175,12 @@
     z-index: 1;
     border-radius: 0.75rem;
 
+    &-right-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     &-right,
     &-left {
       opacity: 0.8;
@@ -206,6 +212,10 @@
       opacity: 0;
       pointer-events: none;
       cursor: default;
+    }
+
+    &-right--hidden {
+      display: none;
     }
   }
 
