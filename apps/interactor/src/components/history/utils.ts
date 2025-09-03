@@ -137,6 +137,17 @@ export const setAllNodesPosition = (
       currentX += childSubtreeWidth + SIBLINGS_DISTANCE_GAP;
     });
   }
-  setPosition(rootId, 0);
+  // Ensure root node exists in nodeMap before positioning
+  if (!nodeMap.has(rootId)) {
+    //Root node not found in nodeMap
+    // Find any node that exists in the nodeMap as fallback
+    const fallbackRoot = Array.from(nodeMap.keys())[0];
+    if (fallbackRoot) {
+      //Using fallback root
+      setPosition(fallbackRoot, 0);
+    }
+  } else {
+    setPosition(rootId, 0);
+  }
   return startPos;
 };
