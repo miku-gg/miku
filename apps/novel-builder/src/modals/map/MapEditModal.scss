@@ -75,6 +75,12 @@
       display: flex;
       gap: 10px;
     }
+    
+    &__checkbox {
+      display: flex;
+      align-items: center;
+      margin-top: 1.5rem; // Adjust this value to align with input field heights
+    }
   }
 
   &__createPlace {

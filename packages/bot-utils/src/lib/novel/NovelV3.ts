@@ -121,6 +121,7 @@ export interface NovelMap {
   id: string;
   name: string;
   description: string;
+  isGlobal?: boolean;
   source: {
     png: string;
     mp4?: string;
