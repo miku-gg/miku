@@ -1,4 +1,4 @@
-import { AreYouSure, Button, DragAndDropImages, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import { AreYouSure, Button, CheckBox, DragAndDropImages, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import { HiOutlinePlus } from 'react-icons/hi';
 
 import { FaTrashAlt } from 'react-icons/fa';
@@ -125,6 +125,37 @@ export default function MapEditModal() {
                   )
                 }
               />
+              <div className="MapEdit__form__checkbox">
+                <CheckBox
+                  label="Global"
+                  value={map?.isGlobal}
+                  onChange={(e) => {
+                    const nextIsGlobal = !!e.target.checked;
+                    if (map?.isGlobal && !nextIsGlobal) {
+                      areYouSure.openModal({
+                        title: 'Are you sure?',
+                        description:
+                          'This map is global. Are you sure you want to make it non-global?',
+                        onYes: () => {
+                          dispatch(
+                            updateMap({
+                              ...map!,
+                              isGlobal: nextIsGlobal,
+                            }),
+                          );
+                        },
+                      });
+                    } else {
+                      dispatch(
+                        updateMap({
+                          ...map!,
+                          isGlobal: nextIsGlobal,
+                        }),
+                      );
+                    }
+                  }}
+                />
+              </div>
             </div>
             <div className="MapEdit__form__map">
               {map?.places &&

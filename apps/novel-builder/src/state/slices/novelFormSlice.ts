@@ -341,6 +341,7 @@ const novelFormSlice = createSlice({
         id: action.payload.id,
         name: 'New Map',
         description: '',
+        isGlobal: false,
         places: [],
         source: { png: '' },
       });
