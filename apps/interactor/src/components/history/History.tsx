@@ -11,7 +11,7 @@ import { setEditModal, setHistoryModal } from '../../state/slices/settingsSlice'
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import DialogueNode from './DialogueNode';
 import { NodeEditor } from './NodeEditor';
-import { DialogueNodeData, setAllNodesPosition } from './utils';
+import { DialogueNodeData, setAllNodesPosition, findClosestNodes } from './utils';
 
 import mergeWith from 'lodash.mergewith';
 import 'reactflow/dist/style.css';
@@ -163,11 +163,19 @@ const HistoryModal = (): ReactElement => {
     })();
     const topResponse = narration.responses[parentIds[parentIds.length - 1]];
     const parentIdsSet = new Set(parentIds);
+    
+    // Find the closest 100 nodes to the current node
+    const closestNodes = findClosestNodes(narration.responses, narration.interactions, narration.currentResponseId, 100);
 
     const nodes: Node<DialogueNodeData>[] = [];
     const edges: Edge[] = [];
 
     function dfs(response: NarrationResponse) {
+      // Only include nodes that are in the closest nodes set
+      if (!closestNodes.has(response.id)) {
+        return;
+      }
+
       // get parent scene
       const parentSceneId = response.parentInteractionId
         ? narration.interactions[response.parentInteractionId]?.sceneId
@@ -198,7 +206,7 @@ const HistoryModal = (): ReactElement => {
           isUser: false,
           isLastResponse,
           isRoot,
-          isLeaf: response.childrenInteractions.length === 0,
+          isLeaf: response.childrenInteractions.filter(({ interactionId }) => closestNodes.has(interactionId)).length === 0,
           highlighted: parentIdsSet.has(response.id),
           text: (response.characters[0]?.text || '').substring(0, 100),
           charName: charactersData[0]?.name || '',
@@ -212,7 +220,7 @@ const HistoryModal = (): ReactElement => {
       response.childrenInteractions.forEach(({ interactionId }) => {
         const interaction = narration.interactions[interactionId];
 
-        if (interaction?.id) {
+        if (interaction?.id && closestNodes.has(interactionId)) {
           const item = getItemByActionPrompt(inventoryItems, interaction.query);
           let query = '';
           if (item) {
@@ -233,7 +241,7 @@ const HistoryModal = (): ReactElement => {
               isLastResponse: false,
               highlighted: parentIdsSet.has(interaction.id || ''),
               text: query || '',
-              isLeaf: interaction.responsesId.length === 0,
+              isLeaf: interaction.responsesId.filter((responseId) => closestNodes.has(responseId)).length === 0,
               isRoot: false,
               avatars: ['default-profile-pic.png'],
               charName: charactersData[0]?.name || '',
@@ -241,38 +249,89 @@ const HistoryModal = (): ReactElement => {
             },
             position: { x: 0, y: 0 },
           });
-        }
-        edges.push({
-          id: `vertical_${response.id}_${interaction?.id}`,
-          source: response.id,
-          type: 'default',
-          target: interactionId,
-          focusable: false,
-          selected: false,
-          animated: parentIdsSet.has(interactionId) && (!response.parentInteractionId || parentIdsSet.has(response.id)),
-        });
-        interaction?.responsesId.forEach((responseId) => {
-          const childResponse = narration.responses[responseId];
-          if (!childResponse) return;
+
           edges.push({
-            id: `vertical_${interaction?.id}_${childResponse.id}`,
-            source: interaction?.id,
+            id: `vertical_${response.id}_${interaction?.id}`,
+            source: response.id,
             type: 'default',
-            target: childResponse.id,
+            target: interactionId,
             focusable: false,
             selected: false,
-            animated: parentIdsSet.has(interaction?.id) && parentIdsSet.has(childResponse.id),
+            animated: parentIdsSet.has(interactionId) && (!response.parentInteractionId || parentIdsSet.has(response.id)),
           });
+        }
+
+        interaction?.responsesId.forEach((responseId) => {
+          const childResponse = narration.responses[responseId];
+          if (!childResponse || !closestNodes.has(responseId)) return;
+          
+          if (closestNodes.has(interactionId)) {
+            edges.push({
+              id: `vertical_${interaction?.id}_${childResponse.id}`,
+              source: interaction?.id,
+              type: 'default',
+              target: childResponse.id,
+              focusable: false,
+              selected: false,
+              animated: parentIdsSet.has(interaction?.id) && parentIdsSet.has(childResponse.id),
+            });
+          }
           dfs(childResponse);
         });
       });
     }
 
-    // eslint-disable-next-line
-    // @ts-ignore
-    dfs(topResponse);
+    // Build the filtered tree starting from all root nodes within closest nodes
+    const visitedNodes = new Set<string>();
+    
+    function traverseFromNode(nodeId: string) {
+      if (visitedNodes.has(nodeId) || !closestNodes.has(nodeId)) return;
+      
+      const response = narration.responses[nodeId];
+      const interaction = narration.interactions[nodeId];
+      
+      if (response) {
+        dfs(response);
+        visitedNodes.add(nodeId);
+      } else if (interaction) {
+        // Handle interaction nodes by traversing their responses
+        interaction.responsesId.forEach(responseId => {
+          if (closestNodes.has(responseId) && !visitedNodes.has(responseId)) {
+            const childResponse = narration.responses[responseId];
+            if (childResponse) {
+              dfs(childResponse);
+              visitedNodes.add(responseId);
+            }
+          }
+        });
+        visitedNodes.add(nodeId);
+      }
+    }
+    
+    // Find nodes with no parents within the closest nodes (potential roots)
+    const rootNodes = Array.from(closestNodes).filter(nodeId => {
+      const response = narration.responses[nodeId];
+      const interaction = narration.interactions[nodeId];
+      
+      if (response && response.parentInteractionId && closestNodes.has(response.parentInteractionId)) {
+        return false;
+      }
+      if (interaction && interaction.parentResponseId && closestNodes.has(interaction.parentResponseId)) {
+        return false;
+      }
+      return true;
+    });
+    
+    // Traverse from all root nodes
+    rootNodes.forEach(rootNodeId => {
+      traverseFromNode(rootNodeId);
+    });
+    
+    // Use the original top response as root for positioning if it exists in closest nodes,
+    // otherwise use the first root node found
+    const positioningRoot = closestNodes.has(topResponse?.id || '') ? topResponse?.id || '' : rootNodes[0] || '';
 
-    return [nodes, edges, setAllNodesPosition(nodes, edges, topResponse?.id || '')];
+    return [nodes, edges, setAllNodesPosition(nodes, edges, positioningRoot)];
   })();
 
   return (

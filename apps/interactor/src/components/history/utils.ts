@@ -1,4 +1,5 @@
 import { Edge, Node } from 'reactflow';
+import { NarrationResponse, NarrationInteraction } from '../../state/slices/narrationSlice';
 
 export type DialogueNodeData = {
   avatars: string[];
@@ -17,6 +18,60 @@ const NODE_WIDTH = 200;
 const NODE_HEIGHT = 50;
 const PARENT_DISTANCE_GAP = 50;
 const SIBLINGS_DISTANCE_GAP = 20;
+
+export const findClosestNodes = (
+  responses: Record<string, NarrationResponse | undefined>,
+  interactions: Record<string, NarrationInteraction | undefined>,
+  currentNodeId: string,
+  maxNodes: number = 100
+): Set<string> => {
+  const closestNodes = new Set<string>();
+  const queue: { id: string; distance: number }[] = [{ id: currentNodeId, distance: 0 }];
+  const visited = new Set<string>();
+
+  while (queue.length > 0 && closestNodes.size < maxNodes) {
+    // Sort queue by distance to always process the closest nodes first
+    queue.sort((a, b) => a.distance - b.distance);
+    const { id, distance } = queue.shift()!;
+
+    if (visited.has(id)) continue;
+    visited.add(id);
+    closestNodes.add(id);
+
+    const response = responses[id];
+    const interaction = interactions[id];
+
+    if (response) {
+      // Add parent interaction
+      if (response.parentInteractionId && !visited.has(response.parentInteractionId)) {
+        queue.push({ id: response.parentInteractionId, distance: distance + 1 });
+      }
+
+      // Add children interactions
+      response.childrenInteractions?.forEach(({ interactionId }) => {
+        if (!visited.has(interactionId)) {
+          queue.push({ id: interactionId, distance: distance + 1 });
+        }
+      });
+    }
+
+    if (interaction) {
+      // Add parent response
+      if (interaction.parentResponseId && !visited.has(interaction.parentResponseId)) {
+        queue.push({ id: interaction.parentResponseId, distance: distance + 1 });
+      }
+
+      // Add children responses
+      interaction.responsesId?.forEach((responseId) => {
+        if (!visited.has(responseId)) {
+          queue.push({ id: responseId, distance: distance + 1 });
+        }
+      });
+    }
+  }
+
+  return closestNodes;
+};
 
 export const setAllNodesPosition = (
   nodes: Node<DialogueNodeData>[],
