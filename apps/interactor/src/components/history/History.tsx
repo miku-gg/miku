@@ -1,10 +1,10 @@
 import { Modal, Tooltip } from '@mikugg/ui-kit';
-import { ReactElement } from 'react';
+import { ReactElement, useRef, useEffect } from 'react';
 import { BiCloudDownload, BiCloudUpload } from 'react-icons/bi';
 import { FaTimes } from 'react-icons/fa';
 import { GrHistory } from 'react-icons/gr';
 import { toast } from 'react-toastify';
-import ReactFlow, { Edge, Node, NodeTypes, Position } from 'reactflow';
+import ReactFlow, { Edge, Node, NodeTypes, Position, ReactFlowInstance } from 'reactflow';
 import { NarrationResponse, swipeResponse } from '../../state/slices/narrationSlice';
 import { replaceState } from '../../state/slices/replaceState';
 import { setEditModal, setHistoryModal } from '../../state/slices/settingsSlice';
@@ -147,17 +147,21 @@ const HistoryModal = (): ReactElement => {
   const narration = useAppSelector((state) => state.narration);
   const novel = useAppSelector((state) => state.novel);
   const inventoryItems = useAppSelector((state) => state.inventory.items);
+  const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
 
   const [nodes, edges, startPos] = (() => {
     const parentIds = (() => {
       const parentIds: string[] = [];
       let currentId = narration.currentResponseId;
-      while (currentId) {
+      let depth = 0;
+      const MAX_DEPTH = 100;
+      while (currentId && depth < MAX_DEPTH) {
         parentIds.push(currentId);
         currentId =
           narration.responses[currentId]?.parentInteractionId ||
           narration.interactions[currentId]?.parentResponseId ||
           '';
+          depth++;
       }
       return parentIds;
     })();
@@ -334,6 +338,29 @@ const HistoryModal = (): ReactElement => {
     return [nodes, edges, setAllNodesPosition(nodes, edges, positioningRoot)];
   })();
 
+  // Center viewport on current node when it changes
+  useEffect(() => {
+    if (!reactFlowInstance.current || !startPos) return;
+    
+    const currentViewport = reactFlowInstance.current.getViewport();
+    const zoom = currentViewport.zoom;
+    
+    // Calculate center position to place current node at center of viewport
+    const centerX = (document.body.clientWidth * 0.8) / 2;
+    const centerY = document.body.clientHeight * (isMobileApp ? 0.7 : 0.8) / 2;
+    
+    // Calculate new viewport position to center the current node
+    const x = centerX - startPos.x * zoom;
+    const y = centerY - startPos.y * zoom;
+    
+    // Small delay to ensure smooth transition
+    const timeoutId = setTimeout(() => {
+      reactFlowInstance.current?.setViewport({ x, y, zoom });
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [narration.currentResponseId, startPos, isMobileApp]);
+
   return (
     <div className={`History__modal ${isMobileApp ? 'History__modal--mobile' : ''}`}>
       {/* eslint-disable-next-line */}
@@ -349,6 +376,9 @@ const HistoryModal = (): ReactElement => {
         attributionPosition="bottom-left"
         draggable={false}
         nodeTypes={nodeTypes}
+        onInit={(instance) => {
+          reactFlowInstance.current = instance;
+        }}
         onNodeClick={(_event, node) => {
           if (narration.responses[node.id]) {
             dispatch(swipeResponse(node.id));
