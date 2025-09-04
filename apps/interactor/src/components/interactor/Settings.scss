@@ -36,7 +36,24 @@ $flex-wrap-gap: 10px;
     }
   }
 
-  &__name,
+  &__name{
+    padding: $padding-standard;
+    background-color: $primary-background-color;
+    border-radius: $border-radius;
+    margin: $margin;
+    text-align: center;
+    width: 100%;
+
+    .Input__label {
+      justify-content: center;
+      text-align: center;
+      width: 100% !important;
+    }
+
+    .Input__field {
+      text-align: center;
+    }
+  }
   &__text-speed,
   &__text-font-size,
   &__voice,
@@ -46,6 +63,67 @@ $flex-wrap-gap: 10px;
     background-color: $primary-background-color;
     border-radius: $border-radius;
     margin: $margin;
+  }
+
+  &__profile-picture {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 500;
+      color: $font-color-light-gray;
+    }
+
+    &-button {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid $secondary-background-color;
+      background-color: $primary-background-color;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease-in-out;
+      overflow: hidden;
+      position: relative;
+
+      &:hover {
+        border-color: $primary-color;
+        background-color: $secondary-background-color;
+        transform: scale(1.05);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+
+    &-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    &-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: $font-color-light-gray;
+      font-size: 2rem;
+      font-weight: 300;
+
+      span {
+        line-height: 1;
+      }
+    }
   }
 
   &__text-speed,

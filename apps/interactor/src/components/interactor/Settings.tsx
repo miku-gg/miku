@@ -17,6 +17,7 @@ import {
   setResponseFormat,
   getVoiceItems,
   setReasoningEnabled,
+  setProfilePicture,
 } from '../../state/slices/settingsSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import './Settings.scss';
@@ -82,6 +83,54 @@ const Settings = (): JSX.Element => {
           {settingsTab === 'prompt' && (
             <>
               <div className="SettingsModal__name">
+                <div className="SettingsModal__profile-picture">
+                  <button
+                    className="SettingsModal__profile-picture-button"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/png,image/jpeg,image/jpg,image/webp';
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          const MAX_FILE_SIZE = 5 * 720 * 720;
+                          const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+                          if (file.size > MAX_FILE_SIZE) {
+                            // @ts-ignore
+                            toast?.error?.(i18n('file_too_large') || 'File size should be less than 5MB');
+                            return;
+                          }
+                          if (!validTypes.includes(file.type)) {
+                            // @ts-ignore
+                            toast?.error?.(i18n('invalid_file_type') || 'Invalid file type. Please upload a valid image file');
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onload = (e) => {
+                            const result = e.target?.result;
+                            if (typeof result === 'string') {
+                              dispatch(setProfilePicture({ jpg: result }));
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      };
+                      input.click();
+                    }}
+                  >
+                    {settings.user.profilePicture?.jpg ? (
+                      <img 
+                        src={settings.user.profilePicture.jpg} 
+                        alt="Profile" 
+                        className="SettingsModal__profile-picture-image"
+                      />
+                    ) : (
+                      <div className="SettingsModal__profile-picture-placeholder">
+                        <span>+</span>
+                      </div>
+                    )}
+                  </button>
+                </div>
                 <Input
                   label={i18n('your_name')}
                   value={settings.user.name}

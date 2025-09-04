@@ -196,6 +196,9 @@ export interface SettingsState {
     credits: number;
     loading: boolean;
     sceneSuggestionsLeft: number;
+    profilePicture?: {
+      jpg: string;
+    };
   };
   prompt: {
     systemPrompt: string;
