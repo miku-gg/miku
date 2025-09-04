@@ -1,6 +1,7 @@
 import { FaPaperPlane } from 'react-icons/fa';
 import { GiFeather } from 'react-icons/gi';
 import { useAppContext } from '../../App.context';
+import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { selectCurrentScene, selectLastLoadedResponse } from '../../state/selectors';
 import { interactionStart, setInputText, setSuggestions } from '../../state/slices/narrationSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
@@ -27,7 +28,7 @@ import { useI18n } from '../../libs/i18n';
 
 const InputBox = (): JSX.Element => {
   const dispatch = useAppDispatch();
-  const { servicesEndpoint, isInteractionDisabled, apiEndpoint } = useAppContext();
+  const { servicesEndpoint, isInteractionDisabled, apiEndpoint, persona, assetLinkLoader } = useAppContext();
 
   const textAreaRef: RefObject<HTMLTextAreaElement> = useRef(null);
   const [textAreaRows, setTextAreaRows] = useState<number>(1);
@@ -195,6 +196,20 @@ const InputBox = (): JSX.Element => {
       })}
     >
       <form className="InputBox__form" onSubmit={onSubmit}>
+        <div className="InputBox__persona-icon">
+          {persona?.profilePic ? (
+            <img 
+              src={assetLinkLoader(persona.profilePic, AssetDisplayPrefix.CHARACTER_PIC_SMALL)} 
+              alt={persona.name || 'Persona'} 
+              className="InputBox__persona-image"
+            />
+          ) : (
+            <div className="InputBox__persona-placeholder">
+              <span>{persona?.name?.charAt(0)?.toUpperCase() || '?'}</span>
+            </div>
+          )}
+        </div>
+
         <button
           className={classNames({
             'InputBox__suggestion-trigger': true,
