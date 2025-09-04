@@ -153,15 +153,12 @@ const HistoryModal = (): ReactElement => {
     const parentIds = (() => {
       const parentIds: string[] = [];
       let currentId = narration.currentResponseId;
-      let depth = 0;
-      const MAX_DEPTH = 100;
-      while (currentId && depth < MAX_DEPTH) {
+      while (currentId) {
         parentIds.push(currentId);
         currentId =
           narration.responses[currentId]?.parentInteractionId ||
           narration.interactions[currentId]?.parentResponseId ||
           '';
-          depth++;
       }
       return parentIds;
     })();
