@@ -78,7 +78,8 @@ const selectSelectableCharacters = createSelector(
     [...characters, ...importedCharacters]
       .filter((character) => {
         if (!character) return false;
-        // Only include characters that have been met in visited scenes
+        // Include characters that are not hidden
+        if (character.hidden !== true) return true;
         return metCharacterIds.includes(character.id);
       })
       .map((character) => {
