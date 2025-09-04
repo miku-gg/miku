@@ -105,11 +105,7 @@ export interface NovelIndicator extends NovelV3.NovelIndicator {}
 export interface NovelBattle extends NovelV3.NovelBattle {}
 export interface NovelRPG extends NovelV3.NovelRPG {}
 
-export interface NovelPersona {
-  name: string;
-  description: string | null;
-  profilePic: string | null;
-}
+export interface NovelPersona extends NovelV3.NovelPersona {}
 
 export interface BattleState extends NovelV3.BattleState {}
 export type WearableSlot = NovelV3.WearableSlot;

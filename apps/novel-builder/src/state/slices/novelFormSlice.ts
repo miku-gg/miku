@@ -28,7 +28,7 @@ export interface PendingInference {
   itemId?: string; // used by item type (if needed)
 }
 
-const initialState: NovelV3.NovelState & { pendingInferences?: PendingInference[]; customPersona?: NovelPersona } = {
+const initialState: NovelV3.NovelState & { pendingInferences?: PendingInference[] } = {
   title: '',
   description: '',
   logoPic: '',

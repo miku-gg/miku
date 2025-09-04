@@ -26,11 +26,13 @@ import { useEffect } from 'react';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { useAppContext } from '../../App.context';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { useEffectivePersona } from '../../libs/useEffectivePersona';
 const audio = new Audio();
 
 const Settings = (): JSX.Element => {
   const dispatch = useAppDispatch();
-  const { isPublishedDemo, persona, assetLinkLoader } = useAppContext();
+  const { isPublishedDemo, assetLinkLoader } = useAppContext();
+  const effectivePersona = useEffectivePersona();
   const language = useAppSelector((state) => state.novel.language);
   const settings = useAppSelector((state) => state.settings);
   const settingsTab = useAppSelector((state) => state.settings.modals.settingsTab);
@@ -85,15 +87,15 @@ const Settings = (): JSX.Element => {
               <div className="SettingsModal__name">
                 <div className="SettingsModal__profile-picture">
                   <div className="SettingsModal__profile-picture-display">
-                    {persona?.profilePic ? (
+                    {effectivePersona?.profilePic ? (
                       <img 
-                        src={assetLinkLoader(persona.profilePic, AssetDisplayPrefix.PROFILE_PIC_SMALL)} 
-                        alt={persona.name || 'Persona'} 
+                        src={assetLinkLoader(effectivePersona.profilePic, AssetDisplayPrefix.PROFILE_PIC_SMALL)} 
+                        alt={effectivePersona.name || 'Persona'} 
                         className="SettingsModal__profile-picture-image"
                       />
                     ) : (
                       <div className="SettingsModal__profile-picture-placeholder">
-                        <span>{persona?.name?.charAt(0)?.toUpperCase() || '?'}</span>
+                        <span>{effectivePersona?.name?.charAt(0)?.toUpperCase() || '?'}</span>
                       </div>
                     )}
                   </div>

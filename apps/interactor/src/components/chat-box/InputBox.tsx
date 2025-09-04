@@ -25,10 +25,12 @@ import { Loader } from '../common/Loader';
 import './InputBox.scss';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
 import { useI18n } from '../../libs/i18n';
+import { useEffectivePersona } from '../../libs/useEffectivePersona';
 
 const InputBox = (): JSX.Element => {
   const dispatch = useAppDispatch();
-  const { servicesEndpoint, isInteractionDisabled, apiEndpoint, persona, assetLinkLoader } = useAppContext();
+  const { servicesEndpoint, isInteractionDisabled, apiEndpoint, assetLinkLoader } = useAppContext();
+  const effectivePersona = useEffectivePersona();
 
   const textAreaRef: RefObject<HTMLTextAreaElement> = useRef(null);
   const [textAreaRows, setTextAreaRows] = useState<number>(1);
@@ -197,15 +199,15 @@ const InputBox = (): JSX.Element => {
     >
       <form className="InputBox__form" onSubmit={onSubmit}>
         <div className="InputBox__persona-icon">
-          {persona?.profilePic ? (
+          {effectivePersona?.profilePic ? (
             <img 
-              src={assetLinkLoader(persona.profilePic, AssetDisplayPrefix.PROFILE_PIC_SMALL)} 
-              alt={persona.name || 'Persona'} 
+              src={assetLinkLoader(effectivePersona.profilePic, AssetDisplayPrefix.PROFILE_PIC_SMALL)} 
+              alt={effectivePersona.name || 'Persona'} 
               className="InputBox__persona-image"
             />
           ) : (
             <div className="InputBox__persona-placeholder">
-              <span>{persona?.name?.charAt(0)?.toUpperCase() || '?'}</span>
+              <span>{effectivePersona?.name?.charAt(0)?.toUpperCase() || '?'}</span>
             </div>
           )}
         </div>

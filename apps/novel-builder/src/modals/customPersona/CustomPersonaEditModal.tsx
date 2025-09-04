@@ -1,5 +1,4 @@
 import { Button, Modal } from '@mikugg/ui-kit';
-import ButtonGroup from '../../components/ButtonGroup';
 import { useEffect, useState } from 'react';
 import './CustomPersonaEditModal.scss';
 import { AreYouSure } from '@mikugg/ui-kit';

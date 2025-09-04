@@ -312,6 +312,7 @@ export interface NovelState {
   useModalForStartSelection?: boolean;
   rpg?: NovelRPG;
   battles?: NovelBattle[];
+  customPersona?: NovelPersona;
 }
 
 export interface NovelIndicator {
@@ -329,4 +330,10 @@ export interface NovelIndicator {
   editable?: boolean;
   color?: string;
   persistent?: boolean;
+}
+
+export interface NovelPersona {
+  name: string;
+  description: string | null;
+  profilePic: string | null;
 }

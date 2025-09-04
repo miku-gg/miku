@@ -37,7 +37,18 @@ const NovelLoader = (): JSX.Element => {
         voicesItems.find((v) => v.value === state.settings.voice.voiceId)?.value || voicesItems[0].value;
 
       dispatch(replaceState(state));
-      if (persona?.name) {
+      
+      // Check if current persona is empty and replace with novel's customPersona if available
+      const isPersonaEmpty = !persona?.name || persona.name.trim() === '';
+      const novelPersona = state.novel.customPersona;
+      
+      if (isPersonaEmpty && novelPersona?.name) {
+        // Use novel's customPersona
+        if (novelPersona.description) {
+          dispatch(setSystemPrompt(`${novelPersona.name} Description: ${novelPersona.description}`));
+        }
+        dispatch(setName(novelPersona.name));
+      } else if (persona?.name) { // Use existing persona
         if (persona?.description) {
           dispatch(setSystemPrompt(`${persona.name} Description: ${persona.description}`));
         }
