@@ -92,9 +92,6 @@ export const initialState: SettingsState = {
     credits: 0,
     loading: false,
     sceneSuggestionsLeft: 0,
-    profilePicture: {
-      jpg: '',
-    },
   },
   chatBox: {
     isDraggable: false,
@@ -159,9 +156,6 @@ export const settingSlice = createSlice({
     },
     setName: (state, action: PayloadAction<string>) => {
       state.user.name = action.payload;
-    },
-    setProfilePicture: (state, action: PayloadAction<{ jpg: string; }>) => {
-      state.user.profilePicture = action.payload;
     },
     setSettingsTab: (state, action: PayloadAction<'general' | 'prompt' | 'audio'>) => {
       state.modals.settingsTab = action.payload;

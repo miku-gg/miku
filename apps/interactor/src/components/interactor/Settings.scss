@@ -78,29 +78,17 @@ $flex-wrap-gap: 10px;
       color: $font-color-light-gray;
     }
 
-    &-button {
+    &-display {
       width: 120px;
       height: 120px;
       border-radius: 50%;
       border: 2px solid $secondary-background-color;
       background-color: $primary-background-color;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease-in-out;
       overflow: hidden;
       position: relative;
-
-      &:hover {
-        border-color: $primary-color;
-        background-color: $secondary-background-color;
-        transform: scale(1.05);
-      }
-
-      &:active {
-        transform: scale(0.95);
-      }
     }
 
     &-image {
