@@ -87,7 +87,7 @@ const Settings = (): JSX.Element => {
                   <div className="SettingsModal__profile-picture-display">
                     {persona?.profilePic ? (
                       <img 
-                        src={assetLinkLoader(persona.profilePic, AssetDisplayPrefix.CHARACTER_PIC_SMALL)} 
+                        src={assetLinkLoader(persona.profilePic, AssetDisplayPrefix.PROFILE_PIC_SMALL)} 
                         alt={persona.name || 'Persona'} 
                         className="SettingsModal__profile-picture-image"
                       />

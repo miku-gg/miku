@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 // Define a type for the modal types
 export type ModalType =
+  | 'customPersona'
   | 'background'
   | 'backgroundSearch'
   | 'song'
@@ -88,6 +89,9 @@ const initialState: InputState = {
       opened: false,
     },
     cutscenes: {
+      opened: false,
+    },
+    customPersona: {
       opened: false,
     },
     cutscenePartEdit: {

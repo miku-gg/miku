@@ -199,7 +199,7 @@ const InputBox = (): JSX.Element => {
         <div className="InputBox__persona-icon">
           {persona?.profilePic ? (
             <img 
-              src={assetLinkLoader(persona.profilePic, AssetDisplayPrefix.CHARACTER_PIC_SMALL)} 
+              src={assetLinkLoader(persona.profilePic, AssetDisplayPrefix.PROFILE_PIC_SMALL)} 
               alt={persona.name || 'Persona'} 
               className="InputBox__persona-image"
             />

@@ -283,7 +283,6 @@ export const {
   setMemoryCapacityModal,
   setModel,
   setName,
-  setProfilePicture,
   setIsDraggable,
   setSystemPrompt,
   setFontSize,

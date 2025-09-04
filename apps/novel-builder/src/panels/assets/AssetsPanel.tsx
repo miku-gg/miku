@@ -1,6 +1,7 @@
 import './AssetsPanel.scss';
 import Backgrounds from './backgrounds/Backgrounds';
 import Characters from './characters/Characters';
+import CustomPersona from './customPersona/CustomPersona';
 import InventoryItems from './inventory/InventoryItems';
 import Songs from './songs/Songs';
 import { useEffect } from 'react';
@@ -24,6 +25,7 @@ export default function AssetsPanel() {
         <h1>Assets</h1>
       </div>
       <div className="AssetsPanel__groups">
+        <CustomPersona />
         <Characters />
         <Backgrounds />
         <Songs />

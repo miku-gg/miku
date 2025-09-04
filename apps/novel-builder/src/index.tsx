@@ -11,6 +11,7 @@ import LorebookEditModal from './modals/LorebookEditModal';
 import SongEditModal from './modals/SongEditModal';
 import SongSearchModal from './modals/SongSearchModal';
 import CharacterEditModal from './modals/character/CharacterEditModal';
+import CustomPersonaEditModal from './modals/customPersona/CustomPersonaEditModal';
 import ActionEditModal from './modals/items/ActionEditModal';
 import ItemEditModal from './modals/items/ItemEditModal';
 import MapEditModal from './modals/map/MapEditModal';
@@ -65,6 +66,7 @@ ReactDOM.render(
         <SongEditModal />
         <SongSearchModal />
         <CharacterEditModal />
+        <CustomPersonaEditModal />
         <LorebookEditModal />
         <LoadingModal />
         <MapEditModal />

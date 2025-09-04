@@ -1,4 +1,5 @@
 import { CharacterBook, NovelV3 } from '@mikugg/bot-utils';
+import { NovelPersona } from '../../../../interactor/src/state/versioning/v3.state';
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { v4 as randomUUID } from 'uuid';
@@ -27,7 +28,7 @@ export interface PendingInference {
   itemId?: string; // used by item type (if needed)
 }
 
-const initialState: NovelV3.NovelState & { pendingInferences?: PendingInference[] } = {
+const initialState: NovelV3.NovelState & { pendingInferences?: PendingInference[]; customPersona?: NovelPersona } = {
   title: '',
   description: '',
   logoPic: '',
@@ -44,6 +45,7 @@ const initialState: NovelV3.NovelState & { pendingInferences?: PendingInference[
   cutscenes: [],
   language: 'en',
   pendingInferences: [],
+  customPersona: undefined,
 };
 
 const novelFormSlice = createSlice({
@@ -89,6 +91,20 @@ const novelFormSlice = createSlice({
       const index = state.songs.findIndex((song) => song.id === action.payload);
       if (index === -1) return;
       state.songs.splice(index, 1);
+    },
+    createCustomPersona: (state, action: PayloadAction<string>) => {
+      const customPersona: NovelPersona = {
+        name: 'Custom Persona',
+        description: null,
+        profilePic: 'empty_char.png',
+      };
+      state.customPersona = customPersona;
+    },
+    updateCustomPersona: (state, action: PayloadAction<NovelPersona>) => {
+      state.customPersona = action.payload;
+    },
+    deleteCustomPersona: (state, action: PayloadAction<string>) => {
+      state.customPersona = undefined;
     },
     createCharacter: (state, action: PayloadAction<string>) => {
       const id = action.payload;
@@ -747,6 +763,9 @@ export const {
   addSong,
   updateSong,
   deleteSong,
+  createCustomPersona,
+  updateCustomPersona,
+  deleteCustomPersona,
   createCharacter,
   updateCharacter,
   deleteCharacter,
