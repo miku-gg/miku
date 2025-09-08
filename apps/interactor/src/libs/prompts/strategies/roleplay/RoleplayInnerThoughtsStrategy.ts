@@ -67,17 +67,6 @@ export class RoleplayInnerThoughtsStrategy extends AbstractPromptStrategy<RootSt
     template += `${INPUT_END}${OUTPUT_START}`;
     template += `{{GEN inner_thoughts max_tokens=${maxNewTokens} stop=["\\"", "\\n"]}}`;
 
-    console.log('RoleplayInnerThoughtsStrategy - buildGuidancePrompt:', {
-      characterName,
-      characterResponse,
-      template,
-      variables: {
-        character_name: characterName,
-        character_response: characterResponse,
-        inner_thoughts: '',
-      }
-    });
-
     return {
       template,
       variables: {
@@ -93,13 +82,6 @@ export class RoleplayInnerThoughtsStrategy extends AbstractPromptStrategy<RootSt
     const innerThoughts = variables.get('inner_thoughts') || '';
     const selectedCharacterId = response.selectedCharacterId;
     
-    console.log('RoleplayInnerThoughtsStrategy - completeResponse:', {
-      innerThoughts,
-      selectedCharacterId,
-      variables: Object.fromEntries(variables),
-      originalResponse: response
-    });
-    
     // Update the innerThoughts field
     const updatedResponse = {
       ...response,
@@ -113,8 +95,6 @@ export class RoleplayInnerThoughtsStrategy extends AbstractPromptStrategy<RootSt
         return char;
       }),
     };
-
-    console.log('RoleplayInnerThoughtsStrategy - updatedResponse:', updatedResponse);
     return updatedResponse;
   }
 

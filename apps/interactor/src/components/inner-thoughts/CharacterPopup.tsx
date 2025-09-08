@@ -10,6 +10,7 @@ import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { RoleplayInnerThoughtsStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayInnerThoughtsStrategy';
 import textCompletion from '../../libs/textCompletion';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
+import { toast } from 'react-toastify';
 import './CharacterPopup.scss';
 
 interface CharacterPopupProps {
@@ -67,13 +68,6 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
   const generateInnerThoughts = async () => {
     if (isGeneratingThoughts) return;
     
-    console.log('CharacterPopup - generateInnerThoughts started:', {
-      character: character.name,
-      characterId: character.id,
-      lastResponse,
-      isGeneratingThoughts
-    });
-    
     // Check if there's already a response from this character
     // If there's none, we should not generate inner thoughts
     const currentCharacterResponse = lastResponse?.characters.find(char => char.characterId === character.id);
@@ -92,7 +86,6 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       });
       
       const prompt = promptBuilder.buildPrompt(state, 30);
-      console.log('CharacterPopup - Built prompt:', prompt);
       
       const stream = textCompletion({
         template: prompt.template,
@@ -127,9 +120,17 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         }
       }
       setIsGeneratingThoughts(false);
+      
+      const finalCharacter = response?.characters.find(char => char.characterId === character.id);
+      const finalResponse = finalCharacter?.innerThoughts?.trim();
+      if (!finalResponse) {
+        toast.error('Failed to generate inner thoughts');
+      }
 
     } catch (error) {
       setIsGeneratingThoughts(false);
+      console.error(error);
+      toast.error('Failed to generate inner thoughts');
     }
   };
 
