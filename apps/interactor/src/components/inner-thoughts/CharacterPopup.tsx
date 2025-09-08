@@ -2,6 +2,7 @@ import React from 'react';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { IoChatbubbleEllipsesSharp } from 'react-icons/io5';
 import { FaSpinner } from 'react-icons/fa';
+import { Tooltip } from '@mikugg/ui-kit';
 import InnerThoughtsBox from './InnerThoughtsBox';
 import { useAppContext } from '../../App.context';
 import { useAppSelector } from '../../state/store';
@@ -10,6 +11,8 @@ import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { RoleplayInnerThoughtsStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayInnerThoughtsStrategy';
 import textCompletion from '../../libs/textCompletion';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
+import { CustomEventType, postMessage } from '../../libs/stateEvents';
+import { useI18n } from '../../libs/i18n';
 import { toast } from 'react-toastify';
 import './CharacterPopup.scss';
 
@@ -31,9 +34,11 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
   isVisible,
   innerThoughts = [],
 }) => {
-  const { servicesEndpoint } = useAppContext();
+  const { servicesEndpoint, isProduction } = useAppContext();
   const state = useAppSelector((state) => state);
   const lastResponse = useAppSelector(selectLastLoadedResponse);
+  const isPremium = useAppSelector((state) => state.settings.user.isPremium);
+  const { i18n } = useI18n();
   
   const [isHovered, setIsHovered] = React.useState(false);
   const [isClicked, setIsClicked] = React.useState(false);
@@ -64,6 +69,16 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       return () => window.removeEventListener('resize', updatePosition);
     }
   }, [isVisible, character.name]);
+
+  const handleCharacterClick = () => {
+    // Check if user is premium
+    if (!isPremium) {
+      // prompt the suscription upgrade
+      postMessage(CustomEventType.OPEN_PREMIUM);
+      return;
+    }
+    generateInnerThoughts();
+  };
 
   const generateInnerThoughts = async () => {
     if (isGeneratingThoughts) return;
@@ -162,11 +177,17 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         ) : (
            <IoChatbubbleEllipsesSharp 
              className={`CharacterPopup__icon ${
-               !lastResponse?.characters.find(char => char.characterId === character.id)?.text 
+               !lastResponse?.characters.find(char => char.characterId === character.id)?.text || (!isPremium && isProduction)
                  ? 'CharacterPopup__icon--disabled' 
                  : ''
              }`}
-             onClick={generateInnerThoughts}
+             onClick={handleCharacterClick}
+             data-tooltip-id="inner-thoughts-tooltip"
+             data-tooltip-content={
+               !isPremium && isProduction
+                 ? i18n('this_is_a_premium_feature')
+                 : ''
+             }
            />
         )}
       </div>
@@ -181,6 +202,8 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
           setIsHovered(false);
         }}
       />
+      
+      <Tooltip id="inner-thoughts-tooltip" place="top" />
     </div>
   );
 };
