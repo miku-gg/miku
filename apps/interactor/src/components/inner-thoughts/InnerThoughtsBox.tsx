@@ -45,7 +45,6 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({
               onClick={onClose}
               aria-label="Close inner thoughts"
             >
-              ×
             </button>
           </div>
         </div>

@@ -57,13 +57,15 @@ export class RoleplayInnerThoughtsStrategy extends AbstractPromptStrategy<RootSt
     
     // Get the character's response text to provide context
     const currentCharacter = currentResponse?.characters.find(char => char.characterId === selectedCharacterId);
+    const currentReaction = currentCharacter?.emotion || '';
     const characterResponse = currentCharacter?.text || '';
     
     // the template that the AI will autocomplete
     const { BOS, SYSTEM_START, SYSTEM_END, INPUT_START, INPUT_END, OUTPUT_START } = this.instructTemplate;
     
-    let template = `${BOS}${SYSTEM_START}You are completing the inner thoughts for a character. Generate what the character is thinking based on their response. Write the inner thoughts in first person from the character's perspective (use "I", "me", "my", etc.).${SYSTEM_END}`;
-    template += `${INPUT_START}${characterName}: "${characterResponse}"\n${this.i18n('inner_thoughts_prompt', [characterName])}`;
+    let template = `${BOS}${SYSTEM_START}You are completing the inner thoughts for a character. Generate what the character is thinking based on their reaction and response. Write the inner thoughts in first person from the character's perspective (use "I", "me", "my", etc.).${SYSTEM_END}`;
+    template += `${INPUT_START}${characterName}'s reaction: "${currentReaction}"\n`;
+    template += `${characterName}: "${characterResponse}"\n${this.i18n('inner_thoughts_prompt', [characterName])}`;
     template += `${INPUT_END}${OUTPUT_START}`;
     template += `{{GEN inner_thoughts max_tokens=${maxNewTokens} stop=["\\"", "\\n"]}}`;
 
