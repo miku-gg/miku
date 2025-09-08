@@ -84,6 +84,7 @@ export interface NarrationState {
   responses: {
     [id: string]: NarrationResponse | undefined;
   };
+  freeThoughtUsed?: boolean;
   seenHints?: string[];
   createdIndicatorIds?: string[];
   hasPlayedGlobalStartCutscene?: boolean;

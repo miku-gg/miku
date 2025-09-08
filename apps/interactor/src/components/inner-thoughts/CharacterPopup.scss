@@ -33,9 +33,21 @@
     pointer-events: auto;
     cursor: pointer;
     transition: color 0.2s ease;
+    outline: none;
+    border: none;
 
     &:hover {
         color: #a78bfa;
+    }
+
+    &:focus {
+        outline: none;
+        border: none;
+    }
+
+    &:active {
+        outline: none;
+        border: none;
     }
 
     &--spinner {

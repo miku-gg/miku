@@ -5,8 +5,9 @@ import { FaSpinner } from 'react-icons/fa';
 import { Tooltip } from '@mikugg/ui-kit';
 import InnerThoughtsBox from './InnerThoughtsBox';
 import { useAppContext } from '../../App.context';
-import { useAppSelector } from '../../state/store';
+import { useAppSelector, useAppDispatch } from '../../state/store';
 import { selectLastLoadedResponse } from '../../state/selectors';
+import { setFreeThoughtUsed } from '../../state/slices/narrationSlice';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { RoleplayInnerThoughtsStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayInnerThoughtsStrategy';
 import textCompletion from '../../libs/textCompletion';
@@ -35,9 +36,11 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
   innerThoughts = [],
 }) => {
   const { servicesEndpoint, isProduction } = useAppContext();
+  const dispatch = useAppDispatch();
   const state = useAppSelector((state) => state);
   const lastResponse = useAppSelector(selectLastLoadedResponse);
   const isPremium = useAppSelector((state) => state.settings.user.isPremium);
+  const freeThoughtUsed = useAppSelector((state) => state.narration.freeThoughtUsed);
   const { i18n } = useI18n();
   
   const [isHovered, setIsHovered] = React.useState(false);
@@ -73,9 +76,12 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
   const handleCharacterClick = () => {
     // Check if user is premium
     if (!isPremium) {
-      // prompt the suscription upgrade
-      postMessage(CustomEventType.OPEN_PREMIUM);
-      return;
+      // Check if free thought has already been used for non-premium users
+      if (freeThoughtUsed) {
+        // prompt the suscription upgrade
+        postMessage(CustomEventType.OPEN_PREMIUM);
+        return;
+      }
     }
     generateInnerThoughts();
   };
@@ -131,6 +137,9 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
           if (!hasShownWindow) {
             setShowInnerThoughts(true);
             hasShownWindow = true;
+            // Mark free thought as used when window is successfully displayed
+            // only if the user is not premium
+            if(!isPremium) dispatch(setFreeThoughtUsed(true));
           }
         }
       }
@@ -177,7 +186,7 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         ) : (
            <IoChatbubbleEllipsesSharp 
              className={`CharacterPopup__icon ${
-               !lastResponse?.characters.find(char => char.characterId === character.id)?.text || (!isPremium && isProduction)
+               !lastResponse?.characters.find(char => char.characterId === character.id)?.text || (freeThoughtUsed && !isPremium)
                  ? 'CharacterPopup__icon--disabled' 
                  : ''
              }`}
