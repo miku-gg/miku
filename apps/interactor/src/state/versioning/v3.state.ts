@@ -44,6 +44,7 @@ export interface NarrationResponse {
     emotion: string;
     pose: string;
     text: string;
+    innerThoughts?: string;
     reasoning?: string;
   }[];
   childrenInteractions: {

@@ -1,0 +1,182 @@
+@import '../../_variables.scss';
+@import '../chat-box/ResponseBox.scss';
+
+// Ensure InnerThoughtsBox always stays on top
+.InnerThoughtsBox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Always present but only clickable when visible
+  &--hidden {
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  &--visible {
+    pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+  }
+
+  &__container {
+    position: relative;
+    background: linear-gradient(#0c0a1d 0%, #1e1a41 100%);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 70vh;
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    animation: grow 0.3s ease forwards;
+    text-align: left;
+
+    &--visible {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+  }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    // Ensure TTS button gets proper styling
+    .ResponseBox__voice {
+      font-family: 'Poppins', 'Roboto', sans-serif;
+      background: transparent !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      border-radius: 8px !important;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
+      }
+      
+      &:disabled {
+        background: transparent !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        opacity: 0.5;
+      }
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: lightgray;
+    font-family: 'Poppins', 'Roboto', sans-serif;
+  }
+
+  &__close-button {
+    background: none;
+    border: none;
+    color: $text-2;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+
+    &:hover {
+      color: $text-1;
+      background-color: $background-color-light;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &__content {
+    padding: 0 0.5rem 0.5rem 0.5rem;
+    height: calc(2.5 * 2.5em); // 2.5 lines with 2.5em line-height
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #a78bfa $background-color-dark;
+
+    &::-webkit-scrollbar {
+      width: 0.3rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $background-color-dark;
+      border-radius: 100vh;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #a78bfa;
+      border-radius: 100vh;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #c4b5fd;
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    color: lightgray;
+    font-style: italic;
+    font-size: 1rem;
+    margin: 2rem 0;
+    font-family: 'Poppins', 'Roboto', sans-serif;
+  }
+
+  &__thoughts-text {
+    color: lightgray;
+    font-family: 'Poppins', 'Roboto', sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .InnerThoughtsBox {
+    &__container {
+      width: 95%;
+      max-height: 80vh;
+    }
+
+    &__content {
+      padding: 0.5rem;
+      height: calc(2.5 * 2.5em); // 2.5 lines with 2.5em line-height on mobile too
+    }
+  }
+}
