@@ -6,37 +6,37 @@ export class RoleplayInnerThoughtsStrategy extends AbstractPromptStrategy<RootSt
   protected getLabels(): Record<string, Record<string, string>> {
     const labels = {
       en: {
-        inner_thoughts_prompt: '%\'s inner thoughts (first person): "',
+        inner_thoughts_prompt: '%\'s inner thoughts: "',
       },
       es: {
-        inner_thoughts_prompt: 'Pensamientos internos de % (primera persona): "',
+        inner_thoughts_prompt: 'Pensamientos internos de %: "',
       },
       es_es: {
-        inner_thoughts_prompt: 'Pensamientos internos de % (primera persona): "',
+        inner_thoughts_prompt: 'Pensamientos internos de %: "',
       },
       fr: {
-        inner_thoughts_prompt: 'Pensées intérieures de % (première personne): "',
+        inner_thoughts_prompt: 'Pensées intérieures de %"',
       },
       de: {
-        inner_thoughts_prompt: 'Innere Gedanken von % (erste Person): "',
+        inner_thoughts_prompt: 'Innere Gedanken von %: "',
       },
       it: {
-        inner_thoughts_prompt: 'Pensieri interiori di % (prima persona): "',
+        inner_thoughts_prompt: 'Pensieri interiori di %: "',
       },
       pt: {
-        inner_thoughts_prompt: 'Pensamentos internos de % (primeira pessoa): "',
+        inner_thoughts_prompt: 'Pensamentos internos de %: "',
       },
       ru: {
-        inner_thoughts_prompt: 'Внутренние мысли % (от первого лица): "',
+        inner_thoughts_prompt: 'Внутренние мысли %: "',
       },
       ja: {
-        inner_thoughts_prompt: '%の内面の思考 (一人称): "',
+        inner_thoughts_prompt: '%の内面の思考: "',
       },
       ko: {
-        inner_thoughts_prompt: '%의 내면의 생각 (1인칭): "',
+        inner_thoughts_prompt: '%의 내면의 생각: "',
       },
       zh: {
-        inner_thoughts_prompt: '%的内心想法 (第一人称): "',
+        inner_thoughts_prompt: '%的内心想法: "',
       },
     };
     return labels;
@@ -63,11 +63,16 @@ export class RoleplayInnerThoughtsStrategy extends AbstractPromptStrategy<RootSt
     // the template that the AI will autocomplete
     const { BOS, SYSTEM_START, SYSTEM_END, INPUT_START, INPUT_END, OUTPUT_START } = this.instructTemplate;
     
-    let template = `${BOS}${SYSTEM_START}You are completing the inner thoughts for a character. Generate what the character is thinking based on their reaction and response. Write the inner thoughts in first person from the character's perspective (use "I", "me", "my", etc.).${SYSTEM_END}`;
-    template += `${INPUT_START}${characterName}'s reaction: "${currentReaction}"\n`;
-    template += `${characterName}: "${characterResponse}"\n${this.i18n('inner_thoughts_prompt', [characterName])}`;
+    let template = `${BOS}${SYSTEM_START}You are ${characterName}. Based on what was said to you and your response, write your inner thoughts. Write ONLY your internal thoughts, feelings, opinions, and mental reactions.`;
+    template += `Do NOT describe actions, movements, or external observations. Do NOT explain what you are doing or reference your role. Do NOT label your thoughts. `;
+    template += `Write in first person (use "I", "me", "my", etc.). Don't say "My inner thoughts" or "My thoughts", or ${characterName}'s inner thoughts, or anything like that.`;
+    template += `Just write your thoughts directly without any prefix or explanation.${SYSTEM_END}`;
+    template += `${INPUT_START}`;
+    template += `${characterName}'s reaction: "${currentReaction}"\n`;
+    template += `${characterName}: "${characterResponse}"\n`;
+    template += `${characterName}'s inner thoughts: `;
     template += `${INPUT_END}${OUTPUT_START}`;
-    template += `{{GEN inner_thoughts max_tokens=${maxNewTokens} stop=["\\"", "\\n"]}}`;
+    template += `{{GEN inner_thoughts max_tokens=${maxNewTokens} stop=["\\n"]}}`;
 
     return {
       template,
