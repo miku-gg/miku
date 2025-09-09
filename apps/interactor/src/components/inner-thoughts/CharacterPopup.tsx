@@ -201,7 +201,6 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         isVisible={showInnerThoughts}
         thoughts={generatedThoughts ? [generatedThoughts] : innerThoughts}
         characterName={character.name}
-        isGenerating={isGeneratingThoughts}
         onClose={() => {
           setShowInnerThoughts(false);
           setIsClicked(false);
