@@ -13,7 +13,7 @@ import { useAppContext } from '../../App.context';
 import { trackEvent } from '../../libs/analytics';
 import { BackgroundResult, CharacterResult, listSearch, SearchType } from '../../libs/listSearch';
 import { loadNovelFromSingleCard } from '../../libs/loadNovel';
-import { selectCurrentIndicators, selectCurrentScene } from '../../state/selectors';
+import { selectAllParentScenesIds, selectCurrentIndicators, selectCurrentScene } from '../../state/selectors';
 import {
   addImportedBackground,
   addImportedCharacter,
@@ -39,17 +39,57 @@ import './CreateScene.scss';
 import CreditsDisplayer from './CreditsDisplayer';
 import { useI18n } from '../../libs/i18n';
 
+// Selector to get all character IDs that have been met in visited scenes
+// This uses a more efficient approach by limiting to recent scenes only
+const selectMetCharacterIds = createSelector(
+  [
+    (state: RootState) => state.novel.scenes,
+    selectCurrentScene,
+    selectAllParentScenesIds,
+  ],
+  (scenes, currentScene, visitedSceneIds) => {
+    const metCharacterIds = new Set<string>(); 
+    if (currentScene) { // Always include characters from the current scene
+      currentScene.characters.forEach(char => {
+        metCharacterIds.add(char.characterId);
+      });
+    }
+    // Limit to the last 100 scenes to avoid performance issues
+    const recentSceneIds = visitedSceneIds.slice(-100);
+    recentSceneIds.forEach(sceneId => {
+      const scene = scenes.find(s => s.id === sceneId);
+      if (scene) {
+        scene.characters.forEach(char => {
+          metCharacterIds.add(char.characterId);
+        });
+      }
+    });
+    return Array.from(metCharacterIds);
+  },
+);
+
 const selectSelectableCharacters = createSelector(
-  [(state: RootState) => state.novel.characters, (state: RootState) => state.creation.importedCharacters],
-  (characters, importedCharacters) =>
-    [...characters, ...importedCharacters].map((character) => {
-      if (!character) return null;
-      return {
-        id: character.id,
-        name: character.name,
-        outfits: character.card.data.extensions.mikugg_v2.outfits,
-      };
-    }),
+  [
+    (state: RootState) => state.novel.characters, 
+    (state: RootState) => state.creation.importedCharacters,
+    selectMetCharacterIds,
+  ],
+  (characters, importedCharacters, metCharacterIds) =>
+    [...characters, ...importedCharacters]
+      .filter((character) => {
+        if (!character) return false;
+        // Include characters that are not hidden
+        if (character.hidden !== true) return true;
+        return metCharacterIds.includes(character.id);
+      })
+      .map((character) => {
+        if (!character) return null;
+        return {
+          id: character.id,
+          name: character.name,
+          outfits: character.card.data.extensions.mikugg_v2.outfits,
+        };
+      }),
 );
 
 // Definition: Defines the CreateSceneModal component

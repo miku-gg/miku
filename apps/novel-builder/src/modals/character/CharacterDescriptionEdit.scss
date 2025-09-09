@@ -75,7 +75,18 @@
   .Input__textArea {
     height: 4em;
   }
+
+  &__checkbox {
+    display: flex;
+    align-items: center;
+    padding-top: 10px;
+  }
 }
+
+.Modal__overlay.AreYouSure__overlay--high-z-index {
+  z-index: 999999 !important;
+}
+
 .disabled {
   & button {
     background-color: #808080;

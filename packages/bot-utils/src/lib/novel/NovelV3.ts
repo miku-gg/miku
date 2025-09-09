@@ -88,6 +88,7 @@ export interface CutScene {
 export interface NovelCharacter {
   id: string;
   name: string;
+  hidden?: boolean;
   profile_pic: string;
   short_description: string;
   tags: string[];

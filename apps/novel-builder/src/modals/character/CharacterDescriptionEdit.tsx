@@ -1,4 +1,4 @@
-import { DragAndDropImages, Input, Modal, TagAutocomplete } from '@mikugg/ui-kit';
+import { AreYouSure, CheckBox, DragAndDropImages, Input, Modal, TagAutocomplete } from '@mikugg/ui-kit';
 import { useState } from 'react';
 import { BsStars } from 'react-icons/bs';
 import { toast } from 'react-toastify';
@@ -41,6 +41,7 @@ export default function CharacterDescriptionEdit({ characterId }: { characterId?
   const [isGenerating, setIsGenerating] = useState(false);
 
   const dispatch = useAppDispatch();
+  const areYouSure = AreYouSure.useAreYouSure();
   const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === characterId));
   const GenerateCharacterModal = useAppSelector((state) => state.input.modals.characterGeneration.opened);
 
@@ -145,6 +146,34 @@ export default function CharacterDescriptionEdit({ characterId }: { characterId?
                 }
                 className="CharacterDescriptionEdit__input"
               />
+              <div className="CharacterDescriptionEdit__checkbox">
+                <CheckBox
+                    label="Hidden"
+                    value={character?.hidden || false}
+                    onChange={(e) => {
+                      const nextIsHidden = e.target.checked;
+                      if (nextIsHidden) {
+                        areYouSure.openModal({
+                          title: 'Are you sure?',
+                          description: (
+                            <>
+                              Marking a character as hidden will exclude them from scene creation.
+                              <br />
+                              They will remain hidden from scenes until the player has met them.
+                            </>
+                          ),
+                          onYes: () => {
+                            dispatch(updateCharacter({ ...character, hidden: nextIsHidden }));
+                          },
+                          overlayClassName: 'AreYouSure__overlay--high-z-index',
+                        });
+                      }
+                      else {
+                        dispatch(updateCharacter({ ...character, hidden: false }));
+                      }
+                    }}
+                  />
+              </div>
             </div>
             <div className="CharacterDescriptionEdit__version">
               <Input

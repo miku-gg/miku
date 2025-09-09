@@ -95,6 +95,7 @@ const novelFormSlice = createSlice({
       const character: NovelV3.NovelCharacter = {
         id,
         name: 'char1',
+        hidden: false,
         short_description: '',
         profile_pic: 'empty_char.png',
         tags: [],

@@ -10,6 +10,7 @@ export interface AreYouSureSettings {
   noLabel?: string;
   onNo?: () => void;
   onYes: () => Promise<void> | void;
+  overlayClassName?: string;
 }
 
 const DEFAULT_ARE_YOU_SURE_SETTINGS: AreYouSureSettings = {
@@ -61,7 +62,7 @@ export const AreYouSureProvider: React.FC<AreYouSureProviderProps> = ({ children
   return (
     <AreYouSureContext.Provider value={{ isOpen, openModal, closeModal }}>
       {children}
-      <Modal opened={isOpen} onCloseModal={closeModal} shouldCloseOnOverlayClick title={settings?.title}>
+      <Modal opened={isOpen} onCloseModal={closeModal} shouldCloseOnOverlayClick title={settings?.title} overlayClassName={settings?.overlayClassName}>
         <p className="AreYouSure__description">{settings?.description || ''}</p>
         <div className="AreYouSure__actions">
           <Button
