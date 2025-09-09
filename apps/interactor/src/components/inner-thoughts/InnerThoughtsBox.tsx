@@ -39,7 +39,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({
             {characterName ? `${characterName}'s Inner Thoughts` : 'Inner Thoughts'}
           </h3>
           <div className="InnerThoughtsBox__header-actions">
-            <TTSPlayer />
+            <TTSPlayer text={thoughts.length > 0 ? thoughts.join(' ') : undefined} />
             <button 
               className="InnerThoughtsBox__close-button"
               onClick={onClose}

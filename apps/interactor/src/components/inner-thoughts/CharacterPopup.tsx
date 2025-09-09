@@ -124,7 +124,6 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       }
       
       // here starts the stream processing
-      let hasShownWindow = false;
       
       for await (const result of stream) {
         response = promptBuilder.completeResponse(response, result, state);        
@@ -132,22 +131,19 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         const currentCharacter = response?.characters.find(char => char.characterId === character.id);
         if (currentCharacter?.innerThoughts && currentCharacter.innerThoughts.trim()) {
           setGeneratedThoughts(currentCharacter.innerThoughts);
-          
-          // Show the window only when we have actual content
-          if (!hasShownWindow) {
-            setShowInnerThoughts(true);
-            hasShownWindow = true;
-            // Mark free thought as used when window is successfully displayed
-            // only if the user is not premium
-            if(!isPremium) dispatch(setFreeThoughtUsed(true));
-          }
         }
       }
       setIsGeneratingThoughts(false);
       
       const finalCharacter = response?.characters.find(char => char.characterId === character.id);
       const finalResponse = finalCharacter?.innerThoughts?.trim();
-      if (!finalResponse) {
+      if (finalResponse) {
+        // Show window only when generation is completely
+        setShowInnerThoughts(true);
+        // Mark free thought as used when window is successfully displayed
+        // only if the user is not premium
+        if(!isPremium) dispatch(setFreeThoughtUsed(true));
+      } else {
         toast.error('Failed to generate inner thoughts');
       }
 
@@ -205,6 +201,7 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         isVisible={showInnerThoughts}
         thoughts={generatedThoughts ? [generatedThoughts] : innerThoughts}
         characterName={character.name}
+        isGenerating={isGeneratingThoughts}
         onClose={() => {
           setShowInnerThoughts(false);
           setIsClicked(false);
