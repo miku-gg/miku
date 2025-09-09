@@ -39,6 +39,9 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
   const dispatch = useAppDispatch();
   const state = useAppSelector((state) => state);
   const lastResponse = useAppSelector(selectLastLoadedResponse);
+  const isCurrentResponseFetching = useAppSelector(
+    (state) => state.narration.responses[state.narration.currentResponseId]?.fetching || false,
+  );
   const isPremium = useAppSelector((state) => state.settings.user.isPremium);
   const freeThoughtUsed = useAppSelector((state) => state.narration.freeThoughtUsed);
   const { i18n } = useI18n();
@@ -74,14 +77,15 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
   }, [isVisible, character.name]);
 
   const handleCharacterClick = () => {
-    // Check if user is premium
-    if (!isPremium) {
-      // Check if free thought has already been used for non-premium users
-      if (freeThoughtUsed) {
+    // Don't allow clicking when response is fetching
+    if (isCurrentResponseFetching) {
+      return;
+    }
+    // Check if free thought has already been used for non-premium users
+    if (!isPremium && freeThoughtUsed) {
         // prompt the suscription upgrade
         postMessage(CustomEventType.OPEN_PREMIUM);
         return;
-      }
     }
     generateInnerThoughts();
   };
@@ -163,7 +167,7 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       <div 
         className="CharacterPopup__container"
         style={{
-          opacity: (isHovered || isClicked) ? 1 : 0,
+          opacity: (isHovered || isClicked || isGeneratingThoughts) ? 1 : 0,
         }}
         onMouseEnter={() => {
           setIsHovered(true);
@@ -179,10 +183,11 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
               animation: 'spin 1s linear infinite',
             }}
           />
-        ) : (
+        ) : isCurrentResponseFetching ? null : (
            <IoChatbubbleEllipsesSharp 
              className={`CharacterPopup__icon ${
-               !lastResponse?.characters.find(char => char.characterId === character.id)?.text || (freeThoughtUsed && !isPremium)
+               !lastResponse?.characters.find(char => char.characterId === character.id)?.text || 
+               (freeThoughtUsed && !isPremium)
                  ? 'CharacterPopup__icon--disabled' 
                  : ''
              }`}
