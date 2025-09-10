@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import { fillTextTemplate } from '../../../libs/prompts/strategies';
 import EmotionRenderer from '../../emotion-render/EmotionRenderer';
 import { useI18n } from '../../../libs/i18n';
+import { useEffect, useRef, useState } from 'react';
 import './SceneListWindow.scss';
 
 interface SceneListWindowProps {
@@ -26,6 +27,35 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
   const currentIndicators = useAppSelector(selectCurrentIndicators);
   const currentScene = useAppSelector(selectCurrentScene);
   const userName = useAppSelector((state) => state.settings.user.name);
+  
+  const [topFadeSize, setTopFadeSize] = useState(0);
+  const [bottomFadeSize, setBottomFadeSize] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    const maxFadeSize = 60;
+    
+    // Calculate top fade size (0 to 60px based on scroll position)
+    const topFade = Math.min(maxFadeSize, Math.max(0, scrollTop));
+    setTopFadeSize(topFade);
+    
+    // Calculate bottom fade size (0 to 60px based on distance from bottom)
+    const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
+    const bottomFade = Math.min(maxFadeSize, Math.max(0, distanceFromBottom));
+    setBottomFadeSize(bottomFade);
+  };
+
+  useEffect(() => {
+    const scrollElement = scrollRef.current;
+    if (!scrollElement) return;
+
+    handleScroll();
+    scrollElement.addEventListener('scroll', handleScroll);
+    return () => scrollElement.removeEventListener('scroll', handleScroll);
+  }, [availableScenes]);
 
   const handleGoToScene = (sceneId: string) => {
     if (isInteractionDisabled) {
@@ -95,7 +125,14 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
       onCloseModal={onClose}
       shouldCloseOnOverlayClick
     >
-      <div className="SceneListWindow__content">
+      <div 
+        className="SceneListWindow__scroll-container"
+        style={{
+          mask: `linear-gradient(to bottom, transparent 0px, black ${Math.max(1, topFadeSize)}px, black calc(100% - ${Math.max(1, bottomFadeSize)}px), transparent 100%)`,
+          WebkitMask: `linear-gradient(to bottom, transparent 0px, black ${Math.max(1, topFadeSize)}px, black calc(100% - ${Math.max(1, bottomFadeSize)}px), transparent 100%)`
+        }}
+      >
+        <div className="SceneListWindow__content scrollbar" ref={scrollRef}>
         {(() => {
           // Move current scene to index 0 if it exists in availableScenes
           const orderedScenes = [...availableScenes];
@@ -167,6 +204,7 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
             );
           });
         })()}
+        </div>
       </div>
     </Modal>
   );

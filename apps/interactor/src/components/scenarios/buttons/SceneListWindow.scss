@@ -37,12 +37,44 @@
   }
 }
 
+.SceneListWindow__scroll-container {
+  position: relative;
+  max-height: 80vh;
+  overflow: hidden;
+  /* Mask will be applied via inline styles for dynamic behavior */
+}
+
 
 .SceneListWindow__content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   padding: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+  
+  // Scrollbar styling to match project
+  &::-webkit-scrollbar {
+    width: 0.3em;
+  }
+  
+  &::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgb(167 139 250);
+    border-radius: 100vh;
+    border: 0;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgb(196 181 253);
+  }
+  
+  scrollbar-color: rgb(167 139 250) transparent;
+  scrollbar-width: auto;
 }
 
 .SceneListWindow__scene-button {
