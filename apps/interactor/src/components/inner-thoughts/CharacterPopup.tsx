@@ -9,7 +9,7 @@ import { useAppSelector, useAppDispatch } from '../../state/store';
 import { selectLastLoadedResponse } from '../../state/selectors';
 import { setFreeThoughtUsed } from '../../state/slices/narrationSlice';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
-import { RoleplayInnerThoughtsStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayInnerThoughtsStrategy';
+import { RoleplayPromptStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayPromptStrategy';
 import textCompletion from '../../libs/textCompletion';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
@@ -39,9 +39,7 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
   const dispatch = useAppDispatch();
   const state = useAppSelector((state) => state);
   const lastResponse = useAppSelector(selectLastLoadedResponse);
-  const isCurrentResponseFetching = useAppSelector(
-    (state) => state.narration.responses[state.narration.currentResponseId]?.fetching || false,
-  );
+  const { disabled: isCurrentResponseFetching } = useAppSelector((state) => state.narration.input);
   const isPremium = useAppSelector((state) => state.settings.user.isPremium);
   const freeThoughtUsed = useAppSelector((state) => state.narration.freeThoughtUsed);
   const { i18n } = useI18n();
@@ -81,12 +79,12 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
     if (isCurrentResponseFetching) {
       return;
     }
-    // Check if free thought has already been used for non-premium users
-    if (!isPremium && freeThoughtUsed) {
-        // prompt the suscription upgrade
-        postMessage(CustomEventType.OPEN_PREMIUM);
-        return;
-    }
+    // TODO: Re-enable premium check when ready
+    // if (!isPremium && freeThoughtUsed) {
+    //     // prompt the suscription upgrade
+    //     postMessage(CustomEventType.OPEN_PREMIUM);
+    //     return;
+    // }
     generateInnerThoughts();
   };
 
@@ -104,13 +102,21 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
     
     try {
       const modelMetadata = await retrieveModelMetadata(servicesEndpoint, state.settings.model);
-      const promptBuilder = new PromptBuilder<RoleplayInnerThoughtsStrategy>({
+      const promptBuilder = new PromptBuilder<RoleplayPromptStrategy>({
         maxNewTokens: 100,
-        strategy: new RoleplayInnerThoughtsStrategy(modelMetadata.strategy, state.novel.language || 'en', modelMetadata.has_reasoning),
+        strategy: new RoleplayPromptStrategy(
+          modelMetadata.strategy, 
+          state.novel.language || 'en', 
+          modelMetadata.has_reasoning,
+          true // includeInnerThoughts
+        ),
         truncationLength: modelMetadata.truncation_length - 150,
       });
       
-      const prompt = promptBuilder.buildPrompt(state, 30);
+      const prompt = promptBuilder.buildPrompt({
+        state,
+        currentCharacterId: character.id
+      }, 30);
       
       const stream = textCompletion({
         template: prompt.template,
@@ -130,7 +136,10 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       // here starts the stream processing
       
       for await (const result of stream) {
-        response = promptBuilder.completeResponse(response, result, state);        
+        response = promptBuilder.completeResponse(response, result, {
+          state,
+          currentCharacterId: character.id
+        });        
         // Update the generated thoughts as they come in
         const currentCharacter = response?.characters.find(char => char.characterId === character.id);
         if (currentCharacter?.innerThoughts && currentCharacter.innerThoughts.trim()) {
@@ -144,9 +153,8 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       if (finalResponse) {
         // Show window only when generation is completely
         setShowInnerThoughts(true);
-        // Mark free thought as used when window is successfully displayed
-        // only if the user is not premium
-        if(!isPremium) dispatch(setFreeThoughtUsed(true));
+        // TODO: Re-enable when premium check is restored
+        // if(!isPremium) dispatch(setFreeThoughtUsed(true));
       } else {
         toast.error('Failed to generate inner thoughts');
       }
@@ -186,18 +194,20 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         ) : isCurrentResponseFetching ? null : (
            <IoChatbubbleEllipsesSharp 
              className={`CharacterPopup__icon ${
-               !lastResponse?.characters.find(char => char.characterId === character.id)?.text || 
-               (freeThoughtUsed && !isPremium)
+               !lastResponse?.characters.find(char => char.characterId === character.id)?.text
+               //|| (freeThoughtUsed && !isPremium)
                  ? 'CharacterPopup__icon--disabled' 
                  : ''
              }`}
              onClick={handleCharacterClick}
              data-tooltip-id="inner-thoughts-tooltip"
+             data-tooltip-content=""
+             /*
              data-tooltip-content={
                !isPremium && isProduction
                  ? i18n('this_is_a_premium_feature')
                  : ''
-             }
+                 */
            />
         )}
       </div>
