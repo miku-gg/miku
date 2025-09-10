@@ -12,8 +12,16 @@ import { setModalOpened } from '../../state/slices/creationSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { getInitialBattleState } from '../../state/utils/battleUtils';
+import SceneListWindow from './buttons/SceneListWindow';
 
 const isTouchScreen = window.navigator.maxTouchPoints > 0;
+
+// Get all scenes from a comma-separated sceneId string
+export const getAvailableScenes = (sceneIdString?: string): string[] => {
+  if (!sceneIdString) return [];
+  const sceneIds = sceneIdString.split(',').map(id => id.trim()).filter(id => id.length > 0);
+  return sceneIds;
+};
 
 const InteractiveMapToggle = () => {
   const dispatch = useAppDispatch();
@@ -121,6 +129,8 @@ const InteractiveMapModal = ({
   const offScreenCanvasRef = useRef(document.createElement('canvas'));
   const maskImagesRef = useRef(new Map<string, HTMLImageElement>());
   const [highlightedPlaceId, setHighlightedPlaceId] = useState<string | null>(null);
+  const [showSceneSelection, setShowSceneSelection] = useState(false);
+  const [availableScenes, setAvailableScenes] = useState<string[]>([]);
   const highlightedPlace = map?.places.find((place) => place.id === highlightedPlaceId);
   const scenes = useAppSelector((state) => state.novel.scenes);
   const scene = scenes.find((scene) => scene.id === highlightedPlace?.sceneId);
@@ -284,15 +294,36 @@ const InteractiveMapModal = ({
       const selectedPlace = map?.places.find((p) => p.id === highlightedPlaceId);
       if (selectedPlace?.battleId) {
         handleStartBattle();
-      } else if (scene && selectedPlace?.sceneId !== currentScene?.id) {
-        dispatch(
-          setModalOpened({
-            id: 'scene-preview',
-            opened: true,
-            itemId: scene.id,
-          }),
-        );
-        trackEvent('scene-select');
+      } else {
+        // Get all available scenes from the place
+        const availableSceneIds = getAvailableScenes(selectedPlace?.sceneId);
+        
+        if (availableSceneIds.length > 1) {
+          // Multiple scenes available - show scene selection modal
+          setShowSceneSelection(true);
+          setAvailableScenes(availableSceneIds);
+          trackEvent('scene-select');
+        } else if (availableSceneIds.length === 1 && availableSceneIds[0] !== currentScene?.id) {
+          // Single scene available - open directly
+          dispatch(
+            setModalOpened({
+              id: 'scene-preview',
+              opened: true,
+              itemId: availableSceneIds[0],
+            }),
+          );
+          trackEvent('scene-select');
+        } else if (scene && selectedPlace?.sceneId !== currentScene?.id) {
+          // Fallback to the old behavior if no comma-separated sceneId is provided
+          dispatch(
+            setModalOpened({
+              id: 'scene-preview',
+              opened: true,
+              itemId: scene.id,
+            }),
+          );
+          trackEvent('scene-select');
+        }
       }
     }
   };
@@ -373,6 +404,14 @@ const InteractiveMapModal = ({
           </div>
         )
       ) : null}
+      
+      {/* Scene Selection Modal */}
+      {showSceneSelection && (
+        <SceneListWindow
+          availableScenes={availableScenes}
+          onClose={() => setShowSceneSelection(false)}
+        />
+      )}
     </div>
   );
 };
