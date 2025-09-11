@@ -37,21 +37,25 @@
   }
 }
 
-.SceneListWindow__scroll-container {
-  position: relative;
-  max-height: 80vh;
-  overflow: hidden;
-  /* Mask will be applied via inline styles for dynamic behavior */
-}
-
-
-.SceneListWindow__content {
+.SceneListWindow__container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 0;
   max-height: 80vh;
+}
+
+.SceneListWindow__header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  background: transparent;
+  flex-shrink: 0; // Prevent header from shrinking
+}
+
+.SceneListWindow__scroll-container {
+  position: relative;
+  flex: 1;
   overflow-y: auto;
+  /* Mask will be applied via inline styles for dynamic behavior */
   
   // Scrollbar styling to match project
   &::-webkit-scrollbar {
@@ -75,6 +79,13 @@
   
   scrollbar-color: rgb(167 139 250) transparent;
   scrollbar-width: auto;
+}
+
+.SceneListWindow__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0;
 }
 
 .SceneListWindow__scene-button {
@@ -142,6 +153,7 @@
 
     & button {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.212);
+      min-width: 115px; // Ensure consistent button width
     }
   }
 

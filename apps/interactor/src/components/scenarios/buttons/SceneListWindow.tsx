@@ -12,6 +12,7 @@ import { fillTextTemplate } from '../../../libs/prompts/strategies';
 import EmotionRenderer from '../../emotion-render/EmotionRenderer';
 import { useI18n } from '../../../libs/i18n';
 import { useEffect, useRef, useState } from 'react';
+import { FaTimes } from 'react-icons/fa';
 import './SceneListWindow.scss';
 
 interface SceneListWindowProps {
@@ -49,12 +50,22 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
   };
 
   useEffect(() => {
-    const scrollElement = scrollRef.current;
-    if (!scrollElement) return;
+    // Add a small delay to ensure the element is fully rendered
+    const timer = setTimeout(() => {
+      const scrollElement = scrollRef.current;
+      if (!scrollElement) return;
+      
+      handleScroll();
+      scrollElement.addEventListener('scroll', handleScroll);
+    }, 100);
 
-    handleScroll();
-    scrollElement.addEventListener('scroll', handleScroll);
-    return () => scrollElement.removeEventListener('scroll', handleScroll);
+    return () => {
+      clearTimeout(timer);
+      const scrollElement = scrollRef.current;
+      if (scrollElement) {
+        scrollElement.removeEventListener('scroll', handleScroll);
+      }
+    };
   }, [availableScenes]);
 
   const handleGoToScene = (sceneId: string) => {
@@ -125,14 +136,21 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
       onCloseModal={onClose}
       shouldCloseOnOverlayClick
     >
-      <div 
-        className="SceneListWindow__scroll-container"
-        style={{
-          mask: `linear-gradient(to bottom, transparent 0px, black ${Math.max(1, topFadeSize)}px, black calc(100% - ${Math.max(1, bottomFadeSize)}px), transparent 100%)`,
-          WebkitMask: `linear-gradient(to bottom, transparent 0px, black ${Math.max(1, topFadeSize)}px, black calc(100% - ${Math.max(1, bottomFadeSize)}px), transparent 100%)`
-        }}
-      >
-        <div className="SceneListWindow__content scrollbar" ref={scrollRef}>
+      <div className="SceneListWindow__container">
+        <div className="SceneListWindow__header">
+          <Button theme="secondary" onClick={onClose}>
+            <FaTimes size={20} />
+          </Button>
+        </div>
+        <div 
+          className="SceneListWindow__scroll-container scrollbar" 
+          ref={scrollRef}
+          style={{
+            mask: `linear-gradient(to bottom, transparent 0px, black ${Math.max(1, topFadeSize)}px, black calc(100% - ${Math.max(1, bottomFadeSize)}px), transparent 100%)`,
+            WebkitMask: `linear-gradient(to bottom, transparent 0px, black ${Math.max(1, topFadeSize)}px, black calc(100% - ${Math.max(1, bottomFadeSize)}px), transparent 100%)`
+          }}
+        >
+          <div className="SceneListWindow__content">
         {(() => {
           // Move current scene to index 0 if it exists in availableScenes
           const orderedScenes = [...availableScenes];
@@ -196,7 +214,7 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
                       disabled={isCurrentScene}
                       onClick={() => !isCurrentScene && handleGoToScene(sceneId)}
                     >
-                      {isCurrentScene ? i18n('go_to_scene') : i18n('go_to_scene')}
+                      {isCurrentScene ? i18n('you_are_here') : i18n('go_to_scene')}
                     </Button>
                   </div>
                 </div>
@@ -204,6 +222,7 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
             );
           });
         })()}
+          </div>
         </div>
       </div>
     </Modal>

@@ -297,29 +297,20 @@ const InteractiveMapModal = ({
       } else {
         // Get all available scenes from the place
         const availableSceneIds = getAvailableScenes(selectedPlace?.sceneId);
-        
         if (availableSceneIds.length > 1) {
+          console.log("multiple scenes");
           // Multiple scenes available - show scene selection modal
           setShowSceneSelection(true);
           setAvailableScenes(availableSceneIds);
           trackEvent('scene-select');
         } else if (availableSceneIds.length === 1 && availableSceneIds[0] !== currentScene?.id) {
+          console.log("una sola escena");
           // Single scene available - open directly
           dispatch(
             setModalOpened({
               id: 'scene-preview',
               opened: true,
               itemId: availableSceneIds[0],
-            }),
-          );
-          trackEvent('scene-select');
-        } else if (scene && selectedPlace?.sceneId !== currentScene?.id) {
-          // Fallback to the old behavior if no comma-separated sceneId is provided
-          dispatch(
-            setModalOpened({
-              id: 'scene-preview',
-              opened: true,
-              itemId: scene.id,
             }),
           );
           trackEvent('scene-select');
@@ -389,7 +380,15 @@ const InteractiveMapModal = ({
                   Start Battle
                 </Button>
               ) : highlightedPlace.sceneId !== currentScene?.id ? (
-                <Button theme="secondary" onClick={handleGoToScene}>
+                <Button theme="secondary" onClick={() => { // for mobile, we use a different approach
+                  const availableSceneIds = getAvailableScenes(highlightedPlace.sceneId);
+                  if (availableSceneIds.length > 0) {
+                    // Multiple scenes available - show scene selection modal
+                    setShowSceneSelection(true);
+                    setAvailableScenes(availableSceneIds);
+                    trackEvent('scene-select');
+                  }
+                }}>
                   Go to place
                 </Button>
               ) : (
@@ -405,7 +404,7 @@ const InteractiveMapModal = ({
         )
       ) : null}
       
-      {/* Scene Selection Modal */}
+      {/* Scene List Window */}
       {showSceneSelection && (
         <SceneListWindow
           availableScenes={availableScenes}
