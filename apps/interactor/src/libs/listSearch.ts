@@ -80,6 +80,9 @@ export const listSearch = async <T extends BackgroundResult | CharacterResult | 
     skip: number;
     languages?: string[];
     isApprovedForMobile?: boolean;
+    nsfw?: boolean;
+    excludeNotInMobile?: boolean;
+    excludeNSFW?: boolean;
   },
 ): Promise<T[]> => {
   const response = await axios.get<T[]>(apiEndpont + searchType, {
