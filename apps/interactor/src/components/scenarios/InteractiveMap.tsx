@@ -12,16 +12,10 @@ import { setModalOpened } from '../../state/slices/creationSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { getInitialBattleState } from '../../state/utils/battleUtils';
+import { getAvailableScenes } from '../../state/utils/sceneUtils';
 import SceneListWindow from './buttons/SceneListWindow';
 
 const isTouchScreen = window.navigator.maxTouchPoints > 0;
-
-// Get all scenes from a comma-separated sceneId string
-export const getAvailableScenes = (sceneIdString?: string): string[] => {
-  if (!sceneIdString) return [];
-  const sceneIds = sceneIdString.split(',').map(id => id.trim()).filter(id => id.length > 0);
-  return sceneIds;
-};
 
 const InteractiveMapToggle = () => {
   const dispatch = useAppDispatch();
@@ -298,13 +292,11 @@ const InteractiveMapModal = ({
         // Get all available scenes from the place
         const availableSceneIds = getAvailableScenes(selectedPlace?.sceneId);
         if (availableSceneIds.length > 1) {
-          console.log("multiple scenes");
           // Multiple scenes available - show scene selection modal
           setShowSceneSelection(true);
           setAvailableScenes(availableSceneIds);
           trackEvent('scene-select');
         } else if (availableSceneIds.length === 1 && availableSceneIds[0] !== currentScene?.id) {
-          console.log("una sola escena");
           // Single scene available - open directly
           dispatch(
             setModalOpened({
