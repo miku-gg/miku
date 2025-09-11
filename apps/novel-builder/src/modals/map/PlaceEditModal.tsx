@@ -239,7 +239,7 @@ export default function PlaceEditModal() {
           <div className="PlaceEdit__form">
             <div className="PlaceEdit__sceneSelect">
               <div className="PlaceEdit__sceneSelect__header">
-                <label>Select scenes</label>
+                <label>Select scenes ({place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0).length : 0})</label>
                 <div data-tooltip-id="add-scene-tooltip" data-tooltip-content="Add scene">
                   <SceneSelector
                     multiSelect={false}
