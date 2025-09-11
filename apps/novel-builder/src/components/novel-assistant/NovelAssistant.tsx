@@ -140,7 +140,9 @@ export default function NovelAssistant() {
   useEffect(() => {
     const checkPremiumStatus = async () => {
       try {
-        const premium = await config.isPremiumUser();
+        const premium = config.enableNovelAssistant === true
+          ? await config.isPremiumUser() 
+          : false;
         setIsPremium(premium);
       } catch (error) {
         console.error('Failed to check premium status:', error);
