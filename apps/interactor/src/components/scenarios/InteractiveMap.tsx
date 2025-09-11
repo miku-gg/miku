@@ -374,11 +374,14 @@ const InteractiveMapModal = ({
               ) : highlightedPlace.sceneId !== currentScene?.id ? (
                 <Button theme="secondary" onClick={() => { // for mobile, we use a different approach
                   const availableSceneIds = getAvailableScenes(highlightedPlace.sceneId);
-                  if (availableSceneIds.length > 0) {
+                  if (availableSceneIds.length > 1) {
                     // Multiple scenes available - show scene selection modal
                     setShowSceneSelection(true);
                     setAvailableScenes(availableSceneIds);
                     trackEvent('scene-select');
+                  }
+                  else {
+                    handleGoToScene();
                   }
                 }}>
                   Go to place
