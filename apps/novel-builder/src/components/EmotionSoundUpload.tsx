@@ -1,6 +1,6 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { Button, Tooltip } from '@mikugg/ui-kit';
-import { AssetDisplayPrefix, MikuCardV2, NovelV3 } from '@mikugg/bot-utils';
+import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import config from '../config';
 import AudioPreview from './AudioPreview';
 import { handleEmotionSoundUpload, removeCharacterEmotionSound } from '../libs/emotionSoundUpload';
@@ -14,7 +14,7 @@ const ACCEPTED_AUDIO_TYPES = 'audio/*';
 const UPLOADING_TEXT = '...';
 
 // Types
-type Emotion = MikuCardV2['data']['extensions']['mikugg_v2']['outfits'][number]['emotions'][number];
+type Emotion = NovelV3.NovelCharacterOutfit['emotions'][number];
 
 interface EmotionSoundUploadProps {
   character: NovelV3.NovelCharacter;
