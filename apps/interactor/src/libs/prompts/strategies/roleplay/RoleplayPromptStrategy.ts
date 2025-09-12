@@ -484,7 +484,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         const character = state.novel.characters.find((char) => char.id === characterId);
         const charName = (character?.name || '').replace(/"/g, '\\"');
 
-        return `"\\n${charName}:","\\n${charName}'s reaction:","# "`;
+        return `"\\n${charName}:","\\n${charName}'s reaction:","\\n${charName}'s inner thoughts:","# "`;
       })
       .concat(temp.stops.map((stop) => `"${stop}"`))
       .join(',');
@@ -529,11 +529,16 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'
       }\n`;
     }
-    response += `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`;
+    // Only generate text if we don't have existing text or if we're not generating inner thoughts
+    if (!existingText || !this.includeInnerThoughts) {
+      response += `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`;
+    } else {
+      // If we have existing text and are generating inner thoughts, just show the existing text
+      response += `{{char}}:${existingText}`;
+    }
     
     // Add inner thoughts generation
     if (this.includeInnerThoughts) {
-      response += `\n\n${this.i18n('inner_thoughts_instruction', ['{{char}}'])}`;
       response += `\n${this.i18n('character_inner_thoughts', ['{{char}}'])}: "{{GEN inner_thoughts max_tokens=${maxTokens} stop=["\\n", "\\""]}}`;
     }
     

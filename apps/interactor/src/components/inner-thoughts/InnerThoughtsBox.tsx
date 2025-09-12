@@ -5,7 +5,7 @@ import './InnerThoughtsBox.scss';
 
 interface InnerThoughtsBoxProps {
   isVisible: boolean;
-  thoughts: string[];
+  thoughts: string;
   onClose: () => void;
   characterName?: string;
   className?: string;
@@ -39,7 +39,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({
             {characterName ? `${characterName}'s Inner Thoughts` : 'Inner Thoughts'}
           </h3>
           <div className="InnerThoughtsBox__header-actions">
-            <TTSPlayer text={thoughts.length > 0 ? thoughts.join(' ') : undefined} />
+            <TTSPlayer text={thoughts || undefined} />
             <button 
               className="InnerThoughtsBox__close-button"
               onClick={onClose}
@@ -51,11 +51,11 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({
         </div>
         
         <div className="InnerThoughtsBox__content">
-          {thoughts.length === 0 ? (
+          {!thoughts ? (
             <p className="InnerThoughtsBox__empty">This is a test message for the inner thoughts text-to-speech feature.</p>
           ) : (
             <div className="InnerThoughtsBox__thoughts-text">
-              {thoughts.join(' ')}
+              {thoughts}
             </div>
           )}
         </div>

@@ -27,13 +27,13 @@ interface CharacterPopupProps {
   assetLinkLoader: (asset: string, type: AssetDisplayPrefix) => string;
   isVisible: boolean;
   position: { x: number; y: number };
-  innerThoughts?: string[];
+  innerThoughts?: string;
 }
 
 const CharacterPopup: React.FC<CharacterPopupProps> = ({
   character,
   isVisible,
-  innerThoughts = [],
+  innerThoughts = '',
 }) => {
   const { servicesEndpoint, isProduction } = useAppContext();
   const dispatch = useAppDispatch();
@@ -140,17 +140,38 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
           state,
           currentCharacterId: character.id
         });        
-        // Update the generated thoughts as they come in
-        const currentCharacter = response?.characters.find(char => char.characterId === character.id);
-        if (currentCharacter?.innerThoughts && currentCharacter.innerThoughts.trim()) {
-          setGeneratedThoughts(currentCharacter.innerThoughts);
-        }
       }
-      setIsGeneratingThoughts(false);
       
       const finalCharacter = response?.characters.find(char => char.characterId === character.id);
-      const finalResponse = finalCharacter?.innerThoughts?.trim();
+      const originalResponse = finalCharacter?.innerThoughts; // Keep original for debug entry
+      const finalResponse = originalResponse?.trim(); // Trimmed version for display processing
       if (finalResponse) {
+        // Create second debug entry with filled-in results
+        const filledTemplate = prompt.template.replace(
+          /{{GEN inner_thoughts max_tokens=\d+ stop=\[.*?\]}}/g,
+          originalResponse || ''
+        );
+        
+        const resultsStream = textCompletion({
+          template: filledTemplate,
+          variables: prompt.variables,
+          model: state.settings.model,
+          serviceBaseUrl: servicesEndpoint,
+          identifier: `${Date.now()}_results`,
+        });
+        
+        // Consume the stream to trigger debug entry creation
+        // Just consume the stream to create the debug entry
+        for await (const _ of resultsStream) {
+        }
+        
+        // Remove trailing quote mark for display only
+        let displayThoughts = finalResponse;
+        if (displayThoughts.endsWith('"')) {
+          displayThoughts = displayThoughts.slice(0, -1);
+        }
+        setGeneratedThoughts(displayThoughts);
+        
         // Show window only when generation is completely
         setShowInnerThoughts(true);
         // TODO: Re-enable when premium check is restored
@@ -158,6 +179,8 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       } else {
         toast.error('Failed to generate inner thoughts');
       }
+      
+      setIsGeneratingThoughts(false);
 
     } catch (error) {
       setIsGeneratingThoughts(false);
@@ -214,7 +237,7 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       
       <InnerThoughtsBox
         isVisible={showInnerThoughts}
-        thoughts={generatedThoughts ? [generatedThoughts] : innerThoughts}
+        thoughts={generatedThoughts || innerThoughts}
         characterName={character.name}
         onClose={() => {
           setShowInnerThoughts(false);
