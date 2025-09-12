@@ -27,6 +27,7 @@ import { TokenDisplayer } from '../../components/TokenDisplayer';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
 import CharacterOutfitGenerateModal from './CharacterOutfitGenerateModal';
 import CharacterOutfitEmotionsGenerateModal from './CharacterOutfitEmotionsGenerateModal';
+import EmotionSoundUpload from '../../components/EmotionSoundUpload';
 export default function CharacterOutfitsEdit({ characterId }: { characterId?: string }) {
   const dispatch = useAppDispatch();
   const isPremium = useAppSelector((state) => state.user.user?.tier === 'PREMIUM');
@@ -306,11 +307,17 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
                   return checkFileType(file, ['image/png', 'image/gif', 'image/webp', 'video/webm', 'audio/mpeg']);
                 }}
               />
-              {emotion?.sources.sound ? (
-                <div className="CharacterOutfitsEdit__audioPreview">
-                  <AudioPreview src={config.genAssetLink(emotion?.sources.sound, AssetDisplayPrefix.EMOTION_SOUND)} />
-                </div>
-              ) : null}
+              <div className="CharacterOutfitsEdit__audio">
+                {['base-emotions', 'tiny-emotions'].includes(group.template) && (
+                  <EmotionSoundUpload
+                    character={character}
+                    outfitIndex={groupIndex}
+                    emotionId={emotionId}
+                    emotion={emotion || { id: emotionId, sources: { png: '' } }}
+                    size="sm"
+                  />
+                )}
+              </div>
             </div>
           );
         });
