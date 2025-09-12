@@ -19,6 +19,7 @@ import InteractorHeader from './InteractorHeader';
 import Inventory from './Inventory';
 import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
+import EmotionSoundPlayer from '../emotion-sound/EmotionSoundPlayer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
 import {
@@ -42,6 +43,7 @@ const Interactor = () => {
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
   const battles = useAppSelector((state) => state.novel.battles);
+  const characters = useAppSelector((state) => state.novel.characters);
 
   if (!scene) {
     return null;
@@ -166,6 +168,11 @@ const Interactor = () => {
               <DebugModal />
               <ModelSelectorModal />
               <RegenerateEmotionModal />
+              <EmotionSoundPlayer
+                lastCharacters={lastCharacters}
+                characters={characters}
+                assetLinkLoader={assetLinkLoader}
+              />
             </div>
           </>
         )}
