@@ -1,5 +1,13 @@
 @import '../../styles/variables';
 
+// Global override for emotion template dropdown scrollbar
+.emotion-template-dropdown .dropdown__list {
+  overflow-y: hidden !important;
+  max-height: none !important;
+  overflow: hidden !important;
+  height: auto !important;
+}
+
 .CharacterOutfitsEdit {
   &__group {
     .CharacterOutfitsEdit__groupHeader {
@@ -147,4 +155,5 @@
     display: flex;
     gap: 20px;
   }
+
 }

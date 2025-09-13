@@ -372,6 +372,7 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
             <label htmlFor={`group_${groupIndex}_emotionsHash`}>Emotion Set:</label>
             <Dropdown
               items={emotionTemplates}
+              className="emotion-template-dropdown"
               onChange={(index) => {
                 const hasEmotionsUploaded = outfits[groupIndex]?.emotions.length > 0;
                 const isNeutralDefaultEmotion =
