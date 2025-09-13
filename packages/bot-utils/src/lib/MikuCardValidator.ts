@@ -155,7 +155,7 @@ export type MikuCardV2 = TavernCardV2 & {
 
 export const LICENSES = ['CC0', 'CC BY', 'CC BY-SA', 'CC BY-ND', 'CC BY-NC', 'CC BY-NC-SA', 'CC BY-NC-ND'];
 
-export type EmotionTemplateSlug = 'single-emotion' | 'tiny-emotions' | 'base-emotions' | 'lewd-emotions';
+export type EmotionTemplateSlug = 'single-emotion' | 'tiny-emotions' | 'base-emotions' | 'lewd-emotions' | 'fullscreen-emotions';
 
 export const EMOTION_GROUP_TEMPLATES: Record<
   EmotionTemplateSlug,
@@ -230,6 +230,21 @@ export const EMOTION_GROUP_TEMPLATES: Record<
       'pain',
       'teasing',
       'arrogant',
+    ],
+  },
+  'fullscreen-emotions': {
+    id: 'fullscreen-emotions',
+    label: 'Fullscreen emotions',
+    emotionIds: [
+      'angry',
+      'sad',
+      'happy',
+      'disgusted',
+      'scared',
+      'embarrased',
+      'surprised',
+      'neutral',
+      'confused',
     ],
   },
 };
