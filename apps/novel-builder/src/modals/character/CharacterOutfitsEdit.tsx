@@ -27,6 +27,7 @@ import { TokenDisplayer } from '../../components/TokenDisplayer';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
 import CharacterOutfitGenerateModal from './CharacterOutfitGenerateModal';
 import CharacterOutfitEmotionsGenerateModal from './CharacterOutfitEmotionsGenerateModal';
+import CharacterOutfitFullscreenEmotionsGenerator from './CharacterOutfitFullscreenEmotionsGenerator';
 export default function CharacterOutfitsEdit({ characterId }: { characterId?: string }) {
   const dispatch = useAppDispatch();
   const isPremium = useAppSelector((state) => state.user.user?.tier === 'PREMIUM');
@@ -99,10 +100,18 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
     if (groupIndex < outfits.length) {
       const newGroups = [...outfits];
 
+      // Initialize emotions based on template
+      const template = emotionTemplates.find(t => t.id === selectedTemplateId);
+      const emotions = template ? template.emotionIds.map(emotionId => ({
+        id: emotionId,
+        sources: { png: '' },
+        isFullscreen: selectedTemplateId === 'fullscreen-emotions'
+      })) : [];
+
       newGroups[groupIndex] = {
         ...newGroups[groupIndex],
         template: selectedTemplateId,
-        emotions: [],
+        emotions,
       };
       dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
     }
@@ -210,6 +219,7 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
             png: '',
             webm: assetId,
           },
+          isFullscreen: false,
         });
       }
     } else {
@@ -227,8 +237,71 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
           sources: {
             png: assetId,
           },
+          isFullscreen: false,
         });
       }
+    }
+
+    newGroups[groupIndex] = {
+      ...newGroups[groupIndex],
+      emotions,
+    };
+    return newGroups;
+  };
+
+  const uploadFullscreenEmotionFile = async ({
+    file,
+    groupIndex,
+    emotionId,
+    variant,
+    outfits: _outfits,
+  }: {
+    file: File;
+    groupIndex: number;
+    emotionId: string;
+    variant: 'desktop' | 'mobile';
+    outfits: MikuCardV2['data']['extensions']['mikugg_v2']['outfits'];
+  }): Promise<MikuCardV2['data']['extensions']['mikugg_v2']['outfits']> => {
+    const { assetId, success } = await config.uploadAsset(
+      file,
+      file.type === 'video/webm'
+        ? AssetType.EMOTION_ANIMATED
+        : AssetType.EMOTION_IMAGE,
+    );
+    if (!success) {
+      toast.warn('Failed to upload asset');
+      return _outfits;
+    }
+    
+    const newGroups = [..._outfits];
+    const emotionTemplate = emotionTemplates.find((template) => template.id === newGroups[groupIndex].template);
+
+    if (emotionTemplate?.emotionIds.includes(emotionId) === false) {
+      console.warn(`Invalid emotion id: ${emotionId}`);
+      return _outfits;
+    }
+
+    const emotions = [...newGroups[groupIndex].emotions];
+    const emotionIndex = emotions.findIndex((img) => img.id === emotionId);
+
+    if (emotionIndex >= 0) {
+      emotions[emotionIndex] = {
+        ...emotions[emotionIndex],
+        sources: {
+          ...emotions[emotionIndex]?.sources,
+          [variant]: assetId,
+        },
+        isFullscreen: true, // Mark as fullscreen emotion
+      };
+    } else {
+      emotions.push({
+        id: emotionId,
+        sources: {
+          png: '',
+          [variant]: assetId,
+        },
+        isFullscreen: true, // Mark as fullscreen emotion
+      });
     }
 
     newGroups[groupIndex] = {
@@ -245,6 +318,24 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
         groupIndex,
         emotionId,
         isAudio,
+        outfits,
+      });
+      dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
+    }
+  };
+
+  const handleFullscreenImageChange = async (
+    file: File,
+    groupIndex: number,
+    emotionId: string,
+    variant: 'desktop' | 'mobile'
+  ) => {
+    if (file) {
+      const newGroups = await uploadFullscreenEmotionFile({
+        file,
+        groupIndex,
+        emotionId,
+        variant,
         outfits,
       });
       dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
@@ -398,7 +489,17 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
             />
           </div>
           <div className="CharacterOutfitsEdit__emotions-container">
-            <div className="CharacterOutfitsEdit__emotions">{renderEmotionImages()}</div>
+            {group.template === 'fullscreen-emotions' ? (
+              <CharacterOutfitFullscreenEmotionsGenerator
+                groupIndex={groupIndex}
+                group={group}
+                characterId={characterId}
+                pendingInferences={pendingInferences}
+                handleFullscreenImageChange={handleFullscreenImageChange}
+              />
+            ) : (
+              <div className="CharacterOutfitsEdit__emotions">{renderEmotionImages()}</div>
+            )}
             {group.template === 'single-emotion' ? (
               <div className="CharacterOutfitsEdit__group-generation-buttons">
                 {isPremium ? (

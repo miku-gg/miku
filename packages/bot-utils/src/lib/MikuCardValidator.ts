@@ -145,7 +145,10 @@ export type MikuCardV2 = TavernCardV2 & {
               png: string;
               webm?: string;
               sound?: string; // id of the sound to be used when the emotion is triggered
+              desktop?: string; // id of the desktop fullscreen asset
+              mobile?: string; // id of the mobile fullscreen asset
             };
+            isFullscreen?: boolean; // indicates if this emotion supports desktop/mobile variants
           }[];
         }[];
       };
