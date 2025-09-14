@@ -19,6 +19,7 @@ interface BuilderConfig {
   uploadAssetEndpoint: string;
   platformAPIEndpoint: string;
   isPremiumUser: () => Promise<boolean>;
+  enableNovelAssistant?: boolean;
   genAssetLink: (asset: string, displayPrefix: AssetDisplayPrefix) => string;
   uploadAsset: (
     file: File | string,
@@ -74,6 +75,7 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
           return false;
         }
       },
+      enableNovelAssistant: false,
       genAssetLink: (asset: string) => {
         if (asset.startsWith('data')) {
           return asset;
@@ -185,6 +187,7 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
           return false;
         }
       },
+      enableNovelAssistant: false,
       genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
           return asset;
@@ -303,6 +306,7 @@ const configs: Map<'development' | 'staging' | 'production', BuilderConfig> = ne
           return false;
         }
       },
+      enableNovelAssistant: false,
       genAssetLink: (asset: string, displayPrefix?: AssetDisplayPrefix) => {
         if (asset.startsWith('data')) {
           return asset;
