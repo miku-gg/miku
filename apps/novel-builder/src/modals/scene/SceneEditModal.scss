@@ -120,6 +120,75 @@
     position: relative;
   }
 
+  &__character-fullscreen-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+  }
+
+  &__character-fullscreen-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    opacity: 0.1;
+    transition: opacity 0.2s ease;
+    pointer-events: auto;
+  }
+
+  &__character-fullscreen-overlay:hover {
+    opacity: 0.7;
+  }
+
+  &__character-fullscreen-overlay-btn {
+    border: 2px solid white !important;
+    border-radius: 50% !important;
+    color: white !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    width: 80px !important;
+    height: 80px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    &:active {
+      transform: scale(0.98) !important;
+    }
+  }
+
+  &__character-fullscreen-toggle {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.8);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
   &__scene-details {
     background-color: $background-1;
     padding: 1rem;
@@ -289,6 +358,27 @@
     }
     .ImageSlider__selectedImage {
       height: 60%;
+    }
+
+    .SceneEditModal__character-fullscreen-overlay {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.7;
+    }
+
+    .SceneEditModal__character-fullscreen-controls {
+      top: 38%;
+    }
+
+    .SceneEditModal__character-fullscreen-overlay-btn {
+      width: 60px !important;
+      height: 60px !important;
+
+      svg {
+        width: 32px;
+        height: 32px;
+      }
     }
   }
 }

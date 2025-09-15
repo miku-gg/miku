@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { AiOutlinePicture } from 'react-icons/ai';
 import { FaUser } from 'react-icons/fa6';
 import { IoInformationCircleOutline } from 'react-icons/io5';
+import { MdZoomIn } from 'react-icons/md';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import config from '../../config';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
@@ -50,6 +51,7 @@ export default function SceneEditModal() {
   });
   const [showingEmotionChar1, setShowingEmotionChar1] = useState('neutral');
   const [showingEmotionChar2, setShowingEmotionChar2] = useState('neutral');
+  const [fullscreenPreviewMode, setFullscreenPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   const getObjectiveData = (id: string) => {
     return objectives?.find((objective) => objective.id === id);
@@ -192,20 +194,32 @@ export default function SceneEditModal() {
                     outfits.findIndex((outfit) => outfit.id === character.outfit),
                     0,
                   );
-                  const selectedEmotion = outfits[selectedOutfitIndex].emotions.find(
+                  const selectedOutfit = outfits[selectedOutfitIndex];
+                  const selectedEmotion = selectedOutfit.emotions.find(
                     (emotion) => emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
                   ) ||
-                    outfits[selectedOutfitIndex].emotions[0] || {
+                    selectedOutfit.emotions[0] || {
                       id: 'neutral',
                       sources: {
                         png: '',
                       },
                     };
+                  
+                  // Check if the selected outfit is fullscreen
+                  const isFullscreenOutfit = selectedOutfit.isFullscreen;
+                  
                   return (
                     <div key={character.id} className="SceneEditModal__character">
                       <ImageSlider
                         images={outfits.map((outfit) => ({
-                          source: config.genAssetLink(selectedEmotion.sources.png, AssetDisplayPrefix.EMOTION_IMAGE),
+                          source: config.genAssetLink(
+                            isFullscreenOutfit 
+                              ? (fullscreenPreviewMode === 'desktop' 
+                                  ? selectedEmotion.sources.desktop || '' 
+                                  : selectedEmotion.sources.mobile || '')
+                              : selectedEmotion.sources.png,
+                            AssetDisplayPrefix.EMOTION_IMAGE
+                          ),
                           label: outfit.name,
                         }))}
                         backgroundImageSource=""
@@ -238,19 +252,40 @@ export default function SceneEditModal() {
                           );
                         }}
                       />
+                      {isFullscreenOutfit && (
+                        <div className="SceneEditModal__character-fullscreen-controls">
+                          <button
+                            className="SceneEditModal__character-fullscreen-toggle"
+                            onClick={() => setFullscreenPreviewMode(
+                              fullscreenPreviewMode === 'desktop' ? 'mobile' : 'desktop'
+                            )}
+                          >
+                            {fullscreenPreviewMode === 'desktop' ? '📱' : '🖥️'}
+                          </button>
+                        </div>
+                      )}
+                      {isFullscreenOutfit && (
+                        <div className="SceneEditModal__character-fullscreen-overlay">
+                          <button
+                            className="SceneEditModal__character-fullscreen-overlay-btn"
+                          >
+                            <MdZoomIn />
+                          </button>
+                        </div>
+                      )}
                       <Carousel
-                        items={outfits[selectedOutfitIndex].emotions.map((emotion) => ({
+                        items={selectedOutfit.emotions.map((emotion) => ({
                           title: emotion.id,
                         }))}
                         selectedIndex={
-                          outfits[selectedOutfitIndex].emotions.findIndex(
+                          selectedOutfit.emotions.findIndex(
                             (emotion) => emotion.id === selectedEmotion.id,
                           ) || 0
                         }
                         onClick={(index) => {
                           characterIndex === 0
-                            ? setShowingEmotionChar1(outfits[selectedOutfitIndex].emotions[index]?.id || '')
-                            : setShowingEmotionChar2(outfits[selectedOutfitIndex].emotions[index]?.id || '');
+                            ? setShowingEmotionChar1(selectedOutfit.emotions[index]?.id || '')
+                            : setShowingEmotionChar2(selectedOutfit.emotions[index]?.id || '');
                         }}
                       />
                     </div>
