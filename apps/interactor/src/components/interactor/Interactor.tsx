@@ -21,7 +21,7 @@ import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
-import { useEmotionBackground } from '../fullscreen-emotions/useEmotionBackground';
+import { useFullscreenEmotions } from '../fullscreen-emotions/useFullscreenEmotions';
 import {
   markCurrentCutsceneAsSeen,
   setHasPlayedGlobalStartCutscene,
@@ -39,7 +39,7 @@ const Interactor = () => {
   const currentBattle = useAppSelector((state) => state.narration.currentBattle);
   const lastCharacters = useAppSelector(selectLastLoadedCharacters);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
-  const { fullscreenCharacter } = useEmotionBackground();
+  const { fullscreenCharacter, nonFullscreenCharacters } = useFullscreenEmotions();
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
@@ -155,7 +155,7 @@ const Interactor = () => {
                 <div
                   className={classNames({
                     Interactor__characters: true,
-                    'Interactor__characters--multiple': lastCharacters.length > 1,
+                    'Interactor__characters--multiple': nonFullscreenCharacters.length > 1,
                   })}
                 >
                   {!fullscreenCharacter && lastCharacters.map(({ id, image }) => {
