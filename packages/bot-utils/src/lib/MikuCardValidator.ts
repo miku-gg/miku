@@ -138,6 +138,7 @@ export type MikuCardV2 = TavernCardV2 & {
             poseImage?: string; // pose that was used to generate the outfit
             referenceImage?: string; // reference image that was used to generate the outfit
           };
+          isFullscreen?: boolean; // indicates if this emotion supports desktop/mobile variants
           emotions: {
             // list of emotions of the group, derived from the template
             id: string; // id of the emotion
@@ -148,7 +149,6 @@ export type MikuCardV2 = TavernCardV2 & {
               desktop?: string; // id of the desktop fullscreen asset
               mobile?: string; // id of the mobile fullscreen asset
             };
-            isFullscreen?: boolean; // indicates if this emotion supports desktop/mobile variants
           }[];
         }[];
       };

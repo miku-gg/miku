@@ -21,6 +21,7 @@ import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
+import { useEmotionBackground } from '../fullscreen-emotions/useEmotionBackground';
 import {
   markCurrentCutsceneAsSeen,
   setHasPlayedGlobalStartCutscene,
@@ -38,6 +39,7 @@ const Interactor = () => {
   const currentBattle = useAppSelector((state) => state.narration.currentBattle);
   const lastCharacters = useAppSelector(selectLastLoadedCharacters);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
+  const { fullscreenCharacter } = useEmotionBackground();
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
@@ -91,7 +93,9 @@ const Interactor = () => {
               <div className="Interactor__main-image-container">
                 <ProgressiveImage
                   src={
-                    background
+                    fullscreenCharacter
+                      ? assetLinkLoader(fullscreenCharacter.image, AssetDisplayPrefix.BACKGROUND_IMAGE)
+                      : background
                       ? assetLinkLoader(
                           (isMobileApp || window.innerWidth < 600) && background.source.mp4Mobile
                             ? background.source.mp4Mobile
@@ -109,7 +113,19 @@ const Interactor = () => {
                   }
                 >
                   {(src) =>
-                    (isMobileApp || window.innerWidth < 600) && background?.source.mp4Mobile ? (
+                    fullscreenCharacter ? (
+                      <img
+                        className="Interactor__background-image"
+                        src={`${src}`}
+                        alt="fullscreen emotion"
+                        onError={({ currentTarget }) => {
+                          if (currentTarget.src !== '/images/default_background.png') {
+                            currentTarget.onerror = null;
+                            currentTarget.src = '/images/default_background.png';
+                          }
+                        }}
+                      />
+                    ) : (isMobileApp || window.innerWidth < 600) && background?.source.mp4Mobile ? (
                       <video className="Interactor__background-mobileVideo" loop autoPlay muted>
                         <source
                           src={assetLinkLoader(background.source.mp4Mobile, AssetDisplayPrefix.BACKGROUND_IMAGE)}
@@ -142,7 +158,7 @@ const Interactor = () => {
                     'Interactor__characters--multiple': lastCharacters.length > 1,
                   })}
                 >
-                  {lastCharacters.map(({ id, image }) => {
+                  {!fullscreenCharacter && lastCharacters.map(({ id, image }) => {
                     if (!image || displayingCutscene) {
                       return null;
                     }

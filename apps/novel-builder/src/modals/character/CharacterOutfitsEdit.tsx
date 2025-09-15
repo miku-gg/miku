@@ -104,14 +104,14 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
       const template = emotionTemplates.find(t => t.id === selectedTemplateId);
       const emotions = template ? template.emotionIds.map(emotionId => ({
         id: emotionId,
-        sources: { png: '' },
-        isFullscreen: selectedTemplateId === 'fullscreen-emotions'
+        sources: { png: '' }
       })) : [];
 
       newGroups[groupIndex] = {
         ...newGroups[groupIndex],
         template: selectedTemplateId,
         emotions,
+        isFullscreen: selectedTemplateId === 'fullscreen-emotions'
       };
       dispatch(updateCharacter(decorateCharacterWithOutfits(newGroups)));
     }
@@ -219,7 +219,6 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
             png: '',
             webm: assetId,
           },
-          isFullscreen: false,
         });
       }
     } else {
@@ -237,7 +236,6 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
           sources: {
             png: assetId,
           },
-          isFullscreen: false,
         });
       }
     }
@@ -291,7 +289,6 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
           ...emotions[emotionIndex]?.sources,
           [variant]: assetId,
         },
-        isFullscreen: true, // Mark as fullscreen emotion
       };
     } else {
       emotions.push({
@@ -300,7 +297,6 @@ export default function CharacterOutfitsEdit({ characterId }: { characterId?: st
           png: '',
           [variant]: assetId,
         },
-        isFullscreen: true, // Mark as fullscreen emotion
       });
     }
 
