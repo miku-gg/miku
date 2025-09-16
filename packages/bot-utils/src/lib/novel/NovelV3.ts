@@ -83,10 +83,11 @@ export interface CutScenePart {
 export interface CutSceneOption {
   id: string;
   text: string;
-  actions: CutSceneAction[];
+  action: CutSceneAction;
 }
 
 export type CutSceneAction =
+  | null
   | {
       type: 'NAVIGATE_TO_SCENE';
       params: {
@@ -97,7 +98,6 @@ export type CutSceneAction =
     type: 'GIVE_ITEM';
     params: {
       itemId: string;
-      quantity?: number;
     };
   };
 

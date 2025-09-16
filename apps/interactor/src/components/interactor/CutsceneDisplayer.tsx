@@ -11,6 +11,7 @@ import { IoIosArrowBack, IoIosArrowForward, IoIosSkipForward } from 'react-icons
 import { useI18n } from '../../libs/i18n';
 import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
+import { addItem } from '../../state/slices/inventorySlice';
 
 const PartRenderer = ({
   part,
@@ -145,6 +146,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const fillTextTemplate = useFillTextTemplateFunction();
   const scene = useAppSelector(selectCurrentScene);
   const currentCutscene = useAppSelector(selectCurrentCutscene);
+  const items = useAppSelector((state) => state.novel.inventory);
 
   const currentPartIndex = useAppSelector((state) => state.narration.input.cutscenePartIndex || 0);
   const currentTextIndex = useAppSelector((state) => state.narration.input.cutsceneTextIndex || 0);
@@ -173,6 +175,42 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
     }
   };
 
+  const handleOptionSelect = (optionId: string) => {
+    if (!currentCutscene) return;
+    const currentPart = parts[currentPartIndex];
+    const option = currentPart.options?.find((option) => option.id === optionId);
+    if (!option) return;
+
+    switch (option.action?.type) {
+      case 'NAVIGATE_TO_SCENE':
+        dispatch({
+          type: 'narration/suggestAdvanceScene',
+          payload: { sceneId: option.action.params.sceneId }
+        });
+        onEndDisplay();
+        break;
+      case 'GIVE_ITEM': {
+        const giveItemAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'GIVE_ITEM' }>;
+        const item = items?.find((i) => i.id === giveItemAction.params.itemId);
+        if (item) {
+          dispatch(addItem(item));
+        }
+        break;
+      }
+    }
+
+    dispatch({
+      type: NovelV3.NovelActionType.CUTSCENE_OPTION_SELECTED,
+      params: {
+        cutsceneId: currentCutscene.id,
+        partId: currentPart.id,
+        optionId: optionId,
+      },
+    });
+    
+    handleContinueClick();
+  };  
+  
   const isAtEnd = () => {
     if (!parts[currentPartIndex]) return false;
 

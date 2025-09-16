@@ -564,7 +564,7 @@ const novelFormSlice = createSlice({
       part.options?.push({
         id: action.payload.optionId,
         text: 'New Option',
-        actions: [],
+        action: null,
       });
     },
     updateCutsceneOption: (state, action: PayloadAction<{ cutsceneId: string; partId: string; optionId: string; option: NovelV3.CutSceneOption }>) => {
