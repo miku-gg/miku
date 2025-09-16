@@ -53,6 +53,7 @@
 
   &__background-edit-btn,
   &__character-select1-btn,
+  &__fullscreen-emotion-btn,
   &__character-select2-btn {
     position: absolute;
     top: 10px;
@@ -122,12 +123,21 @@
 
   &__character-fullscreen-controls {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 10;
+    display: flex;
+    gap: 6px;
+
+    .SceneEditModal__fullscreen-emotion-btn {
+      position: static;
+      top: auto;
+      right: auto;
+    }
   }
 
-  &__character-fullscreen-overlay {
+  &__character-fullscreen-zoom-overlay {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -138,11 +148,11 @@
     pointer-events: auto;
   }
 
-  &__character-fullscreen-overlay:hover {
+  &__character-fullscreen-zoom-overlay:hover {
     opacity: 0.7;
   }
 
-  &__character-fullscreen-overlay-btn {
+  &__character-fullscreen-zoom-overlay-btn {
     border: 2px solid white !important;
     border-radius: 50% !important;
     color: white !important;
@@ -164,28 +174,9 @@
     }
   }
 
-  &__character-fullscreen-toggle {
-    background: rgba(255, 255, 255, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 6px;
-    padding: 8px;
-    color: rgba(255, 255, 255, 0.9);
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s ease;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.8);
-      border-color: rgba(255, 255, 255, 0.5);
-    }
-
-    &:active {
-      transform: scale(0.95);
+  &__character-fullscreen-controls {
+    .SceneEditModal__fullscreen-emotion-btn:first-child {
+      display: none; // Hide the first button (zoom) on desktop
     }
   }
 
@@ -355,31 +346,37 @@
     }
     .ImageSlider__backgroundImage {
       width: initial;
+      max-width: 198px;
     }
     .ImageSlider__selectedImage {
       height: 60%;
     }
 
-    .SceneEditModal__character-fullscreen-overlay {
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      opacity: 0.7;
+    .SceneEditModal__character-fullscreen-zoom-overlay {
+      display: none;
     }
 
     .SceneEditModal__character-fullscreen-controls {
-      top: 38%;
-    }
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
 
-    .SceneEditModal__character-fullscreen-overlay-btn {
-      width: 60px !important;
-      height: 60px !important;
-
-      svg {
-        width: 32px;
-        height: 32px;
+      .SceneEditModal__fullscreen-emotion-btn {
+        position: static;
+        top: auto;
+        right: auto;
+        flex-shrink: 0;
+        display: flex !important; // Show zoom button on mobile
       }
     }
+
   }
 }
 //add media query for width 975px

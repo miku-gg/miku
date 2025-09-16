@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { AiOutlinePicture } from 'react-icons/ai';
 import { FaUser } from 'react-icons/fa6';
 import { IoInformationCircleOutline } from 'react-icons/io5';
-import { MdZoomIn } from 'react-icons/md';
+import { MdZoomIn, MdComputer, MdPhoneAndroid } from 'react-icons/md';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import config from '../../config';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
@@ -29,6 +29,7 @@ import {
   deleteIndicatorFromScene,
 } from '../../state/slices/novelFormSlice';
 import { IndicatorEditor } from './IndicatorEditor';
+import FullscreenEmotionZoomModal from '../FullscreenEmotionZoomModal';
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -52,6 +53,10 @@ export default function SceneEditModal() {
   const [showingEmotionChar1, setShowingEmotionChar1] = useState('neutral');
   const [showingEmotionChar2, setShowingEmotionChar2] = useState('neutral');
   const [fullscreenPreviewMode, setFullscreenPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [zoomModalOpen, setZoomModalOpen] = useState(false);
+  const [zoomModalImage, setZoomModalImage] = useState('');
+  const [zoomModalEmotionName, setZoomModalEmotionName] = useState('');
+  const [zoomModalCharacterName, setZoomModalCharacterName] = useState('');
 
   const getObjectiveData = (id: string) => {
     return objectives?.find((objective) => objective.id === id);
@@ -128,6 +133,19 @@ export default function SceneEditModal() {
 
   const handleDeleteIndicator = (indicatorId: string) => {
     dispatch(deleteIndicatorFromScene({ sceneId: scene?.id || '', indicatorId }));
+  };
+
+  const handleZoomEmotion = (character: any, emotion: any) => {
+    const imageUrl = config.genAssetLink(
+      fullscreenPreviewMode === 'desktop' 
+        ? (emotion.sources.desktop || '') 
+        : (emotion.sources.mobile || ''),
+      AssetDisplayPrefix.EMOTION_IMAGE
+    );
+    setZoomModalImage(imageUrl);
+    setZoomModalEmotionName(emotion.id);
+    setZoomModalCharacterName(character.name);
+    setZoomModalOpen(true);
   };
 
   return (
@@ -255,19 +273,26 @@ export default function SceneEditModal() {
                       {isFullscreenOutfit && (
                         <div className="SceneEditModal__character-fullscreen-controls">
                           <button
-                            className="SceneEditModal__character-fullscreen-toggle"
+                            className="SceneEditModal__fullscreen-emotion-btn"
+                            onClick={() => handleZoomEmotion(character, selectedEmotion)}
+                          >
+                            <MdZoomIn />
+                          </button>
+                          <button
+                            className="SceneEditModal__fullscreen-emotion-btn"
                             onClick={() => setFullscreenPreviewMode(
                               fullscreenPreviewMode === 'desktop' ? 'mobile' : 'desktop'
                             )}
                           >
-                            {fullscreenPreviewMode === 'desktop' ? '📱' : '🖥️'}
+                            {fullscreenPreviewMode === 'desktop' ? <MdPhoneAndroid /> : <MdComputer />}
                           </button>
                         </div>
                       )}
                       {isFullscreenOutfit && (
-                        <div className="SceneEditModal__character-fullscreen-overlay">
+                        <div className="SceneEditModal__character-fullscreen-zoom-overlay">
                           <button
-                            className="SceneEditModal__character-fullscreen-overlay-btn"
+                            className="SceneEditModal__character-fullscreen-zoom-overlay-btn"
+                            onClick={() => handleZoomEmotion(character, selectedEmotion)}
                           >
                             <MdZoomIn />
                           </button>
@@ -699,6 +724,13 @@ export default function SceneEditModal() {
           }}
         />
       </Modal>
+      <FullscreenEmotionZoomModal
+        isOpen={zoomModalOpen}
+        onClose={() => setZoomModalOpen(false)}
+        imageUrl={zoomModalImage}
+        emotionName={zoomModalEmotionName}
+        characterName={zoomModalCharacterName}
+      />
     </>
   );
 }
