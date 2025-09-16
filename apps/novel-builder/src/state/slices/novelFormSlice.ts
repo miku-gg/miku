@@ -555,6 +555,38 @@ const novelFormSlice = createSlice({
       if (!cutscene) return;
       cutscene.parts = cutscene.parts.filter((part) => part.id !== action.payload.partId);
     },
+
+    createCutsceneOption: (state, action: PayloadAction<{ cutsceneId: string; partId: string; optionId: string }>) => {
+      const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
+      if (!cutscene) return;
+      const part = cutscene.parts.find((part) => part.id === action.payload.partId);
+      if (!part) return;
+      part.options?.push({
+        id: action.payload.optionId,
+        text: 'New Option',
+        actions: [],
+      });
+    },
+    updateCutsceneOption: (state, action: PayloadAction<{ cutsceneId: string; partId: string; optionId: string; option: NovelV3.CutSceneOption }>) => {
+      const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
+      if (!cutscene) return;
+      const part = cutscene.parts.find((part) => part.id === action.payload.partId);
+      if (!part?.options) return;
+
+      const index = part.options.findIndex((option) => option.id === action.payload.optionId);
+      if (index !== -1) {
+        part.options[index] = action.payload.option;
+      }
+    },
+    deleteCutsceneOption: (state, action: PayloadAction<{ cutsceneId: string; partId: string; optionId: string }>) => {
+      const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
+      if (!cutscene) return;
+      const part = cutscene.parts.find((part) => part.id === action.payload.partId);
+      if (!part?.options) return;
+
+      part.options = part.options.filter((option) => option.id !== action.payload.optionId);
+    },
+    
     reorderStart: (state, action: PayloadAction<{ startId: string; direction: 'up' | 'down' }>) => {
       const { startId, direction } = action.payload;
       const currentIndex = state.starts.findIndex((start) => start.id === startId);
