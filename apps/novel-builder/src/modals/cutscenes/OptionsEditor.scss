@@ -1,0 +1,40 @@
+@import '../../styles/variables';
+
+.OptionsEditor {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+
+    h3 {
+      margin: 0;
+    }
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-right: 10px;
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid $node-conector-color;
+    border-radius: 8px;
+    background-color: $background-1;
+
+    &-text {
+      flex: 1;
+    }
+  }
+
+  &__action-dropdown {
+    min-width: 150px;
+    max-width: 150px;
+  }
+}

@@ -71,7 +71,7 @@ export interface NovelCharacterOutfit {
 export interface CutScenePart {
   id: string;
   text: {
-    type: 'dialogue' | 'description';
+    type: 'dialogue' | 'description' | 'options';
     content: string;
   }[];
   background: string;

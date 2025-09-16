@@ -207,8 +207,6 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         optionId: optionId,
       },
     });
-    
-    handleContinueClick();
   };  
   
   const isAtEnd = () => {
