@@ -11,7 +11,7 @@ import { IoIosArrowBack, IoIosArrowForward, IoIosSkipForward } from 'react-icons
 import { useI18n } from '../../libs/i18n';
 import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
-import { addItem } from '../../state/slices/inventorySlice';
+import { addItem, toggleItemVisibility } from '../../state/slices/inventorySlice';
 
 const PartRenderer = ({
   part,
@@ -147,6 +147,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const scene = useAppSelector(selectCurrentScene);
   const currentCutscene = useAppSelector(selectCurrentCutscene);
   const items = useAppSelector((state) => state.novel.inventory);
+  const inventoryItems = useAppSelector((state) => state.inventory.items);
 
   const currentPartIndex = useAppSelector((state) => state.narration.input.cutscenePartIndex || 0);
   const currentTextIndex = useAppSelector((state) => state.narration.input.cutsceneTextIndex || 0);
@@ -193,8 +194,14 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         const giveItemAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'GIVE_ITEM' }>;
         const item = items?.find((i) => i.id === giveItemAction.params.itemId);
         if (item) {
-          dispatch(addItem(item));
+          const existingItem = inventoryItems.find(i => i.id === item.id);
+          if (!existingItem) {
+            dispatch(addItem(item));
+          }
+          // Make the item visible
+          dispatch(toggleItemVisibility({ itemId: item.id, hidden: false }));
         }
+        handleContinueClick();
         break;
       }
     }
@@ -307,50 +314,78 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
             </div>
           ))}
         </div>
-        <div className="CutsceneDisplayer__buttons">
-          <button
-            className={classNames({
-              'CutsceneDisplayer__buttons-left': true,
-              'CutsceneDisplayer__buttons-left--hidden': currentTextIndex === 0 && currentPartIndex === 0,
-            })}
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              handlePreviousClick();
-            }}
-          >
-            <IoIosArrowBack />
-          </button>
-          <div className="CutsceneDisplayer__buttons-right-group">
-            <button
-              className={classNames({
-                'CutsceneDisplayer__buttons-right': true,
-              })}
-              onClick={(e) => {
-                e.stopPropagation();
-                onEndDisplay();
-              }}
-            >
-              <p className="CutsceneDisplayer__buttons-right__text">{i18n('go_to_scene')}</p>
-              <IoIosSkipForward />
-            </button>
-            <button
-              className={classNames({
-                'CutsceneDisplayer__buttons-right': true,
-                'CutsceneDisplayer__buttons-right--hidden': isAtEnd(),
-              })}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (isAtEnd()) {
-                  onEndDisplay();
-                } else {
-                  handleContinueClick();
-                }
-              }}
-            >
-              <IoIosArrowForward />
-            </button>
-          </div>
-        </div>
+        {/* Render options if current text has type 'options' */}
+        {(() => {
+          const currentPart = parts[currentPartIndex];
+          const currentText = currentPart?.text[currentTextIndex];
+          const hasOptions = currentText?.type === 'options' && currentPart?.options && currentPart.options.length > 0;
+          
+          if (hasOptions) {
+            return (
+              <div className="CutsceneDisplayer__options">
+                {currentPart.options?.map((option) => (
+                  <button
+                    key={option.id}
+                    className="CutsceneDisplayer__option-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOptionSelect(option.id);
+                    }}
+                  >
+                    {fillTextTemplate(option.text)}
+                  </button>
+                ))}
+              </div>
+            );
+          }
+          
+          return (
+            <div className="CutsceneDisplayer__buttons">
+              <button
+                className={classNames({
+                  'CutsceneDisplayer__buttons-left': true,
+                  'CutsceneDisplayer__buttons-left--hidden': currentTextIndex === 0 && currentPartIndex === 0,
+                })}
+                onClick={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  handlePreviousClick();
+                }}
+              >
+                <IoIosArrowBack />
+              </button>
+              <div className="CutsceneDisplayer__buttons-right-group">
+                <button
+                  className={classNames({
+                    'CutsceneDisplayer__buttons-right': true,
+                  })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEndDisplay();
+                  }}
+                >
+                  <p className="CutsceneDisplayer__buttons-right__text">{i18n('go_to_scene')}</p>
+                  <IoIosSkipForward />
+                </button>
+                <button
+                  className={classNames({
+                    'CutsceneDisplayer__buttons-right': true,
+                    'CutsceneDisplayer__buttons-right--hidden': isAtEnd(),
+                  })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isAtEnd()) {
+                      onEndDisplay();
+                    } else {
+                      handleContinueClick();
+                    }
+                  }}
+                >
+                  <IoIosArrowForward />
+                </button>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </>
   );

@@ -86,7 +86,12 @@ export const OptionsEditor = ({ part, cutsceneId, onUpdate }: OptionsEditorProps
       <div className="OptionsEditor__options">
         {part.options?.map((option) => (
           <div key={option.id} className="OptionsEditor__option">
-            
+            <Input
+              value={option.text}
+              onChange={(e) => updateOption(option.id, { text: e.target.value })}
+              placeHolder="Option text..."
+            />          
+
             {option.action?.type === 'NAVIGATE_TO_SCENE' && (
               <SceneSelector
                 multiSelect={false}
