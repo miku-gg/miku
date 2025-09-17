@@ -770,14 +770,19 @@ export function validateNovelState(novel: NovelV3.NovelState): NovelValidation[]
             message: `Place has no name in map ${map.name}`,
           });
         }
-        // validate sceneId
-        if (!novel.scenes.some((scene) => scene.id === place.sceneId)) {
-          errors.push({
-            targetType: NovelValidationTargetType.MAP,
-            targetId: map.id,
-            severity: 'error',
-            message: `Scene ${place.sceneId} not found, please change it on place ${place.name} in map ${map.name}`,
-          });
+        // validate sceneId (can be comma-separated)
+        if (place.sceneId) {
+          const availableSceneIds = place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0);
+          const invalidSceneIds = availableSceneIds.filter(sceneId => !novel.scenes.some((scene) => scene.id === sceneId));
+          
+          if (invalidSceneIds.length > 0) {
+            errors.push({
+              targetType: NovelValidationTargetType.MAP,
+              targetId: map.id,
+              severity: 'error',
+              message: `Scene(s) ${invalidSceneIds.join(', ')} not found, please change them on place ${place.name} in map ${map.name}`,
+            });
+          }
         }
 
         if (!place.sceneId) {

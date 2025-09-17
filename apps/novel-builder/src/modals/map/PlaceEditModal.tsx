@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { selectEditingMap, selectEditingPlace } from '../../state/selectors';
 
 import { closeModal } from '../../state/slices/inputSlice';
-import { deletePlace, updatePlace } from '../../state/slices/novelFormSlice';
+import { deletePlace, updatePlace, addSceneIdToPlace, removeSceneIdFromPlace } from '../../state/slices/novelFormSlice';
 import { useAppSelector } from '../../state/store';
 
 import { toast } from 'react-toastify';
@@ -14,6 +14,7 @@ import { checkFileType } from '../../libs/utils';
 import SceneSelector from '../scene/SceneSelector';
 import './PlaceEditModal.scss';
 import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
+import React from 'react';
 
 function isBlackAndWhite(pixels: Uint8ClampedArray): boolean {
   const tolerance = 20;
@@ -70,6 +71,7 @@ export default function PlaceEditModal() {
   const map = useAppSelector(selectEditingMap);
   const place = useAppSelector(selectEditingPlace);
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
+  const scenes = useAppSelector((state) => state.novel.scenes);
 
   const validateMaskImage = async (file: File) => {
     const mapImageSrc = map?.source.png;
@@ -236,23 +238,33 @@ export default function PlaceEditModal() {
           </div>
           <div className="PlaceEdit__form">
             <div className="PlaceEdit__sceneSelect">
-              <label>Select a scene</label>
-              <SceneSelector
-                multiSelect={false}
-                nonDeletable
-                value={place.sceneId}
-                onChange={(sceneId) => {
-                  dispatch(
-                    updatePlace({
-                      mapId: map!.id,
-                      place: {
-                        ...place,
-                        sceneId: sceneId || '',
-                      },
-                    }),
+              <div className="PlaceEdit__sceneSelect__header">
+                <label>Select scenes ({place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0).length : 0})</label>
+                <div data-tooltip-id="add-scene-tooltip" data-tooltip-content="Add scene">
+                  <SceneSelector
+                    multiSelect={false}
+                    nonDeletable
+                    value=""
+                    onChange={(sceneId) => {
+                      if (sceneId) {
+                        dispatch(addSceneIdToPlace({ mapId: map!.id, placeId: place.id, sceneId }));
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="scrollable-scene-list">
+                {(place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0) : []).map(sceneId => {
+                  const scene = scenes.find(s => s.id === sceneId);
+                  return (
+                    <div key={sceneId} className="scene-item">
+                      <span>{scene?.name || `Unknown Scene (${sceneId})`}</span>
+                      <button onClick={() => dispatch(removeSceneIdFromPlace({ mapId: map!.id, placeId: place.id, sceneId }))}>×</button>
+                    </div>
                   );
-                }}
-              />
+                })}
+              </div>
+              <Tooltip id="add-scene-tooltip" place="top" />
             </div>
             <Input
               label="Place name"

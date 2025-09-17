@@ -1,10 +1,12 @@
 @import '../../styles/variables.scss';
+@import '../../styles/buttons.scss';
 
 .PlaceEditModal {
   max-width: 850px !important;
 }
 .PlaceEdit {
   display: flex;
+  align-items: center;
   gap: 10px;
 
   &__buttons {
@@ -67,12 +69,167 @@
   }
 
   &__sceneSelect {
-    & label {
-      color: $text-1;
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-bottom: 0.5rem;
-      font-weight: 500;
-      font-size: 0.875rem;
+      min-height: 20px;
+      
+      label {
+        color: $text-1;
+        margin-bottom: 0;
+        font-weight: 500;
+        font-size: 0.875rem;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+      }
+      
+      > div {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
+    
+
+    .scrollable-scene-list {
+      max-height: 145px;
+      min-height: 145px;
+      overflow-y: auto;
+      border: 1px solid $background-2;
+      border-radius: 8px;
+      background: $background-1;
+      padding: 8px;
+      margin-bottom: 0%;
+      @extend .scrollbar;
+
+      .scene-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        margin-bottom: 4px;
+        background: $background-2;
+        border-radius: 6px;
+        transition: all 0.2s ease-out;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        &:hover {
+          background: lighten($background-2, 5%);
+        }
+
+        span {
+          color: $text-1;
+          font-size: 0.875rem;
+          font-weight: 500;
+          flex: 1;
+        }
+
+        button {
+          background: $color-red;
+          color: $text-1;
+          border: none;
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: bold;
+          transition: all 0.2s ease-out;
+
+          &:hover {
+            background: darken($color-red, 10%);
+            transform: scale(1.1);
+          }
+
+          &:active {
+            transform: scale(0.95);
+          }
+        }
+      }
+    }
+
+    .SceneSelector {
+      background: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      
+      .SceneNode {
+        height: 20px !important;
+        width: 20px !important;
+        background: $secondary-color !important;
+        border: none !important;
+        border-radius: 6px !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease-out !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: relative !important;
+        
+        &:hover {
+          background: darken($secondary-color, 10%) !important;
+          transform: translateY(-1px) !important;
+        }
+        
+        &:active {
+          transform: translateY(0) !important;
+        }
+        
+        &__title {
+          font-size: 14px !important;
+          font-weight: bold !important;
+          color: white !important;
+          background: none !important;
+          border-radius: 0 !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          position: static !important;
+          width: auto !important;
+          text-align: center !important;
+          line-height: 1 !important;
+          display: block !important;
+          
+          &:before {
+            content: '+';
+            font-size: 14px;
+            font-weight: bold;
+            display: block;
+          }
+        }
+        
+        &:before {
+          content: '+';
+          font-size: 14px;
+          font-weight: bold;
+          color: white;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 1;
+        }
+        
+        &__characters {
+          display: none !important;
+        }
+        
+        &__delete {
+          display: none !important;
+        }
+      }
+    }
+
   }
 }
 
@@ -83,25 +240,13 @@
   }
 
   .PlaceEdit {
-    // flex-direction: column;
-
     &__form {
       width: 100%;
-
-      .mdSize {
-        width: 10rem !important;
-        height: 10rem !important;
-      }
     }
 
     &__maskImage {
       width: 20rem;
       height: 20rem;
-
-      .mdSize {
-        width: 20rem !important;
-        height: 20rem !important;
-      }
     }
   }
 }
