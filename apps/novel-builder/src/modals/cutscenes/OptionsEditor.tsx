@@ -86,63 +86,73 @@ export const OptionsEditor = ({ part, cutsceneId, onUpdate }: OptionsEditorProps
       <div className="OptionsEditor__options">
         {part.options?.map((option) => (
           <div key={option.id} className="OptionsEditor__option">
-            <Input
-              value={option.text}
-              onChange={(e) => updateOption(option.id, { text: e.target.value })}
-              placeHolder="Option text..."
-            />          
-
-            {option.action?.type === 'NAVIGATE_TO_SCENE' && (
-              <SceneSelector
-                multiSelect={false}
-                nonDeletable
-                value={option.action.params.sceneId || null}
-                onChange={(sceneId) => {
-                  updateAction(option.id, {
-                    type: 'NAVIGATE_TO_SCENE',
-                    params: { sceneId: sceneId || '' }
-                  });
-                }}
+            <div className="OptionsEditor__option-controls">
+              <Input
+                value={option.text}
+                onChange={(e) => updateOption(option.id, { text: e.target.value })}
+                placeHolder="Option text..."
               />
-            )}
-            
-            {option.action?.type === 'GIVE_ITEM' && (
-              <ItemSelector
-                multiSelect={false}
-                nonDeletable
-                value={option.action.params?.itemId || null}
-                onChange={(itemId) => {
-                  updateAction(option.id, {
-                    type: 'GIVE_ITEM',
-                    params: { itemId: itemId || '' }
-                  });
+              
+              <Dropdown
+                items={actionTypes}
+                selectedIndex={actionTypes.findIndex(item => item.value === option.action?.type)}
+                onChange={(selectedIndex) => {
+                  const actionType = actionTypes[selectedIndex].value;
+                  if (actionType === 'NAVIGATE_TO_SCENE') {
+                    updateAction(option.id, {
+                      type: 'NAVIGATE_TO_SCENE',
+                      params: { sceneId: '' }
+                    });
+                  } else if (actionType === 'GIVE_ITEM') {
+                    updateAction(option.id, {
+                      type: 'GIVE_ITEM',
+                      params: { itemId: ''}
+                    });
+                  }
                 }}
+                className="OptionsEditor__action-dropdown"
               />
-            )}
+              
+              <Button theme="primary" onClick={() => deleteOption(option.id)}>
+                Delete
+              </Button>
+            </div>
             
-            <Dropdown
-              items={actionTypes}
-              selectedIndex={actionTypes.findIndex(item => item.value === option.action?.type)}
-              onChange={(selectedIndex) => {
-                const actionType = actionTypes[selectedIndex].value;
-                if (actionType === 'NAVIGATE_TO_SCENE') {
-                  updateAction(option.id, {
-                    type: 'NAVIGATE_TO_SCENE',
-                    params: { sceneId: '' }
-                  });
-                } else if (actionType === 'GIVE_ITEM') {
-                  updateAction(option.id, {
-                    type: 'GIVE_ITEM',
-                    params: { itemId: ''}
-                  });
-                }
-              }}
-              className="OptionsEditor__action-dropdown"
-            />
-            
-            <Button theme="primary" onClick={() => deleteOption(option.id)}>
-              Delete
-            </Button>
+            <div className="OptionsEditor__option-selectors">
+              {option.action?.type === 'NAVIGATE_TO_SCENE' && (
+                <SceneSelector
+                  multiSelect={false}
+                  nonDeletable
+                  value={option.action.params.sceneId || null}
+                  onChange={(sceneId) => {
+                    updateAction(option.id, {
+                      type: 'NAVIGATE_TO_SCENE',
+                      params: { sceneId: sceneId || '' }
+                    });
+                  }}
+                />
+              )}
+              
+              {option.action?.type === 'GIVE_ITEM' && (
+                <ItemSelector
+                  multiSelect={false}
+                  nonDeletable
+                  value={(() => {
+                    const itemId = option.action.params?.itemId;
+                    if (!itemId) return null;
+                    // Check if the item still exists in the inventory
+                    const itemExists = items?.find(item => item.id === itemId);
+                    return itemExists ? itemId : null;
+                  })()}
+                  onChange={(itemId) => {
+                    updateAction(option.id, {
+                      type: 'GIVE_ITEM',
+                      params: { itemId: itemId || '' }
+                    });
+                  }}
+                />
+              )}
+            </div>
           </div>
         ))}
       </div>

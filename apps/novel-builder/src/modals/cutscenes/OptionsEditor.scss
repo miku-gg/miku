@@ -21,8 +21,8 @@
 
   &__option {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 5px;
     padding: 10px;
     border: 1px solid $node-conector-color;
     border-radius: 8px;
@@ -33,31 +33,44 @@
     }
   }
 
+  &__option-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    flex: 1;
+
+    .Input {
+      flex: 1;
+    }
+  }
+
+  &__option-selectors {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
   &__action-dropdown {
     min-width: 150px;
     max-width: 150px;
   }
 
   .SceneSelector {
-    flex: 1 !important;
-    min-width: 200px !important;
-    width: 100% !important;
+    display: flex;
+    justify-content: center;
     
     .SceneNode {
-      width: 100% !important;
-      min-width: 200px !important;
       background-size: cover !important;
     }
   }
 
   .ItemSelector {
-    flex: 1 !important;
-    min-width: 200px !important;
-    width: 100% !important;
+    display: flex;
+    justify-content: center;
     
     .ItemNode {
-      width: 100% !important;
-      min-width: 200px !important;
       background-size: cover !important;
     }
   }
