@@ -152,6 +152,74 @@ const InteractiveMapModal = ({
       current: (() => void) | null;
     } = { current: null };
 
+    const setupEventListeners = () => {
+      const canvas = canvasRef?.current;
+      if (!canvas || !map) return;
+
+      const ctx = canvas.getContext('2d');
+      const offScreenCanvas = offScreenCanvasRef?.current;
+      const offScreenCtx = offScreenCanvas?.getContext('2d');
+
+      if (!ctx || !offScreenCtx) return;
+
+      const isWhitePixel = (data: Uint8ClampedArray) => {
+        const tolerance = 10;
+        return data[0] > 255 - tolerance && data[1] > 255 - tolerance && data[2] > 255 - tolerance;
+      };
+
+      const highlightCoord = (x: number, y: number): string | null => {
+        // Clear the off-screen canvas
+        offScreenCtx?.clearRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
+
+        // Check each mask image
+        let highlightedPlace: (typeof map.places)[number] | undefined;
+        for (const place of map.places) {
+          const maskImage = maskImagesRef.current.get(place.id);
+          if (maskImage) {
+            offScreenCtx?.drawImage(maskImage, 0, 0, offScreenCanvas.width, offScreenCanvas.height);
+            const pixel = offScreenCtx?.getImageData(x, y, 1, 1).data;
+            if (pixel && isWhitePixel(pixel)) {
+              ctx?.drawImage(maskImage, 0, 0, offScreenCanvas.width, offScreenCanvas.height);
+              highlightedPlace = place;
+              break;
+            }
+          }
+        }
+
+        if (highlightedPlace) {
+          if (canvas && highlightedPlace.sceneId !== currentScene?.id) canvas.style.cursor = 'pointer';
+          if (canvas) canvas.style.opacity = '0.4';
+          if (canvas) canvas.style.filter = 'blur(5px)';
+          setHighlightedPlaceId(highlightedPlace.id);
+          return highlightedPlace.id;
+        } else {
+          setHighlightedPlaceId(null);
+          if (canvas) canvas.style.cursor = 'default';
+          if (canvas) canvas.style.opacity = '0.1';
+          return null;
+        }
+      };
+
+      const handleMouseMove = (e: MouseEvent) => highlightCoord(e.offsetX, e.offsetY);
+      const handleTouchEnd = (e: TouchEvent) => {
+        e.preventDefault();
+        const touch = e.changedTouches && e.changedTouches[0];
+        highlightCoord(
+          touch?.clientX - (canvas?.getBoundingClientRect().left || 0),
+          touch?.clientY - (canvas?.getBoundingClientRect().top || 0),
+        );
+      };
+
+      canvas.addEventListener('mousemove', handleMouseMove);
+      canvas.addEventListener('touchend', handleTouchEnd);
+
+      cleanupFuncRef.current = () => {
+        canvas.removeEventListener('mousemove', handleMouseMove);
+        canvas.removeEventListener('touchend', handleTouchEnd);
+        setHighlightedPlaceId(null);
+      };
+    };
+
     const handleImageLoad = () => {
       if (
         map &&
@@ -191,69 +259,17 @@ const InteractiveMapModal = ({
         if (canvas) canvas.width = mapBackgroundRef.current.width;
         if (canvas) canvas.height = mapBackgroundRef.current.height;
 
-        const isWhitePixel = (data: Uint8ClampedArray) => {
-          const tolerance = 10;
-          return data[0] > 255 - tolerance && data[1] > 255 - tolerance && data[2] > 255 - tolerance;
-        };
-
-        const highlightCoord = (x: number, y: number): string | null => {
-          // Clear the off-screen canvas
-          offScreenCtx?.clearRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
-
-          // Check each mask image
-          let highlightedPlace: (typeof map.places)[number] | undefined;
-          for (const place of map.places) {
-            const maskImage = maskImagesRef.current.get(place.id);
-            if (maskImage) {
-              offScreenCtx?.drawImage(maskImage, 0, 0, offScreenCanvas.width, offScreenCanvas.height);
-              const pixel = offScreenCtx?.getImageData(x, y, 1, 1).data;
-              if (pixel && isWhitePixel(pixel)) {
-                ctx?.drawImage(maskImage, 0, 0, offScreenCanvas.width, offScreenCanvas.height);
-                highlightedPlace = place;
-                break;
-              }
-            }
-          }
-
-          if (highlightedPlace) {
-            if (canvas && highlightedPlace.sceneId !== currentScene?.id) canvas.style.cursor = 'pointer';
-            if (canvas) canvas.style.opacity = '0.4';
-            if (canvas) canvas.style.filter = 'blur(5px)';
-            setHighlightedPlaceId(highlightedPlace.id);
-            return highlightedPlace.id;
-          } else {
-            setHighlightedPlaceId(null);
-            if (canvas) canvas.style.cursor = 'default';
-            if (canvas) canvas.style.opacity = '0.1';
-            return null;
-          }
-        };
-
-        const handleMouseMove = (e: MouseEvent) => highlightCoord(e.offsetX, e.offsetY);
-        const handleTouchEnd = (e: TouchEvent) => {
-          e.preventDefault();
-          const touch = e.changedTouches && e.changedTouches[0];
-          highlightCoord(
-            touch?.clientX - (canvas?.getBoundingClientRect().left || 0),
-            touch?.clientY - (canvas?.getBoundingClientRect().top || 0),
-          );
-        };
-
-        canvas.addEventListener('mousemove', handleMouseMove);
-        canvas.addEventListener('touchend', handleTouchEnd);
-
-        cleanupFuncRef.current = () => {
-          canvas.removeEventListener('mousemove', handleMouseMove);
-          canvas.removeEventListener('touchend', handleTouchEnd);
-          maskImages.clear();
-          setHighlightedPlaceId(null);
-        };
+        setupEventListeners();
       }
     };
 
     const imgElement = mapBackgroundRef.current;
     if (imgElement) {
       imgElement.addEventListener('load', handleImageLoad);
+      // If the image finished loading, setup event listeners
+      if (imgElement.complete && imgElement.naturalHeight !== 0) {
+        handleImageLoad();
+      }
     }
 
     return () => {
