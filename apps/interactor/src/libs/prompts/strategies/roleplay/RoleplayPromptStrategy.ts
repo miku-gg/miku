@@ -1,5 +1,6 @@
 import { EMOTION_GROUP_TEMPLATES, EMPTY_MIKU_CARD, NovelV3, TavernCardV2 } from '@mikugg/bot-utils';
 import { AbstractPromptStrategy, fillTextTemplate, parseLLMResponse } from '..';
+import { InstructTemplateSlug } from '../instructTemplates';
 import {
   selectAllParentDialoguesWhereCharactersArePresent,
   selectAvailableSummarySentences,
@@ -24,6 +25,18 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
   },
   NarrationResponse
 > {
+  protected includeInnerThoughts: boolean;
+
+  constructor(
+    _instructTemplate: InstructTemplateSlug = 'chatml',
+    language: string = 'en',
+    hasReasoning: boolean = false,
+    includeInnerThoughts: boolean = false,
+  ) {
+    super(_instructTemplate, language, hasReasoning);
+    this.includeInnerThoughts = includeInnerThoughts;
+  }
+
   protected getLabels(): Record<string, Record<string, string>> {
     return labels;
   }
@@ -250,10 +263,16 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       emotion: currentCharacterResponse?.emotion || '',
       pose: currentCharacterResponse?.pose || '',
       reasoning: currentCharacterResponse?.reasoning || '',
+      innerThoughts: currentCharacterResponse?.innerThoughts || '',
     };
     characterResponse.emotion = variables.get('emotion')?.trim() || characterResponse.emotion;
     characterResponse.text = parseLLMResponse(variables.get('text')?.trim() || '', currentCharacterName);
     characterResponse.reasoning = variables.get('reasoning')?.trim() || '';
+    
+    // Handle inner thoughts if they were generated
+    if (this.includeInnerThoughts) {
+      characterResponse.innerThoughts = variables.get('inner_thoughts')?.trim() || '';
+    }
 
     const index = response.characters.findIndex(({ characterId }) => characterId === input.currentCharacterId);
 
@@ -398,6 +417,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
                 text: '',
                 emotion: '',
                 pose: '',
+                innerThoughts: '',
               };
         if (currentCharacterIndex !== -1) {
           prevCharString = dialog.item.characters
@@ -413,6 +433,10 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
             .map(({ text, characterId }) => `{{${characterId}}}: ${text}`)
             .join('\n');
         }
+        // Include inner thoughts if they exist
+        const innerThoughtsText = currentCharacter.innerThoughts;
+        const innerThoughtsLine = innerThoughtsText ? `${this.i18n('character_inner_thoughts', ['{{char}}'])}: "${innerThoughtsText}"\n` : '';
+
         if (dialog.item.parentInteractionId) {
           return (
             (prevCharString ? prevCharString + '\n' : '') +
@@ -420,7 +444,8 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
               ? temp.response +
                 (indicatorsString ? indicatorsString + '\n' : '') +
                 `${this.i18n('character_reaction', [`{{char}}`])}: ${currentCharacter.emotion}\n` +
-                `{{char}}: ${currentCharacter.text}\n`
+                `{{char}}: ${currentCharacter.text}\n` +
+                innerThoughtsLine
               : '') +
             (nextCharString ? `${temp.instruction}${nextCharString}\n` : '')
           );
@@ -430,7 +455,8 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
             (currentCharacter.text
               ? temp.response +
                 (indicatorsString ? indicatorsString + '\n' : '') +
-                `{{char}}: ${currentCharacter.text}\n`
+                `{{char}}: ${currentCharacter.text}\n` +
+                innerThoughtsLine
               : '') +
             '\n' +
             (nextCharString ? `${temp.instruction}${nextCharString}\n` : '')
@@ -458,7 +484,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         const character = state.novel.characters.find((char) => char.id === characterId);
         const charName = (character?.name || '').replace(/"/g, '\\"');
 
-        return `"\\n${charName}:","\\n${charName}'s reaction:","# "`;
+        return `"\\n${charName}:","\\n${charName}'s reaction:","\\n${charName}'s inner thoughts:","# "`;
       })
       .concat(temp.stops.map((stop) => `"${stop}"`))
       .join(',');
@@ -503,7 +529,19 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         existingEmotion ? ' ' + existingEmotion : '{{SEL emotion options=emotions}}'
       }\n`;
     }
-    response += `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`;
+    // Only generate text if we don't have existing text or if we're not generating inner thoughts
+    if (!existingText || !this.includeInnerThoughts) {
+      response += `{{char}}:${existingText}{{GEN text max_tokens=${maxTokens} stop=["\\n${userSanitized}:",${charStops}]}}`;
+    } else {
+      // If we have existing text and are generating inner thoughts, just show the existing text
+      response += `{{char}}:${existingText}`;
+    }
+    
+    // Add inner thoughts generation
+    if (this.includeInnerThoughts) {
+      response += `\n${this.i18n('character_inner_thoughts', ['{{char}}'])}: "{{GEN inner_thoughts max_tokens=${maxTokens} stop=["\\n", "\\""]}}`;
+    }
+    
     return response;
   }
 

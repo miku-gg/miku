@@ -19,6 +19,7 @@ import InteractorHeader from './InteractorHeader';
 import Inventory from './Inventory';
 import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
+import CharacterPopup from '../inner-thoughts/CharacterPopup';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
 import {
@@ -42,6 +43,7 @@ const Interactor = () => {
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
   const battles = useAppSelector((state) => state.novel.battles);
+  const novelCharacters = useAppSelector((state) => state.novel.characters);
 
   if (!scene) {
     return null;
@@ -142,30 +144,51 @@ const Interactor = () => {
                     'Interactor__characters--multiple': lastCharacters.length > 1,
                   })}
                 >
-                  {lastCharacters.map(({ id, image }) => {
-                    if (!image || displayingCutscene) {
-                      return null;
-                    }
-                    return (
-                      <EmotionRenderer
-                        key={`character-emotion-render-${id}`}
-                        assetLinkLoader={assetLinkLoader}
-                        assetUrl={image}
-                        upDownAnimation
-                        className={classNames({
-                          'Interactor__emotion-renderer': true,
-                          selected: displayCharacter?.id === id,
-                        })}
-                      />
-                    );
-                  })}
                 </div>
               </div>
+              {/* Character Popups - positioned relative to each character */}
+              {lastCharacters.map(({ id, image }) => {
+                if (!image || displayingCutscene) {
+                  return null;
+                }
+                const character = novelCharacters.find(c => c.id === id);
+                if (!character) return null;
+                
+                return (
+                  <div
+                    key={`character-with-popup-${id}`}
+                    className="Interactor__character-container"
+                  >
+                    <EmotionRenderer
+                      key={`character-emotion-render-${id}`}
+                      assetLinkLoader={assetLinkLoader}
+                      assetUrl={image}
+                      upDownAnimation
+                      className={classNames({
+                        'Interactor__emotion-renderer': true,
+                        selected: displayCharacter?.id === id,
+                      })}
+                    />
+                    <CharacterPopup
+                      character={{
+                        id: character.id,
+                        name: character.name,
+                        description: character.card?.data?.description || character.card?.data?.personality || '',
+                        profile_pic: character.profile_pic,
+                      }}
+                      assetLinkLoader={assetLinkLoader}
+                      isVisible={true}
+                      position={{ x: 0, y: 0 }} // Position will be calculated relative to character
+                    />
+                  </div>
+                );
+              })}
               <ChatBox />
               <Inventory />
               <DebugModal />
               <ModelSelectorModal />
               <RegenerateEmotionModal />
+              
             </div>
           </>
         )}
