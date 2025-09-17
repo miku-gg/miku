@@ -123,7 +123,13 @@ export const OptionsEditor = ({ part, cutsceneId, onUpdate }: OptionsEditorProps
                 <SceneSelector
                   multiSelect={false}
                   nonDeletable
-                  value={option.action.params.sceneId || null}
+                  value={(() => {
+                    const sceneId = option.action.params?.sceneId;
+                    if (!sceneId) return null;
+                    // Check if the scene still exists in the scenes
+                    const sceneExists = scenes?.find(scene => scene.id === sceneId);
+                    return sceneExists ? sceneId : null;
+                  })()}
                   onChange={(sceneId) => {
                     updateAction(option.id, {
                       type: 'NAVIGATE_TO_SCENE',

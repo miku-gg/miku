@@ -9,9 +9,10 @@ import { useRef, useEffect, useState } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward, IoIosSkipForward } from 'react-icons/io';
 import { useI18n } from '../../libs/i18n';
-import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
+import { setCutsceneTextIndex, setCutscenePartIndex, interactionStart } from '../../state/slices/narrationSlice';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
 import { addItem, toggleItemVisibility } from '../../state/slices/inventorySlice';
+import { toast } from 'react-toastify';
 
 const PartRenderer = ({
   part,
@@ -140,7 +141,7 @@ const PartRenderer = ({
 };
 
 export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }) => {
-  const { assetLinkLoader, isMobileApp } = useAppContext();
+  const { assetLinkLoader, isMobileApp, servicesEndpoint, apiEndpoint } = useAppContext();
   const { i18n } = useI18n();
   const dispatch = useAppDispatch();
   const fillTextTemplate = useFillTextTemplateFunction();
@@ -148,6 +149,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const currentCutscene = useAppSelector(selectCurrentCutscene);
   const items = useAppSelector((state) => state.novel.inventory);
   const inventoryItems = useAppSelector((state) => state.inventory.items);
+  const scenes = useAppSelector((state) => state.novel.scenes);
 
   const currentPartIndex = useAppSelector((state) => state.narration.input.cutscenePartIndex || 0);
   const currentTextIndex = useAppSelector((state) => state.narration.input.cutsceneTextIndex || 0);
@@ -181,15 +183,40 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
     const currentPart = parts[currentPartIndex];
     const option = currentPart.options?.find((option) => option.id === optionId);
     if (!option) return;
+    if(!option.action) return;
 
-    switch (option.action?.type) {
-      case 'NAVIGATE_TO_SCENE':
+    switch (option.action.type) {
+      case 'NAVIGATE_TO_SCENE': {
+        const navigateAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'NAVIGATE_TO_SCENE' }>;
+        const targetScene = scenes.find(s => s.id === navigateAction.params.sceneId);
+        if (!targetScene) {
+          toast.error('Target scene not found.', {
+            position: 'bottom-right',
+          });
+          break;
+        }
+        
         dispatch({
-          type: 'narration/suggestAdvanceScene',
-          payload: { sceneId: option.action.params.sceneId }
+          type: 'novel/CUTSCENE_OPTION_SELECTED',
+          payload: { 
+            optionId: option.id,
+            action: option.action
+          }
         });
+        
+        dispatch(interactionStart({
+          sceneId: navigateAction.params.sceneId,
+          isNewScene: true,
+          text: targetScene.prompt || '',
+          characters: targetScene.characters.map(c => c.characterId) || [],
+          servicesEndpoint,
+          apiEndpoint,
+          selectedCharacterId: targetScene.characters[Math.floor(Math.random() * targetScene.characters.length)]?.characterId || '',
+        }));
+        
         onEndDisplay();
         break;
+      }
       case 'GIVE_ITEM': {
         const giveItemAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'GIVE_ITEM' }>;
         const item = items?.find((i) => i.id === giveItemAction.params.itemId);
@@ -200,6 +227,10 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
           }
           // Make the item visible
           dispatch(toggleItemVisibility({ itemId: item.id, hidden: false }));
+        } else {
+          toast.error('Item not found in inventory.', {
+            position: 'bottom-right',
+          });
         }
         handleContinueClick();
         break;
