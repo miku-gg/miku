@@ -4,6 +4,7 @@ import { NovelV3 } from '@mikugg/bot-utils';
 import { useState } from 'react';
 import { v4 as randomUUID } from 'uuid';
 import SceneSelector from '../scene/SceneSelector';
+import ItemSelector from '../items/ItemSelector';
 import './OptionsEditor.scss';
 
 interface OptionsEditorProps {
@@ -95,6 +96,20 @@ export const OptionsEditor = ({ part, cutsceneId, onUpdate }: OptionsEditorProps
                   updateAction(option.id, {
                     type: 'NAVIGATE_TO_SCENE',
                     params: { sceneId: sceneId || '' }
+                  });
+                }}
+              />
+            )}
+            
+            {option.action?.type === 'GIVE_ITEM' && (
+              <ItemSelector
+                multiSelect={false}
+                nonDeletable
+                value={option.action.params?.itemId || null}
+                onChange={(itemId) => {
+                  updateAction(option.id, {
+                    type: 'GIVE_ITEM',
+                    params: { itemId: itemId || '' }
                   });
                 }}
               />

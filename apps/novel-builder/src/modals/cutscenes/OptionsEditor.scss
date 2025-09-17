@@ -49,4 +49,16 @@
       background-size: cover !important;
     }
   }
+
+  .ItemSelector {
+    flex: 1 !important;
+    min-width: 200px !important;
+    width: 100% !important;
+    
+    .ItemNode {
+      width: 100% !important;
+      min-width: 200px !important;
+      background-size: cover !important;
+    }
+  }
 }
