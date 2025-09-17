@@ -37,4 +37,16 @@
     min-width: 150px;
     max-width: 150px;
   }
+
+  .SceneSelector {
+    flex: 1 !important;
+    min-width: 200px !important;
+    width: 100% !important;
+    
+    .SceneNode {
+      width: 100% !important;
+      min-width: 200px !important;
+      background-size: cover !important;
+    }
+  }
 }

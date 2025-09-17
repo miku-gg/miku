@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { useState } from 'react';
 import { v4 as randomUUID } from 'uuid';
+import SceneSelector from '../scene/SceneSelector';
 import './OptionsEditor.scss';
 
 interface OptionsEditorProps {
@@ -84,27 +85,35 @@ export const OptionsEditor = ({ part, cutsceneId, onUpdate }: OptionsEditorProps
       <div className="OptionsEditor__options">
         {part.options?.map((option) => (
           <div key={option.id} className="OptionsEditor__option">
-            <Input
-              value={option.text}
-              onChange={(e) => updateOption(option.id, { text: e.target.value })}
-              placeholder="Option text..."
-              className="OptionsEditor__option-text"
-            />
+            
+            {option.action?.type === 'NAVIGATE_TO_SCENE' && (
+              <SceneSelector
+                multiSelect={false}
+                nonDeletable
+                value={option.action.params.sceneId || null}
+                onChange={(sceneId) => {
+                  updateAction(option.id, {
+                    type: 'NAVIGATE_TO_SCENE',
+                    params: { sceneId: sceneId || '' }
+                  });
+                }}
+              />
+            )}
             
             <Dropdown
               items={actionTypes}
-              selectedIndex={actionTypes.findIndex(item => item.value === option.action.type)}
+              selectedIndex={actionTypes.findIndex(item => item.value === option.action?.type)}
               onChange={(selectedIndex) => {
                 const actionType = actionTypes[selectedIndex].value;
                 if (actionType === 'NAVIGATE_TO_SCENE') {
                   updateAction(option.id, {
                     type: 'NAVIGATE_TO_SCENE',
-                    params: { sceneId: scenes[0]?.id || '' }
+                    params: { sceneId: '' }
                   });
                 } else if (actionType === 'GIVE_ITEM') {
                   updateAction(option.id, {
                     type: 'GIVE_ITEM',
-                    params: { itemId: items[0]?.id || '', quantity: 1 }
+                    params: { itemId: ''}
                   });
                 }
               }}
