@@ -32,7 +32,7 @@ export const ItemSelectorModal = ({
     <Modal title="Select an Item" opened={opened} onCloseModal={onCloseModal} className="ItemSelectorModal">
       <div className="ItemSelectorModal__item-selection">
         <IoIosCloseCircleOutline className="ItemSelectorModal__closeModal" onClick={onCloseModal} />
-        <div className="ItemSelectorModal__item-selection-list">
+        <div className="ItemSelectorModal__item-selection-grid">
           {items.length === 0 ? (
             <div className="ItemSelectorModal__no-items">
               No items available. Create some items first.
@@ -54,22 +54,22 @@ export const ItemSelectorModal = ({
                 onCloseModal();
               }}
             >
-              <div
-                className="ItemNode"
-                style={{
-                  backgroundImage: `url(${config.genAssetLink(
-                    item.icon || '',
-                    AssetDisplayPrefix.ITEM_IMAGE,
-                  )})`,
-                }}
-              >
-                <div className="ItemNode__title">{item.name}</div>
-                <div className="ItemNode__description">{item.description}</div>
-               </div>
-             </div>
-           ))
+              <div className="ItemNode">
+                <div className="ItemNode__image">
+                  <img
+                    src={config.genAssetLink(item.icon || '', AssetDisplayPrefix.ITEM_IMAGE)}
+                    alt={item.name}
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/default_item.png';
+                    }}
+                  />
+                </div>
+                <div className="ItemNode__name">{item.name}</div>
+              </div>
+            </div>
+            ))
           )}
-         </div>
+        </div>
       </div>
     </Modal>
   );
