@@ -53,6 +53,7 @@
 
   &__background-edit-btn,
   &__character-select1-btn,
+  &__fullscreen-emotion-btn,
   &__character-select2-btn {
     position: absolute;
     top: 10px;
@@ -118,6 +119,65 @@
 
   &__character {
     position: relative;
+  }
+
+  &__character-fullscreen-controls {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 6px;
+
+    .SceneEditModal__fullscreen-emotion-btn {
+      position: static;
+      top: auto;
+      right: auto;
+    }
+  }
+
+  &__character-fullscreen-zoom-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    opacity: 0.1;
+    transition: opacity 0.2s ease;
+    pointer-events: auto;
+  }
+
+  &__character-fullscreen-zoom-overlay:hover {
+    opacity: 0.7;
+  }
+
+  &__character-fullscreen-zoom-overlay-btn {
+    border: 2px solid white !important;
+    border-radius: 50% !important;
+    color: white !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    width: 80px !important;
+    height: 80px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    &:active {
+      transform: scale(0.98) !important;
+    }
+  }
+
+  &__character-fullscreen-controls {
+    .SceneEditModal__fullscreen-emotion-btn:first-child {
+      display: none; // Hide the first button (zoom) on desktop
+    }
   }
 
   &__scene-details {
@@ -286,10 +346,37 @@
     }
     .ImageSlider__backgroundImage {
       width: initial;
+      max-width: 198px;
     }
     .ImageSlider__selectedImage {
       height: 60%;
     }
+
+    .SceneEditModal__character-fullscreen-zoom-overlay {
+      display: none;
+    }
+
+    .SceneEditModal__character-fullscreen-controls {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+
+      .SceneEditModal__fullscreen-emotion-btn {
+        position: static;
+        top: auto;
+        right: auto;
+        flex-shrink: 0;
+        display: flex !important; // Show zoom button on mobile
+      }
+    }
+
   }
 }
 //add media query for width 975px

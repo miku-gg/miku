@@ -58,12 +58,15 @@ export interface NovelCharacterOutfit {
   attributes: string[][];
   template: EmotionTemplateSlug;
   nsfw: NovelNSFW;
+  isFullscreen?: boolean;
   emotions: {
     id: string;
     sources: {
       png: string;
       webm?: string;
       sound?: string;
+      desktop?: string;
+      mobile?: string;
     };
   }[];
 }

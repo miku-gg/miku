@@ -138,6 +138,7 @@ export type MikuCardV2 = TavernCardV2 & {
             poseImage?: string; // pose that was used to generate the outfit
             referenceImage?: string; // reference image that was used to generate the outfit
           };
+          isFullscreen?: boolean; // indicates if this emotion supports desktop/mobile variants
           emotions: {
             // list of emotions of the group, derived from the template
             id: string; // id of the emotion
@@ -145,6 +146,8 @@ export type MikuCardV2 = TavernCardV2 & {
               png: string;
               webm?: string;
               sound?: string; // id of the sound to be used when the emotion is triggered
+              desktop?: string; // id of the desktop fullscreen asset
+              mobile?: string; // id of the mobile fullscreen asset
             };
           }[];
         }[];
@@ -155,7 +158,7 @@ export type MikuCardV2 = TavernCardV2 & {
 
 export const LICENSES = ['CC0', 'CC BY', 'CC BY-SA', 'CC BY-ND', 'CC BY-NC', 'CC BY-NC-SA', 'CC BY-NC-ND'];
 
-export type EmotionTemplateSlug = 'single-emotion' | 'tiny-emotions' | 'base-emotions' | 'lewd-emotions';
+export type EmotionTemplateSlug = 'single-emotion' | 'tiny-emotions' | 'base-emotions' | 'lewd-emotions' | 'fullscreen-emotions';
 
 export const EMOTION_GROUP_TEMPLATES: Record<
   EmotionTemplateSlug,
@@ -230,6 +233,21 @@ export const EMOTION_GROUP_TEMPLATES: Record<
       'pain',
       'teasing',
       'arrogant',
+    ],
+  },
+  'fullscreen-emotions': {
+    id: 'fullscreen-emotions',
+    label: 'Fullscreen emotions',
+    emotionIds: [
+      'angry',
+      'sad',
+      'happy',
+      'disgusted',
+      'scared',
+      'embarrased',
+      'surprised',
+      'neutral',
+      'confused',
     ],
   },
 };
