@@ -11,6 +11,7 @@ const initialState: NarrationState = {
   id: '',
   fetching: true,
   currentResponseId: '',
+  disposableResponseId: null,
   input: {
     text: '',
     suggestions: [],
@@ -59,44 +60,123 @@ const narrationSlice = createSlice({
       }>,
     ) {
       const { text, sceneId, isNewScene, afterBattle } = action.payload;
-      const newInteractionId = randomUUID();
-      const response: NarrationResponse = {
-        id: randomUUID(),
-        selectedCharacterId: action.payload.selectedCharacterId,
-        characters: [
-          {
-            characterId: action.payload.selectedCharacterId,
-            text: '',
-            emotion: '',
-            pose: '',
-          },
-        ],
-        childrenInteractions: [],
-        fetching: true,
-        parentInteractionId: newInteractionId,
-        selected: true,
-        suggestedScenes: [],
-        indicators: [],
-      };
-      const interaction: NarrationInteraction = {
-        id: newInteractionId,
-        parentResponseId: state.currentResponseId,
-        query: text,
-        sceneId,
-        responsesId: [response.id],
-        ...(afterBattle && { afterBattle }),
-      };
-      const currentResponse = state.responses[state.currentResponseId];
-      currentResponse?.childrenInteractions.forEach((child) => {
-        child.selected = false;
-      });
-      currentResponse?.childrenInteractions.push({
-        interactionId: newInteractionId,
-        selected: true,
-      });
-      state.interactions[newInteractionId] = interaction;
-      state.responses[response.id] = response;
-      state.currentResponseId = response.id;
+      
+      // Replace disposable response data with new interaction data
+      if(state.disposableResponseId) {
+        const disposableResponse = state.responses[state.disposableResponseId];
+        const disposableInteraction = disposableResponse?.parentInteractionId ? 
+          state.interactions[disposableResponse.parentInteractionId] : null;
+        
+        if (disposableResponse && disposableInteraction) {
+          // Update the disposable response with new interaction data
+          disposableResponse.selectedCharacterId = action.payload.selectedCharacterId;
+          disposableResponse.characters = [
+            {
+              characterId: action.payload.selectedCharacterId,
+              text: '',
+              emotion: '',
+              pose: '',
+            },
+          ];
+          disposableResponse.fetching = true;
+          disposableResponse.selected = true;
+          disposableResponse.suggestedScenes = [];
+          disposableResponse.indicators = [];
+          
+          // Update the disposable interaction with new data
+          disposableInteraction.query = text;
+          disposableInteraction.sceneId = sceneId;
+          if (afterBattle) {
+            disposableInteraction.afterBattle = afterBattle;
+          }
+          
+          // Update current response ID to the transformed response
+          state.currentResponseId = disposableResponse.id;
+          
+          // Clear the disposable flag
+          state.disposableResponseId = null;
+        } else {
+          // Fallback: create new interaction normally
+          const newInteractionId = randomUUID();
+          const response: NarrationResponse = {
+            id: randomUUID(),
+            selectedCharacterId: action.payload.selectedCharacterId,
+            characters: [
+              {
+                characterId: action.payload.selectedCharacterId,
+                text: '',
+                emotion: '',
+                pose: '',
+              },
+            ],
+            childrenInteractions: [],
+            fetching: true,
+            parentInteractionId: newInteractionId,
+            selected: true,
+            suggestedScenes: [],
+            indicators: [],
+          };
+          const interaction: NarrationInteraction = {
+            id: newInteractionId,
+            parentResponseId: state.currentResponseId,
+            query: text,
+            sceneId,
+            responsesId: [response.id],
+            ...(afterBattle && { afterBattle }),
+          };
+          const parentResponse = state.responses[state.currentResponseId];
+          parentResponse?.childrenInteractions.forEach((child) => {
+            child.selected = false;
+          });
+          parentResponse?.childrenInteractions.push({
+            interactionId: newInteractionId,
+            selected: true,
+          });
+          state.interactions[newInteractionId] = interaction;
+          state.responses[response.id] = response;
+          state.currentResponseId = response.id;
+        }
+      } else {
+        // Normal interaction start without disposable response
+        const newInteractionId = randomUUID();
+        const response: NarrationResponse = {
+          id: randomUUID(),
+          selectedCharacterId: action.payload.selectedCharacterId,
+          characters: [
+            {
+              characterId: action.payload.selectedCharacterId,
+              text: '',
+              emotion: '',
+              pose: '',
+            },
+          ],
+          childrenInteractions: [],
+          fetching: true,
+          parentInteractionId: newInteractionId,
+          selected: true,
+          suggestedScenes: [],
+          indicators: [],
+        };
+        const interaction: NarrationInteraction = {
+          id: newInteractionId,
+          parentResponseId: state.currentResponseId,
+          query: text,
+          sceneId,
+          responsesId: [response.id],
+          ...(afterBattle && { afterBattle }),
+        };
+        const currentResponse = state.responses[state.currentResponseId];
+        currentResponse?.childrenInteractions.forEach((child) => {
+          child.selected = false;
+        });
+        currentResponse?.childrenInteractions.push({
+          interactionId: newInteractionId,
+          selected: true,
+        });
+        state.interactions[newInteractionId] = interaction;
+        state.responses[response.id] = response;
+        state.currentResponseId = response.id;
+      }
       state.input.disabled = true;
       state.input.suggestions = [];
       state.input.seenCutscene = isNewScene ? false : state.input.seenCutscene;
@@ -627,28 +707,105 @@ const narrationSlice = createSlice({
       }>,
     ) {
       const { sceneId, isNewScene } = action.payload;
-      const newInteractionId = randomUUID();
-      const response: NarrationResponse = {
-        id: randomUUID(),
-        selectedCharacterId: '', // Empty since we don't need it for scene changes
-        characters: [],
-        childrenInteractions: [],
-        fetching: false, // No AI fetch
-        parentInteractionId: newInteractionId,
-        selected: true,
-        suggestedScenes: [],
-        indicators: [],
-      };
-      const interaction: NarrationInteraction = {
-        id: newInteractionId,
-        parentResponseId: state.currentResponseId,
-        query: '', // No query since no AI interaction
-        sceneId,
-        responsesId: [response.id],
-      };
-      state.interactions[newInteractionId] = interaction;
-      state.responses[response.id] = response;
-      state.currentResponseId = response.id;
+      
+      // Replace previous disposable response if it exists, otherwise create new one
+      if (state.disposableResponseId) {
+        const disposableResponse = state.responses[state.disposableResponseId];
+        const disposableInteraction = disposableResponse?.parentInteractionId ? 
+          state.interactions[disposableResponse.parentInteractionId] : null;
+        
+        if (disposableResponse && disposableInteraction) {
+          // Update the existing disposable response with new scene data
+          disposableResponse.selectedCharacterId = '';
+          disposableResponse.characters = [];
+          disposableResponse.fetching = false;
+          disposableResponse.selected = true;
+          disposableResponse.suggestedScenes = [];
+          disposableResponse.indicators = [];
+          
+          // Update the existing disposable interaction with new scene data
+          disposableInteraction.query = '';
+          disposableInteraction.sceneId = sceneId;
+          
+          state.currentResponseId = disposableResponse.id;
+        } else {
+          // Fallback: create new disposable response
+          const newInteractionId = randomUUID();
+          const response: NarrationResponse = {
+            id: randomUUID(),
+            selectedCharacterId: '',
+            characters: [],
+            childrenInteractions: [],
+            fetching: false,
+            parentInteractionId: newInteractionId,
+            selected: true,
+            suggestedScenes: [],
+            indicators: [],
+          };
+          const interaction: NarrationInteraction = {
+            id: newInteractionId,
+            parentResponseId: state.currentResponseId,
+            query: '',
+            sceneId,
+            responsesId: [response.id],
+          };
+          
+          // Add the disposable interaction to the parent's children
+          const parentResponse = state.responses[state.currentResponseId];
+          if (parentResponse) {
+            parentResponse.childrenInteractions.forEach((child) => {
+              child.selected = false;
+            });
+            parentResponse.childrenInteractions.push({
+              interactionId: newInteractionId,
+              selected: true,
+            });
+          }
+          
+          state.interactions[newInteractionId] = interaction;
+          state.responses[response.id] = response;
+          state.currentResponseId = response.id;
+          state.disposableResponseId = response.id;
+        }
+      } else {
+        // Create new disposable response
+        const newInteractionId = randomUUID();
+        const response: NarrationResponse = {
+          id: randomUUID(),
+          selectedCharacterId: '',
+          characters: [],
+          childrenInteractions: [],
+          fetching: false,
+          parentInteractionId: newInteractionId,
+          selected: true,
+          suggestedScenes: [],
+          indicators: [],
+        };
+        const interaction: NarrationInteraction = {
+          id: newInteractionId,
+          parentResponseId: state.currentResponseId,
+          query: '',
+          sceneId,
+          responsesId: [response.id],
+        };
+        
+        // Add the disposable interaction to the parent's children
+        const parentResponse = state.responses[state.currentResponseId];
+        if (parentResponse) {
+          parentResponse.childrenInteractions.forEach((child) => {
+            child.selected = false;
+          });
+          parentResponse.childrenInteractions.push({
+            interactionId: newInteractionId,
+            selected: true,
+          });
+        }
+        
+        state.interactions[newInteractionId] = interaction;
+        state.responses[response.id] = response;
+        state.currentResponseId = response.id;
+        state.disposableResponseId = response.id;
+      }
       state.input.disabled = false; // Keep input enabled
       state.input.suggestions = [];
       state.input.seenCutscene = isNewScene ? false : state.input.seenCutscene;

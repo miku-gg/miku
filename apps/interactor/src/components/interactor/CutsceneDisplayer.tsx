@@ -209,7 +209,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         cutsceneOptionsBuffer.changeScene(dispatch, store.getState(), {
           sceneId: navigateAction.params.sceneId,
           isNewScene: true,
-          bufferInteraction: false, // We want to trigger AI query after scene change
+          bufferInteraction: true, // We want to trigger AI query after scene change
         });
         
         break;
