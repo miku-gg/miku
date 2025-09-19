@@ -1,6 +1,6 @@
 import { useAppContext } from '../../App.context';
 import { selectCurrentScene, selectCurrentCutscene } from '../../state/selectors';
-import { useAppSelector, useAppDispatch } from '../../state/store';
+import { useAppSelector, useAppDispatch, store } from '../../state/store';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import classNames from 'classnames';
@@ -9,7 +9,8 @@ import { useRef, useEffect, useState } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward, IoIosSkipForward } from 'react-icons/io';
 import { useI18n } from '../../libs/i18n';
-import { setCutsceneTextIndex, setCutscenePartIndex, interactionStart } from '../../state/slices/narrationSlice';
+import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
+import { cutsceneOptionsBuffer } from '../../libs/cutsceneOptionsBuffer';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
 import { addItem, toggleItemVisibility } from '../../state/slices/inventorySlice';
 import { toast } from 'react-toastify';
@@ -141,7 +142,7 @@ const PartRenderer = ({
 };
 
 export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }) => {
-  const { assetLinkLoader, isMobileApp, servicesEndpoint, apiEndpoint } = useAppContext();
+  const { assetLinkLoader, isMobileApp } = useAppContext();
   const { i18n } = useI18n();
   const dispatch = useAppDispatch();
   const fillTextTemplate = useFillTextTemplateFunction();
@@ -204,17 +205,13 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
           }
         });
         
-        dispatch(interactionStart({
+        // Use cutscene options buffer for scene navigation
+        cutsceneOptionsBuffer.changeScene(dispatch, store.getState(), {
           sceneId: navigateAction.params.sceneId,
           isNewScene: true,
-          text: targetScene.prompt || '',
-          characters: targetScene.characters.map(c => c.characterId) || [],
-          servicesEndpoint,
-          apiEndpoint,
-          selectedCharacterId: targetScene.characters[Math.floor(Math.random() * targetScene.characters.length)]?.characterId || '',
-        }));
+          bufferInteraction: false, // We want to trigger AI query after scene change
+        });
         
-        onEndDisplay();
         break;
       }
       case 'GIVE_ITEM': {

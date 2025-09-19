@@ -619,6 +619,45 @@ const narrationSlice = createSlice({
       if (!cb) return;
       cb.state.turn += 1;
     },
+    navigateToScene( // Doesn't trigger AI query nor adds nodes to the history graph. Needs interaction start later.
+      state,
+      action: PayloadAction<{
+        sceneId: string;
+        isNewScene: boolean;
+      }>,
+    ) {
+      const { sceneId, isNewScene } = action.payload;
+      const newInteractionId = randomUUID();
+      const response: NarrationResponse = {
+        id: randomUUID(),
+        selectedCharacterId: '', // Empty since we don't need it for scene changes
+        characters: [],
+        childrenInteractions: [],
+        fetching: false, // No AI fetch
+        parentInteractionId: newInteractionId,
+        selected: true,
+        suggestedScenes: [],
+        indicators: [],
+      };
+      const interaction: NarrationInteraction = {
+        id: newInteractionId,
+        parentResponseId: state.currentResponseId,
+        query: '', // No query since no AI interaction
+        sceneId,
+        responsesId: [response.id],
+      };
+      state.interactions[newInteractionId] = interaction;
+      state.responses[response.id] = response;
+      state.currentResponseId = response.id;
+      state.input.disabled = false; // Keep input enabled
+      state.input.suggestions = [];
+      state.input.seenCutscene = isNewScene ? false : state.input.seenCutscene;
+      if (isNewScene) {
+        state.input.seenCutscene = false;
+        state.input.cutscenePartIndex = 0;
+        state.input.cutsceneTextIndex = 0;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -671,6 +710,7 @@ export const {
   addMana,
   addBattleLog,
   moveNextTurn,
+  navigateToScene,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;
