@@ -53,13 +53,30 @@ const narrationSlice = createSlice({
         characters: string[];
         selectedCharacterId: string;
         emotion?: string;
+        skipCutscene?: boolean;
         afterBattle?: {
           battleId: string;
           isWin: boolean;
         };
       }>,
     ) {
-      const { text, sceneId, isNewScene, afterBattle } = action.payload;
+      const { text, sceneId, isNewScene, skipCutscene, afterBattle } = action.payload;
+      
+      // Helper function to handle cutscene state
+      const handleCutsceneState = (state: any) => {
+        if (skipCutscene) {
+          // Skip cutscene: mark as seen so it won't replay
+          state.input.seenCutscene = true;
+        } else {
+          // Normal cutscene logic
+          state.input.seenCutscene = isNewScene ? false : state.input.seenCutscene;
+          if (isNewScene) {
+            state.input.seenCutscene = false;
+            state.input.cutscenePartIndex = 0;
+            state.input.cutsceneTextIndex = 0;
+          }
+        }
+      };
       
       // Replace disposable response data with new interaction data
       if(state.disposableResponseId) {
@@ -92,6 +109,9 @@ const narrationSlice = createSlice({
           
           // Update current response ID to the transformed response
           state.currentResponseId = disposableResponse.id;
+          
+          // Handle cutscene state
+          handleCutsceneState(state);
           
           // Clear the disposable flag
           state.disposableResponseId = null;
@@ -179,12 +199,9 @@ const narrationSlice = createSlice({
       }
       state.input.disabled = true;
       state.input.suggestions = [];
-      state.input.seenCutscene = isNewScene ? false : state.input.seenCutscene;
-      if (isNewScene) {
-        state.input.seenCutscene = false;
-        state.input.cutscenePartIndex = 0;
-        state.input.cutsceneTextIndex = 0;
-      }
+      
+      // Handle cutscene state
+      handleCutsceneState(state);
     },
     interactionFailure(state, action: PayloadAction<string | undefined>) {
       state.input.disabled = false;

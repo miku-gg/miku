@@ -54,6 +54,7 @@ const Interactor = () => {
       interactionStart({
         sceneId: scene.id,
         isNewScene: true,
+        skipCutscene: true, // Skip cutscene since it already played
         text: scene.prompt,
         apiEndpoint,
         characters: scene.characters.map((r) => r.characterId) || [],
