@@ -1,6 +1,6 @@
 import { useAppContext } from '../../App.context';
 import { selectCurrentScene, selectCurrentCutscene } from '../../state/selectors';
-import { useAppSelector, useAppDispatch } from '../../state/store';
+import { useAppSelector, useAppDispatch, store } from '../../state/store';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import classNames from 'classnames';
@@ -10,7 +10,10 @@ import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward, IoIosSkipForward } from 'react-icons/io';
 import { useI18n } from '../../libs/i18n';
 import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
+import { cutsceneOptionsBuffer } from '../../libs/cutsceneOptionsBuffer';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
+import { addItem, toggleItemVisibility } from '../../state/slices/inventorySlice';
+import { toast } from 'react-toastify';
 
 const PartRenderer = ({
   part,
@@ -145,6 +148,9 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const fillTextTemplate = useFillTextTemplateFunction();
   const scene = useAppSelector(selectCurrentScene);
   const currentCutscene = useAppSelector(selectCurrentCutscene);
+  const items = useAppSelector((state) => state.novel.inventory);
+  const inventoryItems = useAppSelector((state) => state.inventory.items);
+  const scenes = useAppSelector((state) => state.novel.scenes);
 
   const currentPartIndex = useAppSelector((state) => state.narration.input.cutscenePartIndex || 0);
   const currentTextIndex = useAppSelector((state) => state.narration.input.cutsceneTextIndex || 0);
@@ -173,6 +179,71 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
     }
   };
 
+  const handleOptionSelect = (optionId: string) => {
+    if (!currentCutscene) return;
+    const currentPart = parts[currentPartIndex];
+    const option = currentPart.options?.find((option) => option.id === optionId);
+    if (!option) return;
+    if(!option.action) return;
+
+    switch (option.action.type) {
+      case 'NAVIGATE_TO_SCENE': {
+        const navigateAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'NAVIGATE_TO_SCENE' }>;
+        const targetScene = scenes.find(s => s.id === navigateAction.params.sceneId);
+        if (!targetScene) {
+          toast.error('Target scene not found.', {
+            position: 'bottom-right',
+          });
+          break;
+        }
+        
+        dispatch({
+          type: 'novel/CUTSCENE_OPTION_SELECTED',
+          payload: { 
+            optionId: option.id,
+            action: option.action
+          }
+        });
+        
+        // Use cutscene options buffer for scene navigation
+        cutsceneOptionsBuffer.changeScene(dispatch, store.getState(), {
+          sceneId: navigateAction.params.sceneId,
+          isNewScene: true,
+          bufferInteraction: true, // We want to trigger AI query after scene change
+        });
+        
+        break;
+      }
+      case 'GIVE_ITEM': {
+        const giveItemAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'GIVE_ITEM' }>;
+        const item = items?.find((i) => i.id === giveItemAction.params.itemId);
+        if (item) {
+          const existingItem = inventoryItems.find(i => i.id === item.id);
+          if (!existingItem) {
+            dispatch(addItem(item));
+          }
+          // Make the item visible
+          dispatch(toggleItemVisibility({ itemId: item.id, hidden: false }));
+        } else {
+          toast.error('Item not found in inventory.', {
+            position: 'bottom-right',
+          });
+        }
+        handleContinueClick();
+        break;
+      }
+    }
+
+    dispatch({
+      type: NovelV3.NovelActionType.CUTSCENE_OPTION_SELECTED,
+      params: {
+        cutsceneId: currentCutscene.id,
+        partId: currentPart.id,
+        optionId: optionId,
+      },
+    });
+  };  
+  
   const isAtEnd = () => {
     if (!parts[currentPartIndex]) return false;
 
@@ -271,50 +342,78 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
             </div>
           ))}
         </div>
-        <div className="CutsceneDisplayer__buttons">
-          <button
-            className={classNames({
-              'CutsceneDisplayer__buttons-left': true,
-              'CutsceneDisplayer__buttons-left--hidden': currentTextIndex === 0 && currentPartIndex === 0,
-            })}
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              handlePreviousClick();
-            }}
-          >
-            <IoIosArrowBack />
-          </button>
-          <div className="CutsceneDisplayer__buttons-right-group">
-            <button
-              className={classNames({
-                'CutsceneDisplayer__buttons-right': true,
-              })}
-              onClick={(e) => {
-                e.stopPropagation();
-                onEndDisplay();
-              }}
-            >
-              <p className="CutsceneDisplayer__buttons-right__text">{i18n('go_to_scene')}</p>
-              <IoIosSkipForward />
-            </button>
-            <button
-              className={classNames({
-                'CutsceneDisplayer__buttons-right': true,
-                'CutsceneDisplayer__buttons-right--hidden': isAtEnd(),
-              })}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (isAtEnd()) {
-                  onEndDisplay();
-                } else {
-                  handleContinueClick();
-                }
-              }}
-            >
-              <IoIosArrowForward />
-            </button>
-          </div>
-        </div>
+        {/* Render options if current text has type 'options' */}
+        {(() => {
+          const currentPart = parts[currentPartIndex];
+          const currentText = currentPart?.text[currentTextIndex];
+          const hasOptions = currentText?.type === 'options' && currentPart?.options && currentPart.options.length > 0;
+          
+          if (hasOptions) {
+            return (
+              <div className="CutsceneDisplayer__options">
+                {currentPart.options?.map((option) => (
+                  <button
+                    key={option.id}
+                    className="CutsceneDisplayer__option-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOptionSelect(option.id);
+                    }}
+                  >
+                    {fillTextTemplate(option.text)}
+                  </button>
+                ))}
+              </div>
+            );
+          }
+          
+          return (
+            <div className="CutsceneDisplayer__buttons">
+              <button
+                className={classNames({
+                  'CutsceneDisplayer__buttons-left': true,
+                  'CutsceneDisplayer__buttons-left--hidden': currentTextIndex === 0 && currentPartIndex === 0,
+                })}
+                onClick={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  handlePreviousClick();
+                }}
+              >
+                <IoIosArrowBack />
+              </button>
+              <div className="CutsceneDisplayer__buttons-right-group">
+                <button
+                  className={classNames({
+                    'CutsceneDisplayer__buttons-right': true,
+                  })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEndDisplay();
+                  }}
+                >
+                  <p className="CutsceneDisplayer__buttons-right__text">{i18n('go_to_scene')}</p>
+                  <IoIosSkipForward />
+                </button>
+                <button
+                  className={classNames({
+                    'CutsceneDisplayer__buttons-right': true,
+                    'CutsceneDisplayer__buttons-right--hidden': isAtEnd(),
+                  })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isAtEnd()) {
+                      onEndDisplay();
+                    } else {
+                      handleContinueClick();
+                    }
+                  }}
+                >
+                  <IoIosArrowForward />
+                </button>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </>
   );

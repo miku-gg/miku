@@ -30,12 +30,14 @@ const textCompletion = async function* ({
   model,
   variables,
   identifier,
+  abortController,
 }: {
   serviceBaseUrl: string;
   template: string;
   model: ModelType;
   variables: Record<string, string[] | string>;
   identifier: string;
+  abortController?: AbortController;
 }): AsyncGenerator<Map<string, string>> {
   try {
     completionHistory.push({
@@ -56,6 +58,7 @@ const textCompletion = async function* ({
         Identifier: identifier,
       },
       credentials: 'include',
+      signal: abortController?.signal,
     });
     const reader = response.body?.getReader();
     const decoder = new TextDecoder('utf-8');
@@ -63,6 +66,12 @@ const textCompletion = async function* ({
     const result = new Map<string, string>();
     let read;
     while (!read || !read.done) {
+      // Check if the request was aborted
+      if (abortController?.signal.aborted) {
+        reader?.cancel();
+        return;
+      }
+      
       read = await reader?.read();
       if (read?.value) {
         const valueString = decoder.decode(read.value);
@@ -72,6 +81,9 @@ const textCompletion = async function* ({
       }
     }
   } catch (error) {
+    if (abortController?.signal.aborted) {
+      return; // Don't throw error if aborted
+    }
     throw 'Error fetching data:' + error;
   }
 };

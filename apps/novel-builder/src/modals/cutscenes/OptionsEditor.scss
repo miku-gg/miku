@@ -1,0 +1,77 @@
+@import '../../styles/variables';
+
+.OptionsEditor {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+
+    h3 {
+      margin: 0;
+    }
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-right: 10px;
+  }
+
+  &__option {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+    border: 1px solid $node-conector-color;
+    border-radius: 8px;
+    background-color: $background-1;
+
+    &-text {
+      flex: 1;
+    }
+  }
+
+  &__option-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    flex: 1;
+
+    .Input {
+      flex: 1;
+    }
+  }
+
+  &__option-selectors {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__action-dropdown {
+    min-width: 150px;
+    max-width: 150px;
+  }
+
+  .SceneSelector {
+    display: flex;
+    justify-content: center;
+    
+    .SceneNode {
+      background-size: cover !important;
+    }
+  }
+
+  .ItemSelector {
+    display: flex;
+    justify-content: center;
+    
+    .ItemNode {
+      background-size: cover !important;
+    }
+  }
+}
