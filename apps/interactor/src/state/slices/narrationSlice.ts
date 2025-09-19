@@ -832,6 +832,16 @@ const narrationSlice = createSlice({
         state.input.cutsceneTextIndex = 0;
       }
     },
+    stopAiQueryAndMarkDisposable(state) {
+      // Mark the current response as disposable if it's currently fetching
+      const currentResponse = state.responses[state.currentResponseId];
+      if (currentResponse && currentResponse.fetching) {
+        state.disposableResponseId = state.currentResponseId;
+        currentResponse.fetching = false;
+      }
+      // prevent new queries
+      state.input.disabled = true;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -885,6 +895,7 @@ export const {
   addBattleLog,
   moveNextTurn,
   navigateToScene,
+  stopAiQueryAndMarkDisposable,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;

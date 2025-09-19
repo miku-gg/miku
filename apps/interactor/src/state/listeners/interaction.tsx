@@ -15,6 +15,7 @@ import textCompletion from '../../libs/textCompletion';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { retrieveModelMetadata } from '../../libs/retrieveMetadata';
 import { fillTextTemplate, SummaryPromptStrategy } from '../../libs/prompts/strategies';
+import { setCurrentInteractionAbortController } from '../../libs/interactionAbortController';
 import {
   indicatorVarName,
   RoleplayPromptStrategy,
@@ -66,6 +67,12 @@ const interactionEffect = async (
   apiEndpoint: string,
   selectedCharacterId: string,
 ) => {
+  // Create AbortController for this interaction
+  const abortController = new AbortController();
+  
+  // Store the abort controller in module-level variable
+  setCurrentInteractionAbortController(abortController);
+  
   try {
     let currentResponseState: NarrationResponse = state.narration.responses[state.narration.currentResponseId]!;
     const currentCharacterResponse = currentResponseState.characters.find(
@@ -180,6 +187,7 @@ const interactionEffect = async (
           model: secondary.id,
           serviceBaseUrl: servicesEndpoint,
           identifier,
+          abortController,
         }),
       );
 
@@ -222,10 +230,16 @@ const interactionEffect = async (
       model: state.settings.model,
       serviceBaseUrl: servicesEndpoint,
       identifier,
+      abortController,
     });
 
     let finishedCompletionResult = new Map<string, string>();
     for await (const result of stream) {
+      // Check if the request was aborted
+      if (abortController.signal.aborted) {
+        return; // Exit early if aborted
+      }
+      
       finishedCompletionResult = result;
       result.set('text', startText + (result.get('text') || ''));
       currentResponseState = responsePromptBuilder.completeResponse(currentResponseState, result, {
@@ -240,6 +254,12 @@ const interactionEffect = async (
         }),
       );
     }
+    
+    // Check if the request was aborted before final processing
+    if (abortController.signal.aborted) {
+      return; // Exit early if aborted
+    }
+    
     if (!currentResponseState.characters.find(({ characterId }) => characterId === selectedCharacterId)?.text) {
       throw new Error('No text');
     }
@@ -502,7 +522,13 @@ const interactionEffect = async (
     }
   } catch (error) {
     console.error(error);
-    dispatch(interactionFailure());
+    // Don't dispatch failure if the request was aborted
+    if (!abortController.signal.aborted) {
+      dispatch(interactionFailure());
+    }
+  } finally {
+    // Clean up the abort controller reference
+    setCurrentInteractionAbortController(null);
   }
 };
 
