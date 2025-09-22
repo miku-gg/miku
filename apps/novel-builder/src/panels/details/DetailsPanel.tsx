@@ -9,6 +9,7 @@ import ReactCountryFlag from 'react-country-flag';
 import './DetailsPanel.scss';
 import { LorebookList } from './LorebookList';
 import { AssetDisplayPrefix, AssetType } from '@mikugg/bot-utils';
+import CustomPersona from '../assets/customPersona/CustomPersona';
 
 const languageOptions = [
   { code: 'en', name: 'English', flag: 'GB' },
@@ -155,6 +156,9 @@ export default function DetailsPanel() {
         </div>
       </div>
       <LorebookList tooltipText="Prompt collections dynamically used by the AI." />
+      <div style={{ paddingTop: '0.5rem' }}>
+      <CustomPersona tooltipText="Make a persona for users without one." />
+      </div>
     </div>
   );
 }
