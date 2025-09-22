@@ -1,6 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
-import { navigateToScene } from '../state/slices/narrationSlice';
-import { RootState } from '../state/store';
+import { navigateToScene, stopAiQueryAndMarkDisposable } from '../state/slices/narrationSlice';
+import { abortCurrentInteraction, getCurrentInteractionAbortController } from './interactionAbortController';
+import { RootState, store } from '../state/store';
 
 class CutsceneOptionsBuffer {
   private needsInteractionStart: boolean = false;
@@ -29,6 +30,25 @@ class CutsceneOptionsBuffer {
     this.needsInteractionStart = buffer;
   }
 
+  /**
+   * Stop any ongoing AI query and abort ongoing interactions.
+   */
+  stopAiQuery() {
+    const state = store.getState();
+    const narration = state.narration;
+    const currentResponse = narration.responses[narration.currentResponseId];
+    const hadActiveFetch = Boolean(currentResponse?.fetching);
+    const hadActiveAbortController = Boolean(getCurrentInteractionAbortController());
+
+    if (hadActiveFetch) {
+      store.dispatch(stopAiQueryAndMarkDisposable());
+    }
+    if (hadActiveAbortController) {
+      abortCurrentInteraction();
+    }
+    this.needsInteractionStart = hadActiveFetch || hadActiveAbortController;
+  }
+ 
   /**
    * Check if AI query is needed
    */

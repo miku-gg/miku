@@ -28,10 +28,8 @@ import {
   startBattle,
   clearCurrentBattle,
   interactionStart,
-  stopAiQueryAndMarkDisposable,
 } from '../../state/slices/narrationSlice';
 import { cutsceneOptionsBuffer } from '../../libs/cutsceneOptionsBuffer';
-import { abortCurrentInteraction } from '../../libs/interactionAbortController';
 import IndicatorsDisplay from '../indicators-display/IndicatorsDisplay';
 import StartSelector from '../start-selector/StartSelector';
 import BattleScreen from './BattleScreen';
@@ -80,11 +78,7 @@ const Interactor = () => {
   // Stop AI queries when a cutscene starts
   useEffect(() => {
     if (displayingCutscene) {
-      // Stop any ongoing AI query and mark the current node as disposable
-      dispatch(stopAiQueryAndMarkDisposable());
-      
-      // Cancel any ongoing fetch requests
-      abortCurrentInteraction();
+      cutsceneOptionsBuffer.stopAiQuery();
     }
   }, [displayingCutscene, dispatch]);
 
