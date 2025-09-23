@@ -255,6 +255,8 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
 
   const getCurrentTextsToShow = () => {
     const currentPart = parts[currentPartIndex];
+    // Mark current part as seen when we enter it
+    cutsceneOptionsBuffer.addSeenPart(currentPart);
     if (!isMobileDisplay) {
       return currentPart.text.slice(0, currentTextIndex + 1);
     }

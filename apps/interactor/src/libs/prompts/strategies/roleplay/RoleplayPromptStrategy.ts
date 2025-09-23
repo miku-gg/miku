@@ -12,6 +12,7 @@ import { RootState } from '../../../../state/store';
 import { NarrationInteraction, NarrationResponse } from '../../../../state/versioning';
 import { findLorebooksEntries } from '../../../lorebookSearch';
 import labels from './RoleplayPromptLabels';
+import { cutsceneOptionsBuffer } from '../../../cutsceneOptionsBuffer';
 
 const PROMPT_TOKEN_OFFSET = 50;
 
@@ -293,7 +294,9 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const temp = this.template();
 
     const transformCutsceneToPrompt = (cutscene: NovelV3.CutScene): string => {
-      return cutscene.parts
+      const bufferedParts = cutsceneOptionsBuffer.getSeenParts();
+      const parts = bufferedParts.length ? bufferedParts : cutscene.parts;
+      return parts
         .map((part) =>
           part.text
             .map((textPart) => (textPart.type === 'description' ? `*${textPart.content}*` : `"${textPart.content}"`))
