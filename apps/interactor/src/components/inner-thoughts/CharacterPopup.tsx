@@ -79,12 +79,11 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
     if (isCurrentResponseFetching) {
       return;
     }
-    // TODO: Re-enable premium check when ready
-    // if (!isPremium && freeThoughtUsed) {
-    //     // prompt the suscription upgrade
-    //     postMessage(CustomEventType.OPEN_PREMIUM);
-    //     return;
-    // }
+    if (!isPremium && freeThoughtUsed) {
+        // prompt the suscription upgrade
+        postMessage(CustomEventType.OPEN_PREMIUM);
+        return;
+    }
     generateInnerThoughts();
   };
 
@@ -174,8 +173,7 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         
         // Show window only when generation is completely
         setShowInnerThoughts(true);
-        // TODO: Re-enable when premium check is restored
-        // if(!isPremium) dispatch(setFreeThoughtUsed(true));
+        if(!isPremium) dispatch(setFreeThoughtUsed(true));
       } else {
         toast.error('Failed to generate inner thoughts');
       }
@@ -218,19 +216,17 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
            <IoChatbubbleEllipsesSharp 
              className={`CharacterPopup__icon ${
                !lastResponse?.characters.find(char => char.characterId === character.id)?.text
-               //|| (freeThoughtUsed && !isPremium)
+               || (freeThoughtUsed && !isPremium)
                  ? 'CharacterPopup__icon--disabled' 
                  : ''
              }`}
              onClick={handleCharacterClick}
              data-tooltip-id="inner-thoughts-tooltip"
-             data-tooltip-content=""
-             /*
              data-tooltip-content={
                !isPremium && isProduction
                  ? i18n('this_is_a_premium_feature')
                  : ''
-                 */
+              }
            />
         )}
       </div>
