@@ -6,12 +6,13 @@ import './InteractiveMap.scss';
 import { Button, Modal } from '@mikugg/ui-kit';
 import { setMapModal } from '../../state/slices/settingsSlice';
 import { trackEvent } from '../../libs/analytics';
-import { interactionStart, setCurrentBattle } from '../../state/slices/narrationSlice';
+import { setCurrentBattle } from '../../state/slices/narrationSlice';
 import { useAppContext } from '../../App.context';
 import { setModalOpened } from '../../state/slices/creationSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { getInitialBattleState } from '../../state/utils/battleUtils';
+import { cutsceneOptionsBuffer } from '../../libs/cutsceneOptionsBuffer';
 
 const isTouchScreen = window.navigator.maxTouchPoints > 0;
 
@@ -111,7 +112,7 @@ const InteractiveMapModal = ({
   } | null;
 }) => {
   const dispatch = useAppDispatch();
-  const { servicesEndpoint, apiEndpoint, assetLinkLoader } = useAppContext();
+  const { assetLinkLoader } = useAppContext();
   const currentScene = useAppSelector(selectCurrentScene);
   const currentIndicators = useAppSelector(selectCurrentIndicators);
   const battles = useAppSelector((state) => state.novel.battles || []);
@@ -313,18 +314,11 @@ const InteractiveMapModal = ({
             }),
           );
         });
-      dispatch(
-        interactionStart({
+        cutsceneOptionsBuffer.changeScene(dispatch, {
           sceneId: scene.id,
           isNewScene: true,
-          text: scene.prompt,
-          apiEndpoint,
-          characters: scene?.characters.map((r) => r.characterId) || [],
-          servicesEndpoint,
-          selectedCharacterId:
-            scene?.characters[Math.floor(Math.random() * (scene?.characters.length || 0))].characterId || '',
-        }),
-      );
+          bufferInteraction: true, // We want to trigger AI query after scene change
+        });
       trackEvent('scene-select');
     }
   };

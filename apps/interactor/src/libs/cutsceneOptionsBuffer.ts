@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import { navigateToScene, stopAiQueryAndMarkDisposable } from '../state/slices/narrationSlice';
 import { abortCurrentInteraction, getCurrentInteractionAbortController } from './interactionAbortController';
-import { RootState, store } from '../state/store';
+import { store } from '../state/store';
 import { NovelV3 } from '@mikugg/bot-utils';
 
 class CutsceneOptionsBuffer {
@@ -13,14 +13,13 @@ class CutsceneOptionsBuffer {
    */
   changeScene(
     dispatch: Dispatch,
-    _state: RootState,
     params: {
       sceneId: string;
       isNewScene: boolean;
       bufferInteraction: boolean;
     }
   ) {
-    const { sceneId, isNewScene, bufferInteraction: buffer } = params;
+    const { sceneId, isNewScene, bufferInteraction } = params;
 
     // Always dispatch navigateToScene to change the scene
     dispatch(navigateToScene({
@@ -29,7 +28,7 @@ class CutsceneOptionsBuffer {
     }));
 
     // Set the flag if AI query is needed
-    this.needsInteractionStart = buffer;
+    this.needsInteractionStart = bufferInteraction
   }
 
   /**

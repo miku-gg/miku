@@ -75,13 +75,6 @@ const Interactor = () => {
     }
   }, [scene]);
 
-  // Stop AI queries when a cutscene starts
-  useEffect(() => {
-    if (displayingCutscene) {
-      cutsceneOptionsBuffer.stopAiQuery();
-    }
-  }, [displayingCutscene, dispatch]);
-
   if (!scene) {
     return null;
   }

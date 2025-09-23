@@ -1,6 +1,6 @@
 import { useAppContext } from '../../App.context';
 import { selectCurrentScene, selectCurrentCutscene } from '../../state/selectors';
-import { useAppSelector, useAppDispatch, store } from '../../state/store';
+import { useAppSelector, useAppDispatch } from '../../state/store';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { AssetDisplayPrefix, NovelV3 } from '@mikugg/bot-utils';
 import classNames from 'classnames';
@@ -206,7 +206,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         });
         
         // Use cutscene options buffer for scene navigation
-        cutsceneOptionsBuffer.changeScene(dispatch, store.getState(), {
+        cutsceneOptionsBuffer.changeScene(dispatch, {
           sceneId: navigateAction.params.sceneId,
           isNewScene: true,
           bufferInteraction: true, // We want to trigger AI query after scene change
@@ -229,7 +229,11 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
             position: 'bottom-right',
           });
         }
-        handleContinueClick();
+        if (isAtEnd()) {
+          onEndDisplay();
+        } else {
+          handleContinueClick();
+        }
         break;
       }
     }

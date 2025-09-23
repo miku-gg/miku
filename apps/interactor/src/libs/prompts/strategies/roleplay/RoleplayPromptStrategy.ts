@@ -294,15 +294,32 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     const temp = this.template();
 
     const transformCutsceneToPrompt = (cutscene: NovelV3.CutScene): string => {
-      const bufferedParts = cutsceneOptionsBuffer.getSeenParts();
-      const parts = bufferedParts.length ? bufferedParts : cutscene.parts;
-      return parts
+      return cutscene.parts
         .map((part) =>
           part.text
-            .map((textPart) => (textPart.type === 'description' ? `*${textPart.content}*` : `"${textPart.content}"`))
+            .map((textPart) =>
+              textPart.type === 'description' ? `*${textPart.content}*` : `"${textPart.content}"`,
+            )
             .join('\n'),
         )
         .join('\n');
+    };
+
+    const transformCutsceneBufferToPrompt = (): string => {
+      const bufferedParts = cutsceneOptionsBuffer.getSeenParts();
+      if (!bufferedParts.length) return ''; // No hay partes, no hacemos nada
+    
+      const prompt = bufferedParts
+        .map((part) =>
+          part.text
+            .map((textPart) =>
+              textPart.type === 'description' ? `*${textPart.content}*` : `"${textPart.content}"`,
+            )
+            .join('\n'),
+        )
+        .join('\n');
+    
+      return prompt;
     };
 
     for (const message of [...messages].reverse().slice(-maxLines)) {
@@ -314,7 +331,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         scene = state.novel.scenes.find((scene) => scene.id === messageSceneId);
         const cutscene = state.novel.cutscenes?.find((cutscene) => cutscene.id === scene?.cutScene?.id);
         if (cutscene?.parts.length) {
-          prompt += `${temp.response}${transformCutsceneToPrompt(cutscene)}\n`;
+          prompt += `${temp.response}${transformCutsceneBufferToPrompt()}\n`;
         }
         sceneId = messageSceneId;
       }
@@ -329,7 +346,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
           if (cutsceneId) {
             const cutscene = state.novel.cutscenes?.find((c) => c.id === cutsceneId);
             if (cutscene?.parts.length) {
-              prompt += `${temp.response}${transformCutsceneToPrompt(cutscene)}\n`;
+              prompt += `${temp.response}${transformCutsceneBufferToPrompt()}\n`;
             }
           }
         }
