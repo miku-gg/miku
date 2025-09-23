@@ -58,12 +58,15 @@ export interface NovelCharacterOutfit {
   attributes: string[][];
   template: EmotionTemplateSlug;
   nsfw: NovelNSFW;
+  isFullscreen?: boolean;
   emotions: {
     id: string;
     sources: {
       png: string;
       webm?: string;
       sound?: string;
+      desktop?: string;
+      mobile?: string;
     };
   }[];
 }
@@ -88,6 +91,7 @@ export interface CutScene {
 export interface NovelCharacter {
   id: string;
   name: string;
+  hidden?: boolean;
   profile_pic: string;
   short_description: string;
   tags: string[];

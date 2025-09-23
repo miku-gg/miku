@@ -1,0 +1,56 @@
+@import '../styles/variables.scss';
+
+.FullscreenEmotionZoomModal {
+  width: auto !important;
+  height: auto !important;
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+  box-shadow: 0px 0px 20px 0px rgb(205 95 234) !important;
+  background: $background-3 !important;
+
+
+  &__image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    overflow: hidden;
+  }
+
+  &__image {
+    max-width: 800px;
+    max-height: 700px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .FullscreenEmotionZoomModal {
+    &__image-container {
+      padding: 0.75rem;
+    }
+
+    &__image {
+      max-width: 500px;
+      max-height: 500px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .FullscreenEmotionZoomModal {
+    &__image-container {
+      padding: 0.5rem;
+    }
+
+    &__image {
+      max-width: 350px;
+      max-height: 350px;
+    }
+  }
+}
