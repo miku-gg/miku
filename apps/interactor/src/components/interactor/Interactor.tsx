@@ -144,8 +144,6 @@ const Interactor = () => {
                     'Interactor__characters--multiple': lastCharacters.length > 1,
                   })}
                 >
-                </div>
-              </div>
               {/* Character Popups - positioned relative to each character */}
               {lastCharacters.map(({ id, image }) => {
                 if (!image || displayingCutscene) {
@@ -154,35 +152,39 @@ const Interactor = () => {
                 const character = novelCharacters.find(c => c.id === id);
                 if (!character) return null;
                 
-                return (
-                  <div
-                    key={`character-with-popup-${id}`}
-                    className="Interactor__character-container"
-                  >
-                    <EmotionRenderer
-                      key={`character-emotion-render-${id}`}
-                      assetLinkLoader={assetLinkLoader}
-                      assetUrl={image}
-                      upDownAnimation
-                      className={classNames({
-                        'Interactor__emotion-renderer': true,
-                        selected: displayCharacter?.id === id,
-                      })}
-                    />
-                    <CharacterPopup
-                      character={{
-                        id: character.id,
-                        name: character.name,
-                        description: character.card?.data?.description || character.card?.data?.personality || '',
-                        profile_pic: character.profile_pic,
-                      }}
-                      assetLinkLoader={assetLinkLoader}
-                      isVisible={true}
-                      position={{ x: 0, y: 0 }} // Position will be calculated relative to character
-                    />
-                  </div>
-                );
+                 return (
+                   <div className={classNames({
+                     'Interactor__character-container': true,
+                     selected: displayCharacter?.id === id,
+                   })}>
+                     <EmotionRenderer
+                        key={`character-emotion-render-${id}`}
+                        assetLinkLoader={assetLinkLoader}
+                        assetUrl={image}
+                        upDownAnimation
+                        className= 'Interactor__emotion-renderer'
+                     />
+                     {displayCharacter?.id === id && (
+                        <CharacterPopup
+                          character={{
+                            id: character.id,
+                            name: character.name,
+                            description:
+                              character.card?.data?.description ||
+                              character.card?.data?.personality ||
+                              '',
+                            profile_pic: character.profile_pic,
+                          }}
+                          assetLinkLoader={assetLinkLoader}
+                          isVisible={true}
+                          position={{ x: 0, y: 0 }} // Position will be calculated relative to character
+                        />
+                      )}
+                   </div>
+                 );
               })}
+              </div>
+            </div>
               <ChatBox />
               <Inventory />
               <DebugModal />

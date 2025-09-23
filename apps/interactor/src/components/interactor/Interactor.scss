@@ -110,32 +110,41 @@
     z-index: 1;
     display: initial;
     justify-content: initial;
-
-    .Interactor__emotion-renderer {
+    
+    .Interactor__character-container {
       position: absolute;
-      width: 100%;
-      filter: brightness(0.6);
-      animation: none;
-
-      &.selected {
-        animation: up-and-down 3s ease-in-out infinite, brightnessfade 0.5s ease-in-out forwards;
-        z-index: 1;
-      }
+      height: 100%;
 
       &:first-child {
-        left: -25%;
+        left: 25%;
+        transform: translateX(-50%);
       }
 
       &:last-child {
-        right: -25%;
+        right: 25%;
+        transform: translateX(50%);
       }
     }
   }
 
   &__character-container {
-    position: relative;
-    display: inline-block;
+    position: absolute;
     height: 100%;
+
+    .Interactor__emotion-renderer {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      filter: brightness(0.6);
+      animation: none;
+    }
+
+    &.selected{
+      .Interactor__emotion-renderer {
+      animation: up-and-down 3s ease-in-out infinite, brightnessfade 0.5s ease-in-out forwards;
+      z-index: 1;
+      }
+    }
   }
 }
 
