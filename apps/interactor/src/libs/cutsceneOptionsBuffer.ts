@@ -101,7 +101,7 @@ class CutsceneOptionsBuffer {
    * Clear the cutscene buffer
    */
   clearCutsceneBuffer() {
-
+    this.cutsceneBuffer = [];
   }
 }
 
