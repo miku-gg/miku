@@ -161,6 +161,9 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const handleContinueClick = () => {
     const currentPart = parts[currentPartIndex];
     cutsceneOptionsBuffer.addToCutsceneBuffer(currentPart, currentTextIndex);
+    if (isAtEnd()) {
+      onEndDisplay();
+    }
     if (currentTextIndex < currentPart.text.length - 1) {
       dispatch(setCutsceneTextIndex(currentTextIndex + 1));
     } else if (currentPartIndex < parts.length - 1) {
@@ -273,6 +276,53 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   };
 
   const textContainerRef = useRef<HTMLDivElement>(null);
+
+  const skipCutscene = () => {
+    let partIndex = currentPartIndex;
+    let textIndex = currentTextIndex;
+  
+    const advance = () => {
+      const currentPart = parts[partIndex];
+      if (!currentPart) {
+        onEndDisplay();
+        return;
+      }
+      const currentText = currentPart.text[textIndex];
+      if (!currentText) {
+        onEndDisplay();
+        return;
+      }
+
+      cutsceneOptionsBuffer.addToCutsceneBuffer(currentPart, textIndex);
+  
+      const isLastPart = partIndex === parts.length - 1;
+      const isLastText = textIndex === currentPart.text.length - 1;
+      if (currentText.type === 'options' || (isLastPart && isLastText)) {
+        dispatch(setCutscenePartIndex(partIndex));
+        dispatch(setCutsceneTextIndex(textIndex));
+        if (isLastPart && isLastText) {
+          onEndDisplay();
+        }
+        return;
+      }
+  
+      if (textIndex < currentPart.text.length - 1) {
+        textIndex++;
+      } else if (partIndex < parts.length - 1) {
+        partIndex++;
+        textIndex = 0;
+      } else {
+        dispatch(setCutscenePartIndex(partIndex));
+        dispatch(setCutsceneTextIndex(textIndex));
+        onEndDisplay();
+        return;
+      }
+  
+      setTimeout(advance, 100);
+    };
+  
+    advance();
+  };  
 
   useEffect(() => {
     if (textContainerRef.current) {
@@ -400,7 +450,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
                   })}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onEndDisplay();
+                    skipCutscene();
                   }}
                 >
                   <p className="CutsceneDisplayer__buttons-right__text">{i18n('go_to_scene')}</p>
@@ -413,11 +463,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
                   })}
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (isAtEnd()) {
-                      onEndDisplay();
-                    } else {
-                      handleContinueClick();
-                    }
+                    handleContinueClick();
                   }}
                 >
                   <IoIosArrowForward />
