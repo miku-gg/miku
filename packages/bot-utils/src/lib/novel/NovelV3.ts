@@ -73,16 +73,17 @@ export interface CutScenePart {
   text: {
     type: 'dialogue' | 'description' | 'options';
     content: string;
+    options?: CutSceneOption[];
   }[];
   background: string;
   music?: string;
   characters: { id: string; outfitId: string; emotionId: string }[];
-  options?: CutSceneOption[];
 }
 
 export interface CutSceneOption {
   id: string;
   text: string;
+  prompt: string;
   action: CutSceneAction;
 }
 

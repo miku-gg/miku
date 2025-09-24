@@ -156,7 +156,7 @@ const narrationSlice = createSlice({
           state.interactions[newInteractionId] = interaction;
           state.responses[response.id] = response;
           state.currentResponseId = response.id;
-          cutsceneOptionsBuffer.clearSeenParts();
+          cutsceneOptionsBuffer.clearCutsceneBuffer();
         }
       } else {
         // Normal interaction start without disposable response

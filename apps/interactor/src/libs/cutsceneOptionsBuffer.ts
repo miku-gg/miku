@@ -6,7 +6,7 @@ import { NovelV3 } from '@mikugg/bot-utils';
 
 class CutsceneOptionsBuffer {
   private needsInteractionStart: boolean = false;
-  private seenCutsceneParts: NovelV3.CutScenePart[] = [];
+  private cutsceneBuffer: string[] = [];
 
   /**
    * Change scene using navigateToScene and optionally buffer for AI query
@@ -65,28 +65,43 @@ class CutsceneOptionsBuffer {
   }
 
   /**
-   * Append the provided part to the seen list preserving order.
-   * Avoids pushing the same instance twice in a row.
+   * Save the cutscene parts data in a buffer and player's selection for prompting
    */
-  addSeenPart(part: NovelV3.CutScenePart) {
-    if (!part) return;
-    const last = this.seenCutsceneParts[this.seenCutsceneParts.length - 1];
-    if (last === part) return;
-    this.seenCutsceneParts.push(part);
+  addToCutsceneBuffer(part: NovelV3.CutScenePart, index: number) {
+    if(!part || !part.text || part.text.length - 1 < index) return;
+    const textPart = part.text[index];
+    let promptText: string = '';
+    switch (textPart.type) {
+      case 'description':
+        promptText = `*${textPart.content}*`;
+        break;
+      case 'dialogue':
+        promptText = `"${textPart.content}"`;
+        break;
+    }
+    this.cutsceneBuffer.push(promptText);
   }
 
   /**
-   * Get the seen cutscene parts in the order encountered
+   * Add the player's option choice in the cutscene buffer
    */
-  getSeenParts(): NovelV3.CutScenePart[] {
-    return this.seenCutsceneParts;
+  addPlayerChoice(option: NovelV3.CutSceneOption) {
+    if(!option || !option.prompt) return;
+    this.cutsceneBuffer.push(option.prompt);
   }
 
   /**
-   * Clear the seen parts buffer
+   * Get the cutscene buffer
    */
-  clearSeenParts() {
-    this.seenCutsceneParts = [];
+  getCutsceneBuffer() {
+    return this.cutsceneBuffer;
+  }
+
+  /**
+   * Clear the cutscene buffer
+   */
+  clearCutsceneBuffer() {
+
   }
 }
 

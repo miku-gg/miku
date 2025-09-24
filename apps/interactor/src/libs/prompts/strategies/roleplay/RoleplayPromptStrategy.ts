@@ -306,19 +306,9 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     };
 
     const transformCutsceneBufferToPrompt = (): string => {
-      const bufferedParts = cutsceneOptionsBuffer.getSeenParts();
-      if (!bufferedParts.length) return ''; // No hay partes, no hacemos nada
-    
-      const prompt = bufferedParts
-        .map((part) =>
-          part.text
-            .map((textPart) =>
-              textPart.type === 'description' ? `*${textPart.content}*` : `"${textPart.content}"`,
-            )
-            .join('\n'),
-        )
-        .join('\n');
-    
+      const bufferedParts = cutsceneOptionsBuffer.getCutsceneBuffer();
+      if (!bufferedParts.length) return '';
+      const prompt = bufferedParts.join('\n');
       return prompt;
     };
 

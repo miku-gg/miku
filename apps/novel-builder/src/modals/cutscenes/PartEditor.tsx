@@ -39,7 +39,7 @@ export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneI
 
   const [showingEmotionChar1, setShowingEmotionChar1] = useState<string | undefined>(undefined);
   const [showingEmotionChar2, setShowingEmotionChar2] = useState<string | undefined>(undefined);
-  const [showOptionsEditor, setShowOptionsEditor] = useState(false);
+  const [openOptionsEditors, setOpenOptionsEditors] = useState<number[]>([]);
 
   const getCharacterAssetSRC = (character: { id: string; outfitId: string; emotionId: string }) => {
     const characterData = characters.find((c) => c.id === character.id);
@@ -410,16 +410,22 @@ export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneI
                      <div className="PartEditor__modal__text__part">
                       {text.type === 'options' && (
                         <>
-                          {(!part.options || part.options.length === 0) && (
+                          {(!text.options || text.options.length === 0) && (
                              <div className="PartEditor__modal__text__option-label">
                                No options created
                              </div>
                             )}
                           <Button 
                             theme="secondary" 
-                            onClick={() => setShowOptionsEditor(!showOptionsEditor)}
+                            onClick={ () => {
+                              if (openOptionsEditors.includes(index)) {
+                                setOpenOptionsEditors(openOptionsEditors.filter(i => i !== index));
+                              } else {
+                                setOpenOptionsEditors([...openOptionsEditors, index]);
+                              }
+                            }}
                           >
-                            {showOptionsEditor ? 'Hide' : 'Show'}
+                            {openOptionsEditors.includes(index) ? 'Hide' : 'Show'}
                           </Button>
                         </>
                       )}
@@ -452,10 +458,10 @@ export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneI
 
                     </div>
                     
-                    {text.type === 'options' && showOptionsEditor && (
+                    {text.type === 'options' && openOptionsEditors.includes(index) && (
                       <OptionsEditor
                         part={part}
-                        cutsceneId={cutsceneId}
+                        textIndex={index}
                         onUpdate={updatePart}
                       />
                     )}

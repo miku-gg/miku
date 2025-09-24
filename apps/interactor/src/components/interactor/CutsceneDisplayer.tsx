@@ -160,7 +160,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
 
   const handleContinueClick = () => {
     const currentPart = parts[currentPartIndex];
-
+    cutsceneOptionsBuffer.addToCutsceneBuffer(currentPart, currentTextIndex);
     if (currentTextIndex < currentPart.text.length - 1) {
       dispatch(setCutsceneTextIndex(currentTextIndex + 1));
     } else if (currentPartIndex < parts.length - 1) {
@@ -182,9 +182,14 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const handleOptionSelect = (optionId: string) => {
     if (!currentCutscene) return;
     const currentPart = parts[currentPartIndex];
-    const option = currentPart.options?.find((option) => option.id === optionId);
+    const currentText = currentPart.text[currentTextIndex];
+    if (!currentText || !Array.isArray(currentText.options)) return;
+
+    const option = currentText.options?.find((option) => option.id === optionId);
     if (!option) return;
     if(!option.action) return;
+    
+    cutsceneOptionsBuffer.addPlayerChoice(option);
 
     switch (option.action.type) {
       case 'NAVIGATE_TO_SCENE': {
@@ -259,8 +264,6 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
 
   const getCurrentTextsToShow = () => {
     const currentPart = parts[currentPartIndex];
-    // Mark current part as seen when we enter it
-    cutsceneOptionsBuffer.addSeenPart(currentPart);
     if (!isMobileDisplay) {
       return currentPart.text.slice(0, currentTextIndex + 1);
     }
@@ -352,12 +355,15 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         {(() => {
           const currentPart = parts[currentPartIndex];
           const currentText = currentPart?.text[currentTextIndex];
-          const hasOptions = currentText?.type === 'options' && currentPart?.options && currentPart.options.length > 0;
-          
+          const hasOptions =
+          currentText?.type === 'options' &&
+          Array.isArray(currentText.options) &&
+          currentText.options.length > 0;
+
           if (hasOptions) {
             return (
               <div className="CutsceneDisplayer__options">
-                {currentPart.options?.map((option) => (
+                {currentText.options?.map((option) => (
                   <button
                     key={option.id}
                     className="CutsceneDisplayer__option-button"

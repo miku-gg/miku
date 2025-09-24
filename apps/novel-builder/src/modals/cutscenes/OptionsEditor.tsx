@@ -1,7 +1,6 @@
 import { Button, Dropdown, Input } from '@mikugg/ui-kit';
-import { useAppDispatch, useAppSelector } from '../../state/store';
+import { useAppSelector } from '../../state/store';
 import { NovelV3 } from '@mikugg/bot-utils';
-import { useState } from 'react';
 import { v4 as randomUUID } from 'uuid';
 import SceneSelector from '../scene/SceneSelector';
 import ItemSelector from '../items/ItemSelector';
@@ -9,16 +8,16 @@ import './OptionsEditor.scss';
 
 interface OptionsEditorProps {
   part: NovelV3.CutScenePart;
-  cutsceneId: string;
+  textIndex: number;
   onUpdate: (part: NovelV3.CutScenePart) => void;
 }
 
-export const OptionsEditor = ({ part, cutsceneId, onUpdate }: OptionsEditorProps) => {
-  const dispatch = useAppDispatch();
+export const OptionsEditor = ({ part, textIndex, onUpdate }: OptionsEditorProps) => {
   const scenes = useAppSelector((state) => state.novel.scenes);
   const items = useAppSelector((state) => state.novel.inventory);
 
-  const [editingOption, setEditingOption] = useState<NovelV3.CutSceneOption | null>(null);
+  const currentText = part.text[textIndex];
+  if (!currentText || currentText.type !== 'options') return null;
 
   // Only render if there's a text part with type 'options'
   const hasOptionsText = part.text.some(text => text.type === 'options');
@@ -33,42 +32,47 @@ export const OptionsEditor = ({ part, cutsceneId, onUpdate }: OptionsEditorProps
     const newOption: NovelV3.CutSceneOption = {
       id: randomUUID(),
       text: '',
+      prompt: '',
       action: {
         type: 'NAVIGATE_TO_SCENE',
         params: { sceneId: scenes[0]?.id || '' }
       }
     };
 
-    const updatedPart = {
-      ...part,
-      options: [...(part.options || []), newOption]
+    const updatedText = [...part.text];
+    const existingOptions = currentText.options || [];
+    updatedText[textIndex] = {
+      ...currentText,
+      options: [...existingOptions, newOption],
     };
 
-    onUpdate(updatedPart);
+    onUpdate({ ...part, text: updatedText });
   };
 
   const updateOption = (optionId: string, updates: Partial<NovelV3.CutSceneOption>) => {
-    const updatedOptions = part.options?.map(option => 
+    const updatedOptions = (currentText.options || []).map((option) =>
       option.id === optionId ? { ...option, ...updates } : option
-    ) || [];
+    );
 
-    const updatedPart = {
-      ...part,
-      options: updatedOptions
+    const updatedText = [...part.text];
+    updatedText[textIndex] = {
+      ...currentText,
+      options: updatedOptions,
     };
 
-    onUpdate(updatedPart);
+    onUpdate({ ...part, text: updatedText });
   };
 
   const deleteOption = (optionId: string) => {
-    const updatedOptions = part.options?.filter(option => option.id !== optionId) || [];
-    
-    const updatedPart = {
-      ...part,
-      options: updatedOptions
+    const updatedOptions = (currentText.options || []).filter((option) => option.id !== optionId);
+
+    const updatedText = [...part.text];
+    updatedText[textIndex] = {
+      ...currentText,
+      options: updatedOptions,
     };
 
-    onUpdate(updatedPart);
+    onUpdate({ ...part, text: updatedText });
   };
 
   const updateAction = (optionId: string, action: NovelV3.CutSceneAction) => {
@@ -84,14 +88,14 @@ export const OptionsEditor = ({ part, cutsceneId, onUpdate }: OptionsEditorProps
       </div>
       
       <div className="OptionsEditor__options">
-        {part.options?.map((option) => (
+        {(currentText.options || []).map((option) => (
           <div key={option.id} className="OptionsEditor__option">
             <div className="OptionsEditor__option-controls">
               <Input
                 value={option.text}
                 onChange={(e) => updateOption(option.id, { text: e.target.value })}
                 placeHolder="Option text..."
-              />
+              />        
               
               <Dropdown
                 items={actionTypes}
@@ -117,7 +121,13 @@ export const OptionsEditor = ({ part, cutsceneId, onUpdate }: OptionsEditorProps
                 Delete
               </Button>
             </div>
-            
+
+            <Input
+                value={option.prompt}
+                onChange={(e) => updateOption(option.id, { prompt: e.target.value })}
+                placeHolder="*{{user}} took the shiny golden key*"
+              />
+
             <div className="OptionsEditor__option-selectors">
               {option.action?.type === 'NAVIGATE_TO_SCENE' && (
                 <SceneSelector
