@@ -29,7 +29,7 @@ import {
   clearCurrentBattle,
   interactionStart,
 } from '../../state/slices/narrationSlice';
-import { cutsceneOptionsBuffer } from '../../libs/cutsceneOptionsBuffer';
+import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
 import IndicatorsDisplay from '../indicators-display/IndicatorsDisplay';
 import StartSelector from '../start-selector/StartSelector';
 import BattleScreen from './BattleScreen';
@@ -65,12 +65,12 @@ const Interactor = () => {
     );
     
     // Clear the flag after dispatching
-    cutsceneOptionsBuffer.clearAiQueryFlag();
+    cutsceneUtilities.clearAiQueryFlag();
   };
 
   // Check for AI query after scene change when scene has no cutscene
   useEffect(() => {
-    if (cutsceneOptionsBuffer.needsAiQueryAfterSceneChange() && scene && !scene.cutScene) {
+    if (cutsceneUtilities.needsAiQueryAfterSceneChange() && scene && !scene.cutScene) {
       dispatchInteractionStart();
     }
   }, [scene]);
@@ -109,7 +109,7 @@ const Interactor = () => {
                 }
                 
                 // Check if we need to trigger AI query after cutscene ends
-                if (cutsceneOptionsBuffer.needsAiQueryAfterSceneChange()) {
+                if (cutsceneUtilities.needsAiQueryAfterSceneChange()) {
                   dispatchInteractionStart();
                 }
               }}

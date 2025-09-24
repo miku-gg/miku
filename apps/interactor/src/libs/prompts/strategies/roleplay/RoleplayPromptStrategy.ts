@@ -12,7 +12,7 @@ import { RootState } from '../../../../state/store';
 import { NarrationInteraction, NarrationResponse } from '../../../../state/versioning';
 import { findLorebooksEntries } from '../../../lorebookSearch';
 import labels from './RoleplayPromptLabels';
-import { cutsceneOptionsBuffer } from '../../../cutsceneOptionsBuffer';
+import { cutsceneUtilities } from '../../../cutsceneUtilities';
 
 const PROMPT_TOKEN_OFFSET = 50;
 
@@ -306,7 +306,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     };
 
     const transformCutsceneBufferToPrompt = (): string => {
-      const bufferedParts = cutsceneOptionsBuffer.getCutsceneBuffer();
+      const bufferedParts = cutsceneUtilities.getCutsceneBuffer();
       if (!bufferedParts.length) return '';
       const prompt = bufferedParts.join('\n');
       return prompt;

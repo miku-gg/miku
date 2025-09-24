@@ -4,7 +4,7 @@ import { NarrationState, NarrationInteraction, NarrationResponse } from '../vers
 import { toast } from 'react-toastify';
 import trim from 'lodash.trim';
 import { NarrationSceneSuggestion, NarrationSummarySentence, BattleState } from '../versioning/v3.state';
-import { cutsceneOptionsBuffer } from '../../libs/cutsceneOptionsBuffer';
+import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
 
 export type { NarrationState, NarrationInteraction, NarrationResponse } from '../versioning';
 
@@ -156,7 +156,7 @@ const narrationSlice = createSlice({
           state.interactions[newInteractionId] = interaction;
           state.responses[response.id] = response;
           state.currentResponseId = response.id;
-          cutsceneOptionsBuffer.clearCutsceneBuffer();
+          cutsceneUtilities.clearCutsceneBuffer();
         }
       } else {
         // Normal interaction start without disposable response

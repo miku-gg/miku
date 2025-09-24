@@ -4,7 +4,7 @@ import { abortCurrentInteraction, getCurrentInteractionAbortController } from '.
 import { store } from '../state/store';
 import { NovelV3 } from '@mikugg/bot-utils';
 
-class CutsceneOptionsBuffer {
+class CutsceneUtilities {
   private needsInteractionStart: boolean = false;
   private cutsceneBuffer: string[] = [];
 
@@ -105,4 +105,4 @@ class CutsceneOptionsBuffer {
   }
 }
 
-export const cutsceneOptionsBuffer = new CutsceneOptionsBuffer();
+export const cutsceneUtilities = new CutsceneUtilities();

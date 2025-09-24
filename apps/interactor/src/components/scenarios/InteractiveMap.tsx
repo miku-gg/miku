@@ -12,7 +12,7 @@ import { setModalOpened } from '../../state/slices/creationSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { getInitialBattleState } from '../../state/utils/battleUtils';
-import { cutsceneOptionsBuffer } from '../../libs/cutsceneOptionsBuffer';
+import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
 
 const isTouchScreen = window.navigator.maxTouchPoints > 0;
 
@@ -314,7 +314,7 @@ const InteractiveMapModal = ({
             }),
           );
         });
-        cutsceneOptionsBuffer.changeScene(dispatch, {
+        cutsceneUtilities.changeScene(dispatch, {
           sceneId: scene.id,
           isNewScene: true,
           bufferInteraction: true, // We want to trigger AI query after scene change

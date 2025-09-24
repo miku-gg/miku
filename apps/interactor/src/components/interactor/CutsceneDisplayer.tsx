@@ -10,7 +10,7 @@ import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward, IoIosSkipForward } from 'react-icons/io';
 import { useI18n } from '../../libs/i18n';
 import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
-import { cutsceneOptionsBuffer } from '../../libs/cutsceneOptionsBuffer';
+import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
 import { addItem, toggleItemVisibility } from '../../state/slices/inventorySlice';
 import { toast } from 'react-toastify';
@@ -160,7 +160,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
 
   const handleContinueClick = () => {
     const currentPart = parts[currentPartIndex];
-    cutsceneOptionsBuffer.addToCutsceneBuffer(currentPart, currentTextIndex);
+    cutsceneUtilities.addToCutsceneBuffer(currentPart, currentTextIndex);
     if (isAtEnd()) {
       onEndDisplay();
     }
@@ -192,7 +192,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
     if (!option) return;
     if(!option.action) return;
     
-    cutsceneOptionsBuffer.addPlayerChoice(option);
+    cutsceneUtilities.addPlayerChoice(option);
 
     switch (option.action.type) {
       case 'NAVIGATE_TO_SCENE': {
@@ -214,7 +214,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         });
         
         // Use cutscene options buffer for scene navigation
-        cutsceneOptionsBuffer.changeScene(dispatch, {
+        cutsceneUtilities.changeScene(dispatch, {
           sceneId: navigateAction.params.sceneId,
           isNewScene: true,
           bufferInteraction: true, // We want to trigger AI query after scene change
@@ -293,7 +293,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         return;
       }
 
-      cutsceneOptionsBuffer.addToCutsceneBuffer(currentPart, textIndex);
+      cutsceneUtilities.addToCutsceneBuffer(currentPart, textIndex);
   
       const isLastPart = partIndex === parts.length - 1;
       const isLastText = textIndex === currentPart.text.length - 1;

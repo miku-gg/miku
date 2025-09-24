@@ -11,7 +11,7 @@ import { setMapModal } from '../../state/slices/settingsSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { useI18n } from '../../libs/i18n';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
-import { cutsceneOptionsBuffer } from '../../libs/cutsceneOptionsBuffer';
+import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
 
 export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) => {
   const { assetLinkLoader, isInteractionDisabled} = useAppContext();
@@ -60,7 +60,7 @@ export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) 
           }),
         );
       });
-      cutsceneOptionsBuffer.changeScene(dispatch, {
+      cutsceneUtilities.changeScene(dispatch, {
         sceneId: sceneId,
         isNewScene: true,
         bufferInteraction: true, // We want to trigger AI query after scene change
