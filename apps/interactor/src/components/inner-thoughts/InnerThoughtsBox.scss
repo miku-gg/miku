@@ -1,17 +1,15 @@
 @import '../../_variables.scss';
 @import '../chat-box/ResponseBox.scss';
 
-// Ensure InnerThoughtsBox always stays on top
 .InnerThoughtsBox {
-  position: fixed;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 100%;
+  height: 150px;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: all;
 
   // Always present but only clickable when visible
   &--hidden {
@@ -26,25 +24,12 @@
     visibility: visible;
   }
 
-  &__overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(2px);
-  }
-
+  
   &__container {
     position: relative;
-    background: linear-gradient(#0c0a1d 0%, #1e1a41 100%);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    max-width: 500px;
+    min-width: 380px;
     width: 90%;
-    max-height: 70vh;
-    transform: scale(0.8) translateY(20px);
+    max-height: 80vh;
     opacity: 0;
     transition: all 0.3s ease;
     animation: grow 0.3s ease forwards;
@@ -54,6 +39,21 @@
       transform: scale(1) translateY(0);
       opacity: 1;
     }
+  }
+
+  &__bg{
+    position: absolute;
+    inset: -15px;
+    background: linear-gradient(
+      rgba(12, 10, 29, 0.7) 0%, 
+      rgba(30, 26, 65, 0.7) 100%
+    );
+    filter: blur(6px);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    filter: blur(8px);
+    -webkit-filter: blur(8px);
+    z-index: -1;
   }
 
   &__header {
@@ -99,7 +99,7 @@
   &__close-button {
     background: none;
     border: none;
-    color: $text-2;
+    color: white;
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0.25rem;
@@ -110,6 +110,7 @@
     justify-content: center;
     width: 2rem;
     height: 2rem;
+    margin-left: auto;
 
     &:hover {
       color: $text-1;
@@ -119,6 +120,10 @@
     &:active {
       transform: scale(0.95);
     }
+  }
+
+  &__body{
+    position: relative;
   }
 
   &__content {
@@ -161,19 +166,26 @@
     font-family: 'Poppins', 'Roboto', sans-serif;
     font-size: 1rem;
     line-height: 1.5;
+    max-height: 100%;
     word-wrap: break-word;
     white-space: pre-wrap;
+    overflow-y: auto;
+    flex-grow: 1;
   }
+}
+
+.InnerThoughtsBox__rnd {
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
 }
 
 // Responsive design
 @media (max-width: 768px) {
-  .InnerThoughtsBox {
-    &__container {
-      width: 95%;
-      max-height: 80vh;
-    }
 
+  .InnerThoughtsBox {
     &__content {
       padding: 0.5rem;
       height: calc(2.5 * 2.5em); // 2.5 lines with 2.5em line-height on mobile too

@@ -22,11 +22,17 @@
   pointer-events: auto;
   z-index: 1000;
   user-select: none;
-    }
+
+  @media (max-width: 768px) {
+      opacity: 1 !important;
+  }
+}
 
 &__icon{
     font-size: 48px;
     color: white;
+    transform: translateY(-50%);    
+    transform: translateX(-50%);
     position: absolute;
     top: 20%;
     right: 5%;
@@ -64,7 +70,31 @@
             color: #666;
         }
     }
+
+    &--flipped {
+        transform: scaleX(-1);          
+    }
+
+    &--small {
+        font-size: 24px;
+    }
 }
+
+.InnerThoughtsBox--popup {
+    top: 0%;
+    left: 0%;
+  
+    @media (max-width: 768px) {
+        position: relative;
+        transform: translateY(50%);
+        left: 0;
+        top: 100%;
+        bottom: 0%;
+        right: 0;
+        top: auto;
+    }
+}
+  
 
 @keyframes spin {
   from {

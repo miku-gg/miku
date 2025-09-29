@@ -1,6 +1,6 @@
 import React from 'react';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
-import { IoChatbubbleEllipsesSharp } from 'react-icons/io5';
+import { TfiThought } from "react-icons/tfi";
 import { FaSpinner } from 'react-icons/fa';
 import { Tooltip } from '@mikugg/ui-kit';
 import InnerThoughtsBox from './InnerThoughtsBox';
@@ -52,6 +52,8 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
   const [_characterPosition, setCharacterPosition] = React.useState({ x: 0, y: 0, width: 0, height: 0 });
   const characterRef = React.useRef<HTMLDivElement>(null);
 
+  const { isMobileApp } = useAppContext();
+  
   // Calculate character position for popup placement
   React.useEffect(() => {
     const updatePosition = () => {
@@ -84,8 +86,19 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         postMessage(CustomEventType.OPEN_PREMIUM);
         return;
     }
+    if(generatedThoughts || innerThoughts){
+      setShowInnerThoughts(true);
+      return;
+    }
+
     generateInnerThoughts();
   };
+
+  const handleCloseInnerThoughts = () => {
+    setShowInnerThoughts(false);
+    setIsClicked(false);
+    setIsHovered(false);
+  }
 
   const generateInnerThoughts = async () => {
     if (isGeneratingThoughts) return;
@@ -171,7 +184,7 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         }
         setGeneratedThoughts(displayThoughts);
         
-        // Show window only when generation is completely
+        // Show window only when generation is complete
         setShowInnerThoughts(true);
         if(!isPremium) dispatch(setFreeThoughtUsed(true));
       } else {
@@ -187,6 +200,14 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
     }
   };
 
+  React.useEffect(() => {
+    if (isCurrentResponseFetching && showInnerThoughts) {
+      handleCloseInnerThoughts();
+      setGeneratedThoughts('');
+    }
+  }, [isCurrentResponseFetching]);
+  
+
   return (
     <div
       ref={characterRef}
@@ -196,7 +217,8 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       <div 
         className="CharacterPopup__container"
         style={{
-          opacity: (isHovered || isClicked || isGeneratingThoughts) ? 1 : 0,
+          opacity: (isHovered || isClicked || isGeneratingThoughts ||
+                    showInnerThoughts || isMobileApp || window.innerWidth < 768) ? 1 : 0,
         }}
         onMouseEnter={() => {
           setIsHovered(true);
@@ -206,42 +228,40 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         }}
       >
         {isGeneratingThoughts ? (
-          <FaSpinner 
-            className="CharacterPopup__icon CharacterPopup__icon--spinner"
-            style={{
-              animation: 'spin 1s linear infinite',
-            }}
-          />
-        ) : isCurrentResponseFetching ? null : (
-           <IoChatbubbleEllipsesSharp 
-             className={`CharacterPopup__icon ${
-               !lastResponse?.characters.find(char => char.characterId === character.id)?.text
-               || (freeThoughtUsed && !isPremium)
-                 ? 'CharacterPopup__icon--disabled' 
-                 : ''
-             }`}
-             onClick={handleCharacterClick}
-             data-tooltip-id="inner-thoughts-tooltip"
-             data-tooltip-content={
-               !isPremium && isProduction
-                 ? i18n('this_is_a_premium_feature')
-                 : ''
-              }
-           />
+            <FaSpinner 
+              className="CharacterPopup__icon CharacterPopup__icon--spinner"
+              style={{
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+          ) : isCurrentResponseFetching ? null : (
+            <TfiThought 
+              className={`CharacterPopup__icon CharacterPopup__icon--flipped ${
+                !lastResponse?.characters.find(char => char.characterId === character.id)?.text
+                || (freeThoughtUsed && !isPremium)
+                  ? 'CharacterPopup__icon--disabled' 
+                  : ''
+              }`}
+              onClick={showInnerThoughts? undefined : handleCharacterClick}
+              data-tooltip-id="inner-thoughts-tooltip"
+              data-tooltip-content={
+                !isPremium && isProduction
+                  ? i18n('this_is_a_premium_feature')
+                  : ''
+                }
+            />
+          )
+        }
+
+        {showInnerThoughts && (
+        <InnerThoughtsBox
+          className='InnerThoughtsBox--popup'
+          isVisible={true}
+          onClose={handleCloseInnerThoughts}
+          thoughts={generatedThoughts || innerThoughts}
+        />
         )}
       </div>
-      
-      <InnerThoughtsBox
-        isVisible={showInnerThoughts}
-        thoughts={generatedThoughts || innerThoughts}
-        characterName={character.name}
-        onClose={() => {
-          setShowInnerThoughts(false);
-          setIsClicked(false);
-          setIsHovered(false);
-        }}
-      />
-      
       <Tooltip id="inner-thoughts-tooltip" place="top" />
     </div>
   );

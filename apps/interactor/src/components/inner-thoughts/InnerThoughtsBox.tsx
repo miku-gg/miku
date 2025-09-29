@@ -1,13 +1,14 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
+import { Rnd } from 'react-rnd';
 import TTSPlayer from '../chat-box/TTSPlayer';
+import { IoIosCloseCircleOutline } from "react-icons/io";
 import './InnerThoughtsBox.scss';
+import { useAppContext } from '../../App.context';
 
 interface InnerThoughtsBoxProps {
   isVisible: boolean;
   thoughts: string;
-  onClose: () => void;
-  characterName?: string;
+  onClose?: () => void;
   className?: string;
 }
 
@@ -15,56 +16,59 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({
   isVisible,
   thoughts,
   onClose,
-  characterName,
   className = '',
 }) => {
-  const [isAnimating, setIsAnimating] = React.useState(false);
+  if (!isVisible) return null;
 
-  React.useEffect(() => {
-    if (isVisible) {
-      setIsAnimating(true);
-    } else {
-      setIsAnimating(false);
-    }
-  }, [isVisible]);
+  const { isMobileApp } = useAppContext();
 
-  const modalContent = (
-    <div className={`InnerThoughtsBox ${className} ${isVisible ? 'InnerThoughtsBox--visible' : 'InnerThoughtsBox--hidden'}`}>
-      <div className="InnerThoughtsBox__overlay" onClick={onClose} />
-      <div 
-        className={`InnerThoughtsBox__container ${isAnimating ? 'InnerThoughtsBox__container--visible' : ''}`}
-      >
+  return (
+    <div className={`InnerThoughtsBox ${className}`}>
+      <div className="InnerThoughtsBox__container">
         <div className="InnerThoughtsBox__header">
-          <h3 className="InnerThoughtsBox__title">
-            {characterName ? `${characterName}'s Inner Thoughts` : 'Inner Thoughts'}
-          </h3>
-          <div className="InnerThoughtsBox__header-actions">
-            <TTSPlayer text={thoughts || undefined} />
-            <button 
+          <TTSPlayer text={thoughts || undefined} />
+          {onClose && (
+            <IoIosCloseCircleOutline 
               className="InnerThoughtsBox__close-button"
               onClick={onClose}
               aria-label="Close inner thoughts"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-        
-        <div className="InnerThoughtsBox__content">
-          {!thoughts ? (
-            <p className="InnerThoughtsBox__empty">This is a test message for the inner thoughts text-to-speech feature.</p>
-          ) : (
-            <div className="InnerThoughtsBox__thoughts-text">
-              {thoughts}
-            </div>
+            />
           )}
+        </div>
+        <div className='InnerThoughtsBox__body'>
+          <div className='InnerThoughtsBox__bg'></div>
+          <div className="InnerThoughtsBox__content">
+            {!thoughts ? (
+              <p className="InnerThoughtsBox__empty">No thoughts generated.</p>
+            ) : (
+              isMobileApp || window.innerWidth < 1024 ? (
+                <Rnd
+                  className="InnerThoughtsBox__rnd"
+                  bounds=".InnerThoughtsBox__content"
+                  enableResizing={false}
+                  dragAxis="y"
+                  default={{
+                    x: 0,
+                    y: 0,
+                    width: 'unset',
+                    height: 120, 
+                  }}
+                >
+                  <div className="InnerThoughtsBox__thoughts-text">
+                    {thoughts}
+                  </div>
+                </Rnd>
+              ) : (
+                <div className="InnerThoughtsBox__thoughts-text">
+                  {thoughts}
+                </div>
+              )
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
-
-  // Render using portal to ensure it's always on top
-  return createPortal(modalContent, document.body);
 };
 
 export default InnerThoughtsBox;
