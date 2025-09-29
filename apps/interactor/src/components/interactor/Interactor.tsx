@@ -2,7 +2,6 @@ import { AreYouSure } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import ProgressiveImage from 'react-progressive-graceful-image';
 import { useAppContext } from '../../App.context';
-import { useEffect } from 'react';
 import {
   selectCurrentScene,
   selectLastLoadedCharacters,
@@ -68,17 +67,15 @@ const Interactor = () => {
     cutsceneUtilities.clearAiQueryFlag();
   };
 
-  // Check for AI query after scene change when scene has no cutscene
-  useEffect(() => {
-    if (cutsceneUtilities.needsAiQueryAfterSceneChange() && scene && !displayingCutscene) {
-      dispatchInteractionStart();
-    }
-  }, [scene]);
-
   if (!scene) {
     return null;
   }
   const background = backgrounds.find((b) => b.id === scene.backgroundId);
+
+  // Check for AI query after scene change when scene has no cutscene
+  if (cutsceneUtilities.needsAiQueryAfterSceneChange() && scene && !displayingCutscene) {
+    dispatchInteractionStart();
+  }
 
   return (
     <AreYouSure.AreYouSureProvider>
