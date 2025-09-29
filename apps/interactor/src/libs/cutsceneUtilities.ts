@@ -5,7 +5,6 @@ import { store } from '../state/store';
 import { NovelV3 } from '@mikugg/bot-utils';
 
 class CutsceneUtilities {
-  private needsInteractionStart: boolean = false;
   private cutsceneBuffer: string[] = [];
 
   /**
@@ -19,16 +18,13 @@ class CutsceneUtilities {
       bufferInteraction: boolean;
     }
   ) {
-    const { sceneId, isNewScene, bufferInteraction } = params;
+    const { sceneId, isNewScene } = params;
 
     // Always dispatch navigateToScene to change the scene
     dispatch(navigateToScene({
       sceneId,
       isNewScene,
     }));
-
-    // Set the flag if AI query is needed
-    this.needsInteractionStart = bufferInteraction
   }
 
   /**
@@ -47,21 +43,6 @@ class CutsceneUtilities {
     if (hadActiveAbortController) {
       abortCurrentInteraction();
     }
-    this.needsInteractionStart = hadActiveFetch || hadActiveAbortController;
-  }
- 
-  /**
-   * Check if AI query is needed
-   */
-  needsAiQueryAfterSceneChange(): boolean {
-    return this.needsInteractionStart;
-  }
-
-  /**
-   * Clear the AI query flag
-   */
-  clearAiQueryFlag() {
-    this.needsInteractionStart = false;
   }
 
   /**

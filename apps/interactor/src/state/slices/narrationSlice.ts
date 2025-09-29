@@ -156,7 +156,6 @@ const narrationSlice = createSlice({
           state.interactions[newInteractionId] = interaction;
           state.responses[response.id] = response;
           state.currentResponseId = response.id;
-          cutsceneUtilities.clearCutsceneBuffer();
         }
       } else {
         // Normal interaction start without disposable response
@@ -201,7 +200,7 @@ const narrationSlice = createSlice({
       }
       state.input.disabled = true;
       state.input.suggestions = [];
-      
+      state.shouldTriggerInteractionAfterSceneChange = false;
       // Handle cutscene state
       handleCutsceneState(state);
     },
@@ -255,6 +254,7 @@ const narrationSlice = createSlice({
         objectiveCompletedIds?: string[];
       }>,
     ) {
+      cutsceneUtilities.clearCutsceneBuffer();
       const { characters, indicators, battleStartId, objectiveCompletedIds } = action.payload;
       const response = state.responses[state.currentResponseId];
       const interaction = state.interactions[response?.parentInteractionId || ''];
@@ -726,6 +726,7 @@ const narrationSlice = createSlice({
       }>,
     ) {
       const { sceneId, isNewScene } = action.payload;
+      state.shouldTriggerInteractionAfterSceneChange = true;
       
       // Replace previous disposable response if it exists, otherwise create new one
       if (state.disposableResponseId) {

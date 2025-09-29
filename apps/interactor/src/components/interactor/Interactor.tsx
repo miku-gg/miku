@@ -28,7 +28,6 @@ import {
   clearCurrentBattle,
   interactionStart,
 } from '../../state/slices/narrationSlice';
-import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
 import IndicatorsDisplay from '../indicators-display/IndicatorsDisplay';
 import StartSelector from '../start-selector/StartSelector';
 import BattleScreen from './BattleScreen';
@@ -43,8 +42,13 @@ const Interactor = () => {
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
-  const battles = useAppSelector((state) => state.novel.battles);
+  const battles = useAppSelector((state) => state.novel.battles);  
+  const narration = useAppSelector((state) => state.narration);
   
+  const shouldTriggerInteraction = () => {
+    return narration.shouldTriggerInteractionAfterSceneChange;
+  }
+
   // Helper function to dispatch interaction start with current scene and first character
   const dispatchInteractionStart = () => {
     if (!scene) return;
@@ -62,18 +66,15 @@ const Interactor = () => {
           scene.characters[Math.floor(Math.random() * (scene.characters.length || 0))].characterId || '',
       }),
     );
-    
-    // Clear the flag after dispatching
-    cutsceneUtilities.clearAiQueryFlag();
   };
 
   if (!scene) {
     return null;
   }
   const background = backgrounds.find((b) => b.id === scene.backgroundId);
-
+  
   // Check for AI query after scene change when scene has no cutscene
-  if (cutsceneUtilities.needsAiQueryAfterSceneChange() && scene && !displayingCutscene) {
+  if (shouldTriggerInteraction() && scene && !displayingCutscene) {
     dispatchInteractionStart();
   }
 
@@ -106,7 +107,7 @@ const Interactor = () => {
                 }
                 
                 // Check if we need to trigger AI query after cutscene ends
-                if (cutsceneUtilities.needsAiQueryAfterSceneChange()) {
+                if (shouldTriggerInteraction()) {
                   dispatchInteractionStart();
                 }
               }}
