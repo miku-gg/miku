@@ -268,7 +268,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     characterResponse.emotion = variables.get('emotion')?.trim() || characterResponse.emotion;
     characterResponse.text = parseLLMResponse(variables.get('text')?.trim() || '', currentCharacterName);
     characterResponse.reasoning = variables.get('reasoning')?.trim() || '';
-    
+
     // Handle inner thoughts if they were generated
     if (this.includeInnerThoughts) {
       characterResponse.innerThoughts = variables.get('inner_thoughts')?.trim() || '';
@@ -391,6 +391,8 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
     let currentCharacter;
     let linePrefix = '';
     let indicatorsString = '';
+    let innerThoughtsText = '';
+    let innerThoughtsLine = '';
     switch (dialog.type) {
       case 'response':
         indicatorsString =
@@ -434,8 +436,10 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
             .join('\n');
         }
         // Include inner thoughts if they exist
-        const innerThoughtsText = currentCharacter.innerThoughts;
-        const innerThoughtsLine = innerThoughtsText ? `${this.i18n('character_inner_thoughts', ['{{char}}'])}: "${innerThoughtsText}"\n` : '';
+        innerThoughtsText = currentCharacter.innerThoughts || '';
+        innerThoughtsLine = innerThoughtsText
+          ? `${this.i18n('character_inner_thoughts', ['{{char}}'])}: "${innerThoughtsText}"\n`
+          : '';
 
         if (dialog.item.parentInteractionId) {
           return (
@@ -536,12 +540,14 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       // If we have existing text and are generating inner thoughts, just show the existing text
       response += `{{char}}:${existingText}`;
     }
-    
+
     // Add inner thoughts generation
     if (this.includeInnerThoughts) {
-      response += `\n${this.i18n('character_inner_thoughts', ['{{char}}'])}: "{{GEN inner_thoughts max_tokens=${maxTokens} stop=["\\n", "\\""]}}`;
+      response += `\n${this.i18n('character_inner_thoughts', [
+        '{{char}}',
+      ])}: "{{GEN inner_thoughts max_tokens=${maxTokens} stop=["\\n", "\\""]}}`;
     }
-    
+
     return response;
   }
 

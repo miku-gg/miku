@@ -314,14 +314,18 @@ const narrationSlice = createSlice({
         text: string;
         characterId: string;
         emotion: string;
+        innerThoughts?: string;
       }>,
     ) {
-      const { id, text, characterId, emotion } = action.payload;
+      const { id, text, characterId, emotion, innerThoughts } = action.payload;
       const response = state.responses[id];
       const charResponse = response?.characters.find((char) => char.characterId === characterId);
       if (charResponse) {
         charResponse.emotion = emotion;
         charResponse.text = text;
+        if (innerThoughts) {
+          charResponse.innerThoughts = innerThoughts;
+        }
       }
     },
     deleteNode(state, action: PayloadAction<string>) {

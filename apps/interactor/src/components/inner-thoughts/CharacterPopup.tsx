@@ -1,13 +1,13 @@
 import React from 'react';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
-import { TfiThought } from "react-icons/tfi";
+import { TfiThought } from 'react-icons/tfi';
 import { FaSpinner } from 'react-icons/fa';
 import { Tooltip } from '@mikugg/ui-kit';
 import InnerThoughtsBox from './InnerThoughtsBox';
 import { useAppContext } from '../../App.context';
 import { useAppSelector, useAppDispatch } from '../../state/store';
 import { selectLastLoadedResponse } from '../../state/selectors';
-import { setFreeThoughtUsed } from '../../state/slices/narrationSlice';
+import { interactionSuccess, setFreeThoughtUsed, updateResponse } from '../../state/slices/narrationSlice';
 import PromptBuilder from '../../libs/prompts/PromptBuilder';
 import { RoleplayPromptStrategy } from '../../libs/prompts/strategies/roleplay/RoleplayPromptStrategy';
 import textCompletion from '../../libs/textCompletion';
@@ -30,11 +30,7 @@ interface CharacterPopupProps {
   innerThoughts?: string;
 }
 
-const CharacterPopup: React.FC<CharacterPopupProps> = ({
-  character,
-  isVisible,
-  innerThoughts = '',
-}) => {
+const CharacterPopup: React.FC<CharacterPopupProps> = ({ character, isVisible, innerThoughts = '' }) => {
   const { servicesEndpoint, isProduction } = useAppContext();
   const dispatch = useAppDispatch();
   const state = useAppSelector((state) => state);
@@ -43,7 +39,7 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
   const isPremium = useAppSelector((state) => state.settings.user.isPremium);
   const freeThoughtUsed = useAppSelector((state) => state.narration.freeThoughtUsed);
   const { i18n } = useI18n();
-  
+
   const [isHovered, setIsHovered] = React.useState(false);
   const [isClicked, setIsClicked] = React.useState(false);
   const [showInnerThoughts, setShowInnerThoughts] = React.useState(false);
@@ -53,7 +49,7 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
   const characterRef = React.useRef<HTMLDivElement>(null);
 
   const { isMobileApp } = useAppContext();
-  
+
   // Calculate character position for popup placement
   React.useEffect(() => {
     const updatePosition = () => {
@@ -61,9 +57,9 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         const rect = characterRef.current.getBoundingClientRect();
         setCharacterPosition({
           x: rect.left, // Cover from left edge
-          y: rect.top,  // Cover from top edge
-          width: rect.width,  // Full width
-          height: rect.height // Full height
+          y: rect.top, // Cover from top edge
+          width: rect.width, // Full width
+          height: rect.height, // Full height
         });
       }
     };
@@ -82,11 +78,11 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       return;
     }
     if (!isPremium && freeThoughtUsed) {
-        // prompt the suscription upgrade
-        postMessage(CustomEventType.OPEN_PREMIUM);
-        return;
+      // prompt the suscription upgrade
+      postMessage(CustomEventType.OPEN_PREMIUM);
+      return;
     }
-    if(generatedThoughts || innerThoughts){
+    if (generatedThoughts || innerThoughts) {
       setShowInnerThoughts(true);
       return;
     }
@@ -98,38 +94,41 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
     setShowInnerThoughts(false);
     setIsClicked(false);
     setIsHovered(false);
-  }
+  };
 
   const generateInnerThoughts = async () => {
     if (isGeneratingThoughts) return;
-    
+
     // Check if there's already a response from this character
     // If there's none, we should not generate inner thoughts
-    const currentCharacterResponse = lastResponse?.characters.find(char => char.characterId === character.id);
+    const currentCharacterResponse = lastResponse?.characters.find((char) => char.characterId === character.id);
     if (!currentCharacterResponse || !currentCharacterResponse.text) {
       return;
     }
-    
+
     setIsGeneratingThoughts(true);
-    
+
     try {
       const modelMetadata = await retrieveModelMetadata(servicesEndpoint, state.settings.model);
       const promptBuilder = new PromptBuilder<RoleplayPromptStrategy>({
         maxNewTokens: 100,
         strategy: new RoleplayPromptStrategy(
-          modelMetadata.strategy, 
-          state.novel.language || 'en', 
+          modelMetadata.strategy,
+          state.novel.language || 'en',
           modelMetadata.has_reasoning,
-          true // includeInnerThoughts
+          true, // includeInnerThoughts
         ),
         truncationLength: modelMetadata.truncation_length - 150,
       });
-      
-      const prompt = promptBuilder.buildPrompt({
-        state,
-        currentCharacterId: character.id
-      }, 30);
-      
+
+      const prompt = promptBuilder.buildPrompt(
+        {
+          state,
+          currentCharacterId: character.id,
+        },
+        30,
+      );
+
       const stream = textCompletion({
         template: prompt.template,
         variables: prompt.variables,
@@ -144,55 +143,44 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         setIsGeneratingThoughts(false);
         return;
       }
-      
+
       // here starts the stream processing
-      
+
       for await (const result of stream) {
         response = promptBuilder.completeResponse(response, result, {
           state,
-          currentCharacterId: character.id
-        });        
+          currentCharacterId: character.id,
+        });
       }
-      
-      const finalCharacter = response?.characters.find(char => char.characterId === character.id);
+
+      const finalCharacter = response?.characters.find((char) => char.characterId === character.id);
       const originalResponse = finalCharacter?.innerThoughts; // Keep original for debug entry
       const finalResponse = originalResponse?.trim(); // Trimmed version for display processing
       if (finalResponse) {
-        // Create second debug entry with filled-in results
-        const filledTemplate = prompt.template.replace(
-          /{{GEN inner_thoughts max_tokens=\d+ stop=\[.*?\]}}/g,
-          originalResponse || ''
-        );
-        
-        const resultsStream = textCompletion({
-          template: filledTemplate,
-          variables: prompt.variables,
-          model: state.settings.model,
-          serviceBaseUrl: servicesEndpoint,
-          identifier: `${Date.now()}_results`,
-        });
-        
-        // Consume the stream to trigger debug entry creation
-        // Just consume the stream to create the debug entry
-        for await (const _ of resultsStream) {
-        }
-        
         // Remove trailing quote mark for display only
         let displayThoughts = finalResponse;
         if (displayThoughts.endsWith('"')) {
           displayThoughts = displayThoughts.slice(0, -1);
         }
         setGeneratedThoughts(displayThoughts);
-        
+        dispatch(
+          updateResponse({
+            id: lastResponse?.id || '',
+            characterId: character.id,
+            text: lastResponse?.characters.find((char) => char.characterId === character.id)?.text || '',
+            emotion: lastResponse?.characters.find((char) => char.characterId === character.id)?.emotion || '',
+            innerThoughts: displayThoughts,
+          }),
+        );
+
         // Show window only when generation is complete
         setShowInnerThoughts(true);
-        if(!isPremium) dispatch(setFreeThoughtUsed(true));
+        if (!isPremium) dispatch(setFreeThoughtUsed(true));
       } else {
         toast.error('Failed to generate inner thoughts');
       }
-      
-      setIsGeneratingThoughts(false);
 
+      setIsGeneratingThoughts(false);
     } catch (error) {
       setIsGeneratingThoughts(false);
       console.error(error);
@@ -206,19 +194,22 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
       setGeneratedThoughts('');
     }
   }, [isCurrentResponseFetching]);
-  
 
   return (
-    <div
-      ref={characterRef}
-      className="CharacterPopup"
-    >
+    <div ref={characterRef} className="CharacterPopup">
       {/* Popup covering entire character */}
-      <div 
+      <div
         className="CharacterPopup__container"
         style={{
-          opacity: (isHovered || isClicked || isGeneratingThoughts ||
-                    showInnerThoughts || isMobileApp || window.innerWidth < 768) ? 1 : 0,
+          opacity:
+            isHovered ||
+            isClicked ||
+            isGeneratingThoughts ||
+            showInnerThoughts ||
+            isMobileApp ||
+            window.innerWidth < 768
+              ? 1
+              : 0,
         }}
         onMouseEnter={() => {
           setIsHovered(true);
@@ -228,38 +219,33 @@ const CharacterPopup: React.FC<CharacterPopupProps> = ({
         }}
       >
         {isGeneratingThoughts ? (
-            <FaSpinner 
-              className="CharacterPopup__icon CharacterPopup__icon--spinner"
-              style={{
-                animation: 'spin 1s linear infinite',
-              }}
-            />
-          ) : isCurrentResponseFetching ? null : (
-            <TfiThought 
-              className={`CharacterPopup__icon CharacterPopup__icon--flipped ${
-                !lastResponse?.characters.find(char => char.characterId === character.id)?.text
-                || (freeThoughtUsed && !isPremium)
-                  ? 'CharacterPopup__icon--disabled' 
-                  : ''
-              }`}
-              onClick={showInnerThoughts? undefined : handleCharacterClick}
-              data-tooltip-id="inner-thoughts-tooltip"
-              data-tooltip-content={
-                !isPremium && isProduction
-                  ? i18n('this_is_a_premium_feature')
-                  : ''
-                }
-            />
-          )
-        }
+          <FaSpinner
+            className="CharacterPopup__icon CharacterPopup__icon--spinner"
+            style={{
+              animation: 'spin 1s linear infinite',
+            }}
+          />
+        ) : isCurrentResponseFetching ? null : (
+          <TfiThought
+            className={`CharacterPopup__icon CharacterPopup__icon--flipped ${
+              !lastResponse?.characters.find((char) => char.characterId === character.id)?.text ||
+              (freeThoughtUsed && !isPremium)
+                ? 'CharacterPopup__icon--disabled'
+                : ''
+            }`}
+            onClick={showInnerThoughts ? undefined : handleCharacterClick}
+            data-tooltip-id="inner-thoughts-tooltip"
+            data-tooltip-content={!isPremium && isProduction ? i18n('this_is_a_premium_feature') : ''}
+          />
+        )}
 
         {showInnerThoughts && (
-        <InnerThoughtsBox
-          className='InnerThoughtsBox--popup'
-          isVisible={true}
-          onClose={handleCloseInnerThoughts}
-          thoughts={generatedThoughts || innerThoughts}
-        />
+          <InnerThoughtsBox
+            className="InnerThoughtsBox--popup"
+            isVisible={true}
+            onClose={handleCloseInnerThoughts}
+            thoughts={generatedThoughts || innerThoughts}
+          />
         )}
       </div>
       <Tooltip id="inner-thoughts-tooltip" place="top" />
