@@ -70,7 +70,7 @@ const Interactor = () => {
 
   // Check for AI query after scene change when scene has no cutscene
   useEffect(() => {
-    if (cutsceneUtilities.needsAiQueryAfterSceneChange() && scene && !scene.cutScene) {
+    if (cutsceneUtilities.needsAiQueryAfterSceneChange() && scene && !displayingCutscene) {
       dispatchInteractionStart();
     }
   }, [scene]);
