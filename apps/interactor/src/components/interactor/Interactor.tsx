@@ -19,7 +19,8 @@ import InteractorHeader from './InteractorHeader';
 import Inventory from './Inventory';
 import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
-import CharacterPopup from '../inner-thoughts/CharacterPopup';
+import InnerThoughtsTrigger from '../inner-thoughts/InnerThoughtsTrigger';
+import InnerThoughtsModal from '../inner-thoughts/InnerThoughtsModal';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
 import { useFullscreenEmotions } from '../fullscreen-emotions/useFullscreenEmotions';
@@ -160,53 +161,42 @@ const Interactor = () => {
                     'Interactor__characters--multiple': nonFullscreenCharacters.length > 1,
                   })}
                 >
-              {/* Character Popups - positioned relative to each character */}
-              {!fullscreenCharacter && lastCharacters.map(({ id, image }) => {
-                if (!image || displayingCutscene) {
-                  return null;
-                }
-                const character = novelCharacters.find(c => c.id === id);
-                if (!character) return null;
-                
-                 return (
-                   <div className={classNames({
-                     'Interactor__character-container': true,
-                     selected: displayCharacter?.id === id,
-                   })}>
-                     <EmotionRenderer
-                        key={`character-emotion-render-${id}`}
-                        assetLinkLoader={assetLinkLoader}
-                        assetUrl={image}
-                        upDownAnimation
-                        className= 'Interactor__emotion-renderer'
-                     />
-                     {displayCharacter?.id === id && (
-                        <CharacterPopup
-                          character={{
-                            id: character.id,
-                            name: character.name,
-                            description:
-                              character.card?.data?.description ||
-                              character.card?.data?.personality ||
-                              '',
-                            profile_pic: character.profile_pic,
-                          }}
-                          assetLinkLoader={assetLinkLoader}
-                          isVisible={true}
-                          position={{ x: 0, y: 0 }} // Position will be calculated relative to character
-                        />
-                      )}
-                   </div>
-                 );
-              })}
+                  {/* Character emotions with inner thoughts triggers */}
+                  {!fullscreenCharacter &&
+                    lastCharacters.map(({ id, image }) => {
+                      if (!image || displayingCutscene) {
+                        return null;
+                      }
+                      const character = novelCharacters.find((c) => c.id === id);
+                      if (!character) return null;
+
+                      return (
+                        <div
+                          key={`character-container-${id}`}
+                          className={classNames({
+                            'Interactor__character-container': true,
+                            selected: displayCharacter?.id === id,
+                          })}
+                        >
+                          <EmotionRenderer
+                            key={`character-emotion-render-${id}`}
+                            assetLinkLoader={assetLinkLoader}
+                            assetUrl={image}
+                            upDownAnimation
+                            className="Interactor__emotion-renderer"
+                          />
+                          {displayCharacter?.id === id && <InnerThoughtsTrigger characterId={id} />}
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
-            </div>
               <ChatBox />
               <Inventory />
               <DebugModal />
               <ModelSelectorModal />
               <RegenerateEmotionModal />
-              
+              <InnerThoughtsModal />
             </div>
           </>
         )}

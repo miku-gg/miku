@@ -240,6 +240,10 @@ export interface SettingsState {
       opened: boolean;
       id: string;
     };
+    innerThoughts?: {
+      opened: boolean;
+      characterId: string;
+    };
   };
   summaries?: {
     enabled: boolean;

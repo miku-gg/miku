@@ -438,7 +438,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         // Include inner thoughts if they exist
         innerThoughtsText = currentCharacter.innerThoughts || '';
         innerThoughtsLine = innerThoughtsText
-          ? `${this.i18n('character_inner_thoughts', ['{{char}}'])}: "${innerThoughtsText}"\n`
+          ? `[${this.i18n('character_inner_thoughts', ['{{char}}'])}: "${innerThoughtsText}"]\n`
           : '';
 
         if (dialog.item.parentInteractionId) {
@@ -488,7 +488,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         const character = state.novel.characters.find((char) => char.id === characterId);
         const charName = (character?.name || '').replace(/"/g, '\\"');
 
-        return `"\\n${charName}:","\\n${charName}'s reaction:","\\n${charName}'s inner thoughts:","# "`;
+        return `"\\n${charName}:","\\n${charName}'s reaction:","\\n${charName}'s inner thoughts:","# ","["`;
       })
       .concat(temp.stops.map((stop) => `"${stop}"`))
       .join(',');
@@ -543,7 +543,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
 
     // Add inner thoughts generation
     if (this.includeInnerThoughts) {
-      response += `\n${this.i18n('character_inner_thoughts', [
+      response += `\n[${this.i18n('character_inner_thoughts', [
         '{{char}}',
       ])}: "{{GEN inner_thoughts max_tokens=${maxTokens} stop=["\\n", "\\""]}}`;
     }

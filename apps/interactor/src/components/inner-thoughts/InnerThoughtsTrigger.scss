@@ -1,0 +1,87 @@
+@import '../../variables';
+
+.InnerThoughtsTrigger {
+  position: absolute;
+  top: 0;
+  right: 30%;
+  width: 2rem;
+  height: 2rem;
+  outline: none;
+
+  &__container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 1;
+    outline: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    &:hover {
+      pointer-events: all;
+    }
+
+    &--always-visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    &--showing {
+      opacity: 1;
+      pointer-events: all;
+    }
+  }
+
+  &__icon {
+    font-size: 2rem;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    filter: drop-shadow(0 0 8px rgba(138, 43, 226, 0.6));
+    pointer-events: all;
+    outline: none;
+    // background as radial gray
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
+
+    &:hover {
+      color: rgba(255, 255, 255, 1);
+      filter: drop-shadow(0 0 12px rgba(138, 43, 226, 0.9));
+      transform: scale(1.1);
+    }
+
+    &--disabled {
+      color: rgb(124, 124, 124);
+      filter: drop-shadow(0 0 4px rgba(100, 100, 100, 0.3));
+      // radial gradient white
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
+
+      &:hover {
+        color: rgb(124, 124, 124);
+        filter: drop-shadow(0 0 4px rgba(100, 100, 100, 0.3));
+      }
+    }
+
+    &--spinner {
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
