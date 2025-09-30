@@ -19,6 +19,8 @@ import InteractorHeader from './InteractorHeader';
 import Inventory from './Inventory';
 import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
+import InnerThoughtsTrigger from '../inner-thoughts/InnerThoughtsTrigger';
+import InnerThoughtsModal from '../inner-thoughts/InnerThoughtsModal';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
 import { useFullscreenEmotions } from '../fullscreen-emotions/useFullscreenEmotions';
@@ -44,6 +46,7 @@ const Interactor = () => {
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
   const battles = useAppSelector((state) => state.novel.battles);
+  const novelCharacters = useAppSelector((state) => state.novel.characters);
 
   if (!scene) {
     return null;
@@ -158,23 +161,34 @@ const Interactor = () => {
                     'Interactor__characters--multiple': nonFullscreenCharacters.length > 1,
                   })}
                 >
-                  {!fullscreenCharacter && lastCharacters.map(({ id, image }) => {
-                    if (!image || displayingCutscene) {
-                      return null;
-                    }
-                    return (
-                      <EmotionRenderer
-                        key={`character-emotion-render-${id}`}
-                        assetLinkLoader={assetLinkLoader}
-                        assetUrl={image}
-                        upDownAnimation
-                        className={classNames({
-                          'Interactor__emotion-renderer': true,
-                          selected: displayCharacter?.id === id,
-                        })}
-                      />
-                    );
-                  })}
+                  {/* Character emotions with inner thoughts triggers */}
+                  {!fullscreenCharacter &&
+                    lastCharacters.map(({ id, image }) => {
+                      if (!image || displayingCutscene) {
+                        return null;
+                      }
+                      const character = novelCharacters.find((c) => c.id === id);
+                      if (!character) return null;
+
+                      return (
+                        <div
+                          key={`character-container-${id}`}
+                          className={classNames({
+                            'Interactor__character-container': true,
+                            selected: displayCharacter?.id === id,
+                          })}
+                        >
+                          <EmotionRenderer
+                            key={`character-emotion-render-${id}`}
+                            assetLinkLoader={assetLinkLoader}
+                            assetUrl={image}
+                            upDownAnimation
+                            className="Interactor__emotion-renderer"
+                          />
+                          {displayCharacter?.id === id && <InnerThoughtsTrigger characterId={id} />}
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
               <ChatBox />
@@ -182,6 +196,7 @@ const Interactor = () => {
               <DebugModal />
               <ModelSelectorModal />
               <RegenerateEmotionModal />
+              <InnerThoughtsModal />
             </div>
           </>
         )}

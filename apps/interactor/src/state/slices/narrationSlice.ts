@@ -21,6 +21,7 @@ const initialState: NarrationState = {
     prefillIndicators: [],
   },
   interactions: {},
+  freeThoughtUsed: false,
   responses: {},
   seenHints: [],
   createdIndicatorIds: [],
@@ -313,14 +314,18 @@ const narrationSlice = createSlice({
         text: string;
         characterId: string;
         emotion: string;
+        innerThoughts?: string;
       }>,
     ) {
-      const { id, text, characterId, emotion } = action.payload;
+      const { id, text, characterId, emotion, innerThoughts } = action.payload;
       const response = state.responses[id];
       const charResponse = response?.characters.find((char) => char.characterId === characterId);
       if (charResponse) {
         charResponse.emotion = emotion;
         charResponse.text = text;
+        if (innerThoughts) {
+          charResponse.innerThoughts = innerThoughts;
+        }
       }
     },
     deleteNode(state, action: PayloadAction<string>) {
@@ -619,6 +624,10 @@ const narrationSlice = createSlice({
       if (!cb) return;
       cb.state.turn += 1;
     },
+    // Set freeThoughtUsed to true only when inner thoughts are successfully displayed
+    setFreeThoughtUsed(state, action: PayloadAction<boolean>) {
+      state.freeThoughtUsed = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -671,6 +680,7 @@ export const {
   addMana,
   addBattleLog,
   moveNextTurn,
+  setFreeThoughtUsed,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;

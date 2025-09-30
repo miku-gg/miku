@@ -1,0 +1,194 @@
+@import '../../_variables.scss';
+@import '../chat-box/ResponseBox.scss';
+
+.InnerThoughtsBox {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+
+  // Always present but only clickable when visible
+  &--hidden {
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  &--visible {
+    pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  
+  &__container {
+    position: relative;
+    min-width: 380px;
+    width: 90%;
+    max-height: 80vh;
+    opacity: 0;
+    transition: all 0.3s ease;
+    animation: grow 0.3s ease forwards;
+    text-align: left;
+
+    &--visible {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+
+  &__bg{
+    position: absolute;
+    inset: -15px;
+    background: linear-gradient(
+      rgba(12, 10, 29, 0.7) 0%, 
+      rgba(30, 26, 65, 0.7) 100%
+    );
+    filter: blur(6px);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    filter: blur(8px);
+    -webkit-filter: blur(8px);
+    z-index: -1;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+  }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    // Ensure TTS button gets proper styling
+    .ResponseBox__voice {
+      font-family: 'Poppins', 'Roboto', sans-serif;
+      background: transparent !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      border-radius: 8px !important;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
+      }
+      
+      &:disabled {
+        background: transparent !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        opacity: 0.5;
+      }
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: lightgray;
+    font-family: 'Poppins', 'Roboto', sans-serif;
+  }
+
+  &__close-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin-left: auto;
+
+    &:hover {
+      color: $text-1;
+      background-color: $background-color-light;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &__body{
+    position: relative;
+  }
+
+  &__content {
+    padding: 0 0.5rem 0.5rem 0.5rem;
+    height: calc(2.5 * 2.5em); // 2.5 lines with 2.5em line-height
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #a78bfa $background-color-dark;
+
+    &::-webkit-scrollbar {
+      width: 0.3rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $background-color-dark;
+      border-radius: 100vh;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #a78bfa;
+      border-radius: 100vh;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #c4b5fd;
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    color: lightgray;
+    font-style: italic;
+    font-size: 1rem;
+    margin: 2rem 0;
+    font-family: 'Poppins', 'Roboto', sans-serif;
+  }
+
+  &__thoughts-text {
+    color: lightgray;
+    font-family: 'Poppins', 'Roboto', sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    max-height: 100%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+}
+
+.InnerThoughtsBox__rnd {
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+
+  .InnerThoughtsBox {
+    &__content {
+      padding: 0.5rem;
+      height: calc(2.5 * 2.5em); // 2.5 lines with 2.5em line-height on mobile too
+    }
+  }
+}

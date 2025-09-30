@@ -134,6 +134,10 @@ export const initialState: SettingsState = {
       opened: false,
       id: '',
     },
+    innerThoughts: {
+      opened: false,
+      characterId: '',
+    },
   },
   summaries: {
     enabled: false,
@@ -268,6 +272,21 @@ export const settingSlice = createSlice({
     setReasoningEnabled: (state, action: PayloadAction<boolean>) => {
       state.prompt.reasoningEnabled = action.payload;
     },
+    setInnerThoughtsModal: (state, action: PayloadAction<{ opened: boolean; characterId?: string }>) => {
+      if (!state.modals.innerThoughts) {
+        state.modals.innerThoughts = {
+          opened: false,
+          characterId: '',
+        };
+      }
+      state.modals.innerThoughts.opened = action.payload.opened;
+      if (action.payload.characterId !== undefined) {
+        state.modals.innerThoughts.characterId = action.payload.characterId;
+      } else if (!action.payload.opened) {
+        // Reset characterId when closing if no characterId is provided
+        state.modals.innerThoughts.characterId = '';
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -310,6 +329,7 @@ export const {
   setDisplayingLastSentence,
   setRegenerateEmotionModal,
   setReasoningEnabled,
+  setInnerThoughtsModal,
 } = settingSlice.actions;
 
 export default settingSlice.reducer;
