@@ -105,27 +105,23 @@
     -webkit-user-drag: none;
   }
 
-  &__characters--multiple {
-    opacity: 1;
-    z-index: 1;
-    display: initial;
-    justify-content: initial;
+&__characters--multiple {
+  z-index: 1;
+  perspective: 1000px;
+  transform-style: preserve-3d;
 
-    .Interactor__character-container {
-      position: absolute;
-      height: 100%;
+  .Interactor__character-container {
+    position: absolute;
+    left: 50%;
+    transform-origin: center bottom;
+    transform-style: preserve-3d;
+    transition: transform 0.4s ease;
 
-      &:first-child {
-        left: 25%;
-        transform: translateX(-50%);
-      }
-
-      &:last-child {
-        right: 25%;
-        transform: translateX(50%);
-      }
+    &.selected {
+      z-index: 10;
     }
   }
+}
 
   &__character-container {
     position: absolute;

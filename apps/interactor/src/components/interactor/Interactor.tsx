@@ -52,6 +52,65 @@ const Interactor = () => {
     return null;
   }
   const background = backgrounds.find((b) => b.id === scene.backgroundId);
+  const selectedCharacterId = (displayCharacter) ? displayCharacter.id : lastCharacters[0].id;
+
+  function getChara3DTransform(
+    index: number,
+    selectedCharacterId?: string,
+  ): string {
+    const total = orderedCharacters.length;
+    if (total === 0) return '';
+  
+    const radius = 300;
+    const maxScale = 1;
+    const minScale = 0.75;
+
+    let selectedIndex = 0;
+    if (selectedCharacterId) {
+      const foundIndex = orderedCharacters.findIndex(c => c.id === selectedCharacterId);
+      if (foundIndex !== -1) selectedIndex = foundIndex;
+    }
+
+    const angleStep = (2 * Math.PI) / total;
+    const relativeIndex = (index - selectedIndex + total) % total;
+    const angle = relativeIndex * angleStep;
+
+    const x = radius * Math.sin(angle);
+    const z = radius * Math.cos(angle);
+  
+    const maxZ = radius;
+    const scale =
+      maxScale - ((maxZ - z) / (2 * radius)) * (maxScale - minScale);
+  
+    return `
+      translateX(${x}px)
+      scale(${scale})
+      translateX(-50%)
+    `;
+  }  
+  
+  function reorderCharactersForCenterDisplay<T extends { id: string }>(
+    characters: T[],
+    selectedId: string,
+  ): T[] {
+    const selectedIndex = characters.findIndex((c) => c.id === selectedId);
+    if (selectedIndex === -1) return characters;
+  
+    const total = characters.length;
+  
+    const offset = Math.floor(total / 2);
+    const rotated = [
+      ...characters.slice(selectedIndex + 1),
+      ...characters.slice(0, selectedIndex),
+    ];
+  
+    const before = rotated.slice(-offset);
+    const after = rotated.slice(0, total - 1 - offset);
+  
+    return [...before, characters[selectedIndex], ...after];
+  }
+  
+  const orderedCharacters = reorderCharactersForCenterDisplay(lastCharacters.filter(c => c.image), displayCharacter?.id);
 
   return (
     <AreYouSure.AreYouSureProvider>
@@ -163,32 +222,35 @@ const Interactor = () => {
                 >
                   {/* Character emotions with inner thoughts triggers */}
                   {!fullscreenCharacter &&
-                    lastCharacters.map(({ id, image }) => {
-                      if (!image || displayingCutscene) {
-                        return null;
-                      }
-                      const character = novelCharacters.find((c) => c.id === id);
-                      if (!character) return null;
+                  orderedCharacters.map(({ id, image }, index) => {
+                    if (!image || displayingCutscene) {
+                      return null;
+                    }
+                    const character = novelCharacters.find((c) => c.id === id);
+                    if (!character) return null;
 
-                      return (
-                        <div
-                          key={`character-container-${id}`}
-                          className={classNames({
-                            'Interactor__character-container': true,
-                            selected: displayCharacter?.id === id,
-                          })}
-                        >
-                          <EmotionRenderer
-                            key={`character-emotion-render-${id}`}
-                            assetLinkLoader={assetLinkLoader}
-                            assetUrl={image}
-                            upDownAnimation
-                            className="Interactor__emotion-renderer"
-                          />
-                          {displayCharacter?.id === id && <InnerThoughtsTrigger characterId={id} />}
-                        </div>
-                      );
-                    })}
+                    const isSelected = displayCharacter?.id === id;
+
+                    return (
+                      <div
+                        key={`character-container-${id}`}
+                        className={classNames('Interactor__character-container', { selected: isSelected })}
+                        style={{
+                          transform: getChara3DTransform(index, selectedCharacterId),
+                          zIndex: isSelected ? 10 : 1,
+                        }}
+                      >
+                        <EmotionRenderer
+                          key={`character-emotion-render-${id}`}
+                          assetLinkLoader={assetLinkLoader}
+                          assetUrl={image}
+                          upDownAnimation
+                          className="Interactor__emotion-renderer"
+                        />
+                        {isSelected && <InnerThoughtsTrigger characterId={id} />}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
               <ChatBox />
