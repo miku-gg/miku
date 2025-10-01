@@ -1,12 +1,9 @@
 import { FaHammer, FaPencil } from 'react-icons/fa6';
-import { MdSearch } from 'react-icons/md';
 import config from '../../../config';
 import { openModal } from '../../../state/slices/inputSlice';
 import { useAppDispatch, useAppSelector } from '../../../state/store';
 import './Characters.scss';
 import { Blocks } from '@mikugg/ui-kit';
-import { useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 import { v4 as randomUUID } from 'uuid';
 import { createCharacter } from '../../../state/slices/novelFormSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';

@@ -58,6 +58,8 @@ export default function SceneEditModal() {
   const [zoomModalEmotionName, setZoomModalEmotionName] = useState('');
   const [zoomModalCharacterName, setZoomModalCharacterName] = useState('');
 
+  const characterCount = 4; // here we define the max amount of characters in a scene
+
   const getObjectiveData = (id: string) => {
     return objectives?.find((objective) => objective.id === id);
   };
@@ -168,6 +170,7 @@ export default function SceneEditModal() {
                   AssetDisplayPrefix.BACKGROUND_IMAGE,
                 )}
               />
+              <div className="SceneEditModal__buttons-container">
               <div
                 className="SceneEditModal__background-edit-btn"
                 onClick={() => setSelectBackgroundModalOpened(true)}
@@ -176,35 +179,35 @@ export default function SceneEditModal() {
               >
                 <AiOutlinePicture />
               </div>
-              <div
-                className="SceneEditModal__character-select1-btn"
-                onClick={() =>
-                  setSelectCharacterModal({
-                    opened: true,
-                    characterIndex: 0,
-                  })
-                }
-                tabIndex={0}
-                role="button"
-              >
-                <FaUser /> 1
+              {Array.from({ length: characterCount }).map((_, index) => {
+                const activeButtonLimit = (scene?.characters?.length ?? 0) + 1;
+                const isDisabled = index >= activeButtonLimit;
+
+                return (
+                  <div
+                    key={index}
+                    className={classNames(
+                      'SceneEditModal__character-select-btn',
+                      { 'SceneEditModal__character-select-btn--disabled': isDisabled }
+                    )}
+                    onClick={() => {
+                      if (!isDisabled) {
+                        setSelectCharacterModal({
+                          opened: true,
+                          characterIndex: index,
+                        });
+                      }
+                    }}
+                    tabIndex={0}
+                    role="button"
+                    data-index={index}
+                  >
+                    <FaUser /> {index + 1}
+                  </div>
+                );
+              })}
               </div>
-              <div
-                className={classNames({
-                  'SceneEditModal__character-select2-btn': true,
-                  'SceneEditModal__character-select2-btn--disabled': scene.characters.length < 2,
-                })}
-                onClick={() =>
-                  setSelectCharacterModal({
-                    opened: true,
-                    characterIndex: 1,
-                  })
-                }
-                tabIndex={0}
-                role="button"
-              >
-                <FaUser /> 2
-              </div>
+
               <div className="SceneEditModal__characters">
                 {scene.characters.map((character, characterIndex) => {
                   const outfits = character.card?.data.extensions.mikugg_v2.outfits || [];
@@ -665,15 +668,12 @@ export default function SceneEditModal() {
       >
         <Characters
           ignoreIds={
-            selectCharacterModal.characterIndex == 0
-              ? scene?.characters[1]?.id
-                ? [scene?.characters[1]?.id]
-                : []
-              : scene?.characters[0]?.id
-              ? [scene?.characters[0]?.id]
-              : []
+            scene?.characters
+              ?.map(c => c.id)
+              .filter((id): id is string => id !== undefined && id !== null)
+              .filter((_, idx) => idx !== selectCharacterModal.characterIndex) || []
           }
-          showNone={selectCharacterModal.characterIndex === 1}
+          showNone={(scene?.characters?.length ?? 0) > 1}
           selected={scene?.characters[selectCharacterModal.characterIndex]?.id}
           onSelect={(characterId) => {
             if (scene?._source) {
