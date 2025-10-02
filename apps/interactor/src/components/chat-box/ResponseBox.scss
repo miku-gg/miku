@@ -252,8 +252,8 @@
   &__characters {
     position: absolute;
     top: -43px;
-    margin: 0 auto;
-    margin-left: -50px;
+    margin: 0 auto auto auto;
+    transform: translateX(-50%);
     display: inline-flex;
     justify-content: center;
     z-index: 0;
