@@ -53,10 +53,16 @@ const Interactor = () => {
   }
   const background = backgrounds.find((b) => b.id === scene.backgroundId);
   const selectedCharacterId = (displayCharacter) ? displayCharacter.id : lastCharacters[0].id;
+  let orderedCharacters = lastCharacters.filter((c) => c.image);
+  orderedCharacters = displayCharacter && !orderedCharacters.some(c => c.id === displayCharacter.id) ?
+                      [...orderedCharacters, displayCharacter] :
+                      orderedCharacters;
+  orderedCharacters = (isMobileApp || window.innerWidth < 600) ? 
+                      reorderCharactersForCenterDisplay(orderedCharacters, displayCharacter?.id, 3) :
+                      orderedCharacters;
 
-  function getSideBySideCharaTransform(
+  function getDesktopCharaTransform(
     index: number,
-    selectedCharacterId?: string,
   ): string {
     let total: number = orderedCharacters.length;
     if (total === 0) return '';
@@ -118,9 +124,41 @@ const Interactor = () => {
     `;
   }
   
+  function getMobileCharaTransform(
+    index: number,
+  ): string {
+    const offsetX = 160;
+    const backgroundZ = -10;
+    const backgroundScale = 0.75;
+  
+    const selectedIndex = selectedCharacterId
+      ? orderedCharacters.findIndex(c => c.id === selectedCharacterId)
+      : -1;
+  
+    if (selectedIndex < 0 || index === selectedIndex) {
+      return `
+        translateX(0px)
+        translateZ(0px)
+        scale(1)
+        translateX(-50%)
+      `;
+    }
+  
+    const offsetFromSelected = index - selectedIndex;
+    const x = offsetFromSelected * offsetX;
+  
+    return `
+      translateX(${x}px)
+      translateZ(${backgroundZ}px)
+      scale(${backgroundScale})
+      translateX(-50%)
+    `;
+  }
+
   function reorderCharactersForCenterDisplay<T extends { id: string }>(
     characters: T[],
     selectedId: string,
+    maxCharacters?: number,
   ): T[] {
     const selectedIndex = characters.findIndex((c) => c.id === selectedId);
     if (selectedIndex === -1) return characters;
@@ -133,13 +171,17 @@ const Interactor = () => {
       ...characters.slice(0, selectedIndex),
     ];
   
-    const before = rotated.slice(-offset);
-    const after = rotated.slice(0, total - 1 - offset);
-  
+    let before = rotated.slice(-offset);
+    let after = rotated.slice(0, total - 1 - offset);
+
+    if (typeof maxCharacters === 'number' && maxCharacters > 1) {
+      const sideCount = Math.floor((maxCharacters - 1) / 2);
+      before = before.slice(-sideCount);
+      after = after.slice(0, sideCount);
+    }
+
     return [...before, characters[selectedIndex], ...after];
   }
-  
-  const orderedCharacters = lastCharacters.filter(c => c.image);
 
   return (
     <AreYouSure.AreYouSureProvider>
@@ -265,7 +307,9 @@ const Interactor = () => {
                         key={`character-container-${id}`}
                         className={classNames('Interactor__character-container', { selected: isSelected })}
                         style={{
-                          transform: getSideBySideCharaTransform(index, selectedCharacterId),
+                          transform: (isMobileApp || window.innerWidth < 600)
+                          ? getMobileCharaTransform(index)
+                          : getDesktopCharaTransform(index),
                           zIndex: isSelected ? 1 : 0,
                         }}
                       >
