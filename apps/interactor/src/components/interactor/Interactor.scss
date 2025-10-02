@@ -107,19 +107,16 @@
 
 &__characters--multiple {
   z-index: 1;
-  perspective: 1000px;
-  transform-style: preserve-3d;
+  transform-origin: center bottom;
+  left: auto;
+  right: auto;
+  width: 800px;
 
   .Interactor__character-container {
     position: absolute;
     left: 50%;
     transform-origin: center bottom;
-    transform-style: preserve-3d;
     transition: transform 0.4s ease;
-
-    &.selected {
-      z-index: 10;
-    }
   }
 }
 

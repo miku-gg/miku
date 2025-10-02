@@ -54,40 +54,69 @@ const Interactor = () => {
   const background = backgrounds.find((b) => b.id === scene.backgroundId);
   const selectedCharacterId = (displayCharacter) ? displayCharacter.id : lastCharacters[0].id;
 
-  function getChara3DTransform(
+  function getSideBySideCharaTransform(
     index: number,
     selectedCharacterId?: string,
   ): string {
-    const total = orderedCharacters.length;
+    let total: number = orderedCharacters.length;
     if (total === 0) return '';
   
-    const radius = 300;
-    const maxScale = 1;
-    const minScale = 0.75;
+    const totalSpaceWidth = 800;
+    const centralGap = 400;
+    const backgroundZ = -10;
+    const backgroundScale = 0.75;
+  
+    const selectedIndex = selectedCharacterId
+      ? orderedCharacters.findIndex(c => c.id === selectedCharacterId)
+      : -1;
 
-    let selectedIndex = 0;
-    if (selectedCharacterId) {
-      const foundIndex = orderedCharacters.findIndex(c => c.id === selectedCharacterId);
-      if (foundIndex !== -1) selectedIndex = foundIndex;
+    if (index === selectedIndex) {
+      return `
+        translateX(0px)
+        translateZ(0px)
+        scale(1)
+        translateX(-50%)
+      `;
     }
 
-    const angleStep = (2 * Math.PI) / total;
-    const relativeIndex = (index - selectedIndex + total) % total;
-    const angle = relativeIndex * angleStep;
+    if(selectedIndex < 0) total += 1;
 
-    const x = radius * Math.sin(angle);
-    const z = radius * Math.cos(angle);
-  
-    const maxZ = radius;
-    const scale =
-      maxScale - ((maxZ - z) / (2 * radius)) * (maxScale - minScale);
-  
+    if (total === 1) return '';
+
+    const leftStart = -totalSpaceWidth / 2;
+    const leftEnd = -centralGap / 2;
+    const rightStart = centralGap / 2;
+    const rightEnd = totalSpaceWidth / 2;
+
+    const leftCount = Math.ceil(total / 2);
+    const rightCount = Math.floor(total / 2);
+
+    let x = 0;
+    
+    if (index < leftCount) {
+      if (leftCount === 1) {
+        x = (leftStart + leftEnd) / 2;
+      } else {
+        const step = (leftEnd - leftStart) / (leftCount - 1);
+        x = leftStart + step * index;
+      }
+    } else {
+      if (rightCount === 1) {
+        x = (rightStart + rightEnd) / 2;
+      } else {
+        const step = (rightEnd - rightStart) / (rightCount - 1);
+        const rightIndex = index - leftCount;
+        x = rightStart + step * rightIndex;
+      }
+    }
+
     return `
       translateX(${x}px)
-      scale(${scale})
+      translateZ(${backgroundZ}px)
+      scale(${backgroundScale})
       translateX(-50%)
     `;
-  }  
+  }
   
   function reorderCharactersForCenterDisplay<T extends { id: string }>(
     characters: T[],
@@ -110,7 +139,7 @@ const Interactor = () => {
     return [...before, characters[selectedIndex], ...after];
   }
   
-  const orderedCharacters = reorderCharactersForCenterDisplay(lastCharacters.filter(c => c.image), displayCharacter?.id);
+  const orderedCharacters = lastCharacters.filter(c => c.image);
 
   return (
     <AreYouSure.AreYouSureProvider>
@@ -236,8 +265,8 @@ const Interactor = () => {
                         key={`character-container-${id}`}
                         className={classNames('Interactor__character-container', { selected: isSelected })}
                         style={{
-                          transform: getChara3DTransform(index, selectedCharacterId),
-                          zIndex: isSelected ? 10 : 1,
+                          transform: getSideBySideCharaTransform(index, selectedCharacterId),
+                          zIndex: isSelected ? 1 : 0,
                         }}
                       >
                         <EmotionRenderer
