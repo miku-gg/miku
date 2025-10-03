@@ -1,11 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Rnd } from 'react-rnd';
 import TTSPlayer from '../chat-box/TTSPlayer';
-import { IoIosCloseCircleOutline } from "react-icons/io";
+import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { FaPencil, FaCheck } from 'react-icons/fa6';
 import { FaTimes, FaTrash } from 'react-icons/fa';
 import './InnerThoughtsBox.scss';
-import { useAppContext } from '../../App.context';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { updateResponse } from '../../state/slices/narrationSlice';
 
@@ -16,15 +14,8 @@ interface InnerThoughtsBoxProps {
   className?: string;
 }
 
-const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({
-  isVisible,
-  thoughts,
-  onClose,
-  className = '',
-}) => {
+const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts, onClose, className = '' }) => {
   if (!isVisible) return null;
-
-  const { isMobileApp } = useAppContext();
   const dispatch = useAppDispatch();
   const characterId = useAppSelector((state) => state.settings.modals.innerThoughts?.characterId || '');
   const lastResponse = useAppSelector((state) => state.narration.responses[state.narration.currentResponseId]);
@@ -120,7 +111,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({
           </div>
           <div className="InnerThoughtsBox__right-actions">
             {onClose && (
-              <IoIosCloseCircleOutline 
+              <IoIosCloseCircleOutline
                 className="InnerThoughtsBox__close-button"
                 onClick={onClose}
                 aria-label="Close inner thoughts"
@@ -128,8 +119,8 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({
             )}
           </div>
         </div>
-        <div className='InnerThoughtsBox__body'>
-          <div className='InnerThoughtsBox__bg'></div>
+        <div className="InnerThoughtsBox__body">
+          <div className="InnerThoughtsBox__bg"></div>
           <div className="InnerThoughtsBox__content">
             {isEditing ? (
               <textarea
@@ -143,28 +134,9 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({
             ) : !thoughts ? (
               <p className="InnerThoughtsBox__empty">No thoughts generated.</p>
             ) : (
-              isMobileApp || window.innerWidth < 1024 ? (
-                <Rnd
-                  className="InnerThoughtsBox__rnd"
-                  bounds=".InnerThoughtsBox__content"
-                  enableResizing={false}
-                  dragAxis="y"
-                  default={{
-                    x: 0,
-                    y: 0,
-                    width: 'unset',
-                    height: 120, 
-                  }}
-                >
-                  <div className="InnerThoughtsBox__thoughts-text">
-                    {thoughts}
-                  </div>
-                </Rnd>
-              ) : (
                 <div className="InnerThoughtsBox__thoughts-text">
                   {thoughts}
                 </div>
-              )
             )}
           </div>
         </div>
