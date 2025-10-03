@@ -21,6 +21,7 @@ import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import InnerThoughtsTrigger from '../inner-thoughts/InnerThoughtsTrigger';
 import InnerThoughtsModal from '../inner-thoughts/InnerThoughtsModal';
+import ImageGeneration from '../image-generation/ImageGeneration';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { CutsceneDisplayer } from './CutsceneDisplayer';
 import { useFullscreenEmotions } from '../fullscreen-emotions/useFullscreenEmotions';
@@ -93,6 +94,7 @@ const Interactor = () => {
             <div className="Interactor__content">
               <IndicatorsDisplay />
               <SceneSuggestion />
+              <ImageGeneration />
               <div className="Interactor__main-image-container">
                 <ProgressiveImage
                   src={
