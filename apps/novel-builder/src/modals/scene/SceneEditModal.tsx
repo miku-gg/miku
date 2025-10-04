@@ -1,4 +1,4 @@
-import { AreYouSure, Button, Carousel, CheckBox, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import { AreYouSure, Button, CheckBox, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import { useState } from 'react';
 import { AiOutlinePicture } from 'react-icons/ai';
@@ -50,8 +50,6 @@ export default function SceneEditModal() {
     opened: false,
     characterIndex: 0,
   });
-  const [showingEmotionChar1, setShowingEmotionChar1] = useState('neutral');
-  const [showingEmotionChar2, setShowingEmotionChar2] = useState('neutral');
   const [fullscreenPreviewMode, setFullscreenPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [zoomModalOpen, setZoomModalOpen] = useState(false);
   const [zoomModalImage, setZoomModalImage] = useState('');
@@ -216,9 +214,7 @@ export default function SceneEditModal() {
                     0,
                   );
                   const selectedOutfit = outfits[selectedOutfitIndex];
-                  const selectedEmotion = selectedOutfit.emotions.find(
-                    (emotion) => emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
-                  ) ||
+                  const neutralEmotion = selectedOutfit.emotions.find((emotion) => emotion.id === 'neutral') ||
                     selectedOutfit.emotions[0] || {
                       id: 'neutral',
                       sources: {
@@ -236,53 +232,36 @@ export default function SceneEditModal() {
                         'SceneEditModal__character--hovered': hoveredIndex === characterIndex,
                       })}
                     >
-                      <ImageSlider
-                        images={outfits.map((outfit) => ({
-                          source: config.genAssetLink(
+                      <div className="SceneEditModal__character-image-container">
+                        <img
+                          src={config.genAssetLink(
                             isFullscreenOutfit
                               ? fullscreenPreviewMode === 'desktop'
-                                ? selectedEmotion.sources.desktop || ''
-                                : selectedEmotion.sources.mobile || ''
-                              : selectedEmotion.sources.png,
+                                ? neutralEmotion.sources.desktop || ''
+                                : neutralEmotion.sources.mobile || ''
+                              : neutralEmotion.sources.png,
                             AssetDisplayPrefix.EMOTION_IMAGE,
-                          ),
-                          label: outfit.name,
-                        }))}
-                        backgroundImageSource=""
-                        selectedIndex={selectedOutfitIndex}
-                        onChange={(delta) => {
-                          let newOutfitIndex = selectedOutfitIndex + delta;
-                          if (newOutfitIndex < 0) {
-                            newOutfitIndex = outfits.length - 1;
-                          } else if (newOutfitIndex >= outfits.length) {
-                            newOutfitIndex = 0;
-                          }
-                          dispatch(
-                            updateScene({
-                              ...scene._source,
-                              characters: scene.characters.map((char) => {
-                                if (char.id === character.id) {
-                                  return {
-                                    characterId: char.id || '',
-                                    objective: char.objective,
-                                    outfit: outfits[newOutfitIndex].id,
-                                  };
-                                }
-                                return {
-                                  characterId: char.id || '',
-                                  objective: char.objective,
-                                  outfit: char.outfit,
-                                };
-                              }),
-                            }),
-                          );
-                        }}
-                      />
+                          )}
+                          alt={character.name}
+                          className="SceneEditModal__character-image"
+                          data-fullscreen={isFullscreenOutfit}
+                        />
+                        {isFullscreenOutfit && (
+                          <div className="SceneEditModal__character-fullscreen-zoom-overlay">
+                            <button
+                              className="SceneEditModal__character-fullscreen-zoom-overlay-btn"
+                              onClick={() => handleZoomEmotion(character, neutralEmotion)}
+                            >
+                              <MdZoomIn />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                       {isFullscreenOutfit && (
                         <div className="SceneEditModal__character-fullscreen-controls">
                           <button
                             className="SceneEditModal__fullscreen-emotion-btn"
-                            onClick={() => handleZoomEmotion(character, selectedEmotion)}
+                            onClick={() => handleZoomEmotion(character, neutralEmotion)}
                           >
                             <MdZoomIn />
                           </button>
@@ -296,29 +275,6 @@ export default function SceneEditModal() {
                           </button>
                         </div>
                       )}
-                      {isFullscreenOutfit && (
-                        <div className="SceneEditModal__character-fullscreen-zoom-overlay">
-                          <button
-                            className="SceneEditModal__character-fullscreen-zoom-overlay-btn"
-                            onClick={() => handleZoomEmotion(character, selectedEmotion)}
-                          >
-                            <MdZoomIn />
-                          </button>
-                        </div>
-                      )}
-                      <Carousel
-                        items={selectedOutfit.emotions.map((emotion) => ({
-                          title: emotion.id,
-                        }))}
-                        selectedIndex={
-                          selectedOutfit.emotions.findIndex((emotion) => emotion.id === selectedEmotion.id) || 0
-                        }
-                        onClick={(index) => {
-                          characterIndex === 0
-                            ? setShowingEmotionChar1(selectedOutfit.emotions[index]?.id || '')
-                            : setShowingEmotionChar2(selectedOutfit.emotions[index]?.id || '');
-                        }}
-                      />
                     </div>
                   );
                 })}
@@ -664,7 +620,7 @@ export default function SceneEditModal() {
           }}
         />
       </Modal>
-        <CharacterSelectModal
+      <CharacterSelectModal
         opened={selectCharacterModal.opened}
         onCloseModal={() => setSelectCharacterModal((_state) => ({ ..._state, opened: false }))}
         selectedCharacterId={scene?.characters[selectCharacterModal.characterIndex]?.id}
