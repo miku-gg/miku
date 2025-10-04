@@ -9,7 +9,6 @@ import { TokenDisplayer } from '../../components/TokenDisplayer';
 import config from '../../config';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
 import Backgrounds from '../../panels/assets/backgrounds/Backgrounds';
-import Characters from '../../panels/assets/characters/Characters';
 import Songs from '../../panels/assets/songs/Songs';
 import { LorebookList } from '../../panels/details/LorebookList';
 import { MapList } from '../../panels/maps/MapList';
@@ -30,6 +29,7 @@ import {
 } from '../../state/slices/novelFormSlice';
 import { IndicatorEditor } from './IndicatorEditor';
 import FullscreenEmotionZoomModal from '../FullscreenEmotionZoomModal';
+import CharacterSelectModal from './CharacterSelectModal';
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -664,49 +664,47 @@ export default function SceneEditModal() {
           }}
         />
       </Modal>
-      <Modal
+        <CharacterSelectModal
         opened={selectCharacterModal.opened}
         onCloseModal={() => setSelectCharacterModal((_state) => ({ ..._state, opened: false }))}
-        className="SceneEditModal__select-character-modal"
-      >
-        <Characters
-          ignoreIds={
-            scene?.characters
-              ?.map((c) => c.id)
-              .filter((id): id is string => id !== undefined && id !== null)
-              .filter((_, idx) => idx !== selectCharacterModal.characterIndex) || []
-          }
-          showNone={(scene?.characters?.length ?? 0) > 1}
-          selected={scene?.characters[selectCharacterModal.characterIndex]?.id}
-          onSelect={(characterId) => {
-            if (scene?._source) {
-              const newSceneCharacters = scene.characters.map((character) => ({
-                characterId: character.id || '',
-                outfit: character.outfit || '',
-              }));
-              const newCharacter = characters.find((character) => character.id === characterId);
-              if (newCharacter) {
-                newSceneCharacters[selectCharacterModal.characterIndex || 0] = {
-                  characterId,
-                  outfit: newCharacter?.card.data.extensions.mikugg_v2.outfits[0].id || '',
-                };
-              } else {
-                newSceneCharacters.splice(selectCharacterModal.characterIndex, 1);
-              }
-              dispatch(
-                updateScene({
-                  ...scene._source,
-                  characters: newSceneCharacters,
-                }),
-              );
-              setSelectCharacterModal({
-                opened: false,
-                characterIndex: 0,
-              });
+        selectedCharacterId={scene?.characters[selectCharacterModal.characterIndex]?.id}
+        ignoreIds={
+          scene?.characters
+            ?.map((c) => c.id)
+            .filter((id): id is string => id !== undefined && id !== null)
+            .filter((_, idx) => idx !== selectCharacterModal.characterIndex) || []
+        }
+        showNone={(scene?.characters?.length ?? 0) > 1}
+        onSelect={(characterId, outfitId) => {
+          if (scene?._source) {
+            const newSceneCharacters = scene.characters.map((character) => ({
+              characterId: character.id || '',
+              outfit: character.outfit || '',
+              objective: character.objective || '',
+            }));
+            const newCharacter = characters.find((character) => character.id === characterId);
+            if (newCharacter && characterId) {
+              newSceneCharacters[selectCharacterModal.characterIndex || 0] = {
+                characterId,
+                outfit: outfitId || newCharacter?.card.data.extensions.mikugg_v2.outfits[0].id || '',
+                objective: '',
+              };
+            } else {
+              newSceneCharacters.splice(selectCharacterModal.characterIndex, 1);
             }
-          }}
-        />
-      </Modal>
+            dispatch(
+              updateScene({
+                ...scene._source,
+                characters: newSceneCharacters,
+              }),
+            );
+            setSelectCharacterModal({
+              opened: false,
+              characterIndex: 0,
+            });
+          }
+        }}
+      />
       <Modal
         opened={selectSongModalOpened}
         onCloseModal={() => setSelectSongModalOpened(false)}

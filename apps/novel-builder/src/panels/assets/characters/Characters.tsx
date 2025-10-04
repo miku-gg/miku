@@ -13,11 +13,13 @@ export default function Characters({
   onSelect,
   showNone,
   ignoreIds,
+  hideHeader,
 }: {
   selected?: string;
   onSelect?: (id: string) => void;
   showNone?: boolean;
   ignoreIds?: string[];
+  hideHeader?: boolean;
 }) {
   const characters = useAppSelector((state) => state.novel.characters);
   const dispatch = useAppDispatch();
@@ -100,7 +102,7 @@ export default function Characters({
 
   return (
     <div className="Characters group">
-      <div className="title-small">Characters</div>
+      {!hideHeader && <div className="title-small">Characters</div>}
       <div className="Characters__list">
         <Blocks tooltipId="characters" items={blocks} />
       </div>

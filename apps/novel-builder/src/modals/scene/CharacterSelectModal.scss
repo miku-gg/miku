@@ -1,0 +1,136 @@
+@import '../../styles/variables';
+
+.CharacterSelectModal {
+  max-width: 800px !important;
+  background: $background-3 !important;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    &-title {
+      color: $text-1;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    &-actions {
+      display: flex;
+      gap: 1rem;
+    }
+  }
+
+  &__save-btn {
+    background-color: #22c55e !important;
+    border-color: #22c55e !important;
+    width: 80px;
+    
+    &:hover {
+      background-color: #16a34a !important;
+      border-color: #16a34a !important;
+    }
+  }
+
+  &__cancel-btn {
+    background-color: #ef4444 !important;
+    border-color: #ef4444 !important;
+    width: 80px;
+    
+    &:hover {
+      background-color: #dc2626 !important;
+      border-color: #dc2626 !important;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__character-selection {
+    width: 100%;
+    position: relative;
+
+    &--compact {
+      max-height: 140px;
+      overflow: hidden;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 80px;
+        background: linear-gradient(to bottom, transparent, $background-3);
+        pointer-events: none;
+        z-index: 5;
+      }
+    }
+  }
+
+  &__character-customization {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__toggle-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    margin-top: -15px;
+    z-index: 10;
+  }
+
+  &__toggle-btn {
+    background: linear-gradient(135deg, #a855f7, #9333ea);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    svg {
+      font-size: 14px;
+    }
+    
+    &:hover {
+      background: linear-gradient(135deg, #9333ea, #7c3aed);
+      transform: scale(1.05);
+    }
+  }
+
+  &__emotion-selection {
+    .Carousel {
+      width: 64%;
+      margin: 0 auto;
+    }
+  }
+
+
+}
+
+// Mobile responsiveness
+@media screen and (max-width: 768px) {
+  .CharacterSelectModal {
+    max-width: 95vw !important;
+    
+    &__content {
+      gap: 15px;
+    }
+    
+    &__character-customization {
+      padding: 15px 0;
+    }
+  }
+}
