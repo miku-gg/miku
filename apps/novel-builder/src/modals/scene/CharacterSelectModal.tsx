@@ -1,4 +1,4 @@
-import { Button, Carousel, ImageSlider, Modal } from '@mikugg/ui-kit';
+import { Button, Carousel, Modal } from '@mikugg/ui-kit';
 import { useState, useEffect } from 'react';
 import { MdKeyboardArrowUp, MdKeyboardArrowDown, MdComputer, MdPhoneAndroid } from 'react-icons/md';
 import Characters from '../../panels/assets/characters/Characters';
@@ -37,7 +37,7 @@ export default function CharacterSelectModal({
   const outfits = selectedCharacter?.card?.data.extensions.mikugg_v2.outfits || [];
   const selectedOutfit = outfits[selectedOutfitIndex];
   const emotions = selectedOutfit?.emotions || [];
-  
+
   const selectedEmotion = emotions.find((emotion) => emotion.id === showingEmotion) || emotions[0];
 
   useEffect(() => {
@@ -51,16 +51,20 @@ export default function CharacterSelectModal({
           0,
         );
       }
-      
+
       setSelectedOutfitIndex(outfitIndex);
       setShowingEmotion('neutral');
     }
   }, [internalSelectedCharacterId, scene]);
 
   useEffect(() => {
-    if (opened && selectedCharacterId) {
-      setInternalSelectedCharacterId(selectedCharacterId);
-      setShowCharacterPreview(true);
+    if (opened) {
+      setInternalSelectedCharacterId(selectedCharacterId || '');
+      if (selectedCharacterId) {
+        setShowCharacterPreview(true);
+      } else {
+        setShowCharacterPreview(false);
+      }
     }
   }, [opened, selectedCharacterId]);
 
@@ -90,7 +94,6 @@ export default function CharacterSelectModal({
     setShowCharacterPreview(!showCharacterPreview);
   };
 
-
   return (
     <Modal
       opened={opened}
@@ -99,94 +102,107 @@ export default function CharacterSelectModal({
       overlayClassName="scrollbar"
     >
       <div className="CharacterSelectModal__header">
-        <div className="CharacterSelectModal__header-title">
-          Select Character
-        </div>
+        <div className="CharacterSelectModal__header-title">Select Character</div>
         <div className="CharacterSelectModal__header-actions">
-          <Button theme="primary" onClick={handleSave} className="CharacterSelectModal__save-btn">Save</Button>
-          <Button theme="primary" onClick={handleCancel} className="CharacterSelectModal__cancel-btn">Cancel</Button>
+          <Button theme="primary" onClick={handleSave} className="CharacterSelectModal__save-btn">
+            Save
+          </Button>
+          <Button theme="primary" onClick={handleCancel} className="CharacterSelectModal__cancel-btn">
+            Cancel
+          </Button>
         </div>
       </div>
       <div className="CharacterSelectModal__content">
-        <div className={`CharacterSelectModal__character-selection ${showCharacterPreview ? 'CharacterSelectModal__character-selection--compact' : ''}`}>
-          <Characters
-            ignoreIds={ignoreIds}
-            showNone={showNone}
-            selected={internalSelectedCharacterId}
-            onSelect={handleCharacterSelect}
-            hideHeader={true}
-          />
+        <div
+          className={`CharacterSelectModal__character-selection ${
+            showCharacterPreview ? 'CharacterSelectModal__character-selection--hidden' : ''
+          }`}
+        >
+          {!showCharacterPreview && (
+            <Characters
+              ignoreIds={ignoreIds}
+              showNone={showNone}
+              selected={internalSelectedCharacterId}
+              onSelect={handleCharacterSelect}
+              hideHeader={true}
+            />
+          )}
         </div>
 
         {selectedCharacter && selectedOutfit && (
           <div className="CharacterSelectModal__character-customization">
             <div className="CharacterSelectModal__toggle-container">
-              <button 
-                onClick={toggleCharacterPreview} 
-                className="CharacterSelectModal__toggle-btn"
-              >
+              {showCharacterPreview && <span className="CharacterSelectModal__show-list-text">See character List</span>}
+              <button onClick={toggleCharacterPreview} className="CharacterSelectModal__toggle-btn">
                 {showCharacterPreview ? <MdKeyboardArrowDown /> : <MdKeyboardArrowUp />}
               </button>
             </div>
-            
+
             {showCharacterPreview && (
               <div className="CharacterSelectModal__outfit-selection">
-              <div className="CharacterSelectModal__emotion-selection">
-                <Carousel
-                  items={emotions.map((emotion) => ({
-                    title: emotion.id,
-                  }))}
-                  selectedIndex={emotions.findIndex((emotion) => emotion.id === selectedEmotion.id) || 0}
-                  onClick={(index) => {
-                    setShowingEmotion(emotions[index]?.id || 'neutral');
-                  }}
-                />
-              </div>
-              
-                      <div className="CharacterSelectModal__outfit-container">
-                        <ImageSlider
-                          images={outfits.map((outfit) => {
-                            const selectedEmotion = outfit.emotions.find((emotion) => emotion.id === showingEmotion) || outfit.emotions[0];
-                            const isFullscreenOutfit = outfit.isFullscreen;
-                            return {
-                              source: config.genAssetLink(
-                                isFullscreenOutfit
-                                  ? fullscreenPreviewMode === 'desktop'
-                                    ? selectedEmotion?.sources.desktop || ''
-                                    : selectedEmotion?.sources.mobile || ''
-                                  : selectedEmotion?.sources.png || '',
-                                AssetDisplayPrefix.EMOTION_IMAGE,
-                              ),
-                              label: outfit.name,
-                            };
-                          })}
-                          backgroundImageSource=""
-                          selectedIndex={selectedOutfitIndex}
-                          onChange={(delta) => {
-                            let newOutfitIndex = selectedOutfitIndex + delta;
-                            if (newOutfitIndex < 0) {
-                              newOutfitIndex = outfits.length - 1;
-                            } else if (newOutfitIndex >= outfits.length) {
-                              newOutfitIndex = 0;
-                            }
-                            setSelectedOutfitIndex(newOutfitIndex);
-                            setShowingEmotion('neutral');
-                          }}
+                <div className="CharacterSelectModal__outfit-container">
+                  {/* Outfit Buttons */}
+                  <div className="CharacterSelectModal__outfit-buttons">
+                    {outfits.map((outfit, index) => (
+                      <button
+                        key={outfit.id}
+                        className={`CharacterSelectModal__outfit-button ${
+                          index === selectedOutfitIndex ? 'CharacterSelectModal__outfit-button--selected' : ''
+                        }`}
+                        onClick={() => {
+                          setSelectedOutfitIndex(index);
+                          setShowingEmotion('neutral');
+                        }}
+                      >
+                        {outfit.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="CharacterSelectModal__emotion-selection">
+                    <Carousel
+                      items={emotions.map((emotion) => ({
+                        title: emotion.id,
+                      }))}
+                      selectedIndex={emotions.findIndex((emotion) => emotion.id === selectedEmotion.id) || 0}
+                      onClick={(index) => {
+                        setShowingEmotion(emotions[index]?.id || 'neutral');
+                      }}
+                    />
+                  </div>
+
+                  {selectedOutfit?.isFullscreen && (
+                    <div className="CharacterSelectModal__fullscreen-controls">
+                      <button
+                        className="CharacterSelectModal__fullscreen-toggle-btn"
+                        onClick={() =>
+                          setFullscreenPreviewMode(fullscreenPreviewMode === 'desktop' ? 'mobile' : 'desktop')
+                        }
+                      >
+                        {fullscreenPreviewMode === 'desktop' ? <MdPhoneAndroid /> : <MdComputer />}
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="emotion-display">
+                    {selectedEmotion && (
+                      <>
+                        <img
+                          src={config.genAssetLink(
+                            selectedOutfit?.isFullscreen
+                              ? fullscreenPreviewMode === 'desktop'
+                                ? selectedEmotion?.sources.desktop || ''
+                                : selectedEmotion?.sources.mobile || ''
+                              : selectedEmotion?.sources.png || '',
+                            AssetDisplayPrefix.EMOTION_IMAGE,
+                          )}
+                          alt={selectedEmotion.id}
                         />
-                        {selectedOutfit?.isFullscreen && (
-                          <div className="CharacterSelectModal__fullscreen-controls">
-                            <button
-                              className="CharacterSelectModal__fullscreen-toggle-btn"
-                              onClick={() =>
-                                setFullscreenPreviewMode(fullscreenPreviewMode === 'desktop' ? 'mobile' : 'desktop')
-                              }
-                            >
-                              {fullscreenPreviewMode === 'desktop' ? <MdPhoneAndroid /> : <MdComputer />}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-            </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         )}
