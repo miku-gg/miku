@@ -323,7 +323,7 @@ const narrationSlice = createSlice({
       if (charResponse) {
         charResponse.emotion = emotion;
         charResponse.text = text;
-        if (innerThoughts) {
+        if (innerThoughts !== undefined) {
           charResponse.innerThoughts = innerThoughts;
         }
       }

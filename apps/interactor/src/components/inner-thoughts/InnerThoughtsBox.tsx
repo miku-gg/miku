@@ -15,7 +15,6 @@ interface InnerThoughtsBoxProps {
 }
 
 const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts, onClose, className = '' }) => {
-  if (!isVisible) return null;
   const dispatch = useAppDispatch();
   const characterId = useAppSelector((state) => state.settings.modals.innerThoughts?.characterId || '');
   const lastResponse = useAppSelector((state) => state.narration.responses[state.narration.currentResponseId]);
@@ -61,6 +60,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
     setEditText('');
   };
 
+  if (!isVisible) return null;
   return (
     <div className={`InnerThoughtsBox ${className}`}>
       <div className="InnerThoughtsBox__container">
