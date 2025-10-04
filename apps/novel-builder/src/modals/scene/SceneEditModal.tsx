@@ -57,6 +57,7 @@ export default function SceneEditModal() {
   const [zoomModalImage, setZoomModalImage] = useState('');
   const [zoomModalEmotionName, setZoomModalEmotionName] = useState('');
   const [zoomModalCharacterName, setZoomModalCharacterName] = useState('');
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const characterCount = 4; // here we define the max amount of characters in a scene
 
@@ -139,10 +140,8 @@ export default function SceneEditModal() {
 
   const handleZoomEmotion = (character: any, emotion: any) => {
     const imageUrl = config.genAssetLink(
-      fullscreenPreviewMode === 'desktop' 
-        ? (emotion.sources.desktop || '') 
-        : (emotion.sources.mobile || ''),
-      AssetDisplayPrefix.EMOTION_IMAGE
+      fullscreenPreviewMode === 'desktop' ? emotion.sources.desktop || '' : emotion.sources.mobile || '',
+      AssetDisplayPrefix.EMOTION_IMAGE,
     );
     setZoomModalImage(imageUrl);
     setZoomModalEmotionName(emotion.id);
@@ -171,41 +170,42 @@ export default function SceneEditModal() {
                 )}
               />
               <div className="SceneEditModal__buttons-container">
-              <div
-                className="SceneEditModal__background-edit-btn"
-                onClick={() => setSelectBackgroundModalOpened(true)}
-                tabIndex={0}
-                role="button"
-              >
-                <AiOutlinePicture />
-              </div>
-              {Array.from({ length: characterCount }).map((_, index) => {
-                const activeButtonLimit = (scene?.characters?.length ?? 0) + 1;
-                const isDisabled = index >= activeButtonLimit;
+                <div
+                  className="SceneEditModal__background-edit-btn"
+                  onClick={() => setSelectBackgroundModalOpened(true)}
+                  tabIndex={0}
+                  role="button"
+                >
+                  <AiOutlinePicture />
+                </div>
+                {Array.from({ length: characterCount }).map((_, index) => {
+                  const activeButtonLimit = (scene?.characters?.length ?? 0) + 1;
+                  const isDisabled = index >= activeButtonLimit;
 
-                return (
-                  <div
-                    key={index}
-                    className={classNames(
-                      'SceneEditModal__character-select-btn',
-                      { 'SceneEditModal__character-select-btn--disabled': isDisabled }
-                    )}
-                    onClick={() => {
-                      if (!isDisabled) {
-                        setSelectCharacterModal({
-                          opened: true,
-                          characterIndex: index,
-                        });
-                      }
-                    }}
-                    tabIndex={0}
-                    role="button"
-                    data-index={index}
-                  >
-                    <FaUser /> {index + 1}
-                  </div>
-                );
-              })}
+                  return (
+                    <div
+                      key={index}
+                      className={classNames('SceneEditModal__character-select-btn', {
+                        'SceneEditModal__character-select-btn--disabled': isDisabled,
+                      })}
+                      onClick={() => {
+                        if (!isDisabled) {
+                          setSelectCharacterModal({
+                            opened: true,
+                            characterIndex: index,
+                          });
+                        }
+                      }}
+                      onMouseEnter={() => setHoveredIndex(index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                      tabIndex={0}
+                      role="button"
+                      data-index={index}
+                    >
+                      <FaUser /> {index + 1}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="SceneEditModal__characters">
@@ -225,21 +225,26 @@ export default function SceneEditModal() {
                         png: '',
                       },
                     };
-                  
+
                   // Check if the selected outfit is fullscreen
                   const isFullscreenOutfit = selectedOutfit.isFullscreen;
-                  
+
                   return (
-                    <div key={character.id} className="SceneEditModal__character">
+                    <div
+                      key={character.id}
+                      className={classNames('SceneEditModal__character', {
+                        'SceneEditModal__character--hovered': hoveredIndex === characterIndex,
+                      })}
+                    >
                       <ImageSlider
                         images={outfits.map((outfit) => ({
                           source: config.genAssetLink(
-                            isFullscreenOutfit 
-                              ? (fullscreenPreviewMode === 'desktop' 
-                                  ? selectedEmotion.sources.desktop || '' 
-                                  : selectedEmotion.sources.mobile || '')
+                            isFullscreenOutfit
+                              ? fullscreenPreviewMode === 'desktop'
+                                ? selectedEmotion.sources.desktop || ''
+                                : selectedEmotion.sources.mobile || ''
                               : selectedEmotion.sources.png,
-                            AssetDisplayPrefix.EMOTION_IMAGE
+                            AssetDisplayPrefix.EMOTION_IMAGE,
                           ),
                           label: outfit.name,
                         }))}
@@ -283,9 +288,9 @@ export default function SceneEditModal() {
                           </button>
                           <button
                             className="SceneEditModal__fullscreen-emotion-btn"
-                            onClick={() => setFullscreenPreviewMode(
-                              fullscreenPreviewMode === 'desktop' ? 'mobile' : 'desktop'
-                            )}
+                            onClick={() =>
+                              setFullscreenPreviewMode(fullscreenPreviewMode === 'desktop' ? 'mobile' : 'desktop')
+                            }
                           >
                             {fullscreenPreviewMode === 'desktop' ? <MdPhoneAndroid /> : <MdComputer />}
                           </button>
@@ -306,9 +311,7 @@ export default function SceneEditModal() {
                           title: emotion.id,
                         }))}
                         selectedIndex={
-                          selectedOutfit.emotions.findIndex(
-                            (emotion) => emotion.id === selectedEmotion.id,
-                          ) || 0
+                          selectedOutfit.emotions.findIndex((emotion) => emotion.id === selectedEmotion.id) || 0
                         }
                         onClick={(index) => {
                           characterIndex === 0
@@ -669,7 +672,7 @@ export default function SceneEditModal() {
         <Characters
           ignoreIds={
             scene?.characters
-              ?.map(c => c.id)
+              ?.map((c) => c.id)
               .filter((id): id is string => id !== undefined && id !== null)
               .filter((_, idx) => idx !== selectCharacterModal.characterIndex) || []
           }

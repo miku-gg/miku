@@ -21,16 +21,6 @@
         opacity: 0.3;
       }
     }
-
-    &:has(.SceneEditModal__character-select-btn:hover) {
-      .SceneEditModal__character:first-child {
-        .ImageSlider__selectedImage {
-          filter: blur(5px);
-          margin-bottom: -1rem;
-        }
-      }
-    }
-
   }
 
   &__background {
@@ -133,6 +123,13 @@
 
   &__character {
     position: relative;
+  }
+
+  &__character--hovered {
+    .ImageSlider__selectedImage {
+      filter: blur(5px);
+      margin-bottom: -1rem;
+    }
   }
 
   &__character-fullscreen-controls {
@@ -390,7 +387,6 @@
         display: flex !important; // Show zoom button on mobile
       }
     }
-
   }
 }
 //add media query for width 975px
