@@ -117,6 +117,58 @@
     }
   }
 
+  &__outfit-container {
+    position: relative;
+    max-width: 600px;
+    max-height: 800px;
+    margin: 0 auto;
+
+    .ImageSlider {
+      max-width: 100%;
+      max-height: 100%;
+      
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+    }
+  }
+
+  &__fullscreen-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+  }
+
+  &__fullscreen-toggle-btn {
+    color: black;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    padding: 5px;
+    display: flex;
+    transition: all 0.2s ease-out;
+    outline: none;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    cursor: pointer;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+  }
 
 }
 
