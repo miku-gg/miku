@@ -154,19 +154,19 @@
       gap: 0.75rem;
       padding: 0.5rem;
     }
-    
+
     .Carousel__item {
       // Hide text under carousel images
       &::after {
         display: none !important;
       }
-      
+
       // Or hide the text content directly
       font-size: 0 !important;
       line-height: 0 !important;
       color: transparent !important;
     }
-    
+
     .Carousel__image {
       min-width: 60px !important;
       min-height: 60px !important;
@@ -175,8 +175,6 @@
       border-radius: 0.5rem;
     }
   }
-
-
 
   &__prompt-section {
     background: $background-2;
@@ -195,7 +193,6 @@
       color: $text-3;
     }
   }
-
 
   &__prompt-editor {
     display: flex;
@@ -226,7 +223,6 @@
     }
   }
 
-
   &__actions {
     display: flex;
     justify-content: center;
@@ -241,7 +237,6 @@
       font-size: 0.95rem;
     }
   }
-
 
   &__empty {
     display: flex;
@@ -289,7 +284,6 @@
     &__current-image {
       max-height: 250px;
     }
-
 
     &__prompt-section {
       padding: 1rem;
