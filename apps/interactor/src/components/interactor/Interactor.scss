@@ -83,18 +83,6 @@
     object-fit: none;
   }
 
-  &__characters {
-    position: absolute;
-    bottom: 0;
-    height: 90%;
-    object-fit: cover;
-    transition: all 0.2s ease-in;
-    user-select: none;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-
   &__emotion-renderer {
     opacity: 0;
     z-index: 0;
@@ -105,20 +93,28 @@
     -webkit-user-drag: none;
   }
 
-&__characters--multiple {
-  z-index: 1;
-  transform-origin: center bottom;
-  left: auto;
-  right: auto;
-  width: 800px;
-
-  .Interactor__character-container {
+  &__characters {
     position: absolute;
-    left: 50%;
+    bottom: 0;
+    height: 90%;
+    object-fit: cover;
+    transition: all 0.2s ease-in;
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    z-index: 1;
     transform-origin: center bottom;
-    transition: transform 0.4s ease;
+    left: auto;
+    right: auto;
+    width: 800px;
+
+    .Interactor__character-container {
+      position: absolute;
+      left: 50%;
+      transform-origin: center bottom;
+      transition: transform 0.4s ease;
+    }
   }
-}
 
   &__character-container {
     position: absolute;

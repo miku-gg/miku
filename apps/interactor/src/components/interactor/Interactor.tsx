@@ -276,12 +276,7 @@ const Interactor = () => {
                     )
                   }
                 </ProgressiveImage>
-                <div
-                  className={classNames({
-                    Interactor__characters: true,
-                    'Interactor__characters--multiple': nonFullscreenCharacters.length > 1,
-                  })}
-                >
+                <div className="Interactor__characters">
                   {/* Character emotions with inner thoughts triggers */}
                   {!fullscreenCharacter &&
                     orderedCharacters.map(({ id, image }, index) => {
