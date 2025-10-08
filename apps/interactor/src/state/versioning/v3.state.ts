@@ -44,6 +44,7 @@ export interface NarrationResponse {
     emotion: string;
     pose: string;
     text: string;
+    innerThoughts?: string;
     reasoning?: string;
   }[];
   childrenInteractions: {
@@ -85,6 +86,7 @@ export interface NarrationState {
   responses: {
     [id: string]: NarrationResponse | undefined;
   };
+  freeThoughtUsed?: boolean;
   seenHints?: string[];
   createdIndicatorIds?: string[];
   hasPlayedGlobalStartCutscene?: boolean;
@@ -239,6 +241,10 @@ export interface SettingsState {
     edit: {
       opened: boolean;
       id: string;
+    };
+    innerThoughts?: {
+      opened: boolean;
+      characterId: string;
     };
   };
   summaries?: {

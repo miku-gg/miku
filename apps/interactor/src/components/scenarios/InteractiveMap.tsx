@@ -13,6 +13,8 @@ import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { getInitialBattleState } from '../../state/utils/battleUtils';
 import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
+import { getAvailableScenes } from '../../state/utils/sceneUtils';
+import SceneListWindow from './buttons/SceneListWindow';
 
 const isTouchScreen = window.navigator.maxTouchPoints > 0;
 
@@ -122,6 +124,8 @@ const InteractiveMapModal = ({
   const offScreenCanvasRef = useRef(document.createElement('canvas'));
   const maskImagesRef = useRef(new Map<string, HTMLImageElement>());
   const [highlightedPlaceId, setHighlightedPlaceId] = useState<string | null>(null);
+  const [showSceneSelection, setShowSceneSelection] = useState(false);
+  const [availableScenes, setAvailableScenes] = useState<string[]>([]);
   const highlightedPlace = map?.places.find((place) => place.id === highlightedPlaceId);
   const scenes = useAppSelector((state) => state.novel.scenes);
   const scene = scenes.find((scene) => scene.id === highlightedPlace?.sceneId);
@@ -152,6 +156,74 @@ const InteractiveMapModal = ({
     const cleanupFuncRef: {
       current: (() => void) | null;
     } = { current: null };
+
+    const setupEventListeners = () => {
+      const canvas = canvasRef?.current;
+      if (!canvas || !map) return;
+
+      const ctx = canvas.getContext('2d');
+      const offScreenCanvas = offScreenCanvasRef?.current;
+      const offScreenCtx = offScreenCanvas?.getContext('2d');
+
+      if (!ctx || !offScreenCtx) return;
+
+      const isWhitePixel = (data: Uint8ClampedArray) => {
+        const tolerance = 10;
+        return data[0] > 255 - tolerance && data[1] > 255 - tolerance && data[2] > 255 - tolerance;
+      };
+
+      const highlightCoord = (x: number, y: number): string | null => {
+        // Clear the off-screen canvas
+        offScreenCtx?.clearRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
+
+        // Check each mask image
+        let highlightedPlace: (typeof map.places)[number] | undefined;
+        for (const place of map.places) {
+          const maskImage = maskImagesRef.current.get(place.id);
+          if (maskImage) {
+            offScreenCtx?.drawImage(maskImage, 0, 0, offScreenCanvas.width, offScreenCanvas.height);
+            const pixel = offScreenCtx?.getImageData(x, y, 1, 1).data;
+            if (pixel && isWhitePixel(pixel)) {
+              ctx?.drawImage(maskImage, 0, 0, offScreenCanvas.width, offScreenCanvas.height);
+              highlightedPlace = place;
+              break;
+            }
+          }
+        }
+
+        if (highlightedPlace) {
+          if (canvas && highlightedPlace.sceneId !== currentScene?.id) canvas.style.cursor = 'pointer';
+          if (canvas) canvas.style.opacity = '0.4';
+          if (canvas) canvas.style.filter = 'blur(5px)';
+          setHighlightedPlaceId(highlightedPlace.id);
+          return highlightedPlace.id;
+        } else {
+          setHighlightedPlaceId(null);
+          if (canvas) canvas.style.cursor = 'default';
+          if (canvas) canvas.style.opacity = '0.1';
+          return null;
+        }
+      };
+
+      const handleMouseMove = (e: MouseEvent) => highlightCoord(e.offsetX, e.offsetY);
+      const handleTouchEnd = (e: TouchEvent) => {
+        e.preventDefault();
+        const touch = e.changedTouches && e.changedTouches[0];
+        highlightCoord(
+          touch?.clientX - (canvas?.getBoundingClientRect().left || 0),
+          touch?.clientY - (canvas?.getBoundingClientRect().top || 0),
+        );
+      };
+
+      canvas.addEventListener('mousemove', handleMouseMove);
+      canvas.addEventListener('touchend', handleTouchEnd);
+
+      cleanupFuncRef.current = () => {
+        canvas.removeEventListener('mousemove', handleMouseMove);
+        canvas.removeEventListener('touchend', handleTouchEnd);
+        setHighlightedPlaceId(null);
+      };
+    };
 
     const handleImageLoad = () => {
       if (
@@ -192,69 +264,17 @@ const InteractiveMapModal = ({
         if (canvas) canvas.width = mapBackgroundRef.current.width;
         if (canvas) canvas.height = mapBackgroundRef.current.height;
 
-        const isWhitePixel = (data: Uint8ClampedArray) => {
-          const tolerance = 10;
-          return data[0] > 255 - tolerance && data[1] > 255 - tolerance && data[2] > 255 - tolerance;
-        };
-
-        const highlightCoord = (x: number, y: number): string | null => {
-          // Clear the off-screen canvas
-          offScreenCtx?.clearRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
-
-          // Check each mask image
-          let highlightedPlace: (typeof map.places)[number] | undefined;
-          for (const place of map.places) {
-            const maskImage = maskImagesRef.current.get(place.id);
-            if (maskImage) {
-              offScreenCtx?.drawImage(maskImage, 0, 0, offScreenCanvas.width, offScreenCanvas.height);
-              const pixel = offScreenCtx?.getImageData(x, y, 1, 1).data;
-              if (pixel && isWhitePixel(pixel)) {
-                ctx?.drawImage(maskImage, 0, 0, offScreenCanvas.width, offScreenCanvas.height);
-                highlightedPlace = place;
-                break;
-              }
-            }
-          }
-
-          if (highlightedPlace) {
-            if (canvas && highlightedPlace.sceneId !== currentScene?.id) canvas.style.cursor = 'pointer';
-            if (canvas) canvas.style.opacity = '0.4';
-            if (canvas) canvas.style.filter = 'blur(5px)';
-            setHighlightedPlaceId(highlightedPlace.id);
-            return highlightedPlace.id;
-          } else {
-            setHighlightedPlaceId(null);
-            if (canvas) canvas.style.cursor = 'default';
-            if (canvas) canvas.style.opacity = '0.1';
-            return null;
-          }
-        };
-
-        const handleMouseMove = (e: MouseEvent) => highlightCoord(e.offsetX, e.offsetY);
-        const handleTouchEnd = (e: TouchEvent) => {
-          e.preventDefault();
-          const touch = e.changedTouches && e.changedTouches[0];
-          highlightCoord(
-            touch?.clientX - (canvas?.getBoundingClientRect().left || 0),
-            touch?.clientY - (canvas?.getBoundingClientRect().top || 0),
-          );
-        };
-
-        canvas.addEventListener('mousemove', handleMouseMove);
-        canvas.addEventListener('touchend', handleTouchEnd);
-
-        cleanupFuncRef.current = () => {
-          canvas.removeEventListener('mousemove', handleMouseMove);
-          canvas.removeEventListener('touchend', handleTouchEnd);
-          maskImages.clear();
-          setHighlightedPlaceId(null);
-        };
+        setupEventListeners();
       }
     };
 
     const imgElement = mapBackgroundRef.current;
     if (imgElement) {
       imgElement.addEventListener('load', handleImageLoad);
+      // If the image finished loading, setup event listeners
+      if (imgElement.complete && imgElement.naturalHeight !== 0) {
+        handleImageLoad();
+      }
     }
 
     return () => {
@@ -285,15 +305,25 @@ const InteractiveMapModal = ({
       const selectedPlace = map?.places.find((p) => p.id === highlightedPlaceId);
       if (selectedPlace?.battleId) {
         handleStartBattle();
-      } else if (scene && selectedPlace?.sceneId !== currentScene?.id) {
-        dispatch(
-          setModalOpened({
-            id: 'scene-preview',
-            opened: true,
-            itemId: scene.id,
-          }),
-        );
-        trackEvent('scene-select');
+      } else {
+        // Get all available scenes from the place
+        const availableSceneIds = getAvailableScenes(selectedPlace?.sceneId);
+        if (availableSceneIds.length > 1) {
+          // Multiple scenes available - show scene selection modal
+          setShowSceneSelection(true);
+          setAvailableScenes(availableSceneIds);
+          trackEvent('scene-select');
+        } else if (availableSceneIds.length === 1 && availableSceneIds[0] !== currentScene?.id) {
+          // Single scene available - open directly
+          dispatch(
+            setModalOpened({
+              id: 'scene-preview',
+              opened: true,
+              itemId: availableSceneIds[0],
+            }),
+          );
+          trackEvent('scene-select');
+        }
       }
     }
   };
@@ -314,11 +344,11 @@ const InteractiveMapModal = ({
             }),
           );
         });
-        cutsceneUtilities.changeScene(dispatch, {
-          sceneId: scene.id,
-          isNewScene: true,
-          bufferInteraction: true, // We want to trigger AI query after scene change
-        });
+      cutsceneUtilities.changeScene(dispatch, {
+        sceneId: scene.id,
+        isNewScene: true,
+        bufferInteraction: true, // We want to trigger AI query after scene change
+      });
       trackEvent('scene-select');
     }
   };
@@ -352,7 +382,21 @@ const InteractiveMapModal = ({
                   Start Battle
                 </Button>
               ) : highlightedPlace.sceneId !== currentScene?.id ? (
-                <Button theme="secondary" onClick={handleGoToScene}>
+                <Button
+                  theme="secondary"
+                  onClick={() => {
+                    // for mobile, we use a different approach
+                    const availableSceneIds = getAvailableScenes(highlightedPlace.sceneId);
+                    if (availableSceneIds.length > 1) {
+                      // Multiple scenes available - show scene selection modal
+                      setShowSceneSelection(true);
+                      setAvailableScenes(availableSceneIds);
+                      trackEvent('scene-select');
+                    } else {
+                      handleGoToScene();
+                    }
+                  }}
+                >
                   Go to place
                 </Button>
               ) : (
@@ -367,6 +411,11 @@ const InteractiveMapModal = ({
           </div>
         )
       ) : null}
+
+      {/* Scene List Window */}
+      {showSceneSelection && (
+        <SceneListWindow availableScenes={availableScenes} onClose={() => setShowSceneSelection(false)} />
+      )}
     </div>
   );
 };

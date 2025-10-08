@@ -402,6 +402,34 @@ const novelFormSlice = createSlice({
       if (!map) return;
       map.places = map.places.filter((place) => place.id !== action.payload.placeId);
     },
+    addSceneIdToPlace(state, action: PayloadAction<{ mapId: string; placeId: string; sceneId: string }>) {
+      const map = state.maps.find((map) => map.id === action.payload.mapId);
+      if (!map) return;
+      const place = map.places.find((place) => place.id === action.payload.placeId);
+      if (!place) return;
+      
+      // Parse existing sceneIds
+      const existingSceneIds = place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0) : [];
+      // Add the new sceneId if it doesn't already exist
+      if (!existingSceneIds.includes(action.payload.sceneId)) {
+        existingSceneIds.push(action.payload.sceneId);
+      }      
+      // Update with comma-separated string
+      place.sceneId = existingSceneIds.join(',');
+    },
+    removeSceneIdFromPlace(state, action: PayloadAction<{ mapId: string; placeId: string; sceneId: string }>) {
+      const map = state.maps.find((map) => map.id === action.payload.mapId);
+      if (!map) return;
+      const place = map.places.find((place) => place.id === action.payload.placeId);
+      if (!place) return;
+      
+      // Parse existing sceneIds
+      const existingSceneIds = place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0) : [];
+      // Remove the sceneId
+      const updatedSceneIds = existingSceneIds.filter((id) => id !== action.payload.sceneId);
+      // Update with comma-separated string
+      place.sceneId = updatedSceneIds.join(',');
+    },
 
     createNewInventoryItem: (
       state,
@@ -803,6 +831,8 @@ export const {
   createPlace,
   updatePlace,
   deletePlace,
+  addSceneIdToPlace,
+  removeSceneIdFromPlace,
   createNewInventoryItem,
   updateInventoryItem,
   deleteInventoryItem,

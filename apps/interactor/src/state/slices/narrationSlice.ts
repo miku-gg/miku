@@ -23,6 +23,7 @@ const initialState: NarrationState = {
     prefillIndicators: [],
   },
   interactions: {},
+  freeThoughtUsed: false,
   responses: {},
   seenHints: [],
   createdIndicatorIds: [],
@@ -62,7 +63,7 @@ const narrationSlice = createSlice({
       }>,
     ) {
       const { text, sceneId, isNewScene, skipCutscene, afterBattle } = action.payload;
-      
+
       // Helper function to handle cutscene state
       const handleCutsceneState = (state: any) => {
         if (skipCutscene) {
@@ -78,13 +79,14 @@ const narrationSlice = createSlice({
           }
         }
       };
-      
+
       // Replace disposable response data with new interaction data
-      if(state.disposableResponseId) {
+      if (state.disposableResponseId) {
         const disposableResponse = state.responses[state.disposableResponseId];
-        const disposableInteraction = disposableResponse?.parentInteractionId ? 
-          state.interactions[disposableResponse.parentInteractionId] : null;
-        
+        const disposableInteraction = disposableResponse?.parentInteractionId
+          ? state.interactions[disposableResponse.parentInteractionId]
+          : null;
+
         if (disposableResponse && disposableInteraction) {
           // Update the disposable response with new interaction data
           disposableResponse.selectedCharacterId = action.payload.selectedCharacterId;
@@ -100,20 +102,20 @@ const narrationSlice = createSlice({
           disposableResponse.selected = true;
           disposableResponse.suggestedScenes = [];
           disposableResponse.indicators = [];
-          
+
           // Update the disposable interaction with new data
           disposableInteraction.query = text;
           disposableInteraction.sceneId = sceneId;
           if (afterBattle) {
             disposableInteraction.afterBattle = afterBattle;
           }
-          
+
           // Update current response ID to the transformed response
           state.currentResponseId = disposableResponse.id;
-          
+
           // Handle cutscene state
           handleCutsceneState(state);
-          
+
           // Clear the disposable flag
           state.disposableResponseId = null;
         } else {
@@ -412,14 +414,18 @@ const narrationSlice = createSlice({
         text: string;
         characterId: string;
         emotion: string;
+        innerThoughts?: string;
       }>,
     ) {
-      const { id, text, characterId, emotion } = action.payload;
+      const { id, text, characterId, emotion, innerThoughts } = action.payload;
       const response = state.responses[id];
       const charResponse = response?.characters.find((char) => char.characterId === characterId);
       if (charResponse) {
         charResponse.emotion = emotion;
         charResponse.text = text;
+        if (innerThoughts !== undefined) {
+          charResponse.innerThoughts = innerThoughts;
+        }
       }
     },
     deleteNode(state, action: PayloadAction<string>) {
@@ -718,7 +724,8 @@ const narrationSlice = createSlice({
       if (!cb) return;
       cb.state.turn += 1;
     },
-    navigateToScene( // Doesn't trigger AI query nor adds nodes to the history graph. Needs interaction start later.
+    navigateToScene(
+      // Doesn't trigger AI query nor adds nodes to the history graph. Needs interaction start later.
       state,
       action: PayloadAction<{
         sceneId: string;
@@ -727,13 +734,14 @@ const narrationSlice = createSlice({
     ) {
       const { sceneId, isNewScene } = action.payload;
       state.shouldTriggerInteractionAfterSceneChange = true;
-      
+
       // Replace previous disposable response if it exists, otherwise create new one
       if (state.disposableResponseId) {
         const disposableResponse = state.responses[state.disposableResponseId];
-        const disposableInteraction = disposableResponse?.parentInteractionId ? 
-          state.interactions[disposableResponse.parentInteractionId] : null;
-        
+        const disposableInteraction = disposableResponse?.parentInteractionId
+          ? state.interactions[disposableResponse.parentInteractionId]
+          : null;
+
         if (disposableResponse && disposableInteraction) {
           // Update the existing disposable response with new scene data
           disposableResponse.selectedCharacterId = '';
@@ -742,11 +750,11 @@ const narrationSlice = createSlice({
           disposableResponse.selected = true;
           disposableResponse.suggestedScenes = [];
           disposableResponse.indicators = [];
-          
+
           // Update the existing disposable interaction with new scene data
           disposableInteraction.query = '';
           disposableInteraction.sceneId = sceneId;
-          
+
           state.currentResponseId = disposableResponse.id;
         } else {
           // Fallback: create new disposable response
@@ -769,7 +777,7 @@ const narrationSlice = createSlice({
             sceneId,
             responsesId: [response.id],
           };
-          
+
           // Add the disposable interaction to the parent's children
           const parentResponse = state.responses[state.currentResponseId];
           if (parentResponse) {
@@ -781,7 +789,7 @@ const narrationSlice = createSlice({
               selected: true,
             });
           }
-          
+
           state.interactions[newInteractionId] = interaction;
           state.responses[response.id] = response;
           state.currentResponseId = response.id;
@@ -808,7 +816,7 @@ const narrationSlice = createSlice({
           sceneId,
           responsesId: [response.id],
         };
-        
+
         // Add the disposable interaction to the parent's children
         const parentResponse = state.responses[state.currentResponseId];
         if (parentResponse) {
@@ -820,7 +828,7 @@ const narrationSlice = createSlice({
             selected: true,
           });
         }
-        
+
         state.interactions[newInteractionId] = interaction;
         state.responses[response.id] = response;
         state.currentResponseId = response.id;
@@ -844,6 +852,10 @@ const narrationSlice = createSlice({
       }
       // prevent new queries
       state.input.disabled = true;
+    },
+    // Set freeThoughtUsed to true only when inner thoughts are successfully displayed
+    setFreeThoughtUsed(state, action: PayloadAction<boolean>) {
+      state.freeThoughtUsed = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -899,6 +911,7 @@ export const {
   moveNextTurn,
   navigateToScene,
   stopAiQueryAndMarkDisposable,
+  setFreeThoughtUsed,
 } = narrationSlice.actions;
 
 export default narrationSlice.reducer;
