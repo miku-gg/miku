@@ -6,12 +6,13 @@ import './InteractiveMap.scss';
 import { Button, Modal } from '@mikugg/ui-kit';
 import { setMapModal } from '../../state/slices/settingsSlice';
 import { trackEvent } from '../../libs/analytics';
-import { interactionStart, setCurrentBattle } from '../../state/slices/narrationSlice';
+import { setCurrentBattle } from '../../state/slices/narrationSlice';
 import { useAppContext } from '../../App.context';
 import { setModalOpened } from '../../state/slices/creationSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { getInitialBattleState } from '../../state/utils/battleUtils';
+import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
 import { getAvailableScenes } from '../../state/utils/sceneUtils';
 import SceneListWindow from './buttons/SceneListWindow';
 
@@ -113,7 +114,7 @@ const InteractiveMapModal = ({
   } | null;
 }) => {
   const dispatch = useAppDispatch();
-  const { servicesEndpoint, apiEndpoint, assetLinkLoader } = useAppContext();
+  const { assetLinkLoader } = useAppContext();
   const currentScene = useAppSelector(selectCurrentScene);
   const currentIndicators = useAppSelector(selectCurrentIndicators);
   const battles = useAppSelector((state) => state.novel.battles || []);
@@ -343,18 +344,11 @@ const InteractiveMapModal = ({
             }),
           );
         });
-      dispatch(
-        interactionStart({
-          sceneId: scene.id,
-          isNewScene: true,
-          text: scene.prompt,
-          apiEndpoint,
-          characters: scene?.characters.map((r) => r.characterId) || [],
-          servicesEndpoint,
-          selectedCharacterId:
-            scene?.characters[Math.floor(Math.random() * (scene?.characters.length || 0))].characterId || '',
-        }),
-      );
+      cutsceneUtilities.changeScene(dispatch, {
+        sceneId: scene.id,
+        isNewScene: true,
+        bufferInteraction: true, // We want to trigger AI query after scene change
+      });
       trackEvent('scene-select');
     }
   };
@@ -388,18 +382,21 @@ const InteractiveMapModal = ({
                   Start Battle
                 </Button>
               ) : highlightedPlace.sceneId !== currentScene?.id ? (
-                <Button theme="secondary" onClick={() => { // for mobile, we use a different approach
-                  const availableSceneIds = getAvailableScenes(highlightedPlace.sceneId);
-                  if (availableSceneIds.length > 1) {
-                    // Multiple scenes available - show scene selection modal
-                    setShowSceneSelection(true);
-                    setAvailableScenes(availableSceneIds);
-                    trackEvent('scene-select');
-                  }
-                  else {
-                    handleGoToScene();
-                  }
-                }}>
+                <Button
+                  theme="secondary"
+                  onClick={() => {
+                    // for mobile, we use a different approach
+                    const availableSceneIds = getAvailableScenes(highlightedPlace.sceneId);
+                    if (availableSceneIds.length > 1) {
+                      // Multiple scenes available - show scene selection modal
+                      setShowSceneSelection(true);
+                      setAvailableScenes(availableSceneIds);
+                      trackEvent('scene-select');
+                    } else {
+                      handleGoToScene();
+                    }
+                  }}
+                >
                   Go to place
                 </Button>
               ) : (
@@ -414,13 +411,10 @@ const InteractiveMapModal = ({
           </div>
         )
       ) : null}
-      
+
       {/* Scene List Window */}
       {showSceneSelection && (
-        <SceneListWindow
-          availableScenes={availableScenes}
-          onClose={() => setShowSceneSelection(false)}
-        />
+        <SceneListWindow availableScenes={availableScenes} onClose={() => setShowSceneSelection(false)} />
       )}
     </div>
   );

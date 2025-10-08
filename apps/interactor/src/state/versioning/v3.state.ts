@@ -66,6 +66,8 @@ export interface NarrationState {
   id: string;
   fetching: boolean;
   currentResponseId: string;
+  disposableResponseId?: string | null; // response id created by navigateToScene
+  shouldTriggerInteractionAfterSceneChange?: boolean;
   input: {
     text: string;
     suggestions: string[];

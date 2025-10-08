@@ -6,15 +6,15 @@ import { useAppDispatch, useAppSelector } from '../../state/store';
 import './SceneChangeModal.scss';
 import { setModalOpened } from '../../state/slices/creationSlice';
 import { toast } from 'react-toastify';
-import { interactionStart } from '../../state/slices/narrationSlice';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import { setMapModal } from '../../state/slices/settingsSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { useI18n } from '../../libs/i18n';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
+import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
 
 export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) => {
-  const { assetLinkLoader, isInteractionDisabled, servicesEndpoint, apiEndpoint } = useAppContext();
+  const { assetLinkLoader, isInteractionDisabled} = useAppContext();
   const { i18n } = useI18n();
   const dispatch = useAppDispatch();
   const userName = useAppSelector((state) => state.settings.user.name);
@@ -60,19 +60,11 @@ export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) 
           }),
         );
       });
-    dispatch(
-      interactionStart({
-        sceneId,
+      cutsceneUtilities.changeScene(dispatch, {
+        sceneId: sceneId,
         isNewScene: true,
-        text: scene.prompt || '',
-        characters: scene.characters.map((r) => r.characterId) || [],
-        servicesEndpoint,
-        apiEndpoint,
-        selectedCharacterId:
-          (scene.characters.length &&
-            scene.characters[Math.floor(Math.random() * (scene.characters.length || 0))].characterId) ||
-          '',
-      }),
+        bufferInteraction: true, // We want to trigger AI query after scene change
+      }
     );
   };
 

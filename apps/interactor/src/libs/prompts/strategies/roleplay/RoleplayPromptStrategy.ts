@@ -13,6 +13,7 @@ import { RootState } from '../../../../state/store';
 import { NarrationInteraction, NarrationResponse } from '../../../../state/versioning';
 import { findLorebooksEntries } from '../../../lorebookSearch';
 import labels from './RoleplayPromptLabels';
+import { cutsceneUtilities } from '../../../cutsceneUtilities';
 
 const PROMPT_TOKEN_OFFSET = 50;
 
@@ -315,10 +316,19 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
       return cutscene.parts
         .map((part) =>
           part.text
-            .map((textPart) => (textPart.type === 'description' ? `*${textPart.content}*` : `"${textPart.content}"`))
+            .map((textPart) =>
+              textPart.type === 'description' ? `*${textPart.content}*` : `"${textPart.content}"`,
+            )
             .join('\n'),
         )
         .join('\n');
+    };
+
+    const transformCutsceneBufferToPrompt = (): string => {
+      const bufferedParts = cutsceneUtilities.getCutsceneBuffer();
+      if (!bufferedParts.length) return '';
+      const prompt = bufferedParts.join('\n');
+      return prompt;
     };
 
     for (const message of [...messages].reverse().slice(-maxLines)) {
@@ -330,7 +340,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
         scene = state.novel.scenes.find((scene) => scene.id === messageSceneId);
         const cutscene = state.novel.cutscenes?.find((cutscene) => cutscene.id === scene?.cutScene?.id);
         if (cutscene?.parts.length) {
-          prompt += `${temp.response}${transformCutsceneToPrompt(cutscene)}\n`;
+          prompt += `${temp.response}${transformCutsceneBufferToPrompt()}\n`;
         }
         sceneId = messageSceneId;
       }
@@ -345,7 +355,7 @@ export class RoleplayPromptStrategy extends AbstractPromptStrategy<
           if (cutsceneId) {
             const cutscene = state.novel.cutscenes?.find((c) => c.id === cutsceneId);
             if (cutscene?.parts.length) {
-              prompt += `${temp.response}${transformCutsceneToPrompt(cutscene)}\n`;
+              prompt += `${temp.response}${transformCutsceneBufferToPrompt()}\n`;
             }
           }
         }

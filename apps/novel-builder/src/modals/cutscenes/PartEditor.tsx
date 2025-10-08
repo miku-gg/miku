@@ -15,6 +15,7 @@ import Characters from '../../panels/assets/characters/Characters';
 import './PartEditor.scss';
 import { CutScenePart } from '@mikugg/bot-utils/dist/lib/novel/NovelV3';
 import { BsChatLeftText } from 'react-icons/bs';
+import { OptionsEditor } from './OptionsEditor';
 
 export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneId: string }) => {
   const dispatch = useAppDispatch();
@@ -38,6 +39,7 @@ export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneI
 
   const [showingEmotionChar1, setShowingEmotionChar1] = useState<string | undefined>(undefined);
   const [showingEmotionChar2, setShowingEmotionChar2] = useState<string | undefined>(undefined);
+  const [openOptionsEditors, setOpenOptionsEditors] = useState<number[]>([]);
 
   const getCharacterAssetSRC = (character: { id: string; outfitId: string; emotionId: string }) => {
     const characterData = characters.find((c) => c.id === character.id);
@@ -108,13 +110,13 @@ export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneI
     updatePart({ ...part, text: newText });
   };
 
-  const handleTextTypeChange = (index: number, type: 'description' | 'dialogue') => {
+  const handleTextTypeChange = (index: number, type: 'description' | 'dialogue' | 'options') => {
     if (!part?.text || index < 0 || index >= part.text.length) return;
 
     const newText = [...part.text];
     newText[index] = {
       ...newText[index],
-      type: type as 'description' | 'dialogue',
+      type: type as 'description' | 'dialogue' | 'options',
     };
 
     updatePart({ ...part, text: newText });
@@ -132,6 +134,7 @@ export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneI
   const dropdownItems = [
     { name: 'Description', value: 'description' },
     { name: 'Dialogue', value: 'dialogue' },
+    { name: 'Options', value: 'options' },
   ];
 
   useEffect(() => {
@@ -403,23 +406,48 @@ export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneI
               {part.text.length > 0 && (
                 <div className="PartEditor__modal__text__parts scrollbar">
                   {part.text.map((text, index) => (
-                    <div key={`${text.type}-${index}`} className="PartEditor__modal__text__part">
-                      <Input
-                        className={classNames({
-                          PartEditor__modal__text__input: true,
-                          'PartEditor__modal__text__input--dialogue': text.type === 'dialogue',
-                        })}
-                        value={text.content}
-                        maxLength={100}
-                        onChange={(e) => handleInputChange(index, e.target.value)}
-                      />
+                    <div key={`${text.type}-${index}`} className="PartEditor__modal__text__part-container">
+                     <div className="PartEditor__modal__text__part">
+                      {text.type === 'options' && (
+                        <>
+                          {(!text.options || text.options.length === 0) && (
+                             <div className="PartEditor__modal__text__option-label">
+                               No options created
+                             </div>
+                            )}
+                          <Button 
+                            theme="secondary" 
+                            onClick={ () => {
+                              if (openOptionsEditors.includes(index)) {
+                                setOpenOptionsEditors(openOptionsEditors.filter(i => i !== index));
+                              } else {
+                                setOpenOptionsEditors([...openOptionsEditors, index]);
+                              }
+                            }}
+                          >
+                            {openOptionsEditors.includes(index) ? 'Hide' : 'Show'}
+                          </Button>
+                        </>
+                      )}
+                      
+                        {(text.type === 'dialogue' || text.type === 'description') && (
+                          <Input
+                            className={classNames({
+                              PartEditor__modal__text__input: true,
+                              'PartEditor__modal__text__input--dialogue': text.type === 'dialogue',
+                            })}
+                            value={text.content}
+                            maxLength={100}
+                            onChange={(e) => handleInputChange(index, e.target.value)}
+                          />
+                        )}
 
                       <Dropdown
                         className="PartEditor__modal__text__dropdown"
                         items={dropdownItems}
                         selectedIndex={dropdownItems.findIndex((item) => item.value === text.type)}
                         onChange={(selectedIndex) =>
-                          handleTextTypeChange(index, dropdownItems[selectedIndex].value as 'description' | 'dialogue')
+                          handleTextTypeChange(index, dropdownItems[selectedIndex].value as 'description' | 'dialogue' | 'options')
                         }
                       />
                       {part.text.length > 1 && (
@@ -427,8 +455,19 @@ export const PartEditor = ({ part, cutsceneId }: { part: CutScenePart; cutsceneI
                           Delete
                         </Button>
                       )}
+
+                    </div>
+                    
+                    {text.type === 'options' && openOptionsEditors.includes(index) && (
+                      <OptionsEditor
+                        part={part}
+                        textIndex={index}
+                        onUpdate={updatePart}
+                      />
+                    )}
                     </div>
                   ))}
+                  
                 </div>
               )}
             </div>

@@ -29,13 +29,14 @@ import {
   setHasPlayedGlobalStartCutscene,
   startBattle,
   clearCurrentBattle,
+  interactionStart,
 } from '../../state/slices/narrationSlice';
 import IndicatorsDisplay from '../indicators-display/IndicatorsDisplay';
 import StartSelector from '../start-selector/StartSelector';
 import BattleScreen from './BattleScreen';
 
 const Interactor = () => {
-  const { assetLinkLoader, isMobileApp } = useAppContext();
+  const { assetLinkLoader, isMobileApp, servicesEndpoint, apiEndpoint } = useAppContext();
   const dispatch = useAppDispatch();
   const scene = useAppSelector(selectCurrentScene);
   const currentBattle = useAppSelector((state) => state.narration.currentBattle);
@@ -46,12 +47,41 @@ const Interactor = () => {
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
   const battles = useAppSelector((state) => state.novel.battles);
+  const narration = useAppSelector((state) => state.narration);
   const novelCharacters = useAppSelector((state) => state.novel.characters);
+
+  const shouldTriggerInteraction = () => {
+    return narration.shouldTriggerInteractionAfterSceneChange;
+  };
+
+  // Helper function to dispatch interaction start with current scene and first character
+  const dispatchInteractionStart = () => {
+    if (!scene) return;
+
+    dispatch(
+      interactionStart({
+        sceneId: scene.id,
+        isNewScene: true,
+        skipCutscene: true, // Skip cutscene since it already played
+        text: scene.prompt,
+        apiEndpoint,
+        characters: scene.characters.map((r) => r.characterId) || [],
+        servicesEndpoint,
+        selectedCharacterId:
+          scene.characters[Math.floor(Math.random() * (scene.characters.length || 0))].characterId || '',
+      }),
+    );
+  };
 
   if (!scene) {
     return null;
   }
   const background = backgrounds.find((b) => b.id === scene.backgroundId);
+
+  // Check for AI query after scene change when scene has no cutscene
+  if (shouldTriggerInteraction() && scene && !displayingCutscene) {
+    dispatchInteractionStart();
+  }
 
   return (
     <AreYouSure.AreYouSureProvider>
@@ -79,6 +109,11 @@ const Interactor = () => {
                   dispatch(setHasPlayedGlobalStartCutscene(true));
                 } else {
                   dispatch(markCurrentCutsceneAsSeen());
+                }
+
+                // Check if we need to trigger AI query after cutscene ends
+                if (shouldTriggerInteraction()) {
+                  dispatchInteractionStart();
                 }
               }}
             />
