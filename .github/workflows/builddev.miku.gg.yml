@@ -1,4 +1,4 @@
-name: build.miku.gg deployment
+name: builddev.miku.gg deployment
 
 on:
   push:
