@@ -41,7 +41,7 @@ const Interactor = () => {
   const currentBattle = useAppSelector((state) => state.narration.currentBattle);
   const lastCharacters = useAppSelector(selectLastLoadedCharacters);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
-  const { fullscreenCharacter, nonFullscreenCharacters } = useFullscreenEmotions();
+  const { fullscreenCharacter } = useFullscreenEmotions();
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
@@ -77,9 +77,9 @@ const Interactor = () => {
     if (index === selectedIndex) {
       return `
         translateX(0px)
+        translateX(-50%)
         translateZ(0px)
         scale(1)
-        translateX(-50%)
       `;
     }
 
@@ -116,9 +116,9 @@ const Interactor = () => {
 
     return `
       translateX(${x}px)
+      translateX(-50%)
       translateZ(${backgroundZ}px)
       scale(${backgroundScale})
-      translateX(-50%)
     `;
   }
 
@@ -132,9 +132,9 @@ const Interactor = () => {
     if (selectedIndex < 0 || index === selectedIndex) {
       return `
         translateX(0px)
+        translateX(-50%)
         translateZ(0px)
         scale(1)
-        translateX(-50%)
       `;
     }
 
@@ -143,9 +143,9 @@ const Interactor = () => {
 
     return `
       translateX(${x}px)
+      translateX(-50%)
       translateZ(${backgroundZ}px)
       scale(${backgroundScale})
-      translateX(-50%)
     `;
   }
 

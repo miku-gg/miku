@@ -87,6 +87,7 @@
     opacity: 0;
     z-index: 0;
     object-fit: contain;
+    object-position: bottom;
     height: 100%;
     transition: all 0.2s ease-out;
     animation: up-and-down 3s ease-in-out infinite;
@@ -104,12 +105,13 @@
     justify-content: center;
     z-index: 1;
     transform-origin: center bottom;
-    left: auto;
-    right: auto;
-    width: 800px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1000px;
 
     .Interactor__character-container {
       position: absolute;
+      bottom: 0;
       left: 50%;
       transform-origin: center bottom;
       transition: transform 0.4s ease;
