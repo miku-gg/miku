@@ -78,6 +78,12 @@ const Interactor = () => {
   }
   const background = backgrounds.find((b) => b.id === scene.backgroundId);
 
+  // Inner thoughts visibility conditions
+  const isMobile = isMobileApp || window.innerWidth < 768;
+  const showInnerThoughts = displayCharacter && !fullscreenCharacter;
+  const showMobileInnerThoughts = isMobile && showInnerThoughts;
+  const showDesktopInnerThoughts = !isMobile && showInnerThoughts;
+
   // Check for AI query after scene change when scene has no cutscene
   if (shouldTriggerInteraction() && scene && !displayingCutscene) {
     dispatchInteractionStart();
@@ -127,6 +133,11 @@ const Interactor = () => {
             <StartSelector />
             <div className="Interactor__content">
               <IndicatorsDisplay />
+              {showMobileInnerThoughts && (
+                <div className="Interactor__mobile-inner-thoughts">
+                  <InnerThoughtsTrigger characterId={displayCharacter.id} />
+                </div>
+              )}
               <SceneSuggestion />
               <div className="Interactor__main-image-container">
                 <ProgressiveImage
@@ -220,7 +231,9 @@ const Interactor = () => {
                             upDownAnimation
                             className="Interactor__emotion-renderer"
                           />
-                          {displayCharacter?.id === id && <InnerThoughtsTrigger characterId={id} />}
+                          {displayCharacter?.id === id && showDesktopInnerThoughts && (
+                            <InnerThoughtsTrigger characterId={id} />
+                          )}
                         </div>
                       );
                     })}
