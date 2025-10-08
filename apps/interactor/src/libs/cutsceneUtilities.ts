@@ -1,31 +1,10 @@
-import { Dispatch } from '@reduxjs/toolkit';
-import { navigateToScene, stopAiQueryAndMarkDisposable } from '../state/slices/narrationSlice';
+import { stopAiQueryAndMarkDisposable } from '../state/slices/narrationSlice';
 import { abortCurrentInteraction, getCurrentInteractionAbortController } from './interactionAbortController';
 import { store } from '../state/store';
 import { NovelV3 } from '@mikugg/bot-utils';
 
 class CutsceneUtilities {
   private cutsceneBuffer: string[] = [];
-
-  /**
-   * Change scene using navigateToScene and optionally buffer for AI query
-   */
-  changeScene(
-    dispatch: Dispatch,
-    params: {
-      sceneId: string;
-      isNewScene: boolean;
-      bufferInteraction: boolean;
-    }
-  ) {
-    const { sceneId, isNewScene } = params;
-
-    // Always dispatch navigateToScene to change the scene
-    dispatch(navigateToScene({
-      sceneId,
-      isNewScene,
-    }));
-  }
 
   /**
    * Stop any ongoing AI query and abort ongoing interactions.
@@ -49,7 +28,7 @@ class CutsceneUtilities {
    * Save the cutscene parts data in a buffer and player's selection for prompting
    */
   addToCutsceneBuffer(part: NovelV3.CutScenePart, index: number) {
-    if(!part || !part.text || part.text.length - 1 < index) return;
+    if (!part || !part.text || part.text.length - 1 < index) return;
     const textPart = part.text[index];
     let promptText: string = '';
     switch (textPart.type) {
@@ -67,7 +46,7 @@ class CutsceneUtilities {
    * Add the player's option choice in the cutscene buffer
    */
   addPlayerChoice(option: NovelV3.CutSceneOption) {
-    if(!option || !option.prompt) return;
+    if (!option || !option.prompt) return;
     this.cutsceneBuffer.push(option.prompt);
   }
 

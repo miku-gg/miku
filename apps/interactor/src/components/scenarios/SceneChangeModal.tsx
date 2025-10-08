@@ -11,10 +11,10 @@ import { setMapModal } from '../../state/slices/settingsSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { useI18n } from '../../libs/i18n';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
-import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
+import { navigateToScene } from '../../state/slices/narrationSlice';
 
 export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) => {
-  const { assetLinkLoader, isInteractionDisabled} = useAppContext();
+  const { assetLinkLoader, isInteractionDisabled } = useAppContext();
   const { i18n } = useI18n();
   const dispatch = useAppDispatch();
   const userName = useAppSelector((state) => state.settings.user.name);
@@ -60,11 +60,11 @@ export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) 
           }),
         );
       });
-      cutsceneUtilities.changeScene(dispatch, {
+    dispatch(
+      navigateToScene({
         sceneId: sceneId,
         isNewScene: true,
-        bufferInteraction: true, // We want to trigger AI query after scene change
-      }
+      }),
     );
   };
 
