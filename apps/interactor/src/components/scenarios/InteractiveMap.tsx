@@ -12,7 +12,7 @@ import { setModalOpened } from '../../state/slices/creationSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { getInitialBattleState } from '../../state/utils/battleUtils';
-import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
+import { navigateToScene } from '../../state/slices/narrationSlice';
 import { getAvailableScenes } from '../../state/utils/sceneUtils';
 import SceneListWindow from './buttons/SceneListWindow';
 
@@ -344,11 +344,12 @@ const InteractiveMapModal = ({
             }),
           );
         });
-      cutsceneUtilities.changeScene(dispatch, {
-        sceneId: scene.id,
-        isNewScene: true,
-        bufferInteraction: true, // We want to trigger AI query after scene change
-      });
+      dispatch(
+        navigateToScene({
+          sceneId: scene.id,
+          isNewScene: true,
+        }),
+      );
       trackEvent('scene-select');
     }
   };

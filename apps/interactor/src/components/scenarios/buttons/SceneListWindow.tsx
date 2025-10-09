@@ -4,7 +4,7 @@ import { Button, Modal } from '@mikugg/ui-kit';
 import { setModalOpened } from '../../../state/slices/creationSlice';
 import { useAppContext } from '../../../App.context';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
-import { interactionStart } from '../../../state/slices/narrationSlice';
+import { navigateToScene } from '../../../state/slices/narrationSlice';
 import { addIndicatorToScene } from '../../../state/slices/novelSlice';
 import { setMapModal } from '../../../state/slices/settingsSlice';
 import { toast } from 'react-toastify';
@@ -22,27 +22,27 @@ interface SceneListWindowProps {
 
 export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowProps) => {
   const dispatch = useAppDispatch();
-  const { assetLinkLoader, isInteractionDisabled, servicesEndpoint, apiEndpoint } = useAppContext();
+  const { assetLinkLoader, isInteractionDisabled } = useAppContext();
   const { i18n } = useI18n();
   const scenes = useAppSelector(selectScenes);
   const currentIndicators = useAppSelector(selectCurrentIndicators);
   const currentScene = useAppSelector(selectCurrentScene);
   const userName = useAppSelector((state) => state.settings.user.name);
-  
+
   const [topFadeSize, setTopFadeSize] = useState(0);
   const [bottomFadeSize, setBottomFadeSize] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
-    
+
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
     const maxFadeSize = 60;
-    
+
     // Calculate top fade size (0 to 60px based on scroll position)
     const topFade = Math.min(maxFadeSize, Math.max(0, scrollTop));
     setTopFadeSize(topFade);
-    
+
     // Calculate bottom fade size (0 to 60px based on distance from bottom)
     const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
     const bottomFade = Math.min(maxFadeSize, Math.max(0, distanceFromBottom));
@@ -54,7 +54,7 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
     const timer = setTimeout(() => {
       const scrollElement = scrollRef.current;
       if (!scrollElement) return;
-      
+
       handleScroll();
       scrollElement.addEventListener('scroll', handleScroll);
     }, 100);
@@ -78,7 +78,7 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
       });
       return;
     }
-    
+
     const scene = scenes.find((s) => s.id === sceneId);
     if (!scene) {
       toast.warn('Scene not found.', {
@@ -111,19 +111,10 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
         );
       });
 
-    // Start the scene interaction
     dispatch(
-      interactionStart({
+      navigateToScene({
         sceneId,
         isNewScene: true,
-        text: scene.prompt || '',
-        characters: scene.characters.map((r) => r.characterId) || [],
-        servicesEndpoint,
-        apiEndpoint,
-        selectedCharacterId:
-          (scene.characters.length &&
-            scene.characters[Math.floor(Math.random() * (scene.characters.length || 0))].characterId) ||
-          '',
       }),
     );
   };
@@ -142,86 +133,98 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
             <FaTimes size={20} />
           </Button>
         </div>
-        <div 
-          className="SceneListWindow__scroll-container scrollbar" 
+        <div
+          className="SceneListWindow__scroll-container scrollbar"
           ref={scrollRef}
           style={{
-            mask: `linear-gradient(to bottom, transparent 0px, black ${Math.max(1, topFadeSize)}px, black calc(100% - ${Math.max(1, bottomFadeSize)}px), transparent 100%)`,
-            WebkitMask: `linear-gradient(to bottom, transparent 0px, black ${Math.max(1, topFadeSize)}px, black calc(100% - ${Math.max(1, bottomFadeSize)}px), transparent 100%)`
+            mask: `linear-gradient(to bottom, transparent 0px, black ${Math.max(
+              1,
+              topFadeSize,
+            )}px, black calc(100% - ${Math.max(1, bottomFadeSize)}px), transparent 100%)`,
+            WebkitMask: `linear-gradient(to bottom, transparent 0px, black ${Math.max(
+              1,
+              topFadeSize,
+            )}px, black calc(100% - ${Math.max(1, bottomFadeSize)}px), transparent 100%)`,
           }}
         >
           <div className="SceneListWindow__content">
-        {(() => {
-          // Move current scene to index 0 if it exists in availableScenes
-          const orderedScenes = [...availableScenes];
-          if (currentScene && availableScenes.includes(currentScene.id)) {
-            const currentIndex = orderedScenes.indexOf(currentScene.id);
-            orderedScenes.splice(currentIndex, 1);
-            orderedScenes.unshift(currentScene.id);
-          }
-          
-          return orderedScenes.map((sceneId) => {
-            const sceneData = scenes.find((s) => s.id === sceneId);
-            if (!sceneData) return null;
-            
-            const isCurrentScene = currentScene && sceneId === currentScene.id;
-            const currentCharacterName = useAppSelector(
-              (state) => state.novel.characters.find((c) => c.id === sceneData.characters[0]?.characterId)?.name,
-            );
-            
-            const prompt = fillTextTemplate(sceneData.prompt || '', {
-              user: userName,
-              bot: currentCharacterName || '{{char}}',
-            });
+            {(() => {
+              // Move current scene to index 0 if it exists in availableScenes
+              const orderedScenes = [...availableScenes];
+              if (currentScene && availableScenes.includes(currentScene.id)) {
+                const currentIndex = orderedScenes.indexOf(currentScene.id);
+                orderedScenes.splice(currentIndex, 1);
+                orderedScenes.unshift(currentScene.id);
+              }
 
-            const description = sceneData.description
-              ? fillTextTemplate(sceneData.description, {
+              return orderedScenes.map((sceneId) => {
+                const sceneData = scenes.find((s) => s.id === sceneId);
+                if (!sceneData) return null;
+
+                const isCurrentScene = currentScene && sceneId === currentScene.id;
+                const currentCharacterName = useAppSelector(
+                  (state) => state.novel.characters.find((c) => c.id === sceneData.characters[0]?.characterId)?.name,
+                );
+
+                const prompt = fillTextTemplate(sceneData.prompt || '', {
                   user: userName,
                   bot: currentCharacterName || '{{char}}',
-                })
-              : '';
-            
-            return (
-              <div key={sceneId} className={`SceneListWindow__scene-button ${isCurrentScene ? 'SceneListWindow__scene-button--disabled' : ''}`}>
-                <div className="SceneListWindow__scene-button__content">
-                  <img
-                    className="SceneListWindow__scene-button__background-image"
-                    src={assetLinkLoader(sceneData.backgroundImage || '', AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL)}
-                    alt={sceneData.name}
-                  />
-                  <div className="SceneListWindow__scene-button__characters">
-                    {sceneData.characterImages?.map((image, index) => {
-                      return (
-                        <EmotionRenderer
-                          key={`scene-character-${index}`}
-                          className="SceneListWindow__scene-button__character-emotion"
-                          assetLinkLoader={assetLinkLoader}
-                          assetUrl={image}
-                          isSmall
-                        />
-                      );
-                    })}
+                });
+
+                const description = sceneData.description
+                  ? fillTextTemplate(sceneData.description, {
+                      user: userName,
+                      bot: currentCharacterName || '{{char}}',
+                    })
+                  : '';
+
+                return (
+                  <div
+                    key={sceneId}
+                    className={`SceneListWindow__scene-button ${
+                      isCurrentScene ? 'SceneListWindow__scene-button--disabled' : ''
+                    }`}
+                  >
+                    <div className="SceneListWindow__scene-button__content">
+                      <img
+                        className="SceneListWindow__scene-button__background-image"
+                        src={assetLinkLoader(
+                          sceneData.backgroundImage || '',
+                          AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL,
+                        )}
+                        alt={sceneData.name}
+                      />
+                      <div className="SceneListWindow__scene-button__characters">
+                        {sceneData.characterImages?.map((image, index) => {
+                          return (
+                            <EmotionRenderer
+                              key={`scene-character-${index}`}
+                              className="SceneListWindow__scene-button__character-emotion"
+                              assetLinkLoader={assetLinkLoader}
+                              assetUrl={image}
+                              isSmall
+                            />
+                          );
+                        })}
+                      </div>
+                      <div className="SceneListWindow__scene-button__text-container">
+                        <h2 className="SceneListWindow__scene-button__title">{sceneData.name || 'Next scene'}</h2>
+                        <p className="SceneListWindow__scene-button__prompt">{description || prompt}</p>
+                      </div>
+                      <div className="SceneListWindow__scene-button__buttons">
+                        <Button
+                          theme="gradient"
+                          disabled={isCurrentScene}
+                          onClick={() => !isCurrentScene && handleGoToScene(sceneId)}
+                        >
+                          {isCurrentScene ? i18n('you_are_here') : i18n('go_to_scene')}
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="SceneListWindow__scene-button__text-container">
-                    <h2 className="SceneListWindow__scene-button__title">
-                      {sceneData.name || 'Next scene'}
-                    </h2>
-                    <p className="SceneListWindow__scene-button__prompt">{description || prompt}</p>
-                  </div>
-                  <div className="SceneListWindow__scene-button__buttons">
-                    <Button
-                      theme="gradient"
-                      disabled={isCurrentScene}
-                      onClick={() => !isCurrentScene && handleGoToScene(sceneId)}
-                    >
-                      {isCurrentScene ? i18n('you_are_here') : i18n('go_to_scene')}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            );
-          });
-        })()}
+                );
+              });
+            })()}
           </div>
         </div>
       </div>

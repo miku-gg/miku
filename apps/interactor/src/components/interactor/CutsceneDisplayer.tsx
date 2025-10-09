@@ -9,7 +9,7 @@ import { useRef, useEffect, useState } from 'react';
 import { TextFormatterStatic } from '../common/TextFormatter';
 import { IoIosArrowBack, IoIosArrowForward, IoIosSkipForward } from 'react-icons/io';
 import { useI18n } from '../../libs/i18n';
-import { setCutsceneTextIndex, setCutscenePartIndex } from '../../state/slices/narrationSlice';
+import { setCutsceneTextIndex, setCutscenePartIndex, navigateToScene } from '../../state/slices/narrationSlice';
 import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
 import { addItem, toggleItemVisibility } from '../../state/slices/inventorySlice';
@@ -190,43 +190,43 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
 
     const option = currentText.options?.find((option) => option.id === optionId);
     if (!option) return;
-    if(!option.action) return;
-    
+    if (!option.action) return;
+
     cutsceneUtilities.addPlayerChoice(option);
 
     switch (option.action.type) {
       case 'NAVIGATE_TO_SCENE': {
         const navigateAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'NAVIGATE_TO_SCENE' }>;
-        const targetScene = scenes.find(s => s.id === navigateAction.params.sceneId);
+        const targetScene = scenes.find((s) => s.id === navigateAction.params.sceneId);
         if (!targetScene) {
           toast.error('Target scene not found.', {
             position: 'bottom-right',
           });
           break;
         }
-        
+
         dispatch({
           type: 'novel/CUTSCENE_OPTION_SELECTED',
-          payload: { 
+          payload: {
             optionId: option.id,
-            action: option.action
-          }
+            action: option.action,
+          },
         });
-        
-        // Use cutscene options buffer for scene navigation
-        cutsceneUtilities.changeScene(dispatch, {
-          sceneId: navigateAction.params.sceneId,
-          isNewScene: true,
-          bufferInteraction: true, // We want to trigger AI query after scene change
-        });
-        
+
+        dispatch(
+          navigateToScene({
+            sceneId: navigateAction.params.sceneId,
+            isNewScene: true,
+          }),
+        );
+
         break;
       }
       case 'GIVE_ITEM': {
         const giveItemAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'GIVE_ITEM' }>;
         const item = items?.find((i) => i.id === giveItemAction.params.itemId);
         if (item) {
-          const existingItem = inventoryItems.find(i => i.id === item.id);
+          const existingItem = inventoryItems.find((i) => i.id === item.id);
           if (!existingItem) {
             dispatch(addItem(item));
           }
@@ -254,8 +254,8 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         optionId: optionId,
       },
     });
-  };  
-  
+  };
+
   const isAtEnd = () => {
     if (!parts[currentPartIndex]) return false;
 
@@ -280,7 +280,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
   const skipCutscene = () => {
     let partIndex = currentPartIndex;
     let textIndex = currentTextIndex;
-  
+
     const advance = () => {
       const currentPart = parts[partIndex];
       if (!currentPart) {
@@ -294,7 +294,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
       }
 
       cutsceneUtilities.addToCutsceneBuffer(currentPart, textIndex);
-  
+
       const isLastPart = partIndex === parts.length - 1;
       const isLastText = textIndex === currentPart.text.length - 1;
       if (currentText.type === 'options' || (isLastPart && isLastText)) {
@@ -305,7 +305,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         }
         return;
       }
-  
+
       if (textIndex < currentPart.text.length - 1) {
         textIndex++;
       } else if (partIndex < parts.length - 1) {
@@ -317,12 +317,12 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         onEndDisplay();
         return;
       }
-  
+
       setTimeout(advance, 100);
     };
-  
+
     advance();
-  };  
+  };
 
   useEffect(() => {
     if (textContainerRef.current) {
@@ -406,9 +406,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
           const currentPart = parts[currentPartIndex];
           const currentText = currentPart?.text[currentTextIndex];
           const hasOptions =
-          currentText?.type === 'options' &&
-          Array.isArray(currentText.options) &&
-          currentText.options.length > 0;
+            currentText?.type === 'options' && Array.isArray(currentText.options) && currentText.options.length > 0;
 
           if (hasOptions) {
             return (
@@ -428,7 +426,7 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
               </div>
             );
           }
-          
+
           return (
             <div className="CutsceneDisplayer__buttons">
               <button

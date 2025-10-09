@@ -9,7 +9,11 @@
   left: auto !important;
   right: auto !important;
   transform: none !important;
-  
+
+  @media (max-width: 768px) {
+    margin: 80px auto 0 auto !important;
+  }
+
   .Modal__content {
     max-width: 600px;
     max-height: 80vh;
@@ -20,17 +24,17 @@
     padding: 0 !important;
     margin: 0 auto !important;
   }
-  
+
   .Modal__header {
     display: none !important;
   }
-  
+
   .Modal__overlay {
     background: transparent !important;
     padding: 0 !important;
     margin: 0 !important;
   }
-  
+
   .Modal {
     padding: 0 !important;
     margin: 0 auto !important;
@@ -56,27 +60,27 @@
   flex: 1;
   overflow-y: auto;
   /* Mask will be applied via inline styles for dynamic behavior */
-  
+
   // Scrollbar styling to match project
   &::-webkit-scrollbar {
     width: 0.3em;
   }
-  
+
   &::-webkit-scrollbar-track {
     border-radius: 100vh;
     background: transparent;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: rgb(167 139 250);
     border-radius: 100vh;
     border: 0;
   }
-  
+
   &::-webkit-scrollbar-thumb:hover {
     background: rgb(196 181 253);
   }
-  
+
   scrollbar-color: rgb(167 139 250) transparent;
   scrollbar-width: auto;
 }
@@ -176,11 +180,11 @@
 
   &--disabled {
     opacity: 0.6;
-    
+
     .SceneListWindow__scene-button__content {
       pointer-events: none;
     }
-    
+
     .SceneListWindow__scene-button__background-image {
       filter: grayscale(50%);
     }
