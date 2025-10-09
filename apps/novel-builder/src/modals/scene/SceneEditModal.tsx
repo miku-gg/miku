@@ -1,4 +1,4 @@
-import { AreYouSure, Button, Carousel, CheckBox, ImageSlider, Input, Modal, Tooltip } from '@mikugg/ui-kit';
+import { AreYouSure, Button, CheckBox, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import { useState } from 'react';
 import { AiOutlinePicture } from 'react-icons/ai';
@@ -9,7 +9,6 @@ import { TokenDisplayer } from '../../components/TokenDisplayer';
 import config from '../../config';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
 import Backgrounds from '../../panels/assets/backgrounds/Backgrounds';
-import Characters from '../../panels/assets/characters/Characters';
 import Songs from '../../panels/assets/songs/Songs';
 import { LorebookList } from '../../panels/details/LorebookList';
 import { MapList } from '../../panels/maps/MapList';
@@ -30,6 +29,7 @@ import {
 } from '../../state/slices/novelFormSlice';
 import { IndicatorEditor } from './IndicatorEditor';
 import FullscreenEmotionZoomModal from '../FullscreenEmotionZoomModal';
+import CharacterSelectModal from './CharacterSelectModal';
 
 export default function SceneEditModal() {
   const dispatch = useAppDispatch();
@@ -50,13 +50,14 @@ export default function SceneEditModal() {
     opened: false,
     characterIndex: 0,
   });
-  const [showingEmotionChar1, setShowingEmotionChar1] = useState('neutral');
-  const [showingEmotionChar2, setShowingEmotionChar2] = useState('neutral');
   const [fullscreenPreviewMode, setFullscreenPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [zoomModalOpen, setZoomModalOpen] = useState(false);
   const [zoomModalImage, setZoomModalImage] = useState('');
   const [zoomModalEmotionName, setZoomModalEmotionName] = useState('');
   const [zoomModalCharacterName, setZoomModalCharacterName] = useState('');
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const characterCount = 4; // here we define the max amount of characters in a scene
 
   const getObjectiveData = (id: string) => {
     return objectives?.find((objective) => objective.id === id);
@@ -137,10 +138,8 @@ export default function SceneEditModal() {
 
   const handleZoomEmotion = (character: any, emotion: any) => {
     const imageUrl = config.genAssetLink(
-      fullscreenPreviewMode === 'desktop' 
-        ? (emotion.sources.desktop || '') 
-        : (emotion.sources.mobile || ''),
-      AssetDisplayPrefix.EMOTION_IMAGE
+      fullscreenPreviewMode === 'desktop' ? emotion.sources.desktop || '' : emotion.sources.mobile || '',
+      AssetDisplayPrefix.EMOTION_IMAGE,
     );
     setZoomModalImage(imageUrl);
     setZoomModalEmotionName(emotion.id);
@@ -168,43 +167,45 @@ export default function SceneEditModal() {
                   AssetDisplayPrefix.BACKGROUND_IMAGE,
                 )}
               />
-              <div
-                className="SceneEditModal__background-edit-btn"
-                onClick={() => setSelectBackgroundModalOpened(true)}
-                tabIndex={0}
-                role="button"
-              >
-                <AiOutlinePicture />
-              </div>
-              <div
-                className="SceneEditModal__character-select1-btn"
-                onClick={() =>
-                  setSelectCharacterModal({
-                    opened: true,
-                    characterIndex: 0,
-                  })
-                }
-                tabIndex={0}
-                role="button"
-              >
-                <FaUser /> 1
-              </div>
-              <div
-                className={classNames({
-                  'SceneEditModal__character-select2-btn': true,
-                  'SceneEditModal__character-select2-btn--disabled': scene.characters.length < 2,
+              <div className="SceneEditModal__buttons-container">
+                <div
+                  className="SceneEditModal__background-edit-btn"
+                  onClick={() => setSelectBackgroundModalOpened(true)}
+                  tabIndex={0}
+                  role="button"
+                >
+                  <AiOutlinePicture />
+                </div>
+                {Array.from({ length: characterCount }).map((_, index) => {
+                  const activeButtonLimit = (scene?.characters?.length ?? 0) + 1;
+                  const isDisabled = index >= activeButtonLimit;
+
+                  return (
+                    <div
+                      key={index}
+                      className={classNames('SceneEditModal__character-select-btn', {
+                        'SceneEditModal__character-select-btn--disabled': isDisabled,
+                      })}
+                      onClick={() => {
+                        if (!isDisabled) {
+                          setSelectCharacterModal({
+                            opened: true,
+                            characterIndex: index,
+                          });
+                        }
+                      }}
+                      onMouseEnter={() => setHoveredIndex(index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                      tabIndex={0}
+                      role="button"
+                      data-index={index}
+                    >
+                      <FaUser /> {index + 1}
+                    </div>
+                  );
                 })}
-                onClick={() =>
-                  setSelectCharacterModal({
-                    opened: true,
-                    characterIndex: 1,
-                  })
-                }
-                tabIndex={0}
-                role="button"
-              >
-                <FaUser /> 2
               </div>
+
               <div className="SceneEditModal__characters">
                 {scene.characters.map((character, characterIndex) => {
                   const outfits = character.card?.data.extensions.mikugg_v2.outfits || [];
@@ -213,106 +214,67 @@ export default function SceneEditModal() {
                     0,
                   );
                   const selectedOutfit = outfits[selectedOutfitIndex];
-                  const selectedEmotion = selectedOutfit.emotions.find(
-                    (emotion) => emotion.id === (characterIndex === 0 ? showingEmotionChar1 : showingEmotionChar2),
-                  ) ||
+                  const neutralEmotion = selectedOutfit.emotions.find((emotion) => emotion.id === 'neutral') ||
                     selectedOutfit.emotions[0] || {
                       id: 'neutral',
                       sources: {
                         png: '',
                       },
                     };
-                  
+
                   // Check if the selected outfit is fullscreen
                   const isFullscreenOutfit = selectedOutfit.isFullscreen;
-                  
+
                   return (
-                    <div key={character.id} className="SceneEditModal__character">
-                      <ImageSlider
-                        images={outfits.map((outfit) => ({
-                          source: config.genAssetLink(
-                            isFullscreenOutfit 
-                              ? (fullscreenPreviewMode === 'desktop' 
-                                  ? selectedEmotion.sources.desktop || '' 
-                                  : selectedEmotion.sources.mobile || '')
-                              : selectedEmotion.sources.png,
-                            AssetDisplayPrefix.EMOTION_IMAGE
-                          ),
-                          label: outfit.name,
-                        }))}
-                        backgroundImageSource=""
-                        selectedIndex={selectedOutfitIndex}
-                        onChange={(delta) => {
-                          let newOutfitIndex = selectedOutfitIndex + delta;
-                          if (newOutfitIndex < 0) {
-                            newOutfitIndex = outfits.length - 1;
-                          } else if (newOutfitIndex >= outfits.length) {
-                            newOutfitIndex = 0;
-                          }
-                          dispatch(
-                            updateScene({
-                              ...scene._source,
-                              characters: scene.characters.map((char) => {
-                                if (char.id === character.id) {
-                                  return {
-                                    characterId: char.id || '',
-                                    objective: char.objective,
-                                    outfit: outfits[newOutfitIndex].id,
-                                  };
-                                }
-                                return {
-                                  characterId: char.id || '',
-                                  objective: char.objective,
-                                  outfit: char.outfit,
-                                };
-                              }),
-                            }),
-                          );
-                        }}
-                      />
+                    <div
+                      key={character.id}
+                      className={classNames('SceneEditModal__character', {
+                        'SceneEditModal__character--hovered': hoveredIndex === characterIndex,
+                      })}
+                    >
+                      <div className="SceneEditModal__character-image-container">
+                        <img
+                          src={config.genAssetLink(
+                            isFullscreenOutfit
+                              ? fullscreenPreviewMode === 'desktop'
+                                ? neutralEmotion.sources.desktop || ''
+                                : neutralEmotion.sources.mobile || ''
+                              : neutralEmotion.sources.png,
+                            AssetDisplayPrefix.EMOTION_IMAGE,
+                          )}
+                          alt={character.name}
+                          className="SceneEditModal__character-image"
+                          data-fullscreen={isFullscreenOutfit}
+                        />
+                        {isFullscreenOutfit && (
+                          <div className="SceneEditModal__character-fullscreen-zoom-overlay">
+                            <button
+                              className="SceneEditModal__character-fullscreen-zoom-overlay-btn"
+                              onClick={() => handleZoomEmotion(character, neutralEmotion)}
+                            >
+                              <MdZoomIn />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                       {isFullscreenOutfit && (
                         <div className="SceneEditModal__character-fullscreen-controls">
                           <button
                             className="SceneEditModal__fullscreen-emotion-btn"
-                            onClick={() => handleZoomEmotion(character, selectedEmotion)}
+                            onClick={() => handleZoomEmotion(character, neutralEmotion)}
                           >
                             <MdZoomIn />
                           </button>
                           <button
                             className="SceneEditModal__fullscreen-emotion-btn"
-                            onClick={() => setFullscreenPreviewMode(
-                              fullscreenPreviewMode === 'desktop' ? 'mobile' : 'desktop'
-                            )}
+                            onClick={() =>
+                              setFullscreenPreviewMode(fullscreenPreviewMode === 'desktop' ? 'mobile' : 'desktop')
+                            }
                           >
                             {fullscreenPreviewMode === 'desktop' ? <MdPhoneAndroid /> : <MdComputer />}
                           </button>
                         </div>
                       )}
-                      {isFullscreenOutfit && (
-                        <div className="SceneEditModal__character-fullscreen-zoom-overlay">
-                          <button
-                            className="SceneEditModal__character-fullscreen-zoom-overlay-btn"
-                            onClick={() => handleZoomEmotion(character, selectedEmotion)}
-                          >
-                            <MdZoomIn />
-                          </button>
-                        </div>
-                      )}
-                      <Carousel
-                        items={selectedOutfit.emotions.map((emotion) => ({
-                          title: emotion.id,
-                        }))}
-                        selectedIndex={
-                          selectedOutfit.emotions.findIndex(
-                            (emotion) => emotion.id === selectedEmotion.id,
-                          ) || 0
-                        }
-                        onClick={(index) => {
-                          characterIndex === 0
-                            ? setShowingEmotionChar1(selectedOutfit.emotions[index]?.id || '')
-                            : setShowingEmotionChar2(selectedOutfit.emotions[index]?.id || '');
-                        }}
-                      />
                     </div>
                   );
                 })}
@@ -658,52 +620,47 @@ export default function SceneEditModal() {
           }}
         />
       </Modal>
-      <Modal
+      <CharacterSelectModal
         opened={selectCharacterModal.opened}
         onCloseModal={() => setSelectCharacterModal((_state) => ({ ..._state, opened: false }))}
-        className="SceneEditModal__select-character-modal"
-      >
-        <Characters
-          ignoreIds={
-            selectCharacterModal.characterIndex == 0
-              ? scene?.characters[1]?.id
-                ? [scene?.characters[1]?.id]
-                : []
-              : scene?.characters[0]?.id
-              ? [scene?.characters[0]?.id]
-              : []
-          }
-          showNone={selectCharacterModal.characterIndex === 1}
-          selected={scene?.characters[selectCharacterModal.characterIndex]?.id}
-          onSelect={(characterId) => {
-            if (scene?._source) {
-              const newSceneCharacters = scene.characters.map((character) => ({
-                characterId: character.id || '',
-                outfit: character.outfit || '',
-              }));
-              const newCharacter = characters.find((character) => character.id === characterId);
-              if (newCharacter) {
-                newSceneCharacters[selectCharacterModal.characterIndex || 0] = {
-                  characterId,
-                  outfit: newCharacter?.card.data.extensions.mikugg_v2.outfits[0].id || '',
-                };
-              } else {
-                newSceneCharacters.splice(selectCharacterModal.characterIndex, 1);
-              }
-              dispatch(
-                updateScene({
-                  ...scene._source,
-                  characters: newSceneCharacters,
-                }),
-              );
-              setSelectCharacterModal({
-                opened: false,
-                characterIndex: 0,
-              });
+        selectedCharacterId={scene?.characters[selectCharacterModal.characterIndex]?.id}
+        ignoreIds={
+          scene?.characters
+            ?.map((c) => c.id)
+            .filter((id): id is string => id !== undefined && id !== null)
+            .filter((_, idx) => idx !== selectCharacterModal.characterIndex) || []
+        }
+        showNone={(scene?.characters?.length ?? 0) > 1}
+        onSelect={(characterId, outfitId) => {
+          if (scene?._source) {
+            const newSceneCharacters = scene.characters.map((character) => ({
+              characterId: character.id || '',
+              outfit: character.outfit || '',
+              objective: character.objective || '',
+            }));
+            const newCharacter = characters.find((character) => character.id === characterId);
+            if (newCharacter && characterId) {
+              newSceneCharacters[selectCharacterModal.characterIndex || 0] = {
+                characterId,
+                outfit: outfitId || newCharacter?.card.data.extensions.mikugg_v2.outfits[0].id || '',
+                objective: '',
+              };
+            } else {
+              newSceneCharacters.splice(selectCharacterModal.characterIndex, 1);
             }
-          }}
-        />
-      </Modal>
+            dispatch(
+              updateScene({
+                ...scene._source,
+                characters: newSceneCharacters,
+              }),
+            );
+            setSelectCharacterModal({
+              opened: false,
+              characterIndex: 0,
+            });
+          }
+        }}
+      />
       <Modal
         opened={selectSongModalOpened}
         onCloseModal={() => setSelectSongModalOpened(false)}

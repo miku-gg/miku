@@ -10,7 +10,7 @@
     border-radius: 1rem;
     margin: 20px 0;
     position: relative;
-    margin-bottom: 60px;
+    margin-bottom: 30px;
 
     .ImageSlider__selectedImage {
       transition: all 0.2s ease-out;
@@ -19,24 +19,6 @@
     &:has(.SceneEditModal__background-edit-btn:hover) {
       .SceneEditModal__background {
         opacity: 0.3;
-      }
-    }
-
-    &:has(.SceneEditModal__character-select1-btn:hover) {
-      .SceneEditModal__character:first-child {
-        .ImageSlider__selectedImage {
-          filter: blur(5px);
-          margin-bottom: -1rem;
-        }
-      }
-    }
-
-    &:has(.SceneEditModal__character-select2-btn:hover) {
-      .SceneEditModal__character:last-child {
-        .ImageSlider__selectedImage {
-          filter: blur(5px);
-          margin-bottom: -1rem;
-        }
       }
     }
   }
@@ -51,10 +33,17 @@
     z-index: -1;
   }
 
-  &__background-edit-btn,
-  &__character-select1-btn,
-  &__fullscreen-emotion-btn,
-  &__character-select2-btn {
+  &__buttons-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; // espacio entre botones (ajustable)
+    z-index: 9999;
+  }
+
+  &__fullscreen-emotion-btn {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -79,46 +68,114 @@
     &:hover {
       background-color: rgba(255, 255, 255, 0.8);
     }
-  }
-
-  &__character-select1-btn,
-  &__character-select2-btn {
-    top: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-
-    svg {
-      width: 12px;
-      height: 12px;
-    }
-  }
-
-  &__character-select2-btn {
-    top: 90px;
 
     &--disabled {
       background-color: rgba(255, 255, 255, 0.1);
     }
   }
 
-  &__characters {
+  &__background-edit-btn,
+  &__character-select-btn {
+    top: 10px;
+    right: 10px;
+    color: black;
+    z-index: 99999;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    padding: 5px;
+    display: flex;
+    transition: all 0.2s ease-out;
+    outline: none;
+    width: 36px;
     display: flex;
     justify-content: center;
-    gap: 30px;
 
-    .ImageSlider__backgroundImage {
-      overflow: hidden;
+    svg {
+      width: 24px;
+      height: 24px;
     }
 
-    .Carousel {
-      position: absolute;
-      bottom: -40px;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.8);
     }
+
+    &--disabled {
+      background-color: rgba(255, 255, 255, 0.1);
+      pointer-events: none;
+    }
+  }
+
+  &__characters {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 15px;
+    height: 100%;
+    padding: 0 20px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   &__character {
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+
+  &__character-image-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    height: fit-content;
+
+    &:has(.SceneEditModal__character-image[data-fullscreen='true']) {
+      width: 196px;
+      height: 196px;
+    }
+  }
+
+  &__character-image {
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+    transform-origin: center bottom;
+    bottom: 0;
+    top: auto;
+    max-width: 331px;
+    max-height: 331px;
+    flex-shrink: 0;
+
+    &[data-fullscreen='true'] {
+      max-width: 196px;
+      max-height: 196px;
+      width: 196px;
+      height: 196px;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 1rem;
+      position: absolute;
+      top: auto;
+      left: 0;
+      right: auto;
+      margin: 0 auto;
+      transform: translateY(-50%);
+    }
+  }
+
+  &__character--hovered {
+    .SceneEditModal__character-image {
+      filter: blur(5px);
+      margin-bottom: -1rem;
+    }
   }
 
   &__character-fullscreen-controls {
@@ -139,9 +196,11 @@
 
   &__character-fullscreen-zoom-overlay {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: translateY(-50%);
     z-index: 3;
     opacity: 0.1;
     transition: opacity 0.2s ease;
@@ -153,6 +212,12 @@
   }
 
   &__character-fullscreen-zoom-overlay-btn {
+    position: absolute;
+    top: 50%;
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
     border: 2px solid white !important;
     border-radius: 50% !important;
     color: white !important;
@@ -170,7 +235,7 @@
     }
 
     &:active {
-      transform: scale(0.98) !important;
+      transform: translate(-50%, -50%) scale(0.98) !important;
     }
   }
 
@@ -325,9 +390,6 @@
         border-radius: 50%;
       }
     }
-
-    &__input {
-    }
   }
 
   &__scene-objectives-list {
@@ -338,45 +400,72 @@
 }
 
 // if screen is mobile
-@media screen and (max-width: 928px) {
+@media screen and (max-width: 975px) {
+  .SceneEditModal__characters {
+    gap: 3px;
+    height: 100%;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+
   .SceneEditModal__character {
-    width: 40%;
-    .ImageSlider__container {
-      gap: 0;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+
+    .SceneEditModal__character-image-container {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      margin: 0 auto !important;
     }
-    .ImageSlider__backgroundImage {
-      width: initial;
-      max-width: 198px;
-    }
-    .ImageSlider__selectedImage {
+
+    .SceneEditModal__character-image {
+      width: auto;
       height: 60%;
-    }
+      max-width: 250px;
+      max-height: 250px;
 
-    .SceneEditModal__character-fullscreen-zoom-overlay {
-      display: none;
-    }
-
-    .SceneEditModal__character-fullscreen-controls {
-      position: absolute;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin: 0;
-      padding: 0;
-
-      .SceneEditModal__fullscreen-emotion-btn {
-        position: static;
+      &[data-fullscreen='true'] {
+        max-width: 140px;
+        max-height: 140px;
+        width: 140px;
+        height: 140px;
+        object-fit: cover;
+        object-position: center;
+        border-radius: 1rem;
+        position: absolute;
         top: auto;
+        left: auto;
         right: auto;
-        flex-shrink: 0;
-        display: flex !important; // Show zoom button on mobile
+        transform: translateY(-50%);
+        right: auto;
+        margin: 0 auto;
       }
     }
+  }
 
+  .SceneEditModal__character-fullscreen-zoom-overlay {
+    display: none;
+  }
+
+  .SceneEditModal__character-fullscreen-controls {
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+
+    .SceneEditModal__fullscreen-emotion-btn {
+      position: static;
+      top: auto;
+      right: auto;
+      flex-shrink: 0;
+      display: flex !important; // Show zoom button on mobile
+    }
   }
 }
 //add media query for width 975px
@@ -396,15 +485,6 @@
       & .Input {
         width: 100%;
       }
-    }
-  }
-}
-
-//add media query for width 580px
-@media (max-width: 640px) {
-  .SceneEditModal {
-    &__character {
-      width: 100%;
     }
   }
 }

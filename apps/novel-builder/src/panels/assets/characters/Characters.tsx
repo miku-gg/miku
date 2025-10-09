@@ -1,12 +1,9 @@
 import { FaHammer, FaPencil } from 'react-icons/fa6';
-import { MdSearch } from 'react-icons/md';
 import config from '../../../config';
 import { openModal } from '../../../state/slices/inputSlice';
 import { useAppDispatch, useAppSelector } from '../../../state/store';
 import './Characters.scss';
 import { Blocks } from '@mikugg/ui-kit';
-import { useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 import { v4 as randomUUID } from 'uuid';
 import { createCharacter } from '../../../state/slices/novelFormSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
@@ -16,11 +13,13 @@ export default function Characters({
   onSelect,
   showNone,
   ignoreIds,
+  hideHeader,
 }: {
   selected?: string;
   onSelect?: (id: string) => void;
   showNone?: boolean;
   ignoreIds?: string[];
+  hideHeader?: boolean;
 }) {
   const characters = useAppSelector((state) => state.novel.characters);
   const dispatch = useAppDispatch();
@@ -103,7 +102,7 @@ export default function Characters({
 
   return (
     <div className="Characters group">
-      <div className="title-small">Characters</div>
+      {!hideHeader && <div className="title-small">Characters</div>}
       <div className="Characters__list">
         <Blocks tooltipId="characters" items={blocks} />
       </div>
