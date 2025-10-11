@@ -22,13 +22,10 @@
     text-align: left;
   }
 
-  &__bg{
+  &__bg {
     position: absolute;
     inset: -15px;
-    background: linear-gradient(
-      rgba(12, 10, 29, 0.7) 0%, 
-      rgba(30, 26, 65, 0.7) 100%
-    );
+    background: linear-gradient(rgba(12, 10, 29, 0.7) 0%, rgba(30, 26, 65, 0.7) 100%);
     filter: blur(6px);
     border-radius: 24px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -173,7 +170,7 @@
     }
   }
 
-  &__body{
+  &__body {
     position: relative;
   }
 
@@ -262,8 +259,12 @@
 
 // Responsive design
 @media (max-width: 768px) {
-
   .InnerThoughtsBox {
+    &__container {
+      min-width: 350px;
+      width: 90%;
+    }
+
     &__content {
       padding: 0.5rem;
       height: calc(2.5 * 2.5em); // 2.5 lines with 2.5em line-height on mobile too
