@@ -219,6 +219,41 @@
     }
   }
 
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    padding: 20px 20px 100px 20px;
+    background: linear-gradient(to top, #000000b3, #0000 100%);
+    z-index: 1;
+    border-radius: 0.75rem;
+  }
+
+  &__option-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: $color-white;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-align: left;
+    backdrop-filter: blur(10px);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: $secondary-color;
+      color: $secondary-color;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
   &__music-player {
     position: absolute;
     top: 10px;

@@ -1,40 +1,10 @@
 name: build.miku.gg deployment
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - apps/novel-builder/**
-      - packages/**
-      - .github/workflows/build.miku.gg.yml
-      - package.json
-      - pnpm-lock.yaml
-      - pnpm-workspace.yaml
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - master
-    paths:
-      - apps/novel-builder/**
-      - packages/**
-      - .github/workflows/build.miku.gg.yml
-      - package.json
-      - pnpm-lock.yaml
-      - pnpm-workspace.yaml
+  workflow_dispatch:
+    branches: [master]
 
 jobs:
-  build_and_test_job:
-    if: github.event_name != 'push' || github.ref != 'refs/heads/master'
-    runs-on: ubuntu-latest
-    name: Build and Test Job
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-      - name: Install
-        run: npm i -g pnpm && pnpm install --no-frozen-lockfile && pnpm test && pnpm run build --scope=@mikugg/novel-builder
-
   deploy_job:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest

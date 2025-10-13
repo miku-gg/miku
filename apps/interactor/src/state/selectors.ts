@@ -677,3 +677,14 @@ export const selectCurrentCutScenePart = createSelector(
     return cutscene.parts[currentPartIndex] || null;
   },
 );
+
+export const selectInnerThoughtsForCharacter = (state: RootState, characterId: string): string | undefined => {
+  const lastResponse = selectLastLoadedResponse(state);
+  const characterResponse = lastResponse?.characters.find((char) => char.characterId === characterId);
+  return characterResponse?.innerThoughts;
+};
+
+export const selectIsCurrentlyAtStart = (state: RootState): boolean => {
+  const currentResponse = state.narration.responses[state.narration.currentResponseId];
+  return currentResponse?.parentInteractionId === null;
+};

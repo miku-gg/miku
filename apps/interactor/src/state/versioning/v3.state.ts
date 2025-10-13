@@ -44,6 +44,7 @@ export interface NarrationResponse {
     emotion: string;
     pose: string;
     text: string;
+    innerThoughts?: string;
     reasoning?: string;
   }[];
   childrenInteractions: {
@@ -65,6 +66,8 @@ export interface NarrationState {
   id: string;
   fetching: boolean;
   currentResponseId: string;
+  disposableResponseId?: string | null; // response id created by navigateToScene
+  shouldTriggerInteractionAfterSceneChange?: boolean;
   input: {
     text: string;
     suggestions: string[];
@@ -83,6 +86,7 @@ export interface NarrationState {
   responses: {
     [id: string]: NarrationResponse | undefined;
   };
+  freeThoughtUsed?: boolean;
   seenHints?: string[];
   createdIndicatorIds?: string[];
   hasPlayedGlobalStartCutscene?: boolean;
@@ -237,6 +241,10 @@ export interface SettingsState {
     edit: {
       opened: boolean;
       id: string;
+    };
+    innerThoughts?: {
+      opened: boolean;
+      characterId: string;
     };
   };
   summaries?: {

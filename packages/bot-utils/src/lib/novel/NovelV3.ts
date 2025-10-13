@@ -58,12 +58,15 @@ export interface NovelCharacterOutfit {
   attributes: string[][];
   template: EmotionTemplateSlug;
   nsfw: NovelNSFW;
+  isFullscreen?: boolean;
   emotions: {
     id: string;
     sources: {
       png: string;
       webm?: string;
       sound?: string;
+      desktop?: string;
+      mobile?: string;
     };
   }[];
 }
@@ -71,13 +74,36 @@ export interface NovelCharacterOutfit {
 export interface CutScenePart {
   id: string;
   text: {
-    type: 'dialogue' | 'description';
+    type: 'dialogue' | 'description' | 'options';
     content: string;
+    options?: CutSceneOption[];
   }[];
   background: string;
   music?: string;
   characters: { id: string; outfitId: string; emotionId: string }[];
 }
+
+export interface CutSceneOption {
+  id: string;
+  text: string;
+  prompt: string;
+  action: CutSceneAction;
+}
+
+export type CutSceneAction =
+  | null
+  | {
+      type: 'NAVIGATE_TO_SCENE';
+      params: {
+        sceneId: string;
+    };
+  }
+  | {
+    type: 'GIVE_ITEM';
+    params: {
+      itemId: string;
+    };
+  };
 
 export interface CutScene {
   id: string;
@@ -157,6 +183,8 @@ export enum NovelActionType {
   RPG_ADD_ABILITY_TO_CHARACTER = 'RPG_ADD_ABILITY_TO_CHARACTER',
   RPG_ADD_CHARACTER_TO_PARTY = 'RPG_ADD_CHARACTER_TO_PARTY',
   RPG_CHANGE_BATTLE_OUTFIT = 'RPG_CHANGE_BATTLE_OUTFIT',
+
+  CUTSCENE_OPTION_SELECTED = 'CUTSCENE_OPTION_SELECTED',
 }
 
 export type NovelAction =
@@ -244,6 +272,14 @@ export type NovelAction =
         cutsceneId: string;
         partId: string;
         backgroundId: string;
+      };
+    }
+  | {
+      type: NovelActionType.CUTSCENE_OPTION_SELECTED;
+      params: {
+        cutsceneId: string;
+        partId: string;
+        optionId: string;
       };
     };
 

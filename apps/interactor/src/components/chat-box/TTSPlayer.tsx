@@ -57,7 +57,11 @@ const setAudioSpeed = (audioRef: React.RefObject<HTMLAudioElement>, playSpeed: S
   }
 };
 
-const TTSPlayer2: React.FC = () => {
+interface TTSPlayer2Props {
+  text?: string;
+}
+
+const TTSPlayer2: React.FC<TTSPlayer2Props> = ({ text }) => {
   const { servicesEndpoint, isProduction, freeTTS, isPublishedDemo } = useAppContext();
   const voiceId = useAppSelector((state) => state.settings.voice.voiceId);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -69,6 +73,7 @@ const TTSPlayer2: React.FC = () => {
   const { disabled } = useAppSelector((state) => state.narration.input);
   const lastCharacter = lastCharacters.find((char) => char.selected);
   const lastCharacterText = lastCharacter?.text || '';
+  const textToRead = text || lastCharacterText;
   const autoPlay = useAppSelector((state) => state.settings.voice.autoplay);
   const playSpeed = useAppSelector((state) => state.settings.voice.speed);
   const isPremium = useAppSelector((state) => state.settings.user.isPremium);
@@ -134,7 +139,7 @@ const TTSPlayer2: React.FC = () => {
   };
 
   const inferAudio = useCallback(() => {
-    const _inferenceSignature = `${lastCharacterText}.${voiceId}`;
+    const _inferenceSignature = `${textToRead}.${voiceId}`;
     stopAudio();
     if (!window.MediaSource || isFirefoxOrSafari()) {
       (async () => {
@@ -148,7 +153,7 @@ const TTSPlayer2: React.FC = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              text: replaceAll(lastCharacterText, '*', ''),
+              text: replaceAll(textToRead, '*', ''),
               voiceId,
             }),
             signal,
@@ -173,12 +178,13 @@ const TTSPlayer2: React.FC = () => {
     // eslint-disable-next-line
     // @ts-ignore
     if (_inferenceSignature === window.currentInference) {
-      if (audioRef.current) {
+      if (audioRef.current && audioRef.current.src) {
         setAudioSpeed(audioRef, playSpeed);
         audioRef.current.play();
         audioRef.current.currentTime = 0;
         return;
       }
+      // Fall through to normal fetch logic
     }
 
     // Function to initialize MediaSource and start fetching audio
@@ -208,7 +214,7 @@ const TTSPlayer2: React.FC = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            text: replaceAll(lastCharacterText, '*', ''),
+            text: replaceAll(textToRead, '*', ''),
             voiceId,
           }),
           signal,
@@ -270,7 +276,7 @@ const TTSPlayer2: React.FC = () => {
       }
       queueRef.current = [];
     };
-  }, [lastCharacterText, servicesEndpoint, voiceId, playSpeed]);
+  }, [textToRead, servicesEndpoint, voiceId, playSpeed]);
 
   useEffect(() => {
     if (autoPlay) {

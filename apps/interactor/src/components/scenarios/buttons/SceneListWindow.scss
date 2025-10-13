@@ -1,0 +1,192 @@
+.SceneListWindow__modal {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+
+  @media (max-width: 768px) {
+    margin: 80px auto 0 auto !important;
+  }
+
+  .Modal__content {
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+
+  .Modal__header {
+    display: none !important;
+  }
+
+  .Modal__overlay {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .Modal {
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+}
+
+.SceneListWindow__container {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+.SceneListWindow__header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  background: transparent;
+  flex-shrink: 0; // Prevent header from shrinking
+}
+
+.SceneListWindow__scroll-container {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  /* Mask will be applied via inline styles for dynamic behavior */
+
+  // Scrollbar styling to match project
+  &::-webkit-scrollbar {
+    width: 0.3em;
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgb(167 139 250);
+    border-radius: 100vh;
+    border: 0;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgb(196 181 253);
+  }
+
+  scrollbar-color: rgb(167 139 250) transparent;
+  scrollbar-width: auto;
+}
+
+.SceneListWindow__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0;
+}
+
+.SceneListWindow__scene-button {
+  padding: 0 !important;
+  background: black !important;
+  box-shadow: none;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  min-height: 200px;
+
+  &__content {
+    width: 100%;
+    height: 100%;
+    transition: all 0.2s ease-out;
+    padding: 16px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px;
+    z-index: 1;
+    position: relative;
+  }
+
+  &__background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.4;
+    transition: all 0.2s ease-out;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  &__text-container {
+    z-index: 1;
+  }
+
+  &__title {
+    margin-bottom: 10px;
+  }
+
+  &__title,
+  &__prompt {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.897);
+  }
+
+  &__prompt {
+    font-family: 'Courier New', Courier, monospace;
+  }
+
+  &__buttons {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 10px;
+    gap: 16px;
+    z-index: 1;
+
+    & button {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.212);
+      min-width: 115px; // Ensure consistent button width
+    }
+  }
+
+  &__characters {
+    position: absolute;
+    height: 80%;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+    z-index: 0;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  &__character-emotion {
+    height: 100%;
+    margin-left: 10px;
+    z-index: 0;
+  }
+
+  &--disabled {
+    opacity: 0.6;
+
+    .SceneListWindow__scene-button__content {
+      pointer-events: none;
+    }
+
+    .SceneListWindow__scene-button__background-image {
+      filter: grayscale(50%);
+    }
+  }
+}
