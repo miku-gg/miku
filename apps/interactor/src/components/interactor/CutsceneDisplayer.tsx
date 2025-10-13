@@ -281,22 +281,41 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
     let partIndex = currentPartIndex;
     let textIndex = currentTextIndex;
 
-    const advance = () => {
-      const currentPart = parts[partIndex];
-      if (!currentPart) {
+    const maxIterations = parts.length * 100;
+    let iterations = 0;
+
+    while (iterations < maxIterations) {
+      iterations++;
+
+      // forcing end display on edge cases
+      if (partIndex >= parts.length) {
         onEndDisplay();
         return;
       }
+
+      const currentPart = parts[partIndex];
+      if (!currentPart || !currentPart.text || currentPart.text.length === 0) {
+        onEndDisplay();
+        return;
+      }
+
+      if (textIndex >= currentPart.text.length) {
+        onEndDisplay();
+        return;
+      }
+
       const currentText = currentPart.text[textIndex];
       if (!currentText) {
         onEndDisplay();
         return;
       }
+      // end of edge cases
 
       cutsceneUtilities.addToCutsceneBuffer(currentPart, textIndex);
 
       const isLastPart = partIndex === parts.length - 1;
       const isLastText = textIndex === currentPart.text.length - 1;
+
       if (currentText.type === 'options' || (isLastPart && isLastText)) {
         dispatch(setCutscenePartIndex(partIndex));
         dispatch(setCutsceneTextIndex(textIndex));
@@ -317,11 +336,10 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         onEndDisplay();
         return;
       }
+    }
 
-      setTimeout(advance, 100);
-    };
-
-    advance();
+    // hitted max interactions, something went wrong
+    onEndDisplay();
   };
 
   useEffect(() => {
