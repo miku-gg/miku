@@ -178,12 +178,13 @@ const TTSPlayer2: React.FC<TTSPlayer2Props> = ({ text }) => {
     // eslint-disable-next-line
     // @ts-ignore
     if (_inferenceSignature === window.currentInference) {
-      if (audioRef.current) {
+      if (audioRef.current && audioRef.current.src) {
         setAudioSpeed(audioRef, playSpeed);
         audioRef.current.play();
         audioRef.current.currentTime = 0;
         return;
       }
+      // Fall through to normal fetch logic
     }
 
     // Function to initialize MediaSource and start fetching audio
