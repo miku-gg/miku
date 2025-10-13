@@ -1,0 +1,25 @@
+.EmotionSoundUpload {
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__remove {
+    &:hover {
+      background-color: #ff4444 !important;
+      color: white !important;
+    }
+  }
+
+  &__error {
+    color: #ff4444;
+    font-size: 12px;
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  &__file-input {
+    display: none;
+  }
+}

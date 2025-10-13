@@ -19,6 +19,7 @@ import InteractorHeader from './InteractorHeader';
 import Inventory from './Inventory';
 import SceneSuggestion from './SceneSuggestion';
 import EmotionRenderer from '../emotion-render/EmotionRenderer';
+import EmotionSoundPlayer from '../emotion-sound/EmotionSoundPlayer';
 import InnerThoughtsTrigger from '../inner-thoughts/InnerThoughtsTrigger';
 import InnerThoughtsModal from '../inner-thoughts/InnerThoughtsModal';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
@@ -244,6 +245,11 @@ const Interactor = () => {
               <DebugModal />
               <ModelSelectorModal />
               <RegenerateEmotionModal />
+              <EmotionSoundPlayer
+                lastCharacters={lastCharacters}
+                selectedCharacterId={displayCharacter.id}
+                assetLinkLoader={assetLinkLoader}
+              />
               <InnerThoughtsModal />
             </div>
           </>

@@ -151,6 +151,14 @@
     right: 10px;
   }
 
+  &__audio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+  }
+
   &__buttons {
     display: flex;
     gap: 20px;

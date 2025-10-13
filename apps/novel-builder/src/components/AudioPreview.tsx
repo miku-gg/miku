@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { MuteIcon, UnmuteIcon } from '@primer/octicons-react';
+import { FaPlay, FaStop } from 'react-icons/fa';
+import { Button } from '@mikugg/ui-kit';
 import './AudioPreview.scss';
 
 const AudioPreview: React.FC<{ src: string }> = ({ src }) => {
@@ -29,9 +30,13 @@ const AudioPreview: React.FC<{ src: string }> = ({ src }) => {
       <audio ref={audioRef} src={src} onEnded={() => setIsPlaying(false)}>
         Your browser does not support the audio element.
       </audio>
-      <button onClick={togglePlayPause} className="AudioPreview__play-button">
-        {isPlaying ? <MuteIcon fill="white" /> : <UnmuteIcon fill="white" />}
-      </button>
+      <Button
+        theme="transparent"
+        onClick={togglePlayPause}
+        className="AudioPreview__play-button"
+      >
+        {isPlaying ? <FaStop /> : <FaPlay />}
+      </Button>
     </div>
   );
 };
