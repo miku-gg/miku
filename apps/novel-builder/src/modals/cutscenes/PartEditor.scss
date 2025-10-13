@@ -242,9 +242,14 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        height: 450px;
-        overflow-y: auto;
         padding-right: 10px;
+      }
+
+      &__part-container {
+        border: 1px solid $node-conector-color;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
       }
 
       &__input {
@@ -263,17 +268,29 @@
 
       &__part {
         padding: 6px;
-        border: 1px solid $node-conector-color;
-        border-radius: 10px;
         gap: 8px;
 
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
 
         .Input {
           width: 100%;
         }
+
+        button:last-child,
+        .Button:last-child {
+          width: 63px !important;
+          max-width: 63px !important;
+          min-width: 63px !important;
+          flex-shrink: 0 !important;
+        }
+      }
+
+      &__option-label {
+        margin-left: 20px;
+        margin-right: auto;
+        text-align: left;
       }
 
       .last {

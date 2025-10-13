@@ -143,6 +143,13 @@
       }
     }
   }
+
+  &__mobile-inner-thoughts {
+    position: absolute;
+    top: 138px;
+    right: 8px;
+    z-index: 2;
+  }
 }
 
 @keyframes brightnessfade {

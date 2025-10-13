@@ -15,7 +15,7 @@ const InnerThoughtsModal: React.FC = () => {
     dispatch(setInnerThoughtsModal({ opened: false }));
   };
 
-  if (!isOpen || !characterId || !innerThoughts) {
+  if (!isOpen || !characterId || innerThoughts === undefined) {
     return null;
   }
 

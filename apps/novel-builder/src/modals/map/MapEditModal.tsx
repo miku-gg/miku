@@ -205,7 +205,9 @@ export default function MapEditModal() {
             {map?.places.length > 0 && (
               <div className="MapEdit__placesContainer scrollbar">
                 {map?.places.map((place) => {
-                  const mapPlace = place.previewSource || sceneBackgrounds[place.sceneId] || '';
+                  const firstSceneId = place.sceneId?.split(',')[0]?.trim() || '';
+                  const mapPlace = place.previewSource || sceneBackgrounds[firstSceneId] || '';
+                  const sceneCount = place.sceneId?.split(',').filter(id => id.trim().length > 0).length || 0;
                   return (
                     <div
                       className="MapEdit__place"
@@ -220,6 +222,15 @@ export default function MapEditModal() {
                           className="MapEdit__place__previewImage"
                           src={config.genAssetLink(mapPlace, AssetDisplayPrefix.MAP_IMAGE_PREVIEW)}
                         />
+                      )}
+                      {sceneCount > 1 && (
+                        <div 
+                          className="MapEdit__place__sceneCount"
+                          data-tooltip-id="scene-count-tooltip"
+                          data-tooltip-content={`${sceneCount} scenes in this place`}
+                        >
+                          {sceneCount}
+                        </div>
                       )}
                       <FaPencil
                         className="MapEdit__place__edit"
@@ -248,6 +259,7 @@ export default function MapEditModal() {
             />
           </div>
           <Tooltip id="place-tooltip" place="right" />
+          <Tooltip id="scene-count-tooltip" place="top" />
         </div>
       ) : null}
     </Modal>

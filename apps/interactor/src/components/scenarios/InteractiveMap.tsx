@@ -6,12 +6,15 @@ import './InteractiveMap.scss';
 import { Button, Modal } from '@mikugg/ui-kit';
 import { setMapModal } from '../../state/slices/settingsSlice';
 import { trackEvent } from '../../libs/analytics';
-import { interactionStart, setCurrentBattle } from '../../state/slices/narrationSlice';
+import { setCurrentBattle } from '../../state/slices/narrationSlice';
 import { useAppContext } from '../../App.context';
 import { setModalOpened } from '../../state/slices/creationSlice';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { getInitialBattleState } from '../../state/utils/battleUtils';
+import { navigateToScene } from '../../state/slices/narrationSlice';
+import { getAvailableScenes } from '../../state/utils/sceneUtils';
+import SceneListWindow from './buttons/SceneListWindow';
 
 const isTouchScreen = window.navigator.maxTouchPoints > 0;
 
@@ -111,7 +114,7 @@ const InteractiveMapModal = ({
   } | null;
 }) => {
   const dispatch = useAppDispatch();
-  const { servicesEndpoint, apiEndpoint, assetLinkLoader } = useAppContext();
+  const { assetLinkLoader } = useAppContext();
   const currentScene = useAppSelector(selectCurrentScene);
   const currentIndicators = useAppSelector(selectCurrentIndicators);
   const battles = useAppSelector((state) => state.novel.battles || []);
@@ -121,6 +124,8 @@ const InteractiveMapModal = ({
   const offScreenCanvasRef = useRef(document.createElement('canvas'));
   const maskImagesRef = useRef(new Map<string, HTMLImageElement>());
   const [highlightedPlaceId, setHighlightedPlaceId] = useState<string | null>(null);
+  const [showSceneSelection, setShowSceneSelection] = useState(false);
+  const [availableScenes, setAvailableScenes] = useState<string[]>([]);
   const highlightedPlace = map?.places.find((place) => place.id === highlightedPlaceId);
   const scenes = useAppSelector((state) => state.novel.scenes);
   const scene = scenes.find((scene) => scene.id === highlightedPlace?.sceneId);
@@ -300,15 +305,25 @@ const InteractiveMapModal = ({
       const selectedPlace = map?.places.find((p) => p.id === highlightedPlaceId);
       if (selectedPlace?.battleId) {
         handleStartBattle();
-      } else if (scene && selectedPlace?.sceneId !== currentScene?.id) {
-        dispatch(
-          setModalOpened({
-            id: 'scene-preview',
-            opened: true,
-            itemId: scene.id,
-          }),
-        );
-        trackEvent('scene-select');
+      } else {
+        // Get all available scenes from the place
+        const availableSceneIds = getAvailableScenes(selectedPlace?.sceneId);
+        if (availableSceneIds.length > 1) {
+          // Multiple scenes available - show scene selection modal
+          setShowSceneSelection(true);
+          setAvailableScenes(availableSceneIds);
+          trackEvent('scene-select');
+        } else if (availableSceneIds.length === 1 && availableSceneIds[0] !== currentScene?.id) {
+          // Single scene available - open directly
+          dispatch(
+            setModalOpened({
+              id: 'scene-preview',
+              opened: true,
+              itemId: availableSceneIds[0],
+            }),
+          );
+          trackEvent('scene-select');
+        }
       }
     }
   };
@@ -330,15 +345,9 @@ const InteractiveMapModal = ({
           );
         });
       dispatch(
-        interactionStart({
+        navigateToScene({
           sceneId: scene.id,
           isNewScene: true,
-          text: scene.prompt,
-          apiEndpoint,
-          characters: scene?.characters.map((r) => r.characterId) || [],
-          servicesEndpoint,
-          selectedCharacterId:
-            scene?.characters[Math.floor(Math.random() * (scene?.characters.length || 0))].characterId || '',
         }),
       );
       trackEvent('scene-select');
@@ -374,7 +383,21 @@ const InteractiveMapModal = ({
                   Start Battle
                 </Button>
               ) : highlightedPlace.sceneId !== currentScene?.id ? (
-                <Button theme="secondary" onClick={handleGoToScene}>
+                <Button
+                  theme="secondary"
+                  onClick={() => {
+                    // for mobile, we use a different approach
+                    const availableSceneIds = getAvailableScenes(highlightedPlace.sceneId);
+                    if (availableSceneIds.length > 1) {
+                      // Multiple scenes available - show scene selection modal
+                      setShowSceneSelection(true);
+                      setAvailableScenes(availableSceneIds);
+                      trackEvent('scene-select');
+                    } else {
+                      handleGoToScene();
+                    }
+                  }}
+                >
                   Go to place
                 </Button>
               ) : (
@@ -389,6 +412,11 @@ const InteractiveMapModal = ({
           </div>
         )
       ) : null}
+
+      {/* Scene List Window */}
+      {showSceneSelection && (
+        <SceneListWindow availableScenes={availableScenes} onClose={() => setShowSceneSelection(false)} />
+      )}
     </div>
   );
 };

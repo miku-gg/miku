@@ -11,20 +11,6 @@
   justify-content: center;
   pointer-events: all;
 
-  // Always present but only clickable when visible
-  &--hidden {
-    pointer-events: none;
-    opacity: 0;
-    visibility: hidden;
-  }
-
-  &--visible {
-    pointer-events: auto;
-    opacity: 1;
-    visibility: visible;
-  }
-
-  
   &__container {
     position: relative;
     min-width: 380px;
@@ -34,20 +20,12 @@
     transition: all 0.3s ease;
     animation: grow 0.3s ease forwards;
     text-align: left;
-
-    &--visible {
-      transform: scale(1) translateY(0);
-      opacity: 1;
-    }
   }
 
-  &__bg{
+  &__bg {
     position: absolute;
     inset: -15px;
-    background: linear-gradient(
-      rgba(12, 10, 29, 0.7) 0%, 
-      rgba(30, 26, 65, 0.7) 100%
-    );
+    background: linear-gradient(rgba(12, 10, 29, 0.7) 0%, rgba(30, 26, 65, 0.7) 100%);
     filter: blur(6px);
     border-radius: 24px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -63,37 +41,107 @@
     padding: 0.5rem 1rem;
   }
 
-  &__header-actions {
+  &__left-actions {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
 
-    // Ensure TTS button gets proper styling
-    .ResponseBox__voice {
-      font-family: 'Poppins', 'Roboto', sans-serif;
-      background: transparent !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
-      border-radius: 8px !important;
-      
-      &:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border-color: rgba(255, 255, 255, 0.3) !important;
-      }
-      
-      &:disabled {
-        background: transparent !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
-        opacity: 0.5;
-      }
+  &__right-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__edit-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-family: 'Poppins', 'Roboto', sans-serif;
+    font-size: 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: $text-1;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    svg {
+      font-size: 0.875rem;
     }
   }
 
-  &__title {
-    margin: 0;
+  &__save-button,
+  &__cancel-button,
+  &__clear-button {
+    border: none;
+    color: white;
     font-size: 1rem;
-    font-weight: 600;
-    color: lightgray;
+    cursor: pointer;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
     font-family: 'Poppins', 'Roboto', sans-serif;
+    font-size: 0.875rem;
+    min-width: 80px;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    svg {
+      font-size: 0.875rem;
+    }
+  }
+
+  &__save-button {
+    background: #10b981;
+
+    &:hover {
+      background: #059669;
+    }
+  }
+
+  &__cancel-button {
+    background: #ef4444;
+
+    &:hover {
+      background: #dc2626;
+    }
+  }
+
+  &__clear-button {
+    background: #6b7280;
+
+    &:hover {
+      background: #4b5563;
+    }
+  }
+
+  &__action-text {
+    font-size: 0.875rem;
+    font-weight: 500;
   }
 
   &__close-button {
@@ -122,7 +170,7 @@
     }
   }
 
-  &__body{
+  &__body {
     position: relative;
   }
 
@@ -172,6 +220,33 @@
     overflow-y: auto;
     flex-grow: 1;
   }
+
+  &__editor {
+    width: 100%;
+    min-height: 2.5em;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-family: 'Poppins', 'Roboto', sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s ease;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+    }
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
 }
 
 .InnerThoughtsBox__rnd {
@@ -184,8 +259,12 @@
 
 // Responsive design
 @media (max-width: 768px) {
-
   .InnerThoughtsBox {
+    &__container {
+      min-width: 350px;
+      width: 90%;
+    }
+
     &__content {
       padding: 0.5rem;
       height: calc(2.5 * 2.5em); // 2.5 lines with 2.5em line-height on mobile too
