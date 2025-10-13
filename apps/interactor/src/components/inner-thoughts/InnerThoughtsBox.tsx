@@ -37,7 +37,6 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
   };
 
   const handleSaveClick = () => {
-    let newText: string = editText.length === 0 ? '...' : editText;
     if (characterId && lastResponse) {
       dispatch(
         updateResponse({
@@ -45,7 +44,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
           characterId,
           text: lastResponse.characters.find((c) => c.characterId === characterId)?.text || '',
           emotion: lastResponse.characters.find((c) => c.characterId === characterId)?.emotion || '',
-          innerThoughts: newText,
+          innerThoughts: editText,
         }),
       );
     }
