@@ -18,7 +18,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
   const dispatch = useAppDispatch();
   const characterId = useAppSelector((state) => state.settings.modals.innerThoughts?.characterId || '');
   const lastResponse = useAppSelector((state) => state.narration.responses[state.narration.currentResponseId]);
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(thoughts);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -42,8 +42,8 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
         updateResponse({
           id: lastResponse.id,
           characterId,
-          text: lastResponse.characters.find(c => c.characterId === characterId)?.text || '',
-          emotion: lastResponse.characters.find(c => c.characterId === characterId)?.emotion || '',
+          text: lastResponse.characters.find((c) => c.characterId === characterId)?.text || '',
+          emotion: lastResponse.characters.find((c) => c.characterId === characterId)?.emotion || '',
           innerThoughts: editText,
         }),
       );
@@ -68,7 +68,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
           <div className="InnerThoughtsBox__left-actions">
             {isEditing ? (
               <>
-                <button 
+                <button
                   className="InnerThoughtsBox__save-button"
                   onClick={handleSaveClick}
                   aria-label="Save inner thoughts"
@@ -76,7 +76,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
                   <FaCheck />
                   <span className="InnerThoughtsBox__action-text">Save</span>
                 </button>
-                <button 
+                <button
                   className="InnerThoughtsBox__cancel-button"
                   onClick={handleCancelClick}
                   aria-label="Cancel editing"
@@ -84,7 +84,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
                   <FaTimes />
                   <span className="InnerThoughtsBox__action-text">Cancel</span>
                 </button>
-                <button 
+                <button
                   className="InnerThoughtsBox__clear-button"
                   onClick={handleClearClick}
                   aria-label="Clear inner thoughts"
@@ -97,7 +97,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
               <>
                 <TTSPlayer text={thoughts || undefined} />
                 {thoughts && characterId && (
-                  <button 
+                  <button
                     className="InnerThoughtsBox__edit-button"
                     onClick={handleEditClick}
                     aria-label="Edit inner thoughts"
@@ -134,9 +134,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
             ) : !thoughts ? (
               <p className="InnerThoughtsBox__empty">No thoughts generated.</p>
             ) : (
-                <div className="InnerThoughtsBox__thoughts-text">
-                  {thoughts}
-                </div>
+              <div className="InnerThoughtsBox__thoughts-text">{thoughts}</div>
             )}
           </div>
         </div>
