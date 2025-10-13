@@ -247,7 +247,7 @@ const Interactor = () => {
               <RegenerateEmotionModal />
               <EmotionSoundPlayer
                 lastCharacters={lastCharacters}
-                novelCharacters={characters}
+                selectedCharacterId={displayCharacter.id}
                 assetLinkLoader={assetLinkLoader}
               />
               <InnerThoughtsModal />
