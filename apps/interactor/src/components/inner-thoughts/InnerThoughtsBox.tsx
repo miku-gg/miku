@@ -95,7 +95,7 @@ const InnerThoughtsBox: React.FC<InnerThoughtsBoxProps> = ({ isVisible, thoughts
               </>
             ) : (
               <>
-                <TTSPlayer text={thoughts || undefined} />
+                <TTSPlayer text={thoughts} />
                 {thoughts && characterId && (
                   <button
                     className="InnerThoughtsBox__edit-button"
