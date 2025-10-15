@@ -110,6 +110,7 @@
     width: 1000px;
 
     .Interactor__character-container {
+      height: 100%;
       position: absolute;
       bottom: 0;
       left: 50%;
@@ -121,10 +122,12 @@
   &__character-container {
     position: absolute;
     height: 100%;
+    width: fit-content;
+    min-width: 0;
 
     .Interactor__emotion-renderer {
       position: relative;
-      width: 100%;
+      width: auto;
       height: 100%;
       filter: brightness(0.6);
       animation: none;
