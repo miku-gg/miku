@@ -313,15 +313,17 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
 
       cutsceneUtilities.addToCutsceneBuffer(currentPart, textIndex);
 
-      const isLastPart = partIndex === parts.length - 1;
-      const isLastText = textIndex === currentPart.text.length - 1;
+      const isLastPart = partIndex >= parts.length;
+      const isLastText = textIndex >= currentPart.text.length;
 
-      if (currentText.type === 'options' || (isLastPart && isLastText)) {
+      if (currentText.type === 'options') {
         dispatch(setCutscenePartIndex(partIndex));
         dispatch(setCutsceneTextIndex(textIndex));
-        if (isLastPart && isLastText) {
-          onEndDisplay();
-        }
+        return;
+      } else if (isLastPart && isLastText) {
+        dispatch(setCutscenePartIndex(partIndex));
+        dispatch(setCutsceneTextIndex(textIndex));
+        onEndDisplay();
         return;
       }
 
@@ -330,11 +332,6 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
       } else if (partIndex < parts.length - 1) {
         partIndex++;
         textIndex = 0;
-      } else {
-        dispatch(setCutscenePartIndex(partIndex));
-        dispatch(setCutsceneTextIndex(textIndex));
-        onEndDisplay();
-        return;
       }
     }
 
