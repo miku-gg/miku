@@ -201,7 +201,7 @@ console.log('Loading tokenizers...');
 Promise.all([
   // loadTokenizer(TokenizerType.LLAMA3),
   loadTokenizer(TokenizerType.NEMO),
-  // loadTokenizer(TokenizerType.DEEPSEEK),
+  loadTokenizer(TokenizerType.DEEPSEEK),
   // loadTokenizer(TokenizerType.QWEN3),
   // loadTokenizer(TokenizerType.QWQ),
   loadTokenizer(TokenizerType.MISTRAL_SMALL),
