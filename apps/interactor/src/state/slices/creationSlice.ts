@@ -109,6 +109,14 @@ export const initialState: CreationState = {
           id: '',
           outfit: '',
         },
+        {
+          id: '',
+          outfit: '',
+        },
+        {
+          id: '',
+          outfit: '',
+        },
       ],
       search: {
         opened: false,
