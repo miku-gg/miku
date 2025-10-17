@@ -42,7 +42,7 @@ const Interactor = () => {
   const currentBattle = useAppSelector((state) => state.narration.currentBattle);
   const lastCharacters = useAppSelector(selectLastLoadedCharacters);
   const displayCharacter = useAppSelector(selectLastSelectedCharacter);
-  const { fullscreenCharacter, nonFullscreenCharacters } = useFullscreenEmotions();
+  const { fullscreenCharacter } = useFullscreenEmotions();
   const backgrounds = useAppSelector((state) => state.novel.backgrounds);
   const displayingCutscene = useAppSelector(selectDisplayingCutScene);
   const shouldPlayGlobalCutscene = useAppSelector(selectShouldPlayGlobalStartCutscene);
@@ -77,6 +77,127 @@ const Interactor = () => {
     return null;
   }
   const background = backgrounds.find((b) => b.id === scene.backgroundId);
+  const selectedCharacterId = displayCharacter ? displayCharacter.id : lastCharacters[0].id;
+  let orderedCharacters = lastCharacters.filter((c) => c.image);
+  orderedCharacters =
+    displayCharacter && !orderedCharacters.some((c) => c.id === displayCharacter.id)
+      ? [...orderedCharacters, displayCharacter]
+      : orderedCharacters;
+  orderedCharacters =
+    isMobileApp || window.innerWidth < 600
+      ? reorderCharactersForCenterDisplay(orderedCharacters, displayCharacter?.id, 3)
+      : orderedCharacters;
+
+  function getDesktopCharaTransform(index: number): string {
+    let total: number = orderedCharacters.length;
+    if (total === 0) return '';
+
+    const totalSpaceWidth = 800;
+    const centralGap = 400;
+    const backgroundZ = -10;
+    const backgroundScale = 0.75;
+
+    const selectedIndex = selectedCharacterId ? orderedCharacters.findIndex((c) => c.id === selectedCharacterId) : -1;
+
+    if (index === selectedIndex) {
+      return `
+        translateX(0px)
+        translateX(-50%)
+        translateZ(0px)
+        scale(1)
+      `;
+    }
+
+    if (selectedIndex < 0) total += 1;
+
+    if (total === 1) return '';
+
+    const leftStart = -totalSpaceWidth / 2;
+    const leftEnd = -centralGap / 2;
+    const rightStart = centralGap / 2;
+    const rightEnd = totalSpaceWidth / 2;
+
+    const leftCount = Math.ceil(total / 2);
+    const rightCount = Math.floor(total / 2);
+
+    let x = 0;
+
+    if (index < leftCount) {
+      if (leftCount === 1) {
+        x = (leftStart + leftEnd) / 2;
+      } else {
+        const step = (leftEnd - leftStart) / (leftCount - 1);
+        x = leftStart + step * index;
+      }
+    } else {
+      if (rightCount === 1) {
+        x = (rightStart + rightEnd) / 2;
+      } else {
+        const step = (rightEnd - rightStart) / (rightCount - 1);
+        const rightIndex = index - leftCount;
+        x = rightStart + step * rightIndex;
+      }
+    }
+
+    return `
+      translateX(${x}px)
+      translateX(-50%)
+      translateZ(${backgroundZ}px)
+      scale(${backgroundScale})
+    `;
+  }
+
+  function getMobileCharaTransform(index: number): string {
+    const offsetX = 160;
+    const backgroundZ = -10;
+    const backgroundScale = 0.75;
+
+    const selectedIndex = selectedCharacterId ? orderedCharacters.findIndex((c) => c.id === selectedCharacterId) : -1;
+
+    if (selectedIndex < 0 || index === selectedIndex) {
+      return `
+        translateX(0px)
+        translateX(-50%)
+        translateZ(0px)
+        scale(1)
+      `;
+    }
+
+    const offsetFromSelected = index - selectedIndex;
+    const x = offsetFromSelected * offsetX;
+
+    return `
+      translateX(${x}px)
+      translateX(-50%)
+      translateZ(${backgroundZ}px)
+      scale(${backgroundScale})
+    `;
+  }
+
+  function reorderCharactersForCenterDisplay<T extends { id: string }>(
+    characters: T[],
+    selectedId: string,
+    maxCharacters?: number,
+  ): T[] {
+    const selectedIndex = characters.findIndex((c) => c.id === selectedId);
+    if (selectedIndex === -1) return characters;
+
+    const total = characters.length;
+
+    const offset = Math.floor(total / 2);
+    const rotated = [...characters.slice(selectedIndex + 1), ...characters.slice(0, selectedIndex)];
+
+    let before = rotated.slice(-offset);
+    let after = rotated.slice(0, total - 1 - offset);
+
+    if (typeof maxCharacters === 'number' && maxCharacters > 1) {
+      const sideCount = Math.floor((maxCharacters - 1) / 2);
+      before = before.slice(-sideCount);
+      after = after.slice(0, sideCount);
+    }
+
+    return [...before, characters[selectedIndex], ...after];
+  }
 
   // Inner thoughts visibility conditions
   const isMobile = isMobileApp || window.innerWidth < 768;
@@ -201,28 +322,29 @@ const Interactor = () => {
                     )
                   }
                 </ProgressiveImage>
-                <div
-                  className={classNames({
-                    Interactor__characters: true,
-                    'Interactor__characters--multiple': nonFullscreenCharacters.length > 1,
-                  })}
-                >
+                <div className="Interactor__characters-wrapper">
                   {/* Character emotions with inner thoughts triggers */}
                   {!fullscreenCharacter &&
-                    lastCharacters.map(({ id, image }) => {
+                    orderedCharacters.map(({ id, image }, index) => {
                       if (!image || displayingCutscene) {
                         return null;
                       }
                       const character = novelCharacters.find((c) => c.id === id);
                       if (!character) return null;
 
+                      const isSelected = displayCharacter?.id === id;
+
                       return (
                         <div
                           key={`character-container-${id}`}
-                          className={classNames({
-                            'Interactor__character-container': true,
-                            selected: displayCharacter?.id === id,
-                          })}
+                          className={classNames('Interactor__character-container', { selected: isSelected })}
+                          style={{
+                            transform:
+                              isMobileApp || window.innerWidth < 600
+                                ? getMobileCharaTransform(index)
+                                : getDesktopCharaTransform(index),
+                            zIndex: isSelected ? 1 : 0,
+                          }}
                         >
                           <EmotionRenderer
                             key={`character-emotion-render-${id}`}
@@ -231,7 +353,7 @@ const Interactor = () => {
                             upDownAnimation
                             className="Interactor__emotion-renderer"
                           />
-                          {displayCharacter?.id === id && showDesktopInnerThoughts && (
+                          {isSelected && showDesktopInnerThoughts && (
                             <InnerThoughtsTrigger characterId={id} />
                           )}
                         </div>

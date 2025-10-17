@@ -83,57 +83,51 @@
     object-fit: none;
   }
 
-  &__characters {
-    position: absolute;
-    bottom: 0;
-    height: 90%;
-    object-fit: cover;
-    transition: all 0.2s ease-in;
-    user-select: none;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-
   &__emotion-renderer {
     opacity: 0;
     z-index: 0;
     object-fit: contain;
+    object-position: bottom;
     height: 100%;
     transition: all 0.2s ease-out;
     animation: up-and-down 3s ease-in-out infinite;
     -webkit-user-drag: none;
   }
 
-  &__characters--multiple {
-    opacity: 1;
+  &__characters-wrapper {
+    position: absolute;
+    bottom: 0;
+    height: 90%;
+    object-fit: cover;
+    transition: all 0.2s ease-in;
+    user-select: none;
+    display: flex;
+    justify-content: center;
     z-index: 1;
-    display: initial;
-    justify-content: initial;
+    transform-origin: center bottom;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1000px;
 
     .Interactor__character-container {
-      position: absolute;
       height: 100%;
-
-      &:first-child {
-        left: 25%;
-        transform: translateX(-50%);
-      }
-
-      &:last-child {
-        right: 25%;
-        transform: translateX(50%);
-      }
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform-origin: center bottom;
+      transition: transform 0.4s ease;
     }
   }
 
   &__character-container {
     position: absolute;
     height: 100%;
+    width: fit-content;
+    min-width: 0;
 
     .Interactor__emotion-renderer {
       position: relative;
-      width: 100%;
+      width: auto;
       height: 100%;
       filter: brightness(0.6);
       animation: none;
