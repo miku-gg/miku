@@ -41,28 +41,6 @@ export const selectEditingCharacterObjective = createSelector(
     return undefined;
   },
 );
-
-// Selector that can work with any character ID
-export const selectCharacterObjectiveById = (characterId: string, objectiveId: string) =>
-  createSelector([(state: RootState) => state.novel.characters], (characters) => {
-    const character = characters.find((c) => c.id === characterId);
-    if (!character || !character.objectives) return undefined;
-
-    const objective = character.objectives.find((obj) => obj.id === objectiveId);
-    if (objective) {
-      return { ...objective, _characterId: character.id };
-    }
-
-    return undefined;
-  });
-
-// Selector to get all objectives for a specific character
-export const selectCharacterObjectives = (characterId: string) =>
-  createSelector([(state: RootState) => state.novel.characters], (characters) => {
-    const character = characters.find((c) => c.id === characterId);
-    return character?.objectives || [];
-  });
-
 export const selectInventory = (state: RootState) => state.novel.inventory;
 export const selectEditingInventoryItem = createSelector(
   [(state: RootState) => state.input.modals.editInventoryItem, selectInventory],
