@@ -1,5 +1,5 @@
 import { NovelV3 } from '@mikugg/bot-utils';
-import { Button, Tooltip } from '@mikugg/ui-kit';
+import { AreYouSure, Button, Tooltip } from '@mikugg/ui-kit';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { v4 as randomUUID } from 'uuid';
@@ -32,6 +32,7 @@ export const getTextFromActionType = (type: NovelV3.NovelActionType) => {
 
 export const CharacterObjectives = ({ characterId }: CharacterObjectivesProps) => {
   const dispatch = useAppDispatch();
+  const areYouSure = AreYouSure.useAreYouSure();
   const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === characterId));
   const objectives = character?.objectives || [];
 
@@ -60,7 +61,13 @@ export const CharacterObjectives = ({ characterId }: CharacterObjectivesProps) =
   };
 
   const handleDeleteObjective = (objectiveId: string) => {
-    dispatch(deleteObjectiveFromCharacter({ characterId, objectiveId }));
+    areYouSure.openModal({
+      title: 'Are you sure?',
+      description: 'This objective will be deleted. This action cannot be undone.',
+      onYes: () => {
+        dispatch(deleteObjectiveFromCharacter({ characterId, objectiveId }));
+      },
+    });
   };
 
   return (
@@ -71,7 +78,7 @@ export const CharacterObjectives = ({ characterId }: CharacterObjectivesProps) =
           <IoInformationCircleOutline
             data-tooltip-id="Info-character-objective"
             className="CharacterObjectivesEdit__header__title__infoIcon"
-            data-tooltip-content="Objectives specific to this character that define their goals and behaviors."
+            data-tooltip-content="Objectives that are relevant to this character in all scenes."
           />
           <Tooltip id="Info-character-objective" place="top" />
         </div>

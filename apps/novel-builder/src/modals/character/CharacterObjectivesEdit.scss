@@ -49,10 +49,6 @@
       &:hover {
         background-color: rgba(27, 33, 66, 0.5);
         border-color: $secondary-color;
-
-        .CharacterObjectivesEdit__container__actions {
-          opacity: 1;
-        }
       }
 
       & h3 {
@@ -76,7 +72,7 @@
       right: 12px;
       display: flex;
       gap: 8px;
-      opacity: 0;
+      opacity: 1;
       transition: opacity 0.2s ease;
     }
 
@@ -87,6 +83,7 @@
       transition: all 0.2s ease;
       padding: 4px;
       border-radius: 4px;
+      font-size: 25px;
 
       &:hover {
         color: $secondary-color;
