@@ -1,0 +1,146 @@
+@import '../../styles/variables.scss';
+
+.CharacterObjectivesEdit {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &__infoIcon {
+        width: 1.2rem;
+        height: 1.2rem;
+        color: #8489bd;
+      }
+    }
+
+    & h2 {
+      margin: 0;
+    }
+  }
+
+  &__container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 16px;
+
+    &__box {
+      display: flex;
+      width: 100%;
+      min-width: 300px;
+      min-height: 120px;
+    }
+
+    &__objective {
+      position: relative;
+      border: 1px solid $node-conector-color;
+      padding: 16px;
+      border-radius: 16px;
+      width: 100%;
+      background-color: rgba(27, 33, 66, 0.3);
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: rgba(27, 33, 66, 0.5);
+        border-color: $secondary-color;
+
+        .CharacterObjectivesEdit__container__actions {
+          opacity: 1;
+        }
+      }
+
+      & h3 {
+        margin: 0 0 8px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      & p {
+        margin: 4px 0;
+        color: #b0b0b0;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+    }
+
+    &__actions {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    &__edit,
+    &__delete {
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 4px;
+      border-radius: 4px;
+
+      &:hover {
+        color: $secondary-color;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    &__delete:hover {
+      color: #ff6b6b;
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    color: #8489bd;
+    font-style: italic;
+    padding: 40px 20px;
+    background-color: rgba(27, 33, 66, 0.2);
+    border-radius: 12px;
+    border: 1px dashed $node-conector-color;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .CharacterObjectivesEdit {
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    &__container {
+      &__box {
+        min-width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .CharacterObjectivesEdit {
+    &__container {
+      &__objective {
+        padding: 12px;
+
+        & h3 {
+          font-size: 1rem;
+        }
+
+        & p {
+          font-size: 0.85rem;
+        }
+      }
+    }
+  }
+}

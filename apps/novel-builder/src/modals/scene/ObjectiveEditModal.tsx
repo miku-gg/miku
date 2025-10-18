@@ -1,9 +1,14 @@
 import { AreYouSure, Button, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 
 import { useDispatch } from 'react-redux';
-import { selectEditingObjective } from '../../state/selectors';
+import { selectEditingObjective, selectEditingCharacterObjective } from '../../state/selectors';
 import { closeModal } from '../../state/slices/inputSlice';
-import { deleteObjective, updateObjective } from '../../state/slices/novelFormSlice';
+import {
+  deleteObjective,
+  updateObjective,
+  updateObjectiveInCharacter,
+  deleteObjectiveFromCharacter,
+} from '../../state/slices/novelFormSlice';
 import { useAppSelector } from '../../state/store';
 
 import { NovelV3 } from '@mikugg/bot-utils';
@@ -16,16 +21,50 @@ import './ObjectiveEditModal.scss';
 export default function ObjectiveEditModal() {
   const dispatch = useDispatch();
   const areYouSure = AreYouSure.useAreYouSure();
-  const objective = useAppSelector(selectEditingObjective);
+  const globalObjective = useAppSelector(selectEditingObjective);
+  const characterObjective = useAppSelector(selectEditingCharacterObjective);
+
+  // Determine which objective we're editing
+  const objective = globalObjective || characterObjective;
+  const isCharacterObjective = !!characterObjective;
+
+  const handleUpdateObjective = (updatedObjective: NovelV3.NovelObjective) => {
+    if (!objective) return;
+    if (isCharacterObjective) {
+      dispatch(
+        updateObjectiveInCharacter({
+          characterId: (characterObjective as any)._characterId,
+          objectiveId: objective.id,
+          objective: updatedObjective,
+        }),
+      );
+    } else {
+      dispatch(
+        updateObjective({
+          id: objective.id,
+          objective: updatedObjective,
+        }),
+      );
+    }
+  };
 
   const handleDeleteObjective = () => {
     if (!objective) return;
     areYouSure.openModal({
       title: 'Are you sure?',
-      description: 'This map will be deleted. This action cannot be undone.',
+      description: 'This objective will be deleted. This action cannot be undone.',
       onYes: () => {
         dispatch(closeModal({ modalType: 'objectiveEdit' }));
-        dispatch(deleteObjective({ id: objective.id }));
+        if (isCharacterObjective) {
+          dispatch(
+            deleteObjectiveFromCharacter({
+              characterId: (characterObjective as any)._characterId,
+              objectiveId: objective.id,
+            }),
+          );
+        } else {
+          dispatch(deleteObjective({ id: objective.id }));
+        }
       },
     });
   };
@@ -61,30 +100,20 @@ export default function ObjectiveEditModal() {
                 label="Name"
                 value={objective.name || ''}
                 onChange={(e) => {
-                  dispatch(
-                    updateObjective({
-                      id: objective.id,
-                      objective: {
-                        ...objective,
-                        name: e.target.value,
-                      },
-                    }),
-                  );
+                  handleUpdateObjective({
+                    ...objective,
+                    name: e.target.value,
+                  });
                 }}
               />
               <Input
                 label="Description"
                 value={objective.description || ''}
                 onChange={(e) => {
-                  dispatch(
-                    updateObjective({
-                      id: objective.id,
-                      objective: {
-                        ...objective,
-                        description: e.target.value,
-                      },
-                    }),
-                  );
+                  handleUpdateObjective({
+                    ...objective,
+                    description: e.target.value,
+                  });
                 }}
               />
               <Input
@@ -93,15 +122,10 @@ export default function ObjectiveEditModal() {
                 placeHolder="Try to find the key in the room."
                 value={objective.hint || ''}
                 onChange={(e) => {
-                  dispatch(
-                    updateObjective({
-                      id: objective.id,
-                      objective: {
-                        ...objective,
-                        hint: e.target.value,
-                      },
-                    }),
-                  );
+                  handleUpdateObjective({
+                    ...objective,
+                    hint: e.target.value,
+                  });
                 }}
                 maxLength={34}
               />
@@ -112,15 +136,10 @@ export default function ObjectiveEditModal() {
                 placeHolder="{{user}} found the door's key."
                 value={objective.condition || ''}
                 onChange={(e) => {
-                  dispatch(
-                    updateObjective({
-                      id: objective.id,
-                      objective: {
-                        ...objective,
-                        condition: e.target.value,
-                      },
-                    }),
-                  );
+                  handleUpdateObjective({
+                    ...objective,
+                    condition: e.target.value,
+                  });
                 }}
               />
             </div>
@@ -140,23 +159,18 @@ export default function ObjectiveEditModal() {
                   <Button
                     theme="secondary"
                     onClick={() => {
-                      dispatch(
-                        updateObjective({
-                          id: objective.id,
-                          objective: {
-                            ...objective,
-                            actions: [
-                              ...(objective.actions || []),
-                              {
-                                type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
-                                params: {
-                                  sceneId: '',
-                                },
-                              },
-                            ],
+                      handleUpdateObjective({
+                        ...objective,
+                        actions: [
+                          ...(objective.actions || []),
+                          {
+                            type: NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE,
+                            params: {
+                              sceneId: '',
+                            },
                           },
-                        }),
-                      );
+                        ],
+                      });
                     }}
                   >
                     Add action
@@ -170,30 +184,20 @@ export default function ObjectiveEditModal() {
                       <NovelActionForm
                         action={action}
                         onChange={(novelAction) => {
-                          dispatch(
-                            updateObjective({
-                              id: objective.id,
-                              objective: {
-                                ...objective,
-                                actions: [
-                                  ...objective.actions.slice(0, index),
-                                  novelAction,
-                                  ...objective.actions.slice(index + 1),
-                                ],
-                              },
-                            }),
-                          );
+                          handleUpdateObjective({
+                            ...objective,
+                            actions: [
+                              ...objective.actions.slice(0, index),
+                              novelAction,
+                              ...objective.actions.slice(index + 1),
+                            ],
+                          });
                         }}
                         onDelete={() => {
-                          dispatch(
-                            updateObjective({
-                              id: objective.id,
-                              objective: {
-                                ...objective,
-                                actions: [...objective.actions.slice(0, index), ...objective.actions.slice(index + 1)],
-                              },
-                            }),
-                          );
+                          handleUpdateObjective({
+                            ...objective,
+                            actions: [...objective.actions.slice(0, index), ...objective.actions.slice(index + 1)],
+                          });
                         }}
                       />
                     );

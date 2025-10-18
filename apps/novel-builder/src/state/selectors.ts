@@ -19,6 +19,50 @@ export const selectEditingObjective = createSelector(
     return objectives?.find((objective) => objective.id === modal.editId);
   },
 );
+
+// Selector to get the editing character objective
+export const selectEditingCharacterObjective = createSelector(
+  [
+    (state: RootState) => state.input.modals.objectiveEdit,
+    (state: RootState) => state.novel.characters,
+    (state: RootState) => state.input.modals.character?.editId,
+  ],
+  (modal, characters, characterId) => {
+    if (!modal.opened || !characterId) return undefined;
+
+    const character = characters.find((c) => c.id === characterId);
+    if (!character || !character.objectives) return undefined;
+
+    const characterObjective = character.objectives.find((objective) => objective.id === modal.editId);
+    if (characterObjective) {
+      return { ...characterObjective, _characterId: character.id };
+    }
+
+    return undefined;
+  },
+);
+
+// Selector that can work with any character ID
+export const selectCharacterObjectiveById = (characterId: string, objectiveId: string) =>
+  createSelector([(state: RootState) => state.novel.characters], (characters) => {
+    const character = characters.find((c) => c.id === characterId);
+    if (!character || !character.objectives) return undefined;
+
+    const objective = character.objectives.find((obj) => obj.id === objectiveId);
+    if (objective) {
+      return { ...objective, _characterId: character.id };
+    }
+
+    return undefined;
+  });
+
+// Selector to get all objectives for a specific character
+export const selectCharacterObjectives = (characterId: string) =>
+  createSelector([(state: RootState) => state.novel.characters], (characters) => {
+    const character = characters.find((c) => c.id === characterId);
+    return character?.objectives || [];
+  });
+
 export const selectInventory = (state: RootState) => state.novel.inventory;
 export const selectEditingInventoryItem = createSelector(
   [(state: RootState) => state.input.modals.editInventoryItem, selectInventory],
