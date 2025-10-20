@@ -181,3 +181,9 @@ export const selectEditingCutscenePart = createSelector(
       ?.parts.find((part) => part.id === modal.editId);
   },
 );
+
+export const selectGlobalVariables = (state: RootState) => state.novel.globalVariables || [];
+export const selectGlobalVariableById = createSelector(
+  [selectGlobalVariables, (_: RootState, id: string) => id],
+  (list, id) => list.find((g) => g.id === id),
+);

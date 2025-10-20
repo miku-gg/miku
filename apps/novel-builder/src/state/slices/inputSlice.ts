@@ -21,9 +21,9 @@ export type ModalType =
   | 'cutscenePartEdit'
   | 'scene';
 
-export type PanelType = 'details' | 'assets' | 'maps' | 'scenes' | 'starts' | 'preview';
+export type PanelType = 'details' | 'assets' | 'maps' | 'scenes' | 'starts' | 'preview' | 'globals';
 export const isPanelType = (panel: string): panel is PanelType =>
-  ['details', 'assets', 'maps', 'scenes', 'starts', 'preview'].includes(panel);
+  ['details', 'assets', 'maps', 'scenes', 'starts', 'preview', 'globals'].includes(panel);
 
 export interface InputState {
   navigation: {

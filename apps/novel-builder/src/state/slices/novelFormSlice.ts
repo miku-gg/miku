@@ -43,6 +43,7 @@ const initialState: NovelV3.NovelState & { pendingInferences?: PendingInference[
   inventory: [],
   cutscenes: [],
   language: 'en',
+  globalVariables: [],
   pendingInferences: [],
 };
 
@@ -50,6 +51,51 @@ const novelFormSlice = createSlice({
   name: 'novel',
   initialState,
   reducers: {
+    createGlobal: (state, action: PayloadAction<{ id: string }>) => {
+      if (!state.globalVariables) state.globalVariables = [];
+      state.globalVariables.push({
+        id: action.payload.id,
+        name: '',
+        description: '',
+        type: 'number',
+        value: 0,
+      });
+    },
+    updateGlobal: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        changes: Partial<Pick<NovelV3.GlobalVariable, 'name' | 'description' | 'type' | 'value'>>;
+      }>,
+    ) => {
+      const list = state.globalVariables;
+      if (!list) return;
+      const index = list.findIndex((g) => g.id === action.payload.id);
+      if (index === -1) return;
+      const current = list[index];
+      const next: NovelV3.GlobalVariable = { ...current, ...action.payload.changes } as NovelV3.GlobalVariable;
+      if (action.payload.changes.type && action.payload.changes.type !== current.type) {
+        if (action.payload.changes.type === 'string') {
+          next.value = String(current.value ?? 0);
+        } else if (action.payload.changes.type === 'number') {
+          const n = Number(current.value);
+          next.value = Number.isFinite(n) ? n : 0;
+        }
+      }
+      list[index] = next;
+    },
+    deleteGlobal: (state, action: PayloadAction<string>) => {
+      if (!state.globalVariables) return;
+      state.globalVariables = state.globalVariables.filter((g) => g.id !== action.payload);
+    },
+    reorderGlobals: (state, action: PayloadAction<{ from: number; to: number }>) => {
+      const list = state.globalVariables;
+      if (!list) return;
+      const { from, to } = action.payload;
+      if (from < 0 || to < 0 || from >= list.length || to >= list.length) return;
+      const [item] = list.splice(from, 1);
+      list.splice(to, 0, item);
+    },
     addChildScene: (state, action: PayloadAction<{ sourceId: string; targetId: string }>) => {
       const { sourceId, targetId } = action.payload;
       const sourceScene = state.scenes.find((scene) => scene.id === sourceId);
@@ -407,13 +453,18 @@ const novelFormSlice = createSlice({
       if (!map) return;
       const place = map.places.find((place) => place.id === action.payload.placeId);
       if (!place) return;
-      
+
       // Parse existing sceneIds
-      const existingSceneIds = place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0) : [];
+      const existingSceneIds = place.sceneId
+        ? place.sceneId
+            .split(',')
+            .map((id) => id.trim())
+            .filter((id) => id.length > 0)
+        : [];
       // Add the new sceneId if it doesn't already exist
       if (!existingSceneIds.includes(action.payload.sceneId)) {
         existingSceneIds.push(action.payload.sceneId);
-      }      
+      }
       // Update with comma-separated string
       place.sceneId = existingSceneIds.join(',');
     },
@@ -422,9 +473,14 @@ const novelFormSlice = createSlice({
       if (!map) return;
       const place = map.places.find((place) => place.id === action.payload.placeId);
       if (!place) return;
-      
+
       // Parse existing sceneIds
-      const existingSceneIds = place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0) : [];
+      const existingSceneIds = place.sceneId
+        ? place.sceneId
+            .split(',')
+            .map((id) => id.trim())
+            .filter((id) => id.length > 0)
+        : [];
       // Remove the sceneId
       const updatedSceneIds = existingSceneIds.filter((id) => id !== action.payload.sceneId);
       // Update with comma-separated string
@@ -595,7 +651,10 @@ const novelFormSlice = createSlice({
         action: null,
       });
     },
-    updateCutsceneOption: (state, action: PayloadAction<{ cutsceneId: string; partId: string; optionId: string; option: NovelV3.CutSceneOption }>) => {
+    updateCutsceneOption: (
+      state,
+      action: PayloadAction<{ cutsceneId: string; partId: string; optionId: string; option: NovelV3.CutSceneOption }>,
+    ) => {
       const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
       if (!cutscene) return;
       const part = cutscene.parts.find((part) => part.id === action.payload.partId);
@@ -614,7 +673,7 @@ const novelFormSlice = createSlice({
 
       part.options = part.options.filter((option) => option.id !== action.payload.optionId);
     },
-    
+
     reorderStart: (state, action: PayloadAction<{ startId: string; direction: 'up' | 'down' }>) => {
       const { startId, direction } = action.payload;
       const currentIndex = state.starts.findIndex((start) => start.id === startId);
@@ -858,6 +917,10 @@ export const {
   addPendingInference,
   updateInferenceStatus,
   removePendingInference,
+  createGlobal,
+  updateGlobal,
+  deleteGlobal,
+  reorderGlobals,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

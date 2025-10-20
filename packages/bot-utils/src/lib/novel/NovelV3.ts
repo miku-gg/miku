@@ -96,14 +96,14 @@ export type CutSceneAction =
       type: 'NAVIGATE_TO_SCENE';
       params: {
         sceneId: string;
-    };
-  }
+      };
+    }
   | {
-    type: 'GIVE_ITEM';
-    params: {
-      itemId: string;
+      type: 'GIVE_ITEM';
+      params: {
+        itemId: string;
+      };
     };
-  };
 
 export interface CutScene {
   id: string;
@@ -142,6 +142,14 @@ export interface NovelSong {
   description: string;
   tags: string[];
   source: string;
+}
+
+export interface GlobalVariable {
+  id: string;
+  name: string;
+  description: string;
+  type: 'number' | 'string';
+  value: string | number;
 }
 
 export interface NovelMap {
@@ -349,6 +357,7 @@ export interface NovelState {
   useModalForStartSelection?: boolean;
   rpg?: NovelRPG;
   battles?: NovelBattle[];
+  globalVariables?: GlobalVariable[];
 }
 
 export interface NovelIndicator {

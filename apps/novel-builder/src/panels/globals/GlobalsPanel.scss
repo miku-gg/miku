@@ -1,0 +1,55 @@
+.GlobalsPanel {
+  h1 {
+    margin-bottom: 12px;
+  }
+  &__actions {
+    margin-bottom: 12px;
+  }
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  &__row {
+    display: grid;
+    grid-template-columns: 40px 1fr 180px 2fr 160px;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+  }
+  &__cell--index {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+  }
+  &__cell--type {
+    display: flex;
+    align-items: center;
+  }
+  &__cell--actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+}
+
+/* Ensure controls look aligned within the row */
+.GlobalsPanel .Input {
+  margin: 0;
+}
+
+/* Align label + control stacks to match Input layout */
+.GlobalsPanel .GlobalsPanel__cell--type .Input__label,
+.GlobalsPanel .GlobalsPanel__cell--actions .Input__label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.GlobalsPanel .GlobalsPanel__cell--actions {
+  flex-direction: column;
+  align-items: flex-end;
+}
