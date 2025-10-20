@@ -5,7 +5,6 @@ import { BiCameraMovie, BiSolidSave } from 'react-icons/bi';
 import { GiPathDistance } from 'react-icons/gi';
 import { LuMonitorPlay, LuTextQuote } from 'react-icons/lu';
 import { MdOutlinePermMedia, MdOutlineRestartAlt } from 'react-icons/md';
-import { AiOutlineGlobal } from 'react-icons/ai';
 import { TbBoxMultiple } from 'react-icons/tb';
 import { toast } from 'react-toastify';
 import ButtonGroup from '../components/ButtonGroup';
@@ -20,7 +19,6 @@ import { useAppDispatch, useAppSelector } from '../state/store';
 import HomePanel from './HomePanel';
 import './PanelExplorer.scss';
 import AssetsPanel from './assets/AssetsPanel';
-import GlobalsPanel from './globals/GlobalsPanel';
 import DetailsPanel from './details/DetailsPanel';
 import { MapList } from './maps/MapList';
 import PreviewPanel from './preview/PreviewPanel';
@@ -55,14 +53,6 @@ function PanelExplorer() {
                   </>
                 ),
                 value: 'details',
-              },
-              {
-                content: (
-                  <>
-                    <AiOutlineGlobal /> <span>Globals</span>
-                  </>
-                ),
-                value: 'globals',
               },
               {
                 content: (
@@ -178,7 +168,6 @@ function PanelExplorer() {
       <div className="PanelExplorer__content">
         {selectedPanel === 'details' ? <DetailsPanel /> : null}
         {selectedPanel === 'assets' ? <AssetsPanel /> : null}
-        {selectedPanel === 'globals' ? <GlobalsPanel /> : null}
         {selectedPanel === 'scenes' ? <SceneGraph /> : null}
         {selectedPanel === 'maps' ? <MapList /> : null}
         {selectedPanel === 'starts' ? <StartsPanel /> : null}

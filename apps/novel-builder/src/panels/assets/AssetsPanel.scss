@@ -1,6 +1,9 @@
 .AssetsPanel {
   &__header {
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   &__groups {
     display: flex;

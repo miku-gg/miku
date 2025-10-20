@@ -19,11 +19,12 @@ export type ModalType =
   | 'errors'
   | 'cutscenes'
   | 'cutscenePartEdit'
-  | 'scene';
+  | 'scene'
+  | 'globalVariableEdit';
 
-export type PanelType = 'details' | 'assets' | 'maps' | 'scenes' | 'starts' | 'preview' | 'globals';
+export type PanelType = 'details' | 'assets' | 'maps' | 'scenes' | 'starts' | 'preview';
 export const isPanelType = (panel: string): panel is PanelType =>
-  ['details', 'assets', 'maps', 'scenes', 'starts', 'preview', 'globals'].includes(panel);
+  ['details', 'assets', 'maps', 'scenes', 'starts', 'preview'].includes(panel);
 
 export interface InputState {
   navigation: {
@@ -103,6 +104,9 @@ const initialState: InputState = {
       opened: false,
     },
     errors: {
+      opened: false,
+    },
+    globalVariableEdit: {
       opened: false,
     },
   },
