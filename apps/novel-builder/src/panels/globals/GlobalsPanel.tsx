@@ -14,6 +14,7 @@ export default function GlobalsPanel() {
   const typeItems = [
     { name: 'number', value: 'number' },
     { name: 'string', value: 'string' },
+    { name: 'boolean', value: 'boolean' },
   ];
 
   return (
@@ -50,7 +51,12 @@ export default function GlobalsPanel() {
                     items={typeItems}
                     selectedIndex={typeItems.findIndex((t) => t.value === v.type)}
                     onChange={(i) =>
-                      dispatch(updateGlobal({ id: v.id, changes: { type: typeItems[i].value as 'number' | 'string' } }))
+                      dispatch(
+                        updateGlobal({
+                          id: v.id,
+                          changes: { type: typeItems[i].value as 'number' | 'string' | 'boolean' },
+                        }),
+                      )
                     }
                   />
                 </div>
@@ -67,6 +73,18 @@ export default function GlobalsPanel() {
                       value={String(v.value ?? '')}
                       onChange={(e) => dispatch(updateGlobal({ id: v.id, changes: { value: e.target.value } }))}
                       maxLength={512}
+                    />
+                  ) : v.type === 'boolean' ? (
+                    <Dropdown
+                      items={[
+                        { name: 'true', value: 'true' },
+                        { name: 'false', value: 'false' },
+                      ]}
+                      selectedIndex={v.value === true ? 0 : 1}
+                      onChange={(i) => {
+                        const boolValue = i === 0;
+                        dispatch(updateGlobal({ id: v.id, changes: { value: boolValue } }));
+                      }}
                     />
                   ) : (
                     <Input

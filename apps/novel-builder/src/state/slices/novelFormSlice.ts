@@ -80,6 +80,8 @@ const novelFormSlice = createSlice({
         } else if (action.payload.changes.type === 'number') {
           const n = Number(current.value);
           next.value = Number.isFinite(n) ? n : 0;
+        } else if (action.payload.changes.type === 'boolean') {
+          next.value = false;
         }
       }
       list[index] = next;

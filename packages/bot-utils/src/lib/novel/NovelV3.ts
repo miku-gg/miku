@@ -148,8 +148,8 @@ export interface GlobalVariable {
   id: string;
   name: string;
   description: string;
-  type: 'number' | 'string';
-  value: string | number;
+  type: 'number' | 'string' | 'boolean';
+  value: string | number | boolean;
 }
 
 export interface NovelMap {
