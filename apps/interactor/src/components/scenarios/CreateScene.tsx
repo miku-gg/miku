@@ -42,24 +42,21 @@ import { useI18n } from '../../libs/i18n';
 // Selector to get all character IDs that have been met in visited scenes
 // This uses a more efficient approach by limiting to recent scenes only
 const selectMetCharacterIds = createSelector(
-  [
-    (state: RootState) => state.novel.scenes,
-    selectCurrentScene,
-    selectAllParentScenesIds,
-  ],
+  [(state: RootState) => state.novel.scenes, selectCurrentScene, selectAllParentScenesIds],
   (scenes, currentScene, visitedSceneIds) => {
-    const metCharacterIds = new Set<string>(); 
-    if (currentScene) { // Always include characters from the current scene
-      currentScene.characters.forEach(char => {
+    const metCharacterIds = new Set<string>();
+    if (currentScene) {
+      // Always include characters from the current scene
+      currentScene.characters.forEach((char) => {
         metCharacterIds.add(char.characterId);
       });
     }
     // Limit to the last 100 scenes to avoid performance issues
     const recentSceneIds = visitedSceneIds.slice(-100);
-    recentSceneIds.forEach(sceneId => {
-      const scene = scenes.find(s => s.id === sceneId);
+    recentSceneIds.forEach((sceneId) => {
+      const scene = scenes.find((s) => s.id === sceneId);
       if (scene) {
-        scene.characters.forEach(char => {
+        scene.characters.forEach((char) => {
           metCharacterIds.add(char.characterId);
         });
       }
@@ -70,7 +67,7 @@ const selectMetCharacterIds = createSelector(
 
 const selectSelectableCharacters = createSelector(
   [
-    (state: RootState) => state.novel.characters, 
+    (state: RootState) => state.novel.characters,
     (state: RootState) => state.creation.importedCharacters,
     selectMetCharacterIds,
   ],
@@ -282,7 +279,7 @@ const CreateScene = () => {
                 setMusic(
                   musicList.find((m) => m.name === value.name) || {
                     name: value.name,
-                    source: value.source?.split('/')?.pop() || value.source,
+                    source: value.source,
                   },
                 ),
               );
