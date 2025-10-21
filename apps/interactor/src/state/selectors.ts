@@ -688,3 +688,5 @@ export const selectIsCurrentlyAtStart = (state: RootState): boolean => {
   const currentResponse = state.narration.responses[state.narration.currentResponseId];
   return currentResponse?.parentInteractionId === null;
 };
+
+export const selectGlobalVariables = (state: RootState) => state.novel.globalVariables || [];
