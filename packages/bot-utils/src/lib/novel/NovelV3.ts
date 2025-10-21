@@ -200,6 +200,7 @@ export enum NovelActionType {
   RPG_ADD_ABILITY_TO_CHARACTER = 'RPG_ADD_ABILITY_TO_CHARACTER',
   RPG_ADD_CHARACTER_TO_PARTY = 'RPG_ADD_CHARACTER_TO_PARTY',
   RPG_CHANGE_BATTLE_OUTFIT = 'RPG_CHANGE_BATTLE_OUTFIT',
+  SET_GLOBAL_VARIABLE = 'SET_GLOBAL_VARIABLE',
 
   CUTSCENE_OPTION_SELECTED = 'CUTSCENE_OPTION_SELECTED',
 }
@@ -289,6 +290,15 @@ export type NovelAction =
         cutsceneId: string;
         partId: string;
         backgroundId: string;
+      };
+    }
+  | {
+      type: NovelActionType.SET_GLOBAL_VARIABLE;
+      params: {
+        variables: Array<{
+          variableId: string;
+          value: string | number | boolean;
+        }>;
       };
     }
   | {

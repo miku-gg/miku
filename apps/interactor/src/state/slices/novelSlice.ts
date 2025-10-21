@@ -186,6 +186,23 @@ const novelSlice = createSlice({
         }
       }
     },
+    setGlobalVariable: (
+      state,
+      action: PayloadAction<{
+        variables: Array<{
+          variableId: string;
+          value: string | number | boolean;
+        }>;
+      }>,
+    ) => {
+      if (!state.globalVariables) state.globalVariables = [];
+      action.payload.variables.forEach(({ variableId, value }) => {
+        const variable = state.globalVariables?.find((v) => v.id === variableId);
+        if (variable) {
+          variable.value = value;
+        }
+      });
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -209,6 +226,7 @@ export const {
   addCharacterToParty,
   changeCharacterBattleOutfit,
   changeCutscenePartBackground,
+  setGlobalVariable,
 } = novelSlice.actions;
 
 export default novelSlice.reducer;
