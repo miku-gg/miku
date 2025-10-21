@@ -65,12 +65,39 @@
       gap: 10px;
     }
     &__actions {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+
       &__button {
         width: 100%;
         display: flex;
         justify-content: flex-end;
         align-items: center;
       }
+    }
+    &__variable-conditions {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+
+      &-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      &-item {
+        position: relative;
+      }
+    }
+
+    &__no-conditions {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-style: italic;
     }
   }
 }

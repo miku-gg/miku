@@ -152,6 +152,15 @@ export interface GlobalVariable {
   value: string | number | boolean;
 }
 
+export type VariableConditionOperator = 'EQUAL' | 'NOT_EQUAL' | 'LESS_THAN' | 'GREATER_THAN';
+
+export interface VariableCondition {
+  id: string;
+  variableId: string;
+  operator: VariableConditionOperator;
+  value: string | number | boolean;
+}
+
 export interface NovelMap {
   id: string;
   name: string;
@@ -326,6 +335,7 @@ export interface NovelObjective {
   description?: string;
   stateCondition: StateCondition;
   condition: string;
+  variableConditions?: VariableCondition[];
   singleUse: boolean;
   actions: NovelAction[];
   hint?: string;

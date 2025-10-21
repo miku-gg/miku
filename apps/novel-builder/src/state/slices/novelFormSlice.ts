@@ -542,6 +542,7 @@ const novelFormSlice = createSlice({
           },
         },
         condition: '',
+        variableConditions: [],
         actions: [],
       });
     },

@@ -7,10 +7,12 @@ import { deleteObjective, updateObjective } from '../../state/slices/novelFormSl
 import { useAppSelector } from '../../state/store';
 
 import { NovelV3 } from '@mikugg/bot-utils';
-import { FaTrashAlt } from 'react-icons/fa';
+import { FaTrashAlt, FaPlus } from 'react-icons/fa';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { IoInformationCircleOutline } from 'react-icons/io5';
+import { v4 as uuidv4 } from 'uuid';
 import NovelActionForm from './NovelActionForm';
+import VariableConditionForm from './VariableConditionForm';
 import './ObjectiveEditModal.scss';
 
 export default function ObjectiveEditModal() {
@@ -123,6 +125,82 @@ export default function ObjectiveEditModal() {
                   );
                 }}
               />
+            </div>
+            <div className="ObjectiveEdit__content__variable-conditions">
+              <div className="ObjectiveEdit__header">
+                <div className="ObjectiveEdit__header__title">
+                  <h3>Variable Conditions</h3>
+                  <IoInformationCircleOutline
+                    data-tooltip-id="Info-variable-conditions"
+                    className="ObjectiveEdit__header__title__infoIcon"
+                    data-tooltip-content="Set conditions based on global variable values. All conditions must be true."
+                  />
+                  <Tooltip id="Info-variable-conditions" place="top" />
+                </div>
+                <Button
+                  theme="secondary"
+                  onClick={() => {
+                    const newCondition: NovelV3.VariableCondition = {
+                      id: uuidv4(),
+                      variableId: '',
+                      operator: 'EQUAL',
+                      value: '',
+                    };
+                    dispatch(
+                      updateObjective({
+                        id: objective.id,
+                        objective: {
+                          ...objective,
+                          variableConditions: [...(objective.variableConditions || []), newCondition],
+                        },
+                      }),
+                    );
+                  }}
+                >
+                  <FaPlus />
+                  Add condition
+                </Button>
+              </div>
+              {objective.variableConditions && objective.variableConditions.length > 0 ? (
+                <div className="ObjectiveEdit__variable-conditions-list">
+                  {objective.variableConditions.map((condition, index) => (
+                    <div key={condition.id} className="ObjectiveEdit__variable-condition-item">
+                      <VariableConditionForm
+                        condition={condition}
+                        onChange={(updatedCondition) => {
+                          const updatedConditions = [...(objective.variableConditions || [])];
+                          updatedConditions[index] = updatedCondition;
+                          dispatch(
+                            updateObjective({
+                              id: objective.id,
+                              objective: {
+                                ...objective,
+                                variableConditions: updatedConditions,
+                              },
+                            }),
+                          );
+                        }}
+                        onDelete={() => {
+                          const updatedConditions = (objective.variableConditions || []).filter((_, i) => i !== index);
+                          dispatch(
+                            updateObjective({
+                              id: objective.id,
+                              objective: {
+                                ...objective,
+                                variableConditions: updatedConditions,
+                              },
+                            }),
+                          );
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="ObjectiveEdit__no-conditions">
+                  <p>No variable conditions set. Add conditions to create more specific triggers.</p>
+                </div>
+              )}
             </div>
             <div className="ObjectiveEdit__content__actions">
               <div className="ObjectiveEdit__header">
