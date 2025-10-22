@@ -133,10 +133,13 @@
       animation: none;
     }
 
+    .InnerThoughtsTrigger__container {
+      z-index: 2 !important;
+    }
+
     &.selected {
       .Interactor__emotion-renderer {
         animation: up-and-down 3s ease-in-out infinite, brightnessfade 0.5s ease-in-out forwards;
-        z-index: 1;
       }
     }
 
