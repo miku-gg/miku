@@ -96,14 +96,14 @@ export type CutSceneAction =
       type: 'NAVIGATE_TO_SCENE';
       params: {
         sceneId: string;
-    };
-  }
+      };
+    }
   | {
-    type: 'GIVE_ITEM';
-    params: {
-      itemId: string;
+      type: 'GIVE_ITEM';
+      params: {
+        itemId: string;
+      };
     };
-  };
 
 export interface CutScene {
   id: string;
@@ -121,6 +121,7 @@ export interface NovelCharacter {
   card: MikuCardV2;
   nsfw: NovelNSFW;
   lorebookIds?: string[];
+  objectives?: NovelObjective[];
 }
 
 export interface NovelBackground {

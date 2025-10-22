@@ -407,13 +407,18 @@ const novelFormSlice = createSlice({
       if (!map) return;
       const place = map.places.find((place) => place.id === action.payload.placeId);
       if (!place) return;
-      
+
       // Parse existing sceneIds
-      const existingSceneIds = place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0) : [];
+      const existingSceneIds = place.sceneId
+        ? place.sceneId
+            .split(',')
+            .map((id) => id.trim())
+            .filter((id) => id.length > 0)
+        : [];
       // Add the new sceneId if it doesn't already exist
       if (!existingSceneIds.includes(action.payload.sceneId)) {
         existingSceneIds.push(action.payload.sceneId);
-      }      
+      }
       // Update with comma-separated string
       place.sceneId = existingSceneIds.join(',');
     },
@@ -422,9 +427,14 @@ const novelFormSlice = createSlice({
       if (!map) return;
       const place = map.places.find((place) => place.id === action.payload.placeId);
       if (!place) return;
-      
+
       // Parse existing sceneIds
-      const existingSceneIds = place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0) : [];
+      const existingSceneIds = place.sceneId
+        ? place.sceneId
+            .split(',')
+            .map((id) => id.trim())
+            .filter((id) => id.length > 0)
+        : [];
       // Remove the sceneId
       const updatedSceneIds = existingSceneIds.filter((id) => id !== action.payload.sceneId);
       // Update with comma-separated string
@@ -497,6 +507,47 @@ const novelFormSlice = createSlice({
     deleteObjective: (state, action: PayloadAction<{ id: string }>) => {
       if (!state.objectives) return;
       state.objectives = state.objectives.filter((objective) => objective.id !== action.payload.id);
+    },
+    addObjectiveToCharacter: (
+      state,
+      action: PayloadAction<{ characterId: string; objective: NovelV3.NovelObjective }>,
+    ) => {
+      const character = state.characters.find((char) => char.id === action.payload.characterId);
+      if (character) {
+        const charWithObjectives = character as NovelV3.NovelCharacter;
+        if (!charWithObjectives.objectives) {
+          charWithObjectives.objectives = [];
+        }
+        charWithObjectives.objectives.push(action.payload.objective);
+      }
+    },
+    updateObjectiveInCharacter: (
+      state,
+      action: PayloadAction<{ characterId: string; objectiveId: string; objective: NovelV3.NovelObjective }>,
+    ) => {
+      const character = state.characters.find((char) => char.id === action.payload.characterId);
+      if (character) {
+        const charWithObjectives = character as NovelV3.NovelCharacter;
+        if (charWithObjectives.objectives) {
+          const index = charWithObjectives.objectives.findIndex(
+            (objective) => objective.id === action.payload.objectiveId,
+          );
+          if (index !== -1) {
+            charWithObjectives.objectives[index] = action.payload.objective;
+          }
+        }
+      }
+    },
+    deleteObjectiveFromCharacter: (state, action: PayloadAction<{ characterId: string; objectiveId: string }>) => {
+      const character = state.characters.find((char) => char.id === action.payload.characterId);
+      if (character) {
+        const charWithObjectives = character as NovelV3.NovelCharacter;
+        if (charWithObjectives.objectives) {
+          charWithObjectives.objectives = charWithObjectives.objectives.filter(
+            (objective) => objective.id !== action.payload.objectiveId,
+          );
+        }
+      }
     },
     updateTriggerOnlyOnce: (state, action: PayloadAction<{ sceneId: string; triggerOnlyOnce: boolean }>) => {
       const scene = state.scenes.find((scene) => scene.id === action.payload.sceneId);
@@ -595,7 +646,10 @@ const novelFormSlice = createSlice({
         action: null,
       });
     },
-    updateCutsceneOption: (state, action: PayloadAction<{ cutsceneId: string; partId: string; optionId: string; option: NovelV3.CutSceneOption }>) => {
+    updateCutsceneOption: (
+      state,
+      action: PayloadAction<{ cutsceneId: string; partId: string; optionId: string; option: NovelV3.CutSceneOption }>,
+    ) => {
       const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
       if (!cutscene) return;
       const part = cutscene.parts.find((part) => part.id === action.payload.partId);
@@ -614,7 +668,7 @@ const novelFormSlice = createSlice({
 
       part.options = part.options.filter((option) => option.id !== action.payload.optionId);
     },
-    
+
     reorderStart: (state, action: PayloadAction<{ startId: string; direction: 'up' | 'down' }>) => {
       const { startId, direction } = action.payload;
       const currentIndex = state.starts.findIndex((start) => start.id === startId);
@@ -839,6 +893,9 @@ export const {
   createObjective,
   updateObjective,
   deleteObjective,
+  addObjectiveToCharacter,
+  updateObjectiveInCharacter,
+  deleteObjectiveFromCharacter,
   updateTriggerOnlyOnce,
   createCutscene,
   updateCutscene,

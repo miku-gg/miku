@@ -5,6 +5,7 @@ import { closeModal } from '../../state/slices/inputSlice';
 import ButtonGroup from '../../components/ButtonGroup';
 import { useEffect, useState } from 'react';
 import CharacterOutfitsEdit from './CharacterOutfitsEdit';
+import { CharacterObjectives } from './CharacterObjectivesEdit';
 import './CharacterEditModal.scss';
 import { AreYouSure } from '@mikugg/ui-kit';
 import { deleteCharacter } from '../../state/slices/novelFormSlice';
@@ -41,6 +42,10 @@ export default function CharacterEditModal() {
               content: 'Outfits',
               value: 'outfits',
             },
+            {
+              content: 'Objectives',
+              value: 'objectives',
+            },
           ]}
         />
       </div>
@@ -67,6 +72,7 @@ export default function CharacterEditModal() {
         </>
       ) : null}
       {selected === 'outfits' ? <CharacterOutfitsEdit characterId={editId} /> : null}
+      {selected === 'objectives' ? <CharacterObjectives characterId={editId || ''} /> : null}
     </Modal>
   );
 }
