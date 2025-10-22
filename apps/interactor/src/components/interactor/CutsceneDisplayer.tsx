@@ -13,6 +13,7 @@ import { setCutsceneTextIndex, setCutscenePartIndex, navigateToScene } from '../
 import { cutsceneUtilities } from '../../libs/cutsceneUtilities';
 import { useFillTextTemplateFunction } from '../../libs/hooks';
 import { addItem, toggleItemVisibility } from '../../state/slices/inventorySlice';
+import { setGlobalVariable } from '../../state/slices/novelSlice';
 import { toast } from 'react-toastify';
 
 const PartRenderer = ({
@@ -237,6 +238,21 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
             position: 'bottom-right',
           });
         }
+        if (isAtEnd()) {
+          onEndDisplay();
+        } else {
+          handleContinueClick();
+        }
+        break;
+      }
+      case 'SET_GLOBAL_VARIABLE': {
+        const setVariableAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'SET_GLOBAL_VARIABLE' }>;
+        dispatch(
+          setGlobalVariable({
+            variables: setVariableAction.params.variables,
+          }),
+        );
+
         if (isAtEnd()) {
           onEndDisplay();
         } else {

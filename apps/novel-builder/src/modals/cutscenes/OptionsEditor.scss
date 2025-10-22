@@ -60,7 +60,7 @@
   .SceneSelector {
     display: flex;
     justify-content: center;
-    
+
     .SceneNode {
       background-size: cover !important;
     }
@@ -69,9 +69,120 @@
   .ItemSelector {
     display: flex;
     justify-content: center;
-    
+
     .ItemNode {
       background-size: cover !important;
     }
+  }
+}
+
+// SetGlobalVariableForm styles
+.SetGlobalVariableForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+  width: 100%;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 60px;
+    gap: 0.5rem;
+    align-items: end;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    margin-bottom: 0.5rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    color: $text-2;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  &__control {
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  &__delete {
+    width: 37.6px !important;
+    height: 37.6px !important;
+    min-width: 37.6px !important;
+    min-height: 37.6px !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $color-red !important;
+    border: 1px solid $color-red !important;
+    color: white !important;
+    border-radius: 4px !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s ease !important;
+
+    &:hover {
+      background: darken($color-red, 10%) !important;
+      border-color: darken($color-red, 10%) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    &:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &__add {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+
+    .Button {
+      width: 37.6px !important;
+      height: 37.6px !important;
+      min-width: 37.6px !important;
+      min-height: 37.6px !important;
+      padding: 0 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px !important;
+      font-size: 0.875rem !important;
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  .Dropdown {
+    width: 100%;
+  }
+
+  .SetGlobalVariableForm__control > * {
+    width: 100% !important;
+  }
+
+  &__placeholder {
+    height: 37.6px;
+    width: 100%;
+    // Invisible placeholder to maintain grid layout
   }
 }

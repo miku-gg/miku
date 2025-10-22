@@ -103,6 +103,15 @@ export type CutSceneAction =
       params: {
         itemId: string;
       };
+    }
+  | {
+      type: 'SET_GLOBAL_VARIABLE';
+      params: {
+        variables: Array<{
+          variableId: string;
+          value: string | number | boolean;
+        }>;
+      };
     };
 
 export interface CutScene {
