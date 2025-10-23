@@ -20,7 +20,7 @@ export type ModalType =
   | 'cutscenes'
   | 'cutscenePartEdit'
   | 'scene'
-  | 'globalVariableEdit';
+  | 'novelVariableEdit';
 
 export type PanelType = 'details' | 'assets' | 'maps' | 'scenes' | 'starts' | 'preview';
 export const isPanelType = (panel: string): panel is PanelType =>
@@ -36,6 +36,8 @@ export interface InputState {
       opened: boolean;
       editId?: string;
       text?: string;
+      scope?: 'global' | 'scene' | 'character';
+      targetId?: string;
     };
   };
   spendApprovalModal: {
@@ -106,8 +108,10 @@ const initialState: InputState = {
     errors: {
       opened: false,
     },
-    globalVariableEdit: {
+    novelVariableEdit: {
       opened: false,
+      scope: undefined,
+      targetId: undefined,
     },
   },
   spendApprovalModal: {
@@ -128,15 +132,37 @@ const inputSlice = createSlice({
         modalType: ModalType;
         editId?: string;
         text?: string;
+        scope?: 'global' | 'scene' | 'character';
+        targetId?: string;
       }>,
     ) => {
-      const { modalType, editId } = action.payload;
+      const { modalType, editId, scope, targetId } = action.payload;
+
+      if (!state.modals[modalType]) {
+        // Create the modal state if it doesn't exist (for novelVariableEdit)
+        if (modalType === 'novelVariableEdit') {
+          state.modals[modalType] = {
+            opened: false,
+            scope: undefined,
+            targetId: undefined,
+          };
+        } else {
+          return;
+        }
+      }
+
       state.modals[modalType].opened = true;
       if ('editId' in action.payload) {
         state.modals[modalType].editId = editId;
       }
       if ('text' in action.payload) {
         state.modals[modalType].text = action.payload.text;
+      }
+      if ('scope' in action.payload) {
+        state.modals[modalType].scope = scope;
+      }
+      if ('targetId' in action.payload) {
+        state.modals[modalType].targetId = targetId;
       }
     },
     closeModal: (
@@ -145,7 +171,13 @@ const inputSlice = createSlice({
         modalType: ModalType;
       }>,
     ) => {
-      state.modals[action.payload.modalType].opened = false;
+      const modal = state.modals[action.payload.modalType];
+      modal.opened = false;
+      // Reset optional fields for novelVariableEdit modal
+      if (action.payload.modalType === 'novelVariableEdit') {
+        modal.scope = undefined;
+        modal.targetId = undefined;
+      }
     },
     navigatePanel(state, action: PayloadAction<PanelType>) {
       state.navigation.panel = action.payload;

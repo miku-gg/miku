@@ -51,53 +51,6 @@ const novelFormSlice = createSlice({
   name: 'novel',
   initialState,
   reducers: {
-    createGlobal: (state, action: PayloadAction<{ id: string }>) => {
-      if (!state.globalVariables) state.globalVariables = [];
-      state.globalVariables.push({
-        id: action.payload.id,
-        name: '',
-        description: '',
-        type: 'number',
-        value: 0,
-      });
-    },
-    updateGlobal: (
-      state,
-      action: PayloadAction<{
-        id: string;
-        changes: Partial<Pick<NovelV3.GlobalVariable, 'name' | 'description' | 'type' | 'value'>>;
-      }>,
-    ) => {
-      const list = state.globalVariables;
-      if (!list) return;
-      const index = list.findIndex((g) => g.id === action.payload.id);
-      if (index === -1) return;
-      const current = list[index];
-      const next: NovelV3.GlobalVariable = { ...current, ...action.payload.changes } as NovelV3.GlobalVariable;
-      if (action.payload.changes.type && action.payload.changes.type !== current.type) {
-        if (action.payload.changes.type === 'string') {
-          next.value = String(current.value ?? 0);
-        } else if (action.payload.changes.type === 'number') {
-          const n = Number(current.value);
-          next.value = Number.isFinite(n) ? n : 0;
-        } else if (action.payload.changes.type === 'boolean') {
-          next.value = false;
-        }
-      }
-      list[index] = next;
-    },
-    deleteGlobal: (state, action: PayloadAction<string>) => {
-      if (!state.globalVariables) return;
-      state.globalVariables = state.globalVariables.filter((g) => g.id !== action.payload);
-    },
-    reorderGlobals: (state, action: PayloadAction<{ from: number; to: number }>) => {
-      const list = state.globalVariables;
-      if (!list) return;
-      const { from, to } = action.payload;
-      if (from < 0 || to < 0 || from >= list.length || to >= list.length) return;
-      const [item] = list.splice(from, 1);
-      list.splice(to, 0, item);
-    },
     // Scene local variables
     createSceneLocalVariable: (state, action: PayloadAction<{ sceneId: string; id: string }>) => {
       const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
@@ -161,6 +114,103 @@ const novelFormSlice = createSlice({
       const character = state.characters.find((c) => c.id === action.payload.characterId);
       if (!character?.localVariables) return;
       character.localVariables = character.localVariables.filter((v) => v.id !== action.payload.id);
+    },
+    // Generic novel variable actions
+    createNovelVariable: (
+      state,
+      action: PayloadAction<{
+        scope: 'global' | 'scene' | 'character';
+        targetId?: string;
+        id: string;
+      }>,
+    ) => {
+      const { scope, targetId, id } = action.payload;
+      const newVariable: NovelV3.NovelVariable = {
+        id,
+        name: '',
+        description: '',
+        type: 'number',
+        value: 0,
+      };
+
+      switch (scope) {
+        case 'global':
+          if (!state.globalVariables) state.globalVariables = [];
+          state.globalVariables.push(newVariable);
+          break;
+        case 'scene':
+          const scene = state.scenes.find((s) => s.id === targetId);
+          if (!scene) return;
+          if (!scene.localVariables) scene.localVariables = [];
+          scene.localVariables.push(newVariable);
+          break;
+        case 'character':
+          const character = state.characters.find((c) => c.id === targetId);
+          if (!character) return;
+          if (!character.localVariables) character.localVariables = [];
+          character.localVariables.push(newVariable);
+          break;
+      }
+    },
+    updateNovelVariable: (
+      state,
+      action: PayloadAction<{
+        scope: 'global' | 'scene' | 'character';
+        targetId?: string;
+        id: string;
+        changes: Partial<NovelV3.NovelVariable>;
+      }>,
+    ) => {
+      const { scope, targetId, id, changes } = action.payload;
+      let variable: NovelV3.NovelVariable | undefined;
+
+      switch (scope) {
+        case 'global':
+          variable = state.globalVariables?.find((v) => v.id === id);
+          break;
+        case 'scene':
+          const scene = state.scenes.find((s) => s.id === targetId);
+          variable = scene?.localVariables?.find((v) => v.id === id);
+          break;
+        case 'character':
+          const character = state.characters.find((c) => c.id === targetId);
+          variable = character?.localVariables?.find((v) => v.id === id);
+          break;
+      }
+
+      if (variable) {
+        Object.assign(variable, changes);
+      }
+    },
+    deleteNovelVariable: (
+      state,
+      action: PayloadAction<{
+        scope: 'global' | 'scene' | 'character';
+        targetId?: string;
+        id: string;
+      }>,
+    ) => {
+      const { scope, targetId, id } = action.payload;
+
+      switch (scope) {
+        case 'global':
+          if (state.globalVariables) {
+            state.globalVariables = state.globalVariables.filter((v) => v.id !== id);
+          }
+          break;
+        case 'scene':
+          const scene = state.scenes.find((s) => s.id === targetId);
+          if (scene?.localVariables) {
+            scene.localVariables = scene.localVariables.filter((v) => v.id !== id);
+          }
+          break;
+        case 'character':
+          const character = state.characters.find((c) => c.id === targetId);
+          if (character?.localVariables) {
+            character.localVariables = character.localVariables.filter((v) => v.id !== id);
+          }
+          break;
+      }
     },
     addChildScene: (state, action: PayloadAction<{ sourceId: string; targetId: string }>) => {
       const { sourceId, targetId } = action.payload;
@@ -986,10 +1036,9 @@ export const {
   addPendingInference,
   updateInferenceStatus,
   removePendingInference,
-  createGlobal,
-  updateGlobal,
-  deleteGlobal,
-  reorderGlobals,
+  createNovelVariable,
+  updateNovelVariable,
+  deleteNovelVariable,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

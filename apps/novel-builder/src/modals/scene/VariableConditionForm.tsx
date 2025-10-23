@@ -2,12 +2,7 @@ import { Button, Dropdown, Input } from '@mikugg/ui-kit';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { FaTrashAlt } from 'react-icons/fa';
 import { useAppSelector } from '../../state/store';
-import {
-  selectGlobalVariables,
-  selectAllScenes,
-  selectAllCharacters,
-  selectVariablesForScope,
-} from '../../state/selectors';
+import { selectAllScenes, selectAllCharacters, selectVariablesForScope } from '../../state/selectors';
 import { formatNumberInput } from '../../libs/numberFormatter';
 import { useState, useEffect } from 'react';
 import './VariableConditionForm.scss';
@@ -24,7 +19,6 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
     return null;
   }
 
-  const globalVariables = useAppSelector(selectGlobalVariables);
   const scenes = useAppSelector(selectAllScenes);
   const characters = useAppSelector(selectAllCharacters);
   const [numberInputValue, setNumberInputValue] = useState<string>('');

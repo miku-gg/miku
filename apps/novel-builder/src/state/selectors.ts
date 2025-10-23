@@ -182,12 +182,6 @@ export const selectEditingCutscenePart = createSelector(
   },
 );
 
-export const selectGlobalVariables = (state: RootState) => state.novel.globalVariables || [];
-export const selectGlobalVariableById = createSelector(
-  [selectGlobalVariables, (_: RootState, id: string) => id],
-  (list, id) => list.find((g) => g.id === id),
-);
-
 // Get all variables for a specific scope
 export const selectVariablesForScope = createSelector(
   [
@@ -218,3 +212,31 @@ export const selectAllScenes = (state: RootState) => state.novel.scenes;
 
 // Get all characters for scope dropdown
 export const selectAllCharacters = (state: RootState) => state.novel.characters;
+
+// Get variables for the novel variable edit modal
+export const selectNovelVariableModalVariables = createSelector(
+  [
+    (state: RootState) => state.input.modals.novelVariableEdit,
+    (state: RootState) => state.novel.globalVariables,
+    (state: RootState) => state.novel.scenes,
+    (state: RootState) => state.novel.characters,
+  ],
+  (modal, globalVars, scenes, characters) => {
+    if (!modal.opened || !modal.scope) {
+      return [];
+    }
+
+    switch (modal.scope) {
+      case 'global':
+        return globalVars || [];
+      case 'scene':
+        const scene = scenes.find((s) => s.id === modal.targetId);
+        return scene?.localVariables || [];
+      case 'character':
+        const character = characters.find((c) => c.id === modal.targetId);
+        return character?.localVariables || [];
+      default:
+        return [];
+    }
+  },
+);

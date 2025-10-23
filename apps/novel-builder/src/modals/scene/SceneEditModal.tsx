@@ -13,7 +13,7 @@ import Songs from '../../panels/assets/songs/Songs';
 import { LorebookList } from '../../panels/details/LorebookList';
 import { MapList } from '../../panels/maps/MapList';
 import { selectBackgrounds, selectEditingScene } from '../../state/selectors';
-import { closeModal } from '../../state/slices/inputSlice';
+import { closeModal, openModal } from '../../state/slices/inputSlice';
 import { deleteSceneById, updateObjective, updateScene } from '../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelObjectives } from './NovelObjectives';
@@ -560,6 +560,19 @@ export default function SceneEditModal() {
                 tooltipText="Select lorebooks relevant to this scene."
                 onSelectLorebook={(id) => handleLorebookSelect(id)}
               />
+            </div>
+            <div className="SceneEditModal__scene-variables">
+              <div className="SceneEditModal__scene-variables-header">
+                <h2>Local Variables</h2>
+                <Button
+                  theme="secondary"
+                  onClick={() =>
+                    dispatch(openModal({ modalType: 'novelVariableEdit', scope: 'scene', targetId: scene?.id }))
+                  }
+                >
+                  Edit Local Variables
+                </Button>
+              </div>
             </div>
             <div className="SceneEditModal__scene-indicators">
               <div className="SceneEditModal__scene-indicators-header">

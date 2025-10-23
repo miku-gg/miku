@@ -1,4 +1,4 @@
-.GlobalVariableEditModal {
+.NovelVariableEditModal {
   max-width: 800px;
   min-width: 300px;
 
@@ -68,9 +68,9 @@
   &__cell--description {
     flex: 1;
   }
-  &__cell--name .GlobalVariableEditModal__control > *,
-  &__cell--value .GlobalVariableEditModal__control > *,
-  &__cell--description .GlobalVariableEditModal__control > * {
+  &__cell--name .NovelVariableEditModal__control > *,
+  &__cell--value .NovelVariableEditModal__control > *,
+  &__cell--description .NovelVariableEditModal__control > * {
     width: 100%;
     display: block;
   }
@@ -107,19 +107,19 @@
   }
 }
 
-.GlobalVariableEditModal .Input {
+.NovelVariableEditModal .Input {
   margin: 0;
 }
 
-.GlobalVariableEditModal .GlobalVariableEditModal__control > * {
+.NovelVariableEditModal .NovelVariableEditModal__control > * {
   margin: 0 !important;
   align-self: flex-start;
 }
 
-.GlobalVariableEditModal .Input input {
+.NovelVariableEditModal .Input input {
   box-sizing: border-box;
 }
-.GlobalVariableEditModal textarea {
+.NovelVariableEditModal textarea {
   min-height: 20px;
   height: 20px;
   resize: vertical;
@@ -128,17 +128,17 @@
   display: block;
 }
 
-.GlobalVariableEditModal .Button.danger {
+.NovelVariableEditModal .Button.danger {
   background: #ff0800 !important;
   color: #ffffff !important;
 }
-.GlobalVariableEditModal .Button.danger:hover {
+.NovelVariableEditModal .Button.danger:hover {
   background: #e4110ab8 !important;
 }
 
 // Responsive breakpoint for mobile
 @media (max-width: 600px) {
-  .GlobalVariableEditModal {
+  .NovelVariableEditModal {
     &__row {
       grid-template-columns: 40px 1fr; // Index and info only
       gap: 8px;
@@ -157,21 +157,21 @@
       flex-direction: column; // Stack name and type vertically
       gap: 8px;
     }
-    &__info-row:first-child .GlobalVariableEditModal__cell--name {
+    &__info-row:first-child .NovelVariableEditModal__cell--name {
       width: 100%;
       margin-right: 0;
     }
-    &__info-row:first-child .GlobalVariableEditModal__cell--name .GlobalVariableEditModal__control {
+    &__info-row:first-child .NovelVariableEditModal__cell--name .NovelVariableEditModal__control {
       display: flex;
       align-items: flex-start;
       gap: 8px;
       width: 100%;
     }
-    &__info-row:first-child .GlobalVariableEditModal__cell--name .GlobalVariableEditModal__control .Input {
+    &__info-row:first-child .NovelVariableEditModal__cell--name .NovelVariableEditModal__control .Input {
       flex: 1;
       min-width: 200px;
     }
-    &__info-row:first-child .GlobalVariableEditModal__cell--type {
+    &__info-row:first-child .NovelVariableEditModal__cell--type {
       width: 100%;
       flex-shrink: 0;
     }
@@ -179,10 +179,10 @@
       flex-direction: column;
       gap: 8px;
     }
-    &__info-row:not(:first-child) .GlobalVariableEditModal__cell--value {
+    &__info-row:not(:first-child) .NovelVariableEditModal__cell--value {
       width: 100%;
     }
-    &__info-row:not(:first-child) .GlobalVariableEditModal__cell--description {
+    &__info-row:not(:first-child) .NovelVariableEditModal__cell--description {
       width: 100%;
     }
     // Mobile delete button styling
@@ -201,7 +201,7 @@
 
 // Hide mobile delete button on desktop
 @media (min-width: 601px) {
-  .GlobalVariableEditModal {
+  .NovelVariableEditModal {
     &__mobile-delete {
       display: none !important;
     }

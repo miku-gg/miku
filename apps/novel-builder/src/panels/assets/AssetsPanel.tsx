@@ -25,7 +25,10 @@ export default function AssetsPanel() {
     <div className="AssetsPanel">
       <div className="AssetsPanel__header">
         <h1>Assets</h1>
-        <Button theme="secondary" onClick={() => dispatch(openModal({ modalType: 'globalVariableEdit' }))}>
+        <Button
+          theme="secondary"
+          onClick={() => dispatch(openModal({ modalType: 'novelVariableEdit', scope: 'global' }))}
+        >
           <AiOutlineGlobal />
           Global Variables
         </Button>
