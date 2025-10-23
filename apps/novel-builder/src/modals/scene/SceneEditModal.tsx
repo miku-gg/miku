@@ -1,8 +1,10 @@
 import { AreYouSure, Button, CheckBox, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import { useState } from 'react';
+import NovelVariableList from '../NovelVariableList';
 import { AiOutlinePicture } from 'react-icons/ai';
 import { FaUser } from 'react-icons/fa6';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { MdZoomIn, MdComputer, MdPhoneAndroid } from 'react-icons/md';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
@@ -13,7 +15,7 @@ import Songs from '../../panels/assets/songs/Songs';
 import { LorebookList } from '../../panels/details/LorebookList';
 import { MapList } from '../../panels/maps/MapList';
 import { selectBackgrounds, selectEditingScene } from '../../state/selectors';
-import { closeModal, openModal } from '../../state/slices/inputSlice';
+import { closeModal } from '../../state/slices/inputSlice';
 import { deleteSceneById, updateObjective, updateScene } from '../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import { NovelObjectives } from './NovelObjectives';
@@ -56,6 +58,7 @@ export default function SceneEditModal() {
   const [zoomModalEmotionName, setZoomModalEmotionName] = useState('');
   const [zoomModalCharacterName, setZoomModalCharacterName] = useState('');
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [variablesExpanded, setVariablesExpanded] = useState(false);
 
   const characterCount = 4; // here we define the max amount of characters in a scene
 
@@ -566,13 +569,20 @@ export default function SceneEditModal() {
                 <h2>Local Variables</h2>
                 <Button
                   theme="secondary"
-                  onClick={() =>
-                    dispatch(openModal({ modalType: 'novelVariableEdit', scope: 'scene', targetId: scene?.id }))
-                  }
+                  onClick={() => setVariablesExpanded(!variablesExpanded)}
+                  className="SceneEditModal__scene-variables-toggle"
                 >
-                  Edit Local Variables
+                  {variablesExpanded ? <FaEyeSlash /> : <FaEye />}
                 </Button>
               </div>
+              {variablesExpanded && (
+                <NovelVariableList
+                  scope="scene"
+                  targetId={scene?.id}
+                  title={scene ? `${scene.name} - Local Variables` : 'Scene Variables'}
+                  showHeader={false}
+                />
+              )}
             </div>
             <div className="SceneEditModal__scene-indicators">
               <div className="SceneEditModal__scene-indicators-header">

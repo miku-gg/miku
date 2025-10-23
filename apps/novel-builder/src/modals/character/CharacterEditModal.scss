@@ -7,6 +7,10 @@
     display: flex;
     justify-content: space-between;
   }
+
+  .NovelVariableEditModal {
+    margin: 0 auto;
+  }
 }
 // add media query for 580px
 @media (max-width: 981px) {

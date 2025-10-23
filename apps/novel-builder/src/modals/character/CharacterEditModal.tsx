@@ -1,10 +1,11 @@
 import { Button, Modal } from '@mikugg/ui-kit';
 import { useAppDispatch, useAppSelector } from '../../state/store';
 import CharacterDescriptionEdit from './CharacterDescriptionEdit';
-import { closeModal, openModal } from '../../state/slices/inputSlice';
+import { closeModal } from '../../state/slices/inputSlice';
 import ButtonGroup from '../../components/ButtonGroup';
 import { useEffect, useState } from 'react';
 import CharacterOutfitsEdit from './CharacterOutfitsEdit';
+import NovelVariableList from '../NovelVariableList';
 import './CharacterEditModal.scss';
 import { AreYouSure } from '@mikugg/ui-kit';
 import { deleteCharacter } from '../../state/slices/novelFormSlice';
@@ -12,6 +13,7 @@ import { deleteCharacter } from '../../state/slices/novelFormSlice';
 export default function CharacterEditModal() {
   const { openModal: openAreYouSure } = AreYouSure.useAreYouSure();
   const { opened, editId } = useAppSelector((state) => state.input.modals.character);
+  const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === editId));
   const dispatch = useAppDispatch();
   const [selected, setSelected] = useState<string>('prompt');
 
@@ -41,25 +43,16 @@ export default function CharacterEditModal() {
               content: 'Outfits',
               value: 'outfits',
             },
+            {
+              content: 'Variables',
+              value: 'variables',
+            },
           ]}
         />
       </div>
       {selected === 'prompt' ? (
         <>
           <CharacterDescriptionEdit characterId={editId} />
-          <div className="CharacterEditModal__variables">
-            <div className="CharacterEditModal__variables-header">
-              <h2>Local Variables</h2>
-              <Button
-                theme="secondary"
-                onClick={() =>
-                  dispatch(openModal({ modalType: 'novelVariableEdit', scope: 'character', targetId: editId }))
-                }
-              >
-                Edit Local Variables
-              </Button>
-            </div>
-          </div>
           <div className="CharacterEditModal__delete">
             <Button
               theme="primary"
@@ -80,6 +73,13 @@ export default function CharacterEditModal() {
         </>
       ) : null}
       {selected === 'outfits' ? <CharacterOutfitsEdit characterId={editId} /> : null}
+      {selected === 'variables' ? (
+        <NovelVariableList
+          scope="character"
+          targetId={editId}
+          title={character ? `${character.name} - Local Variables` : 'Character Variables'}
+        />
+      ) : null}
     </Modal>
   );
 }
