@@ -49,22 +49,31 @@
   }
 }
 
-.SetGlobalVariableForm {
+.SetNovelVariableForm {
   display: flex;
   flex-direction: column;
   gap: 0rem;
   width: 100%;
 
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0rem;
+    margin-bottom: 0.5rem;
+  }
+
   &__row {
     display: grid;
-    grid-template-columns: 2fr 2fr 60px;
-    align-items: start;
-    gap: 8px;
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.02);
-    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+
+    &--scope {
+      grid-template-columns: 1fr 1fr 60px;
+    }
+
+    &--variable {
+      grid-template-columns: 2fr 2fr;
+    }
   }
 
   &__field {
@@ -126,6 +135,14 @@
     }
   }
 
+  &__placeholder {
+    height: 37.6px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+  }
+
   &__add {
     display: flex;
     justify-content: center;
@@ -147,24 +164,24 @@
   }
 }
 
-.SetGlobalVariableForm .Input {
+.SetNovelVariableForm .Input {
   margin: 0;
 }
 
-.SetGlobalVariableForm .SetGlobalVariableForm__control > * {
+.SetNovelVariableForm .SetNovelVariableForm__control > * {
   margin: 0 !important;
   align-self: flex-start;
 }
 
-.SetGlobalVariableForm .Input input {
+.SetNovelVariableForm .Input input {
   box-sizing: border-box;
   width: 100%;
 }
 
-.SetGlobalVariableForm .Dropdown {
+.SetNovelVariableForm .Dropdown {
   width: 100%;
 }
 
-.SetGlobalVariableForm .SetGlobalVariableForm__control > * {
+.SetNovelVariableForm .SetNovelVariableForm__control > * {
   width: 100% !important;
 }

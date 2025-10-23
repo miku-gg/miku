@@ -76,21 +76,38 @@
   }
 }
 
-// SetGlobalVariableForm styles
-.SetGlobalVariableForm {
+// SetNovelVariableForm styles
+.SetNovelVariableForm {
   display: flex;
   flex-direction: column;
   gap: 0rem;
   width: 100%;
 
+  &__group {
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
   &__row {
     display: grid;
-    grid-template-columns: 2fr 2fr 60px;
     gap: 0.5rem;
     align-items: end;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.02);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &--scope {
+      grid-template-columns: 1fr 1fr 60px; // Scope | Target | Delete
+    }
+
+    &--variable {
+      grid-template-columns: 2fr 2fr; // Variable | Value
+    }
   }
 
   &__field {
@@ -176,7 +193,7 @@
     width: 100%;
   }
 
-  .SetGlobalVariableForm__control > * {
+  .SetNovelVariableForm__control > * {
     width: 100% !important;
   }
 

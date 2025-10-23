@@ -92,10 +92,15 @@ export const novelActionToStateAction = (action: NovelV3.NovelAction): Action[] 
           backgroundId: action.params.backgroundId,
         }),
       ];
-    case NovelV3.NovelActionType.SET_GLOBAL_VARIABLE:
+    case NovelV3.NovelActionType.SET_NOVEL_VARIABLE:
       return [
         setGlobalVariable({
-          variables: action.params.variables,
+          variables: action.params.variables.map((v) => ({
+            variableId: v.variableId,
+            value: v.value,
+            scope: v.scope || 'global',
+            targetId: v.targetId,
+          })),
         }),
       ];
   }

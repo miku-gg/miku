@@ -2,7 +2,12 @@ import { Button, Dropdown, Input } from '@mikugg/ui-kit';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { FaTrashAlt } from 'react-icons/fa';
 import { useAppSelector } from '../../state/store';
-import { selectGlobalVariables } from '../../state/selectors';
+import {
+  selectGlobalVariables,
+  selectAllScenes,
+  selectAllCharacters,
+  selectVariablesForScope,
+} from '../../state/selectors';
 import { formatNumberInput } from '../../libs/numberFormatter';
 import { useState, useEffect } from 'react';
 import './VariableConditionForm.scss';
@@ -14,9 +19,20 @@ interface VariableConditionFormProps {
 }
 
 export default function VariableConditionForm({ condition, onChange, onDelete }: VariableConditionFormProps) {
+  // Defensive check - make sure condition exists and has required properties
+  if (!condition || typeof condition !== 'object') {
+    return null;
+  }
+
   const globalVariables = useAppSelector(selectGlobalVariables);
-  const selectedVariable = globalVariables.find((v) => v.id === condition.variableId);
+  const scenes = useAppSelector(selectAllScenes);
+  const characters = useAppSelector(selectAllCharacters);
   const [numberInputValue, setNumberInputValue] = useState<string>('');
+
+  const currentScope = condition.scope || 'global';
+  const currentTargetId = condition.targetId;
+  const variables = useAppSelector((state) => selectVariablesForScope(state, currentScope, currentTargetId));
+  const selectedVariable = variables.find((v) => v.id === condition.variableId);
 
   // Sync local state with condition value for number inputs
   useEffect(() => {
@@ -118,7 +134,22 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
     }
   };
 
-  const variableOptions = globalVariables.map((v) => ({
+  // Scope options
+  const scopeOptions = [
+    { name: 'Global', value: 'global' },
+    { name: 'Scene', value: 'scene' },
+    { name: 'Character', value: 'character' },
+  ];
+
+  // Target options based on scope
+  let targetOptions: { name: string; value: string }[] = [];
+  if (currentScope === 'scene') {
+    targetOptions = scenes.map((s) => ({ name: s.name, value: s.id }));
+  } else if (currentScope === 'character') {
+    targetOptions = characters.map((c) => ({ name: c.name, value: c.id }));
+  }
+
+  const variableOptions = variables.map((v) => ({
     name: v.name || `Variable ${v.id}`,
     value: v.id,
   }));
@@ -127,64 +158,122 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
 
   return (
     <div className="VariableConditionForm">
-      <div className="VariableConditionForm__field">
-        <label className="VariableConditionForm__label">Variable</label>
-        <div className="VariableConditionForm__control">
-          <Dropdown
-            items={variableOptions}
-            selectedIndex={variableOptions.findIndex((v) => v.value === condition.variableId)}
-            onChange={(index) => {
-              const variableId = variableOptions[index]?.value;
-              if (variableId) {
-                const variable = globalVariables.find((v) => v.id === variableId);
-                onChange({
-                  ...condition,
-                  variableId,
-                  operator: 'EQUAL', // Reset to default operator
-                  value: variable?.type === 'boolean' ? false : variable?.type === 'number' ? 0 : '',
-                });
-              }
-            }}
-          />
-        </div>
-      </div>
-
-      <div className="VariableConditionForm__field">
-        <label className="VariableConditionForm__label">Operator</label>
-        <div className="VariableConditionForm__control">
-          {selectedVariable ? (
-            <Dropdown
-              items={operatorOptions}
-              selectedIndex={operatorOptions.findIndex((o) => o.value === condition.operator)}
-              onChange={(index) => {
-                const operator = operatorOptions[index]?.value as NovelV3.VariableConditionOperator;
-                if (operator) {
+      <div className="VariableConditionForm__group">
+        {/* First row: Scope, Target (if needed), Delete */}
+        <div className="VariableConditionForm__row VariableConditionForm__row--scope">
+          <div className="VariableConditionForm__field">
+            <label className="VariableConditionForm__label">Scope</label>
+            <div className="VariableConditionForm__control">
+              <Dropdown
+                items={scopeOptions}
+                selectedIndex={scopeOptions.findIndex((s) => s.value === currentScope)}
+                onChange={(index) => {
+                  const selectedScope = scopeOptions[index]?.value as NovelV3.VariableScope;
                   onChange({
                     ...condition,
-                    operator,
+                    scope: selectedScope,
+                    targetId: undefined,
+                    variableId: '',
+                    operator: 'EQUAL',
+                    value: '',
                   });
-                }
-              }}
-            />
-          ) : (
-            <Dropdown items={[]} selectedIndex={-1} onChange={() => {}} />
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Show target selector only for scene/character scope */}
+          {(currentScope === 'scene' || currentScope === 'character') && (
+            <div className="VariableConditionForm__field">
+              <label className="VariableConditionForm__label">{currentScope === 'scene' ? 'Scene' : 'Character'}</label>
+              <div className="VariableConditionForm__control">
+                <Dropdown
+                  items={targetOptions}
+                  selectedIndex={Math.max(
+                    0,
+                    targetOptions.findIndex((t) => t.value === currentTargetId),
+                  )}
+                  onChange={(index) => {
+                    const targetId = targetOptions[index]?.value;
+                    onChange({
+                      ...condition,
+                      targetId,
+                      variableId: '',
+                      operator: 'EQUAL',
+                      value: '',
+                    });
+                  }}
+                />
+              </div>
+            </div>
           )}
-        </div>
-      </div>
 
-      <div className="VariableConditionForm__field">
-        <label className="VariableConditionForm__label">Value</label>
-        <div className="VariableConditionForm__control">
-          {selectedVariable ? getValueInput() : <Input value="" onChange={() => {}} />}
+          <div className="VariableConditionForm__field">
+            <label className="VariableConditionForm__label">&nbsp;</label>
+            <div className="VariableConditionForm__control">
+              <Button theme="secondary" className="VariableConditionForm__delete danger" onClick={onDelete}>
+                <FaTrashAlt />
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="VariableConditionForm__field">
-        <label className="VariableConditionForm__label">&nbsp;</label>
-        <div className="VariableConditionForm__control">
-          <Button theme="secondary" className="VariableConditionForm__delete danger" onClick={onDelete}>
-            <FaTrashAlt />
-          </Button>
+        {/* Second row: Variable, Operator, Value */}
+        <div className="VariableConditionForm__row VariableConditionForm__row--variable">
+          <div className="VariableConditionForm__field">
+            <label className="VariableConditionForm__label">Variable</label>
+            <div className="VariableConditionForm__control">
+              <Dropdown
+                items={variableOptions}
+                selectedIndex={Math.max(
+                  0,
+                  variableOptions.findIndex((v) => v.value === condition.variableId),
+                )}
+                onChange={(index) => {
+                  const variableId = variableOptions[index]?.value;
+                  if (variableId) {
+                    const variable = variables.find((v) => v.id === variableId);
+                    onChange({
+                      ...condition,
+                      variableId,
+                      operator: 'EQUAL', // Reset to default operator
+                      value: variable?.type === 'boolean' ? false : variable?.type === 'number' ? 0 : '',
+                    });
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="VariableConditionForm__field">
+            <label className="VariableConditionForm__label">Operator</label>
+            <div className="VariableConditionForm__control">
+              {selectedVariable ? (
+                <Dropdown
+                  items={operatorOptions}
+                  selectedIndex={operatorOptions.findIndex((o) => o.value === condition.operator)}
+                  onChange={(index) => {
+                    const operator = operatorOptions[index]?.value as NovelV3.VariableConditionOperator;
+                    if (operator) {
+                      onChange({
+                        ...condition,
+                        operator,
+                      });
+                    }
+                  }}
+                />
+              ) : (
+                <Dropdown items={[]} selectedIndex={-1} onChange={() => {}} />
+              )}
+            </div>
+          </div>
+
+          <div className="VariableConditionForm__field">
+            <label className="VariableConditionForm__label">Value</label>
+            <div className="VariableConditionForm__control">
+              {selectedVariable ? getValueInput() : <Input value="" onChange={() => {}} />}
+            </div>
+          </div>
         </div>
       </div>
     </div>

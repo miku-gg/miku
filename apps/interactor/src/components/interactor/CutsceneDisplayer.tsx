@@ -245,8 +245,8 @@ export const CutsceneDisplayer = ({ onEndDisplay }: { onEndDisplay: () => void }
         }
         break;
       }
-      case 'SET_GLOBAL_VARIABLE': {
-        const setVariableAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'SET_GLOBAL_VARIABLE' }>;
+      case 'SET_NOVEL_VARIABLE': {
+        const setVariableAction = option.action as Extract<NovelV3.CutSceneAction, { type: 'SET_NOVEL_VARIABLE' }>;
         dispatch(
           setGlobalVariable({
             variables: setVariableAction.params.variables,

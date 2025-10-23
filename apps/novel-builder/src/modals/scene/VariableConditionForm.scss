@@ -1,13 +1,35 @@
 .VariableConditionForm {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 60px;
-  align-items: start;
-  gap: 8px;
-  padding: 8px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.02);
-  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+  width: 100%;
+
+  &__group {
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  &__row {
+    display: grid;
+    gap: 8px;
+    align-items: start;
+    margin-bottom: 0.75rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &--scope {
+      grid-template-columns: 1fr 1fr 60px; // Scope | Target | Delete
+    }
+
+    &--variable {
+      grid-template-columns: 1fr 1fr 1fr; // Variable | Operator | Value
+    }
+  }
 
   &__field {
     display: flex;

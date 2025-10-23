@@ -356,9 +356,22 @@ const interactionEffect = async (
           if (response === ` Yes`) {
             // Check variable conditions if they exist
             const globalVariables = selectGlobalVariables(state);
+            const currentScene = selectCurrentScene(state);
+            const currentCharacters = state.novel.characters.filter((c) =>
+              currentScene?.characters.some((sc) => sc.characterId === c.id),
+            );
+
+            // Get scene variables
+            const sceneVariables = currentScene?.localVariables || [];
+
+            // Get character variables (flatten all character variables)
+            const characterVariables = currentCharacters.flatMap((c) => c.localVariables || []);
+
             const variableConditionsPassed = evaluateVariableConditions(
               objective.variableConditions || [],
               globalVariables,
+              sceneVariables,
+              characterVariables,
             );
 
             if (variableConditionsPassed) {

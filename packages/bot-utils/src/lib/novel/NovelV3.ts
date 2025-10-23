@@ -49,6 +49,8 @@ export interface NovelScene {
   indicators?: NovelIndicator[];
   /** Optional battle to start when this scene begins */
   battleAtBeginning?: string;
+  /** Local variables for this scene */
+  localVariables?: NovelVariable[];
 }
 
 export interface NovelCharacterOutfit {
@@ -105,11 +107,13 @@ export type CutSceneAction =
       };
     }
   | {
-      type: 'SET_GLOBAL_VARIABLE';
+      type: 'SET_NOVEL_VARIABLE';
       params: {
         variables: Array<{
           variableId: string;
           value: string | number | boolean;
+          scope: VariableScope;
+          targetId?: string; // Required for 'scene' or 'character' scope
         }>;
       };
     };
@@ -130,6 +134,8 @@ export interface NovelCharacter {
   card: MikuCardV2;
   nsfw: NovelNSFW;
   lorebookIds?: string[];
+  /** Local variables for this character */
+  localVariables?: NovelVariable[];
 }
 
 export interface NovelBackground {
@@ -153,12 +159,23 @@ export interface NovelSong {
   source: string;
 }
 
-export interface GlobalVariable {
+export interface NovelVariable {
   id: string;
   name: string;
   description: string;
   type: 'number' | 'string' | 'boolean';
   value: string | number | boolean;
+}
+
+// Keep GlobalVariable as alias for backwards compatibility
+export type GlobalVariable = NovelVariable;
+
+export type VariableScope = 'global' | 'scene' | 'character';
+
+export interface VariableScopeReference {
+  scope: VariableScope;
+  // For 'scene' or 'character' scope, specifies which scene/character
+  targetId?: string;
 }
 
 export type VariableConditionOperator = 'EQUAL' | 'NOT_EQUAL' | 'LESS_THAN' | 'GREATER_THAN';
@@ -168,6 +185,8 @@ export interface VariableCondition {
   variableId: string;
   operator: VariableConditionOperator;
   value: string | number | boolean;
+  scope: VariableScope;
+  targetId?: string; // For scene/character scope
 }
 
 export interface NovelMap {
@@ -209,7 +228,7 @@ export enum NovelActionType {
   RPG_ADD_ABILITY_TO_CHARACTER = 'RPG_ADD_ABILITY_TO_CHARACTER',
   RPG_ADD_CHARACTER_TO_PARTY = 'RPG_ADD_CHARACTER_TO_PARTY',
   RPG_CHANGE_BATTLE_OUTFIT = 'RPG_CHANGE_BATTLE_OUTFIT',
-  SET_GLOBAL_VARIABLE = 'SET_GLOBAL_VARIABLE',
+  SET_NOVEL_VARIABLE = 'SET_NOVEL_VARIABLE',
 
   CUTSCENE_OPTION_SELECTED = 'CUTSCENE_OPTION_SELECTED',
 }
@@ -302,11 +321,13 @@ export type NovelAction =
       };
     }
   | {
-      type: NovelActionType.SET_GLOBAL_VARIABLE;
+      type: NovelActionType.SET_NOVEL_VARIABLE;
       params: {
         variables: Array<{
           variableId: string;
           value: string | number | boolean;
+          scope: VariableScope;
+          targetId?: string; // Required for 'scene' or 'character' scope
         }>;
       };
     }

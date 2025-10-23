@@ -1,14 +1,11 @@
 import { NovelV3 } from '@mikugg/bot-utils';
 import ButtonGroup from '../../components/ButtonGroup';
 import InventoryItems from '../../panels/assets/inventory/InventoryItems';
-import { selectEditingInventoryItem, selectGlobalVariables } from '../../state/selectors';
+import { selectEditingInventoryItem } from '../../state/selectors';
 import { useAppSelector } from '../../state/store';
-import { Dropdown, Input, Button } from '@mikugg/ui-kit';
-import { formatNumberInput } from '../../libs/numberFormatter';
-import { useState } from 'react';
-import { FaTrashAlt, FaPlus } from 'react-icons/fa';
 import './NovelActionForm.scss';
 import SceneSelector from './SceneSelector';
+import { SetNovelVariableForm } from './SetNovelVariableForm';
 
 export const getDefaultAction = (actionType: NovelV3.NovelActionType): NovelV3.NovelAction => {
   switch (actionType) {
@@ -41,9 +38,9 @@ export const getDefaultAction = (actionType: NovelV3.NovelActionType): NovelV3.N
           itemId: '',
         },
       };
-    case NovelV3.NovelActionType.SET_GLOBAL_VARIABLE:
+    case NovelV3.NovelActionType.SET_NOVEL_VARIABLE:
       return {
-        type: NovelV3.NovelActionType.SET_GLOBAL_VARIABLE,
+        type: NovelV3.NovelActionType.SET_NOVEL_VARIABLE,
         params: {
           variables: [],
         },
@@ -56,176 +53,6 @@ export const getDefaultAction = (actionType: NovelV3.NovelActionType): NovelV3.N
         },
       };
   }
-};
-
-const SetGlobalVariableForm = ({
-  action,
-  onChange,
-}: {
-  action: NovelV3.NovelAction & { type: NovelV3.NovelActionType.SET_GLOBAL_VARIABLE };
-  onChange: (action: NovelV3.NovelAction) => void;
-}) => {
-  const globalVariables = useAppSelector(selectGlobalVariables);
-  const [numberInputValues, setNumberInputValues] = useState<Record<string, string>>({});
-
-  const variableOptions = globalVariables.map((v) => ({
-    name: v.name || `Variable ${v.id}`,
-    value: v.id,
-  }));
-
-  const addVariable = () => {
-    const newVariable = {
-      variableId: '',
-      value: '',
-    };
-    onChange({
-      ...action,
-      params: {
-        variables: [...action.params.variables, newVariable],
-      },
-    });
-  };
-
-  const removeVariable = (index: number) => {
-    const updatedVariables = action.params.variables.filter((_, i) => i !== index);
-    onChange({
-      ...action,
-      params: {
-        variables: updatedVariables,
-      },
-    });
-  };
-
-  const updateVariable = (index: number, variableId: string, value: string | number | boolean) => {
-    const updatedVariables = [...action.params.variables];
-    updatedVariables[index] = { variableId, value };
-    onChange({
-      ...action,
-      params: {
-        variables: updatedVariables,
-      },
-    });
-  };
-
-  const getValueInput = (variableId: string, currentValue: string | number | boolean, index: number) => {
-    const selectedVariable = globalVariables.find((v) => v.id === variableId);
-    if (!selectedVariable) return null;
-
-    switch (selectedVariable.type) {
-      case 'boolean':
-        return (
-          <Dropdown
-            items={[
-              { name: 'true', value: 'true' },
-              { name: 'false', value: 'false' },
-            ]}
-            selectedIndex={currentValue === true ? 0 : 1}
-            onChange={(dropdownIndex) => {
-              const boolValue = dropdownIndex === 0;
-              updateVariable(index, variableId, boolValue);
-            }}
-          />
-        );
-      case 'number':
-        const numberKey = `${variableId}-${index}`;
-        const numberValue =
-          numberInputValues[numberKey] !== undefined ? numberInputValues[numberKey] : String(currentValue);
-
-        return (
-          <Input
-            value={numberValue}
-            onChange={(e) => {
-              const inputValue = e.target.value;
-              const formattedValue = formatNumberInput(inputValue);
-              setNumberInputValues((prev) => ({
-                ...prev,
-                [numberKey]: formattedValue,
-              }));
-
-              const numValue = Number(formattedValue);
-              if (Number.isFinite(numValue)) {
-                updateVariable(index, variableId, numValue);
-              }
-            }}
-            onBlur={() => {
-              const formattedValue = formatNumberInput(numberValue);
-              const numValue = Number(formattedValue);
-              if (Number.isFinite(numValue)) {
-                setNumberInputValues((prev) => ({
-                  ...prev,
-                  [numberKey]: String(numValue),
-                }));
-                updateVariable(index, variableId, numValue);
-              }
-            }}
-          />
-        );
-      case 'string':
-        return (
-          <Input
-            value={String(currentValue)}
-            onChange={(e) => {
-              updateVariable(index, variableId, e.target.value);
-            }}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="SetGlobalVariableForm">
-      {action.params.variables.map((variable, index) => (
-        <div key={index} className="SetGlobalVariableForm__row">
-          <div className="SetGlobalVariableForm__field">
-            <label className="SetGlobalVariableForm__label">Variable</label>
-            <div className="SetGlobalVariableForm__control">
-              <Dropdown
-                items={variableOptions}
-                selectedIndex={variableOptions.findIndex((v) => v.value === variable.variableId)}
-                onChange={(dropdownIndex) => {
-                  const variableId = variableOptions[dropdownIndex]?.value;
-                  if (variableId) {
-                    const selectedVar = globalVariables.find((v) => v.id === variableId);
-                    const defaultValue =
-                      selectedVar?.type === 'boolean' ? false : selectedVar?.type === 'number' ? 0 : '';
-                    updateVariable(index, variableId, defaultValue);
-                  }
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="SetGlobalVariableForm__field">
-            <label className="SetGlobalVariableForm__label">Value</label>
-            <div className="SetGlobalVariableForm__control">
-              {getValueInput(variable.variableId, variable.value, index)}
-            </div>
-          </div>
-
-          <div className="SetGlobalVariableForm__field">
-            <label className="SetGlobalVariableForm__label">&nbsp;</label>
-            <div className="SetGlobalVariableForm__control">
-              <Button
-                theme="secondary"
-                className="SetGlobalVariableForm__delete danger"
-                onClick={() => removeVariable(index)}
-              >
-                <FaTrashAlt />
-              </Button>
-            </div>
-          </div>
-        </div>
-      ))}
-
-      <div className="SetGlobalVariableForm__add">
-        <Button theme="primary" onClick={addVariable}>
-          <FaPlus />
-        </Button>
-      </div>
-    </div>
-  );
 };
 
 const ActionParamsForm = ({
@@ -335,9 +162,19 @@ const ActionParamsForm = ({
     );
   }
 
-  //set-global-variable
-  else if (action.type === NovelV3.NovelActionType.SET_GLOBAL_VARIABLE) {
-    return <SetGlobalVariableForm action={action} onChange={onChange} />;
+  //set-novel-variable
+  else if (action.type === NovelV3.NovelActionType.SET_NOVEL_VARIABLE) {
+    return (
+      <SetNovelVariableForm
+        variables={action.params.variables}
+        onChange={(variables) => {
+          onChange({
+            ...action,
+            params: { variables },
+          });
+        }}
+      />
+    );
   } else {
     return null;
   }
@@ -376,8 +213,8 @@ export default function NovelActionForm({
               value: NovelV3.NovelActionType.HIDE_ITEM,
             },
             {
-              content: 'Set global variable',
-              value: NovelV3.NovelActionType.SET_GLOBAL_VARIABLE,
+              content: 'Set variable',
+              value: (NovelV3.NovelActionType as any).SET_NOVEL_VARIABLE,
             },
           ]}
           selected={action.type}

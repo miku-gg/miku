@@ -187,3 +187,34 @@ export const selectGlobalVariableById = createSelector(
   [selectGlobalVariables, (_: RootState, id: string) => id],
   (list, id) => list.find((g) => g.id === id),
 );
+
+// Get all variables for a specific scope
+export const selectVariablesForScope = createSelector(
+  [
+    (state: RootState) => state.novel.globalVariables,
+    (state: RootState) => state.novel.scenes,
+    (state: RootState) => state.novel.characters,
+    (_: RootState, scope: NovelV3.VariableScope) => scope,
+    (_: RootState, _scope: NovelV3.VariableScope, targetId?: string) => targetId,
+  ],
+  (globalVars, scenes, characters, scope, targetId) => {
+    switch (scope) {
+      case 'global':
+        return globalVars || [];
+      case 'scene':
+        const scene = scenes.find((s) => s.id === targetId);
+        return scene?.localVariables || [];
+      case 'character':
+        const character = characters.find((c) => c.id === targetId);
+        return character?.localVariables || [];
+      default:
+        return [];
+    }
+  },
+);
+
+// Get all scenes for scope dropdown
+export const selectAllScenes = (state: RootState) => state.novel.scenes;
+
+// Get all characters for scope dropdown
+export const selectAllCharacters = (state: RootState) => state.novel.characters;

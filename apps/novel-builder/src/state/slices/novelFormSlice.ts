@@ -98,6 +98,70 @@ const novelFormSlice = createSlice({
       const [item] = list.splice(from, 1);
       list.splice(to, 0, item);
     },
+    // Scene local variables
+    createSceneLocalVariable: (state, action: PayloadAction<{ sceneId: string; id: string }>) => {
+      const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
+      if (!scene) return;
+      if (!scene.localVariables) scene.localVariables = [];
+      scene.localVariables.push({
+        id: action.payload.id,
+        name: '',
+        description: '',
+        type: 'number',
+        value: 0,
+      });
+    },
+    updateSceneLocalVariable: (
+      state,
+      action: PayloadAction<{
+        sceneId: string;
+        id: string;
+        changes: Partial<NovelV3.NovelVariable>;
+      }>,
+    ) => {
+      const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
+      if (!scene?.localVariables) return;
+      const variable = scene.localVariables.find((v) => v.id === action.payload.id);
+      if (!variable) return;
+      Object.assign(variable, action.payload.changes);
+    },
+    deleteSceneLocalVariable: (state, action: PayloadAction<{ sceneId: string; id: string }>) => {
+      const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
+      if (!scene?.localVariables) return;
+      scene.localVariables = scene.localVariables.filter((v) => v.id !== action.payload.id);
+    },
+    // Character local variables
+    createCharacterLocalVariable: (state, action: PayloadAction<{ characterId: string; id: string }>) => {
+      const character = state.characters.find((c) => c.id === action.payload.characterId);
+      if (!character) return;
+      if (!character.localVariables) character.localVariables = [];
+      character.localVariables.push({
+        id: action.payload.id,
+        name: '',
+        description: '',
+        type: 'number',
+        value: 0,
+      });
+    },
+    updateCharacterLocalVariable: (
+      state,
+      action: PayloadAction<{
+        characterId: string;
+        id: string;
+        changes: Partial<NovelV3.NovelVariable>;
+      }>,
+    ) => {
+      const character = state.characters.find((c) => c.id === action.payload.characterId);
+      if (!character?.localVariables) return;
+      const variable = character.localVariables.find((v) => v.id === action.payload.id);
+      if (!variable) return;
+      Object.assign(variable, action.payload.changes);
+    },
+    deleteCharacterLocalVariable: (state, action: PayloadAction<{ characterId: string; id: string }>) => {
+      const character = state.characters.find((c) => c.id === action.payload.characterId);
+      if (!character?.localVariables) return;
+      character.localVariables = character.localVariables.filter((v) => v.id !== action.payload.id);
+    },
     addChildScene: (state, action: PayloadAction<{ sourceId: string; targetId: string }>) => {
       const { sourceId, targetId } = action.payload;
       const sourceScene = state.scenes.find((scene) => scene.id === sourceId);
@@ -194,6 +258,7 @@ const novelFormSlice = createSlice({
             tags: [],
           },
         },
+        localVariables: [],
       };
       state.characters.push(character);
     },
@@ -229,6 +294,7 @@ const novelFormSlice = createSlice({
         nsfw: NovelV3.NovelNSFW.NONE,
         parentMapIds: null,
         prompt: '',
+        localVariables: [],
       };
       state.scenes.push(newScene);
     },

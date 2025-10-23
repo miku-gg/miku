@@ -192,14 +192,32 @@ const novelSlice = createSlice({
         variables: Array<{
           variableId: string;
           value: string | number | boolean;
+          scope: 'global' | 'scene' | 'character';
+          targetId?: string;
         }>;
       }>,
     ) => {
-      if (!state.globalVariables) state.globalVariables = [];
-      action.payload.variables.forEach(({ variableId, value }) => {
-        const variable = state.globalVariables?.find((v) => v.id === variableId);
-        if (variable) {
-          variable.value = value;
+      action.payload.variables.forEach(({ variableId, value, scope, targetId }) => {
+        switch (scope) {
+          case 'global':
+            if (!state.globalVariables) state.globalVariables = [];
+            const globalVar = state.globalVariables.find((v) => v.id === variableId);
+            if (globalVar) globalVar.value = value;
+            break;
+          case 'scene':
+            const scene = state.scenes?.find((s) => s.id === targetId);
+            if (scene?.localVariables) {
+              const sceneVar = scene.localVariables.find((v) => v.id === variableId);
+              if (sceneVar) sceneVar.value = value;
+            }
+            break;
+          case 'character':
+            const character = state.characters?.find((c) => c.id === targetId);
+            if (character?.localVariables) {
+              const charVar = character.localVariables.find((v) => v.id === variableId);
+              if (charVar) charVar.value = value;
+            }
+            break;
         }
       });
     },
