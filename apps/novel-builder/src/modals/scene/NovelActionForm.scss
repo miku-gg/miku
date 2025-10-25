@@ -143,6 +143,21 @@
     border-radius: 6px;
   }
 
+  &__target-button {
+    width: 100%;
+    text-align: left;
+    justify-content: flex-start;
+    padding: 8px 12px;
+    min-height: 37.6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
   &__add {
     display: flex;
     justify-content: center;

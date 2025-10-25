@@ -145,6 +145,7 @@ export default function ObjectiveEditModal() {
                       variableId: '',
                       operator: 'EQUAL',
                       value: '',
+                      scope: 'global',
                     };
                     dispatch(
                       updateObjective({

@@ -5,6 +5,8 @@ import { useAppSelector } from '../../state/store';
 import { selectAllScenes, selectAllCharacters, selectVariablesForScope } from '../../state/selectors';
 import { formatNumberInput } from '../../libs/numberFormatter';
 import { useState, useEffect } from 'react';
+import CharacterSelectModal from './CharacterSelectModal';
+import { SceneSelectorModal } from './SceneSelector';
 import './VariableConditionForm.scss';
 
 interface VariableConditionFormProps {
@@ -22,6 +24,8 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
   const scenes = useAppSelector(selectAllScenes);
   const characters = useAppSelector(selectAllCharacters);
   const [numberInputValue, setNumberInputValue] = useState<string>('');
+  const [characterSelectOpened, setCharacterSelectOpened] = useState(false);
+  const [sceneSelectOpened, setSceneSelectOpened] = useState(false);
 
   const currentScope = condition.scope || 'global';
   const currentTargetId = condition.targetId;
@@ -135,13 +139,7 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
     { name: 'Character', value: 'character' },
   ];
 
-  // Target options based on scope
-  let targetOptions: { name: string; value: string }[] = [];
-  if (currentScope === 'scene') {
-    targetOptions = scenes.map((s) => ({ name: s.name, value: s.id }));
-  } else if (currentScope === 'character') {
-    targetOptions = characters.map((c) => ({ name: c.name, value: c.id }));
-  }
+  // Target options are no longer needed since we use selector modals
 
   const variableOptions = variables.map((v) => ({
     name: v.name || `Variable ${v.id}`,
@@ -149,6 +147,46 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
   }));
 
   const operatorOptions = selectedVariable ? getOperatorOptions(selectedVariable.type) : [];
+
+  const handleCharacterSelect = (characterId: string) => {
+    setCharacterSelectOpened(false);
+    onChange({
+      ...condition,
+      targetId: characterId,
+      variableId: '',
+      operator: 'EQUAL',
+      value: '',
+    });
+  };
+
+  const handleSceneSelect = (sceneId: string) => {
+    setSceneSelectOpened(false);
+    onChange({
+      ...condition,
+      targetId: sceneId,
+      variableId: '',
+      operator: 'EQUAL',
+      value: '',
+    });
+  };
+
+  const getTargetDisplayName = () => {
+    if (currentScope === 'scene') {
+      if (currentTargetId) {
+        const scene = scenes.find((s) => s.id === currentTargetId);
+        return scene?.name || 'Select Scene';
+      }
+      return 'Select Scene';
+    }
+    if (currentScope === 'character') {
+      if (currentTargetId) {
+        const character = characters.find((c) => c.id === currentTargetId);
+        return character?.name || 'Select Character';
+      }
+      return 'Select Character';
+    }
+    return 'Select Target';
+  };
 
   return (
     <div className="VariableConditionForm">
@@ -181,23 +219,19 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
             <div className="VariableConditionForm__field">
               <label className="VariableConditionForm__label">{currentScope === 'scene' ? 'Scene' : 'Character'}</label>
               <div className="VariableConditionForm__control">
-                <Dropdown
-                  items={targetOptions}
-                  selectedIndex={Math.max(
-                    0,
-                    targetOptions.findIndex((t) => t.value === currentTargetId),
-                  )}
-                  onChange={(index) => {
-                    const targetId = targetOptions[index]?.value;
-                    onChange({
-                      ...condition,
-                      targetId,
-                      variableId: '',
-                      operator: 'EQUAL',
-                      value: '',
-                    });
+                <Button
+                  theme="secondary"
+                  onClick={() => {
+                    if (currentScope === 'scene') {
+                      setSceneSelectOpened(true);
+                    } else if (currentScope === 'character') {
+                      setCharacterSelectOpened(true);
+                    }
                   }}
-                />
+                  className="VariableConditionForm__target-button"
+                >
+                  {getTargetDisplayName()}
+                </Button>
               </div>
             </div>
           )}
@@ -270,6 +304,21 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
           </div>
         </div>
       </div>
+
+      <CharacterSelectModal
+        opened={characterSelectOpened}
+        onCloseModal={() => setCharacterSelectOpened(false)}
+        selectedCharacterId={currentTargetId}
+        onSelect={handleCharacterSelect}
+        showOutfitSelection={false}
+      />
+
+      <SceneSelectorModal
+        opened={sceneSelectOpened}
+        onCloseModal={() => setSceneSelectOpened(false)}
+        selectedSceneId={currentTargetId}
+        onSelectScene={handleSceneSelect}
+      />
     </div>
   );
 }

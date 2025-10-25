@@ -5,6 +5,8 @@ import { Dropdown, Input, Button } from '@mikugg/ui-kit';
 import { formatNumberInput } from '../../libs/numberFormatter';
 import { useState } from 'react';
 import { FaTrashAlt, FaPlus } from 'react-icons/fa';
+import CharacterSelectModal from './CharacterSelectModal';
+import { SceneSelectorModal } from './SceneSelector';
 import './NovelActionForm.scss';
 
 interface SetNovelVariableFormProps {
@@ -29,6 +31,14 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
   const characters = useAppSelector(selectAllCharacters);
   const globalVariables = useAppSelector((state) => state.novel.globalVariables);
   const [numberInputValues, setNumberInputValues] = useState<Record<string, string>>({});
+  const [characterSelectOpened, setCharacterSelectOpened] = useState<{ opened: boolean; index: number }>({
+    opened: false,
+    index: -1,
+  });
+  const [sceneSelectOpened, setSceneSelectOpened] = useState<{ opened: boolean; index: number }>({
+    opened: false,
+    index: -1,
+  });
 
   const addVariable = () => {
     const newVariable = {
@@ -81,6 +91,38 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
       name: v.name || `Variable ${v.id}`,
       value: v.id,
     }));
+  };
+
+  const handleCharacterSelect = (characterId: string) => {
+    if (characterSelectOpened.index >= 0) {
+      updateVariable(characterSelectOpened.index, { targetId: characterId, variableId: '', value: '' });
+    }
+    setCharacterSelectOpened({ opened: false, index: -1 });
+  };
+
+  const handleSceneSelect = (sceneId: string) => {
+    if (sceneSelectOpened.index >= 0) {
+      updateVariable(sceneSelectOpened.index, { targetId: sceneId, variableId: '', value: '' });
+    }
+    setSceneSelectOpened({ opened: false, index: -1 });
+  };
+
+  const getTargetDisplayName = (scope: NovelV3.VariableScope, targetId?: string) => {
+    if (scope === 'scene') {
+      if (targetId) {
+        const scene = scenes.find((s) => s.id === targetId);
+        return scene?.name || 'Select Scene';
+      }
+      return 'Select Scene';
+    }
+    if (scope === 'character') {
+      if (targetId) {
+        const character = characters.find((c) => c.id === targetId);
+        return character?.name || 'Select Character';
+      }
+      return 'Select Character';
+    }
+    return 'Select Target';
   };
 
   const getValueInput = (
@@ -198,13 +240,7 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
           { name: 'Character', value: 'character' },
         ];
 
-        // Target options based on scope
-        let targetOptions: { name: string; value: string }[] = [];
-        if (currentScope === 'scene') {
-          targetOptions = scenes.map((s) => ({ name: s.name, value: s.id }));
-        } else if (currentScope === 'character') {
-          targetOptions = characters.map((c) => ({ name: c.name, value: c.id }));
-        }
+        // Target options are no longer needed since we use selector modals
 
         // Variable options
         const variableOptions = getVariableOptions(currentScope, currentTargetId);
@@ -237,17 +273,19 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
                     {currentScope === 'scene' ? 'Scene' : 'Character'}
                   </label>
                   <div className="SetNovelVariableForm__control">
-                    <Dropdown
-                      items={targetOptions}
-                      selectedIndex={Math.max(
-                        0,
-                        targetOptions.findIndex((t) => t.value === currentTargetId),
-                      )}
-                      onChange={(dropdownIndex) => {
-                        const targetId = targetOptions[dropdownIndex]?.value;
-                        updateVariable(index, { targetId, variableId: '', value: '' });
+                    <Button
+                      theme="secondary"
+                      onClick={() => {
+                        if (currentScope === 'scene') {
+                          setSceneSelectOpened({ opened: true, index });
+                        } else if (currentScope === 'character') {
+                          setCharacterSelectOpened({ opened: true, index });
+                        }
                       }}
-                    />
+                      className="SetNovelVariableForm__target-button"
+                    >
+                      {getTargetDisplayName(currentScope, currentTargetId)}
+                    </Button>
                   </div>
                 </div>
               ) : (
@@ -337,6 +375,25 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
           <FaPlus />
         </Button>
       </div>
+
+      <CharacterSelectModal
+        opened={characterSelectOpened.opened}
+        onCloseModal={() => setCharacterSelectOpened({ opened: false, index: -1 })}
+        selectedCharacterId={
+          characterSelectOpened.index >= 0 ? (variables || [])[characterSelectOpened.index]?.targetId : undefined
+        }
+        onSelect={handleCharacterSelect}
+        showOutfitSelection={false}
+      />
+
+      <SceneSelectorModal
+        opened={sceneSelectOpened.opened}
+        onCloseModal={() => setSceneSelectOpened({ opened: false, index: -1 })}
+        selectedSceneId={
+          sceneSelectOpened.index >= 0 ? (variables || [])[sceneSelectOpened.index]?.targetId : undefined
+        }
+        onSelectScene={handleSceneSelect}
+      />
     </div>
   );
 };
