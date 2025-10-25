@@ -7,6 +7,7 @@ import { formatNumberInput } from '../../libs/numberFormatter';
 import { useState, useEffect } from 'react';
 import CharacterSelectModal from './CharacterSelectModal';
 import { SceneSelectorModal } from './SceneSelector';
+import VariableSelectionModal from './VariableSelectionModal';
 import './VariableConditionForm.scss';
 
 interface VariableConditionFormProps {
@@ -26,6 +27,7 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
   const [numberInputValue, setNumberInputValue] = useState<string>('');
   const [characterSelectOpened, setCharacterSelectOpened] = useState(false);
   const [sceneSelectOpened, setSceneSelectOpened] = useState(false);
+  const [variableSelectOpened, setVariableSelectOpened] = useState(false);
 
   const currentScope = condition.scope || 'global';
   const currentTargetId = condition.targetId;
@@ -141,10 +143,7 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
 
   // Target options are no longer needed since we use selector modals
 
-  const variableOptions = variables.map((v) => ({
-    name: v.name || `Variable ${v.id}`,
-    value: v.id,
-  }));
+  // Variable options are no longer needed since we use the selection modal
 
   const operatorOptions = selectedVariable ? getOperatorOptions(selectedVariable.type) : [];
 
@@ -170,6 +169,17 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
     });
   };
 
+  const handleVariableSelect = (variableId: string) => {
+    setVariableSelectOpened(false);
+    const variable = variables.find((v) => v.id === variableId);
+    onChange({
+      ...condition,
+      variableId,
+      operator: 'EQUAL', // Reset to default operator
+      value: variable?.type === 'boolean' ? false : variable?.type === 'number' ? 0 : '',
+    });
+  };
+
   const getTargetDisplayName = () => {
     if (currentScope === 'scene') {
       if (currentTargetId) {
@@ -186,6 +196,14 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
       return 'Select Character';
     }
     return 'Select Target';
+  };
+
+  const getVariableDisplayName = () => {
+    if (condition.variableId) {
+      const variable = variables.find((v) => v.id === condition.variableId);
+      return variable?.name || 'Select Variable';
+    }
+    return 'Select Variable';
   };
 
   return (
@@ -214,8 +232,8 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
             </div>
           </div>
 
-          {/* Show target selector only for scene/character scope */}
-          {(currentScope === 'scene' || currentScope === 'character') && (
+          {/* Show target selector only for scene/character scope*/}
+          {currentScope === 'scene' || currentScope === 'character' ? (
             <div className="VariableConditionForm__field">
               <label className="VariableConditionForm__label">{currentScope === 'scene' ? 'Scene' : 'Character'}</label>
               <div className="VariableConditionForm__control">
@@ -232,6 +250,13 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
                 >
                   {getTargetDisplayName()}
                 </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="VariableConditionForm__field">
+              <label className="VariableConditionForm__label">&nbsp;</label>
+              <div className="VariableConditionForm__control">
+                <div className="VariableConditionForm__placeholder"></div>
               </div>
             </div>
           )}
@@ -251,25 +276,13 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
           <div className="VariableConditionForm__field">
             <label className="VariableConditionForm__label">Variable</label>
             <div className="VariableConditionForm__control">
-              <Dropdown
-                items={variableOptions}
-                selectedIndex={Math.max(
-                  0,
-                  variableOptions.findIndex((v) => v.value === condition.variableId),
-                )}
-                onChange={(index) => {
-                  const variableId = variableOptions[index]?.value;
-                  if (variableId) {
-                    const variable = variables.find((v) => v.id === variableId);
-                    onChange({
-                      ...condition,
-                      variableId,
-                      operator: 'EQUAL', // Reset to default operator
-                      value: variable?.type === 'boolean' ? false : variable?.type === 'number' ? 0 : '',
-                    });
-                  }
-                }}
-              />
+              <Button
+                theme="secondary"
+                onClick={() => setVariableSelectOpened(true)}
+                className="VariableConditionForm__target-button"
+              >
+                {getVariableDisplayName()}
+              </Button>
             </div>
           </div>
 
@@ -318,6 +331,14 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
         onCloseModal={() => setSceneSelectOpened(false)}
         selectedSceneId={currentTargetId}
         onSelectScene={handleSceneSelect}
+      />
+
+      <VariableSelectionModal
+        opened={variableSelectOpened}
+        onCloseModal={() => setVariableSelectOpened(false)}
+        onSelect={handleVariableSelect}
+        scope={currentScope}
+        targetId={currentTargetId}
       />
     </div>
   );

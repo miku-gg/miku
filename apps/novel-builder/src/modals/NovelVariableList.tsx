@@ -7,7 +7,7 @@ import { selectAllScenes, selectAllCharacters } from '../state/selectors';
 import { formatNumberInput } from '../libs/numberFormatter';
 import './NovelVariableEditModal.scss';
 import { v4 as uuidv4 } from 'uuid';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { NovelV3 } from '@mikugg/bot-utils';
 
 interface NovelVariableListProps {
@@ -23,6 +23,7 @@ export default function NovelVariableList({ scope, targetId, title, showHeader =
   const characters = useAppSelector(selectAllCharacters);
   const areYouSure = AreYouSure.useAreYouSure();
   const [numberInputs, setNumberInputs] = useState<Record<string, string>>({});
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Get variables based on scope
   const getVariables = (): NovelV3.NovelVariable[] => {
@@ -40,7 +41,17 @@ export default function NovelVariableList({ scope, targetId, title, showHeader =
     }
   };
 
-  const variables = getVariables();
+  const allVariables = getVariables();
+
+  // Filter variables based on search query
+  const variables = useMemo(() => {
+    if (!searchQuery.trim()) return allVariables;
+
+    const query = searchQuery.toLowerCase();
+    return allVariables.filter(
+      (variable) => variable.name?.toLowerCase().includes(query) || variable.description?.toLowerCase().includes(query),
+    );
+  }, [allVariables, searchQuery]);
 
   const typeItems = [
     { name: 'number', value: 'number' },
@@ -89,6 +100,11 @@ export default function NovelVariableList({ scope, targetId, title, showHeader =
   return (
     <div className="NovelVariableEditModal">
       {showHeader && <h2>{title}</h2>}
+
+      <div className="NovelVariableEditModal__search">
+        <Input placeHolder="Search variables..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+      </div>
+
       <div className="NovelVariableEditModal__actions">
         <Button theme="secondary" onClick={handleCreateVariable}>
           <FaPlus />

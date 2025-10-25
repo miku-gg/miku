@@ -5,6 +5,14 @@
   h1 {
     margin-bottom: 12px;
   }
+  &__search {
+    margin-bottom: 12px;
+
+    .Input {
+      width: 100%;
+    }
+  }
+
   &__actions {
     margin-bottom: 12px;
     .Button {
