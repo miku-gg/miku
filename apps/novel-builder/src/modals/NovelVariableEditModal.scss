@@ -13,6 +13,31 @@
     }
   }
 
+  &__search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 14px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  &__search-container .Input {
+    width: 100%;
+  }
+
+  &__search-container .Input input {
+    padding-left: 36px !important;
+  }
+
   &__actions {
     margin-bottom: 12px;
     .Button {

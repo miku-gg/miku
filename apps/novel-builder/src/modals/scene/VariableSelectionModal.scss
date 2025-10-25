@@ -12,6 +12,31 @@
     }
   }
 
+  &__search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 14px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  &__search-container .Input {
+    width: 100%;
+  }
+
+  &__search-container .Input input {
+    padding-left: 36px !important;
+  }
+
   &__list {
     display: flex;
     flex-direction: column;
@@ -85,6 +110,7 @@
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }

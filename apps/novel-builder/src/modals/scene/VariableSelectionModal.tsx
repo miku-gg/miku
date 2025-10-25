@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react';
 import { useAppSelector } from '../../state/store';
 import { selectAllScenes, selectAllCharacters } from '../../state/selectors';
 import { NovelV3 } from '@mikugg/bot-utils';
+import { FaSearch } from 'react-icons/fa';
 import './VariableSelectionModal.scss';
 
 interface VariableSelectionModalProps {
@@ -82,11 +83,14 @@ export default function VariableSelectionModal({
     <Modal opened={opened} onCloseModal={onCloseModal} className="VariableSelectionModal" title="Select Variable">
       <div className="VariableSelectionModal__content">
         <div className="VariableSelectionModal__search">
-          <Input
-            placeHolder="Search variables..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <div className="VariableSelectionModal__search-container">
+            <FaSearch className="VariableSelectionModal__search-icon" />
+            <Input
+              placeHolder="Search variables..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
 
         <div className="VariableSelectionModal__list">

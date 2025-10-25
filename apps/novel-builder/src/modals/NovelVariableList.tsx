@@ -1,5 +1,5 @@
 import { AreYouSure, Button, Dropdown, Input } from '@mikugg/ui-kit';
-import { FaTrashAlt } from 'react-icons/fa';
+import { FaTrashAlt, FaSearch } from 'react-icons/fa';
 import { FaPlus } from 'react-icons/fa6';
 import { useAppDispatch, useAppSelector } from '../state/store';
 import { createNovelVariable, deleteNovelVariable, updateNovelVariable } from '../state/slices/novelFormSlice';
@@ -102,11 +102,18 @@ export default function NovelVariableList({ scope, targetId, title, showHeader =
       {showHeader && <h2>{title}</h2>}
 
       <div className="NovelVariableEditModal__search">
-        <Input placeHolder="Search variables..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+        <div className="NovelVariableEditModal__search-container">
+          <FaSearch className="NovelVariableEditModal__search-icon" />
+          <Input
+            placeHolder="Search variables..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className="NovelVariableEditModal__actions">
-        <Button theme="secondary" onClick={handleCreateVariable}>
+        <Button theme="secondary" onClick={handleCreateVariable} disabled={searchQuery.trim().length > 0}>
           <FaPlus />
           Add variable
         </Button>
@@ -269,7 +276,12 @@ export default function NovelVariableList({ scope, targetId, title, showHeader =
         ))}
         {variables.length > 0 && (
           <div className="NovelVariableEditModal__actions NovelVariableEditModal__actions--footer">
-            <Button theme="secondary" onClick={handleCreateVariable} style={{ width: 46 }}>
+            <Button
+              theme="secondary"
+              onClick={handleCreateVariable}
+              style={{ width: 46 }}
+              disabled={searchQuery.trim().length > 0}
+            >
               <FaPlus />
             </Button>
           </div>
