@@ -71,9 +71,24 @@ const novelFormSlice = createSlice({
       }
     },
     deleteVariableBank: (state, action: PayloadAction<{ id: string }>) => {
+      const bankId = action.payload.id;
       if (state.variableBanks) {
-        state.variableBanks = state.variableBanks.filter((b) => b.id !== action.payload.id);
+        state.variableBanks = state.variableBanks.filter((b) => b.id !== bankId);
       }
+
+      // Remove references from all scenes
+      state.scenes.forEach((scene) => {
+        if (scene.variableBankIds) {
+          scene.variableBankIds = scene.variableBankIds.filter((id) => id !== bankId);
+        }
+      });
+
+      // Remove references from all characters
+      state.characters.forEach((character) => {
+        if (character.variableBankIds) {
+          character.variableBankIds = character.variableBankIds.filter((id) => id !== bankId);
+        }
+      });
     },
     // Variable actions within banks
     createVariableInBank: (state, action: PayloadAction<{ bankId: string; variableId: string }>) => {

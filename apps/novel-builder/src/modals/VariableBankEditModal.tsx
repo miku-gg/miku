@@ -1,17 +1,32 @@
-import { Modal, Input } from '@mikugg/ui-kit';
+import { AreYouSure, Button, Modal, Input } from '@mikugg/ui-kit';
+import { FaTrashAlt } from 'react-icons/fa';
 import { useAppDispatch, useAppSelector } from '../state/store';
 import { closeModal } from '../state/slices/inputSlice';
-import { updateVariableBank } from '../state/slices/novelFormSlice';
+import { updateVariableBank, deleteVariableBank } from '../state/slices/novelFormSlice';
 import { selectVariableBankById } from '../state/selectors';
 import NovelVariableList from './NovelVariableList';
 
 export default function VariableBankEditModal() {
   const dispatch = useAppDispatch();
+  const areYouSure = AreYouSure.useAreYouSure();
   const modal = useAppSelector((state) => state.input.modals.novelVariableEdit);
   const bank = useAppSelector((state) => (modal.bankId ? selectVariableBankById(state, modal.bankId) : null));
   const isOpen = modal.opened;
 
   if (!modal.bankId) return null;
+
+  const handleDeleteBank = () => {
+    if (!bank) return;
+    areYouSure.openModal({
+      title: 'Are you sure?',
+      description: `Variable bank "${bank.name}" will be deleted. This action cannot be undone.`,
+      onYes: () => {
+        dispatch(deleteVariableBank({ id: bank.id }));
+        dispatch(closeModal({ modalType: 'novelVariableEdit' }));
+      },
+      overlayClassName: 'AreYouSure__overlay--high-z-index',
+    });
+  };
 
   return (
     <Modal
@@ -55,9 +70,13 @@ export default function VariableBankEditModal() {
           />
         </div>
         <NovelVariableList bankId={modal.bankId} title="Variables" />
+        <div className="VariableBankEditModal__footer">
+          <Button theme="secondary" className="VariableBankEditModal__delete-button danger" onClick={handleDeleteBank}>
+            <FaTrashAlt />
+            Delete Bank
+          </Button>
+        </div>
       </div>
     </Modal>
   );
 }
-
-

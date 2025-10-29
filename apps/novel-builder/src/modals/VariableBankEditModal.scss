@@ -2,6 +2,25 @@
   max-width: 800px;
   min-width: 300px;
 
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  &__delete-button {
+    &.danger {
+      background: #ff0800 !important;
+      color: #ffffff !important;
+
+      &:hover {
+        background: #e4110ab8 !important;
+      }
+    }
+  }
+
   &__bank-info {
     display: flex;
     flex-direction: column;
