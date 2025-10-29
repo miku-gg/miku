@@ -7,7 +7,7 @@ import {
   addCharacterToParty,
   changeCharacterBattleOutfit,
   changeCutscenePartBackground,
-  setGlobalVariable,
+  setNovelVariable,
 } from './slices/novelSlice';
 import { toggleItemVisibility } from './slices/inventorySlice';
 import { setNextSceneToCurrentResponse, setSceneCreationSuggestionToCurrentResponse } from './slices/narrationSlice';
@@ -93,14 +93,14 @@ export const novelActionToStateAction = (action: NovelV3.NovelAction): Action[] 
         }),
       ];
     case NovelV3.NovelActionType.SET_NOVEL_VARIABLE:
+      const mappedVariables = action.params.variables.map((v) => ({
+        variableId: v.variableId,
+        value: v.value,
+        bankId: v.bankId,
+      }));
       return [
-        setGlobalVariable({
-          variables: action.params.variables.map((v) => ({
-            variableId: v.variableId,
-            value: v.value,
-            scope: v.scope || 'global',
-            targetId: v.targetId,
-          })),
+        setNovelVariable({
+          variables: mappedVariables,
         }),
       ];
   }

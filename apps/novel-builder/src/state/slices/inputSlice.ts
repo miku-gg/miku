@@ -36,8 +36,7 @@ export interface InputState {
       opened: boolean;
       editId?: string;
       text?: string;
-      scope?: 'global' | 'scene' | 'character';
-      targetId?: string;
+      bankId?: string;
     };
   };
   spendApprovalModal: {
@@ -110,8 +109,7 @@ const initialState: InputState = {
     },
     novelVariableEdit: {
       opened: false,
-      scope: undefined,
-      targetId: undefined,
+      bankId: undefined,
     },
   },
   spendApprovalModal: {
@@ -132,19 +130,17 @@ const inputSlice = createSlice({
         modalType: ModalType;
         editId?: string;
         text?: string;
-        scope?: 'global' | 'scene' | 'character';
-        targetId?: string;
+        bankId?: string;
       }>,
     ) => {
-      const { modalType, editId, scope, targetId } = action.payload;
+      const { modalType, editId, bankId } = action.payload;
 
       if (!state.modals[modalType]) {
         // Create the modal state if it doesn't exist (for novelVariableEdit)
         if (modalType === 'novelVariableEdit') {
           state.modals[modalType] = {
             opened: false,
-            scope: undefined,
-            targetId: undefined,
+            bankId: undefined,
           };
         } else {
           return;
@@ -158,11 +154,8 @@ const inputSlice = createSlice({
       if ('text' in action.payload) {
         state.modals[modalType].text = action.payload.text;
       }
-      if ('scope' in action.payload) {
-        state.modals[modalType].scope = scope;
-      }
-      if ('targetId' in action.payload) {
-        state.modals[modalType].targetId = targetId;
+      if ('bankId' in action.payload) {
+        state.modals[modalType].bankId = bankId;
       }
     },
     closeModal: (
@@ -175,8 +168,7 @@ const inputSlice = createSlice({
       modal.opened = false;
       // Reset optional fields for novelVariableEdit modal
       if (action.payload.modalType === 'novelVariableEdit') {
-        modal.scope = undefined;
-        modal.targetId = undefined;
+        modal.bankId = undefined;
       }
     },
     navigatePanel(state, action: PayloadAction<PanelType>) {

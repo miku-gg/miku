@@ -24,7 +24,12 @@ const novelSlice = createSlice({
   initialState,
   reducers: {
     setNovel: (_state, action: PayloadAction<NovelState>) => {
-      return action.payload;
+      // Ensure variableBanks is initialized
+      const novel = {
+        ...action.payload,
+        variableBanks: action.payload.variableBanks || [],
+      };
+      return novel;
     },
     addScene: (
       state,
@@ -186,38 +191,30 @@ const novelSlice = createSlice({
         }
       }
     },
-    setGlobalVariable: (
+    setNovelVariable: (
       state,
       action: PayloadAction<{
         variables: Array<{
           variableId: string;
           value: string | number | boolean;
-          scope: 'global' | 'scene' | 'character';
-          targetId?: string;
+          bankId: string;
         }>;
       }>,
     ) => {
-      action.payload.variables.forEach(({ variableId, value, scope, targetId }) => {
-        switch (scope) {
-          case 'global':
-            if (!state.globalVariables) state.globalVariables = [];
-            const globalVar = state.globalVariables.find((v) => v.id === variableId);
-            if (globalVar) globalVar.value = value;
-            break;
-          case 'scene':
-            const scene = state.scenes?.find((s) => s.id === targetId);
-            if (scene?.localVariables) {
-              const sceneVar = scene.localVariables.find((v) => v.id === variableId);
-              if (sceneVar) sceneVar.value = value;
-            }
-            break;
-          case 'character':
-            const character = state.characters?.find((c) => c.id === targetId);
-            if (character?.localVariables) {
-              const charVar = character.localVariables.find((v) => v.id === variableId);
-              if (charVar) charVar.value = value;
-            }
-            break;
+      if (!state.variableBanks) {
+        state.variableBanks = [];
+      }
+
+      action.payload.variables.forEach(({ variableId, value, bankId }) => {
+        let bank = state.variableBanks!.find((b) => b.id === bankId);
+
+        if (!bank) {
+          return;
+        }
+
+        let variable = bank.variables.find((v) => v.id === variableId);
+        if (variable) {
+          variable.value = value;
         }
       });
     },
@@ -244,7 +241,7 @@ export const {
   addCharacterToParty,
   changeCharacterBattleOutfit,
   changeCutscenePartBackground,
-  setGlobalVariable,
+  setNovelVariable,
 } = novelSlice.actions;
 
 export default novelSlice.reducer;

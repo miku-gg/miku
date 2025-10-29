@@ -145,7 +145,7 @@ export default function ObjectiveEditModal() {
                       variableId: '',
                       operator: 'EQUAL',
                       value: '',
-                      scope: 'global',
+                      bankId: 'global-bank',
                     };
                     dispatch(
                       updateObjective({

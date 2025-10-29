@@ -43,7 +43,7 @@ const initialState: NovelV3.NovelState & { pendingInferences?: PendingInference[
   inventory: [],
   cutscenes: [],
   language: 'en',
-  globalVariables: [],
+  variableBanks: [],
   pendingInferences: [],
 };
 
@@ -51,165 +51,57 @@ const novelFormSlice = createSlice({
   name: 'novel',
   initialState,
   reducers: {
-    // Scene local variables
-    createSceneLocalVariable: (state, action: PayloadAction<{ sceneId: string; id: string }>) => {
-      const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
-      if (!scene) return;
-      if (!scene.localVariables) scene.localVariables = [];
-      scene.localVariables.push({
+    // Variable bank actions
+    createVariableBank: (state, action: PayloadAction<{ id: string; name: string; description: string }>) => {
+      if (!state.variableBanks) state.variableBanks = [];
+      state.variableBanks.push({
         id: action.payload.id,
-        name: '',
-        description: '',
-        type: 'number',
-        value: 0,
+        name: action.payload.name,
+        description: action.payload.description,
+        variables: [],
       });
     },
-    updateSceneLocalVariable: (
+    updateVariableBank: (
       state,
-      action: PayloadAction<{
-        sceneId: string;
-        id: string;
-        changes: Partial<NovelV3.NovelVariable>;
-      }>,
+      action: PayloadAction<{ id: string; changes: Partial<Omit<NovelV3.NovelVariableBank, 'id'>> }>,
     ) => {
-      const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
-      if (!scene?.localVariables) return;
-      const variable = scene.localVariables.find((v) => v.id === action.payload.id);
-      if (!variable) return;
-      Object.assign(variable, action.payload.changes);
-    },
-    deleteSceneLocalVariable: (state, action: PayloadAction<{ sceneId: string; id: string }>) => {
-      const scene = state.scenes.find((s) => s.id === action.payload.sceneId);
-      if (!scene?.localVariables) return;
-      scene.localVariables = scene.localVariables.filter((v) => v.id !== action.payload.id);
-    },
-    // Character local variables
-    createCharacterLocalVariable: (state, action: PayloadAction<{ characterId: string; id: string }>) => {
-      const character = state.characters.find((c) => c.id === action.payload.characterId);
-      if (!character) return;
-      if (!character.localVariables) character.localVariables = [];
-      character.localVariables.push({
-        id: action.payload.id,
-        name: '',
-        description: '',
-        type: 'number',
-        value: 0,
-      });
-    },
-    updateCharacterLocalVariable: (
-      state,
-      action: PayloadAction<{
-        characterId: string;
-        id: string;
-        changes: Partial<NovelV3.NovelVariable>;
-      }>,
-    ) => {
-      const character = state.characters.find((c) => c.id === action.payload.characterId);
-      if (!character?.localVariables) return;
-      const variable = character.localVariables.find((v) => v.id === action.payload.id);
-      if (!variable) return;
-      Object.assign(variable, action.payload.changes);
-    },
-    deleteCharacterLocalVariable: (state, action: PayloadAction<{ characterId: string; id: string }>) => {
-      const character = state.characters.find((c) => c.id === action.payload.characterId);
-      if (!character?.localVariables) return;
-      character.localVariables = character.localVariables.filter((v) => v.id !== action.payload.id);
-    },
-    // Generic novel variable actions
-    createNovelVariable: (
-      state,
-      action: PayloadAction<{
-        scope: 'global' | 'scene' | 'character';
-        targetId?: string;
-        id: string;
-      }>,
-    ) => {
-      const { scope, targetId, id } = action.payload;
-      const newVariable: NovelV3.NovelVariable = {
-        id,
-        name: '',
-        description: '',
-        type: 'number',
-        value: 0,
-      };
-
-      switch (scope) {
-        case 'global':
-          if (!state.globalVariables) state.globalVariables = [];
-          state.globalVariables.push(newVariable);
-          break;
-        case 'scene':
-          const scene = state.scenes.find((s) => s.id === targetId);
-          if (!scene) return;
-          if (!scene.localVariables) scene.localVariables = [];
-          scene.localVariables.push(newVariable);
-          break;
-        case 'character':
-          const character = state.characters.find((c) => c.id === targetId);
-          if (!character) return;
-          if (!character.localVariables) character.localVariables = [];
-          character.localVariables.push(newVariable);
-          break;
+      const bank = state.variableBanks?.find((b) => b.id === action.payload.id);
+      if (bank) {
+        Object.assign(bank, action.payload.changes);
       }
     },
-    updateNovelVariable: (
-      state,
-      action: PayloadAction<{
-        scope: 'global' | 'scene' | 'character';
-        targetId?: string;
-        id: string;
-        changes: Partial<NovelV3.NovelVariable>;
-      }>,
-    ) => {
-      const { scope, targetId, id, changes } = action.payload;
-      let variable: NovelV3.NovelVariable | undefined;
-
-      switch (scope) {
-        case 'global':
-          variable = state.globalVariables?.find((v) => v.id === id);
-          break;
-        case 'scene':
-          const scene = state.scenes.find((s) => s.id === targetId);
-          variable = scene?.localVariables?.find((v) => v.id === id);
-          break;
-        case 'character':
-          const character = state.characters.find((c) => c.id === targetId);
-          variable = character?.localVariables?.find((v) => v.id === id);
-          break;
+    deleteVariableBank: (state, action: PayloadAction<{ id: string }>) => {
+      if (state.variableBanks) {
+        state.variableBanks = state.variableBanks.filter((b) => b.id !== action.payload.id);
       }
-
+    },
+    // Variable actions within banks
+    createVariableInBank: (state, action: PayloadAction<{ bankId: string; variableId: string }>) => {
+      const bank = state.variableBanks?.find((b) => b.id === action.payload.bankId);
+      if (bank) {
+        bank.variables.push({
+          id: action.payload.variableId,
+          name: '',
+          description: '',
+          type: 'number',
+          value: 0,
+        });
+      }
+    },
+    updateVariableInBank: (
+      state,
+      action: PayloadAction<{ bankId: string; variableId: string; changes: Partial<NovelV3.NovelVariable> }>,
+    ) => {
+      const bank = state.variableBanks?.find((b) => b.id === action.payload.bankId);
+      const variable = bank?.variables.find((v) => v.id === action.payload.variableId);
       if (variable) {
-        Object.assign(variable, changes);
+        Object.assign(variable, action.payload.changes);
       }
     },
-    deleteNovelVariable: (
-      state,
-      action: PayloadAction<{
-        scope: 'global' | 'scene' | 'character';
-        targetId?: string;
-        id: string;
-      }>,
-    ) => {
-      const { scope, targetId, id } = action.payload;
-
-      switch (scope) {
-        case 'global':
-          if (state.globalVariables) {
-            state.globalVariables = state.globalVariables.filter((v) => v.id !== id);
-          }
-          break;
-        case 'scene':
-          const scene = state.scenes.find((s) => s.id === targetId);
-          if (scene?.localVariables) {
-            scene.localVariables = scene.localVariables.filter((v) => v.id !== id);
-          }
-          break;
-        case 'character':
-          const character = state.characters.find((c) => c.id === targetId);
-          if (character?.localVariables) {
-            character.localVariables = character.localVariables.filter((v) => v.id !== id);
-          }
-          break;
+    deleteVariableInBank: (state, action: PayloadAction<{ bankId: string; variableId: string }>) => {
+      const bank = state.variableBanks?.find((b) => b.id === action.payload.bankId);
+      if (bank) {
+        bank.variables = bank.variables.filter((v) => v.id !== action.payload.variableId);
       }
     },
     addChildScene: (state, action: PayloadAction<{ sourceId: string; targetId: string }>) => {
@@ -308,7 +200,7 @@ const novelFormSlice = createSlice({
             tags: [],
           },
         },
-        localVariables: [],
+        variableBankIds: [],
       };
       state.characters.push(character);
     },
@@ -344,7 +236,7 @@ const novelFormSlice = createSlice({
         nsfw: NovelV3.NovelNSFW.NONE,
         parentMapIds: null,
         prompt: '',
-        localVariables: [],
+        variableBankIds: [],
       };
       state.scenes.push(newScene);
     },
@@ -1036,9 +928,12 @@ export const {
   addPendingInference,
   updateInferenceStatus,
   removePendingInference,
-  createNovelVariable,
-  updateNovelVariable,
-  deleteNovelVariable,
+  createVariableBank,
+  updateVariableBank,
+  deleteVariableBank,
+  createVariableInBank,
+  updateVariableInBank,
+  deleteVariableInBank,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

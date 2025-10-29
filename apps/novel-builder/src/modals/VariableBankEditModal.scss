@@ -1,3 +1,17 @@
+.VariableBankEditModal {
+  max-width: 800px;
+  min-width: 300px;
+
+  &__bank-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
 .NovelVariableEditModal {
   max-width: 800px;
   min-width: 300px;
@@ -140,19 +154,19 @@
   }
 }
 
-.NovelVariableEditModal .Input {
+.VariableBankEditModal .Input {
   margin: 0;
 }
 
-.NovelVariableEditModal .NovelVariableEditModal__control > * {
+.VariableBankEditModal .NovelVariableEditModal__control > * {
   margin: 0 !important;
   align-self: flex-start;
 }
 
-.NovelVariableEditModal .Input input {
+.VariableBankEditModal .Input input {
   box-sizing: border-box;
 }
-.NovelVariableEditModal textarea {
+.VariableBankEditModal textarea {
   min-height: 20px;
   height: 20px;
   resize: vertical;
@@ -161,17 +175,17 @@
   display: block;
 }
 
-.NovelVariableEditModal .Button.danger {
+.VariableBankEditModal .Button.danger {
   background: #ff0800 !important;
   color: #ffffff !important;
 }
-.NovelVariableEditModal .Button.danger:hover {
+.VariableBankEditModal .Button.danger:hover {
   background: #e4110ab8 !important;
 }
 
 // Responsive breakpoint for mobile
 @media (max-width: 600px) {
-  .NovelVariableEditModal {
+  .VariableBankEditModal {
     &__row {
       grid-template-columns: 40px 1fr; // Index and info only
       gap: 8px;
@@ -234,7 +248,7 @@
 
 // Hide mobile delete button on desktop
 @media (min-width: 601px) {
-  .NovelVariableEditModal {
+  .VariableBankEditModal {
     &__mobile-delete {
       display: none !important;
     }

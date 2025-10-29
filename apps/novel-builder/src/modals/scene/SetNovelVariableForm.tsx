@@ -1,12 +1,11 @@
 import { NovelV3 } from '@mikugg/bot-utils';
 import { useAppSelector } from '../../state/store';
-import { selectAllScenes, selectAllCharacters } from '../../state/selectors';
+import { selectVariableBanks, selectVariablesInBank } from '../../state/selectors';
 import { Dropdown, Input, Button } from '@mikugg/ui-kit';
 import { formatNumberInput } from '../../libs/numberFormatter';
 import { useState } from 'react';
 import { FaTrashAlt, FaPlus } from 'react-icons/fa';
-import CharacterSelectModal from './CharacterSelectModal';
-import { SceneSelectorModal } from './SceneSelector';
+import BankSelectionModal from './BankSelectionModal';
 import VariableSelectionModal from './VariableSelectionModal';
 import './NovelActionForm.scss';
 
@@ -14,29 +13,21 @@ interface SetNovelVariableFormProps {
   variables: Array<{
     variableId: string;
     value: string | number | boolean;
-    scope: NovelV3.VariableScope;
-    targetId?: string;
+    bankId: string;
   }>;
   onChange: (
     variables: Array<{
       variableId: string;
       value: string | number | boolean;
-      scope: NovelV3.VariableScope;
-      targetId?: string;
+      bankId: string;
     }>,
   ) => void;
 }
 
 export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFormProps) => {
-  const scenes = useAppSelector(selectAllScenes);
-  const characters = useAppSelector(selectAllCharacters);
-  const globalVariables = useAppSelector((state) => state.novel.globalVariables);
+  const banks = useAppSelector(selectVariableBanks);
   const [numberInputValues, setNumberInputValues] = useState<Record<string, string>>({});
-  const [characterSelectOpened, setCharacterSelectOpened] = useState<{ opened: boolean; index: number }>({
-    opened: false,
-    index: -1,
-  });
-  const [sceneSelectOpened, setSceneSelectOpened] = useState<{ opened: boolean; index: number }>({
+  const [bankSelectOpened, setBankSelectOpened] = useState<{ opened: boolean; index: number }>({
     opened: false,
     index: -1,
   });
@@ -45,12 +36,21 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
     index: -1,
   });
 
+  // Get all variables from all banks for easy lookup
+  const allVariables = useAppSelector((state) => {
+    const allVars: NovelV3.NovelVariable[] = [];
+    banks.forEach((bank) => {
+      const bankVars = selectVariablesInBank(state, bank.id);
+      allVars.push(...bankVars);
+    });
+    return allVars;
+  });
+
   const addVariable = () => {
     const newVariable = {
       variableId: '',
       value: '',
-      scope: 'global' as NovelV3.VariableScope,
-      targetId: undefined,
+      bankId: 'global-bank',
     };
     onChange([...(variables || []), newVariable]);
   };
@@ -65,8 +65,7 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
     updates: Partial<{
       variableId: string;
       value: string | number | boolean;
-      scope: NovelV3.VariableScope;
-      targetId?: string;
+      bankId: string;
     }>,
   ) => {
     if (index < 0 || index >= (variables || []).length) return;
@@ -75,118 +74,39 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
     onChange(newVariables);
   };
 
-  const handleCharacterSelect = (characterId: string) => {
-    if (characterSelectOpened.index >= 0) {
-      updateVariable(characterSelectOpened.index, { targetId: characterId, variableId: '', value: '' });
+  const handleBankSelect = (bankId: string) => {
+    if (bankSelectOpened.index >= 0) {
+      updateVariable(bankSelectOpened.index, { bankId, variableId: '', value: '' });
     }
-    setCharacterSelectOpened({ opened: false, index: -1 });
-  };
-
-  const handleSceneSelect = (sceneId: string) => {
-    if (sceneSelectOpened.index >= 0) {
-      updateVariable(sceneSelectOpened.index, { targetId: sceneId, variableId: '', value: '' });
-    }
-    setSceneSelectOpened({ opened: false, index: -1 });
+    setBankSelectOpened({ opened: false, index: -1 });
   };
 
   const handleVariableSelect = (variableId: string) => {
     if (variableSelectOpened.index >= 0) {
-      const currentVariable = (variables || [])[variableSelectOpened.index];
-      if (currentVariable) {
-        // Get the variable details to set the default value
-        let variables: NovelV3.NovelVariable[] = [];
-        switch (currentVariable.scope) {
-          case 'global':
-            variables = globalVariables || [];
-            break;
-          case 'scene':
-            const scene = scenes.find((s) => s.id === currentVariable.targetId);
-            variables = scene?.localVariables || [];
-            break;
-          case 'character':
-            const character = characters.find((c) => c.id === currentVariable.targetId);
-            variables = character?.localVariables || [];
-            break;
-        }
-
-        const selectedVar = variables.find((v) => v.id === variableId);
-        const defaultValue = selectedVar?.type === 'boolean' ? false : selectedVar?.type === 'number' ? 0 : '';
-
-        updateVariable(variableSelectOpened.index, {
-          variableId,
-          value: defaultValue,
-        });
+      const variable = allVariables.find((v) => v.id === variableId);
+      if (variable) {
+        const defaultValue = variable.type === 'boolean' ? false : variable.type === 'number' ? 0 : '';
+        updateVariable(variableSelectOpened.index, { variableId, value: defaultValue });
       }
     }
     setVariableSelectOpened({ opened: false, index: -1 });
   };
 
-  const getTargetDisplayName = (scope: NovelV3.VariableScope, targetId?: string) => {
-    if (scope === 'scene') {
-      if (targetId) {
-        const scene = scenes.find((s) => s.id === targetId);
-        return scene?.name || 'Select Scene';
-      }
-      return 'Select Scene';
-    }
-    if (scope === 'character') {
-      if (targetId) {
-        const character = characters.find((c) => c.id === targetId);
-        return character?.name || 'Select Character';
-      }
-      return 'Select Character';
-    }
-    return 'Select Target';
+  const getBankDisplayName = (bankId: string) => {
+    const bank = banks.find((b) => b.id === bankId);
+    return bank?.name || 'Select Bank';
   };
 
-  const getVariableDisplayName = (variableId: string, scope: NovelV3.VariableScope, targetId?: string) => {
+  const getVariableDisplayName = (variableId: string) => {
     if (!variableId) return 'Select Variable';
-
-    let variables: NovelV3.NovelVariable[] = [];
-    switch (scope) {
-      case 'global':
-        variables = globalVariables || [];
-        break;
-      case 'scene':
-        const scene = scenes.find((s) => s.id === targetId);
-        variables = scene?.localVariables || [];
-        break;
-      case 'character':
-        const character = characters.find((c) => c.id === targetId);
-        variables = character?.localVariables || [];
-        break;
-    }
-
-    const variable = variables.find((v) => v.id === variableId);
+    const variable = allVariables.find((v) => v.id === variableId);
     return variable?.name || 'Select Variable';
   };
 
-  const getValueInput = (
-    variableId: string,
-    currentValue: string | number | boolean,
-    index: number,
-    scope: NovelV3.VariableScope,
-    targetId?: string,
-  ) => {
+  const getValueInput = (variableId: string, currentValue: string | number | boolean, index: number) => {
     if (!variableId) return null;
 
-    let variables: NovelV3.NovelVariable[] = [];
-
-    switch (scope) {
-      case 'global':
-        variables = globalVariables || [];
-        break;
-      case 'scene':
-        const scene = scenes.find((s) => s.id === targetId);
-        variables = scene?.localVariables || [];
-        break;
-      case 'character':
-        const character = characters.find((c) => c.id === targetId);
-        variables = character?.localVariables || [];
-        break;
-    }
-
-    const selectedVariable = variables.find((v) => v.id === variableId);
+    const selectedVariable = allVariables.find((v) => v.id === variableId);
     if (!selectedVariable) return null;
 
     switch (selectedVariable.type) {
@@ -262,75 +182,30 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
         const safeVariable = {
           variableId: variable.variableId || '',
           value: variable.value ?? '',
-          scope: variable.scope || 'global',
-          targetId: variable.targetId,
+          bankId: variable.bankId || 'global-bank',
         };
 
-        const currentScope = safeVariable.scope;
-        const currentTargetId = safeVariable.targetId;
-
-        // Scope options
-        const scopeOptions = [
-          { name: 'Global', value: 'global' },
-          { name: 'Scene', value: 'scene' },
-          { name: 'Character', value: 'character' },
-        ];
-
-        // Target options are no longer needed since we use selector modals
-
-        // Variable options are no longer needed since we use the selection modal
+        const currentBankId = safeVariable.bankId;
 
         // Use stable key
         const key = `var-${index}-${safeVariable.variableId || 'new'}`;
 
         return (
           <div key={key} className="SetNovelVariableForm__group">
-            {/* First row: Scope, Target (if needed), Delete */}
+            {/* First row: Bank, Delete */}
             <div className="SetNovelVariableForm__row SetNovelVariableForm__row--scope">
               <div className="SetNovelVariableForm__field">
-                <label className="SetNovelVariableForm__label">Scope</label>
+                <label className="SetNovelVariableForm__label">Bank</label>
                 <div className="SetNovelVariableForm__control">
-                  <Dropdown
-                    items={scopeOptions}
-                    selectedIndex={scopeOptions.findIndex((s) => s.value === currentScope)}
-                    onChange={(dropdownIndex) => {
-                      const selectedScope = scopeOptions[dropdownIndex]?.value as NovelV3.VariableScope;
-                      updateVariable(index, { scope: selectedScope, targetId: undefined, variableId: '', value: '' });
-                    }}
-                  />
+                  <Button
+                    theme="secondary"
+                    onClick={() => setBankSelectOpened({ opened: true, index })}
+                    className="SetNovelVariableForm__target-button"
+                  >
+                    {getBankDisplayName(currentBankId)}
+                  </Button>
                 </div>
               </div>
-
-              {/* Show target selector only for scene/character scope, otherwise show placeholder */}
-              {currentScope === 'scene' || currentScope === 'character' ? (
-                <div className="SetNovelVariableForm__field">
-                  <label className="SetNovelVariableForm__label">
-                    {currentScope === 'scene' ? 'Scene' : 'Character'}
-                  </label>
-                  <div className="SetNovelVariableForm__control">
-                    <Button
-                      theme="secondary"
-                      onClick={() => {
-                        if (currentScope === 'scene') {
-                          setSceneSelectOpened({ opened: true, index });
-                        } else if (currentScope === 'character') {
-                          setCharacterSelectOpened({ opened: true, index });
-                        }
-                      }}
-                      className="SetNovelVariableForm__target-button"
-                    >
-                      {getTargetDisplayName(currentScope, currentTargetId)}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="SetNovelVariableForm__field">
-                  <label className="SetNovelVariableForm__label">&nbsp;</label>
-                  <div className="SetNovelVariableForm__control">
-                    <div className="SetNovelVariableForm__placeholder"></div>
-                  </div>
-                </div>
-              )}
 
               <div className="SetNovelVariableForm__field">
                 <label className="SetNovelVariableForm__label">&nbsp;</label>
@@ -356,7 +231,7 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
                     onClick={() => setVariableSelectOpened({ opened: true, index })}
                     className="SetNovelVariableForm__target-button"
                   >
-                    {getVariableDisplayName(safeVariable.variableId, currentScope, currentTargetId)}
+                    {getVariableDisplayName(safeVariable.variableId)}
                   </Button>
                 </div>
               </div>
@@ -366,7 +241,7 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
                   <>
                     <label className="SetNovelVariableForm__label">Value</label>
                     <div className="SetNovelVariableForm__control">
-                      {getValueInput(safeVariable.variableId, safeVariable.value, index, currentScope, currentTargetId)}
+                      {getValueInput(safeVariable.variableId, safeVariable.value, index)}
                     </div>
                   </>
                 ) : (
@@ -389,33 +264,21 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
         </Button>
       </div>
 
-      <CharacterSelectModal
-        opened={characterSelectOpened.opened}
-        onCloseModal={() => setCharacterSelectOpened({ opened: false, index: -1 })}
-        selectedCharacterId={
-          characterSelectOpened.index >= 0 ? (variables || [])[characterSelectOpened.index]?.targetId : undefined
-        }
-        onSelect={handleCharacterSelect}
-        showOutfitSelection={false}
-      />
-
-      <SceneSelectorModal
-        opened={sceneSelectOpened.opened}
-        onCloseModal={() => setSceneSelectOpened({ opened: false, index: -1 })}
-        selectedSceneId={
-          sceneSelectOpened.index >= 0 ? (variables || [])[sceneSelectOpened.index]?.targetId : undefined
-        }
-        onSelectScene={handleSceneSelect}
+      <BankSelectionModal
+        opened={bankSelectOpened.opened}
+        onCloseModal={() => setBankSelectOpened({ opened: false, index: -1 })}
+        onSelect={handleBankSelect}
       />
 
       <VariableSelectionModal
         opened={variableSelectOpened.opened}
         onCloseModal={() => setVariableSelectOpened({ opened: false, index: -1 })}
         onSelect={handleVariableSelect}
-        scope={
-          variableSelectOpened.index >= 0 ? (variables || [])[variableSelectOpened.index]?.scope || 'global' : 'global'
+        bankId={
+          variableSelectOpened.index >= 0
+            ? (variables || [])[variableSelectOpened.index]?.bankId || 'global-bank'
+            : 'global-bank'
         }
-        targetId={variableSelectOpened.index >= 0 ? (variables || [])[variableSelectOpened.index]?.targetId : undefined}
       />
     </div>
   );

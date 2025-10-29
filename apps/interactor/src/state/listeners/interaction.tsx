@@ -27,7 +27,7 @@ import {
   selectCurrentSceneObjectives,
   selectMessagesSinceLastSummary,
   selectSummaryEnabled,
-  selectGlobalVariables,
+  selectVariableBanks,
 } from '../selectors';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
@@ -355,23 +355,11 @@ const interactionEffect = async (
 
           if (response === ` Yes`) {
             // Check variable conditions if they exist
-            const globalVariables = selectGlobalVariables(state);
-            const currentScene = selectCurrentScene(state);
-            const currentCharacters = state.novel.characters.filter((c) =>
-              currentScene?.characters.some((sc) => sc.characterId === c.id),
-            );
-
-            // Get scene variables
-            const sceneVariables = currentScene?.localVariables || [];
-
-            // Get character variables (flatten all character variables)
-            const characterVariables = currentCharacters.flatMap((c) => c.localVariables || []);
+            const variableBanks = selectVariableBanks(state);
 
             const variableConditionsPassed = evaluateVariableConditions(
               objective.variableConditions || [],
-              globalVariables,
-              sceneVariables,
-              characterVariables,
+              variableBanks,
             );
 
             if (variableConditionsPassed) {

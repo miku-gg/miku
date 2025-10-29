@@ -49,8 +49,8 @@ export interface NovelScene {
   indicators?: NovelIndicator[];
   /** Optional battle to start when this scene begins */
   battleAtBeginning?: string;
-  /** Local variables for this scene */
-  localVariables?: NovelVariable[];
+  /** Variable banks referenced by this scene */
+  variableBankIds?: string[];
 }
 
 export interface NovelCharacterOutfit {
@@ -112,8 +112,7 @@ export type CutSceneAction =
         variables: Array<{
           variableId: string;
           value: string | number | boolean;
-          scope: VariableScope;
-          targetId?: string; // Required for 'scene' or 'character' scope
+          bankId: string;
         }>;
       };
     };
@@ -134,8 +133,8 @@ export interface NovelCharacter {
   card: MikuCardV2;
   nsfw: NovelNSFW;
   lorebookIds?: string[];
-  /** Local variables for this character */
-  localVariables?: NovelVariable[];
+  /** Variable banks referenced by this character */
+  variableBankIds?: string[];
 }
 
 export interface NovelBackground {
@@ -167,15 +166,11 @@ export interface NovelVariable {
   value: string | number | boolean;
 }
 
-// Keep GlobalVariable as alias for backwards compatibility
-export type GlobalVariable = NovelVariable;
-
-export type VariableScope = 'global' | 'scene' | 'character';
-
-export interface VariableScopeReference {
-  scope: VariableScope;
-  // For 'scene' or 'character' scope, specifies which scene/character
-  targetId?: string;
+export interface NovelVariableBank {
+  id: string;
+  name: string;
+  description: string;
+  variables: NovelVariable[];
 }
 
 export type VariableConditionOperator = 'EQUAL' | 'NOT_EQUAL' | 'LESS_THAN' | 'GREATER_THAN';
@@ -185,8 +180,7 @@ export interface VariableCondition {
   variableId: string;
   operator: VariableConditionOperator;
   value: string | number | boolean;
-  scope: VariableScope;
-  targetId?: string; // For scene/character scope
+  bankId: string;
 }
 
 export interface NovelMap {
@@ -326,8 +320,7 @@ export type NovelAction =
         variables: Array<{
           variableId: string;
           value: string | number | boolean;
-          scope: VariableScope;
-          targetId?: string; // Required for 'scene' or 'character' scope
+          bankId: string;
         }>;
       };
     }
@@ -407,7 +400,7 @@ export interface NovelState {
   useModalForStartSelection?: boolean;
   rpg?: NovelRPG;
   battles?: NovelBattle[];
-  globalVariables?: GlobalVariable[];
+  variableBanks?: NovelVariableBank[];
 }
 
 export interface NovelIndicator {

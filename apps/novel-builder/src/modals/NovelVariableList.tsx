@@ -2,46 +2,27 @@ import { AreYouSure, Button, Dropdown, Input } from '@mikugg/ui-kit';
 import { FaTrashAlt, FaSearch } from 'react-icons/fa';
 import { FaPlus } from 'react-icons/fa6';
 import { useAppDispatch, useAppSelector } from '../state/store';
-import { createNovelVariable, deleteNovelVariable, updateNovelVariable } from '../state/slices/novelFormSlice';
-import { selectAllScenes, selectAllCharacters } from '../state/selectors';
+import { createVariableInBank, deleteVariableInBank, updateVariableInBank } from '../state/slices/novelFormSlice';
+import { selectVariablesInBank } from '../state/selectors';
 import { formatNumberInput } from '../libs/numberFormatter';
-import './NovelVariableEditModal.scss';
+import './VariableBankEditModal.scss';
 import { v4 as uuidv4 } from 'uuid';
 import { useState, useMemo } from 'react';
-import { NovelV3 } from '@mikugg/bot-utils';
 
 interface NovelVariableListProps {
-  scope: 'global' | 'scene' | 'character';
-  targetId?: string;
+  bankId: string;
   title: string;
   showHeader?: boolean;
 }
 
-export default function NovelVariableList({ scope, targetId, title, showHeader = true }: NovelVariableListProps) {
+export default function NovelVariableList({ bankId, title, showHeader = true }: NovelVariableListProps) {
   const dispatch = useAppDispatch();
-  const scenes = useAppSelector(selectAllScenes);
-  const characters = useAppSelector(selectAllCharacters);
   const areYouSure = AreYouSure.useAreYouSure();
   const [numberInputs, setNumberInputs] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Get variables based on scope
-  const getVariables = (): NovelV3.NovelVariable[] => {
-    switch (scope) {
-      case 'global':
-        return useAppSelector((state) => state.novel.globalVariables || []);
-      case 'scene':
-        const scene = scenes.find((s) => s.id === targetId);
-        return scene?.localVariables || [];
-      case 'character':
-        const character = characters.find((c) => c.id === targetId);
-        return character?.localVariables || [];
-      default:
-        return [];
-    }
-  };
-
-  const allVariables = getVariables();
+  // Get variables from the specified bank
+  const allVariables = useAppSelector((state) => selectVariablesInBank(state, bankId));
 
   // Filter variables based on search query
   const variables = useMemo(() => {
@@ -68,20 +49,18 @@ export default function NovelVariableList({ scope, targetId, title, showHeader =
 
   const handleCreateVariable = () => {
     dispatch(
-      createNovelVariable({
-        scope,
-        targetId,
-        id: uuidv4(),
+      createVariableInBank({
+        bankId,
+        variableId: uuidv4(),
       }),
     );
   };
 
   const handleUpdateVariable = (id: string, changes: any) => {
     dispatch(
-      updateNovelVariable({
-        scope,
-        targetId,
-        id,
+      updateVariableInBank({
+        bankId,
+        variableId: id,
         changes,
       }),
     );
@@ -89,10 +68,9 @@ export default function NovelVariableList({ scope, targetId, title, showHeader =
 
   const handleDeleteVariable = (id: string) => {
     dispatch(
-      deleteNovelVariable({
-        scope,
-        targetId,
-        id,
+      deleteVariableInBank({
+        bankId,
+        variableId: id,
       }),
     );
   };

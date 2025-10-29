@@ -6,9 +6,10 @@ import ButtonGroup from '../../components/ButtonGroup';
 import { useEffect, useState } from 'react';
 import CharacterOutfitsEdit from './CharacterOutfitsEdit';
 import NovelVariableList from '../NovelVariableList';
+import VariableBankList from '../../components/VariableBankList';
 import './CharacterEditModal.scss';
 import { AreYouSure } from '@mikugg/ui-kit';
-import { deleteCharacter } from '../../state/slices/novelFormSlice';
+import { deleteCharacter, updateCharacter } from '../../state/slices/novelFormSlice';
 
 export default function CharacterEditModal() {
   const { openModal: openAreYouSure } = AreYouSure.useAreYouSure();
@@ -22,6 +23,22 @@ export default function CharacterEditModal() {
       setSelected('prompt');
     }
   }, [opened]);
+
+  const handleSelectVariableBank = (bankId: string) => {
+    if (!character) return;
+
+    const currentBankIds = character.variableBankIds || [];
+    const isSelected = currentBankIds.includes(bankId);
+
+    const updatedBankIds = isSelected ? currentBankIds.filter((id) => id !== bankId) : [...currentBankIds, bankId];
+
+    dispatch(
+      updateCharacter({
+        ...character,
+        variableBankIds: updatedBankIds,
+      }),
+    );
+  };
 
   return (
     <Modal
@@ -74,10 +91,10 @@ export default function CharacterEditModal() {
       ) : null}
       {selected === 'outfits' ? <CharacterOutfitsEdit characterId={editId} /> : null}
       {selected === 'variables' ? (
-        <NovelVariableList
-          scope="character"
-          targetId={editId}
-          title={character ? `${character.name} - Local Variables` : 'Character Variables'}
+        <VariableBankList
+          selectedBankIds={character?.variableBankIds || []}
+          onSelectBank={handleSelectVariableBank}
+          tooltipText="Select variable banks accessible for this character"
         />
       ) : null}
     </Modal>

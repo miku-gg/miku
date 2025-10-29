@@ -1,7 +1,7 @@
 import { AreYouSure, Button, CheckBox, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import { useState } from 'react';
-import NovelVariableList from '../NovelVariableList';
+import VariableBankList from '../../components/VariableBankList';
 import { AiOutlinePicture } from 'react-icons/ai';
 import { FaUser } from 'react-icons/fa6';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -69,13 +69,33 @@ export default function SceneEditModal() {
   const handleDeleteScene = () => {
     if (scene) {
       openAreYouSure({
-        description: 'Are you sure you what to delete this scene?',
+        description: 'Are you sure you want to delete this scene?',
         onYes: () => {
           dispatch(deleteSceneById(scene.id));
           dispatch(closeModal({ modalType: 'scene' }));
         },
       });
     }
+  };
+
+  const handleSelectVariableBank = (bankId: string) => {
+    if (!scene) return;
+
+    const currentBankIds = scene.variableBankIds || [];
+    const isSelected = currentBankIds.includes(bankId);
+
+    const updatedBankIds = isSelected ? currentBankIds.filter((id) => id !== bankId) : [...currentBankIds, bankId];
+
+    const updatedScene = {
+      ...scene,
+      variableBankIds: updatedBankIds,
+      characters: scene.characters.map((char) => ({
+        characterId: char.id || '',
+        outfit: char.outfit || '',
+        objective: char.objective,
+      })),
+    };
+    dispatch(updateScene(updatedScene));
   };
 
   const handleLorebookSelect = (id: string) => {
@@ -576,11 +596,10 @@ export default function SceneEditModal() {
                 </Button>
               </div>
               {variablesExpanded && (
-                <NovelVariableList
-                  scope="scene"
-                  targetId={scene?.id}
-                  title={scene ? `${scene.name} - Local Variables` : 'Scene Variables'}
-                  showHeader={false}
+                <VariableBankList
+                  selectedBankIds={scene?.variableBankIds || []}
+                  onSelectBank={handleSelectVariableBank}
+                  tooltipText="Select variable banks accessible in this scene"
                 />
               )}
             </div>

@@ -2,11 +2,10 @@ import { Button, Dropdown, Input } from '@mikugg/ui-kit';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { FaTrashAlt } from 'react-icons/fa';
 import { useAppSelector } from '../../state/store';
-import { selectAllScenes, selectAllCharacters, selectVariablesForScope } from '../../state/selectors';
+import { selectVariableBanks, selectVariablesInBank } from '../../state/selectors';
 import { formatNumberInput } from '../../libs/numberFormatter';
 import { useState, useEffect } from 'react';
-import CharacterSelectModal from './CharacterSelectModal';
-import { SceneSelectorModal } from './SceneSelector';
+import BankSelectionModal from './BankSelectionModal';
 import VariableSelectionModal from './VariableSelectionModal';
 import './VariableConditionForm.scss';
 
@@ -22,17 +21,15 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
     return null;
   }
 
-  const scenes = useAppSelector(selectAllScenes);
-  const characters = useAppSelector(selectAllCharacters);
+  const banks = useAppSelector(selectVariableBanks);
   const [numberInputValue, setNumberInputValue] = useState<string>('');
-  const [characterSelectOpened, setCharacterSelectOpened] = useState(false);
-  const [sceneSelectOpened, setSceneSelectOpened] = useState(false);
+  const [bankSelectOpened, setBankSelectOpened] = useState(false);
   const [variableSelectOpened, setVariableSelectOpened] = useState(false);
 
-  const currentScope = condition.scope || 'global';
-  const currentTargetId = condition.targetId;
-  const variables = useAppSelector((state) => selectVariablesForScope(state, currentScope, currentTargetId));
+  const currentBankId = condition.bankId || 'global-bank';
+  const variables = useAppSelector((state) => selectVariablesInBank(state, currentBankId));
   const selectedVariable = variables.find((v) => v.id === condition.variableId);
+  const selectedBank = banks.find((b) => b.id === currentBankId);
 
   // Sync local state with condition value for number inputs
   useEffect(() => {
@@ -134,35 +131,13 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
     }
   };
 
-  // Scope options
-  const scopeOptions = [
-    { name: 'Global', value: 'global' },
-    { name: 'Scene', value: 'scene' },
-    { name: 'Character', value: 'character' },
-  ];
-
-  // Target options are no longer needed since we use selector modals
-
-  // Variable options are no longer needed since we use the selection modal
-
   const operatorOptions = selectedVariable ? getOperatorOptions(selectedVariable.type) : [];
 
-  const handleCharacterSelect = (characterId: string) => {
-    setCharacterSelectOpened(false);
+  const handleBankSelect = (bankId: string) => {
+    setBankSelectOpened(false);
     onChange({
       ...condition,
-      targetId: characterId,
-      variableId: '',
-      operator: 'EQUAL',
-      value: '',
-    });
-  };
-
-  const handleSceneSelect = (sceneId: string) => {
-    setSceneSelectOpened(false);
-    onChange({
-      ...condition,
-      targetId: sceneId,
+      bankId,
       variableId: '',
       operator: 'EQUAL',
       value: '',
@@ -180,22 +155,11 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
     });
   };
 
-  const getTargetDisplayName = () => {
-    if (currentScope === 'scene') {
-      if (currentTargetId) {
-        const scene = scenes.find((s) => s.id === currentTargetId);
-        return scene?.name || 'Select Scene';
-      }
-      return 'Select Scene';
+  const getBankDisplayName = () => {
+    if (selectedBank) {
+      return selectedBank.name;
     }
-    if (currentScope === 'character') {
-      if (currentTargetId) {
-        const character = characters.find((c) => c.id === currentTargetId);
-        return character?.name || 'Select Character';
-      }
-      return 'Select Character';
-    }
-    return 'Select Target';
+    return 'Select Bank';
   };
 
   const getVariableDisplayName = () => {
@@ -209,57 +173,21 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
   return (
     <div className="VariableConditionForm">
       <div className="VariableConditionForm__group">
-        {/* First row: Scope, Target (if needed), Delete */}
+        {/* First row: Bank, Delete */}
         <div className="VariableConditionForm__row VariableConditionForm__row--scope">
+          {/* Bank selector */}
           <div className="VariableConditionForm__field">
-            <label className="VariableConditionForm__label">Scope</label>
+            <label className="VariableConditionForm__label">Bank</label>
             <div className="VariableConditionForm__control">
-              <Dropdown
-                items={scopeOptions}
-                selectedIndex={scopeOptions.findIndex((s) => s.value === currentScope)}
-                onChange={(index) => {
-                  const selectedScope = scopeOptions[index]?.value as NovelV3.VariableScope;
-                  onChange({
-                    ...condition,
-                    scope: selectedScope,
-                    targetId: undefined,
-                    variableId: '',
-                    operator: 'EQUAL',
-                    value: '',
-                  });
-                }}
-              />
+              <Button
+                theme="secondary"
+                onClick={() => setBankSelectOpened(true)}
+                className="VariableConditionForm__target-button"
+              >
+                {getBankDisplayName()}
+              </Button>
             </div>
           </div>
-
-          {/* Show target selector only for scene/character scope*/}
-          {currentScope === 'scene' || currentScope === 'character' ? (
-            <div className="VariableConditionForm__field">
-              <label className="VariableConditionForm__label">{currentScope === 'scene' ? 'Scene' : 'Character'}</label>
-              <div className="VariableConditionForm__control">
-                <Button
-                  theme="secondary"
-                  onClick={() => {
-                    if (currentScope === 'scene') {
-                      setSceneSelectOpened(true);
-                    } else if (currentScope === 'character') {
-                      setCharacterSelectOpened(true);
-                    }
-                  }}
-                  className="VariableConditionForm__target-button"
-                >
-                  {getTargetDisplayName()}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="VariableConditionForm__field">
-              <label className="VariableConditionForm__label">&nbsp;</label>
-              <div className="VariableConditionForm__control">
-                <div className="VariableConditionForm__placeholder"></div>
-              </div>
-            </div>
-          )}
 
           <div className="VariableConditionForm__field">
             <label className="VariableConditionForm__label">&nbsp;</label>
@@ -318,27 +246,17 @@ export default function VariableConditionForm({ condition, onChange, onDelete }:
         </div>
       </div>
 
-      <CharacterSelectModal
-        opened={characterSelectOpened}
-        onCloseModal={() => setCharacterSelectOpened(false)}
-        selectedCharacterId={currentTargetId}
-        onSelect={handleCharacterSelect}
-        showOutfitSelection={false}
-      />
-
-      <SceneSelectorModal
-        opened={sceneSelectOpened}
-        onCloseModal={() => setSceneSelectOpened(false)}
-        selectedSceneId={currentTargetId}
-        onSelectScene={handleSceneSelect}
+      <BankSelectionModal
+        opened={bankSelectOpened}
+        onCloseModal={() => setBankSelectOpened(false)}
+        onSelect={handleBankSelect}
       />
 
       <VariableSelectionModal
         opened={variableSelectOpened}
         onCloseModal={() => setVariableSelectOpened(false)}
         onSelect={handleVariableSelect}
-        scope={currentScope}
-        targetId={currentTargetId}
+        bankId={currentBankId}
       />
     </div>
   );

@@ -1,8 +1,7 @@
 import { Button, Input, Modal } from '@mikugg/ui-kit';
 import { useState, useMemo } from 'react';
 import { useAppSelector } from '../../state/store';
-import { selectAllScenes, selectAllCharacters } from '../../state/selectors';
-import { NovelV3 } from '@mikugg/bot-utils';
+import { selectVariablesInBank } from '../../state/selectors';
 import { FaSearch } from 'react-icons/fa';
 import './VariableSelectionModal.scss';
 
@@ -10,50 +9,27 @@ interface VariableSelectionModalProps {
   opened: boolean;
   onCloseModal: () => void;
   onSelect: (variableId: string) => void;
-  scope: NovelV3.VariableScope;
-  targetId?: string;
+  bankId: string;
 }
 
 export default function VariableSelectionModal({
   opened,
   onCloseModal,
   onSelect,
-  scope,
-  targetId,
+  bankId,
 }: VariableSelectionModalProps) {
-  const scenes = useAppSelector(selectAllScenes);
-  const characters = useAppSelector(selectAllCharacters);
-  const globalVariables = useAppSelector((state) => state.novel.globalVariables);
+  const variables = useAppSelector((state) => selectVariablesInBank(state, bankId));
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVariableId, setSelectedVariableId] = useState<string>('');
-
-  // Get variables based on scope
-  const getVariables = (): NovelV3.NovelVariable[] => {
-    switch (scope) {
-      case 'global':
-        return globalVariables || [];
-      case 'scene':
-        const scene = scenes.find((s) => s.id === targetId);
-        return scene?.localVariables || [];
-      case 'character':
-        const character = characters.find((c) => c.id === targetId);
-        return character?.localVariables || [];
-      default:
-        return [];
-    }
-  };
-
-  const allVariables = getVariables();
-
   // Filter variables based on search query
   const filteredVariables = useMemo(() => {
-    if (!searchQuery.trim()) return allVariables;
+    if (!searchQuery.trim()) return variables;
 
     const query = searchQuery.toLowerCase();
-    return allVariables.filter(
+    return variables.filter(
       (variable) => variable.name?.toLowerCase().includes(query) || variable.description?.toLowerCase().includes(query),
     );
-  }, [allVariables, searchQuery]);
+  }, [variables, searchQuery]);
 
   const handleVariableSelect = (variableId: string) => {
     setSelectedVariableId(variableId);

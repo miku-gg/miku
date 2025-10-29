@@ -47,16 +47,12 @@ export function evaluateVariableCondition(
 /**
  * Evaluates all variable conditions for an objective
  * @param variableConditions Array of variable conditions to evaluate
- * @param globalVariables Array of global variables to check against
- * @param sceneVariables Array of scene variables to check against
- * @param characterVariables Array of character variables to check against
+ * @param variableBanks Array of variable banks to check against
  * @returns true if ALL conditions pass (AND operator), true if no conditions exist
  */
 export function evaluateVariableConditions(
   variableConditions: NovelV3.VariableCondition[],
-  globalVariables: NovelV3.NovelVariable[],
-  sceneVariables: NovelV3.NovelVariable[] = [],
-  characterVariables: NovelV3.NovelVariable[] = [],
+  variableBanks: NovelV3.NovelVariableBank[],
 ): boolean {
   // If no variable conditions exist, return true (no additional requirements)
   if (!variableConditions || variableConditions.length === 0) {
@@ -75,27 +71,19 @@ export function evaluateVariableConditions(
   for (let i = 0; i < validConditions.length; i++) {
     const condition = validConditions[i];
 
-    // Resolve variable based on scope
-    let variable: NovelV3.NovelVariable | undefined;
+    // Find the bank
+    const bankId = condition.bankId || 'global-bank';
+    const bank = variableBanks.find((b) => b.id === bankId);
 
-    switch (condition.scope) {
-      case 'global':
-        variable = globalVariables.find((v) => v.id === condition.variableId);
-        break;
-      case 'scene':
-        variable = sceneVariables.find((v) => v.id === condition.variableId);
-        break;
-      case 'character':
-        variable = characterVariables.find((v) => v.id === condition.variableId);
-        break;
-      default:
-        // Fallback to global for backwards compatibility
-        variable = globalVariables.find((v) => v.id === condition.variableId);
+    if (!bank) {
+      return false; // Bank not found
     }
 
-    // If variable not found, condition fails
+    // Find variable in the bank
+    const variable = bank.variables.find((v) => v.id === condition.variableId);
+
     if (!variable) {
-      return false;
+      return false; // Variable not found
     }
 
     // Evaluate the condition
