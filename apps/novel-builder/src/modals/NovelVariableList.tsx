@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../state/store';
 import { createVariableInBank, deleteVariableInBank, updateVariableInBank } from '../state/slices/novelFormSlice';
 import { selectVariablesInBank } from '../state/selectors';
 import { formatNumberInput } from '../libs/numberFormatter';
-import './VariableBankEditModal.scss';
+import './NovelVariableList.scss';
 import { v4 as uuidv4 } from 'uuid';
 import { useState, useMemo } from 'react';
 

@@ -1,5 +1,6 @@
 import { Button } from '@mikugg/ui-kit';
-import { FaEdit, FaPlus } from 'react-icons/fa';
+import { FaCheckCircle } from 'react-icons/fa';
+import { FaPencil, FaPlus } from 'react-icons/fa6';
 import { useAppDispatch, useAppSelector } from '../state/store';
 import { selectVariableBanks } from '../state/selectors';
 import { openModal } from '../state/slices/inputSlice';
@@ -39,7 +40,6 @@ export default function VariableBankList({ selectedBankIds, onSelectBank, toolti
   return (
     <div className="VariableBankList">
       <div className="VariableBankList__header">
-        <h3>Variable Banks</h3>
         <Button theme="secondary" onClick={handleCreateBank}>
           <FaPlus />
           Create Bank
@@ -54,21 +54,17 @@ export default function VariableBankList({ selectedBankIds, onSelectBank, toolti
             onClick={() => onSelectBank(bank.id)}
             title={tooltipText}
           >
+            <FaPencil
+              className="VariableBankList__item-edit"
+              onClick={(e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleEditBank(bank.id);
+              }}
+            />
             <div className="VariableBankList__item-content">
               <div className="VariableBankList__item-header">
                 <h4 className="VariableBankList__item-name">{bank.name}</h4>
-                <div className="VariableBankList__item-actions">
-                  <Button
-                    theme="secondary"
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditBank(bank.id);
-                    }}
-                  >
-                    <FaEdit />
-                  </Button>
-                </div>
               </div>
               <p className="VariableBankList__item-description">{bank.description}</p>
               <div className="VariableBankList__item-meta">
@@ -77,13 +73,15 @@ export default function VariableBankList({ selectedBankIds, onSelectBank, toolti
                 </span>
               </div>
             </div>
-            {isSelected(bank.id) && <div className="VariableBankList__item-checkmark">✓</div>}
+            {isSelected(bank.id) && (
+              <div className="VariableBankList__item-selected-badge">
+                <FaCheckCircle />
+                Selected
+              </div>
+            )}
           </div>
         ))}
       </div>
     </div>
   );
 }
-
-
-

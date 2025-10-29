@@ -1,3 +1,5 @@
+@import '../styles/variables.scss';
+
 .VariableBankList {
   &__header {
     display: flex;
@@ -15,20 +17,39 @@
   &__item {
     position: relative;
     padding: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid $node-conector-color;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.02);
     cursor: pointer;
     transition: all 0.2s ease;
 
-    &:hover:not(&--selected) {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.2);
+    &:hover {
+      background-color: rgba(27, 33, 66, 0.6);
+
+      .VariableBankList__item-edit {
+        opacity: 1;
+      }
     }
 
     &--selected {
-      background: rgba(0, 123, 255, 0.1);
-      border-color: #007bff;
+      border-color: $secondary-color;
+      background-color: #1b2142;
+    }
+  }
+
+  &__item-edit {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: white;
+    width: fit-content;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0;
+    z-index: 1;
+
+    &:hover {
+      color: $secondary-color;
     }
   }
 
@@ -50,11 +71,6 @@
     margin: 0;
     flex: 1;
     margin-right: 8px;
-  }
-
-  &__item-actions {
-    display: flex;
-    gap: 4px;
   }
 
   &__item-description {
@@ -83,20 +99,25 @@
     border-radius: 4px;
   }
 
-  &__item-checkmark {
+  &__item-selected-badge {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 20px;
-    height: 20px;
-    background: #007bff;
-    color: white;
-    border-radius: 50%;
+    right: 6px;
+    bottom: 2px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 5px;
+    color: #16a34a;
+    user-select: none;
     font-size: 12px;
-    font-weight: bold;
+  }
+}
+
+// Make edit button always visible on mobile
+@media (max-width: 600px) {
+  .VariableBankList {
+    &__item-edit {
+      opacity: 1;
+    }
   }
 }
 

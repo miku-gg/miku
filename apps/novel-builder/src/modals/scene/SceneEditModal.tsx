@@ -586,7 +586,7 @@ export default function SceneEditModal() {
             </div>
             <div className="SceneEditModal__scene-variables">
               <div className="SceneEditModal__scene-variables-header">
-                <h2>Local Variables</h2>
+                <h2>Variable Bank References</h2>
                 <Button
                   theme="secondary"
                   onClick={() => setVariablesExpanded(!variablesExpanded)}
