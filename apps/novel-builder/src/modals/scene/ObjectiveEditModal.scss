@@ -104,3 +104,9 @@
 .ObjectiveEditModal {
   max-width: 750px !important;
 }
+
+@media (max-width: 768px) {
+  .ObjectiveEdit__add-condition-button-text {
+    display: none;
+  }
+}

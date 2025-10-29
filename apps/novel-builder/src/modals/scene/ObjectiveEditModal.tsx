@@ -139,6 +139,7 @@ export default function ObjectiveEditModal() {
                 </div>
                 <Button
                   theme="secondary"
+                  className="ObjectiveEdit__add-condition-button"
                   onClick={() => {
                     const newCondition: NovelV3.VariableCondition = {
                       id: uuidv4(),
@@ -159,7 +160,7 @@ export default function ObjectiveEditModal() {
                   }}
                 >
                   <FaPlus />
-                  Add condition
+                  <span className="ObjectiveEdit__add-condition-button-text">Add condition</span>
                 </Button>
               </div>
               {objective.variableConditions && objective.variableConditions.length > 0 ? (

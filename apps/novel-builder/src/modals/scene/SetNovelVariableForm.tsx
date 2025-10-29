@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { FaTrashAlt, FaPlus } from 'react-icons/fa';
 import BankSelectionModal from './BankSelectionModal';
 import VariableSelectionModal from './VariableSelectionModal';
-import './NovelActionForm.scss';
+import './SetNovelVariableForm.scss';
 
 interface SetNovelVariableFormProps {
   variables: Array<{

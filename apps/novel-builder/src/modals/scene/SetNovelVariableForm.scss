@@ -1,4 +1,6 @@
-.VariableConditionForm {
+@import '../../styles/variables.scss';
+
+.SetNovelVariableForm {
   display: flex;
   flex-direction: column;
   gap: 0rem;
@@ -23,11 +25,11 @@
     }
 
     &--scope {
-      grid-template-columns: 1fr 1fr 60px; // Bank | (spacer) | Delete
+      grid-template-columns: 1fr 1fr 60px;
     }
 
     &--variable {
-      grid-template-columns: 1fr 1fr 1fr; // Variable | Operator | Value
+      grid-template-columns: 2fr 2fr;
     }
   }
 
@@ -71,40 +73,6 @@
     width: auto;
   }
 
-  &__target-button {
-    width: 100%;
-    text-align: left;
-    justify-content: flex-start;
-    padding: 8px 12px;
-    min-height: 37.6px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-  }
-
-  &__row--variable &__target-button {
-    max-height: 37.6px;
-    height: 37.6px;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__placeholder {
-    height: 37.6px;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-  }
-
   &__delete {
     display: flex;
     align-items: center;
@@ -145,6 +113,47 @@
     }
   }
 
+  &__placeholder {
+    height: 37.6px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+  }
+
+  &__target-button {
+    width: 100%;
+    text-align: left;
+    justify-content: flex-start;
+    padding: 8px 12px;
+    min-height: 37.6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  &__row--variable &__target-button {
+    max-height: 37.6px;
+    height: 37.6px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__add {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  // Responsive design
   @media (max-width: 768px) {
     &__row {
       gap: 8px;
@@ -170,26 +179,6 @@
       margin-right: 0;
     }
 
-    &__row--variable {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
-    }
-
-    &__row--variable &__field:first-child {
-      grid-column: 1 / -1;
-      grid-row: 1;
-    }
-
-    &__row--variable &__field:nth-child(2) {
-      grid-column: 1;
-      grid-row: 2;
-    }
-
-    &__row--variable &__field:nth-child(3) {
-      grid-column: 2;
-      grid-row: 2;
-    }
-
     &__delete {
       width: 37.6px !important;
       height: 37.6px !important;
@@ -202,18 +191,29 @@
       min-height: 37.6px !important;
       height: 37.6px !important;
     }
+
+    &__row--variable {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
   }
 }
 
-.VariableConditionForm .Input {
+.SetNovelVariableForm .Input {
   margin: 0;
 }
 
-.VariableConditionForm .VariableConditionForm__control > * {
+.SetNovelVariableForm .SetNovelVariableForm__control > * {
   margin: 0 !important;
   align-self: flex-start;
+  width: 100% !important;
 }
 
-.VariableConditionForm .Input input {
+.SetNovelVariableForm .Input input {
   box-sizing: border-box;
 }
+
+.SetNovelVariableForm .Dropdown {
+  width: 100%;
+}
+
