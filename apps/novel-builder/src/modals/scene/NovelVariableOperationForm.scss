@@ -201,8 +201,8 @@
     }
 
     &__row--variable {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
+      grid-template-columns: 1fr 1fr !important;
+      grid-template-rows: auto auto !important;
     }
 
     &__row--variable &__field:first-child {
@@ -239,6 +239,3 @@
 .SetNovelVariableForm .Dropdown {
   width: 100%;
 }
-
-
-
