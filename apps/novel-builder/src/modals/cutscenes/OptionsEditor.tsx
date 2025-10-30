@@ -4,6 +4,7 @@ import { NovelV3 } from '@mikugg/bot-utils';
 import { v4 as randomUUID } from 'uuid';
 import SceneSelector from '../scene/SceneSelector';
 import ItemSelector from '../items/ItemSelector';
+import { NovelVariableOperationForm } from '../scene/NovelVariableOperationForm';
 import './OptionsEditor.scss';
 
 interface OptionsEditorProps {
@@ -20,12 +21,13 @@ export const OptionsEditor = ({ part, textIndex, onUpdate }: OptionsEditorProps)
   if (!currentText || currentText.type !== 'options') return null;
 
   // Only render if there's a text part with type 'options'
-  const hasOptionsText = part.text.some(text => text.type === 'options');
+  const hasOptionsText = part.text.some((text) => text.type === 'options');
   if (!hasOptionsText) return null;
 
   const actionTypes = [
     { name: 'Navigate to Scene', value: 'NAVIGATE_TO_SCENE' },
     { name: 'Give Item', value: 'GIVE_ITEM' },
+    { name: 'Set Variable', value: 'SET_NOVEL_VARIABLE' },
   ];
 
   const createOption = () => {
@@ -35,8 +37,8 @@ export const OptionsEditor = ({ part, textIndex, onUpdate }: OptionsEditorProps)
       prompt: '',
       action: {
         type: 'NAVIGATE_TO_SCENE',
-        params: { sceneId: scenes[0]?.id || '' }
-      }
+        params: { sceneId: scenes[0]?.id || '' },
+      },
     };
 
     const updatedText = [...part.text];
@@ -51,7 +53,7 @@ export const OptionsEditor = ({ part, textIndex, onUpdate }: OptionsEditorProps)
 
   const updateOption = (optionId: string, updates: Partial<NovelV3.CutSceneOption>) => {
     const updatedOptions = (currentText.options || []).map((option) =>
-      option.id === optionId ? { ...option, ...updates } : option
+      option.id === optionId ? { ...option, ...updates } : option,
     );
 
     const updatedText = [...part.text];
@@ -86,7 +88,7 @@ export const OptionsEditor = ({ part, textIndex, onUpdate }: OptionsEditorProps)
           +
         </Button>
       </div>
-      
+
       <div className="OptionsEditor__options">
         {(currentText.options || []).map((option) => (
           <div key={option.id} className="OptionsEditor__option">
@@ -95,38 +97,43 @@ export const OptionsEditor = ({ part, textIndex, onUpdate }: OptionsEditorProps)
                 value={option.text}
                 onChange={(e) => updateOption(option.id, { text: e.target.value })}
                 placeHolder="Option text..."
-              />        
-              
+              />
+
               <Dropdown
                 items={actionTypes}
-                selectedIndex={actionTypes.findIndex(item => item.value === option.action?.type)}
+                selectedIndex={actionTypes.findIndex((item) => item.value === option.action?.type)}
                 onChange={(selectedIndex) => {
                   const actionType = actionTypes[selectedIndex].value;
                   if (actionType === 'NAVIGATE_TO_SCENE') {
                     updateAction(option.id, {
                       type: 'NAVIGATE_TO_SCENE',
-                      params: { sceneId: '' }
+                      params: { sceneId: '' },
                     });
                   } else if (actionType === 'GIVE_ITEM') {
                     updateAction(option.id, {
                       type: 'GIVE_ITEM',
-                      params: { itemId: ''}
+                      params: { itemId: '' },
+                    });
+                  } else if (actionType === 'SET_NOVEL_VARIABLE') {
+                    updateAction(option.id, {
+                      type: 'SET_NOVEL_VARIABLE',
+                      params: { variables: [] },
                     });
                   }
                 }}
                 className="OptionsEditor__action-dropdown"
               />
-              
+
               <Button theme="primary" onClick={() => deleteOption(option.id)}>
                 Delete
               </Button>
             </div>
 
             <Input
-                value={option.prompt}
-                onChange={(e) => updateOption(option.id, { prompt: e.target.value })}
-                placeHolder="*{{user}} took the shiny golden key*"
-              />
+              value={option.prompt}
+              onChange={(e) => updateOption(option.id, { prompt: e.target.value })}
+              placeHolder="*{{user}} took the shiny golden key*"
+            />
 
             <div className="OptionsEditor__option-selectors">
               {option.action?.type === 'NAVIGATE_TO_SCENE' && (
@@ -137,18 +144,18 @@ export const OptionsEditor = ({ part, textIndex, onUpdate }: OptionsEditorProps)
                     const sceneId = option.action.params?.sceneId;
                     if (!sceneId) return null;
                     // Check if the scene still exists in the scenes
-                    const sceneExists = scenes?.find(scene => scene.id === sceneId);
+                    const sceneExists = scenes?.find((scene) => scene.id === sceneId);
                     return sceneExists ? sceneId : null;
                   })()}
                   onChange={(sceneId) => {
                     updateAction(option.id, {
                       type: 'NAVIGATE_TO_SCENE',
-                      params: { sceneId: sceneId || '' }
+                      params: { sceneId: sceneId || '' },
                     });
                   }}
                 />
               )}
-              
+
               {option.action?.type === 'GIVE_ITEM' && (
                 <ItemSelector
                   multiSelect={false}
@@ -157,13 +164,25 @@ export const OptionsEditor = ({ part, textIndex, onUpdate }: OptionsEditorProps)
                     const itemId = option.action.params?.itemId;
                     if (!itemId) return null;
                     // Check if the item still exists in the inventory
-                    const itemExists = items?.find(item => item.id === itemId);
+                    const itemExists = items?.find((item) => item.id === itemId);
                     return itemExists ? itemId : null;
                   })()}
                   onChange={(itemId) => {
                     updateAction(option.id, {
                       type: 'GIVE_ITEM',
-                      params: { itemId: itemId || '' }
+                      params: { itemId: itemId || '' },
+                    });
+                  }}
+                />
+              )}
+
+              {option.action?.type === 'SET_NOVEL_VARIABLE' && (
+                <NovelVariableOperationForm
+                  variables={option.action.params.variables}
+                  onChange={(variables) => {
+                    updateAction(option.id, {
+                      type: 'SET_NOVEL_VARIABLE',
+                      params: { variables },
                     });
                   }}
                 />

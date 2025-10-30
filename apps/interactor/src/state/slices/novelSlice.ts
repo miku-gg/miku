@@ -24,7 +24,12 @@ const novelSlice = createSlice({
   initialState,
   reducers: {
     setNovel: (_state, action: PayloadAction<NovelState>) => {
-      return action.payload;
+      // Ensure variableBanks is initialized
+      const novel = {
+        ...action.payload,
+        variableBanks: action.payload.variableBanks || [],
+      };
+      return novel;
     },
     addScene: (
       state,
@@ -186,6 +191,47 @@ const novelSlice = createSlice({
         }
       }
     },
+    setNovelVariable: (
+      state,
+      action: PayloadAction<{
+        variables: Array<{
+          variableId: string;
+          value: string | number | boolean;
+          bankId: string;
+        }>;
+      }>,
+    ) => {
+      if (!state.variableBanks) {
+        state.variableBanks = [];
+      }
+
+      action.payload.variables.forEach(({ variableId, value, bankId }) => {
+        let bank = state.variableBanks!.find((b) => b.id === bankId);
+
+        if (!bank) {
+          return;
+        }
+
+        let variable = bank.variables.find((v) => v.id === variableId);
+        if (!variable) {
+          const inferredType = (
+            typeof value === 'number' ? 'number' : typeof value === 'boolean' ? 'boolean' : 'string'
+          ) as 'number' | 'boolean' | 'string';
+
+          bank.variables.push({
+            id: variableId,
+            name: variableId,
+            description: '',
+            type: inferredType,
+            value: value,
+          });
+          return;
+        }
+
+        // Pure set
+        variable.value = value;
+      });
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -209,6 +255,7 @@ export const {
   addCharacterToParty,
   changeCharacterBattleOutfit,
   changeCutscenePartBackground,
+  setNovelVariable,
 } = novelSlice.actions;
 
 export default novelSlice.reducer;

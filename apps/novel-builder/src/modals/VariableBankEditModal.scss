@@ -1,0 +1,61 @@
+.VariableBankEditModal {
+  max-width: 800px;
+  min-width: 300px;
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  &__delete-button {
+    &.danger {
+      background: #ff0800 !important;
+      color: #ffffff !important;
+
+      &:hover {
+        background: #e4110ab8 !important;
+      }
+    }
+  }
+
+  &__bank-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.VariableBankEditModal .Input {
+  margin: 0;
+}
+
+.VariableBankEditModal .NovelVariableEditModal__control > * {
+  margin: 0 !important;
+  align-self: flex-start;
+}
+
+.VariableBankEditModal .Input input {
+  box-sizing: border-box;
+}
+.VariableBankEditModal textarea {
+  min-height: 20px;
+  height: 20px;
+  resize: vertical;
+  overflow: auto;
+  box-sizing: border-box;
+  display: block;
+}
+
+.VariableBankEditModal .Button.danger {
+  background: #ff0800 !important;
+  color: #ffffff !important;
+}
+.VariableBankEditModal .Button.danger:hover {
+  background: #e4110ab8 !important;
+}

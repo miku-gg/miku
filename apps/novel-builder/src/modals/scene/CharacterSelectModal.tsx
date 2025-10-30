@@ -15,6 +15,7 @@ interface CharacterSelectModalProps {
   onSelect: (characterId: string, outfitId?: string, emotionId?: string) => void;
   ignoreIds?: string[];
   showNone?: boolean;
+  showOutfitSelection?: boolean;
 }
 
 export default function CharacterSelectModal({
@@ -24,6 +25,7 @@ export default function CharacterSelectModal({
   onSelect,
   ignoreIds,
   showNone,
+  showOutfitSelection = true,
 }: CharacterSelectModalProps) {
   const scene = useAppSelector(selectEditingScene);
   const characters = useAppSelector((state) => state.novel.characters);
@@ -115,10 +117,10 @@ export default function CharacterSelectModal({
       <div className="CharacterSelectModal__content">
         <div
           className={`CharacterSelectModal__character-selection ${
-            showCharacterPreview ? 'CharacterSelectModal__character-selection--hidden' : ''
+            showCharacterPreview && showOutfitSelection ? 'CharacterSelectModal__character-selection--hidden' : ''
           }`}
         >
-          {!showCharacterPreview && (
+          {(!showCharacterPreview || !showOutfitSelection) && (
             <Characters
               ignoreIds={ignoreIds}
               showNone={showNone}
@@ -129,7 +131,7 @@ export default function CharacterSelectModal({
           )}
         </div>
 
-        {selectedCharacter && selectedOutfit && (
+        {selectedCharacter && selectedOutfit && showOutfitSelection && (
           <div className="CharacterSelectModal__character-customization">
             <div className="CharacterSelectModal__toggle-container">
               {showCharacterPreview && <span className="CharacterSelectModal__show-list-text">See character List</span>}

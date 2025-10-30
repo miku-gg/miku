@@ -27,12 +27,14 @@ import {
   selectCurrentSceneObjectives,
   selectMessagesSinceLastSummary,
   selectSummaryEnabled,
+  selectVariableBanks,
 } from '../selectors';
 import { NovelV3 } from '@mikugg/bot-utils';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { unlockAchievement } from '../../libs/platformAPI';
 import { addItem } from '../slices/inventorySlice';
 import { removeObjective } from '../slices/objectivesSlice';
+import { evaluateVariableConditions } from '../../libs/variableConditionEvaluator';
 import { toast } from 'react-toastify';
 import { GiOpenChest } from 'react-icons/gi';
 import { novelActionToStateAction } from '../mutations';
@@ -69,10 +71,10 @@ const interactionEffect = async (
 ) => {
   // Create AbortController for this interaction
   const abortController = new AbortController();
-  
+
   // Store the abort controller in module-level variable
   setCurrentInteractionAbortController(abortController);
-  
+
   try {
     let currentResponseState: NarrationResponse = state.narration.responses[state.narration.currentResponseId]!;
     const currentCharacterResponse = currentResponseState.characters.find(
@@ -239,7 +241,7 @@ const interactionEffect = async (
       if (abortController.signal.aborted) {
         return; // Exit early if aborted
       }
-      
+
       finishedCompletionResult = result;
       result.set('text', startText + (result.get('text') || ''));
       currentResponseState = responsePromptBuilder.completeResponse(currentResponseState, result, {
@@ -254,12 +256,12 @@ const interactionEffect = async (
         }),
       );
     }
-    
+
     // Check if the request was aborted before final processing
     if (abortController.signal.aborted) {
       return; // Exit early if aborted
     }
-    
+
     if (!currentResponseState.characters.find(({ characterId }) => characterId === selectedCharacterId)?.text) {
       throw new Error('No text');
     }
@@ -352,87 +354,97 @@ const interactionEffect = async (
           }
 
           if (response === ` Yes`) {
-            // Track that this objective was completed
-            completedObjectiveIds.push(objective.id);
+            // Check variable conditions if they exist
+            const variableBanks = selectVariableBanks(state);
 
-            objective.actions.forEach((action) => {
-              const stateActions = novelActionToStateAction(action);
-              for (const stateAction of stateActions) {
-                dispatch(stateAction);
-              }
-              let item: NovelV3.InventoryItem | undefined = undefined;
-              switch (action.type) {
-                case NovelV3.NovelActionType.ACHIEVEMENT_UNLOCK:
-                  postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
-                    achievement: {
-                      id: action.params.achievementId,
-                      name: objective.name,
-                      description: objective.description || '',
-                      inventoryItem: action.params.reward,
-                      collectibleImage: action.params.collectibleImage,
-                    },
-                  });
-                  unlockAchievement(apiEndpoint, action.params.achievementId);
-                  if (action.params.reward) {
-                    dispatch(addItem(action.params.reward));
-                  }
-                  dispatch(removeObjective(objective.id));
-                  break;
-                case NovelV3.NovelActionType.SHOW_ITEM:
-                  item = state.inventory.items.find((item) => item.id === action.params.itemId);
-                  if (!item) {
+            const variableConditionsPassed = evaluateVariableConditions(
+              objective.variableConditions || [],
+              variableBanks,
+            );
+
+            if (variableConditionsPassed) {
+              // Track that this objective was completed
+              completedObjectiveIds.push(objective.id);
+
+              objective.actions.forEach((action) => {
+                const stateActions = novelActionToStateAction(action);
+                for (const stateAction of stateActions) {
+                  dispatch(stateAction);
+                }
+                let item: NovelV3.InventoryItem | undefined = undefined;
+                switch (action.type) {
+                  case NovelV3.NovelActionType.ACHIEVEMENT_UNLOCK:
+                    postMessage(CustomEventType.ACHIEVEMENT_UNLOCKED, {
+                      achievement: {
+                        id: action.params.achievementId,
+                        name: objective.name,
+                        description: objective.description || '',
+                        inventoryItem: action.params.reward,
+                        collectibleImage: action.params.collectibleImage,
+                      },
+                    });
+                    unlockAchievement(apiEndpoint, action.params.achievementId);
+                    if (action.params.reward) {
+                      dispatch(addItem(action.params.reward));
+                    }
+                    dispatch(removeObjective(objective.id));
+                    break;
+                  case NovelV3.NovelActionType.SHOW_ITEM:
+                    item = state.inventory.items.find((item) => item.id === action.params.itemId);
+                    if (!item) {
+                      break;
+                    }
+                    toast(
+                      <div
+                        style={{
+                          textAlign: 'left',
+                          display: 'inline-flex',
+                          gap: 10,
+                        }}
+                      >
+                        <GiOpenChest />
+                        <span>
+                          <b>{item.name}</b> added to the inventory
+                        </span>
+                      </div>,
+                      {
+                        position: 'top-left',
+                        autoClose: 3000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        closeButton: false,
+                        theme: 'dark',
+                        style: {
+                          marginTop: 50,
+                          marginLeft: 10,
+                        },
+                      },
+                    );
+                    break;
+                  case NovelV3.NovelActionType.BATTLE_START: {
+                    const battleId = action.params.battleId;
+                    // Track that a battle started from this objective
+                    if (!battleStartId) {
+                      battleStartId = battleId;
+                    }
+                    const battleConfig = state.novel.battles?.find((b) => b.battleId === battleId);
+                    const rpgConfig = state.novel.rpg;
+                    if (battleConfig && rpgConfig) {
+                      const initialBattleState = getInitialBattleState(battleConfig, rpgConfig);
+                      dispatch(setCurrentBattle({ state: initialBattleState, isActive: false }));
+                    }
                     break;
                   }
-                  toast(
-                    <div
-                      style={{
-                        textAlign: 'left',
-                        display: 'inline-flex',
-                        gap: 10,
-                      }}
-                    >
-                      <GiOpenChest />
-                      <span>
-                        <b>{item.name}</b> added to the inventory
-                      </span>
-                    </div>,
-                    {
-                      position: 'top-left',
-                      autoClose: 3000,
-                      hideProgressBar: true,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                      closeButton: false,
-                      theme: 'dark',
-                      style: {
-                        marginTop: 50,
-                        marginLeft: 10,
-                      },
-                    },
-                  );
-                  break;
-                case NovelV3.NovelActionType.BATTLE_START: {
-                  const battleId = action.params.battleId;
-                  // Track that a battle started from this objective
-                  if (!battleStartId) {
-                    battleStartId = battleId;
-                  }
-                  const battleConfig = state.novel.battles?.find((b) => b.battleId === battleId);
-                  const rpgConfig = state.novel.rpg;
-                  if (battleConfig && rpgConfig) {
-                    const initialBattleState = getInitialBattleState(battleConfig, rpgConfig);
-                    dispatch(setCurrentBattle({ state: initialBattleState, isActive: false }));
-                  }
-                  break;
+                  default:
+                    break;
                 }
-                default:
-                  break;
+              });
+              if (objective.singleUse) {
+                dispatch(removeObjective(objective.id));
               }
-            });
-            if (objective.singleUse) {
-              dispatch(removeObjective(objective.id));
             }
           }
         }),

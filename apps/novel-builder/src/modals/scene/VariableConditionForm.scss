@@ -1,0 +1,220 @@
+.VariableConditionForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+  width: 100%;
+
+  &__group {
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  &__row {
+    display: grid;
+    gap: 8px;
+    align-items: start;
+    margin-bottom: 0.75rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &--scope {
+      grid-template-columns: 1fr 1fr 60px; // Bank | (spacer) | Delete
+    }
+
+    &--variable {
+      grid-template-columns: 1fr 1fr 1fr; // Variable | Operator | Value
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  &__row--variable &__field {
+    min-width: 0;
+    overflow: visible;
+  }
+
+  &__row--scope &__field:last-child {
+    align-items: flex-end;
+    grid-column: 3;
+  }
+
+  &__label {
+    font-size: 12px;
+    line-height: 16px;
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  &__control {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    min-width: 0;
+  }
+
+  &__row--variable &__control {
+    max-width: 100%;
+    overflow: visible;
+    position: relative;
+  }
+
+  &__row--scope &__field:last-child &__control {
+    width: auto;
+  }
+
+  &__target-button {
+    width: 100%;
+    text-align: left;
+    justify-content: flex-start;
+    padding: 8px 12px;
+    min-height: 37.6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  &__row--variable &__target-button {
+    max-height: 37.6px;
+    height: 37.6px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__placeholder {
+    height: 37.6px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+  }
+
+  &__delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: 37.6px;
+    height: 37.6px;
+    min-width: 37.6px;
+    min-height: 37.6px;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    &.danger {
+      background: #ff0800 !important;
+      color: #ffffff !important;
+      border-color: #ff0800 !important;
+
+      &:hover {
+        background: #e4110ab8 !important;
+        border-color: #e4110ab8 !important;
+      }
+    }
+
+    > * {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 0.625rem !important;
+    }
+
+    svg {
+      width: 14px !important;
+      height: 14px !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__row {
+      gap: 8px;
+    }
+
+    &__row--scope {
+      grid-template-columns: 1fr auto !important;
+      gap: 0;
+      align-items: center;
+    }
+
+    &__row--scope &__field:first-child {
+      grid-column: 1;
+      margin-right: 4px;
+    }
+
+    &__row--scope &__field:last-child {
+      grid-column: 2 !important;
+      margin-left: 4px;
+    }
+
+    &__row--scope &__field:first-child &__control {
+      margin-right: 0;
+    }
+
+    &__row--variable {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+    }
+
+    &__row--variable &__field:first-child {
+      grid-column: 1 / -1;
+      grid-row: 1;
+    }
+
+    &__row--variable &__field:nth-child(2) {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    &__row--variable &__field:nth-child(3) {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    &__delete {
+      width: 37.6px !important;
+      height: 37.6px !important;
+      min-width: 37.6px !important;
+      min-height: 37.6px !important;
+      flex-shrink: 0;
+    }
+
+    &__target-button {
+      min-height: 37.6px !important;
+      height: 37.6px !important;
+    }
+  }
+}
+
+.VariableConditionForm .Input {
+  margin: 0;
+}
+
+.VariableConditionForm .VariableConditionForm__control > * {
+  margin: 0 !important;
+  align-self: flex-start;
+}
+
+.VariableConditionForm .Input input {
+  box-sizing: border-box;
+}

@@ -40,7 +40,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px; // espacio entre botones (ajustable)
-    z-index: 9999;
+    z-index: 10;
   }
 
   &__fullscreen-emotion-btn {
@@ -48,7 +48,7 @@
     top: 10px;
     right: 10px;
     color: black;
-    z-index: 99999;
+    z-index: 10;
     cursor: pointer;
     background-color: rgba(255, 255, 255, 0.4);
     border-radius: 6px;
@@ -79,7 +79,7 @@
     top: 10px;
     right: 10px;
     color: black;
-    z-index: 99999;
+    z-index: 10;
     cursor: pointer;
     background-color: rgba(255, 255, 255, 0.4);
     border-radius: 6px;
@@ -486,5 +486,36 @@
         width: 100%;
       }
     }
+  }
+}
+
+.SceneEditModal__scene-variables-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-top: 20px;
+
+  h2 {
+    margin: 0;
+    margin-right: 12px;
+  }
+}
+
+.SceneEditModal__scene-variables-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+
+  svg {
+    font-size: 16px;
+  }
+}
+
+.SceneEditModal__scene-variables {
+  .NovelVariableEditModal {
+    margin: 0 auto;
   }
 }

@@ -5,6 +5,7 @@ import { selectEditingInventoryItem } from '../../state/selectors';
 import { useAppSelector } from '../../state/store';
 import './NovelActionForm.scss';
 import SceneSelector from './SceneSelector';
+import { NovelVariableOperationForm } from './NovelVariableOperationForm';
 
 export const getDefaultAction = (actionType: NovelV3.NovelActionType): NovelV3.NovelAction => {
   switch (actionType) {
@@ -37,6 +38,13 @@ export const getDefaultAction = (actionType: NovelV3.NovelActionType): NovelV3.N
           itemId: '',
         },
       };
+    case NovelV3.NovelActionType.SET_NOVEL_VARIABLE:
+      return {
+        type: NovelV3.NovelActionType.SET_NOVEL_VARIABLE,
+        params: {
+          variables: [],
+        },
+      };
     default:
       return {
         type: NovelV3.NovelActionType.HIDE_ITEM,
@@ -50,7 +58,6 @@ export const getDefaultAction = (actionType: NovelV3.NovelActionType): NovelV3.N
 const ActionParamsForm = ({
   action,
   onChange,
-  availableActionTypes,
 }: {
   action: NovelV3.NovelAction;
   onChange: (action: NovelV3.NovelAction) => void;
@@ -153,6 +160,21 @@ const ActionParamsForm = ({
         </div>
       </div>
     );
+  }
+
+  //set-novel-variable
+  else if (action.type === NovelV3.NovelActionType.SET_NOVEL_VARIABLE) {
+    return (
+      <NovelVariableOperationForm
+        variables={action.params.variables}
+        onChange={(variables) => {
+          onChange({
+            ...action,
+            params: { variables },
+          });
+        }}
+      />
+    );
   } else {
     return null;
   }
@@ -161,8 +183,8 @@ const ActionParamsForm = ({
 export default function NovelActionForm({
   action,
   onChange,
-  onDelete,
-  availableActionTypes,
+  onDelete: _onDelete,
+  availableActionTypes: _availableActionTypes,
 }: {
   action: NovelV3.NovelAction;
   onChange: (action: NovelV3.NovelAction) => void;
@@ -190,6 +212,10 @@ export default function NovelActionForm({
               content: 'Remove item',
               value: NovelV3.NovelActionType.HIDE_ITEM,
             },
+            {
+              content: 'Set variable',
+              value: (NovelV3.NovelActionType as any).SET_NOVEL_VARIABLE,
+            },
           ]}
           selected={action.type}
           onButtonClick={(value) => {
@@ -198,11 +224,7 @@ export default function NovelActionForm({
         />
       </div>
       <div className="NovelActionForm__action-params">
-        <ActionParamsForm
-          action={action}
-          onChange={(action) => onChange(action)}
-          availableActionTypes={availableActionTypes}
-        />
+        <ActionParamsForm action={action} onChange={(action) => onChange(action)} />
       </div>
     </div>
   );

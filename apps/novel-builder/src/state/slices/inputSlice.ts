@@ -19,7 +19,8 @@ export type ModalType =
   | 'errors'
   | 'cutscenes'
   | 'cutscenePartEdit'
-  | 'scene';
+  | 'scene'
+  | 'novelVariableEdit';
 
 export type PanelType = 'details' | 'assets' | 'maps' | 'scenes' | 'starts' | 'preview';
 export const isPanelType = (panel: string): panel is PanelType =>
@@ -35,6 +36,7 @@ export interface InputState {
       opened: boolean;
       editId?: string;
       text?: string;
+      bankId?: string;
     };
   };
   spendApprovalModal: {
@@ -105,6 +107,10 @@ const initialState: InputState = {
     errors: {
       opened: false,
     },
+    novelVariableEdit: {
+      opened: false,
+      bankId: undefined,
+    },
   },
   spendApprovalModal: {
     open: false,
@@ -124,15 +130,32 @@ const inputSlice = createSlice({
         modalType: ModalType;
         editId?: string;
         text?: string;
+        bankId?: string;
       }>,
     ) => {
-      const { modalType, editId } = action.payload;
+      const { modalType, editId, bankId } = action.payload;
+
+      if (!state.modals[modalType]) {
+        // Create the modal state if it doesn't exist (for novelVariableEdit)
+        if (modalType === 'novelVariableEdit') {
+          state.modals[modalType] = {
+            opened: false,
+            bankId: undefined,
+          };
+        } else {
+          return;
+        }
+      }
+
       state.modals[modalType].opened = true;
       if ('editId' in action.payload) {
         state.modals[modalType].editId = editId;
       }
       if ('text' in action.payload) {
         state.modals[modalType].text = action.payload.text;
+      }
+      if ('bankId' in action.payload) {
+        state.modals[modalType].bankId = bankId;
       }
     },
     closeModal: (
@@ -141,7 +164,12 @@ const inputSlice = createSlice({
         modalType: ModalType;
       }>,
     ) => {
-      state.modals[action.payload.modalType].opened = false;
+      const modal = state.modals[action.payload.modalType];
+      modal.opened = false;
+      // Reset optional fields for novelVariableEdit modal
+      if (action.payload.modalType === 'novelVariableEdit') {
+        modal.bankId = undefined;
+      }
     },
     navigatePanel(state, action: PayloadAction<PanelType>) {
       state.navigation.panel = action.payload;

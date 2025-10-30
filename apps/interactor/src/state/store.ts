@@ -18,6 +18,7 @@ import updateStateMiddleware from './updateState.middleware';
 import { inferenceListenerMiddleware } from './listeners/inference';
 import { sceneSugestionMiddleware } from './listeners/scene-suggestion';
 import { userDataMiddleware } from './listeners/user-data';
+import variableOperationsMiddleware from './variableOperations.middleware';
 
 export const store = configureStore({
   reducer: {
@@ -31,6 +32,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend([
+      variableOperationsMiddleware,
       updateStateMiddleware,
       userDataMiddleware.middleware,
       sceneSugestionMiddleware.middleware,

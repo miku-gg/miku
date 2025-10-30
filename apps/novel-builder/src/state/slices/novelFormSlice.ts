@@ -43,6 +43,7 @@ const initialState: NovelV3.NovelState & { pendingInferences?: PendingInference[
   inventory: [],
   cutscenes: [],
   language: 'en',
+  variableBanks: [],
   pendingInferences: [],
 };
 
@@ -50,6 +51,74 @@ const novelFormSlice = createSlice({
   name: 'novel',
   initialState,
   reducers: {
+    // Variable bank actions
+    createVariableBank: (state, action: PayloadAction<{ id: string; name: string; description: string }>) => {
+      if (!state.variableBanks) state.variableBanks = [];
+      state.variableBanks.push({
+        id: action.payload.id,
+        name: action.payload.name,
+        description: action.payload.description,
+        variables: [],
+      });
+    },
+    updateVariableBank: (
+      state,
+      action: PayloadAction<{ id: string; changes: Partial<Omit<NovelV3.NovelVariableBank, 'id'>> }>,
+    ) => {
+      const bank = state.variableBanks?.find((b) => b.id === action.payload.id);
+      if (bank) {
+        Object.assign(bank, action.payload.changes);
+      }
+    },
+    deleteVariableBank: (state, action: PayloadAction<{ id: string }>) => {
+      const bankId = action.payload.id;
+      if (state.variableBanks) {
+        state.variableBanks = state.variableBanks.filter((b) => b.id !== bankId);
+      }
+
+      // Remove references from all scenes
+      state.scenes.forEach((scene) => {
+        if (scene.variableBankIds) {
+          scene.variableBankIds = scene.variableBankIds.filter((id) => id !== bankId);
+        }
+      });
+
+      // Remove references from all characters
+      state.characters.forEach((character) => {
+        if (character.variableBankIds) {
+          character.variableBankIds = character.variableBankIds.filter((id) => id !== bankId);
+        }
+      });
+    },
+    // Variable actions within banks
+    createVariableInBank: (state, action: PayloadAction<{ bankId: string; variableId: string }>) => {
+      const bank = state.variableBanks?.find((b) => b.id === action.payload.bankId);
+      if (bank) {
+        bank.variables.push({
+          id: action.payload.variableId,
+          name: '',
+          description: '',
+          type: 'number',
+          value: 0,
+        });
+      }
+    },
+    updateVariableInBank: (
+      state,
+      action: PayloadAction<{ bankId: string; variableId: string; changes: Partial<NovelV3.NovelVariable> }>,
+    ) => {
+      const bank = state.variableBanks?.find((b) => b.id === action.payload.bankId);
+      const variable = bank?.variables.find((v) => v.id === action.payload.variableId);
+      if (variable) {
+        Object.assign(variable, action.payload.changes);
+      }
+    },
+    deleteVariableInBank: (state, action: PayloadAction<{ bankId: string; variableId: string }>) => {
+      const bank = state.variableBanks?.find((b) => b.id === action.payload.bankId);
+      if (bank) {
+        bank.variables = bank.variables.filter((v) => v.id !== action.payload.variableId);
+      }
+    },
     addChildScene: (state, action: PayloadAction<{ sourceId: string; targetId: string }>) => {
       const { sourceId, targetId } = action.payload;
       const sourceScene = state.scenes.find((scene) => scene.id === sourceId);
@@ -146,6 +215,7 @@ const novelFormSlice = createSlice({
             tags: [],
           },
         },
+        variableBankIds: [],
       };
       state.characters.push(character);
     },
@@ -181,6 +251,7 @@ const novelFormSlice = createSlice({
         nsfw: NovelV3.NovelNSFW.NONE,
         parentMapIds: null,
         prompt: '',
+        variableBankIds: [],
       };
       state.scenes.push(newScene);
     },
@@ -407,13 +478,18 @@ const novelFormSlice = createSlice({
       if (!map) return;
       const place = map.places.find((place) => place.id === action.payload.placeId);
       if (!place) return;
-      
+
       // Parse existing sceneIds
-      const existingSceneIds = place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0) : [];
+      const existingSceneIds = place.sceneId
+        ? place.sceneId
+            .split(',')
+            .map((id) => id.trim())
+            .filter((id) => id.length > 0)
+        : [];
       // Add the new sceneId if it doesn't already exist
       if (!existingSceneIds.includes(action.payload.sceneId)) {
         existingSceneIds.push(action.payload.sceneId);
-      }      
+      }
       // Update with comma-separated string
       place.sceneId = existingSceneIds.join(',');
     },
@@ -422,9 +498,14 @@ const novelFormSlice = createSlice({
       if (!map) return;
       const place = map.places.find((place) => place.id === action.payload.placeId);
       if (!place) return;
-      
+
       // Parse existing sceneIds
-      const existingSceneIds = place.sceneId ? place.sceneId.split(',').map(id => id.trim()).filter(id => id.length > 0) : [];
+      const existingSceneIds = place.sceneId
+        ? place.sceneId
+            .split(',')
+            .map((id) => id.trim())
+            .filter((id) => id.length > 0)
+        : [];
       // Remove the sceneId
       const updatedSceneIds = existingSceneIds.filter((id) => id !== action.payload.sceneId);
       // Update with comma-separated string
@@ -484,6 +565,7 @@ const novelFormSlice = createSlice({
           },
         },
         condition: '',
+        variableConditions: [],
         actions: [],
       });
     },
@@ -595,7 +677,10 @@ const novelFormSlice = createSlice({
         action: null,
       });
     },
-    updateCutsceneOption: (state, action: PayloadAction<{ cutsceneId: string; partId: string; optionId: string; option: NovelV3.CutSceneOption }>) => {
+    updateCutsceneOption: (
+      state,
+      action: PayloadAction<{ cutsceneId: string; partId: string; optionId: string; option: NovelV3.CutSceneOption }>,
+    ) => {
       const cutscene = state.cutscenes?.find((cutscene) => cutscene.id === action.payload.cutsceneId);
       if (!cutscene) return;
       const part = cutscene.parts.find((part) => part.id === action.payload.partId);
@@ -614,7 +699,7 @@ const novelFormSlice = createSlice({
 
       part.options = part.options.filter((option) => option.id !== action.payload.optionId);
     },
-    
+
     reorderStart: (state, action: PayloadAction<{ startId: string; direction: 'up' | 'down' }>) => {
       const { startId, direction } = action.payload;
       const currentIndex = state.starts.findIndex((start) => start.id === startId);
@@ -858,6 +943,12 @@ export const {
   addPendingInference,
   updateInferenceStatus,
   removePendingInference,
+  createVariableBank,
+  updateVariableBank,
+  deleteVariableBank,
+  createVariableInBank,
+  updateVariableInBank,
+  deleteVariableInBank,
 } = novelFormSlice.actions;
 
 export default novelFormSlice.reducer;

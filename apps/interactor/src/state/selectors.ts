@@ -688,3 +688,31 @@ export const selectIsCurrentlyAtStart = (state: RootState): boolean => {
   const currentResponse = state.narration.responses[state.narration.currentResponseId];
   return currentResponse?.parentInteractionId === null;
 };
+
+export const selectVariableBanks = (state: RootState) => state.novel.variableBanks || [];
+
+export const selectVariablesInBank = (state: RootState, bankId: string) => {
+  const banks = selectVariableBanks(state);
+  const bank = banks.find((b) => b.id === bankId);
+  return bank?.variables || [];
+};
+
+// Get all variables accessible in current scene
+export const selectAccessibleVariables = (state: RootState) => {
+  const currentScene = selectCurrentScene(state);
+  const banks = selectVariableBanks(state);
+
+  if (!currentScene) return [];
+
+  const sceneBankIds = currentScene.variableBankIds || [];
+  const accessibleVars: NovelV3.NovelVariable[] = [];
+
+  sceneBankIds.forEach((bankId) => {
+    const bank = banks.find((b) => b.id === bankId);
+    if (bank) {
+      accessibleVars.push(...bank.variables);
+    }
+  });
+
+  return accessibleVars;
+};

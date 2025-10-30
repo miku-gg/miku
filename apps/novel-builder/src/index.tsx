@@ -17,6 +17,7 @@ import MapEditModal from './modals/map/MapEditModal';
 import PlaceEditModal from './modals/map/PlaceEditModal';
 import ObjectiveEditModal from './modals/scene/ObjectiveEditModal';
 import SceneEditModal from './modals/scene/SceneEditModal';
+import VariableBankEditModal from './modals/VariableBankEditModal';
 import Planels from './panels';
 import { store } from './state/store';
 import './styles/main.scss';
@@ -72,6 +73,7 @@ ReactDOM.render(
         <ObjectiveEditModal />
         <ItemEditModal />
         <ActionEditModal />
+        <VariableBankEditModal />
         <SpendApprovalModal />
       </AreYouSure.AreYouSureProvider>
       <ToastPortal />

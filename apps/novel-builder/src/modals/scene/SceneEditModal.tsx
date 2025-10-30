@@ -1,8 +1,10 @@
 import { AreYouSure, Button, CheckBox, Input, Modal, Tooltip } from '@mikugg/ui-kit';
 import classNames from 'classnames';
 import { useState } from 'react';
+import VariableBankList from '../../components/VariableBankList';
 import { AiOutlinePicture } from 'react-icons/ai';
 import { FaUser } from 'react-icons/fa6';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { MdZoomIn, MdComputer, MdPhoneAndroid } from 'react-icons/md';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
@@ -56,6 +58,8 @@ export default function SceneEditModal() {
   const [zoomModalEmotionName, setZoomModalEmotionName] = useState('');
   const [zoomModalCharacterName, setZoomModalCharacterName] = useState('');
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [variablesExpanded, setVariablesExpanded] = useState(false);
+  const SHOW_VARIABLE_BANK_REFERENCES = false;
 
   const characterCount = 4; // here we define the max amount of characters in a scene
 
@@ -66,13 +70,33 @@ export default function SceneEditModal() {
   const handleDeleteScene = () => {
     if (scene) {
       openAreYouSure({
-        description: 'Are you sure you what to delete this scene?',
+        description: 'Are you sure you want to delete this scene?',
         onYes: () => {
           dispatch(deleteSceneById(scene.id));
           dispatch(closeModal({ modalType: 'scene' }));
         },
       });
     }
+  };
+
+  const handleSelectVariableBank = (bankId: string) => {
+    if (!scene) return;
+
+    const currentBankIds = scene.variableBankIds || [];
+    const isSelected = currentBankIds.includes(bankId);
+
+    const updatedBankIds = isSelected ? currentBankIds.filter((id) => id !== bankId) : [...currentBankIds, bankId];
+
+    const updatedScene = {
+      ...scene,
+      variableBankIds: updatedBankIds,
+      characters: scene.characters.map((char) => ({
+        characterId: char.id || '',
+        outfit: char.outfit || '',
+        objective: char.objective,
+      })),
+    };
+    dispatch(updateScene(updatedScene));
   };
 
   const handleLorebookSelect = (id: string) => {
@@ -561,6 +585,27 @@ export default function SceneEditModal() {
                 onSelectLorebook={(id) => handleLorebookSelect(id)}
               />
             </div>
+            {SHOW_VARIABLE_BANK_REFERENCES && (
+              <div className="SceneEditModal__scene-variables">
+                <div className="SceneEditModal__scene-variables-header">
+                  <h2>Variable Bank References</h2>
+                  <Button
+                    theme="secondary"
+                    onClick={() => setVariablesExpanded(!variablesExpanded)}
+                    className="SceneEditModal__scene-variables-toggle"
+                  >
+                    {variablesExpanded ? <FaEyeSlash /> : <FaEye />}
+                  </Button>
+                </div>
+                {variablesExpanded && (
+                  <VariableBankList
+                    selectedBankIds={scene?.variableBankIds || []}
+                    onSelectBank={handleSelectVariableBank}
+                    tooltipText="Select variable banks accessible in this scene"
+                  />
+                )}
+              </div>
+            )}
             <div className="SceneEditModal__scene-indicators">
               <div className="SceneEditModal__scene-indicators-header">
                 <div className="SceneEditModal__scene-indicators-header-title">

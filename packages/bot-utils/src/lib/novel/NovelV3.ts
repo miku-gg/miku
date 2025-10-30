@@ -49,6 +49,8 @@ export interface NovelScene {
   indicators?: NovelIndicator[];
   /** Optional battle to start when this scene begins */
   battleAtBeginning?: string;
+  /** Variable banks referenced by this scene */
+  variableBankIds?: string[];
 }
 
 export interface NovelCharacterOutfit {
@@ -96,14 +98,25 @@ export type CutSceneAction =
       type: 'NAVIGATE_TO_SCENE';
       params: {
         sceneId: string;
-    };
-  }
+      };
+    }
   | {
-    type: 'GIVE_ITEM';
-    params: {
-      itemId: string;
+      type: 'GIVE_ITEM';
+      params: {
+        itemId: string;
+      };
+    }
+  | {
+      type: 'SET_NOVEL_VARIABLE';
+      params: {
+        variables: Array<{
+          variableId: string;
+          value: string | number | boolean;
+          bankId: string;
+          operation?: 'SET' | 'ADD' | 'MULTIPLY' | 'DIVIDE';
+        }>;
+      };
     };
-  };
 
 export interface CutScene {
   id: string;
@@ -121,6 +134,8 @@ export interface NovelCharacter {
   card: MikuCardV2;
   nsfw: NovelNSFW;
   lorebookIds?: string[];
+  /** Variable banks referenced by this character */
+  variableBankIds?: string[];
 }
 
 export interface NovelBackground {
@@ -142,6 +157,31 @@ export interface NovelSong {
   description: string;
   tags: string[];
   source: string;
+}
+
+export interface NovelVariable {
+  id: string;
+  name: string;
+  description: string;
+  type: 'number' | 'string' | 'boolean';
+  value: string | number | boolean;
+}
+
+export interface NovelVariableBank {
+  id: string;
+  name: string;
+  description: string;
+  variables: NovelVariable[];
+}
+
+export type VariableConditionOperator = 'EQUAL' | 'NOT_EQUAL' | 'LESS_THAN' | 'GREATER_THAN';
+
+export interface VariableCondition {
+  id: string;
+  variableId: string;
+  operator: VariableConditionOperator;
+  value: string | number | boolean;
+  bankId: string;
 }
 
 export interface NovelMap {
@@ -183,6 +223,7 @@ export enum NovelActionType {
   RPG_ADD_ABILITY_TO_CHARACTER = 'RPG_ADD_ABILITY_TO_CHARACTER',
   RPG_ADD_CHARACTER_TO_PARTY = 'RPG_ADD_CHARACTER_TO_PARTY',
   RPG_CHANGE_BATTLE_OUTFIT = 'RPG_CHANGE_BATTLE_OUTFIT',
+  SET_NOVEL_VARIABLE = 'SET_NOVEL_VARIABLE',
 
   CUTSCENE_OPTION_SELECTED = 'CUTSCENE_OPTION_SELECTED',
 }
@@ -275,6 +316,17 @@ export type NovelAction =
       };
     }
   | {
+      type: NovelActionType.SET_NOVEL_VARIABLE;
+      params: {
+        variables: Array<{
+          variableId: string;
+          value: string | number | boolean;
+          bankId: string;
+          operation?: 'SET' | 'ADD' | 'MULTIPLY' | 'DIVIDE';
+        }>;
+      };
+    }
+  | {
       type: NovelActionType.CUTSCENE_OPTION_SELECTED;
       params: {
         cutsceneId: string;
@@ -318,6 +370,7 @@ export interface NovelObjective {
   description?: string;
   stateCondition: StateCondition;
   condition: string;
+  variableConditions?: VariableCondition[];
   singleUse: boolean;
   actions: NovelAction[];
   hint?: string;
@@ -349,6 +402,7 @@ export interface NovelState {
   useModalForStartSelection?: boolean;
   rpg?: NovelRPG;
   battles?: NovelBattle[];
+  variableBanks?: NovelVariableBank[];
 }
 
 export interface NovelIndicator {

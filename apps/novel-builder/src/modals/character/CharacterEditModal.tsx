@@ -5,21 +5,41 @@ import { closeModal } from '../../state/slices/inputSlice';
 import ButtonGroup from '../../components/ButtonGroup';
 import { useEffect, useState } from 'react';
 import CharacterOutfitsEdit from './CharacterOutfitsEdit';
+import NovelVariableList from '../NovelVariableList';
+import VariableBankList from '../../components/VariableBankList';
 import './CharacterEditModal.scss';
 import { AreYouSure } from '@mikugg/ui-kit';
-import { deleteCharacter } from '../../state/slices/novelFormSlice';
+import { deleteCharacter, updateCharacter } from '../../state/slices/novelFormSlice';
 
 export default function CharacterEditModal() {
-  const { openModal } = AreYouSure.useAreYouSure();
+  const { openModal: openAreYouSure } = AreYouSure.useAreYouSure();
   const { opened, editId } = useAppSelector((state) => state.input.modals.character);
+  const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === editId));
   const dispatch = useAppDispatch();
   const [selected, setSelected] = useState<string>('prompt');
+  const SHOW_VARIABLES_TAB = false;
 
   useEffect(() => {
     if (opened) {
       setSelected('prompt');
     }
   }, [opened]);
+
+  const handleSelectVariableBank = (bankId: string) => {
+    if (!character) return;
+
+    const currentBankIds = character.variableBankIds || [];
+    const isSelected = currentBankIds.includes(bankId);
+
+    const updatedBankIds = isSelected ? currentBankIds.filter((id) => id !== bankId) : [...currentBankIds, bankId];
+
+    dispatch(
+      updateCharacter({
+        ...character,
+        variableBankIds: updatedBankIds,
+      }),
+    );
+  };
 
   return (
     <Modal
@@ -41,6 +61,14 @@ export default function CharacterEditModal() {
               content: 'Outfits',
               value: 'outfits',
             },
+            ...(SHOW_VARIABLES_TAB
+              ? [
+                  {
+                    content: 'Variables',
+                    value: 'variables',
+                  },
+                ]
+              : []),
           ]}
         />
       </div>
@@ -51,7 +79,7 @@ export default function CharacterEditModal() {
             <Button
               theme="primary"
               onClick={() =>
-                openModal({
+                openAreYouSure({
                   description: 'Are you sure you want to delete this character?',
                   onYes: () => {
                     dispatch(closeModal({ modalType: 'character' }));
@@ -67,6 +95,13 @@ export default function CharacterEditModal() {
         </>
       ) : null}
       {selected === 'outfits' ? <CharacterOutfitsEdit characterId={editId} /> : null}
+      {SHOW_VARIABLES_TAB && selected === 'variables' ? (
+        <VariableBankList
+          selectedBankIds={character?.variableBankIds || []}
+          onSelectBank={handleSelectVariableBank}
+          tooltipText="Select variable banks accessible for this character"
+        />
+      ) : null}
     </Modal>
   );
 }

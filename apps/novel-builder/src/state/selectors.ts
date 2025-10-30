@@ -181,3 +181,24 @@ export const selectEditingCutscenePart = createSelector(
       ?.parts.find((part) => part.id === modal.editId);
   },
 );
+
+// Get all variable banks
+export const selectVariableBanks = (state: RootState) => state.novel.variableBanks || [];
+
+// Get specific variable bank by ID
+export const selectVariableBankById = createSelector(
+  [selectVariableBanks, (_: RootState, bankId: string) => bankId],
+  (banks, bankId) => banks.find((b) => b.id === bankId),
+);
+
+// Get variables within a specific bank
+export const selectVariablesInBank = createSelector(
+  [selectVariableBanks, (_: RootState, bankId: string) => bankId],
+  (banks, bankId) => banks.find((b) => b.id === bankId)?.variables || [],
+);
+
+// Get all scenes for scope dropdown
+export const selectAllScenes = (state: RootState) => state.novel.scenes;
+
+// Get all characters for scope dropdown
+export const selectAllCharacters = (state: RootState) => state.novel.characters;
