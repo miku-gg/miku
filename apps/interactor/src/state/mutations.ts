@@ -97,6 +97,7 @@ export const novelActionToStateAction = (action: NovelV3.NovelAction): Action[] 
         variableId: v.variableId,
         value: v.value,
         bankId: v.bankId,
+        operation: v.operation,
       }));
       return [
         setNovelVariable({

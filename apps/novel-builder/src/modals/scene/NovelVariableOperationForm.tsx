@@ -7,24 +7,26 @@ import { useState } from 'react';
 import { FaTrashAlt, FaPlus } from 'react-icons/fa';
 import BankSelectionModal from './BankSelectionModal';
 import VariableSelectionModal from './VariableSelectionModal';
-import './SetNovelVariableForm.scss';
+import './NovelVariableOperationForm.scss';
 
-interface SetNovelVariableFormProps {
+interface NovelVariableOperationFormProps {
   variables: Array<{
     variableId: string;
     value: string | number | boolean;
     bankId: string;
+    operation?: 'SET' | 'ADD' | 'MULTIPLY' | 'DIVIDE';
   }>;
   onChange: (
     variables: Array<{
       variableId: string;
       value: string | number | boolean;
       bankId: string;
+      operation?: 'SET' | 'ADD' | 'MULTIPLY' | 'DIVIDE';
     }>,
   ) => void;
 }
 
-export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFormProps) => {
+export const NovelVariableOperationForm = ({ variables, onChange }: NovelVariableOperationFormProps) => {
   const banks = useAppSelector(selectVariableBanks);
   const [numberInputValues, setNumberInputValues] = useState<Record<string, string>>({});
   const [bankSelectOpened, setBankSelectOpened] = useState<{ opened: boolean; index: number }>({
@@ -66,6 +68,7 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
       variableId: string;
       value: string | number | boolean;
       bankId: string;
+      operation?: 'SET' | 'ADD' | 'MULTIPLY' | 'DIVIDE';
     }>,
   ) => {
     if (index < 0 || index >= (variables || []).length) return;
@@ -172,22 +175,33 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
     }
   };
 
+  const getOperationOptions = (variableType: 'number' | 'string' | 'boolean' | undefined) => {
+    if (variableType === 'number') {
+      return [
+        { name: 'SET', value: 'SET' },
+        { name: 'ADD', value: 'ADD' },
+        { name: 'MULTIPLY', value: 'MULTIPLY' },
+        { name: 'DIVIDE', value: 'DIVIDE' },
+      ];
+    }
+    // For string/boolean, only SET is meaningful
+    return [{ name: 'SET', value: 'SET' }];
+  };
+
   return (
     <div className="SetNovelVariableForm">
       {(variables || []).map((variable, index) => {
-        // Safety check - skip invalid variables
         if (!variable || typeof variable !== 'object') return null;
 
-        // Ensure variable has required fields with defaults
         const safeVariable = {
           variableId: variable.variableId || '',
           value: variable.value ?? '',
           bankId: variable.bankId || 'global-bank',
+          operation: (variable as any).operation as 'SET' | 'ADD' | 'MULTIPLY' | 'DIVIDE' | undefined,
         };
 
         const currentBankId = safeVariable.bankId;
-
-        // Use stable key
+        const selectedVar = allVariables.find((v) => v.id === safeVariable.variableId);
         const key = `var-${index}-${safeVariable.variableId || 'new'}`;
 
         return (
@@ -221,7 +235,7 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
               </div>
             </div>
 
-            {/* Second row: Variable, Value */}
+            {/* Second row: Variable, Operator, Value */}
             <div className="SetNovelVariableForm__row SetNovelVariableForm__row--variable">
               <div className="SetNovelVariableForm__field">
                 <label className="SetNovelVariableForm__label">Variable</label>
@@ -233,6 +247,30 @@ export const SetNovelVariableForm = ({ variables, onChange }: SetNovelVariableFo
                   >
                     {getVariableDisplayName(safeVariable.variableId)}
                   </Button>
+                </div>
+              </div>
+
+              <div className="SetNovelVariableForm__field">
+                <label className="SetNovelVariableForm__label">Operation</label>
+                <div className="SetNovelVariableForm__control">
+                  <Dropdown
+                    className="SetNovelVariableForm__dropdown"
+                    items={getOperationOptions(selectedVar?.type)}
+                    selectedIndex={(() => {
+                      const options = getOperationOptions(selectedVar?.type).map((o) => o.value);
+                      return Math.max(0, options.indexOf((safeVariable.operation as any) || 'SET'));
+                    })()}
+                    onChange={(i) => {
+                      const options = getOperationOptions(selectedVar?.type).map((o) => o.value) as (
+                        | 'SET'
+                        | 'ADD'
+                        | 'MULTIPLY'
+                        | 'DIVIDE'
+                      )[];
+                      const op = options[i] || 'SET';
+                      updateVariable(index, { operation: op });
+                    }}
+                  />
                 </div>
               </div>
 

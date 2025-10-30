@@ -4,7 +4,7 @@ import { NovelV3 } from '@mikugg/bot-utils';
 import { v4 as randomUUID } from 'uuid';
 import SceneSelector from '../scene/SceneSelector';
 import ItemSelector from '../items/ItemSelector';
-import { SetNovelVariableForm } from '../scene/SetNovelVariableForm';
+import { NovelVariableOperationForm } from '../scene/NovelVariableOperationForm';
 import './OptionsEditor.scss';
 
 interface OptionsEditorProps {
@@ -177,7 +177,7 @@ export const OptionsEditor = ({ part, textIndex, onUpdate }: OptionsEditorProps)
               )}
 
               {option.action?.type === 'SET_NOVEL_VARIABLE' && (
-                <SetNovelVariableForm
+                <NovelVariableOperationForm
                   variables={option.action.params.variables}
                   onChange={(variables) => {
                     updateAction(option.id, {

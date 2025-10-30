@@ -113,6 +113,7 @@ export type CutSceneAction =
           variableId: string;
           value: string | number | boolean;
           bankId: string;
+          operation?: 'SET' | 'ADD' | 'MULTIPLY' | 'DIVIDE';
         }>;
       };
     };
@@ -321,6 +322,7 @@ export type NovelAction =
           variableId: string;
           value: string | number | boolean;
           bankId: string;
+          operation?: 'SET' | 'ADD' | 'MULTIPLY' | 'DIVIDE';
         }>;
       };
     }

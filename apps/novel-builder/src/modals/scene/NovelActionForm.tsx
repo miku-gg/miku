@@ -5,7 +5,7 @@ import { selectEditingInventoryItem } from '../../state/selectors';
 import { useAppSelector } from '../../state/store';
 import './NovelActionForm.scss';
 import SceneSelector from './SceneSelector';
-import { SetNovelVariableForm } from './SetNovelVariableForm';
+import { NovelVariableOperationForm } from './NovelVariableOperationForm';
 
 export const getDefaultAction = (actionType: NovelV3.NovelActionType): NovelV3.NovelAction => {
   switch (actionType) {
@@ -165,7 +165,7 @@ const ActionParamsForm = ({
   //set-novel-variable
   else if (action.type === NovelV3.NovelActionType.SET_NOVEL_VARIABLE) {
     return (
-      <SetNovelVariableForm
+      <NovelVariableOperationForm
         variables={action.params.variables}
         onChange={(variables) => {
           onChange({

@@ -213,9 +213,23 @@ const novelSlice = createSlice({
         }
 
         let variable = bank.variables.find((v) => v.id === variableId);
-        if (variable) {
-          variable.value = value;
+        if (!variable) {
+          const inferredType = (
+            typeof value === 'number' ? 'number' : typeof value === 'boolean' ? 'boolean' : 'string'
+          ) as 'number' | 'boolean' | 'string';
+
+          bank.variables.push({
+            id: variableId,
+            name: variableId,
+            description: '',
+            type: inferredType,
+            value: value,
+          });
+          return;
         }
+
+        // Pure set
+        variable.value = value;
       });
     },
   },

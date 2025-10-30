@@ -1,6 +1,7 @@
 @import '../../styles/variables.scss';
 
 .SetNovelVariableForm {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0rem;
@@ -12,6 +13,7 @@
     border-radius: 6px;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.02);
+    overflow: visible;
   }
 
   &__row {
@@ -19,6 +21,7 @@
     gap: 8px;
     align-items: start;
     margin-bottom: 0.75rem;
+    overflow: visible;
 
     &:last-child {
       margin-bottom: 0;
@@ -29,7 +32,7 @@
     }
 
     &--variable {
-      grid-template-columns: 2fr 2fr;
+      grid-template-columns: 1fr 1fr 1fr !important; // Variable | Operator | Value
     }
   }
 
@@ -42,7 +45,7 @@
 
   &__row--variable &__field {
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;
   }
 
   &__row--scope &__field:last-child {
@@ -62,11 +65,16 @@
     align-items: flex-start;
     width: 100%;
     min-width: 0;
+    position: relative;
+  }
+
+  .Dropdown {
+    position: relative;
   }
 
   &__row--variable &__control {
     max-width: 100%;
-    overflow: hidden;
+    overflow: visible;
   }
 
   &__row--scope &__field:last-child &__control {
@@ -193,8 +201,23 @@
     }
 
     &__row--variable {
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+    }
+
+    &__row--variable &__field:first-child {
+      grid-column: 1 / -1;
+      grid-row: 1;
+    }
+
+    &__row--variable &__field:nth-child(2) {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    &__row--variable &__field:nth-child(3) {
+      grid-column: 2;
+      grid-row: 2;
     }
   }
 }
@@ -216,4 +239,6 @@
 .SetNovelVariableForm .Dropdown {
   width: 100%;
 }
+
+
 

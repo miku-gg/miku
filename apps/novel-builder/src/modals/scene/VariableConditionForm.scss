@@ -40,7 +40,7 @@
 
   &__row--variable &__field {
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;
   }
 
   &__row--scope &__field:last-child {
@@ -64,7 +64,8 @@
 
   &__row--variable &__control {
     max-width: 100%;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
   }
 
   &__row--scope &__field:last-child &__control {
