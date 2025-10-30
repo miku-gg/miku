@@ -59,6 +59,7 @@ export default function SceneEditModal() {
   const [zoomModalCharacterName, setZoomModalCharacterName] = useState('');
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [variablesExpanded, setVariablesExpanded] = useState(false);
+  const SHOW_VARIABLE_BANK_REFERENCES = false;
 
   const characterCount = 4; // here we define the max amount of characters in a scene
 
@@ -584,25 +585,27 @@ export default function SceneEditModal() {
                 onSelectLorebook={(id) => handleLorebookSelect(id)}
               />
             </div>
-            <div className="SceneEditModal__scene-variables">
-              <div className="SceneEditModal__scene-variables-header">
-                <h2>Variable Bank References</h2>
-                <Button
-                  theme="secondary"
-                  onClick={() => setVariablesExpanded(!variablesExpanded)}
-                  className="SceneEditModal__scene-variables-toggle"
-                >
-                  {variablesExpanded ? <FaEyeSlash /> : <FaEye />}
-                </Button>
+            {SHOW_VARIABLE_BANK_REFERENCES && (
+              <div className="SceneEditModal__scene-variables">
+                <div className="SceneEditModal__scene-variables-header">
+                  <h2>Variable Bank References</h2>
+                  <Button
+                    theme="secondary"
+                    onClick={() => setVariablesExpanded(!variablesExpanded)}
+                    className="SceneEditModal__scene-variables-toggle"
+                  >
+                    {variablesExpanded ? <FaEyeSlash /> : <FaEye />}
+                  </Button>
+                </div>
+                {variablesExpanded && (
+                  <VariableBankList
+                    selectedBankIds={scene?.variableBankIds || []}
+                    onSelectBank={handleSelectVariableBank}
+                    tooltipText="Select variable banks accessible in this scene"
+                  />
+                )}
               </div>
-              {variablesExpanded && (
-                <VariableBankList
-                  selectedBankIds={scene?.variableBankIds || []}
-                  onSelectBank={handleSelectVariableBank}
-                  tooltipText="Select variable banks accessible in this scene"
-                />
-              )}
-            </div>
+            )}
             <div className="SceneEditModal__scene-indicators">
               <div className="SceneEditModal__scene-indicators-header">
                 <div className="SceneEditModal__scene-indicators-header-title">

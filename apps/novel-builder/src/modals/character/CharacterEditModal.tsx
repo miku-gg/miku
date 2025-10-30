@@ -17,6 +17,7 @@ export default function CharacterEditModal() {
   const character = useAppSelector((state) => state.novel.characters.find((c) => c.id === editId));
   const dispatch = useAppDispatch();
   const [selected, setSelected] = useState<string>('prompt');
+  const SHOW_VARIABLES_TAB = false;
 
   useEffect(() => {
     if (opened) {
@@ -60,10 +61,14 @@ export default function CharacterEditModal() {
               content: 'Outfits',
               value: 'outfits',
             },
-            {
-              content: 'Variables',
-              value: 'variables',
-            },
+            ...(SHOW_VARIABLES_TAB
+              ? [
+                  {
+                    content: 'Variables',
+                    value: 'variables',
+                  },
+                ]
+              : []),
           ]}
         />
       </div>
@@ -90,7 +95,7 @@ export default function CharacterEditModal() {
         </>
       ) : null}
       {selected === 'outfits' ? <CharacterOutfitsEdit characterId={editId} /> : null}
-      {selected === 'variables' ? (
+      {SHOW_VARIABLES_TAB && selected === 'variables' ? (
         <VariableBankList
           selectedBankIds={character?.variableBankIds || []}
           onSelectBank={handleSelectVariableBank}
