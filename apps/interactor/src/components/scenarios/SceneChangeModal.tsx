@@ -12,6 +12,7 @@ import { AssetDisplayPrefix } from '@mikugg/bot-utils';
 import { useI18n } from '../../libs/i18n';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { navigateToScene } from '../../state/slices/narrationSlice';
+import { CustomEventType, postMessage } from '../../libs/stateEvents';
 
 export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) => {
   const { assetLinkLoader, isInteractionDisabled } = useAppContext();
@@ -22,10 +23,16 @@ export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) 
   const { opened, sceneId } = useAppSelector((state) => state.creation.scene.scenePreview);
   const scene = useAppSelector(selectScenes).find((s) => s.id === (customSceneId || sceneId));
   const currentCharacterName = useAppSelector(
-    (state) => state.novel.characters.find((c) => c.id === scene?.characters[0].characterId)?.name,
+    (state) => state.novel.characters.find((c) => c.id === scene?.characters[0]?.characterId)?.name,
   );
+  const isPremium = useAppSelector((state) => state.settings.user.isPremium);
+  const isLocked = scene && scene.characters.length > 2 && !isPremium;
 
   const handleConfirm = () => {
+    if (isLocked) {
+      postMessage(CustomEventType.OPEN_PREMIUM);
+      return;
+    }
     if (isInteractionDisabled) {
       toast.warn('Please log in to interact.', {
         position: 'top-center',
@@ -85,8 +92,12 @@ export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) 
     : '';
 
   return (
-    <Modal className="SceneChangeModal" opened={opened} onCloseModal={() => handleCloseModal()}>
-      <div className="SceneChangeModal__content">
+    <Modal
+      className={`SceneChangeModal ${isLocked ? 'SceneChangeModal--disabled' : ''}`}
+      opened={opened}
+      onCloseModal={() => handleCloseModal()}
+    >
+      <div className={`SceneChangeModal__content ${isLocked ? 'SceneChangeModal__content--disabled' : ''}`}>
         <img
           className="SceneChangeModal__background-image"
           src={assetLinkLoader(scene?.backgroundImage || '', AssetDisplayPrefix.BACKGROUND_IMAGE_SMALL)}
@@ -108,14 +119,14 @@ export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) 
           <h2 className="SceneChangeModal__title">{scene?.name || 'Next scene'}</h2>
           <p className="SceneChangeModal__prompt">{description || prompt}</p>
         </div>
-        <div className="SceneChangeModal__buttons">
-          <Button theme="secondary" onClick={() => handleCloseModal()}>
-            {i18n('cancel')}
-          </Button>
-          <Button theme="gradient" onClick={() => handleConfirm()}>
-            {i18n('go_to_scene')}
-          </Button>
-        </div>
+      </div>
+      <div className="SceneChangeModal__buttons">
+        <Button theme="secondary" onClick={() => handleCloseModal()}>
+          {i18n('cancel')}
+        </Button>
+        <Button theme="gradient" onClick={() => handleConfirm()} disabled={isLocked}>
+          {isLocked ? i18n('locked') : i18n('go_to_scene')}
+        </Button>
       </div>
     </Modal>
   );

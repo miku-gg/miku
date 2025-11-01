@@ -14,6 +14,7 @@ import { useI18n } from '../../../libs/i18n';
 import { useEffect, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './SceneListWindow.scss';
+import { CustomEventType, postMessage } from '../../../libs/stateEvents';
 
 interface SceneListWindowProps {
   availableScenes: string[];
@@ -28,6 +29,7 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
   const currentIndicators = useAppSelector(selectCurrentIndicators);
   const currentScene = useAppSelector(selectCurrentScene);
   const userName = useAppSelector((state) => state.settings.user.name);
+  const isPremium = useAppSelector((state) => state.settings.user.isPremium);
 
   const [topFadeSize, setTopFadeSize] = useState(0);
   const [bottomFadeSize, setBottomFadeSize] = useState(0);
@@ -69,6 +71,14 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
   }, [availableScenes]);
 
   const handleGoToScene = (sceneId: string) => {
+    const scene = scenes.find((s) => s.id === sceneId);
+    const isLocked = scene && scene.characters.length > 2 && !isPremium;
+
+    if (isLocked) {
+      postMessage(CustomEventType.OPEN_PREMIUM);
+      return;
+    }
+
     if (isInteractionDisabled) {
       toast.warn('Please log in to interact.', {
         position: 'top-center',
@@ -79,7 +89,6 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
       return;
     }
 
-    const scene = scenes.find((s) => s.id === sceneId);
     if (!scene) {
       toast.warn('Scene not found.', {
         position: 'top-center',
@@ -150,18 +159,43 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
           <div className="SceneListWindow__content">
             {(() => {
               // Move current scene to index 0 if it exists in availableScenes
+              // Then move locked scenes to the end
               const orderedScenes = [...availableScenes];
+              let currentSceneId: string | null = null;
+
               if (currentScene && availableScenes.includes(currentScene.id)) {
+                currentSceneId = currentScene.id;
                 const currentIndex = orderedScenes.indexOf(currentScene.id);
                 orderedScenes.splice(currentIndex, 1);
-                orderedScenes.unshift(currentScene.id);
               }
 
-              return orderedScenes.map((sceneId) => {
+              // Separate locked and unlocked scenes
+              const lockedScenes: string[] = [];
+              const unlockedScenes: string[] = [];
+
+              orderedScenes.forEach((sceneId) => {
+                const sceneData = scenes.find((s) => s.id === sceneId);
+                const isLocked = sceneData && sceneData.characters.length > 2 && !isPremium;
+                if (isLocked) {
+                  lockedScenes.push(sceneId);
+                } else {
+                  unlockedScenes.push(sceneId);
+                }
+              });
+
+              const finalOrder: string[] = [];
+              if (currentSceneId) {
+                finalOrder.push(currentSceneId);
+              }
+              finalOrder.push(...unlockedScenes);
+              finalOrder.push(...lockedScenes);
+
+              return finalOrder.map((sceneId) => {
                 const sceneData = scenes.find((s) => s.id === sceneId);
                 if (!sceneData) return null;
 
                 const isCurrentScene = currentScene && sceneId === currentScene.id;
+                const isLocked = sceneData.characters.length > 2 && !isPremium;
                 const currentCharacterName = useAppSelector(
                   (state) => state.novel.characters.find((c) => c.id === sceneData.characters[0]?.characterId)?.name,
                 );
@@ -182,7 +216,7 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
                   <div
                     key={sceneId}
                     className={`SceneListWindow__scene-button ${
-                      isCurrentScene ? 'SceneListWindow__scene-button--disabled' : ''
+                      isCurrentScene || isLocked ? 'SceneListWindow__scene-button--disabled' : ''
                     }`}
                   >
                     <div className="SceneListWindow__scene-button__content">
@@ -214,10 +248,10 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
                       <div className="SceneListWindow__scene-button__buttons">
                         <Button
                           theme="gradient"
-                          disabled={isCurrentScene}
-                          onClick={() => !isCurrentScene && handleGoToScene(sceneId)}
+                          disabled={isCurrentScene || isLocked}
+                          onClick={() => !isCurrentScene && !isLocked && handleGoToScene(sceneId)}
                         >
-                          {isCurrentScene ? i18n('you_are_here') : i18n('go_to_scene')}
+                          {isCurrentScene ? i18n('you_are_here') : isLocked ? i18n('locked') : i18n('go_to_scene')}
                         </Button>
                       </div>
                     </div>
