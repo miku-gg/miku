@@ -1,8 +1,7 @@
 @import '../../variables';
 
 .CreateScene {
-  &__background__button,
-  &__characters__item {
+  &__background__button {
     height: 100px;
     border-radius: 10px;
     transition: all 0.2s ease-out;
@@ -19,13 +18,32 @@
   }
 
   &__characters__item {
+    height: 100px;
+    border-radius: 10px;
+    transition: all 0.2s ease-out;
+    border: 2px solid transparent;
+    color: white;
+    background-color: $background-1;
+    outline: none;
     display: inline-flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    min-width: calc((100% - 30px) / 4);
+    max-width: calc((100% - 30px) / 4);
+    overflow: hidden;
+    flex-shrink: 0;
 
-    img {
+    &:hover {
+      border: 2px solid #aaa1ff;
+    }
+
+    img,
+    video {
       height: 100%;
+      width: 100%;
+      object-fit: cover;
+      object-position: top center;
     }
   }
 
@@ -148,15 +166,6 @@
   &__characters__list {
     display: flex;
     gap: 10px;
-  }
-
-  &__characters__item {
-    width: 100px;
-
-    img,
-    video {
-      height: 100%;
-    }
   }
 
   &__prompt {
