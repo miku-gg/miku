@@ -37,6 +37,7 @@ import { toast } from 'react-toastify';
 import { GiOpenChest } from 'react-icons/gi';
 import { novelActionToStateAction } from '../mutations';
 import { getInitialBattleState } from '../utils/battleUtils';
+import { isSceneLocked } from '../utils/sceneUtils';
 
 // a simple hash function to generate a unique identifier for the narration
 function simpleHash(str: string): string {
@@ -69,10 +70,10 @@ const interactionEffect = async (
 ) => {
   // Create AbortController for this interaction
   const abortController = new AbortController();
-  
+
   // Store the abort controller in module-level variable
   setCurrentInteractionAbortController(abortController);
-  
+
   try {
     let currentResponseState: NarrationResponse = state.narration.responses[state.narration.currentResponseId]!;
     const currentCharacterResponse = currentResponseState.characters.find(
@@ -239,7 +240,7 @@ const interactionEffect = async (
       if (abortController.signal.aborted) {
         return; // Exit early if aborted
       }
-      
+
       finishedCompletionResult = result;
       result.set('text', startText + (result.get('text') || ''));
       currentResponseState = responsePromptBuilder.completeResponse(currentResponseState, result, {
@@ -254,12 +255,12 @@ const interactionEffect = async (
         }),
       );
     }
-    
+
     // Check if the request was aborted before final processing
     if (abortController.signal.aborted) {
       return; // Exit early if aborted
     }
-    
+
     if (!currentResponseState.characters.find(({ characterId }) => characterId === selectedCharacterId)?.text) {
       throw new Error('No text');
     }
@@ -352,10 +353,37 @@ const interactionEffect = async (
           }
 
           if (response === ` Yes`) {
-            // Track that this objective was completed
-            completedObjectiveIds.push(objective.id);
+            let hasExecutedAction = false;
 
             objective.actions.forEach((action) => {
+              // Check if action involves locked scenes
+              let isBlocked = false;
+
+              if (action.type === NovelV3.NovelActionType.ADD_CHILD_SCENES) {
+                // Block if ANY child scene is locked
+                const childSceneIds = action.params.children || [];
+                for (const childSceneId of childSceneIds) {
+                  const childScene = state.novel.scenes.find((s) => s.id === childSceneId);
+                  if (isSceneLocked(childScene)) {
+                    isBlocked = true;
+                    break;
+                  }
+                }
+              } else if (action.type === NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE) {
+                // Block if target scene is locked
+                const targetScene = state.novel.scenes.find((s) => s.id === action.params.sceneId);
+                if (isSceneLocked(targetScene)) {
+                  isBlocked = true;
+                }
+              }
+
+              // Skip execution if blocked
+              if (isBlocked) {
+                return;
+              }
+
+              // Execute action
+              hasExecutedAction = true;
               const stateActions = novelActionToStateAction(action);
               for (const stateAction of stateActions) {
                 dispatch(stateAction);
@@ -431,6 +459,12 @@ const interactionEffect = async (
                   break;
               }
             });
+
+            // Only mark objective as completed if at least one action was executed
+            if (hasExecutedAction) {
+              completedObjectiveIds.push(objective.id);
+            }
+
             if (objective.singleUse) {
               dispatch(removeObjective(objective.id));
             }
