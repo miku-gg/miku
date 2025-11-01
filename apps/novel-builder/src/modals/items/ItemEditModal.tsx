@@ -75,12 +75,25 @@ export default function ItemEditModal() {
           },
         }),
       );
-    } else if (item.locked.config.sceneIds.length === 0 || ids.length === 0) {
+    } else if (ids.length === 0) {
       dispatch(
         updateInventoryItem({
           ...item,
           hidden: false,
           locked: undefined,
+        }),
+      );
+    } else {
+      dispatch(
+        updateInventoryItem({
+          ...item,
+          locked: {
+            ...item.locked,
+            config: {
+              ...item.locked.config,
+              sceneIds: ids,
+            },
+          },
         }),
       );
     }
