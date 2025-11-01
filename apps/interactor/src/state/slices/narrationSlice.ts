@@ -582,7 +582,13 @@ const narrationSlice = createSlice({
       const { responseId, summary } = action.payload;
       const response = state.responses[responseId];
       if (response) {
-        response.summary = summary;
+        if (response.summary) {
+          response.summary = {
+            sentences: [...response.summary.sentences, ...summary.sentences],
+          };
+        } else {
+          response.summary = summary;
+        }
       }
     },
     deleteSummarySentence(
