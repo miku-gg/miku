@@ -25,6 +25,7 @@ import {
   selectCurrentInteraction,
   selectCurrentScene,
   selectCurrentSceneObjectives,
+  selectCurrentSceneCharacterObjectives,
   selectMessagesSinceLastSummary,
   selectSummaryEnabled,
 } from '../selectors';
@@ -33,6 +34,7 @@ import { CustomEventType, postMessage } from '../../libs/stateEvents';
 import { unlockAchievement } from '../../libs/platformAPI';
 import { addItem } from '../slices/inventorySlice';
 import { removeObjective } from '../slices/objectivesSlice';
+import { deleteObjectiveFromCharacter } from '../slices/novelSlice';
 import { toast } from 'react-toastify';
 import { GiOpenChest } from 'react-icons/gi';
 import { novelActionToStateAction } from '../mutations';
@@ -69,10 +71,10 @@ const interactionEffect = async (
 ) => {
   // Create AbortController for this interaction
   const abortController = new AbortController();
-  
+
   // Store the abort controller in module-level variable
   setCurrentInteractionAbortController(abortController);
-  
+
   try {
     let currentResponseState: NarrationResponse = state.narration.responses[state.narration.currentResponseId]!;
     const currentCharacterResponse = currentResponseState.characters.find(
@@ -239,7 +241,7 @@ const interactionEffect = async (
       if (abortController.signal.aborted) {
         return; // Exit early if aborted
       }
-      
+
       finishedCompletionResult = result;
       result.set('text', startText + (result.get('text') || ''));
       currentResponseState = responsePromptBuilder.completeResponse(currentResponseState, result, {
@@ -254,12 +256,12 @@ const interactionEffect = async (
         }),
       );
     }
-    
+
     // Check if the request was aborted before final processing
     if (abortController.signal.aborted) {
       return; // Exit early if aborted
     }
-    
+
     if (!currentResponseState.characters.find(({ characterId }) => characterId === selectedCharacterId)?.text) {
       throw new Error('No text');
     }
@@ -290,7 +292,10 @@ const interactionEffect = async (
         );
       }
     }
-    const objectives = [...selectCurrentSceneObjectives(state)];
+    const sceneObjectives = selectCurrentSceneObjectives(state);
+    const characterObjectives = selectCurrentSceneCharacterObjectives(state);
+    const objectives = [...sceneObjectives, ...characterObjectives];
+
     if (
       !objectives.some((objective) =>
         objective.actions.some((action) => action.type === NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE),
@@ -432,7 +437,17 @@ const interactionEffect = async (
               }
             });
             if (objective.singleUse) {
-              dispatch(removeObjective(objective.id));
+              const objWithMeta = objective as NovelV3.NovelObjective & { _characterId?: string };
+              if (objWithMeta._characterId) {
+                dispatch(
+                  deleteObjectiveFromCharacter({
+                    characterId: objWithMeta._characterId,
+                    objectiveId: objective.id,
+                  }),
+                );
+              } else {
+                dispatch(removeObjective(objective.id));
+              }
             }
           }
         }),

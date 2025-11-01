@@ -186,6 +186,12 @@ const novelSlice = createSlice({
         }
       }
     },
+    deleteObjectiveFromCharacter: (state, action: PayloadAction<{ characterId: string; objectiveId: string }>) => {
+      const character = state.characters.find((char) => char.id === action.payload.characterId);
+      if (character && character.objectives) {
+        character.objectives = character.objectives.filter((objective) => objective.id !== action.payload.objectiveId);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase('global/replaceState', (_state, action) => {
@@ -209,6 +215,7 @@ export const {
   addCharacterToParty,
   changeCharacterBattleOutfit,
   changeCutscenePartBackground,
+  deleteObjectiveFromCharacter,
 } = novelSlice.actions;
 
 export default novelSlice.reducer;

@@ -404,6 +404,25 @@ export const selectCurrentSceneObjectives = createSelector(
   },
 );
 
+export const selectCurrentSceneCharacterObjectives = createSelector(
+  [selectCurrentScene, (state: RootState) => state.novel.characters],
+  (scene, characters) => {
+    if (!scene) return [];
+
+    const characterIds = scene.characters.map((c) => c.characterId);
+    const characterObjectives: (NovelV3.NovelObjective & { _characterId: string })[] = [];
+
+    for (const characterId of characterIds) {
+      const character = characters.find((c) => c.id === characterId);
+      if (character?.objectives) {
+        characterObjectives.push(...character.objectives.map((obj) => ({ ...obj, _characterId: character.id })));
+      }
+    }
+
+    return characterObjectives;
+  },
+);
+
 export const selectConditionStatus = (state: RootState, condition: NovelV3.StateCondition) => {
   switch (condition.type) {
     case 'IN_SCENE':
