@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useState } from 'react';
 import { BsStars } from 'react-icons/bs';
-import { FaCoins } from 'react-icons/fa6';
+import { FaCoins, FaLock } from 'react-icons/fa6';
 import { MdOutlineImageSearch } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import { v4 as randomUUID } from 'uuid';
@@ -38,6 +38,7 @@ import EmotionRenderer from '../emotion-render/EmotionRenderer';
 import './CreateScene.scss';
 import CreditsDisplayer from './CreditsDisplayer';
 import { useI18n } from '../../libs/i18n';
+import { CustomEventType, postMessage } from '../../libs/stateEvents';
 
 // Selector to get all character IDs that have been met in visited scenes
 // This uses a more efficient approach by limiting to recent scenes only
@@ -129,6 +130,7 @@ const CreateScene = () => {
   const title = useAppSelector((state) => state.creation.scene.title);
   const submitting = useAppSelector((state) => state.creation.scene.submitting);
   const importedCharacters = useAppSelector((state) => state.creation.importedCharacters);
+  const isPremium = useAppSelector((state) => state.settings.user.isPremium);
 
   const { i18n } = useI18n();
 
@@ -242,11 +244,19 @@ const CreateScene = () => {
           <div className="CreateScene__characters__list scrollbar">
             {charactersSelected.map(({ id, outfit }, index) => {
               const character = characters.find((c) => c?.id === id);
+              const isPremiumLocked = (index === 2 || index === 3) && !isPremium;
+              const handleCharacterClick = () => {
+                if (isPremiumLocked) {
+                  postMessage(CustomEventType.OPEN_PREMIUM);
+                  return;
+                }
+                dispatch(setCharacterModalOpened(index));
+              };
               return (
                 <div
                   className="CreateScene__characters__item"
                   key={`character-${id}-${index}`}
-                  onClick={() => dispatch(setCharacterModalOpened(index))}
+                  onClick={handleCharacterClick}
                 >
                   {character?.name ? (
                     <EmotionRenderer
@@ -254,6 +264,8 @@ const CreateScene = () => {
                       assetLinkLoader={assetLinkLoader}
                       assetUrl={character?.outfits.find((o) => o?.id === outfit)?.emotions[0].sources.png || ''}
                     />
+                  ) : isPremiumLocked ? (
+                    <FaLock />
                   ) : (
                     'Select'
                   )}
