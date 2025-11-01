@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import './SceneListWindow.scss';
 import { CustomEventType, postMessage } from '../../../libs/stateEvents';
+import { isSceneLocked } from '../../../state/utils/sceneUtils';
 
 interface SceneListWindowProps {
   availableScenes: string[];
@@ -29,7 +30,6 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
   const currentIndicators = useAppSelector(selectCurrentIndicators);
   const currentScene = useAppSelector(selectCurrentScene);
   const userName = useAppSelector((state) => state.settings.user.name);
-  const isPremium = useAppSelector((state) => state.settings.user.isPremium);
 
   const [topFadeSize, setTopFadeSize] = useState(0);
   const [bottomFadeSize, setBottomFadeSize] = useState(0);
@@ -72,7 +72,7 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
 
   const handleGoToScene = (sceneId: string) => {
     const scene = scenes.find((s) => s.id === sceneId);
-    const isLocked = scene && scene.characters.length > 2 && !isPremium;
+    const isLocked = isSceneLocked(scene);
 
     if (isLocked) {
       postMessage(CustomEventType.OPEN_PREMIUM);
@@ -175,7 +175,7 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
 
               orderedScenes.forEach((sceneId) => {
                 const sceneData = scenes.find((s) => s.id === sceneId);
-                const isLocked = sceneData && sceneData.characters.length > 2 && !isPremium;
+                const isLocked = isSceneLocked(sceneData);
                 if (isLocked) {
                   lockedScenes.push(sceneId);
                 } else {
@@ -195,7 +195,7 @@ export const SceneListWindow = ({ availableScenes, onClose }: SceneListWindowPro
                 if (!sceneData) return null;
 
                 const isCurrentScene = currentScene && sceneId === currentScene.id;
-                const isLocked = sceneData.characters.length > 2 && !isPremium;
+                const isLocked = isSceneLocked(sceneData);
                 const currentCharacterName = useAppSelector(
                   (state) => state.novel.characters.find((c) => c.id === sceneData.characters[0]?.characterId)?.name,
                 );

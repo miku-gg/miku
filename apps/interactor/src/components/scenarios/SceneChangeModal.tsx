@@ -13,6 +13,7 @@ import { useI18n } from '../../libs/i18n';
 import { addIndicatorToScene } from '../../state/slices/novelSlice';
 import { navigateToScene } from '../../state/slices/narrationSlice';
 import { CustomEventType, postMessage } from '../../libs/stateEvents';
+import { isSceneLocked } from '../../state/utils/sceneUtils';
 
 export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) => {
   const { assetLinkLoader, isInteractionDisabled } = useAppContext();
@@ -25,8 +26,7 @@ export const SceneChangeModal = ({ customSceneId }: { customSceneId?: string }) 
   const currentCharacterName = useAppSelector(
     (state) => state.novel.characters.find((c) => c.id === scene?.characters[0]?.characterId)?.name,
   );
-  const isPremium = useAppSelector((state) => state.settings.user.isPremium);
-  const isLocked = scene && scene.characters.length > 2 && !isPremium;
+  const isLocked = isSceneLocked(scene);
 
   const handleConfirm = () => {
     if (isLocked) {
