@@ -31,6 +31,8 @@ import config from '../../config';
 import { getEdgeParams, graphToTree, setAllNodesPosition } from './utils.js';
 import { RiDragMove2Line, RiEdit2Line, RiFileCopyLine } from 'react-icons/ri';
 import { DuplicateSceneModal } from './DuplicateSceneModal';
+import { PremiumBadge } from '../../components/PremiumBadge';
+import { isSceneLocked } from '../../utils/sceneUtils';
 
 function FloatingEdge({ id, source, target, markerEnd, style }: Edge) {
   const sourceNode = useStore(useCallback((store) => store.nodeInternals.get(source), [source]));
@@ -61,6 +63,7 @@ const SceneNode = ({
   title: string;
   background: string;
   characters: string[];
+  isPremium: boolean;
   onOpenDuplicateModal: (sceneId: string, event: React.MouseEvent) => void;
 }>) => {
   const connectionNodeId = useStore((state) => state.connectionNodeId);
@@ -81,6 +84,7 @@ const SceneNode = ({
       <div className="SceneNode" style={{ backgroundImage: `url(${data.background})` }}>
         {!isConnecting && <Handle className="customHandleSource" position={Position.Right} type="source" />}
         <Handle className="customHandleTarget" position={Position.Left} type="target" isConnectableStart={false} />
+        {data.isPremium && <PremiumBadge position="top-right" showTooltip={false} />}
         <div className="SceneNode__title">
           {data.title} <RiDragMove2Line />
         </div>
@@ -122,6 +126,7 @@ const generateNodes = (
         characters: scene.characters.map((char) =>
           config.genAssetLink(char.profile_pic || '', AssetDisplayPrefix.PROFILE_PIC_SMALL),
         ),
+        isPremium: isSceneLocked(scene),
         onOpenDuplicateModal,
       },
     };

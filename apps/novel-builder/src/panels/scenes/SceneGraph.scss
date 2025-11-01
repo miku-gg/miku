@@ -32,6 +32,12 @@
   user-select: none;
   cursor: pointer;
 
+  .PremiumBadge {
+    &__icon {
+      font-size: 1em;
+    }
+  }
+
   &:hover {
     box-shadow: 0px 0px 10px 0px rgb(205 95 234);
   }

@@ -7,6 +7,9 @@ import { v4 as randomUUID } from 'uuid';
 import { openModal } from '../../state/slices/inputSlice';
 import { createObjective } from '../../state/slices/novelFormSlice';
 import { useAppDispatch, useAppSelector } from '../../state/store';
+import { PremiumBadge } from '../../components/PremiumBadge';
+import { isSceneLocked } from '../../utils/sceneUtils';
+import { selectScenes } from '../../state/selectors';
 
 import './NovelObjectives.scss';
 
@@ -35,6 +38,7 @@ export const getTextFromActionType = (type: NovelV3.NovelActionType) => {
 export const NovelObjectives = ({ selectedObjectiveIds, onSelectObjective, tooltipText }: NovelObjectiveProps) => {
   const dispatch = useAppDispatch();
   const objectives = useAppSelector((state) => state.novel.objectives);
+  const scenes = useAppSelector(selectScenes);
 
   const handleCreateObjective = () => {
     const id = randomUUID();
@@ -44,6 +48,22 @@ export const NovelObjectives = ({ selectedObjectiveIds, onSelectObjective, toolt
   const isSelected = (id: string) => {
     if (!selectedObjectiveIds) return false;
     return selectedObjectiveIds.includes(id);
+  };
+
+  const hasPremiumAction = (objective: NovelV3.NovelObjective): boolean => {
+    return objective.actions.some((action) => {
+      if (action.type === NovelV3.NovelActionType.SUGGEST_ADVANCE_SCENE) {
+        const scene = scenes.find((s) => s.id === action.params.sceneId);
+        return isSceneLocked(scene?._source);
+      }
+      if (action.type === NovelV3.NovelActionType.ADD_CHILD_SCENES) {
+        return action.params.children?.some((childId) => {
+          const childScene = scenes.find((s) => s.id === childId);
+          return isSceneLocked(childScene?._source);
+        });
+      }
+      return false;
+    });
   };
 
   return (
@@ -84,6 +104,9 @@ export const NovelObjectives = ({ selectedObjectiveIds, onSelectObjective, toolt
                     onSelectObjective && onSelectObjective(id);
                   }}
                 >
+                  {hasPremiumAction(objective) && (
+                    <PremiumBadge position="top-right" showTooltip={true} tooltipText="Contains a premium scene" />
+                  )}
                   <FaPencil
                     className="NovelObjectives__container__edit"
                     onClick={(e: React.MouseEvent) => {

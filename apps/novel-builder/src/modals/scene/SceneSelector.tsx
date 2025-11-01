@@ -8,6 +8,8 @@ import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { AssetDisplayPrefix } from '@mikugg/bot-utils';
+import { PremiumBadge } from '../../components/PremiumBadge';
+import { isSceneLocked } from '../../utils/sceneUtils';
 
 interface SceneSelectorProps {
   opened: boolean;
@@ -59,7 +61,10 @@ export const SceneSelectorModal = ({
                   )})`,
                 }}
               >
-                <div className="SceneNode__title">{scene.name}</div>
+                <div className="SceneNode__title">
+                  {isSceneLocked(scene._source) && <PremiumBadge position="inline" showTooltip={false} />}
+                  {scene.name}
+                </div>
                 <div className="SceneNode__characters">
                   {scene.characters.map((character, index) => (
                     <img
@@ -128,7 +133,10 @@ export default function SceneSelector({
                 )})`,
               }}
             >
-              <div className="SceneNode__title">{scene.name}</div>
+              <div className="SceneNode__title">
+                {isSceneLocked(scene._source) && <PremiumBadge position="inline" showTooltip={false} />}
+                {scene.name}
+              </div>
               {!nonDeletable && (
                 <FaTrashAlt
                   className="SceneNode__delete"

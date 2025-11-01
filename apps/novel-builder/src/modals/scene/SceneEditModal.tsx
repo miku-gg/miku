@@ -5,6 +5,8 @@ import { AiOutlinePicture } from 'react-icons/ai';
 import { FaUser } from 'react-icons/fa6';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { MdZoomIn, MdComputer, MdPhoneAndroid } from 'react-icons/md';
+import { PremiumBadge } from '../../components/PremiumBadge';
+import { isSceneLocked } from '../../utils/sceneUtils';
 import { TokenDisplayer } from '../../components/TokenDisplayer';
 import config from '../../config';
 import { TOKEN_LIMITS } from '../../data/tokenLimits';
@@ -157,6 +159,16 @@ export default function SceneEditModal() {
         shouldCloseOnOverlayClick
         onCloseModal={() => dispatch(closeModal({ modalType: 'scene' }))}
       >
+        {scene && isSceneLocked(scene._source) && (
+          <div
+            className="SceneEditModal__premium-notice"
+            data-tooltip-id="premium-notice-tooltip"
+            data-tooltip-content="More than two characters"
+          >
+            <em>This scene is premium only</em>
+            <Tooltip id="premium-notice-tooltip" place="bottom" />
+          </div>
+        )}
         {scene ? (
           <div className="SceneEditModal__content">
             <div className="SceneEditModal__background-container">
@@ -179,6 +191,7 @@ export default function SceneEditModal() {
                 {Array.from({ length: characterCount }).map((_, index) => {
                   const activeButtonLimit = (scene?.characters?.length ?? 0) + 1;
                   const isDisabled = index >= activeButtonLimit;
+                  const isPremiumCharacter = index >= 2;
 
                   return (
                     <div
@@ -201,6 +214,13 @@ export default function SceneEditModal() {
                       data-index={index}
                     >
                       <FaUser /> {index + 1}
+                      {isPremiumCharacter && (
+                        <PremiumBadge
+                          position="top-right"
+                          className="SceneEditModal__character-premium-badge"
+                          showTooltip={false}
+                        />
+                      )}
                     </div>
                   );
                 })}
